@@ -188,7 +188,7 @@ class CustomHelper {
 		}
 	}
 
-	public static function sendNotification($table_name = null,$table_id = null,$title = null,$note = null,$to = null){
+	public static function sendNotification($table_name = null, $table_id = null, $title = null, $note = null, $to = null){
 		
 		$menu = Menu::where('table_name',$table_name)->first();
 
@@ -269,7 +269,7 @@ class CustomHelper {
 				foreach($rgrd as $rowdetail){
 					$index = -1;
 
-					$rowtotal = $rowdetail->getRowTotal();
+					$rowtotal = $rowdetail->getRowTotal() * $rowdetail->goodReceipt->purchaseOrder->currency_rate;
 
 					foreach($arrCoa as $key => $rowcek){
 						if($rowcek['coa_id'] == $rowdetail->item->itemGroup->coa_id){
@@ -293,7 +293,8 @@ class CustomHelper {
 						$data->warehouse_id,
 						$rowdetail->item_id,
 						$rowdetail->qtyConvert(),
-						$rowtotal,'IN',
+						$rowtotal,
+						'IN',
 						$data->post_date
 					);
 
@@ -310,9 +311,9 @@ class CustomHelper {
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row['coa_id'],
-						'company_id'	=> isset($data) ? $data->place->company->id : NULL,
+						'company_id'	=> isset($data) ? $data->company_id : NULL,
 						'place_id'		=> isset($data) ? $data->place_id : NULL,
-						'department_id'	=> isset($data) ? $data->purchaseOrder->department_id : NULL,
+						'department_id'	=> isset($data) ? $data->department_id : NULL,
 						'warehouse_id'	=> isset($data) ? $data->warehouse_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row['total']

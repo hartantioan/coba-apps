@@ -1,0 +1,595 @@
+<!-- BEGIN: Page Main-->
+<div id="main">
+    <div class="row">
+        <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
+            <!-- Search for small screen-->
+            <div class="container">
+                <div class="row">
+                    <div class="col s12 m6 l6">
+                        <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
+                    </div>
+                    <div class="col s12 m6 l6 right-align-md">
+                        <ol class="breadcrumbs mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(2))) }}</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(3))) }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(4))) }}
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12">
+            <div class="container">
+                <div class="section section-data-tables">
+                    <!-- DataTables example -->
+                    <div class="row">
+                        <div class="col s12">
+                            <div class="card-panel">
+                                <div class="row">
+                                    <div class="col s12 ">
+                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
+                                            <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                <option value="">Semua</option>
+                                                <option value="1">Aktif</option>
+                                                <option value="2">Non-Aktif</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4 class="card-title">List Data
+                                        <a href="{{ url('admin/setting/menu') }}" class="waves-effect waves-light btn gradient-45deg-purple-deep-orange gradient-shadow right">Kembali ke Menu</a>
+                                    </h4>
+                                    <div class="row mt-3">
+                                        <div class="col s12">
+                                            <table id="datatable_serverside" class="display responsive-table wrap">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Kode</th>
+                                                        <th>Approval</th>
+                                                        <th>Level</th>
+                                                        <th>isCekNominal</th>
+                                                        <th>Tanda Cek</th>
+                                                        <th>Nominal Cek</th>
+                                                        <th>Min.Approve</th>
+                                                        <th>Min.Reject</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-overlay"></div>
+        </div>
+    </div>
+</div>
+
+<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 85% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>Add/Edit Approval Dokumen</h4>
+                <form class="row" id="form_data" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="input-field col s6">
+                            <input type="hidden" id="temp" name="temp">
+                            <input type="hidden" id="tempMenu" name="tempMenu" value="{{ $menu->id }}">
+                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <label class="active" for="code">Kode</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="form-control" id="approval_id" name="approval_id">
+                                @foreach($approval as $a)
+                                    <option value="{{ $a->id }}">{{ $a->name.' - '.$a->document_text }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="approval_id">Tipe Approval</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="level" name="level" type="number" placeholder="Level" step="1" value="1" min="1">
+                            <label class="active" for="level">Level</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="min_approve" name="min_approve" type="number" placeholder="Min.Approve" step="1" value="1" min="1">
+                            <label class="active" for="min_approve">Minimal Approve</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="min_reject" name="min_reject" type="number" placeholder="Min.Reject" step="1" value="1" min="1">
+                            <label class="active" for="min_reject">Minimal Reject</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
+                                <label for="status">Status</label>
+                                <label class="right">
+                                    Non-Active
+                                    <input checked type="checkbox" id="status" name="status" value="1">
+                                    <span class="lever"></span>
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col s12 row">
+                            <h6 class="center-align">Apakah ada syarat nominal?</h6>
+                            <div class="input-field col s12 center-align">
+                                <div class="switch mb-1">
+                                    <label class="center">
+                                        Tidak
+                                        <input type="checkbox" id="is_check_nominal" name="is_check_nominal" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="input-field col s6">
+                                <select class="form-control" disabled id="sign" name="sign">
+                                    <option value=">">> (lebih dari)</option>
+                                    <option value=">=">>= (lebih dari sama dengan)</option>
+                                    <option value="=">= (sama dengan)</option>
+                                    <option value="<">< (kurang dari)</option>
+                                    <option value="<="><= (kurang dari sama dengan)</option>
+                                </select>
+                                <label class="active" for="sign">Operasi</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="nominal" name="nominal" disabled type="text" placeholder="Nominal" onkeyup="formatRupiah(this)">
+                                <label class="active" for="nominal">Nominal Batas</label>
+                            </div>
+                        </div>
+                        <div class="col m12 s12">
+                            <p class="mt-2 mb-2">
+                                <h4>Detail Karyawan</h4>
+                                <div style="overflow:auto;">
+                                    <table class="bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Nama</th>
+                                                <th class="center">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-user">
+                                            <tr id="last-row-user">
+                                                <td colspan="2" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addUser()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Karyawan
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </p>
+                        </div>
+                        <div class="col s12 mt-3">
+                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
+<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
+        <i class="material-icons">add</i>
+    </a>
+</div>
+
+<!-- END: Page Main-->
+<script>
+    $(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+
+        $('#datatable_serverside').on('click', 'td.details-control', function() {
+            var tr    = $(this).closest('tr');
+            var badge = tr.find('button.btn-floating');
+            var icon  = tr.find('i');
+            var row   = table.row(tr);
+
+            if(row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                badge.first().removeClass('red');
+                badge.first().addClass('green');
+                icon.first().html('add');
+            } else {
+                row.child(rowDetail(row.data())).show();
+                tr.addClass('shown');
+                badge.first().removeClass('green');
+                badge.first().addClass('red');
+                icon.first().html('remove');
+            }
+        });
+        
+        loadDataTable();
+        
+        $('#modal1').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#code').focus();
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#temp').val('');
+                M.updateTextFields();
+                $('#status').prop( "checked", true);
+                $('#is_check_nominal').prop( "checked", false);
+                $('#sign').attr('disabled',true).formSelect();
+                $('#nominal').attr('disabled',true);
+                $('#form_data')[0].reset();
+                $('.row_user').each(function(){
+                    $(this).remove();
+                });
+            }
+        });
+
+        $('#body-user').on('click', '.delete-data-user', function() {
+            $(this).closest('tr').remove();
+        });
+
+        $('#is_check_nominal').click(function(){
+            if($(this).is(':checked')){
+                $('#sign').attr('disabled',false).formSelect();
+                $('#nominal').attr('disabled',false);
+            }else{
+                $('#sign').attr('disabled',true).formSelect();
+                $('#nominal').attr('disabled',true);
+            }
+        });
+    });
+
+    function rowDetail(data) {
+        var content = '';
+        $.ajax({
+            url: '{{ Request::url() }}/row_detail',
+            type: 'GET',
+            async: false,
+            data: {
+                id: $(data[0]).data('id')
+            },
+            success: function(response) {
+                content += response;
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+        return content;
+	}
+
+    function addUser(){
+        var count = makeid(10);
+        $('#last-row-user').before(`
+            <tr class="row_user">
+                <td>
+                    <select class="browser-default" id="arr_user` + count + `" name="arr_user[]"></select>
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-user" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_user' + count, '{{ url("admin/select2/employee") }}');
+    }
+
+    function loadDataTable() {
+		window.table = $('#datatable_serverside').DataTable({
+            "responsive": false,
+            "scrollX": true,
+            "stateSave": true,
+            "serverSide": true,
+            "deferRender": true,
+            "destroy": true,
+            "iDisplayInLength": 10,
+            "order": [[1, 'asc']],
+            ajax: {
+                url: '{{ Request::url() }}/datatable',
+                type: 'GET',
+                data: {
+                    status : $('#filter_status').val(),
+                },
+                beforeSend: function() {
+                    loadingOpen('#datatable_serverside');
+                },
+                complete: function() {
+                    loadingClose('#datatable_serverside');
+                },
+                error: function() {
+                    loadingClose('#datatable_serverside');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            },
+            columns: [
+                { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'code', className: 'center-align' },
+                { name: 'approval', className: 'center-align' },
+                { name: 'level', className: 'center-align' },
+                { name: 'isCekNominal', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'sign', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'nominal', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'min_approve', className: 'center-align' },
+                { name: 'min_reject', className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+            ]
+        });
+        $('select[name="datatable_serverside_length"]').addClass('browser-default');
+	}
+
+    function save(){
+
+        var passed = true, passed2 = true;
+
+        if($('#is_check_nominal').is(':checked')){
+            passed = false;
+
+            if($('#sign').val() && $('#nominal').val()){
+                passed = true;
+            }
+        }
+
+        if($('#user_id').val() == null && $('#position_id').val() == ''){
+            passed2 = false;
+        }
+
+        if(passed == true){
+            if(passed2 == true){
+                var formData = new FormData($('#form_data')[0]);
+        
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            $('#parent_id').empty();
+
+                            $.each(response.data, function(i, val) {
+                                $('#parent_id').append(val);
+                            });
+                            
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }else{
+                M.toast({
+                    html: 'Anda harus memilih pegawai atau posisi.'
+                });
+            }
+        }else{
+            M.toast({
+                html: 'Tanda operasi matematika dan nominal tidak boleh kosong.'
+            });
+        }
+    }
+
+    function success(){
+        loadDataTable();
+        $('#modal1').modal('close');
+    }
+
+    function show(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal1').modal('open');
+                
+                $('#temp').val(id);
+                $('#code').val(response.code);
+                $('#approval_id').val(response.approval_id).formSelect();
+                $('#level').val(response.level);
+                $('#min_approve').val(response.min_approve);
+                $('#min_reject').val(response.min_reject);
+
+                if(response.status == '1'){
+                    $('#status').prop( "checked", true);
+                }else{
+                    $('#status').prop( "checked", false);
+                }
+
+                if(response.details.length > 0){
+                    $('.row_user').each(function(){
+                        $(this).remove();
+                    });
+
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        $('#last-row-user').before(`
+                            <tr class="row_user">
+                                <td>
+                                    <select class="browser-default" id="arr_user` + count + `" name="arr_user[]"></select>
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-user" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+
+                        select2ServerSide('#arr_user' + count, '{{ url("admin/select2/employee") }}');
+                        
+                        $('#arr_user' + count).append(`
+                            <option value="` + val.user_id + `">` + val.user_name + `</value>
+                        `);
+                    });
+                }
+
+                if(response.is_check_nominal == '1'){
+                    $('#is_check_nominal').prop( "checked", true);
+                    $('#sign').attr('disabled',false).formSelect();
+                    $('#nominal').attr('disabled',false);
+                    $('#sign').val(response.sign).formSelect();
+                    $('#nominal').val(response.nominal);
+                }else{
+                    $('#is_check_nominal').prop( "checked", false);
+                    $('#sign').attr('disabled',true).formSelect();
+                    $('#nominal').attr('disabled',true);
+                }
+
+                $('.modal-content').scrollTop(0);
+                $('#code').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function destroy(id){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Anda tidak bisa mengembalikan data yang terhapus!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/destroy',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+</script>

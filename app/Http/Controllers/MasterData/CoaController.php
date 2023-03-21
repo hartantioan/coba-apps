@@ -1,0 +1,360 @@
+<?php
+
+namespace App\Http\Controllers\MasterData;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Coa;
+use App\Models\Company;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportCoa;
+
+class CoaController extends Controller
+{
+    public function index()
+    {
+        $data = [
+            'title'     => 'Chart of Account (COA)',
+            'content'   => 'admin.master_data.coa',
+            'coa'       => Coa::where('status','1')->get(),
+            'company'   => Company::where('status','1')->get(),
+        ];
+
+        return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function datatable(Request $request){
+        $column = [
+            'id',
+            'code',
+            'name',
+            'company_id',
+            'parent_id',
+            'level',
+        ];
+
+        $start  = $request->start;
+        $length = $request->length;
+        $order  = $column[$request->input('order.0.column')];
+        $dir    = $request->input('order.0.dir');
+        $search = $request->input('search.value');
+
+        $total_data = Coa::count();
+        
+        $query_data = Coa::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhereHas('company',function($query) use($search, $request){
+                                $query->where('code', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%");
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
+                if($request->company){
+                    $query->where('company_id', $request->company);
+                }
+
+                if($request->type){
+                    $query->where(function($query) use ($request){
+                        foreach($request->type as $row){
+                            if($row == '1'){
+                                $query->OrWhereNotNull('is_confidential');
+                            }
+                            if($row == '2'){
+                                $query->OrWhereNotNull('is_control_account');
+                            }
+                            if($row == '3'){
+                                $query->OrWhereNotNull('is_cash_account');
+                            }
+                        }
+                    });
+                }
+            })
+            ->offset($start)
+            ->limit($length)
+            ->orderBy($order, $dir)
+            ->get();
+
+        $total_filtered = Coa::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhereHas('company',function($query) use($search, $request){
+                                $query->where('code', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%");
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
+                if($request->company){
+                    $query->where('company_id', $request->company);
+                }
+
+                if($request->type){
+                    $query->where(function($query) use ($request){
+                        foreach($request->type as $row){
+                            if($row == '1'){
+                                $query->OrWhereNotNull('is_confidential');
+                            }
+                            if($row == '2'){
+                                $query->OrWhereNotNull('is_control_account');
+                            }
+                            if($row == '3'){
+                                $query->OrWhereNotNull('is_cash_account');
+                            }
+                        }
+                    });
+                }
+            })
+            ->count();
+
+        $response['data'] = [];
+        if($query_data <> FALSE) {
+            $nomor = $start + 1;
+            foreach($query_data as $val) {
+				
+                $space = ' - ';
+                $pretext = '';
+
+                for($i=1;$i<=$val->level;$i++){
+                    $pretext .= $space;
+                }
+
+                $response['data'][] = [
+                    $nomor,
+                    $pretext.$val->code,
+                    $val->name,
+                    $val->company->name,
+                    $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
+                    $val->level,
+                    $val->is_confidential ? '&#10003;' : '&#10005;',
+                    $val->is_control_account ? '&#10003;' : '&#10005;',
+                    $val->is_cash_account ? '&#10003;' : '&#10005;',
+                    $val->status(),
+                    '
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
+					'
+                ];
+
+                $nomor++;
+            }
+        }
+
+        $response['recordsTotal'] = 0;
+        if($total_data <> FALSE) {
+            $response['recordsTotal'] = $total_data;
+        }
+
+        $response['recordsFiltered'] = 0;
+        if($total_filtered <> FALSE) {
+            $response['recordsFiltered'] = $total_filtered;
+        }
+
+        return response()->json($response);
+    }
+
+    public function show(Request $request){
+        $coa = Coa::find($request->id);
+        $coa['parent_id'] = $coa->parentSub()->exists() ? $coa->parent_id : '';
+        $coa['parent_name'] = $coa->parentSub()->exists() ? $coa->parentSub->name : '';
+ 		return response()->json($coa);
+    }
+
+    public function create(Request $request){
+        $validation = Validator::make($request->all(), [
+			'code' 				=> $request->temp ? ['required', Rule::unique('coas', 'code')->ignore($request->temp)] : 'required|unique:coas,code',
+            'name'              => 'required',
+            'company_id'        => 'required',
+			'level'		        => 'required',
+		], [
+			'code.required' 	    => 'Kode tidak boleh kosong.',
+            'code.unique' 	        => 'Kode telah terpakai.',
+			'name.required' 	    => 'Nama tidak boleh kosong.',
+            'company_id.required'   => 'Perusahaan tidak boleh kosong.',
+			'level.required'	    => 'Level tidak boleh kosong.',
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+			if($request->temp){
+                DB::beginTransaction();
+                try {
+                    $query = Coa::find($request->temp);
+                    $query->code = $request->code;
+                    $query->name = $request->name;
+                    $query->company_id = $request->company_id;
+                    $query->parent_id = $request->parent_id ? $request->parent_id : NULL;
+                    $query->level = $request->level;
+                    $query->status = $request->status ? $request->status : '2';
+                    $query->is_confidential = $request->is_confidential ? $request->is_confidential : NULL;
+                    $query->is_control_account = $request->is_control_account ? $request->is_control_account : NULL;
+                    $query->is_cash_account = $request->is_cash_account ? $request->is_cash_account : NULL;
+                    $query->save();
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+
+			}else{
+                DB::beginTransaction();
+                try {
+                    $query = Coa::create([
+                        'code'			        => $request->code,
+                        'name'			        => $request->name,
+                        'company_id'            => $request->company_id,
+                        'parent_id'	            => $request->parent_id ? $request->parent_id : NULL,
+                        'level'                 => $request->level,
+                        'is_confidential'       => $request->is_confidential ? $request->is_confidential : NULL,
+                        'is_control_account'    => $request->is_control_account ? $request->is_control_account : NULL,
+                        'is_cash_account'       => $request->is_cash_account ? $request->is_cash_account : NULL,
+                        'status'                => $request->status ? $request->status : '2'
+                    ]);
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}
+			
+			if($query) {
+
+                activity()
+                    ->performedOn(new Coa())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit coa data.');
+
+                $newdata = [];
+
+                $newdata[] = '<option value="">Parent (Utama)</option>';
+
+                foreach(Coa::whereNull('parent_id')->get() as $m){
+                    $newdata[] = '<option value="'.$m->id.'">'.$m->code.' '.$m->name.'</option>';
+                    foreach($m->childSub as $m2){
+                        $newdata[] = '<option value="'.$m2->id.'"> - '.$m2->code.' '.$m2->name.'</option>';
+                        foreach($m2->childSub as $m3){
+                            $newdata[] = '<option value="'.$m3->id.'"> - - '.$m3->code.' '.$m3->name.'</option>';
+                            foreach($m3->childSub as $m4){
+                                $newdata[] = '<option value="'.$m4->id.'"> - - - '.$m4->code.' '.$m4->name.'</option>';
+                                foreach($m4->childSub as $m5){
+                                    $newdata[] = '<option value="'.$m5->id.'"> - - - - '.$m5->code.' '.$m5->name.'</option>';
+                                }
+                            }
+                        }
+                    }
+                }
+
+				$response = [
+					'status'    => 200,
+					'message'   => 'Data successfully saved.',
+                    'data'      => $newdata
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+		
+		return response()->json($response);
+    }
+
+    public function destroy(Request $request){
+        $query = Coa::find($request->id);
+		
+        if($query->delete()) {
+            activity()
+                ->performedOn(new Coa())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the coa data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function print(Request $request){
+
+        $data = [
+            'title' => 'COA REPORT',
+            'data' => Coa::where(function ($query) use ($request) {
+                if($request->search) {
+                    $query->where(function($query) use ($request) {
+                        $query->where('code', 'like', "%$request->search%")
+                            ->orWhere('name', 'like', "%$request->search%")
+                            ->orWhereHas('company',function($query) use($request){
+                                $query->where('code', 'like', "%$request->search%")
+                                    ->orWhere('name', 'like', "%$request->search%");
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
+                if($request->company){
+                    $query->where('company_id', $request->company);
+                }
+
+                if($request->type){
+                    $query->where(function($query) use ($request){
+                        foreach($request->type as $row){
+                            if($row == '1'){
+                                $query->OrWhereNotNull('is_confidential');
+                            }
+                            if($row == '2'){
+                                $query->OrWhereNotNull('is_control_account');
+                            }
+                            if($row == '3'){
+                                $query->OrWhereNotNull('is_cash_account');
+                            }
+                        }
+                    });
+                }
+            })->get()
+		];
+		
+		return view('admin.print.master_data.coa', $data);
+    }
+
+    public function export(Request $request){
+        $search = $request->search ? $request->search : '';
+        $status = $request->status ? $request->status : '';
+        $company = $request->company ? $request->company : 0;
+        $type = $request->type ? $request->type : '';
+		
+		return Excel::download(new ExportCoa($search,$status,$company,$type), 'coa_'.uniqid().'.xlsx');
+    }
+}

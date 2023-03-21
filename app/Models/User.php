@@ -53,7 +53,8 @@ class User extends Authenticatable
         'married_status',
         'married_date',
         'children',
-        'last_change_password'
+        'last_change_password',
+        'country_id'
     ];
 
     protected $hidden = [
@@ -228,6 +229,10 @@ class User extends Authenticatable
 
     public function city(){
         return $this->belongsTo('App\Models\Region','city_id','id')->withTrashed();
+    }
+
+    public function country(){
+        return $this->belongsTo('App\Models\Country','country_id','id')->withTrashed();
     }
 
     public function company(){

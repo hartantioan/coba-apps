@@ -268,12 +268,16 @@ class UserController extends Controller
                                 <th>'.$data->address.'</th>
                             </tr>
                             <tr>
+                                <th>Kota/Kabupaten</th>
+                                <th>'.$data->city->name.'</th>
+                            </tr>
+                            <tr>
                                 <th>Provinsi</th>
                                 <th>'.$data->province->name.'</th>
                             </tr>
                             <tr>
                                 <th>Kota/Kabupaten</th>
-                                <th>'.$data->city->name.'</th>
+                                <th>'.$data->country->name.'</th>
                             </tr>
                             <tr>
                                 <th>Cabang</th>
@@ -389,7 +393,8 @@ class UserController extends Controller
                 'department_id'     => 'required',
                 'position_id'       => 'required',
                 'province_id'       => 'required',
-                'city_id'           => 'required'
+                'city_id'           => 'required',
+                'country_id'        => 'required',
             ], [
                 'name.required' 	    => 'Nama tidak boleh kosong.',
                 'username.required'     => 'Username tidak boleh kosong.',
@@ -408,6 +413,7 @@ class UserController extends Controller
                 'position_id.required'  => 'Posisi / level tidak boleh kosong.',
                 'province_id.required'  => 'Provinsi tidak boleh kosong.',
                 'city_id.required'      => 'Kota tidak boleh kosong.',
+                'country_id.required'   => 'Negara tidak boleh kosong.',
             ]);
         }else{
             $validation = Validator::make($request->all(), [
@@ -421,7 +427,8 @@ class UserController extends Controller
                 'pic'               => 'required',
                 'pic_no'            => 'required',
                 'office_no'         => 'required',
-                'limit_credit'      => 'required'
+                'limit_credit'      => 'required',
+                'country_id'        => 'required',
             ], [
                 'name.required' 	    => 'Nama tidak boleh kosong.',
                 'phone.required'        => 'Telepon tidak boleh kosong.',
@@ -435,7 +442,8 @@ class UserController extends Controller
                 'pic.required'          => 'PIC tidak boleh kosong.',
                 'pic_no.required'       => 'Nomor PIC tidak boleh kosong.',
                 'office_no.required'    => 'Nomor Kantor tidak boleh kosong.',
-                'limit_credit.required' => 'Limit credit tidak boleh kosong.'
+                'limit_credit.required' => 'Limit credit tidak boleh kosong.',
+                'country_id.required'   => 'Negara tidak boleh kosong.',
             ]);
         }
 
@@ -479,6 +487,7 @@ class UserController extends Controller
                     $query->married_status  = $request->type == '1' ? $request->married_status :NULL;
                     $query->married_date    = $request->type == '1' ? $request->married_date :NULL;
                     $query->children        = $request->type == '1' ? $request->children :NULL;
+                    $query->country_id      = $request->country_id;
                     $query->save();
 
                     $query->userBank()->delete();
@@ -523,6 +532,7 @@ class UserController extends Controller
                         'married_status'=> $request->type == '1' ? $request->married_status :NULL,
                         'married_date'  => $request->type == '1' ? $request->married_date :NULL,
                         'children'      => $request->type == '1' ? $request->children :NULL,
+                        'country_id'    => $request->country_id,
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
@@ -711,6 +721,7 @@ class UserController extends Controller
         $user = User::find($request->id);
         $user['province_name'] = $user->province->name;
         $user['city_name'] = $user->city->name;
+        $user['country_name'] = $user->country->name;
         $user['limit_credit'] = $user->limit_credit ? number_format($user->limit_credit, 0, ',', '.') : '';
 
         $banks = [];

@@ -52,6 +52,7 @@ return new class extends Migration
             $table->char('married_date')->nullable();
             $table->integer('children',2)->nullable();
             $table->timestamp('last_change_password')->nullable();
+            $table->bigInteger('country_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
         });

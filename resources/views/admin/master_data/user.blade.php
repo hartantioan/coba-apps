@@ -265,6 +265,10 @@
                             <label class="active" for="city_id">Kota/Kabupaten</label>
                         </div>
                         <div class="input-field col s3">
+                            <select class="browser-default" id="country_id" name="country_id"></select>
+                            <label class="active" for="country_id">Negara Asal</label>
+                        </div>
+                        <div class="input-field col s3">
                             <select id="group_id" name="group_id">
                                 <option value="">--Kosong--</option>
                                 @foreach($group as $row)
@@ -726,8 +730,7 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('#type').val('1');
-                $('#province_id').empty();
-                $('#city_id').empty();
+                $('#province_id,#city_id,#country_id').empty();
                 M.updateTextFields();
                 $('.row_bank').remove();
                 $('.row_info').remove();
@@ -765,6 +768,7 @@
 
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
+        select2ServerSide('#country_id', '{{ url("admin/select2/country") }}');
 
         $('#body-bank').on('click', '.delete-data-bank', function() {
             $(this).closest('tr').remove();
@@ -1255,11 +1259,17 @@
                 $("#address").val(response.address);
                 $('#type').val(response.type).trigger('change').formSelect();
                 
+                $('#province_id,#city_id,#country_id').empty();
+
                 $('#province_id').append(`
                     <option value="` + response.province_id + `">` + response.province_name + `</option>
                 `);
                 $('#city_id').append(`
                     <option value="` + response.city_id + `">` + response.city_name + `</option>
+                `);
+
+                $('#country_id').append(`
+                    <option value="` + response.country_id + `">` + response.country_name + `</option>
                 `);
 
                 $('#tax_id').val(response.tax_id);

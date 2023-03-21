@@ -26,6 +26,7 @@ class GoodReceipt extends Model
         'document_date',
         'company_id',
         'place_id',
+        'department_id',
         'warehouse_id',
         'document',
         'note',
@@ -46,6 +47,11 @@ class GoodReceipt extends Model
     public function supplier()
     {
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
+    }
+
+    public function department()
+    {
+        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
     public function purchaseOrder()

@@ -311,10 +311,9 @@ class CustomHelper {
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row['coa_id'],
-						'company_id'	=> isset($data) ? $data->company_id : NULL,
-						'place_id'		=> isset($data) ? $data->place_id : NULL,
-						'department_id'	=> isset($data) ? $data->department_id : NULL,
-						'warehouse_id'	=> isset($data) ? $data->warehouse_id : NULL,
+						'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+						'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+						'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row['total']
 					]);
@@ -364,6 +363,7 @@ class CustomHelper {
 							'coa_id'		=> $row['coa_id'],
 							'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
 							'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+							'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
 							'type'			=> '1',
 							'nominal'		=> $row['total']
 						]);
@@ -379,6 +379,7 @@ class CustomHelper {
 					'coa_id'		=> $row->coa_id,
 					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
 					'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+					'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
 					'type'			=> $row->type,
 					'nominal'		=> $nominal
 				]);

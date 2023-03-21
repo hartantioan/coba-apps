@@ -25,6 +25,7 @@ use App\Models\Department;
 use App\Models\Position;
 use App\Models\Menu;
 use App\Models\MenuUser;
+use App\Models\Group;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportUser;
 use App\Helpers\CustomHelper;
@@ -40,7 +41,7 @@ class UserController extends Controller
             'warehouse'     => Warehouse::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
             'position'      => Position::where('status','1')->orderBy('order')->get(),
-            'bank'          => Bank::where('status','1')->get(),
+            'group'         => Group::where('status','1')->get(),
             'menu'          => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'       => 'admin.master_data.user'
         ];
@@ -359,6 +360,10 @@ class UserController extends Controller
                                 <th>'.implode('<br>',$infos).'</th>
                             </tr>
                             <tr>
+                                <th>Kelompok</th>
+                                <th>'.($data->group()->exists() ? $data->group->name : '-').'</th>
+                            </tr>
+                            <tr>
                                 <th>Terakhir Ubah Password</th>
                                 <th>'.$data->last_change_password.'</th>
                             </tr>
@@ -451,6 +456,7 @@ class UserController extends Controller
                     $query->email           = $request->email;
                     $query->address	        = $request->address;
                     $query->type            = $request->type;
+                    $query->group_id        = $request->group_id ? $request->group_id : NULL;
                     $query->id_card         = $request->id_card ? $request->id_card : NULL;
                     $query->id_card_address = $request->id_card_address;
                     $query->company_id	    = $request->company_id ? $request->company_id : NULL;
@@ -494,6 +500,7 @@ class UserController extends Controller
                         'email'	        => $request->email,
                         'address'	    => $request->address,
                         'type'          => $request->type,
+                        'group_id'      => $request->group_id ? $request->group_id : NULL,
                         'id_card'	    => $request->id_card,
                         'id_card_address' => $request->id_card_address,
                         'company_id'	=> $request->company_id ? $request->company_id : NULL,

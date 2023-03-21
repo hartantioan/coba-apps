@@ -20,7 +20,7 @@ class DepartmentController extends Controller
     public function index()
     {
         $data = [
-            'title' => 'Cabang',
+            'title' => 'Departemen',
             'content' => 'admin.master_data.department'
         ];
 

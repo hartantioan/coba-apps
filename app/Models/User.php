@@ -31,6 +31,7 @@ class User extends Authenticatable
         'id_card',
         'id_card_address',
         'type',
+        'group_id',
         'status',
         'company_id',
         'plant_id',
@@ -218,27 +219,31 @@ class User extends Authenticatable
     }
 
     public function province(){
-        return $this->belongsTo('App\Models\Region','province_id','id');
+        return $this->belongsTo('App\Models\Region','province_id','id')->withTrashed();
+    }
+
+    public function group(){
+        return $this->belongsTo('App\Models\Group','group_id','id')->withTrashed();
     }
 
     public function city(){
-        return $this->belongsTo('App\Models\Region','city_id','id');
+        return $this->belongsTo('App\Models\Region','city_id','id')->withTrashed();
     }
 
     public function company(){
-        return $this->belongsTo('App\Models\Company','company_id','id');
+        return $this->belongsTo('App\Models\Company','company_id','id')->withTrashed();
     }
 
     public function place(){
-        return $this->belongsTo('App\Models\Place','place_id','id');
+        return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
 
     public function department(){
-        return $this->belongsTo('App\Models\Department','department_id','id');
+        return $this->belongsTo('App\Models\Department','department_id','id')->withTrashed();
     }
 
     public function position(){
-        return $this->belongsTo('App\Models\Position','position_id','id');
+        return $this->belongsTo('App\Models\Position','position_id','id')->withTrashed();
     }
 
     public function availablePurchaseOrder(){

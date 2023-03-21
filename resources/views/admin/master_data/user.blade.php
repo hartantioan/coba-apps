@@ -265,6 +265,15 @@
                             <label class="active" for="city_id">Kota/Kabupaten</label>
                         </div>
                         <div class="input-field col s3">
+                            <select id="group_id" name="group_id">
+                                <option value="">--Kosong--</option>
+                                @foreach($group as $row)
+                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                @endforeach
+                            </select>
+                            <label for="group_id">Kelompok Partner Bisnis</label>
+                        </div>
+                        <div class="input-field col s3">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -1259,6 +1268,7 @@
                 $('#id_card').val(response.id_card);
                 $('#id_card_address').val(response.id_card_address);
                 $('#gender').val(response.gender).formSelect();
+                $('#group_id').val(response.group_id).formSelect();
 
                 if(response.type == '1'){
                     $('#company_id').val(response.company_id).formSelect();

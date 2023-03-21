@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('id_card')->nullable();
             $table->string('id_card_address')->nullable();
             $table->char('type', 2)->nullable();
+            $table->bigInteger('group_id')->nullable();
             $table->char('status', 1)->nullable();
             $table->bigInteger('company_id')->nullable();
             $table->bigInteger('place_id')->nullable();

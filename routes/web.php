@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\MasterData\ItemController;
 use App\Http\Controllers\MasterData\ItemGroupController;
 use App\Http\Controllers\MasterData\UserController;
+use App\Http\Controllers\MasterData\GroupController;
 use App\Http\Controllers\MasterData\CompanyController;
 use App\Http\Controllers\MasterData\PlaceController;
 use App\Http\Controllers\MasterData\DepartmentController;
@@ -177,6 +178,14 @@ Route::prefix('admin')->group(function () {
                     Route::get('export',[DepartmentController::class, 'export']);
                     Route::post('create',[DepartmentController::class, 'create'])->middleware('operation.access:department,update');
                     Route::post('destroy', [DepartmentController::class, 'destroy'])->middleware('operation.access:department,delete');
+                });
+
+                Route::prefix('group')->middleware('operation.access:group,view')->group(function () {
+                    Route::get('/',[GroupController::class, 'index']);
+                    Route::get('datatable',[GroupController::class, 'datatable']);
+                    Route::post('show', [GroupController::class, 'show']);
+                    Route::post('create',[GroupController::class, 'create'])->middleware('operation.access:group,update');
+                    Route::post('destroy', [GroupController::class, 'destroy'])->middleware('operation.access:group,delete');
                 });
 
                 Route::prefix('position')->middleware('operation.access:position,view')->group(function () {

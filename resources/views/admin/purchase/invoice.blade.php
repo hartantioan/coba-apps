@@ -562,6 +562,16 @@
     function countAll(){
         var total = 0, tax = 0, grandtotal = 0, downpayment = parseFloat($('#downpayment').val().replaceAll(".", "").replaceAll(",",".")), balance = 0;
         
+        if($('input[name^="arr_code"]').length > 0){
+            $('input[name^="arr_code"]').each(function(){
+                let element = $(this);
+                if($(element).is(':checked')){
+                    ada = true;
+                    total += parseFloat($('input[name^="arr_code"][id=' +  + ']' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
+                }
+            });
+        }
+
         $('input[name^="arr_total"]').each(function(){
             total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });

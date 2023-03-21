@@ -257,6 +257,8 @@ class CustomHelper {
 				'code'			=> Journal::generateCode(),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
+				'currency_id'	=> $data->currency_id,
+				'currency_rate'	=> $data->currency_rate,
 				'post_date'		=> $data->post_date,
 				'note'			=> $data->code,
 			]);

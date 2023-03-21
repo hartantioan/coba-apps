@@ -21,13 +21,15 @@ return new class extends Migration
             $table->string('code', 50)->unique();
             $table->string('lookable_type')->nullable();
             $table->bigInteger('lookable_id')->nullable();
+            $table->bigInteger('currency_id')->nullable();
+            $table->double('currency_rate')->nullable();
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'lookable_type', 'lookable_id']);
+            $table->index(['user_id', 'account_id', 'lookable_type', 'lookable_id', 'currency_id']);
         });
     }
 

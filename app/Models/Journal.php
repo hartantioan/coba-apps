@@ -20,6 +20,8 @@ class Journal extends Model
         'code',
         'lookable_type',
         'lookable_id',
+        'currency_id',
+        'currency_rate',
         'post_date',
         'due_date',
         'note'
@@ -31,6 +33,10 @@ class Journal extends Model
 
     public function account(){
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
+    }
+    
+    public function currency(){
+        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
     public function lookable(){

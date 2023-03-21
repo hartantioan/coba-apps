@@ -28,6 +28,8 @@ class GoodReceipt extends Model
         'place_id',
         'department_id',
         'warehouse_id',
+        'currency_id',
+        'currency_rate',
         'document',
         'note',
         'total',
@@ -52,6 +54,11 @@ class GoodReceipt extends Model
     public function department()
     {
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
     public function purchaseOrder()

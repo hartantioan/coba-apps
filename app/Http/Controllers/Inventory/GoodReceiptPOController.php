@@ -291,6 +291,8 @@ class GoodReceiptPOController extends Controller
                         $query->place_id = $purchase_order->place_id;
                         $query->department_id = $purchase_order->department_id;
                         $query->warehouse_id = $request->warehouse_id;
+                        $query->currency_id = $purchase_order->currency_id;
+                        $query->currency_rate = $purchase_order->currency_rate;
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->total = round($total,3);
@@ -329,6 +331,8 @@ class GoodReceiptPOController extends Controller
                         'place_id'		        => $purchase_order->place_id,
                         'department_id'		    => $purchase_order->department_id,
                         'warehouse_id'          => $request->warehouse_id,
+                        'currency_id'           => $purchase_order->currency_id,
+                        'currency_rate'         => $purchase_order->currency_rate,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_receipts') : NULL,
                         'note'                  => $request->note,
                         'total'                 => round($total,3),

@@ -28,6 +28,8 @@ return new class extends Migration
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
+            $table->bigInteger('currency_id')->nullable();
+            $table->double('currency_rate')->nullable();
             $table->string('document')->nullable();
             $table->text('note')->nullable();
             $table->double('total')->nullable();
@@ -40,7 +42,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'purchase_order_id', 'company_id', 'place_id', 'department_id', 'warehouse_id']);
+            $table->index(['user_id', 'account_id', 'purchase_order_id', 'company_id', 'place_id', 'department_id', 'warehouse_id', 'currency_id']);
         });
     }
 

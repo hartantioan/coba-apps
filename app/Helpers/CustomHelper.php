@@ -245,8 +245,10 @@ class CustomHelper {
 			$query->where('table_name',$table_name);
 		})->get();
 
+		$data = DB::table($table_name)->where('id',$table_id)->first();
+
 		if(count($journalMap) > 0){
-			$data = DB::table($table_name)->where('id',$table_id)->first();
+			
 			$arrdata = get_object_vars($data);
 
 			$query = Journal::create([
@@ -284,9 +286,24 @@ class CustomHelper {
 						];
 					}
 
-					self::sendCogs('good_receipts',$data->id,$data->place->company->id,$data->place_id,$data->warehouse_id,$rowdetail->item_id,$rowdetail->qtyConvert(),$rowtotal,'IN',$data->post_date);
+					self::sendCogs('good_receipts',
+						$data->id,
+						$data->company_id,
+						$data->place_id,
+						$data->warehouse_id,
+						$rowdetail->item_id,
+						$rowdetail->qtyConvert(),
+						$rowtotal,'IN',
+						$data->post_date
+					);
 
-					self::sendStock($data->place_id,$data->warehouse_id,$rowdetail->item_id,$rowdetail->qtyConvert(),'IN');
+					self::sendStock(
+						$data->place_id,
+						$data->warehouse_id,
+						$rowdetail->item_id,
+						$rowdetail->qtyConvert(),
+						'IN'
+					);
 				}
 				
 				foreach($arrCoa as $row){

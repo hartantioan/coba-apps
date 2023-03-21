@@ -24,6 +24,7 @@ return new class extends Migration
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
             $table->date('document_date')->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
             $table->string('document')->nullable();
@@ -38,7 +39,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'purchase_order_id', 'place_id', 'warehouse_id']);
+            $table->index(['user_id', 'account_id', 'purchase_order_id', 'company_id', 'place_id', 'warehouse_id']);
         });
     }
 

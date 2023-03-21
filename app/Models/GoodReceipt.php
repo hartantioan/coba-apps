@@ -24,6 +24,7 @@ class GoodReceipt extends Model
         'post_date',
         'due_date',
         'document_date',
+        'company_id',
         'place_id',
         'warehouse_id',
         'document',
@@ -65,6 +66,11 @@ class GoodReceipt extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function company()
+    {
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function goodReceiptDetail()

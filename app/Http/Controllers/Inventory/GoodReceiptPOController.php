@@ -287,6 +287,7 @@ class GoodReceiptPOController extends Controller
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
+                        $query->company_id = $purchase_order->place->company_id;
                         $query->place_id = $purchase_order->place_id;
                         $query->warehouse_id = $request->warehouse_id;
                         $query->document = $document;
@@ -323,6 +324,7 @@ class GoodReceiptPOController extends Controller
                         'post_date'             => $request->post_date,
                         'due_date'              => $request->due_date,
                         'document_date'         => $request->document_date,
+                        'company_id'		    => $purchase_order->place->company_id,
                         'place_id'		        => $purchase_order->place_id,
                         'warehouse_id'          => $request->warehouse_id,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_receipts') : NULL,

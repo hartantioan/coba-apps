@@ -22,6 +22,7 @@ return new class extends Migration
             $table->bigInteger('purchase_order_id')->nullable();
             $table->bigInteger('good_receipt_id')->nullable();
             $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('department_id')->nullable();
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
             $table->string('reference', 155)->nullable();

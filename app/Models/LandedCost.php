@@ -22,6 +22,7 @@ class LandedCost extends Model
         'purchase_order_id',
         'good_receipt_id',
         'place_id',
+        'department_id',
         'post_date',
         'due_date',
         'reference',
@@ -78,6 +79,11 @@ class LandedCost extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function department()
+    {
+        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
     public function landedCostDetail()

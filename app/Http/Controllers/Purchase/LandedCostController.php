@@ -22,6 +22,13 @@ use App\Models\User;
 
 class LandedCostController extends Controller
 {
+    protected $dataplaces;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user->userPlaceArray();
+    }
     public function index()
     {
         $data = [
@@ -88,11 +95,7 @@ class LandedCostController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
-
-        $total_data = LandedCost::whereIn('place_id',$dataplaces)->count();
+        $total_data = LandedCost::whereIn('place_id',$this->dataplaces)->count();
         
         $query_data = LandedCost::where(function($query) use ($search, $request) {
                 if($search) {
@@ -148,7 +151,7 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$dataplaces)
+            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -208,7 +211,7 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$dataplaces)
+            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -347,7 +350,8 @@ class LandedCostController extends Controller
                         $query->account_id = $request->vendor_id;
                         $query->purchase_order_id = $gr->purchase_order_id;
                         $query->good_receipt_id = $gr->id;
-                        $query->branch_id = session('bo_branch_id');
+                        $query->place_id = $gr->place_id;
+                        $query->department_id = $gr->department_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->reference = $request->reference;
@@ -389,7 +393,8 @@ class LandedCostController extends Controller
                         'account_id'                => $request->vendor_id,
                         'purchase_order_id'	        => $gr->purchase_order_id,
                         'good_receipt_id'	        => $gr->id,
-                        'branch_id'                 => session('bo_branch_id'),
+                        'place_id'                  => $gr->place_id,
+                        'department_id'             => $gr->department_id,
                         'post_date'                 => $request->post_date,
                         'due_date'                  => $request->due_date,
                         'reference'                 => $request->reference,
@@ -683,10 +688,6 @@ class LandedCostController extends Controller
 
     public function print(Request $request){
 
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
-
         $data = [
             'title' => 'LANDED COST REPORT',
             'data' => LandedCost::where(function ($query) use ($request) {
@@ -743,7 +744,7 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$dataplaces)
+            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -751,7 +752,7 @@ class LandedCostController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportLandedCost($request->search,$request->status,$request->is_tax,$request->is_include_tax,$request->vendor,$request->currency), 'landed_cost'.uniqid().'.xlsx');
+		return Excel::download(new ExportLandedCost($request->search,$request->status,$request->is_tax,$request->is_include_tax,$request->vendor,$request->currency,$this->dataplaces), 'landed_cost'.uniqid().'.xlsx');
     }
     
     public function test(){

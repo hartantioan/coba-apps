@@ -19,8 +19,7 @@ class PurchaseDownPayment extends Model
         'code',
         'user_id',
         'account_id',
-        'branch_id',
-        'plant_id',
+        'place_id',
         'department_id',
         'is_tax',
         'is_include_tax',
@@ -99,19 +98,14 @@ class PurchaseDownPayment extends Model
         return $type;
     }
 
-    public function branch()
-    {
-        return $this->belongsTo('App\Models\Branch', 'branch_id', 'id')->withTrashed();
-    }
-
     public function currency()
     {
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
-    public function plant()
+    public function place()
     {
-        return $this->belongsTo('App\Models\Plant', 'plant_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
     public function department()

@@ -80,23 +80,12 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_branch" style="font-size:1rem;">Cabang :</label>
+                                                <label for="filter_place" style="font-size:1rem;">Pabrik/Kantor :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_branch" onchange="loadDataTable()">
+                                                    <select class="form-control" id="filter_place" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
-                                                        @foreach ($branch as $rowbranch)
-                                                            <option value="{{ $rowbranch->id }}">{{ $rowbranch->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_plant" style="font-size:1rem;">Pabrik :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_plant" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        @foreach ($plant as $rowplant)
-                                                            <option value="{{ $rowplant->id }}">{{ $rowplant->name }}</option>
+                                                        @foreach ($place as $row)
+                                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->company->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -171,8 +160,7 @@
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Supplier</th>
-                                                        <th rowspan="2">Cabang</th>
-                                                        <th rowspan="2">Pabrik</th>
+                                                        <th rowspan="2">Pabrik/Kantor</th>
                                                         <th rowspan="2">Departemen</th>
                                                         <th colspan="3" class="center-align">Pajak</th>
                                                         <th rowspan="2">Tipe</th>
@@ -239,19 +227,10 @@
                                 <label class="" for="type">Tipe</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="branch_id" name="branch_id">
+                                <select class="form-control" id="place_id" name="place_id">
                                     <option value="">--Kosong--</option>
-                                    @foreach ($branch as $rowbranch)
-                                        <option value="{{ $rowbranch->id }}" {{ $rowbranch->id == session('bo_branch_id') ? 'selected' : '' }}>{{ $rowbranch->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="branch_id">Cabang</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="plant_id" name="plant_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($plant as $rowplant)
-                                        <option value="{{ $rowplant->id }}" {{ $rowplant->id == session('bo_plant_id') ? 'selected' : '' }}>{{ $rowplant->name }}</option>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="" for="plant_id">Pabrik</label>
@@ -582,6 +561,17 @@
                     });
                 }
             });
+        }else{
+            $('#body-purchase').append(`
+                <tr id="empty-purchase">
+                    <td colspan="8" class="center">
+                        Pilih supplier untuk memulai...
+                    </td>
+                </tr>
+            `);
+            $('.row_purchase').each(function(){
+                $(this).remove();
+            });
         }
     }
 
@@ -661,7 +651,7 @@
                     status : $('#filter_status').val(),
                     type : $('#filter_type').val(),
                     'supplier_id[]' : $('#filter_supplier').val(),
-                    branch_id : $('#filter_branch').val(),
+                    place_id : $('#filter_place').val(),
                     plant_id : $('#filter_plant').val(),
                     department_id : $('#filter_department').val(),
                     is_tax : $('#filter_is_tax').val(),
@@ -688,8 +678,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'supplier_id', className: 'center-align' },
-                { name: 'branch_id', className: 'center-align' },
-                { name: 'plant_id', className: 'center-align' },
+                { name: 'place_id', className: 'center-align' },
                 { name: 'department_id', className: 'center-align' },
                 { name: 'is_tax', className: 'center-align' },
                 { name: 'is_include_tax', className: 'center-align' },
@@ -878,8 +867,7 @@
                     <option value="` + response.account_id + `">` + response.supplier_name + `</option>
                 `);
                 $('#type').val(response.type).formSelect();
-                $('#branch_id').val(response.branch_id).formSelect();
-                $('#plant_id').val(response.plant_id).formSelect();
+                $('#place_id').val(response.place_id).formSelect();
                 $('#department_id').val(response.department_id).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
@@ -1045,7 +1033,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), branch = $('#filter_branch').val(), plant = $('#filter_plant').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
         
         $.ajax({
             type : "POST",
@@ -1054,8 +1042,7 @@
                 search : search,
                 status : status,
                 type : type,
-                branch : branch,
-                plant : plant,
+                place : place,
                 department : department,
                 is_tax : is_tax,
                 is_include_tax : is_include_tax,
@@ -1076,8 +1063,8 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), branch = $('#filter_branch').val(), plant = $('#filter_plant').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&branch=" + branch + "&plant=" + plant + "&department=" + department + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&supplier=" + supplier + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&place=" + place + "&department=" + department + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&supplier=" + supplier + "&currency=" + currency;
     }
 </script>

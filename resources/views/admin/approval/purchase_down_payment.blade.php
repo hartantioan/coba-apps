@@ -255,13 +255,7 @@
                     <tr>
                         <td colspan="7" rowspan="6">
                             Rekening :
-                            @if(count($data->supplier->userBank) > 0)
-                            <ul>
-                                @foreach ($data->supplier->userBank as $row)
-                                    <li>{{ $row->bank->name.' Rek. '.$row->bank->account_no.' '.$data->currency->document_text }}</li>
-                                @endforeach
-                            </ul>
-                            @endif
+                            {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">
                                 Catatan : {{ $data->note }}
                             </div>
@@ -300,7 +294,7 @@
         <div class="invoice-subtotal">
             <div class="row">
                 <div class="col m6 s6 l6">
-                    {!! ucwords(strtolower($data->user->branch->city->name)).', '.CustomHelper::tgl_indo($data->document_date) !!}
+                    {!! ucwords(strtolower($data->user->place->city->name)).', '.CustomHelper::tgl_indo($data->document_date) !!}
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">

@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Purchase;
+
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -17,20 +19,27 @@ use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseDownPaymentDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseDownPayment;
-use App\Models\Branch;
-use App\Models\Plant;
+use App\Models\Place;
+use App\Models\User;
 use App\Models\Department;
 
 class PurchaseDownPaymentController extends Controller
 {
+    protected $dataplaces;
+
+    public function __construct(){
+        $user = User::find(Session::get('bo_id'));
+
+        $this->dataplaces = $user->userPlaceArray();
+    }
+
     public function index()
     {
         $data = [
             'title'         => 'Purchase Down Payment',
             'content'       => 'admin.purchase.down_payment',
             'currency'      => Currency::where('status','1')->get(),
-            'branch'        => Branch::where('status','1')->get(),
-            'plant'         => Plant::where('status','1')->get(),
+            'place'         => Place::whereIn('id',$this->dataplaces)->get(),
             'department'    => Department::where('status','1')->get()
         ];
 
@@ -62,8 +71,7 @@ class PurchaseDownPaymentController extends Controller
             'code',
             'user_id',
             'account_id',
-            'branch_id',
-            'plant_id',
+            'place_id',
             'department_id',
             'is_tax',
             'is_included_tax',
@@ -89,7 +97,7 @@ class PurchaseDownPaymentController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseDownPayment::where('branch_id',session('bo_branch_id'))->count();
+        $total_data = PurchaseDownPayment::whereIn('place_id',$this->dataplaces)->count();
         
         $query_data = PurchaseDownPayment::where(function($query) use ($search, $request) {
                 if($search) {
@@ -128,13 +136,9 @@ class PurchaseDownPaymentController extends Controller
                 if($request->supplier_id){
                     $query->whereIn('account_id',$request->supplier_id);
                 }
-
-                if($request->branch_id){
-                    $query->where('branch_id',$request->branch_id);
-                }
                 
-                if($request->plant_id){
-                    $query->where('plant_id',$request->plant_id);
+                if($request->place_id){
+                    $query->where('place_id',$request->place_id);
                 }
 
                 if($request->department_id){
@@ -157,7 +161,7 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->where('branch_id',session('bo_branch_id'))
+            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -201,12 +205,8 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('account_id',$request->supplier_id);
                 }
 
-                if($request->branch_id){
-                    $query->where('branch_id',$request->branch_id);
-                }
-                
-                if($request->plant_id){
-                    $query->where('plant_id',$request->plant_id);
+                if($request->place_id){
+                    $query->where('place_id',$request->place_id);
                 }
 
                 if($request->department_id){
@@ -229,7 +229,7 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->where('branch_id',session('bo_branch_id'))
+            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -241,8 +241,7 @@ class PurchaseDownPaymentController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->supplier->name,
-                    $val->branch->name,
-                    $val->plant->name,
+                    $val->place->name.' - '.$val->place->company->name,
                     $val->department->name,
                     $val->isTax(),
                     $val->isIncludeTax(),
@@ -290,8 +289,7 @@ class PurchaseDownPaymentController extends Controller
         $validation = Validator::make($request->all(), [
 			'supplier_id' 				=> 'required',
 			'type'                      => 'required',
-            'branch_id'                 => 'required',
-            'plant_id'                  => 'required',
+            'place_id'                  => 'required',
             'department_id'             => 'required',
             'post_date'                 => 'required',
             'due_date'                  => 'required',
@@ -302,8 +300,7 @@ class PurchaseDownPaymentController extends Controller
 		], [
 			'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
 			'type.required'                     => 'Tipe tidak boleh kosong',
-            'branch_id.required'                => 'Cabang tidak boleh kosong,',
-            'plant_id.required'                 => 'Pabrik tidak boleh kosong.',
+            'place_id.required'                 => 'Pabrik tidak boleh kosong.',
             'department_id.required'            => 'Departemen tidak boleh kosong.',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
@@ -370,8 +367,7 @@ class PurchaseDownPaymentController extends Controller
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->supplier_id;
                         $query->type = $request->type;
-                        $query->branch_id = $request->branch_id;
-                        $query->plant_id = $request->plant_id;
+                        $query->place_id = $request->place_id;
                         $query->department_id = $request->department_id;
                         $query->is_tax = $request->is_tax ? $request->is_tax : NULL;
                         $query->is_include_tax = $request->is_include_tax ? $request->is_include_tax : '0';
@@ -413,8 +409,7 @@ class PurchaseDownPaymentController extends Controller
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
                         'type'	                    => $request->type,
-                        'branch_id'                 => $request->branch_id,
-                        'plant_id'                  => $request->plant_id,
+                        'place_id'                  => $request->place_id,
                         'department_id'             => $request->department_id,
                         'is_tax'                    => $request->is_tax ? $request->is_tax : NULL,
                         'is_include_tax'            => $request->is_include_tax ? $request->is_include_tax : '0',
@@ -727,13 +722,9 @@ class PurchaseDownPaymentController extends Controller
                 if($request->supplier){
                     $query->whereIn('account_id',$request->supplier);
                 }
-
-                if($request->branch){
-                    $query->where('branch_id',$request->branch);
-                }
                 
-                if($request->plant){
-                    $query->where('plant_id',$request->plant);
+                if($request->place){
+                    $query->where('place_id',$request->place);
                 }
 
                 if($request->department){
@@ -756,7 +747,7 @@ class PurchaseDownPaymentController extends Controller
                     $query->where('is_include_tax',$request->is_include_tax);
                 }
             })
-            ->where('branch_id',session('bo_branch_id'))
+            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -764,6 +755,6 @@ class PurchaseDownPaymentController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPurchaseDownPayment($request->search,$request->status,$request->type,$request->branch,$request->plant,$request->department,$request->is_tax,$request->is_include_tax,$request->supplier,$request->currency), 'purchase_down_payment_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseDownPayment($request->search,$request->status,$request->type,$request->place,$request->department,$request->is_tax,$request->is_include_tax,$request->supplier,$request->currency,$this->dataplaces), 'purchase_down_payment_'.uniqid().'.xlsx');
     }
 }

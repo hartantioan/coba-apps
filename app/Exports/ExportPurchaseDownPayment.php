@@ -16,18 +16,18 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $type = null, string $branch = null, string $plant = null, string $department = null, string $is_tax = null, string $is_include_tax = null, string $supplier = null, string $currency = null)
+    public function __construct(string $search = null, string $status = null, string $type = null, string $place = null, string $department = null, string $is_tax = null, string $is_include_tax = null, string $supplier = null, string $currency = null,array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
         $this->type = $type ? $type : '';
-        $this->branch = $branch ? $branch : '';
-        $this->plant = $plant ? $plant : '';
+        $this->place = $place ? $place : '';
         $this->department = $department ? $department : '';
         $this->is_tax = $is_tax ? $is_tax : '';
         $this->is_include_tax = $is_include_tax ? $is_include_tax : '';
         $this->supplier = $supplier ? $supplier : '';
         $this->currency = $currency ? $currency : '';
+        $this->dataplaces = $dataplaces ? $dataplaces : [];
     }
 
     private $headings = [
@@ -85,13 +85,9 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
             if($this->supplier){
                 $query->whereIn('account_id',$this->supplier);
             }
-
-            if($this->branch){
-                $query->where('branch_id',$this->branch);
-            }
             
-            if($this->plant){
-                $query->where('plant_id',$this->plant);
+            if($this->place){
+                $query->where('place_id',$this->place);
             }
 
             if($this->department){
@@ -114,7 +110,7 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
                 $query->where('is_include_tax',$this->is_include_tax);
             }
         })
-        ->where('branch_id',session('bo_branch_id'))
+        ->whereIn('place_id',$this->dataplaces)
         ->get();
 
         $arr = [];

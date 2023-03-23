@@ -241,11 +241,12 @@ class CustomHelper {
 	}
 
 	public static function sendJournal($table_name = null,$table_id = null,$account_id = null){
-		$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
-			$query->where('table_name',$table_name);
-		})->get();
 
 		$data = DB::table($table_name)->where('id',$table_id)->first();
+
+		$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
+			$query->where('table_name',$table_name);
+		})->where('currency_id',$data->currency_id)->get();
 
 		if(count($journalMap) > 0){
 			

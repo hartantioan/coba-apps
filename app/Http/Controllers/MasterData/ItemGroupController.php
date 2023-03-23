@@ -24,7 +24,8 @@ class ItemGroupController extends Controller
             'title'     => 'Grup Item',
             'content'   => 'admin.master_data.item_group',
             'parent'    => ItemGroup::where('status','1')->get(),
-            'coa'       => Coa::where('status', '1')->oldest('code')->get()
+            /* 'coa'       => Coa::where('status', '1')->oldest('code')->get() */
+            'coa'       => Coa::where('status', '1')->where('level',5)->oldest('code')->get()
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

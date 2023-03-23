@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Menu;
+use App\Models\Currency;
 use App\Models\MenuCoa;
 
 class MenuCoaController extends Controller
@@ -19,6 +20,7 @@ class MenuCoaController extends Controller
         $data = [
             'title'     => 'Menu x Coa',
             'content'   => 'admin.setting.menu_coa',
+            'currency'  => Currency::where('status','1')->get(),
             'menu'      => Menu::whereDoesntHave('sub')->whereNotNull('table_name')->get(),
         ];
 
@@ -126,6 +128,7 @@ class MenuCoaController extends Controller
         foreach($cek as $row){
             $arrDetails[] = [
                 'menu_id'       => $row->menu_id,
+                'currency_id'   => $row->currency_id,
                 'coa_id'        => $row->coa_id,
                 'coa_name'      => $row->coa->code.' - '.$row->coa->name,
                 'field_name'    => $row->field_name,
@@ -148,6 +151,7 @@ class MenuCoaController extends Controller
                 'arr_coa'                   => 'required|array',
                 'arr_percent'               => 'required|array',
                 'arr_field'                 => 'required|array',
+                'arr_currency'              => 'required|array',
             ], [
                 'temp.required'             => 'Menu tidak boleh kosong.',
                 'arr_type.required'         => 'Tipe tidak boleh kosong.',
@@ -158,6 +162,8 @@ class MenuCoaController extends Controller
                 'arr_percent.array'         => 'Prosentase haruslah dalam bentuk array',
                 'arr_field.required'        => 'Kolom tidak boleh kosong.',
                 'arr_field.array'           => 'Kolom haruslah dalam bentuk array',
+                'arr_currency.required'     => 'Mata uang tidak boleh kosong.',
+                'arr_currency.array'        => 'Mata uang haruslah dalam bentuk array',
             ]);
         }else{
             $validation = Validator::make($request->all(), [
@@ -188,6 +194,7 @@ class MenuCoaController extends Controller
                             'user_id'       => session('bo_id'),
                             'menu_id'       => $request->temp,
                             'coa_id'        => $request->arr_coa[$key],
+                            'currency_id'   => $request->arr_currency[$key],
                             'field_name'    => $request->arr_field[$key],
                             'type'          => $row,
                             'percentage'    => str_replace(',','.',str_replace('.','',$request->arr_percent[$key]))

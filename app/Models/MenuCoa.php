@@ -18,6 +18,7 @@ class MenuCoa extends Model
         'user_id',
         'menu_id',
         'coa_id',
+        'currency_id',
         'field_name',
         'type',
         'percentage',
@@ -36,5 +37,10 @@ class MenuCoa extends Model
     public function coa()
     {
         return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 }

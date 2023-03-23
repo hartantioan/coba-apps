@@ -125,42 +125,8 @@
                         <div class="input-field col s6">
                             <select class="select2 browser-default" id="coa_id" name="coa_id">
                                 <option value="">-- Pilih Coa --</option>
-                                @foreach($coa->whereNull('parent_id') as $c)
-                                        @if(!$c->childSub()->exists())
-                                            <option value="{{ $c->id }}"> - {{ $c->code.' - '.$c->name }}</option>
-                                        @else
-                                            <optgroup label=" - {{ $c->code.' - '.$c->name }}">
-                                            @foreach($c->child() as $bc)
-                                                @if(!$bc->childSub()->exists())
-                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->code.' - '.$bc->name }}</option>
-                                                @else
-                                                    <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
-                                                        @foreach($bc->child() as $bcc)
-                                                            @if(!$bcc->childSub()->exists())
-                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->code.' - '.$bcc->name }}</option>
-                                                            @else
-                                                                <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
-                                                                    @foreach($bcc->child() as $bccc)
-                                                                        @if(!$bccc->childSub()->exists())
-                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->code.' - '.$bccc->name }}</option>
-                                                                        @else
-                                                                            <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
-                                                                                @foreach($bccc->child() as $bcccc)
-                                                                                    @if(!$bcccc->childSub()->exists())
-                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->code.' - '.$bcccc->name }}</option>
-                                                                                    @endif
-                                                                                @endforeach
-                                                                            </optgroup>
-                                                                        @endif
-                                                                    @endforeach
-                                                                </optgroup>
-                                                            @endif
-                                                        @endforeach
-                                                    </optgroup>
-                                                @endif
-                                            @endforeach
-                                            </optgroup>
-                                        @endif
+                                @foreach($coa as $c)
+                                    <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
                                 @endforeach
                             </select>
                             <label class="active" for="coa_id">Coa</label>

@@ -22,17 +22,20 @@ use App\Models\Department;
 
 class PurchaseOrderController extends Controller
 {
-    public function index()
-    {
+    protected $dataplaces;
+
+    public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $dataplaces = $user->userPlaceArray();
-
+        $this->dataplaces = $user->userPlaceArray();
+    }
+    public function index()
+    {
         $data = [
             'title'         => 'Purchase Order',
             'content'       => 'admin.purchase.order',
             'currency'      => Currency::where('status','1')->get(),
-            'place'         => Place::where('status','1')->whereIn('id',$dataplaces)->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'    => Department::where('status','1')->get()
         ];
 
@@ -80,11 +83,7 @@ class PurchaseOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
-
-        $total_data = PurchaseOrder::whereIn('place_id',$dataplaces)->count();
+        $total_data = PurchaseOrder::whereIn('place_id',$this->dataplaces)->count();
         
         $query_data = PurchaseOrder::where(function($query) use ($search, $request) {
                 if($search) {
@@ -154,7 +153,7 @@ class PurchaseOrderController extends Controller
                 }
 
             })
-            ->whereIn('place_id',$dataplaces)
+            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -227,7 +226,7 @@ class PurchaseOrderController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$dataplaces)
+            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -812,9 +811,6 @@ class PurchaseOrderController extends Controller
     }
 
     public function print(Request $request){
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
 
         $data = [
             'title' => 'PURCHASE ORDER REPORT',
@@ -885,7 +881,7 @@ class PurchaseOrderController extends Controller
                     $query->whereIn('currency_id',$request->currency);
                 }
             })
-            ->whereIn('place_id',$dataplaces)
+            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -893,10 +889,6 @@ class PurchaseOrderController extends Controller
     }
 
     public function export(Request $request){
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
-
-		return Excel::download(new ExportPurchaseOrder($request->search,$request->status,$request->type,$request->shipping,$request->place,$request->department,$request->is_tax,$request->is_include_tax,$request->payment,$request->supplier,$request->currency,$dataplaces), 'purchase_order_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseOrder($request->search,$request->status,$request->type,$request->shipping,$request->place,$request->department,$request->is_tax,$request->is_include_tax,$request->payment,$request->supplier,$request->currency,$this->dataplaces), 'purchase_order_'.uniqid().'.xlsx');
     }
 }

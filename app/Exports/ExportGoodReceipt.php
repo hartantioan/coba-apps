@@ -15,11 +15,12 @@ class ExportGoodReceipt implements FromCollection, WithTitle, WithHeadings, With
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $warehouse = null)
+    public function __construct(string $search = null, string $status = null, string $warehouse = null, array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
         $this->warehouse = $warehouse ? $warehouse : '';
+        $this->dataplaces = $dataplaces ? $dataplaces : [];
     }
 
     private $headings = [
@@ -74,7 +75,7 @@ class ExportGoodReceipt implements FromCollection, WithTitle, WithHeadings, With
                 $query->whereIn('warehouse_id', $arrWarehouse);
             }
         })
-        ->where('branch_id',session('bo_branch_id'))
+        ->whereIn('place_id',$this->dataplaces)
         ->get();
 
         $arr = [];

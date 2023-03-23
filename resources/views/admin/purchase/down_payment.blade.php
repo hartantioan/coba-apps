@@ -698,8 +698,14 @@
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                'columnsToggle' /* or colvis */
             ]
         });
+        $('.dt-buttons').appendTo('#datatable_buttons');
+        
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 

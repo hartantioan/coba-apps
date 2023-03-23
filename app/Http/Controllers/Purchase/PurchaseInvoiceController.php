@@ -20,21 +20,27 @@ use App\Models\Currency;
 use App\Models\ItemCogs;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportLandedCost;
-use App\Models\Branch;
-use App\Models\Plant;
+use App\Models\Place;
 use App\Models\User;
 use App\Models\Department;
 
 class PurchaseInvoiceController extends Controller
 {
+
+    protected $dataplaces;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user->userPlaceArray();
+    }
     public function index()
     {
         $data = [
             'title'         => 'Invoice Pembelian',
             'content'       => 'admin.purchase.invoice',
             'currency'      => Currency::where('status','1')->get(),
-            'branch'        => Branch::where('status','1')->get(),
-            'plant'         => Plant::where('status','1')->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'    => Department::where('status','1')->get()
         ];
 
@@ -80,8 +86,7 @@ class PurchaseInvoiceController extends Controller
             'code',
             'user_id',
             'account_id',
-            'branch_id',
-            'plant_id',
+            'place_id',
             'department_id',
             'post_date',
             'due_date',
@@ -107,7 +112,7 @@ class PurchaseInvoiceController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseInvoice::where('branch_id',session('bo_branch_id'))->count();
+        $total_data = PurchaseInvoice::whereIn('place_id',$this->dataplaces)->count();
         
         $query_data = PurchaseInvoice::where(function($query) use ($search, $request) {
                 if($search) {
@@ -159,19 +164,15 @@ class PurchaseInvoiceController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
-                if($request->branch_id){
-                    $query->where('branch_id',$request->branch_id);
-                }
-
-                if($request->plant_id){
-                    $query->where('plant_id',$request->plant_id);
+                if($request->place_id){
+                    $query->where('place_id',$request->place_id);
                 }
 
                 if($request->department_id){
                     $query->where('department_id',$request->department_id);
                 }
             })
-            ->where('branch_id',session('bo_branch_id'))
+            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -228,19 +229,15 @@ class PurchaseInvoiceController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
-                if($request->branch_id){
-                    $query->where('branch_id',$request->branch_id);
-                }
-
-                if($request->plant_id){
-                    $query->where('plant_id',$request->plant_id);
+                if($request->place_id){
+                    $query->where('place_id',$request->place_id);
                 }
 
                 if($request->department_id){
                     $query->where('department_id',$request->department_id);
                 }
             })
-            ->where('branch_id',session('bo_branch_id'))
+            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -252,8 +249,7 @@ class PurchaseInvoiceController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->account->name,
-                    $val->branch->name,
-                    $val->plant->name,
+                    $val->place->name.' - '.$val->place->company->name,
                     $val->department->name,
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->due_date)),

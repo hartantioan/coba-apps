@@ -17,6 +17,14 @@ use App\Http\Controllers\Controller;
 
 class Select2Controller extends Controller {
     
+    protected $dataplaces;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user->userPlaceArray();
+    }
+    
     public function city(Request $request)
     {
         $response = [];
@@ -283,9 +291,6 @@ class Select2Controller extends Controller {
 
     public function purchaseRequest(Request $request)
     {
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
 
         $response = [];
         $search   = $request->search;
@@ -310,7 +315,7 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->whereIn('place_id',$dataplaces)
+                ->whereIn('place_id',$this->dataplaces)
                 ->where('status','2')->get();
 
         foreach($data as $d) {
@@ -325,9 +330,6 @@ class Select2Controller extends Controller {
 
     public function purchaseOrder(Request $request)
     {
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
 
         $response = [];
         $search   = $request->search;
@@ -345,7 +347,7 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->whereIn('place_id',$dataplaces)
+                ->whereIn('place_id',$this->dataplaces)
                 ->where('status','2')->get();
 
         foreach($data as $d) {
@@ -435,7 +437,7 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->where('branch_id',session('bo_branch_id'))
+                ->whereIn('place_id',$this->dataplaces)
                 ->where('status','2')->get();
 
         foreach($data as $d) {

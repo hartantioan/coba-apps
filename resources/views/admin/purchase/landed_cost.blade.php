@@ -129,7 +129,7 @@
                                                         <th rowspan="2">Vendor</th>
                                                         <th rowspan="2">PO No.</th>
                                                         <th rowspan="2">GR No.</th>
-                                                        <th rowspan="2">Cabang</th>
+                                                        <th rowspan="2">Pabrik/Kantor</th>
                                                         <th colspan="2" class="center">Tanggal</th>
                                                         <th rowspan="2">No. Referensi</th>
                                                         <th colspan="2" class="center">Mata Uang</th>
@@ -637,8 +637,14 @@
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                'columnsToggle' /* or colvis */
             ]
         });
+        $('.dt-buttons').appendTo('#datatable_buttons');
+        
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 

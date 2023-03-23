@@ -14,12 +14,21 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\GoodReceipt;
+use App\Models\User;
 use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReceipt;
 
 class GoodReceiptPOController extends Controller
 {
+    protected $dataplaces;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user->userPlaceArray();
+    }
+
     public function index()
     {
         $data = [
@@ -52,7 +61,7 @@ class GoodReceiptPOController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReceipt::count();
+        $total_data = GoodReceipt::whereIn('place_id',$this->dataplaces)->count();
         
         $query_data = GoodReceipt::where(function($query) use ($search, $request) {
                 if($search) {
@@ -88,6 +97,7 @@ class GoodReceiptPOController extends Controller
                     $query->whereIn('warehouse_id', $request->warehouse);
                 }
             })
+            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -127,6 +137,7 @@ class GoodReceiptPOController extends Controller
                     $query->whereIn('warehouse_id', $request->warehouse);
                 }
             })
+            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -611,7 +622,7 @@ class GoodReceiptPOController extends Controller
                     $query->whereIn('warehouse_id', $request->warehouse);
                 }
             })
-            ->where('branch_id',session('bo_branch_id'))
+            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -619,6 +630,6 @@ class GoodReceiptPOController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportGoodReceipt($request->search,$request->status,$request->warehouse), 'good_receipt_'.uniqid().'.xlsx');
+		return Excel::download(new ExportGoodReceipt($request->search,$request->status,$request->warehouse,$this->dataplaces), 'good_receipt_'.uniqid().'.xlsx');
     }
 }

@@ -43,7 +43,7 @@ class GoodReceiptDetail extends Model
 
         if($datarow){
             $bobot = $datarow->subtotal / $subtotal;
-            $rowprice = round($datarow->subtotal / $datarow->qty,3);
+            $rowprice = $datarow->subtotal / $datarow->qty;
         }
 
         $total = ($rowprice * $this->qty) - ($bobot * $discount);

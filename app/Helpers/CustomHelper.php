@@ -47,7 +47,7 @@ class CustomHelper {
 				'warehouse_id'	=> $warehouse_id,
 				'item_id'		=> $item_id,
 				'qty_in'		=> $qty,
-				'price_in'		=> round($total / $qty,3),
+				'price_in'		=> $total / $qty,
 				'total_in'		=> $total,
 				'qty_final'		=> $old_data ? $old_data->qty_final + $qty : $qty,
 				'price_final'	=> $old_data ? round((($old_data->total_final + $total) / ($old_data->qty_final + $qty)),3) : round($total / $qty,3),
@@ -57,8 +57,8 @@ class CustomHelper {
 			]);
 		}elseif($type == 'OUT'){
 			if($old_data){
-				$priceeach = round($old_data->total_final / $qty,3);
-				$totalout = $priceeach * $qty;
+				$priceeach = $old_data->total_final / $qty;
+				$totalout = round($priceeach * $qty,3);
 				$qtybalance = $old_data->qty_final - $qty;
 				$totalfinal = round($qtybalance * $priceeach,3);
 				ItemCogs::create([

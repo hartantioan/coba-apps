@@ -39,7 +39,7 @@ class PurchaseDownPaymentController extends Controller
             'title'         => 'Purchase Down Payment',
             'content'       => 'admin.purchase.down_payment',
             'currency'      => Currency::where('status','1')->get(),
-            'place'         => Place::whereIn('id',$this->dataplaces)->get(),
+            'place'         => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
             'department'    => Department::where('status','1')->get()
         ];
 

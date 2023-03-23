@@ -225,7 +225,7 @@ class LandedCostController extends Controller
                     $val->vendor->name,
                     $val->purchaseOrder->code,
                     $val->goodReceipt->code,
-                    $val->branch->name,
+                    $val->place->name.' - '.$val->place->company->name,
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->due_date)),
                     $val->reference,
@@ -596,7 +596,7 @@ class LandedCostController extends Controller
 
                 foreach($query->landedCostDetail as $rowdetail){
                     $pricelc = round($rowdetail->nominal / $rowdetail->qty,3);
-                    $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$query->good_receipt_id)->where('branch_id',$query->branch_id)->where('item_id',$rowdetail->item_id)->first();
+                    $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$query->good_receipt_id)->where('place_id',$query->place_id)->where('item_id',$rowdetail->item_id)->first();
                     if($itemdata){
                         $pricenew = $itemdata->price_in - $pricelc;
                         $itemdata->update([
@@ -604,7 +604,7 @@ class LandedCostController extends Controller
                             'total_in'	=> round($pricenew * $itemdata->qty_in,3),
                         ]);
 
-                        CustomHelper::resetCogsItem($query->branch_id,$rowdetail->item_id);
+                        CustomHelper::resetCogsItem($query->place_id,$rowdetail->item_id);
                     }
                 }
     
@@ -652,7 +652,7 @@ class LandedCostController extends Controller
             
             foreach($query->landedCostDetail as $rowdetail){
                 $pricelc = round($rowdetail->nominal / $rowdetail->qty,3);
-                $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$query->good_receipt_id)->where('branch_id',$query->branch_id)->where('item_id',$rowdetail->item_id)->first();
+                $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$query->good_receipt_id)->where('place_id',$query->place_id)->where('item_id',$rowdetail->item_id)->first();
                 if($itemdata){
                     $pricenew = $itemdata->price_in - $pricelc;
                     $itemdata->update([
@@ -660,7 +660,7 @@ class LandedCostController extends Controller
                         'total_in'	=> round($pricenew * $itemdata->qty_in,3),
                     ]);
 
-                    CustomHelper::resetCogsItem($query->branch_id,$rowdetail->item_id);
+                    CustomHelper::resetCogsItem($query->place_id,$rowdetail->item_id);
                 }
             }
 

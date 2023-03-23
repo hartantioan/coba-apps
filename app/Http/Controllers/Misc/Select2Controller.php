@@ -142,7 +142,8 @@ class Select2Controller extends Controller {
         $data = Coa::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
-                })->whereDoesntHave('childSub')
+                /* })->whereDoesntHave('childSub') */
+                 })->where('level',5)
                 ->where('status','1')->get();
 
         foreach($data as $d) {

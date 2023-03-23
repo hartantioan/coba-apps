@@ -294,18 +294,27 @@ class PurchaseOrderController extends Controller
 
     public function getPurchaseRequest(Request $request){
         $data = PurchaseRequest::where('id',$request->id)->where('status','2')->first();
-        $details = [];
-        foreach($data->purchaseRequestDetail as $row){
-            $details[] = [
-                'item_id'       => $row->item_id,
-                'item_name'     => $row->item->code.' - '.$row->item->name,
-                'unit'          => $row->item->buyUnit->code,
-                'qty'           => $row->qty,
-                'note'          => $row->note,
-            ];
-        }
 
-        $data['details'] = $details;
+        if($data->used()->exists()){
+            $data['status'] = '500';
+            $data['message'] = 'Purchase Request '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+        }else{
+            
+            CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
+
+            $details = [];
+            foreach($data->purchaseRequestDetail as $row){
+                $details[] = [
+                    'item_id'       => $row->item_id,
+                    'item_name'     => $row->item->code.' - '.$row->item->name,
+                    'unit'          => $row->item->buyUnit->code,
+                    'qty'           => $row->qtyBalance(),
+                    'note'          => $row->note,
+                ];
+            }
+
+            $data['details'] = $details;
+        }
 
         return response()->json($data);
     }
@@ -542,6 +551,7 @@ class PurchaseOrderController extends Controller
 
                 CustomHelper::sendApproval('purchase_orders',$query->id,$query->note);
                 CustomHelper::sendNotification('purchase_orders',$query->id,'Pengajuan Purchase Order No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::removeUsedData($query->purchaseRequest->getTable(),$query->purchaseRequest->id);
 
                 activity()
                     ->performedOn(new PurchaseOrder())

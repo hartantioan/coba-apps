@@ -21,7 +21,7 @@ class LandedCost extends Model
         'account_id',
         'purchase_order_id',
         'good_receipt_id',
-        'branch_id',
+        'place_id',
         'post_date',
         'due_date',
         'reference',
@@ -40,6 +40,10 @@ class LandedCost extends Model
         'void_note',
         'void_date'
     ];
+
+    public function used(){
+        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
 
     public function user()
     {
@@ -71,9 +75,9 @@ class LandedCost extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function branch()
+    public function place()
     {
-        return $this->belongsTo('App\Models\Branch', 'branch_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
     public function landedCostDetail()

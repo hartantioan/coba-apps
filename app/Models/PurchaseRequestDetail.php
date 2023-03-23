@@ -43,4 +43,16 @@ class PurchaseRequestDetail extends Model
     {
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
+
+    public function qtyBalance(){
+        $qty = $this->qty;
+
+        foreach($this->purchaseRequest->purchaseOrder as $rowpo){
+            foreach($rowpo->purchaseOrderDetail()->where('item_id',$this->item_id)->get() as $rowdetail){
+                $qty -= $rowdetail->qty;
+            }
+        }
+
+        return $qty;
+    }
 }

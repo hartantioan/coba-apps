@@ -309,6 +309,7 @@ class Select2Controller extends Controller {
                             });
                     });
                 })
+                ->whereDoesntHave('used')
                 ->whereIn('place_id',$dataplaces)
                 ->where('status','2')->get();
 
@@ -343,6 +344,7 @@ class Select2Controller extends Controller {
                             });
                     });
                 })
+                ->whereDoesntHave('used')
                 ->whereIn('place_id',$dataplaces)
                 ->where('status','2')->get();
 
@@ -432,6 +434,7 @@ class Select2Controller extends Controller {
                             });
                     });
                 })
+                ->whereDoesntHave('used')
                 ->where('branch_id',session('bo_branch_id'))
                 ->where('status','2')->get();
 

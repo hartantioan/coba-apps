@@ -45,6 +45,10 @@ class PurchaseDownPayment extends Model
         'void_date'
     ];
 
+    public function used(){
+        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();

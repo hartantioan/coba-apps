@@ -46,6 +46,10 @@ class GoodReceipt extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
+    public function used(){
+        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
     public function supplier()
     {
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();

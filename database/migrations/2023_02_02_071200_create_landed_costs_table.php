@@ -21,7 +21,7 @@ return new class extends Migration
             $table->bigInteger('account_id')->nullable();
             $table->bigInteger('purchase_order_id')->nullable();
             $table->bigInteger('good_receipt_id')->nullable();
-            $table->bigInteger('branch_id')->nullable();
+            $table->bigInteger('place_id')->nullable();
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
             $table->string('reference', 155)->nullable();
@@ -42,7 +42,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'purchase_order_id', 'good_receipt_id', 'branch_id']);
+            $table->index(['user_id', 'account_id', 'purchase_order_id', 'good_receipt_id', 'place_id']);
         });
     }
 

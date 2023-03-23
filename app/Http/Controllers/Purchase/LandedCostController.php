@@ -18,7 +18,7 @@ use App\Models\Currency;
 use App\Models\ItemCogs;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportLandedCost;
-use App\Models\Branch;
+use App\Models\User;
 
 class LandedCostController extends Controller
 {
@@ -36,16 +36,23 @@ class LandedCostController extends Controller
     public function getGoodReceipt(Request $request){
         $data = GoodReceipt::find($request->id);
         
-        $details = [];
+        if($data->used()->exists()){
+            $data['status'] = '500';
+            $data['message'] = 'Good Receipt '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+        }else{
+            CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
 
-        foreach($data->goodReceiptDetail as $row){
-            $details[] = [
-                'item_id'       => $row->item_id,
-                'item_name'     => $row->item->code.' - '.$row->item->name,
-                'qty'           => number_format($row->qtyConvert(),3,',','.'),
-                'qtyRaw'        => $row->qtyConvert(),
-                'unit'          => $row->item->uomUnit->code,
-            ];
+            $details = [];
+
+            foreach($data->goodReceiptDetail as $row){
+                $details[] = [
+                    'item_id'       => $row->item_id,
+                    'item_name'     => $row->item->code.' - '.$row->item->name,
+                    'qty'           => number_format($row->qtyConvert(),3,',','.'),
+                    'qtyRaw'        => $row->qtyConvert(),
+                    'unit'          => $row->item->uomUnit->code,
+                ];
+            }
         }
 
         return response()->json($details);
@@ -59,7 +66,7 @@ class LandedCostController extends Controller
             'account_id',
             'purchase_order_id',
             'good_receipt_id',
-            'branch_id',
+            'place_id',
             'post_date',
             'due_date',
             'reference',
@@ -81,7 +88,11 @@ class LandedCostController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = LandedCost::where('branch_id',session('bo_branch_id'))->count();
+        $user = User::find(session('bo_id'));
+
+        $dataplaces = $user->userPlaceArray();
+
+        $total_data = LandedCost::whereIn('place_id',$dataplaces)->count();
         
         $query_data = LandedCost::where(function($query) use ($search, $request) {
                 if($search) {
@@ -137,7 +148,7 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->where('branch_id',session('bo_branch_id'))
+            ->whereIn('place_id',$dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -197,7 +208,7 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->where('branch_id',session('bo_branch_id'))
+            ->whereIn('place_id',$dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -422,6 +433,7 @@ class LandedCostController extends Controller
 
                 CustomHelper::sendApproval('landed_costs',$query->id,$query->note);
                 CustomHelper::sendNotification('landed_costs',$query->id,'Pengajuan Landed Cost No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::removeUsedData($query->goodReceipt->getTable(),$query->goodReceipt->id);
 
                 activity()
                     ->performedOn(new LandedCost())
@@ -671,6 +683,10 @@ class LandedCostController extends Controller
 
     public function print(Request $request){
 
+        $user = User::find(session('bo_id'));
+
+        $dataplaces = $user->userPlaceArray();
+
         $data = [
             'title' => 'LANDED COST REPORT',
             'data' => LandedCost::where(function ($query) use ($request) {
@@ -727,7 +743,7 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->where('branch_id',session('bo_branch_id'))
+            ->whereIn('place_id',$dataplaces)
             ->get()
 		];
 		

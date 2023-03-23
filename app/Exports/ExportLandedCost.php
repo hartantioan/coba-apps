@@ -15,7 +15,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $is_tax = null, string $is_include_tax = null, string $vendor = null, string $currency = null)
+    public function __construct(string $search = null, string $status = null, string $is_tax = null, string $is_include_tax = null, string $vendor = null, string $currency = null, array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
@@ -23,6 +23,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
         $this->is_include_tax = $is_include_tax ? $is_include_tax : '';
         $this->vendor = $vendor ? $vendor : '';
         $this->currency = $currency ? $currency : '';
+        $this->dataplaces = $dataplaces ? $dataplaces : [];
     }
 
     private $headings = [
@@ -32,7 +33,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
         'VENDOR',
         'PO.NO',
         'GR.NO',
-        'CABANG',
+        'PABRIK/KANTOR',
         'TGL.POST',
         'TGL.TENGGAT',
         'REFERENSI',
@@ -103,7 +104,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                 $query->whereIn('currency_id',$arrCurrency);
             }
         })
-        ->where('branch_id',session('bo_branch_id'))
+        ->whereIn('place_id',$this->dataplaces)
         ->get();
 
         $arr = [];
@@ -116,7 +117,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                 'vendor'        => $row->vendor->name,
                 'po'            => $row->purchaseOrder()->exists() ? $row->purchaseOrder->code : '-',
                 'gr'            => $row->goodReceipt()->exists() ? $row->goodReceipt->code : '-',
-                'cabang'        => $row->branch->name,
+                'cabang'        => $row->place->name.' - '.$row->place->company->name,
                 'tgl_post'      => $row->post_date,
                 'tgl_due'       => $row->due_date,
                 'ref'           => $row->reference,

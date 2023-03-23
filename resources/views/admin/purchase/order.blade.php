@@ -508,11 +508,6 @@
             }
         });
 
-        /* $('#datatable_serverside').on('click', 'tr', function () {
-            var data = window.table.rows().data();
-            alert(data[window.table.row( this ).index()][1]);
-        }); */
-
         loadDataTable();
         
         $('#modal1').modal({
@@ -537,6 +532,7 @@
                 });
                 M.updateTextFields();
                 $('#subtotal,#total,#tax,#grandtotal').text('0,000');
+                $('#purchase_request_id').empty();
             }
         });
 
@@ -585,59 +581,68 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    
-                    if(response.details.length > 0){
-                        $('#branch_id').val(response.branch_id).formSelect();
-                        $('#plant_id').val(response.plant_id).formSelect();
-                        $('#department_id').val(response.department_id).formSelect();
 
-                        $('.row_item').each(function(){
-                            $(this).remove();
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
                         });
+                        $('#purchase_request_id').empty();
+                    }else{
+                        if(response.details.length > 0){
+                            $('#branch_id').val(response.branch_id).formSelect();
+                            $('#plant_id').val(response.plant_id).formSelect();
+                            $('#department_id').val(response.department_id).formSelect();
 
-                        $.each(response.details, function(i, val) {
-                            var count = makeid(10);
-                            $('#last-row-item').before(`
-                                <tr class="row_item">
-                                    <td>
-                                        <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                                    </td>
-                                    <td>
-                                        <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowQty`+ count +`">
-                                    </td>
-                                    <td class="center">
-                                        <span id="arr_unit` + count + `">` + val.unit + `</span>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
-                                    </td>
-                                    <td class="center">
-                                        <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
-                                    </td>
-                                    <td>
-                                        <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-                            $('#arr_item' + count).append(`
-                                <option value="` + val.item_id + `">` + val.item_name + `</option>
-                            `);
-                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-                        });
+                            $('.row_item').each(function(){
+                                $(this).remove();
+                            });
+
+                            $.each(response.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#last-row-item').before(`
+                                    <tr class="row_item">
+                                        <td>
+                                            <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                        </td>
+                                        <td>
+                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                                        </td>
+                                        <td class="center">
+                                            <span id="arr_unit` + count + `">` + val.unit + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                                        </td>
+                                        <td class="center">
+                                            <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
+                                        </td>
+                                        <td>
+                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                                $('#arr_item' + count).append(`
+                                    <option value="` + val.item_id + `">` + val.item_name + `</option>
+                                `);
+                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                            });
+                        }
                     }
                     
                     $('.modal-content').scrollTop(0);

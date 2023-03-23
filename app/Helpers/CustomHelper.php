@@ -14,6 +14,7 @@ use App\Models\JournalDetail;
 use App\Models\LandedCost;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
+use App\Models\UsedData;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
@@ -563,5 +564,31 @@ class CustomHelper {
 		}
 
 		$query->save();
+	}
+
+	public static function sendUsedData($table_name = null, $table_id = null, $ref = null){
+		$count = UsedData::where('lookable_type',$table_name)->where('lookable_id',$table_id)->count();
+		if($count == 0){
+			UsedData::create([
+				'user_id'		=> session('bo_id'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'ref'			=> $ref
+			]);
+		}
+	}
+
+	public static function removeUsedData($table_name = null, $table_id = null){
+		UsedData::where('lookable_type',$table_name)->where('lookable_id',$table_id)->delete();
+	}
+
+	public static function checkUsedData($table_name = null, $table_id = null){
+		$count = UsedData::where('lookable_type',$table_name)->where('lookable_id',$table_id)->count();
+
+		if($count > 0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 }

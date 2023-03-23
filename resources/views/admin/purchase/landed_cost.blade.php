@@ -392,6 +392,7 @@
                 `);
                 M.updateTextFields();
                 $('#total,#tax,#grandtotal').text('0,000');
+                $('#good_receipt_id').empty();
             }
         });
 
@@ -434,38 +435,47 @@
                 success: function(response) {
                     loadingClose('.modal-content');
                     
-                    if(response.length > 0){
-
-                        $('.row_item').each(function(){
-                            $(this).remove();
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
                         });
+                        $('#purchase_request_id').empty();
+                    }else{
+                        if(response.length > 0){
 
-                        arrQty = [];
+                            $('.row_item').each(function(){
+                                $(this).remove();
+                            });
 
-                        $('#last-row-item').remove();
+                            arrQty = [];
 
-                        $.each(response, function(i, val) {
-                            arrQty.push(val.qtyRaw);
-                            var count = makeid(10);
-                            $('#body-item').append(`
-                                <tr class="row_item">
-                                    <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                    <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
-                                    <td>
-                                       ` + val.item_name + ` 
-                                    </td>
-                                    <td class="center">
-                                        ` + val.qty + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.unit + `
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_price[]" class="browser-default nominalitem" type="text" value="0" onkeyup="formatRupiah(this);countRow();" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`">
-                                    </td>
-                                </tr>
-                            `);
-                        });
+                            $('#last-row-item').remove();
+
+                            $.each(response, function(i, val) {
+                                arrQty.push(val.qtyRaw);
+                                var count = makeid(10);
+                                $('#body-item').append(`
+                                    <tr class="row_item">
+                                        <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
+                                        <td>
+                                        ` + val.item_name + ` 
+                                        </td>
+                                        <td class="center">
+                                            ` + val.qty + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.unit + `
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_price[]" class="browser-default nominalitem" type="text" value="0" onkeyup="formatRupiah(this);countRow();" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`">
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }
                     }
                     
                     $('.modal-content').scrollTop(0);
@@ -611,7 +621,7 @@
                 { name: 'vendor_id', className: 'center-align' },
                 { name: 'purchase_order_id', className: 'center-align' },
                 { name: 'good_receipt_id', className: 'center-align' },
-                { name: 'branch_id', className: 'center-align' },
+                { name: 'place_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'due_date', className: 'center-align' },
                 { name: 'no_reference', className: 'center-align' },

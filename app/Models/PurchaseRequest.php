@@ -57,6 +57,15 @@ class PurchaseRequest extends Model
         return $this->hasMany('App\Models\PurchaseRequestDetail');
     }
 
+    public function purchaseOrder()
+    {
+        return $this->hasMany('App\Models\PurchaseOrder');
+    }
+
+    public function used(){
+        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',

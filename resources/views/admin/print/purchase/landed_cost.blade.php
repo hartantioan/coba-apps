@@ -135,7 +135,7 @@
 						<th rowspan="2">Vendor</th>
 						<th rowspan="2">PO No.</th>
                         <th rowspan="2">GR No.</th>
-                        <th rowspan="2">Cabang</th>
+                        <th rowspan="2">Penempatan</th>
 						<th colspan="2">Tanggal</th>
                         <th rowspan="2">Referensi</th>
                         <th colspan="2">Mata Uang</th>
@@ -166,7 +166,7 @@
 							<td>{{ $row->vendor->name }}</td>
                             <td>{{ $row->purchaseOrder()->exists() ? $row->purchaseOrder->code : '-' }}</td>
                             <td>{{ $row->goodReceipt()->exists() ? $row->goodReceipt->code : '-' }}</td>
-                            <td>{{ $row->branch->name }}</td>
+                            <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                             <td>{{ $row->reference }}</td>

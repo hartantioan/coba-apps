@@ -87,6 +87,10 @@ class PurchaseInvoice extends Model
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
+    public function used(){
+        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
     public function purchaseInvoiceDetail()
     {
         return $this->hasMany('App\Models\PurchaseInvoiceDetail');

@@ -30,6 +30,7 @@ class GroupController extends Controller
             'id',
             'code',
             'name',
+            'type',
             'note',
         ];
 
@@ -83,6 +84,7 @@ class GroupController extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
+                    $val->type(),
                     $val->note,
                     $val->status(),
                     '
@@ -112,10 +114,12 @@ class GroupController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('groups', 'code')->ignore($request->temp)] : 'required|unique:groups,code',
             'name'              => 'required',
+            'type'              => 'required'
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
             'name.required'         => 'Nama tidak boleh kosong.',
+            'type.required'         => 'Tipe tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -131,6 +135,7 @@ class GroupController extends Controller
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
                     $query->note	        = $request->note;
+                    $query->type	        = $request->type;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -144,6 +149,7 @@ class GroupController extends Controller
                         'code'          => $request->code,
                         'name'			=> $request->name,
                         'note'			=> $request->note,
+                        'type'			=> $request->type,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

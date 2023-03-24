@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('code',155)->unique();
             $table->string('name')->nullable();
             $table->string('note')->nullable();
+            $table->char('type',2)->nullable();
             $table->char('status',1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');

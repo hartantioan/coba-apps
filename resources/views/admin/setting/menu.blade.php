@@ -46,6 +46,7 @@
                                     <h4 class="card-title">List Menu</h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside" class="display nowrap">
                                                 <thead>
                                                     <tr>
@@ -57,6 +58,7 @@
                                                         <th>Parent</th>
                                                         <th>Urutan</th>
                                                         <th>Status</th>
+                                                        <th>Maintenance</th>
                                                         <th>Hak Akses</th>
                                                         <th>Peta Approval</th>
                                                         <th>Action</th>
@@ -127,6 +129,17 @@
                         <div class="input-field col s6">
                             <input id="order" name="order" type="number" value="0" step="1" placeholder="Nomor urut">
                             <label class="active" for="order">Urutan</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
+                                <label for="maintenance">Maintenance</label>
+                                <label>
+                                    Tidak
+                                    <input checked type="checkbox" id="maintenance" name="maintenance" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -226,11 +239,18 @@
                 { name: 'parent', orderable: false, className: 'center-align' },
                 { name: 'order', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'maintenance', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'crud', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'approval', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                'columnsToggle' /* or colvis */
             ]
         });
+        $('.dt-buttons').appendTo('#datatable_buttons');
+
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -346,6 +366,11 @@
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
+                }
+                if(response.is_maintenance == '1'){
+                    $('#maintenance').prop( "checked", true);
+                }else{
+                    $('#maintenance').prop( "checked", false);
                 }
                 $('.modal-content').scrollTop(0);
                 $('#name').focus();

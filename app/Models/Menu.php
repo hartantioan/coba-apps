@@ -22,7 +22,8 @@ class Menu extends Model
         'table_name',
         'parent_id',
         'order',
-        'status'
+        'status',
+        'is_maintenance'
     ];
 
     public function sub()
@@ -125,6 +126,19 @@ class Menu extends Model
         }
 
         return $status;
+    }
+
+    public function isMaintenance(){
+        switch($this->is_maintenance) {
+            case '1':
+                $maintenance = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>';
+                break;
+            default:
+                $maintenance = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">In-Active</span>';
+                break;
+        }
+
+        return $maintenance;
     }
 
     public function getColumnTypes(){

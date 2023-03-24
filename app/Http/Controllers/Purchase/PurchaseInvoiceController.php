@@ -72,6 +72,8 @@ class PurchaseInvoiceController extends Controller
                 'total'         => number_format($row->total,3,',','.'),
                 'tax'           => number_format($row->tax,3,',','.'),
                 'grandtotal'    => number_format($row->grandtotal,3,',','.'),
+                'department_id' => $row->department_id,
+                'place_id'      => $row->place_id,
             ];
         }
 
@@ -295,33 +297,37 @@ class PurchaseInvoiceController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'good_receipt_id' 			=> 'required',
-			'vendor_id'                 => 'required',
-            'post_date'                 => 'required',
-            'due_date'                  => 'required',
-            'currency_id'               => 'required',
-            'currency_rate'             => 'required',
-            'total'                     => 'required',
-            'tax'                       => 'required',
-            'grandtotal'                => 'required',
-            'arr_item'                  => 'required|array',
-            'arr_price'                 => 'required|array',
-            'arr_qty'                   => 'required|array'
+			'account_id' 			=> 'required',
+			'type'                  => 'required',
+            'place_id'              => 'required',
+            'department_id'         => 'required',
+            'post_date'             => 'required',
+            'due_date'              => 'required',
+            'document_date'         => 'required',
+            'currency_id'           => 'required',
+            'currency_rate'         => 'required',
+            'arr_type'                  => 'required|array',
+            'arr_total'                 => 'required|array',
+            'arr_tax'                   => 'required|array',
+            'arr_grandtotal'            => 'required|array'
 		], [
-			'good_receipt_id.required' 			=> 'Good receipt tidak boleh kosong.',
-			'vendor_id.required'                => 'Vendor/ekspedisi tidak boleh kosong',
-            'post_date.required'                => 'Tgl post tidak boleh kosong.',
-            'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
+			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
+			'type.required'                     => 'Tipe invoice tidak boleh kosong',
+            'place_id.required'                 => 'Penempatan pabrik/kantor tidak boleh kosong.',
+            'department_id.required'            => 'Departemen tidak boleh kosong.',
+            'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
+            'due_date.required'                 => 'Tanggal tenggat tidak boleh kosong.',
+            'document_date.required'            => 'Tanggal dokumen tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'total.required'                    => 'Total tagihan tidak boleh kosong.',
-            'tax.required'                      => 'Total pajak tidak boleh kosong.',
-            'grandtotal.required'               => 'Total tagihan tidak boleh kosong.',
-            'arr_item.required'                 => 'Item tidak boleh kosong.',
-            'arr_item.array'                    => 'Item harus dalam bentuk array.',
-            'arr_price.required'                => 'Harga per item tidak boleh kosong.',
-            'arr_price.array'                   => 'Harga per item harus dalam bentuk array.',
-            'arr_qty.required'                  => 'Qty item tidak boleh kosong.',
-            'arr_qty.array'                     => 'Qty item harus dalam bentuk array.',
+            'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
+            'arr_type.required'                 => 'Tipe dokumen tidak boleh kosong.',
+            'arr_type.array'                    => 'Tipe dokumen harus dalam bentuk array.',
+            'arr_total.required'                => 'Nominal total tidak boleh kosong.',
+            'arr_total.array'                   => 'Nominal harus dalam bentuk array.',
+            'arr_tax.required'                  => 'Nominal pajak tidak boleh kosong.',
+            'arr_tax.array'                     => 'Nominal pajak harus dalam bentuk array.',
+            'arr_grandtotal.required'           => 'Grandtotal tidak boleh kosong.',
+            'arr_grandtotal.array'              => 'Grandtotal harus dalam bentuk array.'
 		]);
 
         if($validation->fails()) {
@@ -331,24 +337,24 @@ class PurchaseInvoiceController extends Controller
             ];
         } else {
             
-            $total = str_replace(',','.',str_replace('.','',$request->total));
+            $total = 0;
             $tax = 0;
             $grandtotal = 0;
-            $percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
+            $balance = 0;
+            $downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
 
-            if($request->is_tax){
-                if($request->is_include_tax){
-                    $total = round($total / (1 + ($percent_tax / 100)),3);
-                }
-                $tax = round($total * ($percent_tax / 100),3);
+            foreach($request->arr_total as $key => $row){
+                $total += str_replace(',','.',str_replace('.','',$row));
+                $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
+                $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
             }
 
-            $grandtotal = round($total + $tax,3);
+            $balance = $grandtotal - $downpayment;
 
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = LandedCost::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
@@ -367,35 +373,32 @@ class PurchaseInvoiceController extends Controller
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
                             }
-                            $document = $request->file('document')->store('public/landed_costs');
+                            $document = $request->file('document')->store('public/purchase_invoices');
                         } else {
                             $document = $query->document;
                         }
 
-                        $gr = GoodReceipt::find($request->good_receipt_id);
-
                         $query->user_id = session('bo_id');
-                        $query->account_id = $request->vendor_id;
-                        $query->purchase_order_id = $gr->purchase_order_id;
-                        $query->good_receipt_id = $gr->id;
-                        $query->branch_id = session('bo_branch_id');
+                        $query->account_id = $request->account_id;
+                        $query->place_id = $request->place_id;
+                        $query->department_id = $request->department_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
-                        $query->reference = $request->reference;
+                        $query->document_date = $request->document_date;
+                        $query->type = $request->type;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->is_tax = $request->is_tax ? $request->is_tax : NULL;
-                        $query->is_include_tax = $request->is_include_tax ? $request->is_include_tax : '0';
-                        $query->percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
-                        $query->note = $request->note;
-                        $query->document = $document;
                         $query->total = round($total,3);
                         $query->tax = round($tax,3);
                         $query->grandtotal = round($grandtotal,3);
+                        $query->downpayment = round($downpayment,3);
+                        $query->balance = round($balance,3);
+                        $query->document = $document;
+                        $query->note = $request->note;
 
                         $query->save();
 
-                        foreach($query->landedCostDetail as $row){
+                        foreach($query->purchaseInvoiceDetail as $row){
                             $row->delete();
                         }
 
@@ -412,28 +415,25 @@ class PurchaseInvoiceController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $gr = GoodReceipt::find($request->good_receipt_id);
-
-                    $query = LandedCost::create([
-                        'code'			            => LandedCost::generateCode(),
+                    $query = PurchaseInvoice::create([
+                        'code'			            => PurchaseInvoice::generateCode(),
                         'user_id'		            => session('bo_id'),
-                        'account_id'                => $request->vendor_id,
-                        'purchase_order_id'	        => $gr->purchase_order_id,
-                        'good_receipt_id'	        => $gr->id,
-                        'branch_id'                 => session('bo_branch_id'),
+                        'account_id'                => $request->account_id,
+                        'place_id'                  => $request->place_id,
+                        'department_id'             => $request->department_id,
                         'post_date'                 => $request->post_date,
                         'due_date'                  => $request->due_date,
-                        'reference'                 => $request->reference,
+                        'document_date'             => $request->document_date,
+                        'type'                      => $request->type,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'is_tax'                    => $request->is_tax ? $request->is_tax : NULL,
-                        'is_include_tax'            => $request->is_include_tax ? $request->is_include_tax : '0',
-                        'percent_tax'               => str_replace(',','.',str_replace('.','',$request->percent_tax)),
-                        'note'                      => $request->note,
-                        'document'                  => $request->file('document') ? $request->file('document')->store('public/landed_costs') : NULL,
                         'total'                     => round($total,3),
                         'tax'                       => round($tax,3),
                         'grandtotal'                => round($grandtotal,3),
+                        'downpayment'               => round($downpayment,3),
+                        'balance'                   => round($balance,3),
+                        'note'                      => $request->note,
+                        'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
                         'status'                    => '1'
                     ]);
 

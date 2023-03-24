@@ -141,13 +141,13 @@
                             </div>
                             <div class="input-field col s6">
                                 <select class="form-control" disabled id="sign" name="sign">
-                                    <option value=">">> (lebih dari)</option>
-                                    <option value=">=">>= (lebih dari sama dengan)</option>
-                                    <option value="=">= (sama dengan)</option>
-                                    <option value="<">< (kurang dari)</option>
-                                    <option value="<="><= (kurang dari sama dengan)</option>
+                                    <option value=">">> (lebih dari) Grandtotal</option>
+                                    <option value=">=">>= (lebih dari sama dengan) Grandtotal</option>
+                                    <option value="=">= (sama dengan) Grandtotal</option>
+                                    <option value="<">< (kurang dari) Grandtotal</option>
+                                    <option value="<="><= (kurang dari sama dengan) Grandtotal</option>
                                 </select>
-                                <label class="active" for="sign">Operasi</label>
+                                <label class="" for="sign">Operasi</label>
                             </div>
                             <div class="input-field col s6">
                                 <input id="nominal" name="nominal" disabled type="text" placeholder="Nominal" onkeyup="formatRupiah(this)">

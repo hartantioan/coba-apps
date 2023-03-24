@@ -120,6 +120,7 @@
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside">
                                                 <thead>
                                                     <tr>

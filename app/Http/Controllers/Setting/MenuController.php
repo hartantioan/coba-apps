@@ -110,6 +110,7 @@ class MenuController extends Controller
                     $val->parentsub()->exists() ? $val->parentSub->name : 'None',
                     $val->order,
                     $val->status(),
+                    $val->isMaintenance(),
                     !$val->sub()->exists() ?
                     '
                         <a href="'.url('admin/setting/menu/operation_access').'/'.$val->id.'" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text" data-popup="tooltip" title="Edit hak akses operasional halaman"><i class="material-icons dp48">folder_shared</i></a>
@@ -195,6 +196,7 @@ class MenuController extends Controller
                     $query->parent_id = $request->parent_id ? $request->parent_id : NULL;
                     $query->order = $request->order;
                     $query->status = $request->status ? $request->status : '2';
+                    $query->is_maintenance = $request->maintenance ? $request->maintenance : NULL;
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -217,13 +219,14 @@ class MenuController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Menu::create([
-                        'name'			=> $request->name,
-                        'url'			=> $request->url,
-                        'icon'		    => $request->icon,
-                        'table_name'	=> $request->table_name,
-                        'parent_id'	    => $request->parent_id ? $request->parent_id : NULL,
-                        'order'         => $request->order,
-                        'status'        => $request->status ? $request->status : '2'
+                        'name'			    => $request->name,
+                        'url'			    => $request->url,
+                        'icon'		        => $request->icon,
+                        'table_name'	    => $request->table_name,
+                        'parent_id'	        => $request->parent_id ? $request->parent_id : NULL,
+                        'order'             => $request->order,
+                        'status'            => $request->status ? $request->status : '2',
+                        'is_maintenance'    => $request->maintenance ? $request->maintenance : '2'
                     ]);
                     DB::commit();
                 }catch(\Exception $e){

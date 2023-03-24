@@ -18,6 +18,7 @@ class Group extends Model
         'code',
         'name',
         'note',
+        'type',
         'status'
     ];
 
@@ -35,6 +36,18 @@ class Group extends Model
         }
 
         return $status;
+    }
+
+    public function type(){
+        $type = match ($this->type) {
+          '1' => 'Pegawai',
+          '2' => 'Customer',
+          '3' => 'Supplier',
+          '4' => 'Expedisi',
+          default => 'Invalid',
+        };
+
+        return $type;
     }
 
     public function user(){

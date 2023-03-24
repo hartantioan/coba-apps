@@ -60,6 +60,7 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
+                                                        <th>Tipe BP</th>
                                                         <th>Keterangan</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -98,6 +99,15 @@
                         <div class="input-field col s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select id="type" name="type">
+                                <option value="1">Pegawai</option>
+                                <option value="2">Customer</option>
+                                <option value="3">Supplier</option>
+                                <option value="4">Ekspedisi</option>
+                            </select>
+                            <label for="type">Tipe Partner Bisnis</label>
                         </div>
                         <div class="input-field col s6">
                             <input id="note" name="note" type="text" placeholder="Keterangan">
@@ -192,6 +202,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -301,6 +312,7 @@
                 $('#code').val(response.code);
                 $('#name').val(response.name);
                 $('#note').val(response.note);
+                $('#type').val(response.type).formSelect();
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

@@ -136,6 +136,7 @@
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside">
                                                 <thead>
                                                     <tr>
@@ -209,13 +210,13 @@
                                 <label class="" for="type">Tipe</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="plant_id" name="plant_id">
+                                <select class="form-control" id="place_id" name="place_id">
                                     <option value="">--Kosong--</option>
                                     @foreach ($place as $rowplace)
                                         <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="plant_id">Pabrik</label>
+                                <label class="" for="place_id">Pabrik/Kantor</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="department_id" name="department_id">
@@ -229,6 +230,10 @@
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="top" name="top" min="{{ date('Y-m-d') }}" type="number" value="0" readonly>
+                                <label class="active" for="top">TOP (hari) Autofill</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
@@ -305,18 +310,6 @@
                             <div class="input-field col m4 s12">
                                 <table width="100%" class="bordered">
                                     <thead>
-                                        {{-- <tr>
-                                            <td width="50%">Subtotal</td>
-                                            <td width="50%" class="right-align">
-                                                <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Discount</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="discount" name="discount" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr> --}}
                                         <tr>
                                             <td>Total</td>
                                             <td class="right-align"><span id="total">0,000</span></td>
@@ -332,7 +325,7 @@
                                         <tr>
                                             <td>Uang Muka</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;">
+                                                <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
@@ -472,18 +465,17 @@
                 success: function(response) {
                     loadingClose('.modal-content');
 
-                    $('#deposit').val(response.deposit);
-                    
+                    $('#deposit,#downpayment').val(response.deposit);
+                    $('#body-detail').empty();
                     if(response.details.length > 0){
-                        $('#body-detail').empty();
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
                             $('#body-detail').append(`
                                 <tr class="row_detail">
-                                    <input type="hidden" name="arr_type" value="` + val.type + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_total" value="` + val.total + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_tax" value="` + val.tax + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_grandtotal" value="` + val.grandtotal + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
                                     <td class="center-align">
                                         <label>
                                             <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
@@ -510,10 +502,26 @@
                                     </td>
                                 </tr>
                             `);
-                        });
+
+                            $('#place_id').val(val.place_id).formSelect();
+                            $('#department_id').val(val.department_id).formSelect();
+                        });                        
+                    }else{
+                        $('#body-detail').empty().append(`
+                            <tr id="empty-detail">
+                                <td colspan="7" class="center">
+                                    Pilih supplier/vendor untuk memulai...
+                                </td>
+                            </tr>
+                        `);
+
+                        $('#total,#tax,#grandtotal,#balance').text('0,000');
                     }
+
+                    $('#top').val(response.top);
+
+                    addDays();
                     
-                    countAll();
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
@@ -535,6 +543,10 @@
                     </td>
                 </tr>
             `);
+            $('#deposit').val('0,000');
+            $('#top').val('0');
+            $('#due_date').val('');
+            $('#total,#tax,#grandtotal,#balance').text('0,000');
         }
     }
 
@@ -546,29 +558,23 @@
                 let element = $(this);
                 if($(element).is(':checked')){
                     ada = true;
-                    total += parseFloat($('input[name^="arr_code"][id=' +  + ']' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
+                    total += parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    tax += parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    grandtotal += parseFloat($('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
                 }
             });
         }
-
-        $('input[name^="arr_total"]').each(function(){
-            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-        });
-
-        $('input[name^="arr_tax"]').each(function(){
-            tax += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-        });
-
-        $('input[name^="arr_total"]').each(function(){
-            grandtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-        });
 
         balance = grandtotal - downpayment;
 
         $('#total').text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
         $('#tax').text(formatRupiahIni(tax.toFixed(3).toString().replace('.',',')));
-        $('#grandtotal').text(formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',',')));
-        $('#balance').text(formatRupiahIni(balance.toFixed(3).toString().replace('.',',')));
+        $('#grandtotal').text(
+            formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
+        );
+        $('#balance').text(
+            (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(3).toString().replace('.',','))
+        );
     }
 
     function chooseAll(element){
@@ -1023,5 +1029,11 @@
         var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
         
         window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&place=" + place + "&department=" + department + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&supplier=" + supplier + "&currency=" + currency;
+    }
+
+    function addDays(){
+        var result = new Date($('#post_date').val());
+        result.setDate(result.getDate() + parseInt($('#top').val()));
+        $('#due_date').val(result.toISOString().split('T')[0]);
     }
 </script>

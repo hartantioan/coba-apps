@@ -47,11 +47,11 @@ class PurchaseRequestDetail extends Model
     public function qtyBalance(){
         $qty = $this->qty;
 
-        /* foreach($this->purchaseRequest->purchaseOrder as $rowpo){
-            foreach($rowpo->purchaseOrderDetail()->where('item_id',$this->item_id)->get() as $rowdetail){
-                $qty -= $rowdetail->qty;
-            }
-        } */
+        foreach(PurchaseOrderDetailComposition::where('pr_id',$this->purchase_request_id)->whereHas('purchaseOrderDetail',function($query){ 
+            $query->where('item_id',$this->item_id);
+        })->get() as $row){
+            $qty -= $row->qty;
+        }
 
         return $qty;
     }

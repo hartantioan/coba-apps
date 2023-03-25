@@ -22,7 +22,7 @@ class PurchaseOrderDetailComposition extends Model
 
     public function purchaseOrderDetail()
     {
-        return $this->belongsTo('App\Models\PurchaseOrder', 'pod_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\PurchaseOrderDetail', 'pod_id', 'id')->withTrashed();
     }
 
     public function purchaseRequest()

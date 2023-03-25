@@ -18,8 +18,10 @@ class PurchaseRequest extends Model
     protected $fillable = [
         'code',
         'user_id',
+        'project_id',
         'place_id',
         'department_id',
+        'warehouse_id',
         'status',
         'post_date',
         'due_date',
@@ -47,6 +49,16 @@ class PurchaseRequest extends Model
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
+    }
+
     public function department()
     {
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
@@ -57,9 +69,9 @@ class PurchaseRequest extends Model
         return $this->hasMany('App\Models\PurchaseRequestDetail');
     }
 
-    public function purchaseOrder()
+    public function purchaseOrderMain()
     {
-        return $this->hasMany('App\Models\PurchaseOrder');
+        return $this->hasMany('App\Models\PurchaseOrderMain');
     }
 
     public function used(){

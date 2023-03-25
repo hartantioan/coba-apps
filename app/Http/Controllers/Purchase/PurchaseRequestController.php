@@ -15,11 +15,21 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestDetail;
 use App\Models\User;
+use App\Models\Warehouse;
+use App\Models\Place;
+use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseRequest;
 
 class PurchaseRequestController extends Controller
 {
+    protected $dataplaces;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user->userPlaceArray();
+    }
     public function index()
     {
         $data = [
@@ -35,6 +45,7 @@ class PurchaseRequestController extends Controller
         $data = [
             'title'     => 'Pengajuan Pembelian Barang - Pengguna',
             'content'   => 'admin.personal.purchase_request',
+            'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -401,6 +412,9 @@ class PurchaseRequestController extends Controller
                     date('d M Y',strtotime($val->required_date)),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    $val->project()->exists() ? $val->project->code.' - '.$val->project->name : ' - ',
+                    $val->warehouse->name,
+                    $val->place->name.' - '.$val->place->company->name,
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -432,7 +446,9 @@ class PurchaseRequestController extends Controller
 			'document_date'		        => 'required',
 			'required_date'		        => 'required',
             'note'		                => 'required',
-            'arr_item'                  => 'required|array'
+            'arr_item'                  => 'required|array',
+            'place_id'                  => 'required',
+            'warehouse_id'              => 'required'
 		], [
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
@@ -440,7 +456,9 @@ class PurchaseRequestController extends Controller
 			'required_date.required' 			=> 'Tanggal dipakai tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'arr_item.required'                 => 'Item tidak boleh kosong',
-            'arr_item.array'                    => 'Item harus dalam bentuk array'
+            'arr_item.array'                    => 'Item harus dalam bentuk array',
+            'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
+            'warehouse_id.required'             => 'Gudang tujuan tidak boleh kosong.'
 		]);
 
         if($validation->fails()) {
@@ -475,13 +493,16 @@ class PurchaseRequestController extends Controller
                         } else {
                             $document = $query->document;
                         }
-
+                        
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
                         $query->required_date = $request->required_date;
                         $query->note = $request->note;
                         $query->document = $document;
+                        $query->project_id = $request->project_id ? $request->project_id : NULL;
+                        $query->place_id = $request->place_id;
+                        $query->warehouse_id = $request->warehouse_id;
                         $query->save();
 
                         foreach($query->purchaseRequestDetail as $row){
@@ -504,7 +525,8 @@ class PurchaseRequestController extends Controller
                     $query = PurchaseRequest::create([
                         'code'			=> PurchaseRequest::generateCode(),
                         'user_id'		=> session('bo_id'),
-                        'place_id'      => session('bo_place_id'),
+                        'place_id'      => $request->place_id,
+                        'warehouse_id'  => $request->warehouse_id,
                         'department_id'	=> session('bo_department_id'),
                         'status'        => '1',
                         'post_date'     => $request->post_date,
@@ -512,6 +534,7 @@ class PurchaseRequestController extends Controller
                         'document_date' => $request->document_date,
                         'required_date' => $request->required_date,
                         'note'          => $request->note,
+                        'project_id'    => $request->project_id ? $request->project_id : NULL,
                         'document'      => $request->file('file') ? $request->file('file')->store('public/purchase_requests') : NULL,
                     ]);
 
@@ -632,6 +655,10 @@ class PurchaseRequestController extends Controller
 
     public function userShow(Request $request){
         $pr = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $pr['project_id'] = $pr->project_id ? $pr->project_id : '';
+        $pr['project_name'] = $pr->project()->exists() ? $pr->project->code.' - '.$pr->project->name : '';
+        $pr['warehouse_name'] = $pr->warehouse->name;
+
         $arr = [];
 
         foreach($pr->purchaseRequestDetail as $row){

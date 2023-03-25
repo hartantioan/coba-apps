@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
             'purchase_requests'         => 'App\Models\PurchaseRequest',
             'purchase_orders'           => 'App\Models\PurchaseOrder',
             'purchase_down_payments'    => 'App\Models\PurchaseDownPayment',
+            'purchase_invoices'         => 'App\Models\PurchaseInvoice',
             'good_receipts'             => 'App\Models\GoodReceipt',
             'landed_costs'              => 'App\Models\LandedCost',
         ]);

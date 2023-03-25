@@ -12,6 +12,7 @@ use App\Models\Bank;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
 use App\Models\GoodReceipt;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -283,6 +284,7 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->name,
+                'top'           => $d->top,
             ];
         }
 
@@ -484,6 +486,27 @@ class Select2Controller extends Controller {
         $data = Bank::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function project(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Project::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('note', 'like', "%$search%");
                 })
                 ->where('status','1')->get();
 

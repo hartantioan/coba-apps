@@ -63,6 +63,9 @@
                                                         <th colspan="4" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Dokumen</th>
+                                                        <th rowspan="2">Proyek</th>
+                                                        <th rowspan="2">Gudang</th>
+                                                        <th rowspan="2">Pabrik/Kantor</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
@@ -128,6 +131,22 @@
                                 <div class="file-path-wrapper">
                                     <input class="file-path validate" type="text">
                                 </div>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <select class="form-control" id="place_id" name="place_id">
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="place_id">Pabrik/Kantor</label>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <select class="browser-default" id="warehouse_id" name="warehouse_id"></select>
+                                <label class="active" for="warehouse_id">Gudang Tujuan</label>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <select class="browser-default" id="project_id" name="project_id"></select>
+                                <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
@@ -241,6 +260,8 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
+                $('#project_id,#warehouse_id').empty();
+                $('.row_item').remove();
             }
         });
 
@@ -249,6 +270,8 @@
         });
 
         select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
+        select2ServerSide('#warehouse_id', '{{ url("admin/select2/warehouse") }}');
     });
 
     function getRowUnit(val){
@@ -333,6 +356,9 @@
                 { name: 'date_use', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'project_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'place_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -482,7 +508,20 @@
                 $('#due_date').removeAttr('min');
                 $('#document_date').removeAttr('min');
                 $('#required_date').removeAttr('min');
+                $('#place_id').val(response.place_id).formSelect();
+
+                if(response.project_id){
+                    $('#project_id').empty();
+                    $('#project_id').append(`
+                        <option value="` + response.project_id + `">` + response.project_name + `</option>
+                    `);
+                }
                 
+                $('#warehouse_id').empty();
+                $('#warehouse_id').append(`
+                    <option value="` + response.warehouse_id + `">` + response.warehouse_name + `</option>
+                `);
+
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
                         $(this).remove();

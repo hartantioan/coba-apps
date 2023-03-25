@@ -96,6 +96,7 @@ Route::prefix('admin')->group(function () {
             Route::get('supplier_vendor', [Select2Controller::class, 'supplierVendor']);
             Route::get('bank', [Select2Controller::class, 'bank']);
             Route::get('region', [Select2Controller::class, 'region']);
+            Route::get('project', [Select2Controller::class, 'project']);
         });
 
         Route::prefix('personal')->middleware('direct.access')->group(function () {

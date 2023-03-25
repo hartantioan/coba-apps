@@ -123,7 +123,7 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field col s3">
-                            <select id="type" name="type" onchange="changeMode(this);">
+                            <select id="type" name="type" onchange="changeMode(this);refreshGroup();">
                                 <option value="1">Pegawai</option>
                                 <option value="2">Customer</option>
                                 <option value="3">Supplier</option>
@@ -269,12 +269,7 @@
                             <label class="active" for="country_id">Negara Asal</label>
                         </div>
                         <div class="input-field col s3">
-                            <select id="group_id" name="group_id">
-                                <option value="">--Kosong--</option>
-                                @foreach($group as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
-                            </select>
+                            <select id="group_id" name="group_id"></select>
                             <label for="group_id">Kelompok Partner Bisnis</label>
                         </div>
                         <div class="input-field col s3">
@@ -684,6 +679,7 @@
 
 <!-- END: Page Main-->
 <script>
+    var arrgroup = @json($group);
     var tempuser = 0;
     $(function() {
         $(".select2").select2({
@@ -734,6 +730,7 @@
                 M.updateTextFields();
                 $('.row_bank').remove();
                 $('.row_info').remove();
+                refreshGroup();
             }
         });
 
@@ -780,7 +777,25 @@
         $('#body-info').on('click', '.delete-data-info', function() {
             $(this).closest('tr').remove();
         });
+
+        refreshGroup();
     });
+
+    function refreshGroup(){
+        $('#group_id').empty();
+        var type = $('#type').val();
+        $('#group_id').append(`
+            <option value="">--Kosong--</option>
+        `);
+        for(let i=0;i<arrgroup.length;i++){
+            if(arrgroup[i]['type'] == type){
+                $('#group_id').append(`
+                    <option value="` + arrgroup[i]['id'] + `">` + arrgroup[i]['name'] + `</option>
+                `);
+            }
+        }
+        $('#group_id').formSelect();
+    }
 
     function access(id,name){
         $('#modal3').modal('open');
@@ -1258,6 +1273,8 @@
                 $('#email').val(response.email);
                 $("#address").val(response.address);
                 $('#type').val(response.type).trigger('change').formSelect();
+
+                refreshGroup();
                 
                 $('#province_id,#city_id,#country_id').empty();
 

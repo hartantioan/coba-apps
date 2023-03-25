@@ -315,7 +315,7 @@
                         @if($data->user->signature)
                             <div>{!! $data->user->signature() !!}</div>
                         @endif
-                        <div class="mt-5">{{ $data->user->name }}</div>
+                        <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                         <div class="mt-1">{{ $data->user->position->name.' - '.$data->user->department->name }}</div>
                     </td>
                     @if($data->approval())
@@ -325,7 +325,7 @@
                                 @if($row->user->signature)
                                     <div>{!! $row->user->signature() !!}</div>
                                 @endif
-                                <div class="mt-5">{{ $row->user->name }}</div>
+                                <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
                                 <div class="mt-1">{{ $row->user->position->name.' - '.$row->user->department->name }}</div>
                             </td>
                         @endforeach

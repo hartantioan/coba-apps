@@ -47,4 +47,9 @@ class PurchaseOrderDetail extends Model
 
         return $balance;
     }
+
+    public function purchaseOrderDetailComposition()
+    {
+        return $this->hasMany('App\Models\PurchaseOrderDetailComposition','pod_id','id');
+    }
 }

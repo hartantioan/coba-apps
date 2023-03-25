@@ -18,7 +18,6 @@ class PurchaseOrder extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'purchase_request_id',
         'account_id',
         'purchasing_type',
         'shipping_type',
@@ -59,11 +58,6 @@ class PurchaseOrder extends Model
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
-    }
-
-    public function purchaseRequest()
-    {
-        return $this->belongsTo('App\Models\PurchaseRequest', 'purchase_request_id', 'id')->withTrashed();
     }
 
     public function supplier(){

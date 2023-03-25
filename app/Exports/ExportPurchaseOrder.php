@@ -36,7 +36,6 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
         'NO',
         'KODE',
         'PENGGUNA',
-        'PR.NO',
         'SUPPLIER',
         'TIPE',
         'SHIPPING',
@@ -73,10 +72,6 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
                         ->orWhere('total', 'like', "%$this->search%")
                         ->orWhere('tax', 'like', "%$this->search%")
                         ->orWhere('grandtotal', 'like', "%$this->search%")
-                        ->orWhereHas('purchaseRequest',function($query){
-                            $query->where('code','like',"%$this->search%")
-                                ->orWhere('note','like',"%$this->search%");
-                        })
                         ->orWhereHas('user',function($query){
                             $query->where('name','like',"%$this->search%")
                                 ->orWhere('employee_no','like',"%$this->search%");
@@ -140,7 +135,6 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
                 'id'            => ($key + 1),
                 'code'          => $row->code,
                 'name'          => $row->user->name,
-                'pr'            => $row->purchaseRequest()->exists() ? $row->purchaseRequest->code : '-',
                 'supp'          => $row->supplier->name,
                 'tipe'          => $row->purchasingType(),
                 'ship'          => $row->shippingType(),

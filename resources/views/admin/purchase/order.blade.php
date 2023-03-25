@@ -183,7 +183,6 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
-                                                        <th rowspan="2">Request No.</th>
                                                         <th rowspan="2">Supplier</th>
                                                         <th rowspan="2">Tipe PO</th>
                                                         <th rowspan="2">Pengiriman</th>
@@ -248,13 +247,10 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
+                            
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="purchase_request_id" name="purchase_request_id" onchange="getPurchaseRequest(this.value)"></select>
-                                <label class="active" for="purchase_request_id">Purchase Request (Jika ada)</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="browser-default" id="supplier_id" name="supplier_id"></select>
+                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getTopSupplier();"></select>
                                 <label class="active" for="supplier_id">Supplier</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -274,10 +270,10 @@
                                 <label class="" for="shipping_type">Tipe Pengiriman</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="place_id" name="place_id">
+                                <select class="form-control" id="place_id" name="place_id" onchange="getReceiverInformation();">
                                     <option value="">--Kosong--</option>
                                     @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
+                                        <option value="{{ $rowplace->id }}" data-name="{{ $rowplace->name.' - '.$rowplace->company->name }}" data-address="{{ $rowplace->address }}">{{ $rowplace->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="" for="place_id">Pabrik/Kantor</label>
@@ -342,32 +338,6 @@
                                 <label class="active" for="document_date">Tgl. Dokumen</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <div class="switch mb-1">
-                                    <label class="active" for="is_tax">Ber-PPN?</label>
-                                    <label>
-                                        Tidak
-                                        <input type="checkbox" id="is_tax" name="is_tax" value="1" onclick="countAll();">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <div class="switch mb-1">
-                                    <label class="active" for="is_include_tax">Termasuk Pajak?</label>
-                                    <label>
-                                        Tidak
-                                        <input type="checkbox" id="is_include_tax" name="is_include_tax" value="1" onclick="countAll();">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
-                                <label class="active" for="percent_tax">Prosentase Tax</label>
-                            </div>
-                            <div class="input-field col m3 s12">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
                                 <label class="active" for="receiver_name">Nama Penerima</label>
                             </div>
@@ -378,6 +348,50 @@
                             <div class="input-field col m3 s12">
                                 <input id="receiver_phone" name="receiver_phone" type="text" placeholder="Kontak Penerima">
                                 <label class="active" for="receiver_phone">Kontak Penerima</label>
+                            </div>
+                            <div class="col m12 s12">
+                                <div class="input-field col m3 s12">
+                                    <div class="switch mb-0">
+                                        <label class="active" for="is_tax">Ber-PPN?</label>
+                                        <label>
+                                            Tidak
+                                            <input type="checkbox" id="is_tax" name="is_tax" value="1" onclick="countAll();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <div class="switch mb-1">
+                                        <label class="active" for="is_include_tax">Termasuk Pajak?</label>
+                                        <label>
+                                            Tidak
+                                            <input type="checkbox" id="is_include_tax" name="is_include_tax" value="1" onclick="countAll();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
+                                    <label class="active" for="percent_tax">Prosentase Tax</label>
+                                </div>
+                            </div>
+                            <div class="col m12 s12">
+                                <p class="mt-2 mb-2">
+                                    <h4>Purchase Request</h4>
+                                    <div class="row">
+                                        <div class="input-field col m3 s3">
+                                            <select class="browser-default" id="purchase_request_id" name="purchase_request_id"></select>
+                                            <label class="active" for="purchase_request_id">Purchase Request (Jika ada)</label>
+                                        </div>
+                                        <div class="col m3 s3 mt-2">
+                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getPurchaseRequest();" href="javascript:void(0);">
+                                                <i class="material-icons left">add</i> Tambah PR
+                                            </a>
+                                        </div>
+                                    </div>
+                                </p>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
@@ -548,9 +562,6 @@
             }
         });
 
-        $('#place_id').val('{{ session("bo_place_id") }}').formSelect();
-        $('#department_id').val('{{ session("bo_department_id") }}').formSelect();
-
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             countAll();
@@ -564,14 +575,33 @@
         $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].buy_unit);
     }
 
-    function getPurchaseRequest(val){
-        if(val){
+    function getTopSupplier(){
+        if($("#supplier_id").val()){
+            $('#payment_term').val($("#supplier_id").select2('data')[0].top);
+        }else{
+            $('#payment_term').val('0');
+        }
+    }
+    
+    function getReceiverInformation(){
+        if($('#place_id').val()){
+            $('#receiver_name').val($('#place_id').find(':selected').data('name'));
+            $('#receiver_address').val($('#place_id').find(':selected').data('address'));
+        }else{
+            $('#receiver_name,#receiver_address').val('');
+        }
+    }
+
+    function getPurchaseRequest(){
+        let nil = $('#purchase_request_id').val();
+
+        if(nil){
             $.ajax({
                 url: '{{ Request::url() }}/get_purchase_request',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: val
+                    id: nil
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -595,14 +625,11 @@
                             $('#plant_id').val(response.plant_id).formSelect();
                             $('#department_id').val(response.department_id).formSelect();
 
-                            $('.row_item').each(function(){
-                                $(this).remove();
-                            });
-
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
                                 $('#last-row-item').before(`
                                     <tr class="row_item">
+                                        <input type="hidden" name="arr_purchase[]" value="` + response.ecode + `">
                                         <td>
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                         </td>
@@ -628,7 +655,7 @@
                                             <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
                                         </td>
                                         <td>
-                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
+                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + response.code + `">
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -643,9 +670,9 @@
                                 select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
                             });
                         }
+
+                        $('#purchase_request_id').empty();
                     }
-                    
-                    $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
                 error: function() {
@@ -669,6 +696,7 @@
         var count = makeid(10);
         $('#last-row-item').before(`
             <tr class="row_item">
+                <input type="hidden" name="arr_purchase[]" value="0">
                 <td>
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                 </td>
@@ -759,7 +787,6 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
-                { name: 'purchase_request_id', className: 'center-align' },
                 { name: 'supplier_id', className: 'center-align' },
                 { name: 'purchasing_type', className: 'center-align' },
                 { name: 'shipping_type', className: 'center-align' },
@@ -926,12 +953,6 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                if(response.purchase_request_name){
-                    $('#purchase_request_id').empty();
-                    $('#purchase_request_id').append(`
-                        <option value="` + response.purchase_request_id + `">` + response.purchase_request_name + `</option>
-                    `);
-                }
                 $('#supplier_id').empty();
                 $('#supplier_id').append(`
                     <option value="` + response.account_id + `">` + response.supplier_name + `</option>

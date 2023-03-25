@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers\Setting;
 use App\Http\Controllers\Controller;
+use App\Models\GoodReceipt;
+use App\Models\LandedCost;
+use App\Models\PurchaseDownPayment;
+use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
+use App\Models\PurchaseInvoice;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -249,7 +254,7 @@ class ApprovalController extends Controller
                             ->orWhere('date_request', 'like', "%$search%")
                             ->orWhere('note','like',"%$search%")
                             ->orWhereHas('approvalSource',function($query) use($search,$request){
-                                $query->whereHasMorph('approvalable',[PurchaseRequest::class],function (Builder $query) use ($search) {
+                                $query->whereHasMorph('lookable',[PurchaseRequest::class,PurchaseOrder::class,PurchaseInvoice::class,PurchaseDownPayment::class,LandedCost::class,GoodReceipt::class],function (Builder $query) use ($search) {
                                     $query->where('code','like',"%$search%");
                                 })
                                 ->orWhereHas('user',function($query) use($search,$request){
@@ -281,7 +286,7 @@ class ApprovalController extends Controller
                             ->orWhere('date_request', 'like', "%$search%")
                             ->orWhere('note','like',"%$search%")
                             ->orWhereHas('approvalSource',function($query) use($search,$request){
-                                $query->whereHasMorph('approvalable',[PurchaseRequest::class],function (Builder $query) use ($search) {
+                                $query->whereHasMorph('lookable',[PurchaseRequest::class,PurchaseOrder::class,PurchaseInvoice::class,PurchaseDownPayment::class,LandedCost::class,GoodReceipt::class],function (Builder $query) use ($search) {
                                     $query->where('code','like',"%$search%");
                                 })
                                 ->orWhereHas('user',function($query) use($search,$request){
@@ -360,8 +365,8 @@ class ApprovalController extends Controller
 			
 			if($query) {
 
-                /* DB::beginTransaction();
-                try { */
+                DB::beginTransaction();
+                try {
 
                     $query->note = $request->note;
 
@@ -410,10 +415,10 @@ class ApprovalController extends Controller
                         }
                     }
 
-                   /*  DB::commit();
+                    DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                } */
+                }
 
                 CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalTable->menu->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTable->level.'.',$query->note,$query->approvalSource->lookable->user_id);
 

@@ -18,7 +18,6 @@ return new class extends Migration
             $table->id();
             $table->string('code',155)->unique();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('purchase_request_id')->nullable();
             $table->bigInteger('supplier_id')->nullable();
             $table->char('purchasing_type', 1)->nullable();
             $table->char('shipping_type', 1)->nullable();
@@ -52,7 +51,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'purchase_request_id', 'supplier_id', 'place_id', 'department_id','currency_id']);
+            $table->index(['user_id', 'supplier_id', 'place_id', 'department_id','currency_id']);
         });
     }
 

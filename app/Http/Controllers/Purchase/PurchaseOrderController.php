@@ -14,6 +14,7 @@ use App\Models\Currency;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetail;
+use App\Models\PurchaseOrderDetailComposition;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseOrder;
 use App\Models\Place;
@@ -47,7 +48,6 @@ class PurchaseOrderController extends Controller
             'id',
             'code',
             'user_id',
-            'purchase_request_id',
             'supplier_id',
             'purchasing_type',
             'shipping_type',
@@ -97,10 +97,6 @@ class PurchaseOrderController extends Controller
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhereHas('purchaseRequest',function($query) use ($search, $request){
-                                $query->where('code','like',"%$search%")
-                                    ->orWhere('note','like',"%$search%");
-                            })
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -171,10 +167,6 @@ class PurchaseOrderController extends Controller
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhereHas('purchaseRequest',function($query) use ($search, $request){
-                                $query->where('code','like',"%$search%")
-                                    ->orWhere('note','like',"%$search%");
-                            })
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -238,7 +230,6 @@ class PurchaseOrderController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->purchase_request_id ? $val->purchaseRequest->code : '-',
                     $val->supplier->name,
                     $val->purchasingType(),
                     $val->shippingType(),
@@ -293,6 +284,7 @@ class PurchaseOrderController extends Controller
 
     public function getPurchaseRequest(Request $request){
         $data = PurchaseRequest::where('id',$request->id)->where('status','2')->first();
+        $data['ecode'] = CustomHelper::encrypt($data->code);
 
         if($data->used()->exists()){
             $data['status'] = '500';
@@ -383,8 +375,19 @@ class PurchaseOrderController extends Controller
             $grandtotal = 0;
             $arr_subtotal = [];
             $percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
+            
+            $arrDetail = [];
 
             foreach($request->arr_item as $key => $row){
+                $index = -1;
+                $detail_pr = [];
+
+                foreach($arrDetail as $keycek => $rowcek){
+                    if($row == $rowcek['item_id']){
+                        $index = $keycek;
+                    }
+                }
+
                 $qty = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
                 $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
                 $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
@@ -395,9 +398,43 @@ class PurchaseOrderController extends Controller
                 $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
                 $finalpricedisc3 = $finalpricedisc2 - $disc3;
 
-                $arr_subtotal[] = round($finalpricedisc3 * $qty,3);
+                $rowsubtotal = round($finalpricedisc3 * $qty,3);
 
-                $subtotal += round($finalpricedisc3 * $qty,3);
+                $subtotal += $rowsubtotal;
+
+                if($index >= 0){
+                    $arrDetail[$index]['detail_pr'][] = [
+                        'pr_code'       => $request->arr_purchase[$key],
+                        'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))
+                    ];
+                    $arrDetail[$index] = [
+                        'item_id'               => $arrDetail[$index]['item_id'],
+                        'qty'                   => $arrDetail[$index]['qty'] + str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                        'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                        'percent_discount_1'    => str_replace(',','.',str_replace('.','',$request->arr_disc1[$key])),
+                        'percent_discount_2'    => str_replace(',','.',str_replace('.','',$request->arr_disc2[$key])),
+                        'discount_3'            => str_replace(',','.',str_replace('.','',$request->arr_disc3[$key])),
+                        'subtotal'              => $arrDetail[$index]['subtotal'] + $rowsubtotal,
+                        'note'                  => $arrDetail[$index]['note'].', '.$request->arr_note[$key],
+                        'detail_pr'             => $arrDetail[$index]['detail_pr']
+                    ];
+                }else{
+                    $detail_pr[] = [
+                        'pr_code'       => $request->arr_purchase[$key],
+                        'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))
+                    ];
+                    $arrDetail[] = [
+                        'item_id'               => $row,
+                        'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                        'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                        'percent_discount_1'    => str_replace(',','.',str_replace('.','',$request->arr_disc1[$key])),
+                        'percent_discount_2'    => str_replace(',','.',str_replace('.','',$request->arr_disc2[$key])),
+                        'discount_3'            => str_replace(',','.',str_replace('.','',$request->arr_disc3[$key])),
+                        'subtotal'              => $rowsubtotal,
+                        'note'                  => $request->arr_note[$key],
+                        'detail_pr'             => $detail_pr,
+                    ];
+                }
             }
 
             $total = $subtotal - $discount;
@@ -440,7 +477,6 @@ class PurchaseOrderController extends Controller
                         }
 
                         $query->user_id = session('bo_id');
-                        $query->purchase_request_id = $request->purchase_request_id ? $request->purchase_request_id : NULL;
                         $query->account_id = $request->supplier_id;
                         $query->purchasing_type = $request->purchasing_type;
                         $query->shipping_type = $request->shipping_type;
@@ -471,6 +507,9 @@ class PurchaseOrderController extends Controller
                         $query->save();
 
                         foreach($query->PurchaseOrderDetail as $row){
+                            foreach($row->purchaseOrderDetailComposition as $composition){
+                                $composition->delete();
+                            }
                             $row->delete();
                         }
 
@@ -490,7 +529,6 @@ class PurchaseOrderController extends Controller
                     $query = PurchaseOrder::create([
                         'code'			            => PurchaseOrder::generateCode(),
                         'user_id'		            => session('bo_id'),
-                        'purchase_request_id'		=> $request->purchase_request_id ? $request->purchase_request_id : NULL,
                         'account_id'                => $request->supplier_id,
                         'purchasing_type'	        => $request->purchasing_type,
                         'shipping_type'             => $request->shipping_type,
@@ -527,30 +565,46 @@ class PurchaseOrderController extends Controller
 			}
 			
 			if($query) {
+
+                DB::beginTransaction();
+                try {
                 
-                foreach($request->arr_item as $key => $row){
-                    DB::beginTransaction();
-                    try {
-                        PurchaseOrderDetail::create([
+                    foreach($arrDetail as $key => $row){
+                        
+                        $querydetail = PurchaseOrderDetail::create([
                             'purchase_order_id'     => $query->id,
-                            'item_id'               => $row,
-                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                            'percent_discount_1'    => str_replace(',','.',str_replace('.','',$request->arr_disc1[$key])),
-                            'percent_discount_2'    => str_replace(',','.',str_replace('.','',$request->arr_disc2[$key])),
-                            'discount_3'            => str_replace(',','.',str_replace('.','',$request->arr_disc3[$key])),
-                            'subtotal'              => $arr_subtotal[$key],
-                            'note'                  => $request->arr_note[$key]
+                            'item_id'               => $row['item_id'],
+                            'qty'                   => $row['qty'],
+                            'price'                 => $row['price'],
+                            'percent_discount_1'    => $row['percent_discount_1'],
+                            'percent_discount_2'    => $row['percent_discount_2'],
+                            'discount_3'            => $row['discount_3'],
+                            'subtotal'              => $row['subtotal'],
+                            'note'                  => $row['note'],
                         ]);
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
+
+                        foreach($row['detail_pr'] as $rowpr){
+                            if($rowpr['pr_code'] !== '0'){
+                                $pr = PurchaseRequest::where('code',CustomHelper::decrypt($rowpr['pr_code']))->first();
+                                if($pr){
+                                    PurchaseOrderDetailComposition::create([
+                                        'pod_id'    => $querydetail->id,
+                                        'pr_id'     => $pr->id,
+                                        'qty'       => $rowpr['qty']
+                                    ]);
+                                    CustomHelper::removeUsedData($pr->getTable(),$pr->id);
+                                }
+                            }
+                        }
                     }
+
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
                 }
 
                 CustomHelper::sendApproval('purchase_orders',$query->id,$query->note);
                 CustomHelper::sendNotification('purchase_orders',$query->id,'Pengajuan Purchase Order No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::removeUsedData($query->purchaseRequest->getTable(),$query->purchaseRequest->id);
 
                 activity()
                     ->performedOn(new PurchaseOrder())
@@ -682,7 +736,6 @@ class PurchaseOrderController extends Controller
 
     public function show(Request $request){
         $po = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
-        $po['purchase_request_name'] = $po->purchase_request_id ? $po->purchaseRequest->code.' - '.$po->purchaseRequest->note : '';
         $po['supplier_name'] = $po->supplier->name;
         $po['percent_tax'] = number_format($po->percent_tax,3,',','.');
         $po['subtotal'] = number_format($po->subtotal,3,',','.');
@@ -826,10 +879,6 @@ class PurchaseOrderController extends Controller
                             ->orWhere('total', 'like', "%$request->search%")
                             ->orWhere('tax', 'like', "%$request->search%")
                             ->orWhere('grandtotal', 'like', "%$request->search%")
-                            ->orWhereHas('purchaseRequest',function($query) use ($request){
-                                $query->where('code','like',"%$request->search%")
-                                    ->orWhere('note','like',"%$request->search%");
-                            })
                             ->orWhereHas('user',function($query) use ($request){
                                 $query->where('name','like',"%$request->search%")
                                     ->orWhere('employee_no','like',"%$request->search%");

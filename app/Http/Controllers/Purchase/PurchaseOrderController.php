@@ -372,7 +372,6 @@ class PurchaseOrderController extends Controller
             $total = 0;
             $tax = 0;
             $grandtotal = 0;
-            $arr_subtotal = [];
             $percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
             
             $arrDetail = [];

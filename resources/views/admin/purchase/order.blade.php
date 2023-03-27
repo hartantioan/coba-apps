@@ -394,7 +394,7 @@
                                 </p>
                             </div>
                             <div class="col m6 s6">
-                                <h6>Used Data : <i id="list-used-data"></i></h6>
+                                <h6><b>PR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 
                             </div>
                             <div class="col m12 s12">
@@ -551,6 +551,7 @@
                 M.updateTextFields();
                 $('#subtotal,#total,#tax,#grandtotal').text('0,000');
                 $('#purchase_request_id').empty();
+                $('#list-used-data').empty();
             }
         });
 

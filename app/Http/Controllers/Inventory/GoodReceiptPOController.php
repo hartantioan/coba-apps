@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Inventory;
+
 use App\Http\Controllers\Controller;
+use App\Models\GoodReceiptDetailComposition;
 use App\Models\PurchaseOrder;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
@@ -14,7 +16,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\GoodReceipt;
+use App\Models\GoodReceiptMain;
 use App\Models\User;
+use App\Models\Place;
+use App\Models\Department;
 use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReceipt;
@@ -34,6 +39,8 @@ class GoodReceiptPOController extends Controller
         $data = [
             'title'     => 'Penerimaan Barang PO',
             'content'   => 'admin.inventory.good_receipt',
+            'place'     => Place::where('status','1')->get(),
+            'department'=> Department::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -60,9 +67,9 @@ class GoodReceiptPOController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReceipt::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = GoodReceiptMain::whereIn('place_id',$this->dataplaces)->count();
         
-        $query_data = GoodReceipt::where(function($query) use ($search, $request) {
+        $query_data = GoodReceiptMain::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -71,10 +78,12 @@ class GoodReceiptPOController extends Controller
                             ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodReceiptDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
+                            ->orWhereHas('goodReceipt', function($query) use($search, $request){
+                                $query->whereHas('goodReceiptDetail',function($query) use($search, $request){
+                                    $query->whereHas('item',function($query) use($search, $request){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -98,7 +107,7 @@ class GoodReceiptPOController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = GoodReceipt::where(function($query) use ($search, $request) {
+        $total_filtered = GoodReceiptMain::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -107,10 +116,12 @@ class GoodReceiptPOController extends Controller
                             ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodReceiptDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
+                            ->orWhereHas('goodReceipt', function($query) use($search, $request){
+                                $query->whereHas('goodReceiptDetail',function($query) use($search, $request){
+                                    $query->whereHas('item',function($query) use($search, $request){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -139,7 +150,6 @@ class GoodReceiptPOController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->user->name,
                     $val->code,
-                    $val->supplier->name,
                     $val->receiver_name,
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->due_date)),
@@ -201,6 +211,8 @@ class GoodReceiptPOController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'place_id'                  => 'required',
+            'department_id'             => 'required',
 			'receiver_name'			    => 'required',
 			'post_date'		            => 'required',
 			'due_date'		            => 'required',
@@ -209,6 +221,8 @@ class GoodReceiptPOController extends Controller
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
 		], [
+            'place_id.required'                 => 'Penempatan tidak boleh kosong.',
+            'department_id.required'            => 'Departemen tidak boleh kosong.',
             'receiver_name.required'            => 'Nama penerima tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
@@ -227,36 +241,78 @@ class GoodReceiptPOController extends Controller
             ];
         } else {
 
-            $purchase_order = PurchaseOrder::find($request->purchase_order_id);
-
+            
             $total = 0;
-            $discount = $purchase_order->discount;
-            $subtotal = $purchase_order->subtotal;
             $bobot = 0;
             $tax = 0;
             $grandtotal = 0;
+            $discount = 0;
+            $subtotal = 0;
 
-            if($purchase_order){
-                foreach($request->arr_item as $key => $row){
+            $arrDetail = [];
+
+            foreach($request->arr_item as $key => $row){
+                $index = -1;
+                $detail_po = [];
+
+                foreach($arrDetail as $keycek => $rowcek){
+                    if($row == $rowcek['item_id']){
+                        $index = $keycek;
+                    }
+                }
+
+                $purchase_order = PurchaseOrder::where('code',CustomHelper::decrypt($request->arr_purchase[$key]))->first();
+
+                if($purchase_order){
+
+                    if($index >= 0){
+                        $arrDetail[$index]['detail_po'][] = [
+                            'po_id'         => $purchase_order->id,
+                            'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))
+                        ];
+                        $arrDetail[$index] = [
+                            'item_id'               => $arrDetail[$index]['item_id'],
+                            'qty'                   => $arrDetail[$index]['qty'] + str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'note'                  => $arrDetail[$index]['note'].', '.$request->arr_note[$key],
+                            'detail_po'             => $arrDetail[$index]['detail_po']
+                        ];
+                    }else{
+                        $detail_po[] = [
+                            'po_id'         => $purchase_order->id,
+                            'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))
+                        ];
+                        $arrDetail[] = [
+                            'item_id'               => $row,
+                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'note'                  => $request->arr_note[$key],
+                            'detail_po'             => $detail_po,
+                        ];
+                    }
+
+                    $discount = $purchase_order->discount;
+                    $subtotal = $purchase_order->subtotal;
+
                     $rowprice = 0;
+
                     $datarow = $purchase_order->purchaseOrderDetail()->where('item_id',$row)->first();
+
                     if($datarow){
                         $bobot = $datarow->subtotal / $subtotal;
                         $rowprice = round($datarow->subtotal / $datarow->qty,3);
                     }
 
                     $total += ($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount);
-                }
 
-                if($purchase_order->is_tax == '1' && $purchase_order->is_include_tax == '1'){
-                    $total = $total / (1 + ($purchase_order->percent_tax / 100));
-                }
+                    if($purchase_order->is_tax == '1' && $purchase_order->is_include_tax == '1'){
+                        $total = $total / (1 + ($purchase_order->percent_tax / 100));
+                    }
 
-                if($purchase_order->is_tax == '1'){
-                    $tax = round($total * ($purchase_order->percent_tax / 100),3);
-                }
+                    if($purchase_order->is_tax == '1'){
+                        $tax = round($total * ($purchase_order->percent_tax / 100),3);
+                    }
 
-                $grandtotal = $total + $tax;
+                    $grandtotal = $total + $tax;
+                }
             }
 
 			if($request->temp){
@@ -306,6 +362,7 @@ class GoodReceiptPOController extends Controller
                         $query->save();
 
                         foreach($query->goodReceiptDetail as $row){
+                            $row->goodReceiptDetailComposition()->delete();
                             $row->delete();
                         }
 
@@ -354,20 +411,29 @@ class GoodReceiptPOController extends Controller
 			}
 			
 			if($query) {
-                
-                foreach($request->arr_item as $key => $row){
-                    DB::beginTransaction();
-                    try {
-                        GoodReceiptDetail::create([
+                DB::beginTransaction();
+                try {
+                    foreach($arrDetail as $key => $row){
+                        
+                        $querydetail = GoodReceiptDetail::create([
                             'good_receipt_id'       => $query->id,
-                            'item_id'               => $row,
-                            'qty'                   => $request->arr_qty[$key],
-                            'note'                  => $request->arr_note[$key]
+                            'item_id'               => $row['item_id'],
+                            'qty'                   => $row['qty'],
+                            'note'                  => $row['note']
                         ]);
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
+                        
+                        foreach($row['detail_po'] as $rowpo){
+                            GoodReceiptDetailComposition::create([
+                                'grd_id'    => $querydetail->id,
+                                'po_id'     => $rowpo['po_id'],
+                                'qty'       => $rowpo['qty']
+                            ]);
+                            CustomHelper::removeUsedData('purchase_orders',$rowpo['po_id']);
+                        }
                     }
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
                 }
 
                 activity()

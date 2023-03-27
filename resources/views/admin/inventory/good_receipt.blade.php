@@ -96,10 +96,9 @@
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">PO No.</th>
-                                                        <th rowspan="2">Supplier</th>
                                                         <th rowspan="2">Penerima</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
-                                                        <th rowspan="2">Cabang</th>
+                                                        <th rowspan="2">Pabrik/Kantor</th>
                                                         <th rowspan="2">Gudang</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Dokumen</th>
@@ -157,6 +156,15 @@
                                 <label class="active" for="document_date">Tgl. Dokumen</label>
                             </div>
                             <div class="input-field col m3 s12">
+                                <select class="form-control" id="place_id" name="place_id">
+                                    <option value="">--Kosong--</option>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}" data-name="{{ $rowplace->name.' - '.$rowplace->company->name }}" data-address="{{ $rowplace->address }}">{{ $rowplace->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="place_id">Pabrik/Kantor</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <select class="browser-default" id="warehouse_id" name="warehouse_id"></select>
                                 <label class="active" for="warehouse_id">Gudang Tujuan</label>
                             </div>
@@ -186,7 +194,7 @@
                                     </p>
                                 </div>
                                 <div class="col m6 s6">
-                                    <h6>Used Data : <i id="list-used-data"></i></h6>
+                                    <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
                             <div class="col m12 s12">
@@ -302,6 +310,7 @@
                 });
                 $('#warehouse_id,#purchase_order_id').empty();
                 M.updateTextFields();
+                $('#list-used-data').empty();
             }
         });
 
@@ -373,12 +382,11 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'po_no', className: 'center-align' },
-                { name: 'supplier', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_due', className: 'center-align' },
                 { name: 'date_doc', className: 'center-align' },
-                { name: 'branch', className: 'center-align' },
+                { name: 'place_id', className: 'center-align' },
                 { name: 'warehouse', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
@@ -527,10 +535,8 @@
                     
                     if(response.details.length > 0){
                         $('#receiver_name').val(response.receiver_name);
-
-                        $('.row_item').each(function(){
-                            $(this).remove();
-                        });
+                        $('#place_id').val(response.place_id).formSelect();
+                        $('#department_id').val(response.department_id).formSelect();
 
                         $('#empty-item').remove();
 
@@ -557,7 +563,7 @@
                                         <span>` + val.unit + `</span>
                                     </td>
                                     <td>
-                                        <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="-" style="width:100%;">
+                                        <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + response.code + `" style="width:100%;">
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -652,6 +658,8 @@
                 $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
                 $('#document_date').removeAttr('min');
+                $('#place_id').val(response.place_id).formSelect();
+                $('#department_id').val(response.department_id).formSelect();
                 $('#warehouse_id').empty();
                 $('#warehouse_id').append(`
                     <option value="` + response.warehouse_id + `">` + response.warehouse_name + `</option>

@@ -60,4 +60,9 @@ class GoodReceiptDetail extends Model
 
         return $qty;
     }
+
+    public function goodReceiptDetailComposition()
+    {
+        return $this->hasMany('App\Models\GoodReceiptDetailComposition','grd_id','id');
+    }
 }

@@ -377,21 +377,25 @@
                                     <label class="active" for="percent_tax">Prosentase Tax</label>
                                 </div>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m6 s6">
                                 <p class="mt-2 mb-2">
                                     <h4>Purchase Request</h4>
                                     <div class="row">
-                                        <div class="input-field col m3 s3">
+                                        <div class="input-field col m6 s6">
                                             <select class="browser-default" id="purchase_request_id" name="purchase_request_id"></select>
                                             <label class="active" for="purchase_request_id">Purchase Request (Jika ada)</label>
                                         </div>
-                                        <div class="col m3 s3 mt-2">
+                                        <div class="col m6 s6 mt-4">
                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getPurchaseRequest();" href="javascript:void(0);">
                                                 <i class="material-icons left">add</i> Tambah PR
                                             </a>
                                         </div>
                                     </div>
                                 </p>
+                            </div>
+                            <div class="col m6 s6">
+                                <h6>Used Data : <i id="list-used-data"></i></h6>
+                                
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
@@ -627,8 +631,14 @@
 
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
+                                $('#list-used-data').append(`
+                                    <div class="chip purple darken-4 gradient-shadow white-text">
+                                        ` + response.code + `
+                                        <i class="material-icons close" onclick="removeUsedData('` + response.id + `')">close</i>
+                                    </div>
+                                `);
                                 $('#last-row-item').before(`
-                                    <tr class="row_item">
+                                    <tr class="row_item" data-id="` + response.id + `">
                                         <input type="hidden" name="arr_purchase[]" value="` + response.ecode + `">
                                         <td>
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
@@ -658,7 +668,7 @@
                                             <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + response.code + `">
                                         </td>
                                         <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + response.id + `')">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
                                             </a>
                                         </td>

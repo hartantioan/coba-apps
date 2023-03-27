@@ -37,13 +37,15 @@ class PurchaseOrderDetail extends Model
 
     public function getBalanceReceipt(){
         $item = $this->item_id;
-        $po = $this->purchase_order_id;
+        /* $po = $this->purchase_order_id;
 
         $received = GoodReceiptDetail::whereHas('goodReceipt',function($query) use($po){
             $query->where('purchase_order_id',$po)->whereIn('status',['1','2','3']);
         })->where('item_id',$item)->sum('qty');
 
-        $balance = $this->qty - $received;
+        $balance = $this->qty - $received; */
+
+        $balance = $this->qty;
 
         return $balance;
     }

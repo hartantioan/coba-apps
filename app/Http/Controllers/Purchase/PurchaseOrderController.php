@@ -291,9 +291,7 @@ class PurchaseOrderController extends Controller
             $data['status'] = '500';
             $data['message'] = 'Purchase Request '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
-            
-            CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
-
+            $ud = CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
             $details = [];
             foreach($data->purchaseRequestDetail as $row){
                 $details[] = [

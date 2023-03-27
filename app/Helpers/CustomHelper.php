@@ -571,13 +571,17 @@ class CustomHelper {
 	public static function sendUsedData($table_name = null, $table_id = null, $ref = null){
 		$count = UsedData::where('lookable_type',$table_name)->where('lookable_id',$table_id)->count();
 		if($count == 0){
-			UsedData::create([
+			$ud = UsedData::create([
 				'user_id'		=> session('bo_id'),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'ref'			=> $ref
 			]);
+
+			return $ud;
 		}
+
+		return '';
 	}
 
 	public static function removeUsedData($table_name = null, $table_id = null){

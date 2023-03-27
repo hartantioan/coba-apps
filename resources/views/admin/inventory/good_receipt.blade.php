@@ -2,6 +2,13 @@
     .modal {
         top:0px !important;
     }
+    table > thead > tr > th {
+        font-size: 13px !important;
+    }
+
+    table.bordered th {
+        padding: 5px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -133,10 +140,6 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="purchase_order_id" name="purchase_order_id" onchange="getPurchaseOrder(this.value)"></select>
-                                <label class="active" for="purchase_request_id">Purchase Order</label>
-                            </div>
-                            <div class="input-field col m3 s12">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
                                 <label class="active" for="receiver_name">Nama Penerima</label>
                             </div>
@@ -164,6 +167,26 @@
                                 </div>
                                 <div class="file-path-wrapper">
                                     <input class="file-path validate" type="text">
+                                </div>
+                            </div>
+                            <div class="col m12 s12">
+                                <div class="col m6 s6">
+                                    <p class="mt-2 mb-2">
+                                        <h4>Purchase Order</h4>
+                                        <div class="row">
+                                            <div class="input-field col m6 s7">
+                                                <select class="browser-default" id="purchase_order_id" name="purchase_order_id">&nbsp;</select>
+                                            </div>
+                                            <div class="col m6 s6 mt-4">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getPurchaseOrder();" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Tambah PO
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </p>
+                                </div>
+                                <div class="col m6 s6">
+                                    <h6>Used Data : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
                             <div class="col m12 s12">
@@ -482,7 +505,9 @@
         $('#modal1').modal('close');
     }
 
-    function getPurchaseOrder(val){
+    function getPurchaseOrder(){
+        let val = $('#purchase_order_id').val();
+
         if(val){
             $.ajax({
                 url: '{{ Request::url() }}/get_purchase_order',
@@ -509,11 +534,19 @@
 
                         $('#empty-item').remove();
 
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + response.code + `
+                                <i class="material-icons close" onclick="removeUsedData('` + response.id + `')">close</i>
+                            </div>
+                        `);
+
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
                             $('#body-item').append(`
                                 <tr class="row_item">
                                     <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                    <input type="hidden" name="arr_purchase[]" value="` + response.ecode + `">
                                     <td>
                                         ` + val.item_name + `
                                     </td>
@@ -564,6 +597,33 @@
                 `);
             }
         }
+    }
+
+    function removeUsedData(id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
     function show(id){

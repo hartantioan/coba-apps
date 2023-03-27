@@ -545,6 +545,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('print',[GoodReceiptPOController::class, 'print']);
                 Route::get('export',[GoodReceiptPOController::class, 'export']);
                 Route::post('get_purchase_order', [GoodReceiptPOController::class, 'getPurchaseOrder']);
+                Route::post('remove_used_data', [GoodReceiptPOController::class, 'removeUsedData']);
                 Route::post('create',[GoodReceiptPOController::class, 'create'])->middleware('operation.access:good_receipt_po,update');
                 Route::get('approval/{id}',[GoodReceiptPOController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');

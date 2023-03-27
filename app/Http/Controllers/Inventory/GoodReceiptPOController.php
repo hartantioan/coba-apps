@@ -175,20 +175,26 @@ class GoodReceiptPOController extends Controller
     }
 
     public function getPurchaseOrder(Request $request){
-        $data = PurchaseOrder::find($request->id);
+        $data = PurchaseOrder::where('id',$request->id)->where('status','2')->first();
+        $data['ecode'] = CustomHelper::encrypt($data->code);
 
-        $details = [];
+        if($data->used()->exists()){
+            $data['status'] = '500';
+            $data['message'] = 'Purchase Order '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+        }else{
+            CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Receipt');
+            $details = [];
+            foreach($data->purchaseOrderDetail as $row){
+                $details[] = [
+                    'item_id'   => $row->item_id,
+                    'item_name' => $row->item->code.' - '.$row->item->name,
+                    'qty'       => $row->getBalanceReceipt(),
+                    'unit'      => $row->item->buyUnit->code
+                ];
+            }
 
-        foreach($data->purchaseOrderDetail as $row){
-            $details[] = [
-                'item_id'   => $row->item_id,
-                'item_name' => $row->item->code.' - '.$row->item->name,
-                'qty'       => $row->getBalanceReceipt(),
-                'unit'      => $row->item->buyUnit->code
-            ];
+            $data['details'] = $details;
         }
-
-        $data['details'] = $details;
 
         return response()->json($data);
     }
@@ -612,5 +618,13 @@ class GoodReceiptPOController extends Controller
 
     public function export(Request $request){
 		return Excel::download(new ExportGoodReceipt($request->search,$request->status,$request->warehouse,$this->dataplaces), 'good_receipt_'.uniqid().'.xlsx');
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData('purchase_orders',$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 }

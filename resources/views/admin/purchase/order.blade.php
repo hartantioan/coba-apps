@@ -658,7 +658,7 @@
                                             <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + response.code + `">
                                         </td>
                                         <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + response.id + `')">
                                                 <i class="material-icons">delete</i>
                                             </a>
                                         </td>
@@ -741,6 +741,33 @@
                 $(this).attr("min",val);
             });
         }
+    }
+
+    function removeUsedData(id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
     function loadDataTable() {
@@ -1002,6 +1029,7 @@
                         var count = makeid(10);
                         $('#last-row-item').before(`
                             <tr class="row_item">
+                                <input type="hidden" name="arr_purchase[]" value="` + val.ecode + `">
                                 <td>
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
@@ -1030,7 +1058,7 @@
                                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                                 </td>
                                 <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>

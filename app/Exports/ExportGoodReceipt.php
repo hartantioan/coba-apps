@@ -27,7 +27,6 @@ class ExportGoodReceipt implements FromCollection, WithTitle, WithHeadings, With
         'NO',
         'KODE',
         'PENGGUNA',
-        'PO.NO',
         'SUPPLIER',
         'PENERIMA',
         'TGL.POST',
@@ -58,10 +57,6 @@ class ExportGoodReceipt implements FromCollection, WithTitle, WithHeadings, With
                         ->orWhereHas('user',function($query){
                             $query->where('name','like',"%$this->search%")
                                 ->orWhere('employee_no','like',"%$this->search%");
-                        })
-                        ->orWhereHas('purchaseOrder',function($query){
-                            $query->where('code','like',"%$this->search%")
-                                ->orWhere('note','like',"%$this->search%");
                         });
                 });
             }
@@ -86,7 +81,6 @@ class ExportGoodReceipt implements FromCollection, WithTitle, WithHeadings, With
                 'id'            => ($key + 1),
                 'code'          => $row->code,
                 'user'          => $row->user->name,
-                'po'            => $row->purchaseOrder->code,
                 'supplier'      => $row->supplier->name,
                 'penerima'      => $row->receiver_name,
                 'tgl_post'      => $row->post_date,

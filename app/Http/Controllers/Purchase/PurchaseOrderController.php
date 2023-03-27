@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
+use App\Models\UsedData;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -662,6 +663,11 @@ class PurchaseOrderController extends Controller
                 <td class="right-align">'.number_format($row->discount_3,3,',','.').'</td>
                 <td class="right-align">'.number_format($row->subtotal,3,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
+            </tr>
+            <tr>
+                <td class="center-align" colspan="10">
+                    '.$row->purchaseRequestList().'
+                </td>
             </tr>';
         }
         
@@ -747,18 +753,40 @@ class PurchaseOrderController extends Controller
         $arr = [];
 
         foreach($po->purchaseOrderDetail as $row){
-            $arr[] = [
-                'item_id'   => $row->item_id,
-                'item_name' => $row->item->name,
-                'qty'       => $row->qty,
-                'unit'      => $row->item->buyUnit->code,
-                'note'      => $row->note,
-                'price'     => number_format($row->price,3,',','.'),
-                'disc1'     => number_format($row->percent_discount_1,3,',','.'),
-                'disc2'     => number_format($row->percent_discount_2,3,',','.'),
-                'disc3'     => number_format($row->discount_3,3,',','.'),
-                'subtotal'  => number_format($row->subtotal,3,',','.'),
-            ];
+            if($row->purchaseOrderDetailComposition()->exists()){
+                foreach($row->purchaseOrderDetailComposition as $rowcompos){
+                    $arr[] = [
+                        'id'        => $rowcompos->pr_id,
+                        'ecode'     => CustomHelper::encrypt($rowcompos->purchaseRequest->code),
+                        'code'      => $rowcompos->purchaseRequest->code,
+                        'item_id'   => $row->item_id,
+                        'item_name' => $row->item->name,
+                        'qty'       => $rowcompos->qty,
+                        'unit'      => $row->item->buyUnit->code,
+                        'note'      => $row->note,
+                        'price'     => number_format($row->price,3,',','.'),
+                        'disc1'     => number_format($row->percent_discount_1,3,',','.'),
+                        'disc2'     => number_format($row->percent_discount_2,3,',','.'),
+                        'disc3'     => number_format($row->discount_3,3,',','.'),
+                        'subtotal'  => number_format($rowcompos->qty * $row->price,3,',','.'),
+                    ];
+                }
+            }else{
+                $arr[] = [
+                    'id'        => 0,
+                    'ecode'     => 0,
+                    'item_id'   => $row->item_id,
+                    'item_name' => $row->item->name,
+                    'qty'       => $row->qty,
+                    'unit'      => $row->item->buyUnit->code,
+                    'note'      => $row->note,
+                    'price'     => number_format($row->price,3,',','.'),
+                    'disc1'     => number_format($row->percent_discount_1,3,',','.'),
+                    'disc2'     => number_format($row->percent_discount_2,3,',','.'),
+                    'disc3'     => number_format($row->discount_3,3,',','.'),
+                    'subtotal'  => number_format($row->subtotal,3,',','.'),
+                ];
+            }
         }
 
         $po['details'] = $arr;
@@ -839,6 +867,7 @@ class PurchaseOrderController extends Controller
         
         if($query->delete()) {
 
+            $query->purchaseOrderDetail()->purchaseOrderDetailComposition()->delete();
             $query->purchaseOrderDetail()->delete();
 
             CustomHelper::removeApproval('purchase_orders',$query->id);
@@ -939,5 +968,13 @@ class PurchaseOrderController extends Controller
 
     public function export(Request $request){
 		return Excel::download(new ExportPurchaseOrder($request->search,$request->status,$request->type,$request->shipping,$request->place,$request->department,$request->is_tax,$request->is_include_tax,$request->payment,$request->supplier,$request->currency,$this->dataplaces), 'purchase_order_'.uniqid().'.xlsx');
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData('purchase_requests',$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 }

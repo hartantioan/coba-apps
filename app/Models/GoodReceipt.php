@@ -18,7 +18,6 @@ class GoodReceipt extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'purchase_order_id',
         'account_id',
         'receiver_name',
         'post_date',
@@ -63,11 +62,6 @@ class GoodReceipt extends Model
     public function currency()
     {
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
-    }
-
-    public function purchaseOrder()
-    {
-        return $this->belongsTo('App\Models\PurchaseOrder', 'purchase_order_id', 'id')->withTrashed();
     }
 
     public function warehouse()

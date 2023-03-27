@@ -485,6 +485,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('print',[PurchaseOrderController::class, 'print']);
                 Route::get('export',[PurchaseOrderController::class, 'export']);
                 Route::post('get_purchase_request', [PurchaseOrderController::class, 'getPurchaseRequest']);
+                Route::post('remove_used_data', [PurchaseOrderController::class, 'removeUsedData']);
                 Route::post('create',[PurchaseOrderController::class, 'create'])->middleware('operation.access:purchase_order,update');
                 Route::get('approval/{id}',[PurchaseOrderController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('void_status', [PurchaseOrderController::class, 'voidStatus'])->middleware('operation.access:purchase_order,void');

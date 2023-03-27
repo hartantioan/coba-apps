@@ -52,4 +52,14 @@ class PurchaseOrderDetail extends Model
     {
         return $this->hasMany('App\Models\PurchaseOrderDetailComposition','pod_id','id');
     }
+
+    public function purchaseRequestList(){
+        $content = '';
+
+        foreach($this->purchaseOrderDetailComposition as $row){
+            $content .= $row->purchaseRequest->code.' - '.$row->qty.' '.$this->item->buyUnit->code.'<br>';
+        }
+
+        return $content;
+    }
 }

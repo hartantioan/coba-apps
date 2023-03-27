@@ -44,7 +44,6 @@ class GoodReceiptPOController extends Controller
             'id',
             'user_id',
             'code',
-            'purchase_order_id',
             'account_id',
             'receiver_name',
             'post_date',
@@ -81,10 +80,6 @@ class GoodReceiptPOController extends Controller
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('purchaseOrder',function($query) use($search, $request){
-                                $query->where('code','like',"%$search%")
-                                    ->orWhere('note','like',"%$search%");
                             });
                     });
                 }
@@ -121,10 +116,6 @@ class GoodReceiptPOController extends Controller
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('purchaseOrder',function($query) use($search, $request){
-                                $query->where('code','like',"%$search%")
-                                    ->orWhere('note','like',"%$search%");
                             });
                     });
                 }
@@ -148,7 +139,6 @@ class GoodReceiptPOController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->user->name,
                     $val->code,
-                    $val->purchaseOrder->code,
                     $val->supplier->name,
                     $val->receiver_name,
                     date('d M Y',strtotime($val->post_date)),
@@ -205,7 +195,6 @@ class GoodReceiptPOController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'purchase_order_id' 		=> 'required',
 			'receiver_name'			    => 'required',
 			'post_date'		            => 'required',
 			'due_date'		            => 'required',
@@ -214,7 +203,6 @@ class GoodReceiptPOController extends Controller
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
 		], [
-            'purchase_order_id.required'        => 'Purchase Order / Pembelian tidak boleh kosong.',
             'receiver_name.required'            => 'Nama penerima tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
@@ -292,7 +280,6 @@ class GoodReceiptPOController extends Controller
                         }
                         
                         $query->user_id = session('bo_id');
-                        $query->purchase_order_id = $request->purchase_order_id;
                         $query->account_id = $purchase_order->account_id;
                         $query->receiver_name = $request->receiver_name;
                         $query->post_date = $request->post_date;
@@ -332,7 +319,6 @@ class GoodReceiptPOController extends Controller
                     $query = GoodReceipt::create([
                         'code'			        => GoodReceipt::generateCode(),
                         'user_id'		        => session('bo_id'),
-                        'purchase_order_id'     => $request->purchase_order_id,
                         'account_id'            => $purchase_order->account_id,
                         'receiver_name'         => $request->receiver_name,
                         'post_date'             => $request->post_date,
@@ -480,7 +466,6 @@ class GoodReceiptPOController extends Controller
 
     public function show(Request $request){
         $gr = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
-        $gr['purchase_order_code'] = $gr->purchaseOrder->code;
         $gr['warehouse_name'] = $gr->warehouse->branch->name.' - '.$gr->warehouse->name;
         $arr = [];
 
@@ -606,10 +591,6 @@ class GoodReceiptPOController extends Controller
                             ->orWhereHas('user',function($query) use($request){
                                 $query->where('name','like',"%$request->search%")
                                     ->orWhere('employee_no','like',"%$request->search%");
-                            })
-                            ->orWhereHas('purchaseOrder',function($query) use($request){
-                                $query->where('code','like',"%$request->search%")
-                                    ->orWhere('note','like',"%$request->search%");
                             });
                     });
                 }

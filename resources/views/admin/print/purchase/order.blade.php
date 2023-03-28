@@ -133,7 +133,6 @@
                         <th rowspan="2">PO NO.</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Supplier</th>
-						<th rowspan="2">PR No.</th>
 						<th colspan="3">Tanggal</th>
 						<th colspan="3">Penerima</th>
                         <th rowspan="2">Dok.Ref</th>
@@ -169,7 +168,6 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
 							<td>{{ $row->supplier->name }}</td>
-                            <td>{{ $row->purchaseRequest()->exists() ? $row->purchaseRequest->code : '-' }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->delivery_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
@@ -192,7 +190,7 @@
                             <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan="25" style="border-right-style: none !important;">
+                            <td colspan="24" style="border-right-style: none !important;">
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
@@ -228,7 +226,7 @@
 					@endforeach
                     @if(count($data) == 0)
                         <tr>
-                            <td colspan="25" align="center">
+                            <td colspan="24" align="center">
                                 Data tidak ditemukan
                             </td>
                         </tr>

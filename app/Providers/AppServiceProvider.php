@@ -33,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
             'purchase_invoices'         => 'App\Models\PurchaseInvoice',
             'good_receipts'             => 'App\Models\GoodReceipt',
             'landed_costs'              => 'App\Models\LandedCost',
+            'good_receipt_mains'        => 'App\Models\GoodReceiptMain' 
         ]);
     }
 }

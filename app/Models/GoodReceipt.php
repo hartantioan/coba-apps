@@ -43,6 +43,11 @@ class GoodReceipt extends Model
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
+    public function supplier()
+    {
+        return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
+    }
+
     public function currency()
     {
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
@@ -66,10 +71,5 @@ class GoodReceipt extends Model
     public function goodReceiptDetail()
     {
         return $this->hasMany('App\Models\GoodReceiptDetail');
-    }
-
-    public function landedCost()
-    {
-        return $this->hasMany('App\Models\LandedCost');
     }
 }

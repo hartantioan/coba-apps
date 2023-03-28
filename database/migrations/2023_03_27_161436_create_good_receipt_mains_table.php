@@ -26,6 +26,9 @@ return new class extends Migration
             $table->string('document')->nullable();
             $table->text('note')->nullable();
             $table->char('status',1)->nullable();
+            $table->double('total')->nullable();
+            $table->double('tax')->nullable();
+            $table->double('grandtotal')->nullable();
             $table->bigInteger('void_id')->nullable();
             $table->string('void_note')->nullable();
             $table->timestamp('void_date')->nullable();

@@ -95,7 +95,6 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Code</th>
-                                                        <th rowspan="2">PO No.</th>
                                                         <th rowspan="2">Penerima</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Pabrik/Kantor</th>
@@ -308,6 +307,13 @@
                 $('.row_item').each(function(){
                     $(this).remove();
                 });
+                $('#body-item').append(`
+                    <tr id="empty-item">
+                        <td colspan="5" class="center">
+                            Pilih purchase order untuk memulai...
+                        </td>
+                    </tr>
+                `);
                 $('#warehouse_id,#purchase_order_id').empty();
                 M.updateTextFields();
                 $('#list-used-data').empty();
@@ -381,7 +387,6 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'name', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
-                { name: 'po_no', className: 'center-align' },
                 { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_due', className: 'center-align' },
@@ -574,7 +579,7 @@
                             `);
                         });
                     }
-                    
+                    $('#purchase_order_id').empty();
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
@@ -645,6 +650,11 @@
             },
             beforeSend: function() {
                 loadingOpen('#main');
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+
+                $('#empty-item').remove();
             },
             success: function(response) {
                 loadingClose('#main');
@@ -659,28 +669,18 @@
                 $('#due_date').removeAttr('min');
                 $('#document_date').removeAttr('min');
                 $('#place_id').val(response.place_id).formSelect();
-                $('#department_id').val(response.department_id).formSelect();
                 $('#warehouse_id').empty();
                 $('#warehouse_id').append(`
                     <option value="` + response.warehouse_id + `">` + response.warehouse_name + `</option>
                 `);
-                $('#purchase_order_id').empty();
-                $('#purchase_order_id').append(`
-                    <option value="` + response.purchase_order_id + `">` + response.purchase_order_code + `</option>
-                `);
                 
                 if(response.details.length > 0){
-                    $('.row_item').each(function(){
-                        $(this).remove();
-                    });
-
-                    $('#empty-item').remove();
-
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#body-item').append(`
                             <tr class="row_item">
                                 <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                <input type="hidden" name="arr_purchase[]" value="` + val.ecode + `">
                                 <td>
                                     ` + val.item_name + `
                                 </td>

@@ -698,40 +698,6 @@ class PurchaseOrderController extends Controller
             </tr>';
         }
 
-        $string .= '</tbody></table></div>';
-
-        $string .= '<div class="col s12 mt-1"><table style="max-width:500px;">
-                        <thead>
-                            <tr>
-                                <th class="center-align" colspan="6">Landed Cost</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">Nomor/Kode</th>
-                                <th class="center-align">Vendor</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Total</th>
-                                <th class="center-align">Pajak</th>
-                                <th class="center-align">Grandtotal</th>
-                            </tr>
-                        </thead><tbody>';
-
-        if($data->landedCost()->exists()){
-            foreach($data->landedCost as $key => $row){
-                $string .= '<tr>
-                    <td class="center-align">'.$row->code.'</td>
-                    <td class="center-align">'.$row->vendor->name.'</td>
-                    <td class="center-align">'.$row->note.'</td>
-                    <td class="center-align">'.number_format($row->total,2,',','.').'</td>
-                    <td class="center-align">'.number_format($row->tax,2,',','.').'</td>
-                    <td class="center-align">'.number_format($row->grandtotal,2,',','.').'</td>
-                </tr>';
-            }
-        }else{
-            $string .= '<tr>
-                <td class="center-align" colspan="6">Landed cost tidak ditemukan.</td>
-            </tr>';
-        }
-        
         $string .= '</tbody></table></div></div>';
 		
         return response()->json($string);

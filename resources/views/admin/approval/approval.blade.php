@@ -130,7 +130,7 @@
                             <label class="active" for="code">Keterangan</label>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="approve();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="approve();">Kirim <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>

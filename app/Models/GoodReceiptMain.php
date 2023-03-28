@@ -27,6 +27,9 @@ class GoodReceiptMain extends Model
         'document',
         'note',
         'status',
+        'total',
+        'tax',
+        'grandtotal',
         'void_id',
         'void_note',
         'void_date'

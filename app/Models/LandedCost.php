@@ -19,8 +19,7 @@ class LandedCost extends Model
         'code',
         'user_id',
         'account_id',
-        'purchase_order_id',
-        'good_receipt_id',
+        'good_receipt_main_id',
         'place_id',
         'department_id',
         'post_date',
@@ -55,15 +54,10 @@ class LandedCost extends Model
     {
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
     }
-
-    public function purchaseOrder()
+    
+    public function goodReceiptMain()
     {
-        return $this->belongsTo('App\Models\PurchaseOrder', 'purchase_order_id', 'id')->withTrashed();
-    }
-
-    public function goodReceipt()
-    {
-        return $this->belongsTo('App\Models\GoodReceipt', 'good_receipt_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\GoodReceiptMain', 'good_receipt_main_id', 'id')->withTrashed();
     }
 
     public function currency()

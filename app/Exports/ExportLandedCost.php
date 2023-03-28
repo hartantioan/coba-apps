@@ -31,7 +31,6 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
         'LC.NO',
         'PENGGUNA',
         'VENDOR',
-        'PO.NO',
         'GR.NO',
         'PABRIK/KANTOR',
         'TGL.POST',
@@ -69,10 +68,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                             $query->where('name','like',"%$this->search%")
                                 ->orWhere('employee_no','like',"%$this->search%");
                         })
-                        ->orWhereHas('purchaseOrder',function($query){
-                            $query->where('code','like',"%$this->search%");
-                        })
-                        ->orWhereHas('goodReceipt',function($query){
+                        ->orWhereHas('goodReceiptMain',function($query){
                             $query->where('code','like',"%$this->search%");
                         });
                 });
@@ -115,8 +111,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                 'code'          => $row->code,
                 'name'          => $row->user->name,
                 'vendor'        => $row->vendor->name,
-                'po'            => $row->purchaseOrder()->exists() ? $row->purchaseOrder->code : '-',
-                'gr'            => $row->goodReceipt()->exists() ? $row->goodReceipt->code : '-',
+                'gr'            => $row->goodReceiptMain()->exists() ? $row->goodReceiptMain->code : '-',
                 'cabang'        => $row->place->name.' - '.$row->place->company->name,
                 'tgl_post'      => $row->post_date,
                 'tgl_due'       => $row->due_date,

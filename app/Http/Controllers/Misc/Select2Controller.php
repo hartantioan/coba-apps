@@ -11,19 +11,20 @@ use App\Models\User;
 use App\Models\Bank;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
-use App\Models\GoodReceipt;
+use App\Models\GoodReceiptMain;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class Select2Controller extends Controller {
     
-    protected $dataplaces;
+    protected $dataplaces, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user->userPlaceArray();
+        $this->datawarehouses = $user->userWarehouseArray();
     }
     
     public function city(Request $request)
@@ -371,6 +372,7 @@ class Select2Controller extends Controller {
                     ->orWhere('name', 'like', "%$search%")
                     ->orWhere('note', 'like', "%$search%");
                 })
+                ->whereIn('id',$this->datawarehouses)
                 ->where('status','1')->get();
 
         foreach($data as $d) {
@@ -414,23 +416,17 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = GoodReceipt::where(function($query) use($search){
+        $data = GoodReceiptMain::where(function($query) use($search){
                     $query->where(function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('supplier',function($query) use($search){
-                                $query->where('name','like',"%$search%");
-                            })
-                            ->orWhereHas('user',function($query) use($search){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            });
-                    })
-                    ->orWhereHas('purchaseOrder',function($query) use($search){
-                        $query->where('code', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('supplier',function($query) use($search){
-                                $query->where('name','like',"%$search%");
+                            ->orWhereHas('goodReceipt', function($query) use($search){
+                                $query->whereHas('goodReceiptDetail',function($query) use($search){
+                                    $query->whereHas('item',function($query) use($search){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
+                                });
                             })
                             ->orWhereHas('user',function($query) use($search){
                                 $query->where('name','like',"%$search%")

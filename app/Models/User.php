@@ -209,7 +209,7 @@ class User extends Authenticatable
 
     public function userWarehouseArray(){
         $arr = [];
-        foreach($this->userWarehouse() as $row){
+        foreach($this->userWarehouse as $row){
             $arr[] = $row->warehouse_id;
         }
         return $arr;

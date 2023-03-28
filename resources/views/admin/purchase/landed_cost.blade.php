@@ -128,7 +128,6 @@
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Vendor</th>
-                                                        <th rowspan="2">PO No.</th>
                                                         <th rowspan="2">GR No.</th>
                                                         <th rowspan="2">Pabrik/Kantor</th>
                                                         <th colspan="2" class="center">Tanggal</th>
@@ -263,6 +262,9 @@
                                         <label class="active" for="grandtotal">Grandtotal</label>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="col m12 s12">
+                                <h6><b>GRPO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
@@ -444,7 +446,14 @@
                         });
                         $('#purchase_request_id').empty();
                     }else{
-                        if(response.length > 0){
+                        if(response.details.length > 0){
+
+                            $('#list-used-data').append(`
+                                <div class="chip purple darken-4 gradient-shadow white-text">
+                                    ` + response.code + `
+                                    <i class="material-icons close" onclick="removeUsedData('` + response.id + `')">close</i>
+                                </div>
+                            `);
 
                             $('.row_item').each(function(){
                                 $(this).remove();
@@ -454,7 +463,7 @@
 
                             $('#last-row-item').remove();
 
-                            $.each(response, function(i, val) {
+                            $.each(response.details, function(i, val) {
                                 arrQty.push(val.qtyRaw);
                                 var count = makeid(10);
                                 $('#body-item').append(`
@@ -620,7 +629,6 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'vendor_id', className: 'center-align' },
-                { name: 'purchase_order_id', className: 'center-align' },
                 { name: 'good_receipt_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
@@ -1022,5 +1030,32 @@
         var search = window.table.search(), status = $('#filter_status').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val(), vendor = $('#filter_vendor').val(), currency = $('#filter_currency').val();
         
         window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&vendor=" + vendor + "&currency=" + currency;
+    }
+
+    function removeUsedData(id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 </script>

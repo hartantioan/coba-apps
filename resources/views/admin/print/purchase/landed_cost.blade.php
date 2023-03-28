@@ -133,7 +133,6 @@
                         <th rowspan="2">LC NO.</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Vendor</th>
-						<th rowspan="2">PO No.</th>
                         <th rowspan="2">GR No.</th>
                         <th rowspan="2">Penempatan</th>
 						<th colspan="2">Tanggal</th>
@@ -164,8 +163,7 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
 							<td>{{ $row->vendor->name }}</td>
-                            <td>{{ $row->purchaseOrder()->exists() ? $row->purchaseOrder->code : '-' }}</td>
-                            <td>{{ $row->goodReceipt()->exists() ? $row->goodReceipt->code : '-' }}</td>
+                            <td>{{ $row->goodReceiptMain()->exists() ? $row->goodReceiptMain->code : '-' }}</td>
                             <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
@@ -183,7 +181,7 @@
                             <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan="25" style="border-right-style: none !important;">
+                            <td colspan="24" style="border-right-style: none !important;">
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
@@ -211,7 +209,7 @@
 					@endforeach
                     @if(count($data) == 0)
                         <tr>
-                            <td colspan="25" align="center">
+                            <td colspan="24" align="center">
                                 Data tidak ditemukan
                             </td>
                         </tr>

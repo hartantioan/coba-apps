@@ -514,6 +514,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [LandedCostController::class, 'show']);
                 Route::post('print',[LandedCostController::class, 'print']);
                 Route::get('export',[LandedCostController::class, 'export']);
+                Route::post('remove_used_data', [LandedCostController::class, 'removeUsedData']);
                 Route::post('create',[LandedCostController::class, 'create'])->middleware('operation.access:landed_cost,update');
                 Route::post('void_status', [LandedCostController::class, 'voidStatus'])->middleware('operation.access:landed_cost,void');
                 Route::get('approval/{id}',[LandedCostController::class, 'approval'])->middleware('operation.access:landed_cost,view')->withoutMiddleware('direct.access');

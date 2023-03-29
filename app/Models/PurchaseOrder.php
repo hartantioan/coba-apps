@@ -227,4 +227,18 @@ class PurchaseOrder extends Model
             return '';
         }
     }
+
+    public function hasBalance(){
+        $qty = 0;
+
+        foreach($this->purchaseOrderDetail as $row){
+            $qty += $row->getBalanceReceipt();
+        }
+
+        if($qty > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

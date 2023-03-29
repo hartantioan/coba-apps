@@ -64,6 +64,7 @@ class LandedCostController extends Controller
 
                     if($index >= 0){
                         $details[$index]['qty'] = number_format($details[$index]['qtyRaw'] + $row->qtyConvert(),3,',','.');
+                        $details[$index]['qtyRaw'] = $details[$index]['qtyRaw'] + $row->qtyConvert();
                     }else{
                         $details[] = [
                             'item_id'       => $row->item_id,
@@ -602,17 +603,22 @@ class LandedCostController extends Controller
                 ]);
 
                 foreach($query->landedCostDetail as $rowdetail){
-                    $pricelc = round($rowdetail->nominal / $rowdetail->qty,3);
-                    $itemdata = ItemCogs::where('lookable_type','good_receipt_mains')->where('lookable_id',$query->good_receipt_main_id)->where('place_id',$query->place_id)->where('item_id',$rowdetail->item_id)->first();
-                    if($itemdata){
-                        $pricenew = $itemdata->price_in - $pricelc;
-                        $itemdata->update([
-                            'price_in'	=> $pricenew,
-                            'total_in'	=> round($pricenew * $itemdata->qty_in,3),
-                        ]);
-
-                        CustomHelper::resetCogsItem($query->place_id,$rowdetail->item_id);
+                    $pricelc = $rowdetail->nominal / $rowdetail->qty;
+    
+                    foreach($query->goodReceiptMain->goodReceipt as $gr){
+                        $pricenew = 0;
+                        $itemdata = NULL;
+                        $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$gr->id)->where('place_id',$query->place_id)->where('item_id',$rowdetail->item_id)->first();
+                        if($itemdata){
+                            $pricenew = $itemdata->price_in - $pricelc;
+                            $itemdata->update([
+                                'price_in'	=> $pricenew,
+                                'total_in'	=> round($pricenew * $itemdata->qty_in,3),
+                            ]);
+                        }
                     }
+    
+                    CustomHelper::resetCogsItem($query->place_id,$rowdetail->item_id);
                 }
     
                 activity()
@@ -623,6 +629,7 @@ class LandedCostController extends Controller
     
                 CustomHelper::sendNotification('landed_costs',$query->id,'Purchase Order Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('landed_costs',$query->id);
+                CustomHelper::removeJournal('landed_costs',$query->id);
 
                 $response = [
                     'status'  => 200,
@@ -658,20 +665,26 @@ class LandedCostController extends Controller
             CustomHelper::removeApproval('landed_costs',$query->id);
             
             foreach($query->landedCostDetail as $rowdetail){
-                $pricelc = round($rowdetail->nominal / $rowdetail->qty,3);
-                $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$query->good_receipt_id)->where('place_id',$query->place_id)->where('item_id',$rowdetail->item_id)->first();
-                if($itemdata){
-                    $pricenew = $itemdata->price_in - $pricelc;
-                    $itemdata->update([
-                        'price_in'	=> $pricenew,
-                        'total_in'	=> round($pricenew * $itemdata->qty_in,3),
-                    ]);
+                $pricelc = $rowdetail->nominal / $rowdetail->qty;
 
-                    CustomHelper::resetCogsItem($query->place_id,$rowdetail->item_id);
+                foreach($query->goodReceiptMain->goodReceipt as $gr){
+                    $pricenew = 0;
+					$itemdata = NULL;
+                    $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$gr->id)->where('place_id',$query->place_id)->where('item_id',$rowdetail->item_id)->first();
+                    if($itemdata){
+                        $pricenew = $itemdata->price_in - $pricelc;
+                        $itemdata->update([
+                            'price_in'	=> $pricenew,
+                            'total_in'	=> round($pricenew * $itemdata->qty_in,3),
+                        ]);
+                    }
                 }
+
+                CustomHelper::resetCogsItem($query->place_id,$rowdetail->item_id);
             }
 
             $query->landedCostDetail()->delete();
+            CustomHelper::removeJournal('landed_costs',$query->id);
 
             activity()
                 ->performedOn(new PurchaseOrder())

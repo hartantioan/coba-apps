@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('purchase_invoice_details', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('purchase_invoice_id')->nullable();
-            $table->bigInteger('good_receipt_id')->nullable();
+            $table->bigInteger('good_receipt_main_id')->nullable();
             $table->bigInteger('landed_cost_id')->nullable();
             $table->double('total')->nullable();
             $table->double('tax')->nullable();

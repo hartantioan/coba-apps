@@ -374,17 +374,22 @@ class CustomHelper {
 						
 						if($lc){
 							foreach($lc->landedCostDetail as $rowdetail){
-								$pricelc = round($rowdetail->nominal / $rowdetail->qty,3);
-								$itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$lc->good_receipt_id)->where('place_id',$lc->place_id)->where('item_id',$rowdetail->item_id)->first();
-								if($itemdata){
-									$pricenew = $pricelc + $itemdata->price_in;
-									$itemdata->update([
-										'price_in'	=> $pricenew,
-										'total_in'	=> round($pricenew * $itemdata->qty_in,3),
-									]);
+								$pricelc = $rowdetail->nominal / $rowdetail->qty;
 
-									self::resetCogsItem($data->place_id,$rowdetail->item_id);
+								foreach($lc->goodReceiptMain->goodReceipt as $gr){
+									$pricenew = 0;
+									$itemdata = NULL;
+									$itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$gr->id)->where('place_id',$lc->place_id)->where('item_id',$rowdetail->item_id)->first();
+									if($itemdata){
+										$pricenew = $pricelc + $itemdata->price_in;
+										$itemdata->update([
+											'price_in'	=> $pricenew,
+											'total_in'	=> round($pricenew * $itemdata->qty_in,3),
+										]);
+									}
 								}
+
+								self::resetCogsItem($data->place_id,$rowdetail->item_id);
 
 								$index = -1;
 

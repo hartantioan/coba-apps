@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
 use App\Models\Currency;
 use App\Models\PurchaseDownPayment;
@@ -55,7 +54,6 @@ class PurchaseDownPaymentController extends Controller
             $details[] = [
                 'po_code'       => CustomHelper::encrypt($row->code),
                 'po_no'         => $row->code,
-                'pr_no'         => $row->purchaseRequest()->exists() ? $row->purchaseRequest->code : '-',
                 'post_date'     => date('d/m/y',strtotime($row->post_date)),
                 'delivery_date' => date('d/m/y',strtotime($row->delivery_date)),
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
@@ -491,7 +489,6 @@ class PurchaseDownPaymentController extends Controller
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">PO No.</th>
-                                <th class="center-align">PR No.</th>
                                 <th class="center-align">Tgl.Post</th>
                                 <th class="center-align">Tgl.Kirim</th>
                                 <th class="center-align">Keterangan</th>
@@ -505,7 +502,6 @@ class PurchaseDownPaymentController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->purchaseOrder->code.'</td>
-                    <td class="center-align">'.($row->purchaseOrder->purchaseRequest()->exists() ? $row->purchaseOrder->purchaseRequest->code : "-" ).'</td>
                     <td class="center-align">'.date('d/m/y',strtotime($row->purchaseOrder->post_date)).'</td>
                     <td class="center-align">'.date('d/m/y',strtotime($row->purchaseOrder->delivery_date)).'</td>
                     <td class="center-align">'.$row->note.'</td>
@@ -587,7 +583,6 @@ class PurchaseDownPaymentController extends Controller
                 'purchase_order_id'         => $row->purchase_order_id,
                 'purchase_order_code'       => $row->purchaseOrder->code,
                 'purchase_order_encrypt'    => CustomHelper::encrypt($row->purchaseOrder->code),
-                'purchase_request_code'     => $row->purchaseOrder->purchaseRequest()->exists() ? $row->purchaseOrder->purchaseRequest->code : '-',
                 'post_date'                 => date('d/m/y',strtotime($row->purchaseOrder->post_date)),
                 'delivery_date'             => date('d/m/y',strtotime($row->purchaseOrder->delivery_date)),
                 'note'                      => $row->note,

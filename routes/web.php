@@ -37,6 +37,8 @@ use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 
+use App\Http\Controllers\Accounting\JournalController;
+
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
 use App\Http\Controllers\Setting\ApprovalController;
@@ -551,6 +553,21 @@ Route::prefix('admin')->group(function () {
                 Route::get('approval/{id}',[GoodReceiptPOController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                 Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
+            });
+        });
+
+        Route::prefix('accounting')->middleware('direct.access')->group(function () {
+            Route::prefix('journal')->middleware('operation.access:journal,view')->group(function () {
+                Route::get('/',[JournalController::class, 'index']);
+                Route::get('datatable',[JournalController::class, 'datatable']);
+                Route::get('row_detail',[JournalController::class, 'rowDetail']);
+                Route::post('show', [JournalController::class, 'show']);
+                Route::post('print',[JournalController::class, 'print']);
+                Route::get('export',[JournalController::class, 'export']);
+                Route::post('create',[JournalController::class, 'create'])->middleware('operation.access:journal,update');
+                Route::get('approval/{id}',[JournalController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('void_status', [JournalController::class, 'voidStatus'])->middleware('operation.access:journal,void');
+                Route::post('destroy', [JournalController::class, 'destroy'])->middleware('operation.access:journal,delete');
             });
         });
     });

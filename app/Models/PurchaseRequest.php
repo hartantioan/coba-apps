@@ -163,4 +163,18 @@ class PurchaseRequest extends Model
             return '';
         }
     }
+
+    public function hasBalance(){
+        $qty = 0;
+
+        foreach($this->purchaseRequestDetail as $row){
+            $qty += $row->qtyBalance();
+        }
+
+        if($qty > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

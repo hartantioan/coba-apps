@@ -76,9 +76,6 @@ class ItemController extends Controller
                                 $query->OrWhereNotNull('is_purchase_item');
                             }
                             if($row == '4'){
-                                $query->OrWhereNotNull('is_asset');
-                            }
-                            if($row == '5'){
                                 $query->OrWhereNotNull('is_service');
                             }
                         }
@@ -115,9 +112,6 @@ class ItemController extends Controller
                                 $query->OrWhereNotNull('is_purchase_item');
                             }
                             if($row == '4'){
-                                $query->OrWhereNotNull('is_asset');
-                            }
-                            if($row == '5'){
                                 $query->OrWhereNotNull('is_service');
                             }
                         }
@@ -207,7 +201,6 @@ class ItemController extends Controller
                     $query->is_inventory_item   = $request->is_inventory_item ? $request->is_inventory_item : NULL;
                     $query->is_sales_item       = $request->is_sales_item ? $request->is_sales_item : NULL;
                     $query->is_purchase_item    = $request->is_purchase_item ? $request->is_purchase_item : NULL;
-                    $query->is_asset            = $request->is_asset ? $request->is_asset : NULL;
                     $query->is_service          = $request->is_service ? $request->is_service : NULL;
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
@@ -233,7 +226,6 @@ class ItemController extends Controller
                         'is_inventory_item' => $request->is_inventory_item ? $request->is_inventory_item : NULL,
                         'is_sales_item'     => $request->is_sales_item ? $request->is_sales_item : NULL,
                         'is_purchase_item'  => $request->is_purchase_item ? $request->is_purchase_item : NULL,
-                        'is_asset'          => $request->is_asset ? $request->is_asset : NULL,
                         'is_service'        => $request->is_service ? $request->is_service : NULL,
                         'status'            => $request->status ? $request->status : '2',
                     ]);
@@ -306,10 +298,6 @@ class ItemController extends Controller
                             <tr>
                                 <th>Item Pembelian</th>
                                 <th>'.($data->is_purchase_item ? '&#10003;' : '&#10005;').'</th>
-                            </tr>
-                            <tr>
-                                <th>Item Aset</th>
-                                <th>'.($data->is_asset ? '&#10003;' : '&#10005;').'</th>
                             </tr>
                             <tr>
                                 <th>Item Service</th>
@@ -395,9 +383,6 @@ class ItemController extends Controller
                                 $query->OrWhereNotNull('is_purchase_item');
                             }
                             if($row == '4'){
-                                $query->OrWhereNotNull('is_asset');
-                            }
-                            if($row == '5'){
                                 $query->OrWhereNotNull('is_service');
                             }
                         }

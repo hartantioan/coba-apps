@@ -191,18 +191,23 @@ class GoodReceiptPOController extends Controller
             $data['status'] = '500';
             $data['message'] = 'Purchase Order '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
-            CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Receipt');
-            $details = [];
-            foreach($data->purchaseOrderDetail as $row){
-                $details[] = [
-                    'item_id'   => $row->item_id,
-                    'item_name' => $row->item->code.' - '.$row->item->name,
-                    'qty'       => $row->getBalanceReceipt(),
-                    'unit'      => $row->item->buyUnit->code
-                ];
-            }
+            if($data->hasBalance()){
+                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Receipt');
+                $details = [];
+                foreach($data->purchaseOrderDetail as $row){
+                    $details[] = [
+                        'item_id'   => $row->item_id,
+                        'item_name' => $row->item->code.' - '.$row->item->name,
+                        'qty'       => $row->getBalanceReceipt(),
+                        'unit'      => $row->item->buyUnit->code
+                    ];
+                }
 
-            $data['details'] = $details;
+                $data['details'] = $details;
+            }else{
+                $data['status'] = '500';
+                $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
+            }
         }
 
         return response()->json($data);

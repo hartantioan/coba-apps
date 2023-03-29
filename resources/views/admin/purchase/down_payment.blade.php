@@ -10,6 +10,10 @@
     table.bordered th {
         padding: 5px !important;
     }
+
+    .switch {
+        height: 3.45rem !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -318,7 +322,6 @@
                                                         </label>
                                                     </th>
                                                     <th class="center">PO No.</th>
-                                                    <th class="center">PR No.</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Kirim</th>
                                                     <th class="center">Keterangan</th>
@@ -328,7 +331,7 @@
                                             </thead>
                                             <tbody id="body-purchase">
                                                 <tr id="empty-purchase">
-                                                    <td colspan="8" class="center">
+                                                    <td colspan="7" class="center">
                                                         Pilih supplier untuk memulai...
                                                     </td>
                                                 </tr>
@@ -467,7 +470,7 @@
                 M.updateTextFields();
                 $('#body-purchase').empty().append(`
                     <tr id="empty-purchase">
-                        <td colspan="8" class="center">
+                        <td colspan="7" class="center">
                             Pilih supplier untuk memulai...
                         </td>
                     </tr>
@@ -526,9 +529,6 @@
                                     <td>
                                         ` + val.po_no + `
                                     </td>
-                                    <td>
-                                        ` + val.pr_no + `
-                                    </td>
                                     <td class="center">
                                         ` + val.post_date + `
                                     </td>
@@ -565,7 +565,7 @@
         }else{
             $('#body-purchase').append(`
                 <tr id="empty-purchase">
-                    <td colspan="8" class="center">
+                    <td colspan="7" class="center">
                         Pilih supplier untuk memulai...
                     </td>
                 </tr>
@@ -916,9 +916,6 @@
                                 </td>
                                 <td>
                                     ` + val.purchase_order_code + `
-                                </td>
-                                <td>
-                                    ` + val.purchase_request_code + `
                                 </td>
                                 <td class="center">
                                     ` + val.post_date + `

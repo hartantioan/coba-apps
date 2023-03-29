@@ -34,7 +34,6 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
         'ITEM STOK',
         'ITEM PENJUALAN',
         'ITEM PEMBELIAN',
-        'ITEM ASET',
         'ITEM SERVICE',
         'GUDANG',
         'STATUS',
@@ -66,9 +65,6 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
                             $query->OrWhereNotNull('is_purchase_item');
                         }
                         if($row == '4'){
-                            $query->OrWhereNotNull('is_asset');
-                        }
-                        if($row == '5'){
                             $query->OrWhereNotNull('is_service');
                         }
                     }
@@ -92,7 +88,6 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'is_stock'      => $row->is_inventory_item ? 'Ya' : 'Tidak',
                 'is_sales'      => $row->is_sales_item ? 'Ya' : 'Tidak',
                 'is_purchase'   => $row->is_purchase_item ? 'Ya' : 'Tidak',
-                'is_asset'      => $row->is_asset ? 'Ya' : 'Tidak',
                 'is_service'    => $row->is_service ? 'Ya' : 'Tidak',
                 'warehouses'    => $row->warehouses(),
                 'status'        => $row->status == '1' ? 'Aktif' : 'Non-Aktif',

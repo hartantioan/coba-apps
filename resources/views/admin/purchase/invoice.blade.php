@@ -232,7 +232,7 @@
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="top" name="top" min="{{ date('Y-m-d') }}" type="number" value="0" readonly>
+                                <input id="top" name="top" min="0" type="number" value="0" readonly>
                                 <label class="active" for="top">TOP (hari) Autofill</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -270,7 +270,7 @@
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h4>Detail Good Receipt / Landed Cost</h4>
+                                    <h4>Detail Good Receipt PO / Landed Cost</h4>
                                     <div style="overflow:auto;">
                                         <table class="bordered">
                                             <thead>
@@ -705,14 +705,18 @@
                 var formData = new FormData($('#form_data')[0]);
 
                 formData.delete("arr_code[]");
-                formData.delete("arr_nominal[]");
-                formData.delete("arr_note[]");
+                formData.delete("arr_type[]");
+                formData.delete("arr_total[]");
+                formData.delete("arr_tax[]");
+                formData.delete("arr_grandtotal[]");
 
                 $('input[name^="arr_code"]').each(function(){
                     if($(this).is(':checked')){
                         formData.append('arr_code[]',$(this).val());
-                        formData.append('arr_nominal[]',$('#rowNominal' + $(this).data('id')).val());
-                        formData.append('arr_note[]',$('#rowNote' + $(this).data('id')).val());
+                        formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_total[]',$('input[name^="arr_total"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_tax[]',$('input[name^="arr_tax"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
                     }
                 });
 
@@ -825,9 +829,9 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#supplier_id').empty();
-                $('#supplier_id').append(`
-                    <option value="` + response.account_id + `">` + response.supplier_name + `</option>
+                $('#account_id').empty();
+                $('#account_id').append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
                 $('#type').val(response.type).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
@@ -836,60 +840,43 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
-                $('#document_date').val(response.document_date);
-                $('#percent_tax').val(response.percent_tax);
-                
-                if(response.is_tax == '1'){
-                    $('#is_tax').prop( "checked", true);
-                }else{
-                    $('#is_tax').prop( "checked", false);
-                }
-
-                if(response.is_include_tax == '1'){
-                    $('#is_include_tax').prop( "checked", true);
-                }else{
-                    $('#is_include_tax').prop( "checked", false);
-                }
-                
+                $('#document_date').val(response.document_date);                
                 $('#note').val(response.note);
-                $('#grandtotal').text(response.grandtotal);
-                $('#total').text(response.total);
-                $('#tax').text(response.tax);
-                $('#subtotal').val(response.subtotal);
-                $('#discount').text(response.discount);
+                $('#downpayment').val(response.downpayment);
                 
                 if(response.details.length > 0){
-                    $('#body-purchase').empty();
+                    $('#body-detail').empty();
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        $('#body-purchase').append(`
-                            <tr class="row_purchase">
+                        $('#body-detail').append(`
+                            <tr class="row_detail">
+                                <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
                                 <td class="center-align">
                                     <label>
-                                        <input type="checkbox" checked id="check` + count + `" name="arr_code[]" value="` + val.purchase_order_encrypt + `" onclick="" data-id="` + count + `">
+                                        <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
                                         <span>Pilih</span>
                                     </label>
                                 </td>
                                 <td>
-                                    ` + val.purchase_order_code + `
-                                </td>
-                                <td>
-                                    ` + val.purchase_request_code + `
+                                    ` + val.rawcode + `
                                 </td>
                                 <td class="center">
                                     ` + val.post_date + `
                                 </td>
                                 <td class="center">
-                                    ` + val.delivery_date + `
+                                    ` + val.due_date + `
                                 </td>
-                                <td class="center">
-                                    <input name="arr_note[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="rowNote` + count + `">
-                                </td>
-                                <td class="center">
+                                <td class="right-align">
                                     ` + val.total + `
                                 </td>
-                                <td class="center">
-                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.total_dp + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                <td class="right-align">
+                                    ` + val.tax + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.grandtotal + `
                                 </td>
                             </tr>
                         `);
@@ -898,6 +885,7 @@
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
+                countAll();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -996,7 +984,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
         $.ajax({
             type : "POST",
@@ -1007,9 +995,7 @@
                 type : type,
                 place : place,
                 department : department,
-                is_tax : is_tax,
-                is_include_tax : is_include_tax,
-                'supplier[]' : supplier,
+                'account[]' : account,
                 'currency[]' : currency
             },
             headers: {
@@ -1026,9 +1012,9 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&place=" + place + "&department=" + department + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&supplier=" + supplier + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&place=" + place + "&department=" + department + "&account=" + account + "&currency=" + currency;
     }
 
     function addDays(){

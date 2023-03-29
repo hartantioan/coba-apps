@@ -537,51 +537,59 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    
-                    if(response.details.length > 0){
-                        $('#receiver_name').val(response.receiver_name);
-                        $('#place_id').val(response.place_id).formSelect();
-                        $('#department_id').val(response.department_id).formSelect();
-
-                        $('#empty-item').remove();
-
-                        $('#list-used-data').append(`
-                            <div class="chip purple darken-4 gradient-shadow white-text">
-                                ` + response.code + `
-                                <i class="material-icons close" onclick="removeUsedData('` + response.id + `')">close</i>
-                            </div>
-                        `);
-
-                        $.each(response.details, function(i, val) {
-                            var count = makeid(10);
-                            $('#body-item').append(`
-                                <tr class="row_item">
-                                    <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                    <input type="hidden" name="arr_purchase[]" value="` + response.ecode + `">
-                                    <td>
-                                        ` + val.item_name + `
-                                    </td>
-                                    <td>
-                                        <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;">
-                                    </td>
-                                    <td class="center">
-                                        <span>` + val.unit + `</span>
-                                    </td>
-                                    <td>
-                                        <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + response.code + `" style="width:100%;">
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
                         });
+                        $('#purchase_order_id').empty();
+                    }else{
+                        if(response.details.length > 0){
+                            $('#receiver_name').val(response.receiver_name);
+                            $('#place_id').val(response.place_id).formSelect();
+                            $('#department_id').val(response.department_id).formSelect();
+
+                            $('#empty-item').remove();
+
+                            $('#list-used-data').append(`
+                                <div class="chip purple darken-4 gradient-shadow white-text">
+                                    ` + response.code + `
+                                    <i class="material-icons close" onclick="removeUsedData('` + response.id + `')">close</i>
+                                </div>
+                            `);
+
+                            $.each(response.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-item').append(`
+                                    <tr class="row_item">
+                                        <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_purchase[]" value="` + response.ecode + `">
+                                        <td>
+                                            ` + val.item_name + `
+                                        </td>
+                                        <td>
+                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;">
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.unit + `</span>
+                                        </td>
+                                        <td>
+                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + response.code + `" style="width:100%;">
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }
+                        $('#purchase_order_id').empty();
+                        $('.modal-content').scrollTop(0);
+                        M.updateTextFields();
                     }
-                    $('#purchase_order_id').empty();
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);

@@ -71,8 +71,7 @@
                                                 <option value="1">Item Stok</option>
                                                 <option value="2">Item Penjualan</option>
                                                 <option value="3">Item Pembelian</option>
-                                                <option value="4">Item Aset</option>
-                                                <option value="5">Item Service</option>
+                                                <option value="4">Item Service</option>
                                             </select>
                                         </div>
                                     </div>
@@ -251,16 +250,7 @@
                                 </label>
                             </div>
                             <div class="switch mb-1">
-                                <label for="is_aset">Item untuk Aset</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_asset" name="is_asset" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
-                            <div class="switch mb-1">
-                                <label for="is_aset">Item untuk Service</label>
+                                <label for="is_service">Item untuk Service</label>
                                 <label class="right">
                                     Tidak
                                     <input type="checkbox" id="is_service" name="is_service" value="1">
@@ -552,12 +542,6 @@
                     $('#is_purchase_item').prop( "checked", true);
                 }else{
                     $('#is_purchase_item').prop( "checked", false);
-                }
-
-                if(response.is_asset == '1'){
-                    $('#is_asset').prop( "checked", true);
-                }else{
-                    $('#is_asset').prop( "checked", false);
                 }
 
                 if(response.is_service == '1'){

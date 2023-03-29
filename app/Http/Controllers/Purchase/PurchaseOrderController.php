@@ -291,19 +291,24 @@ class PurchaseOrderController extends Controller
             $data['status'] = '500';
             $data['message'] = 'Purchase Request '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
-            $ud = CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
-            $details = [];
-            foreach($data->purchaseRequestDetail as $row){
-                $details[] = [
-                    'item_id'       => $row->item_id,
-                    'item_name'     => $row->item->code.' - '.$row->item->name,
-                    'unit'          => $row->item->buyUnit->code,
-                    'qty'           => $row->qtyBalance(),
-                    'note'          => $row->note,
-                ];
-            }
+            if($data->hasBalance()){
+                $ud = CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
+                $details = [];
+                foreach($data->purchaseRequestDetail as $row){
+                    $details[] = [
+                        'item_id'       => $row->item_id,
+                        'item_name'     => $row->item->code.' - '.$row->item->name,
+                        'unit'          => $row->item->buyUnit->code,
+                        'qty'           => $row->qtyBalance(),
+                        'note'          => $row->note,
+                    ];
+                }
 
-            $data['details'] = $details;
+                $data['details'] = $details;
+            }else{
+                $data['status'] = '500';
+                $data['message'] = 'Seluruh item pada purchase request '.$data->code.' telah digunakan pada purchase order.';
+            }
         }
 
         return response()->json($data);

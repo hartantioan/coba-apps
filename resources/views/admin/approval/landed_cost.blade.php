@@ -247,6 +247,21 @@
                         <td class="right-align">{{ number_format(round($row->nominal / $row->qty,3),3,',','.') }}</td>
                     </tr>
                     @endforeach
+                    <tr>
+                        <td class="right-align" colspan="4">Total</td>
+                        <td class="right-align">{{ number_format($data->total,3,',','.') }}</td>
+                        <td class="right-align"></td>
+                    </tr>
+                    <tr>
+                        <td class="right-align" colspan="4">Pajak</td>
+                        <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
+                        <td class="right-align"></td>
+                    </tr>
+                    <tr>
+                        <td class="right-align" colspan="4">Grandtotal</td>
+                        <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
+                        <td class="right-align"></td>
+                    </tr>
                 </tbody>
             </table>
         </div>

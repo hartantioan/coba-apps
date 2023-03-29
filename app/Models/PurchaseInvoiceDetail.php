@@ -16,7 +16,7 @@ class PurchaseInvoiceDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'purchase_invoice_id',
-        'good_receipt_id',
+        'good_receipt_main_id',
         'landed_cost_id',
         'total',
         'tax',
@@ -33,7 +33,7 @@ class PurchaseInvoiceDetail extends Model
         return $this->belongsTo('App\Models\LandedCost', 'landed_cost_id', 'id')->withTrashed();
     }
 
-    public function goodReceipt(){
-        return $this->belongsTo('App\Models\GoodReceipt','good_receipt_id','id')->withTrashed();
+    public function goodReceiptMain(){
+        return $this->belongsTo('App\Models\GoodReceiptMain','good_receipt_main_id','id')->withTrashed();
     }
 }

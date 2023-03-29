@@ -26,7 +26,6 @@ class Item extends Model
         'is_inventory_item',
         'is_sales_item',
         'is_purchase_item',
-        'is_asset',
         'is_service',
         'status'
     ];

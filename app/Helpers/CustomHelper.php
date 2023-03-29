@@ -269,6 +269,7 @@ class CustomHelper {
 						'currency_rate'	=> $rowgr->currency_rate,
 						'post_date'		=> $data->post_date,
 						'note'			=> $data->code,
+						'status'		=> '1'
 					]);
 
 					$arrCoa = [];
@@ -365,6 +366,7 @@ class CustomHelper {
 						'currency_rate'	=> $data->currency_rate,
 						'post_date'		=> $data->post_date,
 						'note'			=> $data->code,
+						'status'		=> '1'
 					]);
 					
 					if($table_name == 'landed_costs'){

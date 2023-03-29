@@ -24,7 +24,11 @@ class Journal extends Model
         'currency_rate',
         'post_date',
         'due_date',
-        'note'
+        'note',
+        'status',
+        'void_id',
+        'void_note',
+        'void_date',
     ];
 
     public function user(){
@@ -46,6 +50,22 @@ class Journal extends Model
     public function journalDetail()
     {
         return $this->hasMany('App\Models\JournalDetail');
+    }
+
+    public function status(){
+        switch($this->status) {
+            case '1':
+                $status = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>';
+                break;
+            case '2':
+                $status = '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>';
+                break;
+            default:
+                $status = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>';
+                break;
+        }
+
+        return $status;
     }
 
     public static function generateCode()

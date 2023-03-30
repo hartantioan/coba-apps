@@ -595,6 +595,8 @@ class PurchaseInvoiceController extends Controller
             $arr[] = [
                 'code'                      => CustomHelper::encrypt($row->goodReceiptMain->code),
                 'rawcode'                   => $row->goodReceiptMain->code,
+                'post_date'                 => date('d/m/y',strtotime($row->goodReceiptMain->post_date)),
+                'due_date'                  => date('d/m/y',strtotime($row->goodReceiptMain->due_date)),
                 'type'                      => $row->good_receipt_main_id ? 'good_receipt' : 'landed_cost',
                 'total'                     => number_format($row->total,3,',','.'),
                 'tax'                       => number_format($row->tax,3,',','.'),

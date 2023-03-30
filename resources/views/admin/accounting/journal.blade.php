@@ -1,3 +1,20 @@
+<style>
+    .modal {
+        top:0px !important;
+    }
+
+    table > thead > tr > th {
+        font-size: 13px !important;
+    }
+
+    table.bordered th {
+        padding: 5px !important;
+    }
+
+    .browser-default {
+        height: 2rem !important;
+    }
+</style>
 <!-- BEGIN: Page Main-->
 <div id="main">
     <div class="row">
@@ -85,7 +102,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;min-width:80%;max-width:100%;">
+<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -95,42 +112,47 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4">
+                        <div class="input-field col m3 s12">
+                            <select class="form-control" id="place_id" name="place_id">
+                                @foreach ($place as $rowplace)
+                                    <option value="{{ $rowplace->id }}" data-name="{{ $rowplace->name.' - '.$rowplace->company->name }}" data-address="{{ $rowplace->address }}">{{ $rowplace->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="place_id">Pabrik/Kantor</label>
+                        </div>
+                        <div class="input-field col m3 s12">
                             <input type="hidden" id="temp" name="temp">
+                            <select class="browser-default" id="account_id" name="account_id"></select>
+                            <label class="active" for="account_id">Target BP</label>
                         </div>
-                        <div class="input-field col s4">
-                            <input id="code" name="code" type="text" placeholder="Kode Bill Of Material">
-                            <label class="active" for="code">Kode</label>
+                        <div class="input-field col m3 s12">
+                            <input id="note" name="note" type="text" placeholder="Keterangan">
+                            <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="input-field col s4">
-                            <input id="name" name="name" type="text" placeholder="Nama Bill Of Material">
-                            <label class="active" for="name">Nama</label>
+                        <div class="input-field col m3 s12">
+                            <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                            <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
-                        <div class="input-field col s4">
-                            <input id="qty_output" name="qty_output" type="text" placeholder="Qty Output" onkeyup="formatRupiah(this)">
-                            <label class="active" for="qty_output">Qty Output</label>
-                            <div class="form-control-feedback uom-unit">-</div>
+                        <div class="input-field col m3 s12">
+                            <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
+                            <label class="active" for="due_date">Tgl. Kadaluarsa</label>
                         </div>
-                        <div class="input-field col s4">
-                            <input id="qty_planned" name="qty_planned" type="text" placeholder="Rata-rata Qty Produksi" onkeyup="formatRupiah(this)">
-                            <label class="active" for="qty_planned">Rata-rata Qty Produksi</label>
-                            <div class="form-control-feedback uom-unit">-</div>
+                        <div class="input-field col m3 s12">
+                            <select class="form-control" id="currency_id" name="currency_id">
+                                @foreach ($currency as $row)
+                                    <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="currency_id">Mata Uang</label>
                         </div>
-                        <div class="input-field col s4">
-                            <div class="switch mb-1">
-                                <label for="status">Status</label>
-                                <label class="right">
-                                    Non-Active
-                                    <input checked type="checkbox" id="status" name="status" value="1">
-                                    <span class="lever"></span>
-                                    Active
-                                </label>
-                            </div>
+                        <div class="input-field col m3 s12">
+                            <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                            <label class="active" for="currency_rate">Konversi</label>
                         </div>
                         <div class="col s12 mt-3">
                             <ul class="tabs tabs-fixed-width tab-demo z-depth-1">
-                                <li class="tab col m3"><a class="active" href="#tabmaterial">Material</a></li>
-                                <li class="tab col m3"><a href="#tabcost">Biaya</a></li>
+                                <li class="tab col m3"><a class="active" href="#tabmaterial">Debit</a></li>
+                                <li class="tab col m3"><a href="#tabcost">Kredit</a></li>
                              </ul>
                         </div>
                         <div class="col s12">
@@ -139,37 +161,20 @@
                                     <table class="bordered">
                                         <thead>
                                             <tr>
-                                                <th width="50%" class="center">Item</th>
-                                                <th width="10%" class="center">Qty</th>
-                                                <th width="10%" class="center">Satuan</th>
-                                                <th width="20%" class="center">Deskripsi</th>
-                                                <th width="10%" class="center">Hapus</th>
+                                                <th class="center">Coa</th>
+                                                <th class="center">Pabrik/Kantor</th>
+                                                <th class="center">Item</th>
+                                                <th class="center">Departemen</th>
+                                                <th class="center">Gudang</th>
+                                                <th class="center">Nominal</th>
+                                                <th class="center">Hapus</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="body-material">
-                                            <tr class="row_material">
-                                                <td>
-                                                    <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this)">
-                                                </td>
-                                                <td class="center">
-                                                    <span id="arr_satuan0">-</span>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_description_material[]" type="text" placeholder="Deskripsi item material">
-                                                </td>
-                                                <td class="center">
-                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-material" href="javascript:void(0);">
-                                                        <i class="material-icons">delete</i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr id="last-row-material">
-                                                <td colspan="5" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addMaterial()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> New Material
+                                        <tbody id="body-debit">
+                                            <tr id="last-row-debit">
+                                                <td colspan="7" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Debit
                                                     </a>
                                                 </td>
                                             </tr>
@@ -182,33 +187,20 @@
                                     <table class="bordered">
                                         <thead>
                                             <tr>
-                                                <th width="30%" class="center">Deskripsi</th>
-                                                <th width="30%" class="center">Coa (Jika ada)</th>
-                                                <th width="10%" class="center">Nominal</th>
-                                                <th width="10%" class="center">Hapus</th>
+                                                <th class="center">Coa</th>
+                                                <th class="center">Pabrik/Kantor</th>
+                                                <th class="center">Item</th>
+                                                <th class="center">Departemen</th>
+                                                <th class="center">Gudang</th>
+                                                <th class="center">Nominal</th>
+                                                <th class="center">Hapus</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="body-cost">
-                                            <tr class="row_cost">
-                                                <td>
-                                                    <input name="arr_description_cost[]" type="text" placeholder="Deskripsi cost material">
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default cost-array" id="arr_coa0" name="arr_coa[]"></select>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_nominal[]" type="text" value="0" onkeyup="formatRupiah(this)">
-                                                </td>
-                                                <td class="center">
-                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-cost" href="javascript:void(0);">
-                                                        <i class="material-icons">delete</i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr id="last-row-cost">
-                                                <td colspan="4" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCost()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> New Cost
+                                        <tbody id="body-credit">
+                                            <tr id="last-row-credit">
+                                                <td colspan="7" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('2')" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Credit
                                                     </a>
                                                 </td>
                                             </tr>
@@ -217,6 +209,8 @@
                                 </p>
                             </div>
                         </div>
+                        <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebit">0,000</b></h5></div>
+                        <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCredit">0,000</b></h5></div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
@@ -278,23 +272,21 @@
                 $('#temp').val('');
                 M.updateTextFields();
                 resetDetailForm();
+                $('.row_coa').remove();
+                countAll();
             }
         });
 
-        select2ServerSide('#item_id,#arr_item0', '{{ url("admin/select2/item") }}');
-        select2ServerSide('#arr_coa0', '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#account_id', '{{ url("admin/select2/business_partner") }}');
         
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
             $('#name').val('');
         });
 
-        $('#body-material').on('click', '.delete-data-material', function() {
+        $('#body-debit,#body-credit').on('click', '.delete-data-coa', function() {
             $(this).closest('tr').remove();
-        });
-
-        $('#body-cost').on('click', '.delete-data-cost', function() {
-            $(this).closest('tr').remove();
+            countAll();
         });
     });
 
@@ -308,53 +300,67 @@
         });
     }
 
-    function addMaterial(){
-        var count = $('select[name^="arr_item"]').length;
-        $('#last-row-material').before(`
-            <tr class="row_material">
+    function addCoa(type){
+        var count = makeid(10);
+
+        $('#last-row-' + (type == '1' ? 'debit' : 'credit')).before(`
+            <tr class="row_coa">
+                <input type="hidden" name="arr_type[]" value="` + type + `">
                 <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit(` + count + `)"></select>
+                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this)">
+                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                        @foreach ($place as $row)
+                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->company->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_item` + count + `" name="arr_item[]"></select>
+                </td>
+                <td>
+                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                        @foreach ($department as $row)
+                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                </td>
+                <td>
+                    <input name="arr_nominal[]" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
                 </td>
                 <td class="center">
-                    <span id="arr_satuan` + count + `">-</span>
-                </td>
-                <td>
-                    <input name="arr_description_material[]" type="text" placeholder="Deskripsi item material">
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-material" href="javascript:void(0);">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" data-type="` + type + `" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
             </tr>
         `);
+        
+        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+        $('#arr_place' + count).formSelect();
+        $('#arr_department' + count).formSelect();
     }
 
-    function addCost(){
-        var count = $('select[name^="arr_coa"]').length;
-        $('#last-row-cost').before(`
-            <tr class="row_cost">
-                <td>
-                    <input name="arr_description_cost[]" type="text" placeholder="Deskripsi cost material">
-                </td>
-                <td>
-                    <select class="browser-default cost-array" id="arr_coa` + count + `" name="arr_coa[]"></select>
-                </td>
-                <td>
-                    <input name="arr_nominal[]" type="text" value="0" onkeyup="formatRupiah(this)">
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-cost" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+    function countAll(){
+        let totalDebit = 0, totalCredit = 0;
+
+        $('input[name^="arr_nominal"]').each(function(index){
+            let nominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            if($('input[name^="arr_type"]').eq(index).val() == '1'){
+                totalDebit += nominal;
+            }else{
+                totalCredit += nominal;
+            }
+        });
+
+        $('#totalDebit').text(formatRupiahIni(totalDebit.toFixed(3).toString().replace('.',',')));
+        $('#totalCredit').text(formatRupiahIni(totalCredit.toFixed(3).toString().replace('.',',')));
     }
 
     function getRowUnit(val){
@@ -428,7 +434,7 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'account', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
+                { name: 'note', className: '' },
                 { name: 'ref', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -443,69 +449,99 @@
 	}
 
     function save(){
-			
-        var formData = new FormData($('#form_data')[0]);
-        
-        $.ajax({
-            url: '{{ Request::url() }}/create',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    success();
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
-                    
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data')[0]);
 
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
+                formData.delete("arr_type[]");
+                formData.delete("arr_coa[]");
+                formData.delete("arr_place[]");
+                formData.delete("arr_item[]");
+                formData.delete("arr_department[]");
+                formData.delete("arr_warehouse[]");
+                formData.delete("arr_nominal[]");
+
+                $('input[name^="arr_type"]').each(function(index){
+                    formData.append('arr_type[]',$(this).val());
+                    formData.append('arr_coa[]',($('select[name^="arr_coa"]').eq(index).val() ? $('select[name^="arr_coa"]').eq(index).val() : 'NULL'));
+                    formData.append('arr_place[]',$('select[name^="arr_place"]').eq(index).val());
+                    formData.append('arr_item[]',($('select[name^="arr_item"]').eq(index).val() ? $('select[name^="arr_item"]').eq(index).val() : 'NULL'));
+                    formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
+                    formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : 'NULL'));
+                    formData.append('arr_nominal[]',($('input[name^="arr_nominal"]').eq(index).val() ? $('input[name^="arr_nominal"]').eq(index).val() : 'NULL'));
+                });
+                
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
                         });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+                    }
                 });
             }
         });
@@ -535,82 +571,81 @@
                 $('#modal1').modal('open');
                 
                 $('#temp').val(id);
-                $('#code').val(response.code);
-                $('#name').val(response.name);
-                $('#item_id').empty();
-                $('#item_id').append(`
-                    <option value="` + response.item_id + `">` + response.item_name + `</option>
-                `);
-                $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
-                $('#qty_output').val(response.qty_output);
-                $('#qty_planned').val(response.qty_planned);
-                $('#type').val(response.type).formSelect();
+                $('#account_id').empty().append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
+                `);
+                $('#note').val(response.note);
+                $('#post_date').val(response.post_date);
+                $('#due_date').val(response.due_date);
+                $('#currency_id').val(response.currency_id).formSelect();
+                $('#currency_rate').val(response.currency_rate);
 
-                if(response.status == '1'){
-                    $('#status').prop( "checked", true);
-                }else{
-                    $('#status').prop( "checked", false);
-                }
+                $('.row_coa').remove();
 
-                resetDetailForm();
-
-                $.each(response.material, function(i, val) {
-                    $('#last-row-material').before(`
-                        <tr class="row_material">
+                $.each(response.details, function(i, val) {
+                    let count = makeid(10);
+                    $('#last-row-' + (val.type == '1' ? 'debit' : 'credit')).before(`
+                        <tr class="row_coa">
+                            <input type="hidden" name="arr_type[]" value="` + val.type + `">
                             <td>
-                                <select class="browser-default item-array" id="arr_item` + i + `" name="arr_item[]" onchange="getRowUnit(` + i + `)">
-                                    <option value="` + val.item_id + `">` + val.item_name + `</option>
-                                    </select>
+                                <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                             </td>
                             <td>
-                                <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this)">
+                                <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                    @foreach ($place as $row)
+                                        <option value="{{ $row->id }}">{{ $row->name.' - '.$row->company->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_item` + count + `" name="arr_item[]"></select>
+                            </td>
+                            <td>
+                                <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                    @foreach ($department as $row)
+                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                            </td>
+                            <td>
+                                <input name="arr_nominal[]" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();">
                             </td>
                             <td class="center">
-                                <span id="arr_satuan` + i + `">` + val.uom_unit + `</span>
-                            </td>
-                            <td>
-                                <input name="arr_description_material[]" type="text" placeholder="Deskripsi item material" value="` + val.description + `">
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-material" href="javascript:void(0);">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" data-type="` + val.type + `" href="javascript:void(0);">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </td>
                         </tr>
                     `);
-
-                    select2ServerSide('#arr_item' + i, '{{ url("admin/select2/item") }}');
-                });
-
-                $.each(response.cost, function(i, val) {
-                    $('#last-row-cost').before(`
-                        <tr class="row_cost">
-                            <td>
-                                <input name="arr_description_cost[]" type="text" placeholder="Deskripsi cost material" value="` + val.description + `">
-                            </td>
-                            <td>
-                                <select class="browser-default cost-array" id="arr_coa` + i + `" name="arr_coa[]">
-                                    <option value="` + val.coa_id + `">` + val.coa_name + `</option>
-                                    </select>
-                            </td>
-                            <td>
-                                <input name="arr_nominal[]" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this)">
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-cost" href="javascript:void(0);">
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </td>
-                        </tr>
+                    
+                    select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                    select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                    select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+                    $('#arr_place' + count).formSelect().val(val.place_id).formSelect();
+                    $('#arr_department' + count).formSelect().val(val.department_id).formSelect();
+                    $('#arr_coa' + count).append(`
+                        <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                     `);
-
-                    select2ServerSide('#arr_coa' + i, '{{ url("admin/select2/coa") }}');
+                    if(val.item_id){
+                        $('#arr_item' + count).append(`
+                            <option value="` + val.item_id + `">` + val.item_name + `</option>
+                        `);
+                    }
+                    if(val.warehouse_id){
+                        $('#arr_warehouse' + count).append(`
+                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                        `);
+                    }
                 });
 
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();
+                countAll();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

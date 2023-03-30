@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
+use App\Models\Currency;
+use App\Models\Department;
+use App\Models\Place;
 use App\Models\User;
 use App\Models\Journal;
 use App\Models\JournalDetail;
@@ -30,6 +33,9 @@ class JournalController extends Controller
         $data = [
             'title'     => 'Jurnal',
             'content'   => 'admin.accounting.journal',
+            'currency'  => Currency::where('status','1')->get(),
+            'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
+            'department'=> Department::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -51,7 +57,7 @@ class JournalController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Journal::whereHas('journalDetail',function($query){ $query->whereIn('place_id',$this->dataplaces); })->count();
+        $total_data = Journal::whereIn('place_id',$this->dataplaces)->count();
         
         $query_data = Journal::where(function($query) use ($search, $request) {
                 if($search) {
@@ -71,7 +77,7 @@ class JournalController extends Controller
                 }
 
             })
-            ->whereHas('journalDetail',function($query){ $query->whereIn('place_id',$this->dataplaces); })
+            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -94,7 +100,7 @@ class JournalController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereHas('journalDetail',function($query){ $query->whereIn('place_id',$this->dataplaces); })
+            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -109,12 +115,12 @@ class JournalController extends Controller
                     $val->account->name,
                     date('d/m/y',strtotime($val->post_date)),
                     $val->note,
-                    $val->lookable_type == 'good_receipts' ? $val->lookable->goodReceiptMain->code : $val->lookable->code,
+                    $val->lookable_type == 'good_receipts' ? $val->lookable->goodReceiptMain->code : ($val->lookable_type ? $val->lookable->code : '-'),
                     $val->status(),
-                    '
+                    !$val->lookable_id ? '
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
-					'
+					' : '-',
                 ];
 
                 $nomor++;
@@ -135,15 +141,13 @@ class JournalController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = PurchaseOrder::find($request->id);
+        $data   = Journal::find($request->id);
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="10">Daftar Item</th>
-                            </tr>
-                            <tr>
                                 <th class="center-align">No.</th>
+                                <th class="center-align">Coa</th>
                                 <th class="center-align">Perusahaan</th>
                                 <th class="center-align">Pabrik/Plant</th>
                                 <th class="center-align">Item</th>
@@ -154,28 +158,215 @@ class JournalController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->purchaseOrderDetail as $key => $row){
+        foreach($data->journalDetail()->orderBy('id')->get() as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.$row->qty.'</td>
-                <td class="center-align">'.$row->item->buyUnit->code.'</td>
-                <td class="right-align">'.number_format($row->price,3,',','.').'</td>
-                <td class="center-align">'.number_format($row->percent_discount_1,3,',','.').'</td>
-                <td class="center-align">'.number_format($row->percent_discount_2,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->discount_3,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->subtotal,3,',','.').'</td>
-                <td class="center-align">'.$row->note.'</td>
-            </tr>
-            <tr>
-                <td class="center-align" colspan="10">
-                    '.$row->purchaseRequestList().'
-                </td>
+                <td>'.$row->coa->name.'</td>
+                <td class="center-align">'.$row->place->company->name.'</td>
+                <td class="center-align">'.$row->place->name.'</td>
+                <td class="center-align">'.($row->item_id ? $row->item->name : '-').'</td>
+                <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,3,',','.') : '').'</td>
+                <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,3,',','.') : '').'</td>
             </tr>';
         }
         
         $string .= '</tbody></table></div></div>';
 		
         return response()->json($string);
+    }
+
+    public function create(Request $request){
+        $validation = Validator::make($request->all(), [
+			'account_id' 				=> 'required',
+            'place_id' 				    => 'required',
+			'note'                      => 'required',
+            'post_date'                 => 'required',
+            'due_date'                  => 'required',
+            'currency_id'               => 'required',
+            'currency_rate'             => 'required',
+            'arr_type'                  => 'required|array',
+            'arr_place'                 => 'required|array',
+            'arr_department'            => 'required|array',
+            'arr_nominal'               => 'required|array',
+		], [
+			'account_id.required' 				=> 'Target BP tidak boleh kosong.',
+            'place_id.required' 				=> 'Pabrik/Kantor tidak boleh kosong.',
+			'note.required'                     => 'Catatan tidak boleh kosong',
+            'post_date.required'                => 'Tgl post tidak boleh kosong.',
+            'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
+            'currency_rate.required'            => 'Konversi tidak boleh kosong.',
+            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+            'arr_type.required'                 => 'Tipe tidak boleh kosong.',
+            'arr_type.array'                    => 'Tipe harus dalam bentuk array.',
+            'arr_place.required'                => 'Penempatan tidak boleh kosong.',
+            'arr_place.array'                   => 'Penempatan harus dalam bentuk array.',
+            'arr_department.required'           => 'Departemen tidak boleh kosong.',
+            'arr_department.array'              => 'Departemen harus dalam bentuk array.',
+            'arr_nominal.required'              => 'Nominal tidak boleh kosong.',
+            'arr_nominal.array'                 => 'Nominal harus dalam bentuk array.',
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            
+            $totalDebit = 0; 
+            $totalCredit = 0;
+            foreach($request->arr_nominal as $key => $row){
+                if($request->arr_type[$key] == '1'){
+                    $totalDebit += str_replace(',','.',str_replace('.','',$row));
+                }elseif($request->arr_type[$key] == '2'){
+                    $totalCredit += str_replace(',','.',str_replace('.','',$row));
+                }
+            }
+
+            if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => $totalDebit
+                ]);
+            }
+
+			if($request->temp){
+                DB::beginTransaction();
+                try {
+                    $query = Journal::where('code',CustomHelper::decrypt($request->temp))->first();
+
+                    if($query->approval()){
+                        foreach($query->approval()->approvalMatrix as $row){
+                            if($row->status == '2'){
+                                return response()->json([
+                                    'status'  => 500,
+                                    'message' => 'Jurnal telah diapprove, anda tidak bisa melakukan perubahan.'
+                                ]);
+                            }
+                        }
+                    }
+
+                    if($query->status == '1'){
+
+                        $query->user_id = session('bo_id');
+                        $query->place_id = $request->place_id;
+                        $query->account_id = $request->account_id;
+                        $query->currency_id = $request->currency_id;
+                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
+                        $query->post_date = $request->post_date;
+                        $query->due_date = $request->due_date;
+                        $query->note = $request->note;
+
+                        $query->save();
+
+                        foreach($query->journalDetail as $row){
+                            $row->delete();
+                        }
+                    }else{
+                        return response()->json([
+                            'status'  => 500,
+					        'message' => 'Status jurnal sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}else{
+                DB::beginTransaction();
+                try {
+                    $query = Journal::create([
+                        'code'			            => Journal::generateCode(),
+                        'place_id'                  => $request->place_id,
+                        'user_id'		            => session('bo_id'),
+                        'account_id'                => $request->account_id,
+                        'currency_id'               => $request->currency_id,
+                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
+                        'post_date'                 => $request->post_date,
+                        'due_date'                  => $request->due_date,
+                        'note'                      => $request->note,
+                        'status'                    => '1'
+                    ]);
+
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}
+			
+			if($query) {
+                
+                if($request->arr_type){
+                    DB::beginTransaction();
+                        try {
+                        foreach($request->arr_type as $key => $row){
+                            JournalDetail::create([
+                                'journal_id'        => $query->id,
+                                'coa_id'            => $request->arr_coa[$key],
+                                'place_id'          => $request->arr_place[$key],
+                                'item_id'           => $request->arr_item[$key] == 'NULL' ? NULL : $request->arr_item[$key],
+                                'department_id'     => $request->arr_department[$key],
+                                'warehouse_id'      => $request->arr_warehouse[$key] == 'NULL' ? NULL : $request->arr_warehouse[$key],
+                                'type'              => $row,
+                                'nominal'           => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                            ]);
+                        }
+                        DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
+                    }
+                }
+
+                CustomHelper::sendApproval('journals',$query->id,$query->note);
+                CustomHelper::sendNotification('journals',$query->id,'Pengajuan Jurnal No. '.$query->code,$query->note,session('bo_id'));
+
+                activity()
+                    ->performedOn(new Journal())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit journal.');
+
+				$response = [
+					'status'    => 200,
+					'message'   => 'Data successfully saved.',
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+		
+		return response()->json($response);
+    }
+
+    public function show(Request $request){
+        $jou = Journal::where('code',CustomHelper::decrypt($request->id))->first();
+        $jou['account_name'] = $jou->account->name;
+        $jou['currency_rate'] = number_format($jou->currency_rate,3,',','.');
+
+        $arr = [];
+        
+        foreach($jou->journalDetail as $row){
+            $arr[] = [
+                'type'              => $row->type,
+                'coa_id'            => $row->coa_id,
+                'coa_name'          => $row->coa->name,
+                'place_id'          => $row->place_id,
+                'item_id'           => $row->item_id ? $row->item_id : '',
+                'item_name'         => $row->item_id ? $row->item->name : '',
+                'department_id'     => $row->department_id,
+                'warehouse_id'      => $row->warehouse_id,
+                'warehouse_name'    => $row->warehouse_id ? $row->warehouse->name : '',
+                'nominal'           => number_format($row->nominal,3,',','.')
+            ];
+        }
+
+        $jou['details'] = $arr;
+        				
+		return response()->json($jou);
     }
 }

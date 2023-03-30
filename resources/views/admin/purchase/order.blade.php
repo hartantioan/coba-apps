@@ -629,15 +629,15 @@
                             $('#branch_id').val(response.branch_id).formSelect();
                             $('#plant_id').val(response.plant_id).formSelect();
                             $('#department_id').val(response.department_id).formSelect();
-
+                            $('#list-used-data').append(`
+                                <div class="chip purple darken-4 gradient-shadow white-text">
+                                    ` + response.code + `
+                                    <i class="material-icons close" onclick="removeUsedData('` + response.id + `')">close</i>
+                                </div>
+                            `);
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
-                                $('#list-used-data').append(`
-                                    <div class="chip purple darken-4 gradient-shadow white-text">
-                                        ` + response.code + `
-                                        <i class="material-icons close" onclick="removeUsedData('` + response.id + `')">close</i>
-                                    </div>
-                                `);
+                                
                                 $('#last-row-item').before(`
                                     <tr class="row_item" data-id="` + response.id + `">
                                         <input type="hidden" name="arr_purchase[]" value="` + response.ecode + `">
@@ -666,7 +666,7 @@
                                             <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
                                         </td>
                                         <td>
-                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + response.code + `">
+                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + ` ` + response.code + `">
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -769,7 +769,8 @@
                 
             },
             success: function(response) {
-                
+                $('.row_item[data-id="' + id + '"]').remove();
+                countAll();
             },
             error: function() {
                 swal({

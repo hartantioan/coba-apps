@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('account_id')->nullable();
             $table->string('code', 50)->unique();
+            $table->bigInteger('place_id')->nullable();
             $table->string('lookable_type')->nullable();
             $table->bigInteger('lookable_id')->nullable();
             $table->bigInteger('currency_id')->nullable();
@@ -33,7 +34,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'lookable_type', 'lookable_id', 'currency_id']);
+            $table->index(['user_id', 'place_id', 'account_id', 'lookable_type', 'lookable_id', 'currency_id']);
         });
     }
 

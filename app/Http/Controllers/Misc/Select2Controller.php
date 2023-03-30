@@ -412,6 +412,32 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function businessPartner(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = User::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('employee_no', 'like', "%$search%")
+                    ->orWhere('username', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('address', 'like', "%$search%")
+                    ->orWhere('pic', 'like', "%$search%")
+                    ->orWhere('pic_no', 'like', "%$search%")
+                    ->orWhere('office_no', 'like', "%$search%");
+                })
+                ->where('status','1')->orderBy('type')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->name.' - '.$d->type(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function goodReceipt(Request $request)
     {
         $response = [];

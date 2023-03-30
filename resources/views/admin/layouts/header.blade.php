@@ -46,9 +46,15 @@
                         <li>
                             <a class="grey-text text-darken-1" href="{{ url('admin/personal/profile') }}"><i class="material-icons">person_outline</i> Profil</a>
                         </li>
-                        <li><a class="grey-text text-darken-1" href="{{ url('admin/personal/chat') }}"><i class="material-icons">chat_bubble_outline</i> Obrolan</a></li>
                         <li>
-                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/purchase_request') }}"><i class="material-icons">library_add</i> Purchase Request</a>
+                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/chat') }}"><i class="material-icons">chat_bubble_outline</i> Obrolan</a>
+                        </li>
+                        <li>
+                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/purchase_request') }}"><i class="material-icons">library_add</i> Purchase Request
+                                <span class="badge badge pill red float-right mr-1 tooltipped" data-position="bottom" data-tooltip="Under construction" style="height:30px !important;margin-top: -5px;">
+                                    <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: -20px;">build</i>
+                                </span>
+                            </a>
                         </li>
                         <li class="divider" tabindex="0"></li>
                         <li><a class="grey-text text-darken-1" href="user-lock-screen.html"><i class="material-icons">lock_outline</i> Kunci</a></li>

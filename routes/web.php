@@ -99,6 +99,7 @@ Route::prefix('admin')->group(function () {
             Route::get('bank', [Select2Controller::class, 'bank']);
             Route::get('region', [Select2Controller::class, 'region']);
             Route::get('project', [Select2Controller::class, 'project']);
+            Route::get('business_partner', [Select2Controller::class, 'businessPartner']);
         });
 
         Route::prefix('personal')->middleware('direct.access')->group(function () {

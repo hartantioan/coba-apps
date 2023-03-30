@@ -186,7 +186,7 @@ class CustomHelper {
 				'status'	=> '2'
 			]);
 
-			self::sendJournal($table_name,$table_id,$data->user_id);
+			self::sendJournal($table_name,$table_id,$data->account_id);
 		}
 	}
 
@@ -263,13 +263,14 @@ class CustomHelper {
 						'user_id'		=> session('bo_id'),
 						'account_id'	=> $rowgr->account_id,
 						'code'			=> Journal::generateCode(),
+						'place_id'		=> $rowgr->place_id,
 						'lookable_type'	=> 'good_receipts',
 						'lookable_id'	=> $rowgr->id,
 						'currency_id'	=> $rowgr->currency_id,
 						'currency_rate'	=> $rowgr->currency_rate,
 						'post_date'		=> $data->post_date,
 						'note'			=> $data->code,
-						'status'		=> '1'
+						'status'		=> '3'
 					]);
 
 					$arrCoa = [];
@@ -360,13 +361,14 @@ class CustomHelper {
 						'user_id'		=> session('bo_id'),
 						'account_id'	=> $account_id,
 						'code'			=> Journal::generateCode(),
+						'place_id'		=> $data->place_id,
 						'lookable_type'	=> $table_name,
 						'lookable_id'	=> $table_id,
 						'currency_id'	=> $data->currency_id,
 						'currency_rate'	=> $data->currency_rate,
 						'post_date'		=> $data->post_date,
 						'note'			=> $data->code,
-						'status'		=> '1'
+						'status'		=> '3'
 					]);
 					
 					if($table_name == 'landed_costs'){
@@ -428,15 +430,17 @@ class CustomHelper {
 					foreach($journalMap as $row){
 						$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
 
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->coa_id,
-							'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
-							'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
-							'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
-							'type'			=> $row->type,
-							'nominal'		=> $nominal
-						]);
+						if($nominal > 0){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->coa_id,
+								'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+								'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+								'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
+								'type'			=> $row->type,
+								'nominal'		=> $nominal
+							]);
+						}
 					}
 				}
 			}

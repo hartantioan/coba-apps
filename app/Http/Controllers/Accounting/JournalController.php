@@ -172,6 +172,36 @@ class JournalController extends Controller
             </tr>';
         }
         
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="max-width:500px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="4">Approval</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Level</th>
+                                <th class="center-align">Kepada</th>
+                                <th class="center-align">Status</th>
+                                <th class="center-align">Catatan</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
+            foreach($data->approval()->approvalMatrix as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.$row->approvalTable->level.'</td>
+                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
+                    <td class="center-align">'.$row->note.'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="4">Approval tidak ditemukan.</td>
+            </tr>';
+        }
+
         $string .= '</tbody></table></div></div>';
 		
         return response()->json($string);
@@ -264,6 +294,7 @@ class JournalController extends Controller
                         foreach($query->journalDetail as $row){
                             $row->delete();
                         }
+
                     }else{
                         return response()->json([
                             'status'  => 500,
@@ -277,6 +308,7 @@ class JournalController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    
                     $query = Journal::create([
                         'code'			            => Journal::generateCode(),
                         'place_id'                  => $request->place_id,
@@ -300,7 +332,7 @@ class JournalController extends Controller
                 
                 if($request->arr_type){
                     DB::beginTransaction();
-                        try {
+                    try {
                         foreach($request->arr_type as $key => $row){
                             JournalDetail::create([
                                 'journal_id'        => $query->id,

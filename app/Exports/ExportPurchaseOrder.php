@@ -54,7 +54,8 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
         'SUBTOTAL',
         'DISKON',
         'TOTAL',
-        'PAJAK',
+        'PPN',
+        'PPH',
         'GRANDTOTAL'
     ];
 
@@ -64,7 +65,6 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
             if($this->search) {
                 $query->where(function($query){
                     $query->where('code', 'like', "%$this->search%")
-                        ->orWhere('percent_tax', 'like', "%$this->search%")
                         ->orWhere('document_no', 'like', "%$this->search%")
                         ->orWhere('note', 'like', "%$this->search%")
                         ->orWhere('subtotal', 'like', "%$this->search%")
@@ -97,18 +97,6 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
 
             if($this->department){
                 $query->where('department_id',$this->department);
-            }
-
-            if($this->is_tax){
-                if($this->is_tax == '1'){
-                    $query->whereNotNull('is_tax');
-                }else{
-                    $query->whereNull('is_tax');
-                }
-            }
-
-            if($this->is_include_tax){
-                $query->where('is_include_tax',$this->is_include_tax);
             }
 
             if($this->payment){
@@ -154,6 +142,7 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
                 'diskon'        => $row->discount,
                 'total'         => $row->total,
                 'pajak'         => $row->tax,
+                'pajakw'        => $row->wtax,
                 'grandtotal'    => $row->grandtotal
             ];
         }

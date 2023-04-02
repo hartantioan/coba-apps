@@ -588,7 +588,7 @@ class LandedCostController extends Controller
         $query = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
-            if($query->status == '5'){
+            if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
@@ -649,7 +649,7 @@ class LandedCostController extends Controller
     public function destroy(Request $request){
         $query = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
 
-        if($query->approval() || in_array($query->status,['2','3'])){
+        if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
@@ -658,6 +658,13 @@ class LandedCostController extends Controller
                     ]);
                 }
             }
+        }
+
+        if(in_array($query->status,['2','3'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
+            ]);
         }
         
         if($query->delete()) {

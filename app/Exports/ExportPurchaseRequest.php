@@ -45,7 +45,6 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
                     $query->where('code', 'like', "%$this->search%")
                         ->orWhere('post_date', 'like', "%$this->search%")
                         ->orWhere('due_date', 'like', "%$this->search%")
-                        ->orWhere('document_date', 'like', "%$this->search%")
                         ->orWhere('required_date', 'like', "%$this->search%")
                         ->orWhere('note', 'like', "%$this->search%")
                         ->orWhereHas('user',function($query){

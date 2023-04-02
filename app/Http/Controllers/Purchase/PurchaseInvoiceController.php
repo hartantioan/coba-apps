@@ -71,9 +71,12 @@ class PurchaseInvoiceController extends Controller
                     'due_date'      => date('d/m/y',strtotime($row->goodReceiptMain->due_date)),
                     'total'         => number_format($row->total,3,',','.'),
                     'tax'           => number_format($row->tax,3,',','.'),
+                    'wtax'          => number_format($row->wtax,3,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,3,',','.'),
                     'department_id' => $row->department_id,
                     'place_id'      => $row->place_id,
+                    'is_wtax'       => $row->wtax > 0 ? '1' : '',
+                    'percent_wtax'  => number_format(($row->wtax / $row->total) * 100,3,',','.'),
                 ];
             }
         }elseif($account->type == '4'){
@@ -345,14 +348,23 @@ class PurchaseInvoiceController extends Controller
             
             $total = 0;
             $tax = 0;
+            $wtax = 0;
             $grandtotal = 0;
             $balance = 0;
             $downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
 
             foreach($request->arr_total as $key => $row){
-                $total += str_replace(',','.',str_replace('.','',$row));
-                $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
-                $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+                $rowtotal = str_replace(',','.',str_replace('.','',$row));
+                $rowtax = str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
+                $rowgrandtotal = str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+                $total += $rowtotal;
+                $tax += $rowtax;
+                if($request->arr_is_wtax[$key] == '1'){
+                    $rowwtax = $rowtotal * (str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])) / 100);
+                    $wtax += $rowwtax;
+                    $rowgrandtotal -= $rowwtax;
+                }
+                $grandtotal += $rowgrandtotal;
             }
 
             $balance = $grandtotal - $downpayment;
@@ -396,6 +408,7 @@ class PurchaseInvoiceController extends Controller
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->total = round($total,3);
                         $query->tax = round($tax,3);
+                        $query->wtax = round($wtax,3);
                         $query->grandtotal = round($grandtotal,3);
                         $query->downpayment = round($downpayment,3);
                         $query->balance = round($balance,3);
@@ -435,6 +448,7 @@ class PurchaseInvoiceController extends Controller
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'total'                     => round($total,3),
                         'tax'                       => round($tax,3),
+                        'wtax'                      => round($wtax,3),
                         'grandtotal'                => round($grandtotal,3),
                         'downpayment'               => round($downpayment,3),
                         'balance'                   => round($balance,3),
@@ -462,6 +476,8 @@ class PurchaseInvoiceController extends Controller
                                 'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                                 'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
                                 'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                                'is_wtax'               => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
+                                'percent_wtax'          => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
                             ]);
                         }
                         DB::commit();
@@ -613,7 +629,7 @@ class PurchaseInvoiceController extends Controller
         $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
-            if($query->status == '5'){
+            if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
@@ -655,7 +671,7 @@ class PurchaseInvoiceController extends Controller
     public function destroy(Request $request){
         $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->id))->first();
 
-        if($query->approval() || in_array($query->status,['2','3'])){
+        if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
@@ -664,6 +680,13 @@ class PurchaseInvoiceController extends Controller
                     ]);
                 }
             }
+        }
+
+        if(in_array($query->status,['2','3'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
+            ]);
         }
         
         if($query->delete()) {

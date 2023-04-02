@@ -60,11 +60,10 @@
                                                     <tr>
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
-                                                        <th colspan="4" class="center-align">Tanggal</th>
+                                                        <th colspan="3" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Proyek</th>
-                                                        <th rowspan="2">Gudang</th>
                                                         <th rowspan="2">Pabrik/Kantor</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
@@ -72,7 +71,6 @@
                                                     <tr>
                                                         <th>Pengajuan</th>
                                                         <th>Kadaluwarsa</th>
-                                                        <th>Dokumen</th>
                                                         <th>Pemakaian</th>
                                                     </tr>
                                                 </thead>
@@ -116,10 +114,6 @@
                                 <label class="active" for="due_date">Tgl. Kadaluwarsa</label>
                             </div>
                             <div class="input-field col m4 s12">
-                                <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                <label class="active" for="document_date">Tgl. Dokumen</label>
-                            </div>
-                            <div class="input-field col m4 s12">
                                 <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
                                 <label class="active" for="required_date">Tgl. Dipakai</label>
                             </div>
@@ -141,10 +135,6 @@
                                 <label class="" for="place_id">Pabrik/Kantor</label>
                             </div>
                             <div class="input-field col m4 s12">
-                                <select class="browser-default" id="warehouse_id" name="warehouse_id"></select>
-                                <label class="active" for="warehouse_id">Gudang Tujuan</label>
-                            </div>
-                            <div class="input-field col m4 s12">
                                 <select class="browser-default" id="project_id" name="project_id"></select>
                                 <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                             </div>
@@ -154,12 +144,13 @@
                                     <table class="bordered">
                                         <thead>
                                             <tr>
-                                                <th width="40%" class="center">Item</th>
-                                                <th width="10%" class="center">Qty</th>
-                                                <th width="10%" class="center">Satuan</th>
-                                                <th width="20%" class="center">Keterangan</th>
-                                                <th width="15%" class="center">Tgl.Dipakai</th>
-                                                <th width="5%" class="center">Hapus</th>
+                                                <th class="center">Item</th>
+                                                <th class="center">Qty</th>
+                                                <th class="center">Satuan</th>
+                                                <th class="center">Keterangan</th>
+                                                <th class="center">Tgl.Dipakai</th>
+                                                <th class="center">Gudang Tujuan</th>
+                                                <th class="center">Hapus</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-item">
@@ -178,6 +169,9 @@
                                                 </td>
                                                 <td>
                                                     <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
+                                                </td>
+                                                <td>
+                                                    <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]"></select>
                                                 </td>
                                                 <td class="center">
                                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -247,7 +241,6 @@
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ date("Y-m-d") }}');
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
-                $('#document_date').attr('min','{{ date("Y-m-d") }}');
                 $('#required_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
@@ -271,7 +264,7 @@
 
         select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
-        select2ServerSide('#warehouse_id', '{{ url("admin/select2/warehouse") }}');
+        select2ServerSide('#arr_warehouse0', '{{ url("admin/select2/warehouse") }}');
     });
 
     function getRowUnit(val){
@@ -297,6 +290,9 @@
                 <td>
                     <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
                 </td>
+                <td>
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -305,11 +301,12 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
     }
 
     function changeDateMinimum(val){
         if(val){
-            $('#due_date,#document_date,#required_date').attr("min",val);
+            $('#due_date,#required_date').attr("min",val);
             $('input[name^="arr_required_date"]').each(function(){
                 $(this).attr("min",val);
             });
@@ -352,12 +349,10 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_due', className: 'center-align' },
-                { name: 'date_doc', className: 'center-align' },
                 { name: 'date_use', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'project_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -502,11 +497,9 @@
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
-                $('#document_date').val(response.document_date);
                 $('#required_date').val(response.required_date);
                 $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
-                $('#document_date').removeAttr('min');
                 $('#required_date').removeAttr('min');
                 $('#place_id').val(response.place_id).formSelect();
 
@@ -516,11 +509,6 @@
                         <option value="` + response.project_id + `">` + response.project_name + `</option>
                     `);
                 }
-                
-                $('#warehouse_id').empty();
-                $('#warehouse_id').append(`
-                    <option value="` + response.warehouse_id + `">` + response.warehouse_name + `</option>
-                `);
 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
@@ -546,6 +534,9 @@
                                 <td>
                                     <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
                                 </td>
+                                <td>
+                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -557,6 +548,10 @@
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                        $('#arr_warehouse' + count).append(`
+                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                        `);
+                        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                     });
                 }
                 

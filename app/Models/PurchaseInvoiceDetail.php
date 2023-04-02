@@ -20,12 +20,24 @@ class PurchaseInvoiceDetail extends Model
         'landed_cost_id',
         'total',
         'tax',
-        'grandtotal'
+        'grandtotal',
+        'is_wtax',
+        'percent_wtax'
     ];
 
     public function purchaseInvoice()
     {
         return $this->belongsTo('App\Models\PurchaseInvoice', 'purchase_invoice_id', 'id')->withTrashed();
+    }
+
+    public function isWtax(){
+        $type = match ($this->is_wtax) {
+          '0' => 'Tidak',
+          '1' => 'Ya',
+          default => 'Invalid',
+        };
+
+        return $type;
     }
     
     public function landedCost()

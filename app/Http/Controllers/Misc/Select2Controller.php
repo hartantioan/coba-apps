@@ -302,7 +302,6 @@ class Select2Controller extends Controller {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search){

@@ -26,6 +26,7 @@ class GoodReceipt extends Model
         'currency_rate',
         'total',
         'tax',
+        'wtax',
         'grandtotal',
     ];
 

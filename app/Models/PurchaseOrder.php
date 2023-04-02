@@ -40,6 +40,7 @@ class PurchaseOrder extends Model
         'discount',
         'total',
         'tax',
+        'wtax',
         'grandtotal',
         'status',
         'void_id',

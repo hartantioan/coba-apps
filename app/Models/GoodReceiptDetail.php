@@ -48,8 +48,8 @@ class GoodReceiptDetail extends Model
 
         $total = ($rowprice * $this->qty) - ($bobot * $discount);
 
-        if($po->is_tax == '1' && $po->is_include_tax == '1'){
-            $total = $total / (1 + ($po->percent_tax / 100));
+        if($datarow->is_tax == '1' && $datarow->is_include_tax == '1'){
+            $total = $total / (1 + ($datarow->percent_tax / 100));
         }
 
         return round($total,3);

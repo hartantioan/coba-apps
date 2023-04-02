@@ -236,9 +236,6 @@ class PurchaseOrderController extends Controller
                     $val->shippingType(),
                     $val->place->name.' - '.$val->place->company->name,
                     $val->department->name,
-                    $val->isTax(),
-                    $val->isIncludeTax(),
-                    number_format($val->percent_tax,3,',','.'),
                     $val->document_no,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->paymentType(),
@@ -256,6 +253,7 @@ class PurchaseOrderController extends Controller
                     number_format($val->discount,3,',','.'),
                     number_format($val->total,3,',','.'),
                     number_format($val->tax,3,',','.'),
+                    number_format($val->wtax,3,',','.'),
                     number_format($val->grandtotal,3,',','.'),
                     $val->status(),
                     '
@@ -296,11 +294,12 @@ class PurchaseOrderController extends Controller
                 $details = [];
                 foreach($data->purchaseRequestDetail as $row){
                     $details[] = [
-                        'item_id'       => $row->item_id,
-                        'item_name'     => $row->item->code.' - '.$row->item->name,
-                        'unit'          => $row->item->buyUnit->code,
-                        'qty'           => $row->qtyBalance(),
-                        'note'          => $row->note,
+                        'item_id'           => $row->item_id,
+                        'item_name'         => $row->item->code.' - '.$row->item->name,
+                        'unit'              => $row->item->buyUnit->code,
+                        'qty'               => $row->qtyBalance(),
+                        'note'              => $row->note,
+                        'warehouse_name'    => $row->warehouse->code.' - '.$row->warehouse->name
                     ];
                 }
 
@@ -329,7 +328,6 @@ class PurchaseOrderController extends Controller
             'receiver_name'             => 'required',
             'receiver_address'          => 'required',
             'receiver_phone'            => 'required',
-            'percent_tax'               => 'required',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_price'                 => 'required|array',
@@ -348,7 +346,6 @@ class PurchaseOrderController extends Controller
             'post_date.required'                => 'Tanggal post tidak boleh kosong.',
             'delivery_date.required'            => 'Tanggal kirim tidak boleh kosong.',
             'document_date.required'            => 'Tanggal dokumen tidak boleh kosong.',
-            'percent_tax.required'              => 'Prosentase tax tidak boleh kosong, minimal harus diisi 0.',
             'arr_item.required'                 => 'Item tidak boleh kosong.',
             'arr_item.array'                    => 'Item harus array.',
             'arr_qty.required'                  => 'Qty tidak boleh kosong.',
@@ -372,12 +369,6 @@ class PurchaseOrderController extends Controller
         } else {
             
             #start_count
-            $subtotal = 0;
-            $discount = str_replace(',','.',str_replace('.','',$request->discount));
-            $total = 0;
-            $tax = 0;
-            $grandtotal = 0;
-            $percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
             
             $arrDetail = [];
 
@@ -403,8 +394,6 @@ class PurchaseOrderController extends Controller
 
                 $rowsubtotal = round($finalpricedisc3 * $qty,3);
 
-                $subtotal += $rowsubtotal;
-
                 if($index >= 0){
                     $arrDetail[$index]['detail_pr'][] = [
                         'pr_code'       => $request->arr_purchase[$key],
@@ -419,6 +408,11 @@ class PurchaseOrderController extends Controller
                         'discount_3'            => str_replace(',','.',str_replace('.','',$request->arr_disc3[$key])),
                         'subtotal'              => $arrDetail[$index]['subtotal'] + $rowsubtotal,
                         'note'                  => $arrDetail[$index]['note'].', '.$request->arr_note[$key],
+                        'is_tax'                => $request->arr_is_tax[$key] == '1' ? '1' : NULL,
+                        'is_include_tax'        => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
+                        'percent_tax'           => str_replace(',','.',str_replace('.','',$request->arr_percent_tax[$key])),
+                        'is_wtax'               => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
+                        'percent_wtax'          => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
                         'detail_pr'             => $arrDetail[$index]['detail_pr']
                     ];
                 }else{
@@ -435,21 +429,15 @@ class PurchaseOrderController extends Controller
                         'discount_3'            => str_replace(',','.',str_replace('.','',$request->arr_disc3[$key])),
                         'subtotal'              => $rowsubtotal,
                         'note'                  => $request->arr_note[$key],
+                        'is_tax'                => $request->arr_is_tax[$key] == '1' ? '1' : NULL,
+                        'is_include_tax'        => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
+                        'percent_tax'           => str_replace(',','.',str_replace('.','',$request->arr_percent_tax[$key])),
+                        'is_wtax'               => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
+                        'percent_wtax'          => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
                         'detail_pr'             => $detail_pr,
                     ];
                 }
             }
-
-            $total = $subtotal - $discount;
-
-            if($request->is_tax){
-                if($request->is_include_tax){
-                    $total = $total / (1 + ($percent_tax / 100));
-                }
-                $tax = $total * ($percent_tax / 100);
-            }
-
-            $grandtotal = round($total + $tax,3);
 
             #end_count
 
@@ -485,11 +473,8 @@ class PurchaseOrderController extends Controller
                         $query->shipping_type = $request->shipping_type;
                         $query->place_id = $request->place_id;
                         $query->department_id = $request->department_id;
-                        $query->is_tax = $request->is_tax ? $request->is_tax : NULL;
-                        $query->is_include_tax = $request->is_include_tax ? $request->is_include_tax : '0';
                         $query->document_no = $request->document_no;
                         $query->document_po = $document;
-                        $query->percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
                         $query->payment_type = $request->payment_type;
                         $query->payment_term = $request->payment_term;
                         $query->currency_id = $request->currency_id;
@@ -498,11 +483,12 @@ class PurchaseOrderController extends Controller
                         $query->delivery_date = $request->delivery_date;
                         $query->document_date = $request->document_date;
                         $query->note = $request->note;
-                        $query->subtotal = round($subtotal,3);
-                        $query->discount = $discount;
-                        $query->total = round($total,3);
-                        $query->tax = round($tax,3);
-                        $query->grandtotal = round($grandtotal,3);
+                        $query->subtotal = str_replace(',','.',str_replace('.','',$request->savesubtotal));
+                        $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
+                        $query->total = str_replace(',','.',str_replace('.','',$request->savetotal));
+                        $query->tax = str_replace(',','.',str_replace('.','',$request->savetax));
+                        $query->wtax = str_replace(',','.',str_replace('.','',$request->savewtax));
+                        $query->grandtotal = str_replace(',','.',str_replace('.','',$request->savegrandtotal));
                         $query->receiver_name = $request->receiver_name;
                         $query->receiver_address = $request->receiver_address;
                         $query->receiver_phone = $request->receiver_phone;
@@ -537,11 +523,8 @@ class PurchaseOrderController extends Controller
                         'shipping_type'             => $request->shipping_type,
                         'place_id'                  => $request->place_id,
                         'department_id'             => $request->department_id,
-                        'is_tax'                    => $request->is_tax ? $request->is_tax : NULL,
-                        'is_include_tax'            => $request->is_include_tax ? $request->is_include_tax : '0',
                         'document_no'               => $request->document_no,
                         'document_po'               => $request->file('document_po') ? $request->file('document_po')->store('public/purchase_orders') : NULL,
-                        'percent_tax'               => str_replace(',','.',str_replace('.','',$request->percent_tax)),
                         'payment_type'              => $request->payment_type,
                         'payment_term'              => $request->payment_term,
                         'currency_id'               => $request->currency_id,
@@ -550,11 +533,12 @@ class PurchaseOrderController extends Controller
                         'delivery_date'             => $request->delivery_date,
                         'document_date'             => $request->document_date,
                         'note'                      => $request->note,
-                        'subtotal'                  => round($subtotal,3),
-                        'discount'                  => $discount,
-                        'total'                     => round($total,3),
-                        'tax'                       => round($tax,3),
-                        'grandtotal'                => round($grandtotal,3),
+                        'subtotal'                  => str_replace(',','.',str_replace('.','',$request->savesubtotal)),
+                        'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
+                        'total'                     => str_replace(',','.',str_replace('.','',$request->savetotal)),
+                        'tax'                       => str_replace(',','.',str_replace('.','',$request->savetax)),
+                        'wtax'                      => str_replace(',','.',str_replace('.','',$request->savewtax)),
+                        'grandtotal'                => str_replace(',','.',str_replace('.','',$request->savegrandtotal)),
                         'status'                    => '1',
                         'receiver_name'             => $request->receiver_name,
                         'receiver_address'          => $request->receiver_address,
@@ -584,6 +568,11 @@ class PurchaseOrderController extends Controller
                             'discount_3'            => $row['discount_3'],
                             'subtotal'              => $row['subtotal'],
                             'note'                  => $row['note'],
+                            'is_tax'                => $row['is_tax'],
+                            'is_include_tax'        => $row['is_include_tax'],
+                            'percent_tax'           => $row['percent_tax'],
+                            'is_wtax'               => $row['is_wtax'],
+                            'percent_wtax'          => $row['percent_wtax'],
                         ]);
 
                         foreach($row['detail_pr'] as $rowpr){
@@ -626,7 +615,7 @@ class PurchaseOrderController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -711,11 +700,11 @@ class PurchaseOrderController extends Controller
     public function show(Request $request){
         $po = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
         $po['supplier_name'] = $po->supplier->name;
-        $po['percent_tax'] = number_format($po->percent_tax,3,',','.');
         $po['subtotal'] = number_format($po->subtotal,3,',','.');
         $po['discount'] = number_format($po->discount,3,',','.');
         $po['total'] = number_format($po->total,3,',','.');
         $po['tax'] = number_format($po->tax,3,',','.');
+        $po['wtax'] = number_format($po->wtax,3,',','.');
         $po['grandtotal'] = number_format($po->grandtotal,3,',','.');
 
         $arr = [];
@@ -737,6 +726,11 @@ class PurchaseOrderController extends Controller
                         'disc2'     => number_format($row->percent_discount_2,3,',','.'),
                         'disc3'     => number_format($row->discount_3,3,',','.'),
                         'subtotal'  => number_format($rowcompos->qty * $row->price,3,',','.'),
+                        'is_tax'    => $row->is_tax ? $row->is_tax : '',
+                        'is_include_tax' => $row->is_include_tax ? $row->is_include_tax : '',
+                        'percent_tax' => number_format($row->percent_tax,3,',','.'),
+                        'is_wtax'    => $row->is_wtax ? $row->is_wtax : '',
+                        'percent_wtax' => number_format($row->percent_wtax,3,',','.'),
                     ];
                 }
             }else{
@@ -753,6 +747,11 @@ class PurchaseOrderController extends Controller
                     'disc2'     => number_format($row->percent_discount_2,3,',','.'),
                     'disc3'     => number_format($row->discount_3,3,',','.'),
                     'subtotal'  => number_format($row->subtotal,3,',','.'),
+                    'is_tax'    => $row->is_tax ? $row->is_tax : '',
+                    'is_include_tax' => $row->is_include_tax ? $row->is_include_tax : '',
+                    'percent_tax' => number_format($row->percent_tax,3,',','.'),
+                    'is_wtax'    => $row->is_wtax ? $row->is_wtax : '',
+                    'percent_wtax' => number_format($row->percent_wtax,3,',','.'),
                 ];
             }
         }
@@ -782,7 +781,7 @@ class PurchaseOrderController extends Controller
         $query = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
-            if($query->status == '5'){
+            if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
@@ -822,7 +821,7 @@ class PurchaseOrderController extends Controller
     public function destroy(Request $request){
         $query = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
 
-        if($query->approval() || in_array($query->status,['2','3'])){
+        if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
@@ -831,6 +830,13 @@ class PurchaseOrderController extends Controller
                     ]);
                 }
             }
+        }
+
+        if(in_array($query->status,['2','3'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
+            ]);
         }
         
         if($query->delete()) {
@@ -868,7 +874,6 @@ class PurchaseOrderController extends Controller
                 if($request->search) {
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
-                            ->orWhere('percent_tax', 'like', "%$request->search%")
                             ->orWhere('document_no', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
                             ->orWhere('subtotal', 'like', "%$request->search%")
@@ -905,18 +910,6 @@ class PurchaseOrderController extends Controller
 
                 if($request->department){
                     $query->where('department_id',$request->department);
-                }
-
-                if($request->is_tax){
-                    if($request->is_tax == '1'){
-                        $query->whereNotNull('is_tax');
-                    }else{
-                        $query->whereNull('is_tax');
-                    }
-                }
-
-                if($request->is_include_tax){
-                    $query->where('is_include_tax',$request->is_include_tax);
                 }
 
                 if($request->payment){

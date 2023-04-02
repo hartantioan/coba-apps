@@ -58,7 +58,6 @@ class PurchaseRequestController extends Controller
             'code',
             'post_date',
             'due_date',
-            'document_date',
             'required_date',
             'note',
         ];
@@ -81,7 +80,6 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
@@ -114,7 +112,6 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
@@ -149,7 +146,6 @@ class PurchaseRequestController extends Controller
                     $val->place->name.' - '.$val->place->company->name,
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->due_date)),
-                    date('d M Y',strtotime($val->document_date)),
                     date('d M Y',strtotime($val->required_date)),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
@@ -246,10 +242,15 @@ class PurchaseRequestController extends Controller
         $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
-            if($query->status == '5'){
+            if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->purchaseOrderDetailComposition()->exists()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Purchase Order.'
                 ];
             }else{
                 $query->update([
@@ -293,7 +294,6 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('post_date', 'like', "%$request->search%")
                             ->orWhere('due_date', 'like', "%$request->search%")
-                            ->orWhere('document_date', 'like', "%$request->search%")
                             ->orWhere('required_date', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($request){
@@ -333,7 +333,6 @@ class PurchaseRequestController extends Controller
             'code',
             'post_date',
             'due_date',
-            'document_date',
             'required_date',
             'note',
         ];
@@ -352,7 +351,6 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
@@ -380,7 +378,6 @@ class PurchaseRequestController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
@@ -408,12 +405,10 @@ class PurchaseRequestController extends Controller
                     $val->code,
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->due_date)),
-                    date('d M Y',strtotime($val->document_date)),
                     date('d M Y',strtotime($val->required_date)),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->project()->exists() ? $val->project->code.' - '.$val->project->name : ' - ',
-                    $val->warehouse->name,
                     $val->place->name.' - '.$val->place->company->name,
                     $val->status(),
                     '
@@ -443,22 +438,21 @@ class PurchaseRequestController extends Controller
         $validation = Validator::make($request->all(), [
 			'post_date' 				=> 'required',
 			'due_date'			        => 'required',
-			'document_date'		        => 'required',
 			'required_date'		        => 'required',
             'note'		                => 'required',
             'arr_item'                  => 'required|array',
             'place_id'                  => 'required',
-            'warehouse_id'              => 'required'
+            'arr_warehouse'             => 'required|array'
 		], [
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
-            'document_date.required' 			=> 'Tanggal dokumen tidak boleh kosong.',
 			'required_date.required' 			=> 'Tanggal dipakai tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'arr_item.required'                 => 'Item tidak boleh kosong',
-            'arr_item.array'                    => 'Item harus dalam bentuk array',
+            'arr_item.array'                    => 'Item harus dalam bentuk array.',
             'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
-            'warehouse_id.required'             => 'Gudang tujuan tidak boleh kosong.'
+            'arr_warehouse.required'            => 'Gudang tujuan tidak boleh kosong.',
+            'arr_warehouse.array'               => 'Gudang harus dalam bentuk array.'
 		]);
 
         if($validation->fails()) {
@@ -496,13 +490,11 @@ class PurchaseRequestController extends Controller
                         
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
-                        $query->document_date = $request->document_date;
                         $query->required_date = $request->required_date;
                         $query->note = $request->note;
                         $query->document = $document;
                         $query->project_id = $request->project_id ? $request->project_id : NULL;
                         $query->place_id = $request->place_id;
-                        $query->warehouse_id = $request->warehouse_id;
                         $query->save();
 
                         foreach($query->purchaseRequestDetail as $row){
@@ -526,12 +518,10 @@ class PurchaseRequestController extends Controller
                         'code'			=> PurchaseRequest::generateCode(),
                         'user_id'		=> session('bo_id'),
                         'place_id'      => $request->place_id,
-                        'warehouse_id'  => $request->warehouse_id,
                         'department_id'	=> session('bo_department_id'),
                         'status'        => '1',
                         'post_date'     => $request->post_date,
                         'due_date'      => $request->due_date,
-                        'document_date' => $request->document_date,
                         'required_date' => $request->required_date,
                         'note'          => $request->note,
                         'project_id'    => $request->project_id ? $request->project_id : NULL,
@@ -559,7 +549,8 @@ class PurchaseRequestController extends Controller
                             'note'                  => $request->arr_note[$key],
                             'required_date'         => $request->arr_required_date[$key],
                             'place_id'              => session('bo_place_id'),
-                            'department_id'         => session('bo_department_id')
+                            'department_id'         => session('bo_department_id'),
+                            'warehouse_id'          => $request->arr_warehouse[$key]
                         ]);
                         DB::commit();
                     }catch(\Exception $e){
@@ -657,18 +648,18 @@ class PurchaseRequestController extends Controller
         $pr = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $pr['project_id'] = $pr->project_id ? $pr->project_id : '';
         $pr['project_name'] = $pr->project()->exists() ? $pr->project->code.' - '.$pr->project->name : '';
-        $pr['warehouse_name'] = $pr->warehouse->name;
 
         $arr = [];
 
         foreach($pr->purchaseRequestDetail as $row){
             $arr[] = [
-                'item_id'   => $row->item_id,
-                'item_name' => $row->item->name,
-                'qty'       => $row->qty,
-                'unit'      => $row->item->buyUnit->code,
-                'note'      => $row->note,
-                'date'      => $row->required_date,
+                'item_id'           => $row->item_id,
+                'item_name'         => $row->item->name,
+                'qty'               => $row->qty,
+                'unit'              => $row->item->buyUnit->code,
+                'note'              => $row->note,
+                'date'              => $row->required_date,
+                'warehouse_name'    => $row->warehouse->name
             ];
         }
 
@@ -680,7 +671,7 @@ class PurchaseRequestController extends Controller
     public function userDestroy(Request $request){
         $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
 
-        if($query->approval() || in_array($query->status,['2','3'])){
+        if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
@@ -690,7 +681,21 @@ class PurchaseRequestController extends Controller
                 }
             }
         }
+
+        if(in_array($query->status,['2','3'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
         
+        if($query->purchaseOrderDetailComposition()->exists()){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Data telah digunakan pada Purchase Order.'
+            ]);
+        }
+
         if($query->delete()) {
             
             $query->purchaseRequestDetail()->delete();

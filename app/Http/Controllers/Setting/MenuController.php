@@ -734,4 +734,33 @@ class MenuController extends Controller
 
         return response()->json($response);
     }
+
+    public function getPageStatusMaintenance(Request $request){
+
+        $query = Menu::where('url',$request->value)->first();
+		
+        if($query) {
+            if($query->is_maintenance){
+                $response = [
+                    'status'    => 300,
+                    'title'     => 'Halaman sedang dalam perbaikan!',
+                    'message'   => 'Mohon maaf, halaman sedang dalam perbaikan, mohon untuk tidak diakses. Terima kasih.'
+                ];
+            }else{
+                $response = [
+                    'status'    => 200,
+                    'title'     => '',
+                    'message'   => ''
+                ];
+            }
+        }else{
+            $response = [
+                'status'    => 200,
+                'title'     => '',
+                'message'   => ''
+            ];
+        }
+
+        return response()->json($response);
+    }
 }

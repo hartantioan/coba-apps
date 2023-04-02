@@ -22,7 +22,7 @@
     <script src="{{ url('app-assets/js/custom/waitMe.min.js') }}"></script>
     <script src="{{ url('app-assets/js/plugins.js?v=7') }}"></script>
     <script src="{{ url('app-assets/js/search.js?v=11') }}"></script>
-    <script src="{{ url('app-assets/js/custom/custom-script.js?v=43') }}"></script>
+    <script src="{{ url('app-assets/js/custom/custom-script.js?v=53') }}"></script>
     @if(session('bo_id'))
         <script>
             $(function() {
@@ -31,6 +31,7 @@
                     cekNotif('{{ URL::to('/') }}');
                 },5000);
                 $('.tooltipped').tooltip();
+                checkPageMaintenance('{{ URL::to('/') }}');
             });
         </script>
     @endif

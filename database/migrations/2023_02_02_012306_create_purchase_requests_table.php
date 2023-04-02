@@ -21,11 +21,9 @@ return new class extends Migration
             $table->bigInteger('project_id')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
-            $table->bigInteger('warehouse_id')->nullable();
             $table->char('status', 1)->nullable();
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
-            $table->date('document_date')->nullable();
             $table->date('required_date')->nullable();
             $table->text('note')->nullable();
             $table->string('document')->nullable();

@@ -23,11 +23,8 @@ return new class extends Migration
             $table->char('shipping_type', 1)->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
-            $table->char('is_tax', 1)->nullable();
-            $table->char('is_include_tax', 1)->nullable();
             $table->string('document_no', 155)->nullable();
             $table->string('document_po')->nullable();
-            $table->double('percent_tax')->nullable();
             $table->char('payment_type', 2)->nullable();
             $table->integer('payment_term')->nullable();
             $table->bigInteger('currency')->nullable();
@@ -40,6 +37,7 @@ return new class extends Migration
             $table->double('discount')->nullable();
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
+            $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
             $table->char('status',1)->nullable();
             $table->bigInteger('void_id')->nullable();

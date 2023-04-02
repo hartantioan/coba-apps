@@ -272,7 +272,7 @@
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Good Receipt PO / Landed Cost</h4>
                                     <div style="overflow:auto;">
-                                        <table class="bordered">
+                                        <table class="bordered" style="width:1500px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">
@@ -285,13 +285,16 @@
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Tenggat</th>
                                                     <th class="center">Total</th>
-                                                    <th class="center">Pajak</th>
+                                                    <th class="center">PPN</th>
+                                                    <th class="center">PPH</th>
                                                     <th class="center">Grandtotal</th>
+                                                    <th class="center">Ber-PPH?</th>
+                                                    <th class="center">% PPH</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="empty-detail">
-                                                    <td colspan="7" class="center">
+                                                    <td colspan="10" class="center">
                                                         Pilih supplier/vendor untuk memulai...
                                                     </td>
                                                 </tr>
@@ -315,8 +318,12 @@
                                             <td class="right-align"><span id="total">0,000</span></td>
                                         </tr>
                                         <tr>
-                                            <td>Pajak</td>
+                                            <td>PPN</td>
                                             <td class="right-align"><span id="tax">0,000</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>PPH</td>
+                                            <td class="right-align"><span id="wtax">0,000</span></td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
@@ -411,6 +418,9 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                window.onbeforeunload = function() {
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -421,14 +431,17 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="7" class="center">
+                        <td colspan="10" class="center">
                             Pilih supplier/vendor untuk memulai...
                         </td>
                     </tr>
                 `);
                 $('#account_id').empty();
-                $('#total,#tax,#grandtotal,#balance').text('0,000');
+                $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
                 $('#subtotal,#discount,#downpayment').val('0,000');
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -475,6 +488,7 @@
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
                                     <td class="center-align">
                                         <label>
@@ -498,18 +512,38 @@
                                         ` + val.tax + `
                                     </td>
                                     <td class="right-align">
+                                        ` + val.wtax + `
+                                    </td>
+                                    <td class="right-align">
                                         ` + val.grandtotal + `
+                                    </td>
+                                    <td class="center">
+                                        <div class="switch mb-0">
+                                            <label>
+                                                Tidak
+                                                <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="countAll();applyWtax('` + count + `');" ` + (val.is_wtax ? `disabled` : ``) + `>
+                                                <span class="lever"></span>
+                                                Ya
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td class="center">
+                                        <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:100px;" ` + (val.is_wtax ? `readonly` : ``) + `>
                                     </td>
                                 </tr>
                             `);
 
                             $('#place_id').val(val.place_id).formSelect();
                             $('#department_id').val(val.department_id).formSelect();
+                            if(val.is_wtax){
+                                $('#arr_is_wtax' + count).prop( "checked", true);
+                            }
+                            $('#arr_percent_wtax' + count).val(val.percent_wtax);
                         });                        
                     }else{
                         $('#body-detail').empty().append(`
                             <tr id="empty-detail">
-                                <td colspan="7" class="center">
+                                <td colspan="10" class="center">
                                     Pilih supplier/vendor untuk memulai...
                                 </td>
                             </tr>
@@ -538,7 +572,7 @@
         }else{
             $('#body-detail').empty().append(`
                 <tr id="empty-detail">
-                    <td colspan="7" class="center">
+                    <td colspan="10" class="center">
                         Pilih supplier/vendor untuk memulai...
                     </td>
                 </tr>
@@ -551,16 +585,24 @@
     }
 
     function countAll(){
-        var total = 0, tax = 0, grandtotal = 0, downpayment = parseFloat($('#downpayment').val().replaceAll(".", "").replaceAll(",",".")), balance = 0;
+        var total = 0, tax = 0, grandtotal = 0, downpayment = parseFloat($('#downpayment').val().replaceAll(".", "").replaceAll(",",".")), balance = 0, wtax = 0;
         
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
                 if($(element).is(':checked')){
                     ada = true;
-                    total += parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                    tax += parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                    grandtotal += parseFloat($('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    let rowtotal = parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowtax = parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowgrandtotal = parseFloat($('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    
+                    total += rowtotal;
+                    tax += rowtax;
+
+                    if($('#arr_is_wtax' + element.data('id')).is(':checked')){
+                        let rowwtax = rowtotal * (parseFloat($('#arr_percent_wtax' + element.data('id')).val().replaceAll(".", "").replaceAll(",",".")) / 100);
+                        wtax += rowwtax;
+                        rowgrandtotal -= rowwtax;
+                    }
+                    grandtotal += rowgrandtotal;
                 }
             });
         }
@@ -569,6 +611,7 @@
 
         $('#total').text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
         $('#tax').text(formatRupiahIni(tax.toFixed(3).toString().replace('.',',')));
+        $('#wtax').text(formatRupiahIni(wtax.toFixed(3).toString().replace('.',',')));
         $('#grandtotal').text(
             formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
         );
@@ -708,7 +751,10 @@
                 formData.delete("arr_type[]");
                 formData.delete("arr_total[]");
                 formData.delete("arr_tax[]");
+                formData.delete("arr_wtax[]");
                 formData.delete("arr_grandtotal[]");
+                formData.delete("arr_is_wtax[]");
+                formData.delete("arr_percent_wtax[]");
 
                 $('input[name^="arr_code"]').each(function(){
                     if($(this).is(':checked')){
@@ -716,7 +762,10 @@
                         formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_total[]',$('input[name^="arr_total"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_tax[]',$('input[name^="arr_tax"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_wtax[]',$('input[name^="arr_wtax"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_is_wtax[]',($('#arr_is_wtax' + $(this).data('id')).is(':checked') ? '1' : '0' ));
+                        formData.append('arr_percent_wtax[]',$('#arr_percent_wtax' + $(this).data('id')).val());
                     }
                 });
 

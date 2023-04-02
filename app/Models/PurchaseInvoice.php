@@ -31,6 +31,7 @@ class PurchaseInvoice extends Model
         'discount',
         'total',
         'tax',
+        'wtax',
         'grandtotal',
         'downpayment',
         'balance',

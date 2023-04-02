@@ -262,7 +262,7 @@
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="7" rowspan="6">
+                        <td colspan="7" rowspan="7">
                             Rekening :
                             {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">
@@ -283,8 +283,12 @@
                         <td class="right-align">{{ number_format($data->total,3,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Pajak</td>
+                        <td class="right-align" colspan="2">PPN</td>
                         <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="right-align" colspan="2">PPH</td>
+                        <td class="right-align">{{ number_format($data->wtax,3,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2"><h6>Grandtotal</h6></td>

@@ -78,7 +78,7 @@
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pabrik/Kantor</th>
-                                                        <th colspan="4" class="center-align">Tanggal</th>
+                                                        <th colspan="3" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
@@ -87,7 +87,6 @@
                                                     <tr>
                                                         <th>Pengajuan</th>
                                                         <th>Kadaluwarsa</th>
-                                                        <th>Dokumen</th>
                                                         <th>Pemakaian</th>
                                                     </tr>
                                                 </thead>
@@ -197,7 +196,6 @@
                 { name: 'place_id', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_due', className: 'center-align' },
-                { name: 'date_doc', className: 'center-align' },
                 { name: 'date_use', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
@@ -333,11 +331,9 @@
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
-                $('#document_date').val(response.document_date);
                 $('#required_date').val(response.required_date);
                 $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
-                $('#document_date').removeAttr('min');
                 $('#required_date').removeAttr('min');
                 
                 if(response.details.length > 0){

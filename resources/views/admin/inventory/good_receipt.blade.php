@@ -300,6 +300,12 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -317,6 +323,9 @@
                 $('#warehouse_id,#purchase_order_id').empty();
                 M.updateTextFields();
                 $('#list-used-data').empty();
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -555,7 +564,7 @@
                             $('#list-used-data').append(`
                                 <div class="chip purple darken-4 gradient-shadow white-text">
                                     ` + response.code + `
-                                    <i class="material-icons close" onclick="removeUsedData('` + response.id + `')">close</i>
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
                                 </div>
                             `);
 

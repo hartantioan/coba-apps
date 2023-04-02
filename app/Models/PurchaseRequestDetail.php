@@ -21,7 +21,8 @@ class PurchaseRequestDetail extends Model
         'note',
         'required_date',
         'place_id',
-        'department_id'
+        'department_id',
+        'warehouse_id',
     ];
 
     public function purchaseRequest()
@@ -54,5 +55,10 @@ class PurchaseRequestDetail extends Model
         }
 
         return $qty;
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 }

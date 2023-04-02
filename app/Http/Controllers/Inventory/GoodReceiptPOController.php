@@ -246,11 +246,13 @@ class GoodReceiptPOController extends Controller
             $total = 0;
             $bobot = 0;
             $tax = 0;
+            $wtax = 0;
             $grandtotal = 0;
             $discount = 0;
             $subtotal = 0;
             $totalall = 0;
             $taxall = 0;
+            $wtaxall = 0;
             $grandtotalall = 0;
 
             $arrDetail = [];
@@ -283,18 +285,23 @@ class GoodReceiptPOController extends Controller
 
                     $total = ($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount);
 
-                    if($purchase_order->is_tax == '1' && $purchase_order->is_include_tax == '1'){
-                        $total = $total / (1 + ($purchase_order->percent_tax / 100));
+                    if($datarow->is_tax == '1' && $datarow->is_include_tax == '1'){
+                        $total = $total / (1 + ($datarow->percent_tax / 100));
                     }
 
-                    if($purchase_order->is_tax == '1'){
-                        $tax = round($total * ($purchase_order->percent_tax / 100),3);
+                    if($datarow->is_tax == '1'){
+                        $tax = round($total * ($datarow->percent_tax / 100),3);
                     }
 
-                    $grandtotal = $total + $tax;
+                    if($datarow->is_wtax == '1'){
+                        $wtax = round($total * ($datarow->percent_wtax / 100),3);
+                    }
+
+                    $grandtotal = $total + $tax - $wtax;
 
                     $totalall += $total;
                     $taxall += $tax;
+                    $wtaxall += $wtax;
                     $grandtotalall += $grandtotal;
 
                     if($index >= 0){
@@ -309,6 +316,7 @@ class GoodReceiptPOController extends Controller
                             'detail'            => $arrDetail[$index]['detail'],
                             'total'             => $arrDetail[$index]['total'] + round($total,3),
                             'tax'               => $arrDetail[$index]['tax'] + $tax,
+                            'wtax'              => $arrDetail[$index]['wtax'] + $wtax,
                             'grandtotal'        => $arrDetail[$index]['grandtotal'] + $grandtotal,
                         ];
                     }else{
@@ -322,6 +330,7 @@ class GoodReceiptPOController extends Controller
                             'detail'            => $detail_po,
                             'total'             => round($total,3),
                             'tax'               => $tax,
+                            'wtax'              => $wtax,
                             'grandtotal'        => $grandtotal
                         ];
                     }
@@ -365,6 +374,7 @@ class GoodReceiptPOController extends Controller
                         $query->note = $request->note;
                         $query->total = $totalall;
                         $query->tax = $taxall;
+                        $query->wtax = $wtaxall;
                         $query->grandtotal = $grandtotalall;
                         $query->save();
 
@@ -402,11 +412,9 @@ class GoodReceiptPOController extends Controller
                         'status'                => '1',
                         'total'                 => $totalall,
                         'tax'                   => $taxall,
+                        'wtax'                  => $wtaxall,
                         'grandtotal'            => $grandtotalall
                     ]);
-
-                    CustomHelper::sendApproval('good_receipt_mains',$query->id,$query->note);
-                    CustomHelper::sendNotification('good_receipt_mains',$query->id,'Pengajuan Penerimaan Barang No. '.$query->code,$query->note,session('bo_id'));
 
                     DB::commit();
                 }catch(\Exception $e){
@@ -430,6 +438,7 @@ class GoodReceiptPOController extends Controller
                             'currency_rate'             => $row['po']->currency_rate,
                             'total'                     => $row['total'],
                             'tax'                       => $row['tax'],
+                            'wtax'                      => $row['wtax'],
                             'grandtotal'                => $row['grandtotal']
                         ]);
                         
@@ -444,6 +453,10 @@ class GoodReceiptPOController extends Controller
 
                         CustomHelper::removeUsedData('purchase_orders',$row['po']->id);
                     }
+
+                    CustomHelper::sendApproval('good_receipt_mains',$query->id,$query->note);
+                    CustomHelper::sendNotification('good_receipt_mains',$query->id,'Pengajuan Penerimaan Barang No. '.$query->code,$query->note,session('bo_id'));
+                    
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
@@ -458,7 +471,6 @@ class GoodReceiptPOController extends Controller
 				$response = [
 					'status'    => 200,
 					'message'   => 'Data successfully saved.',
-                    'test'      => json_encode($arrDetail)
 				];
 			} else {
 				$response = [
@@ -645,7 +657,7 @@ class GoodReceiptPOController extends Controller
         $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
-            if($query->status == '5'){
+            if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
@@ -690,7 +702,7 @@ class GoodReceiptPOController extends Controller
     public function destroy(Request $request){
         $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
 
-        if($query->approval() || in_array($query->status,['2','3'])){
+        if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
@@ -699,6 +711,13 @@ class GoodReceiptPOController extends Controller
                     ]);
                 }
             }
+        }
+
+        if(in_array($query->status,['2','3'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
+            ]);
         }
         
         if($query->delete()) {

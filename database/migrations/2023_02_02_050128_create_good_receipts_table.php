@@ -26,6 +26,7 @@ return new class extends Migration
             $table->double('currency_rate')->nullable();
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
+            $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');

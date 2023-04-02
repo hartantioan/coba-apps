@@ -21,11 +21,9 @@ class PurchaseRequest extends Model
         'project_id',
         'place_id',
         'department_id',
-        'warehouse_id',
         'status',
         'post_date',
         'due_date',
-        'document_date',
         'required_date',
         'note',
         'document',
@@ -49,11 +47,6 @@ class PurchaseRequest extends Model
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
-    public function warehouse()
-    {
-        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
-    }
-
     public function project()
     {
         return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
@@ -69,9 +62,9 @@ class PurchaseRequest extends Model
         return $this->hasMany('App\Models\PurchaseRequestDetail');
     }
 
-    public function purchaseOrderMain()
+    public function purchaseOrderDetailComposition()
     {
-        return $this->hasMany('App\Models\PurchaseOrderMain');
+        return $this->hasMany('App\Models\PurchaseOrderDetailComposition','pr_id','id');
     }
 
     public function used(){

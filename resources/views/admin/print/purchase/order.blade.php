@@ -145,7 +145,8 @@
                         <th rowspan="2">Subtotal</th>
                         <th rowspan="2">Diskon</th>
                         <th rowspan="2">Total</th>
-                        <th rowspan="2">Pajak</th>
+                        <th rowspan="2">PPN</th>
+						<th rowspan="2">PPH</th>
                         <th rowspan="2">Grandtotal</th>
 					</tr>
                     <tr align="center">
@@ -187,10 +188,11 @@
                             <td align="right">{{ number_format($row->discount,2,',','.') }}</td>
                             <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                             <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
+							<td align="right">{{ number_format($row->wtax,2,',','.') }}</td>
                             <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan="24" style="border-right-style: none !important;">
+                            <td colspan="25" style="border-right-style: none !important;">
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
@@ -226,7 +228,7 @@
 					@endforeach
                     @if(count($data) == 0)
                         <tr>
-                            <td colspan="24" align="center">
+                            <td colspan="25" align="center">
                                 Data tidak ditemukan
                             </td>
                         </tr>

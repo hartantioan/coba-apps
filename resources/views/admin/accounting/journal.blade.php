@@ -54,20 +54,55 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <div class="card-panel">
-                                <div class="row">
-                                    <div class="col s12 ">
-                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
-                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
-                                            <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Non-Aktif</option>
-                                            </select>
-                                        </div>
+                            <ul class="collapsible collapsible-accordion">
+                                <li>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-body">
+                                        <div class="row">
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Menunggu</option>
+                                                        <option value="2">Dalam Proses</option>
+                                                        <option value="3">Selesai</option>
+                                                        <option value="4">Ditolak</option>
+                                                        <option value="5">Ditutup</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_place" style="font-size:1rem;">Pabrik/Kantor :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_place" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        @foreach ($place as $rowplace)
+                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_account" style="font-size:1rem;">Target BP :</label>
+                                                <div class="input-field">
+                                                    <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_currency" style="font-size:1rem;">Mata Uang :</label>
+                                                <div class="input-field">
+                                                    <select class="select2 browser-default" multiple="multiple" id="filter_currency" name="filter_currency" onchange="loadDataTable()">
+                                                        <option value="" disabled>Semua</option>
+                                                        @foreach ($currency as $row)
+                                                            <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
                                     </div>
-                                </div>
-                            </div>
+                                </li>
+                            </ul>
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">List Data</h4>
@@ -80,7 +115,7 @@
                                                         <th>#</th>
                                                         <th>Kode</th>
                                                         <th>Pengguna</th>
-                                                        <th>Atas Nama</th>
+                                                        <th>Target BP</th>
                                                         <th>Tanggal</th>
                                                         <th>Keterangan</th>
                                                         <th>Ref No.</th>
@@ -232,7 +267,19 @@
 
 <!-- END: Page Main-->
 <script>
+    /* document.addEventListener('keydown', (e) => {
+        e = e || window.event;
+        if(e.keyCode == 116 || (e.ctrlKey && e.keyCode == 82)){
+            e.preventDefault();
+        }
+    }); */
+
     $(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+        
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
             var badge = tr.find('button.btn-floating');
@@ -277,7 +324,7 @@
             }
         });
 
-        select2ServerSide('#account_id', '{{ url("admin/select2/business_partner") }}');
+        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
         
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
@@ -412,6 +459,9 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
+                    'account_id[]' : $('#filter_account').val(),
+                    place_id : $('#filter_place').val(),
+                    'currency_id[]' : $('#filter_currency').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -729,10 +779,8 @@
     }
 
     function exportExcel(){
-        var search = window.table.search();
-        var status = $('#filter_status').val();
-        var type = $('#filter_type').val();
+        var search = window.table.search(), status = $('#filter_status').val(), place = $('#filter_place').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&place=" + place + "&account=" + account + "&currency=" + currency;
     }
 </script>

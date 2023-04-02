@@ -24,7 +24,42 @@ class PurchaseOrderDetail extends Model
         'discount_3',
         'subtotal',
         'note',
+        'is_tax',
+        'is_include_tax',
+        'percent_tax',
+        'is_wtax',
+        'percent_wtax'
     ];
+
+    public function isIncludeTax(){
+        $type = match ($this->is_include_tax) {
+          '0' => 'Tidak',
+          '1' => 'Termasuk',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function isTax(){
+        $type = match ($this->is_tax) {
+          NULL => 'Tidak',
+          '1' => 'Ya',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function isWtax(){
+        $type = match ($this->is_wtax) {
+          NULL => 'Tidak',
+          '1' => 'Ya',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
 
     public function purchaseOrder()
     {

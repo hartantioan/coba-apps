@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ExportCoa;
+use App\Exports\ExportJournal;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 
@@ -76,6 +76,18 @@ class JournalController extends Controller
                     $query->where('status', $request->status);
                 }
 
+                if($request->account_id){
+                    $query->whereIn('account_id',$request->account_id);
+                }
+                
+                if($request->place_id){
+                    $query->where('place_id',$request->place_id);
+                }       
+                
+                if($request->currency_id){
+                    $query->whereIn('currency_id',$request->currency_id);
+                }
+
             })
             ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
@@ -99,6 +111,18 @@ class JournalController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
+
+                if($request->account_id){
+                    $query->whereIn('account_id',$request->account_id);
+                }
+                
+                if($request->place_id){
+                    $query->where('place_id',$request->place_id);
+                }       
+                
+                if($request->currency_id){
+                    $query->whereIn('currency_id',$request->currency_id);
+                }
             })
             ->whereIn('place_id',$this->dataplaces)
             ->count();
@@ -119,6 +143,7 @@ class JournalController extends Controller
                     $val->status(),
                     !$val->lookable_id ? '
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					' : '-',
                 ];
@@ -400,5 +425,143 @@ class JournalController extends Controller
         $jou['details'] = $arr;
         				
 		return response()->json($jou);
+    }
+
+    public function destroy(Request $request){
+        
+        $query = Journal::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query->approval()){
+            foreach($query->approval()->approvalMatrix as $row){
+                if($row->status == '2'){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Jurnal telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+            }
+        }
+
+        if(in_array($query->status,['2','3'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+        
+        if($query->delete()) {
+
+            $query->journalDetail()->delete();
+
+            CustomHelper::removeApproval('journals',$query->id);
+
+            activity()
+                ->performedOn(new Journal())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the journal data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function voidStatus(Request $request){
+        $query = Journal::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+            if(in_array($query->status,['4','5'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }else{
+
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+
+                foreach($query->journalDetail as $row){
+                    $row->delete();
+                }
+    
+                activity()
+                    ->performedOn(new Journal())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the journal data');
+    
+                CustomHelper::sendNotification('journals',$query->id,'Jurnal No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function print(Request $request){
+
+        $data = [
+            'title' => 'JOURNAL REPORT',
+            'data' => Journal::where(function($query) use ($request) {
+                if($request->search) {
+                    $query->where(function($query) use ($request) {
+                        $query->where('code', 'like', "%$request->search%")
+                            ->orWhere('note', 'like', "%$request->search%")
+                            ->orWhereHas('user',function($query) use ($request){
+                                $query->where('name', 'like', "%$request->search%");
+                            })->orWhereHas('account',function($query) use ($request){
+                                $query->where('name', 'like', "%$request->search%");
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
+                if($request->account_id){
+                    $query->whereIn('account_id',$request->account_id);
+                }
+                
+                if($request->place_id){
+                    $query->where('place_id',$request->place_id);
+                }       
+                
+                if($request->currency_id){
+                    $query->whereIn('currency_id',$request->currency_id);
+                }
+
+            })
+            ->whereIn('place_id',$this->dataplaces)
+            ->get()
+		];
+		
+		return view('admin.print.accounting.journal', $data);
+    }
+
+    public function export(Request $request){
+		return Excel::download(new ExportJournal($request->search,$request->status,$request->place,$request->account,$request->currency,$this->dataplaces), 'journal_'.uniqid().'.xlsx');
     }
 }

@@ -186,7 +186,11 @@ class CustomHelper {
 				'status'	=> '2'
 			]);
 
-			self::sendJournal($table_name,$table_id,$data->account_id);
+			if($table_name == 'good_receipt_mains'){
+				self::sendJournal('good_receipt_mains',$data->id,null);
+			}else{
+				self::sendJournal($table_name,$table_id,$data->account_id);
+			}
 		}
 	}
 

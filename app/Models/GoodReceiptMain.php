@@ -29,6 +29,7 @@ class GoodReceiptMain extends Model
         'status',
         'total',
         'tax',
+        'wtax',
         'grandtotal',
         'void_id',
         'void_note',

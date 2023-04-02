@@ -91,7 +91,7 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_place" style="font-size:1rem;">Pabrik :</label>
+                                                <label for="filter_place" style="font-size:1rem;">Pabrik/Kantor :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_place" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
@@ -109,26 +109,6 @@
                                                         @foreach ($department as $rowdepartment)
                                                             <option value="{{ $rowdepartment->id }}">{{ $rowdepartment->name }}</option>
                                                         @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_is_tax" style="font-size:1rem;">Ber-PPN? :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_is_tax" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Ya</option>
-                                                        <option value="2">Tidak</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_is_include_ppn" style="font-size:1rem;">Termasuk PPN? :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_is_include_ppn" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Ya</option>
-                                                        <option value="0">Tidak</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -188,7 +168,6 @@
                                                         <th rowspan="2">Pengiriman</th>
                                                         <th rowspan="2">Pabrik/Kantor</th>
                                                         <th rowspan="2">Departemen</th>
-                                                        <th colspan="3" class="center">Pajak</th>
                                                         <th colspan="2" class="center">Proforma</th>
                                                         <th colspan="2" class="center">Pembayaran</th>
                                                         <th colspan="2" class="center">Mata Uang</th>
@@ -198,15 +177,13 @@
                                                         <th rowspan="2">Subtotal</th>
                                                         <th rowspan="2">Diskon</th>
                                                         <th rowspan="2">Total</th>
-                                                        <th rowspan="2">Pajak</th>
+                                                        <th rowspan="2">PPN</th>
+                                                        <th rowspan="2">PPH</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>Ya/Tidak</th>
-                                                        <th>Termasuk</th>
-                                                        <th>Prosentase</th>
                                                         <th>Nomor</th>
                                                         <th>Dokumen</th>
                                                         <th>Tipe</th>
@@ -247,9 +224,13 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
+                                <input type="hidden" id="savesubtotal" name="savesubtotal" value="0,000">
+                                <input type="hidden" id="savetotal" name="savetotal" value="0,000">
+                                <input type="hidden" id="savetax" name="savetax" value="0,000">
+                                <input type="hidden" id="savewtax" name="savewtax" value="0,000">
+                                <input type="hidden" id="savegrandtotal" name="savegrandtotal" value="0,000">
                                 <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getTopSupplier();"></select>
                                 <label class="active" for="supplier_id">Supplier</label>
                             </div>
@@ -350,58 +331,31 @@
                                 <label class="active" for="receiver_phone">Kontak Penerima</label>
                             </div>
                             <div class="col m12 s12">
-                                <div class="input-field col m3 s12">
-                                    <div class="switch mb-0">
-                                        <label class="active" for="is_tax">Ber-PPN?</label>
-                                        <label>
-                                            Tidak
-                                            <input type="checkbox" id="is_tax" name="is_tax" value="1" onclick="countAll();">
-                                            <span class="lever"></span>
-                                            Ya
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <div class="switch mb-1">
-                                        <label class="active" for="is_include_tax">Termasuk Pajak?</label>
-                                        <label>
-                                            Tidak
-                                            <input type="checkbox" id="is_include_tax" name="is_include_tax" value="1" onclick="countAll();">
-                                            <span class="lever"></span>
-                                            Ya
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
-                                    <label class="active" for="percent_tax">Prosentase Tax</label>
-                                </div>
-                            </div>
-                            <div class="col m6 s6">
-                                <p class="mt-2 mb-2">
-                                    <h4>Purchase Request</h4>
-                                    <div class="row">
-                                        <div class="input-field col m6 s6">
-                                            <select class="browser-default" id="purchase_request_id" name="purchase_request_id"></select>
-                                            <label class="active" for="purchase_request_id">Purchase Request (Jika ada)</label>
+                                <div class="col m6 s6">
+                                    <p class="mt-2 mb-2">
+                                        <h4>Purchase Request</h4>
+                                        <div class="row">
+                                            <div class="input-field col m6 s6">
+                                                <select class="browser-default" id="purchase_request_id" name="purchase_request_id"></select>
+                                                <label class="active" for="purchase_request_id">Purchase Request (Jika ada)</label>
+                                            </div>
+                                            <div class="col m6 s6 mt-4">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getPurchaseRequest();" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Tambah PR
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div class="col m6 s6 mt-4">
-                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getPurchaseRequest();" href="javascript:void(0);">
-                                                <i class="material-icons left">add</i> Tambah PR
-                                            </a>
-                                        </div>
-                                    </div>
-                                </p>
-                            </div>
-                            <div class="col m6 s6">
-                                <h6><b>PR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
-                                
+                                    </p>
+                                </div>
+                                <div class="col m6 s6">
+                                    <h6><b>PR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                                </div>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     <div style="overflow:auto;">
-                                        <table class="bordered">
+                                        <table class="bordered" style="width:2500px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -413,12 +367,17 @@
                                                     <th class="center">Disc3(Rp)</th>
                                                     <th class="center">Subtotal</th>
                                                     <th class="center">Keterangan</th>
+                                                    <th class="center">Ber-PPN?</th>
+                                                    <th class="center">Incl.PPN</th>
+                                                    <th class="center" width="25px">% PPN</th>
+                                                    <th class="center">Ber-PPH?</th>
+                                                    <th class="center" width="25px">% PPH</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="10" class="center">
+                                                    <td colspan="15" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> New Item
                                                         </a>
@@ -454,8 +413,12 @@
                                             <td class="right-align"><span id="total">0,000</span></td>
                                         </tr>
                                         <tr>
-                                            <td>Pajak</td>
+                                            <td>PPN</td>
                                             <td class="right-align"><span id="tax">0,000</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>PPH</td>
+                                            <td class="right-align"><span id="wtax">0,000</span></td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
@@ -499,6 +462,7 @@
 
 <!-- END: Page Main-->
 <script>
+    
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
@@ -541,10 +505,17 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#savesubtotal,#savetotal,#savetax,#savewtax,#savegrandtotal').val('0,000');
                 $('.row_item').each(function(){
                     $(this).remove();
                 });
@@ -552,6 +523,9 @@
                 $('#subtotal,#total,#tax,#grandtotal').text('0,000');
                 $('#purchase_request_id').empty();
                 $('#list-used-data').empty();
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -626,13 +600,12 @@
                         $('#purchase_request_id').empty();
                     }else{
                         if(response.details.length > 0){
-                            $('#branch_id').val(response.branch_id).formSelect();
-                            $('#plant_id').val(response.plant_id).formSelect();
+                            $('#place_id').val(response.place_id).formSelect();
                             $('#department_id').val(response.department_id).formSelect();
                             $('#list-used-data').append(`
                                 <div class="chip purple darken-4 gradient-shadow white-text">
                                     ` + response.code + `
-                                    <i class="material-icons close" onclick="removeUsedData('` + response.id + `')">close</i>
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
                                 </div>
                             `);
                             $.each(response.details, function(i, val) {
@@ -666,7 +639,43 @@
                                             <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
                                         </td>
                                         <td>
-                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + ` ` + response.code + `">
+                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + ` ` + response.code + ` ke Gudang ` + val.warehouse_name + `">
+                                        </td>
+                                        <td>
+                                            <div class="switch mb-0">
+                                                <label>
+                                                    Tidak
+                                                    <input id="arr_is_tax` + count + `" type="checkbox" name="arr_is_tax[]" value="1" onclick="countAll();">
+                                                    <span class="lever"></span>
+                                                    Ya
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="switch mb-1">
+                                                <label>
+                                                    Tidak
+                                                    <input id="arr_is_include_tax` + count + `" type="checkbox" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                                                    <span class="lever"></span>
+                                                    Ya
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input id="arr_percent_tax` + count + `" name="arr_percent_tax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
+                                        </td>
+                                        <td>
+                                            <div class="switch mb-0">
+                                                <label>
+                                                    Tidak
+                                                    <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="countAll();">
+                                                    <span class="lever"></span>
+                                                    Ya
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -734,6 +743,42 @@
                 </td>
                 <td>
                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ...">
+                </td>
+                <td>
+                    <div class="switch mb-0">
+                        <label>
+                            Tidak
+                            <input id="arr_is_tax` + count + `" type="checkbox" name="arr_is_tax[]" value="1" onclick="countAll();">
+                            <span class="lever"></span>
+                            Ya
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="switch mb-1">
+                        <label>
+                            Tidak
+                            <input id="arr_is_include_tax` + count + `" type="checkbox" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                            <span class="lever"></span>
+                            Ya
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <input id="arr_percent_tax` + count + `" name="arr_percent_tax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td>
+                    <div class="switch mb-0">
+                        <label>
+                            Tidak
+                            <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="countAll();">
+                            <span class="lever"></span>
+                            Ya
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -831,9 +876,6 @@
                 { name: 'shipping_type', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
                 { name: 'department_id', className: 'center-align' },
-                { name: 'is_tax', className: 'center-align' },
-                { name: 'is_include_tax', className: 'center-align' },
-                { name: 'percent_tax', className: 'center-align' },
                 { name: 'document_no', className: 'center-align' },
                 { name: 'document_po', className: 'center-align' },
                 { name: 'payment_tye', className: 'center-align' },
@@ -851,6 +893,7 @@
                 { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
+                { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -902,6 +945,21 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]);
+
+                formData.delete("arr_is_tax[]");
+                formData.delete("arr_is_include_tax[]");
+                formData.delete("arr_percent_tax[]");
+                formData.delete("arr_is_wtax[]");
+                formData.delete("arr_percent_wtax[]");
+
+                $('input[name^="arr_is_tax"]').each(function(index){
+                    formData.append('arr_is_tax[]',($(this).is(':checked') ? '1' : '0' ));
+                    formData.append('arr_is_include_tax[]',($('input[name^="arr_is_include_tax"]').eq(index).is(':checked') ? '1' : '0'));
+                    formData.append('arr_percent_tax[]',$('input[name^="arr_percent_tax"]').eq(index).val());
+                    formData.append('arr_is_wtax[]',($('input[name^="arr_is_wtax"]').eq(index).is(':checked') ? '1' : '0' ));
+                    formData.append('arr_percent_wtax[]',$('input[name^="arr_percent_wtax"]').eq(index).val());
+                });
+
                 $.ajax({
                     url: '{{ Request::url() }}/create',
                     type: 'POST',
@@ -1027,10 +1085,16 @@
                 
                 $('#note').val(response.note);
                 $('#subtotal').text(response.subtotal);
+                $('#savesubtotal').val(response.subtotal);
                 $('#discount').val(response.discount);
                 $('#total').text(response.total);
+                $('#savetotal').val(response.total);
                 $('#tax').text(response.tax);
+                $('#savetax').val(response.tax);
+                $('#wtax').text(response.wtax);
+                $('#savewtax').val(response.wtax);
                 $('#grandtotal').text(response.grandtotal);
+                $('#savegrandtotal').val(response.grandtotal);
                 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
@@ -1069,6 +1133,42 @@
                                 <td>
                                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                                 </td>
+                                <td>
+                                    <div class="switch mb-0">
+                                        <label>
+                                            Tidak
+                                            <input id="arr_is_tax` + count + `" type="checkbox" name="arr_is_tax[]" value="1" onclick="countAll();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="switch mb-1">
+                                        <label>
+                                            Tidak
+                                            <input id="arr_is_include_tax` + count + `" type="checkbox" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input id="arr_percent_tax` + count + `" name="arr_percent_tax[]" class="browser-default" type="text" value="` + val.percent_tax + `" onkeyup="formatRupiah(this);countAll();">
+                                </td>
+                                <td>
+                                    <div class="switch mb-0">
+                                        <label>
+                                            Tidak
+                                            <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="countAll();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="` + val.percent_wtax + `" onkeyup="formatRupiah(this);countAll();">
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
                                         <i class="material-icons">delete</i>
@@ -1080,6 +1180,15 @@
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                        if(val.is_tax){
+                            $('#arr_is_tax' + count).prop( "checked", true);
+                        }
+                        if(val.is_include_tax){
+                            $('#arr_is_include_tax' + count).prop( "checked", true);
+                        }
+                        if(val.is_wtax){
+                            $('#arr_is_wtax' + count).prop( "checked", true);
+                        }
                     });
                 }
                 
@@ -1218,39 +1327,74 @@
     }
 
     function countAll(){
-        var subtotal = 0, tax = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), discount = parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",",".")), total = 0, grandtotal = 0;
+        var subtotal = 0, tax = 0, discount = parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",",".")), total = 0, grandtotal = 0, wtax = 0;
 
-        $('.arr_subtotal').each(function(){
+        $('.arr_subtotal').each(function(index){
 			subtotal += parseFloat($(this).text().replaceAll(".", "").replaceAll(",","."));
 		});
 
-        total = subtotal - discount;
+        /* total = subtotal - discount; */
 
-        if($('#is_tax').is(':checked')){
-            if($('#is_include_tax').is(':checked')){
-                total = total / (1 + (percent_tax / 100));
+        $('.arr_subtotal').each(function(index){
+            let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0;
+            rowbobot = rownominal / subtotal;
+            rowdiscount = discount * rowbobot;
+            rownominal -= rowdiscount;
+
+            if($('input[name^="arr_is_tax"]').eq(index).is(':checked')){
+                let percent_tax = parseFloat($('input[name^="arr_percent_tax"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                if($('input[name^="arr_is_include_tax"]').eq(index).is(':checked')){
+                    rownominal = rownominal / (1 + (percent_tax / 100));
+                }
+
+                rowtax = rownominal * (percent_tax / 100);
             }
-            tax = total * (percent_tax / 100);
-        }
 
-        grandtotal = total + tax;
-        
+            if($('input[name^="arr_is_wtax"]').eq(index).is(':checked')){
+                let percent_wtax = parseFloat($('input[name^="arr_percent_wtax"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                rowwtax = rownominal * (percent_wtax / 100);
+            }
+            
+            tax += rowtax;
+            wtax += rowwtax;
+            total += rownominal;
+            grandtotal += rownominal + rowtax - rowwtax;
+        });
+
         $('#subtotal').text(
+            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(3).toString().replace('.',','))
+        );
+        $('#savesubtotal').val(
             (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(3).toString().replace('.',','))
         );
         $('#total').text(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
         );
+        $('#savetotal').val(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+        );
         $('#tax').text(
             (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
         );
+        $('#savetax').val(
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
+        );
+        $('#wtax').text(
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(3).toString().replace('.',','))
+        );
+        $('#savewtax').val(
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(3).toString().replace('.',','))
+        );
         $('#grandtotal').text(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
+        );
+        $('#savegrandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
         );
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
         
         $.ajax({
             type : "POST",
@@ -1262,8 +1406,6 @@
                 shipping : shipping,
                 place : place,
                 department : department,
-                is_tax : is_tax,
-                is_include_tax : is_include_tax,
                 payment : payment,
                 'supplier[]' : supplier,
                 'currency[]' : currency
@@ -1282,8 +1424,8 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&shipping=" + shipping + "&place=" + place + "&department=" + department + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&payment=" + payment + "&supplier=" + supplier + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&shipping=" + shipping + "&place=" + place + "&department=" + department + "&payment=" + payment + "&supplier=" + supplier + "&currency=" + currency;
     }
 </script>

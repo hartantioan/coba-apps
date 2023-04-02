@@ -30,10 +30,12 @@ return new class extends Migration
             $table->char('is_tax',1)->nullable();
             $table->char('is_include_tax',1)->nullable();
             $table->double('percent_tax')->nullable();
+            $table->char('is_wtax',1)->nullable();
             $table->text('note')->nullable();
             $table->string('document')->nullable();
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
+            $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
             $table->char('status',1)->nullable();
             $table->bigInteger('void_id')->nullable();

@@ -154,7 +154,8 @@
                                                         <th rowspan="2">Subtotal</th>
                                                         <th colspan="2" class="center-align">Diskon</th>
                                                         <th rowspan="2">Total</th>
-                                                        <th rowspan="2">Pajak</th>
+                                                        <th rowspan="2">PPN</th>
+                                                        <th rowspan="2">PPH</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Downpayment</th>
                                                         <th rowspan="2">Balance</th>
@@ -511,24 +512,24 @@
                                     <td class="right-align">
                                         ` + val.tax + `
                                     </td>
-                                    <td class="right-align">
+                                    <td class="right-align" id="row_wtax` + count + `">
                                         ` + val.wtax + `
                                     </td>
-                                    <td class="right-align">
+                                    <td class="right-align" id="row_grandtotal` + count + `">
                                         ` + val.grandtotal + `
                                     </td>
                                     <td class="center">
                                         <div class="switch mb-0">
                                             <label>
                                                 Tidak
-                                                <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="countAll();applyWtax('` + count + `');" ` + (val.is_wtax ? `disabled` : ``) + `>
+                                                <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="applyWtax('` + count + `');countAll();">
                                                 <span class="lever"></span>
                                                 Ya
                                             </label>
                                         </div>
                                     </td>
                                     <td class="center">
-                                        <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:100px;" ` + (val.is_wtax ? `readonly` : ``) + `>
+                                        <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);applyWtax('` + count + `');countAll();" style="width:100px;">
                                     </td>
                                 </tr>
                             `);
@@ -580,8 +581,20 @@
             $('#deposit').val('0,000');
             $('#top').val('0');
             $('#due_date').val('');
-            $('#total,#tax,#grandtotal,#balance').text('0,000');
+            $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
         }
+    }
+
+    function applyWtax(val){
+        let percent_wtax = parseFloat($('#arr_percent_wtax' + val).val().replaceAll(".", "").replaceAll(",",".")), total = parseFloat($('input[name^="arr_total"][data-id="' + val + '"]').val().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('input[name^="arr_tax"][data-id="' + val + '"]').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, wtax=0;
+        if($('#arr_is_wtax' + val).is(':checked')){
+            wtax = total * (percent_wtax / 100);
+        }
+        grandtotal = total + tax - wtax;
+        $('input[name^="arr_wtax"][data-id="' + val + '"]').val(formatRupiahIni(wtax.toFixed(3).toString().replace('.',',')));
+        $('input[name^="arr_grandtotal"][data-id="' + val + '"]').val(formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',',')));
+        $('#row_wtax' + val).text(formatRupiahIni(wtax.toFixed(3).toString().replace('.',',')));
+        $('#row_grandtotal' + val).text(formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',',')));
     }
 
     function countAll(){
@@ -591,18 +604,11 @@
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
                 if($(element).is(':checked')){
-                    ada = true;
-                    let rowtotal = parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowtax = parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowgrandtotal = parseFloat($('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                    
-                    total += rowtotal;
-                    tax += rowtax;
-
-                    if($('#arr_is_wtax' + element.data('id')).is(':checked')){
-                        let rowwtax = rowtotal * (parseFloat($('#arr_percent_wtax' + element.data('id')).val().replaceAll(".", "").replaceAll(",",".")) / 100);
-                        wtax += rowwtax;
-                        rowgrandtotal -= rowwtax;
-                    }
-                    grandtotal += rowgrandtotal;
+                    ada = true;                    
+                    total += parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    tax += parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    wtax += parseFloat($('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    grandtotal += parseFloat($('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
                 }
             });
         }
@@ -693,6 +699,7 @@
                 { name: 'nominal_discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
+                { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'downpayment', className: 'right-align' },
                 { name: 'balance', className: 'right-align' },
@@ -902,6 +909,7 @@
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                 <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
                                 <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
                                 <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
                                 <td class="center-align">
                                     <label>
@@ -924,11 +932,31 @@
                                 <td class="right-align">
                                     ` + val.tax + `
                                 </td>
-                                <td class="right-align">
+                                <td class="right-align" id="row_wtax` + count + `">
+                                    ` + val.wtax + `
+                                </td>
+                                <td class="right-align" id="row_grandtotal` + count + `">
                                     ` + val.grandtotal + `
+                                </td>
+                                <td class="center">
+                                    <div class="switch mb-0">
+                                        <label>
+                                            Tidak
+                                            <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="applyWtax('` + count + `');countAll();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </td>
+                                <td class="center">
+                                    <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);applyWtax('` + count + `');countAll();" style="width:100px;">
                                 </td>
                             </tr>
                         `);
+                        if(val.is_wtax){
+                            $('#arr_is_wtax' + count).prop( "checked", true);
+                        }
+                        $('#arr_percent_wtax' + count).val(val.percent_wtax);
                     });
                 }
                 $('.modal-content').scrollTop(0);

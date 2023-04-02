@@ -20,6 +20,7 @@ class PurchaseInvoiceDetail extends Model
         'landed_cost_id',
         'total',
         'tax',
+        'wtax',
         'grandtotal',
         'is_wtax',
         'percent_wtax'

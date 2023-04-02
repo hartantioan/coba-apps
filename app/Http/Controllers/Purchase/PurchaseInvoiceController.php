@@ -95,6 +95,8 @@ class PurchaseInvoiceController extends Controller
                     'grandtotal'    => number_format($row->grandtotal,3,',','.'),
                     'department_id' => $row->department_id,
                     'place_id'      => $row->place_id,
+                    'is_wtax'       => $row->wtax > 0 ? '1' : '',
+                    'percent_wtax'  => number_format(($row->wtax / $row->total) * 100,3,',','.'),
                 ];
             }
         }
@@ -275,6 +277,7 @@ class PurchaseInvoiceController extends Controller
                     number_format($val->nominal_discount,3,',','.'),
                     number_format($val->total,3,',','.'),
                     number_format($val->tax,3,',','.'),
+                    number_format($val->wtax,3,',','.'),
                     number_format($val->grandtotal,3,',','.'),
                     number_format($val->downpayment,3,',','.'),
                     number_format($val->balance,3,',','.'),
@@ -354,17 +357,10 @@ class PurchaseInvoiceController extends Controller
             $downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
 
             foreach($request->arr_total as $key => $row){
-                $rowtotal = str_replace(',','.',str_replace('.','',$row));
-                $rowtax = str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
-                $rowgrandtotal = str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
-                $total += $rowtotal;
-                $tax += $rowtax;
-                if($request->arr_is_wtax[$key] == '1'){
-                    $rowwtax = $rowtotal * (str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])) / 100);
-                    $wtax += $rowwtax;
-                    $rowgrandtotal -= $rowwtax;
-                }
-                $grandtotal += $rowgrandtotal;
+                $total += str_replace(',','.',str_replace('.','',$row));
+                $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
+                $wtax += str_replace(',','.',str_replace('.','',$request->arr_wtax[$key]));
+                $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
             }
 
             $balance = $grandtotal - $downpayment;
@@ -475,6 +471,7 @@ class PurchaseInvoiceController extends Controller
                                 'landed_cost_id'        => $row == 'landed_cost' ? LandedCost::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
                                 'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                                 'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
                                 'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
                                 'is_wtax'               => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
                                 'percent_wtax'          => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
@@ -518,13 +515,14 @@ class PurchaseInvoiceController extends Controller
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="10">Daftar Order Pembelian</th>
+                                <th class="center-align" colspan="6">Daftar Order Pembelian</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">GR. PO / Landed Cost</th>
                                 <th class="center-align">Total</th>
-                                <th class="center-align">Tax</th>
+                                <th class="center-align">PPN</th>
+                                <th class="center-align">PPH</th>
                                 <th class="center-align">Grandtotal</th>
                             </tr>
                         </thead><tbody>';
@@ -536,12 +534,13 @@ class PurchaseInvoiceController extends Controller
                     <td>'.($row->goodReceiptMain()->exists() ? $row->goodReceiptMain->code : $row->landedCost->code).'</td>
                     <td class="right-align">'.number_format($row->total,3,',','.').'</td>
                     <td class="right-align">'.number_format($row->tax,3,',','.').'</td>
+                    <td class="right-align">'.number_format($row->wtax,3,',','.').'</td>
                     <td class="right-align">'.number_format($row->grandtotal,3,',','.').'</td>
                 </tr>';
             }
         }else{
             $string .= '<tr>
-                <td class="center-align" colspan="8">Data item tidak ditemukan.</td>
+                <td class="center-align" colspan="6">Data item tidak ditemukan.</td>
             </tr>';
         }
         
@@ -601,6 +600,7 @@ class PurchaseInvoiceController extends Controller
         $pi['account_name'] = $pi->account->name;
         $pi['total'] = number_format($pi->total,3,',','.');
         $pi['tax'] = number_format($pi->tax,3,',','.');
+        $pi['wtax'] = number_format($pi->wtax,3,',','.');
         $pi['grandtotal'] = number_format($pi->grandtotal,3,',','.');
         $pi['downpayment'] = number_format($pi->downpayment,3,',','.');
         $pi['currency_rate'] = number_format($pi->currency_rate,3,',','.');
@@ -616,7 +616,10 @@ class PurchaseInvoiceController extends Controller
                 'type'                      => $row->good_receipt_main_id ? 'good_receipt' : 'landed_cost',
                 'total'                     => number_format($row->total,3,',','.'),
                 'tax'                       => number_format($row->tax,3,',','.'),
+                'wtax'                      => number_format($row->wtax,3,',','.'),
                 'grandtotal'                => number_format($row->grandtotal,3,',','.'),
+                'is_wtax'                   => $row->wtax > 0 ? '1' : '',
+                'percent_wtax'              => number_format($row->percent_wtax,3,',','.'),
             ];
         }
 

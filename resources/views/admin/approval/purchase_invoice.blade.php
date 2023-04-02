@@ -209,7 +209,8 @@
                         <th class="center-align">No.</th>
                         <th class="center-align">GR. PO / Landed Cost</th>
                         <th class="center-align">Total</th>
-                        <th class="center-align">Tax</th>
+                        <th class="center-align">PPN</th>
+                        <th class="center-align">PPH</th>
                         <th class="center-align">Grandtotal</th>
                     </tr>
                 </thead>
@@ -220,11 +221,12 @@
                         <td class="center-align">{{ $row->goodReceiptMain()->exists() ? $row->goodReceiptMain->code : $row->landedCost->code  }}</td>
                         <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->tax,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->wtax,3,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->grandtotal,3,',','.') }}</td>
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="5" rowspan="6">
+                        <td colspan="6" rowspan="6">
                             Rekening :
                             {{ $data->account->defaultBank() ? $data->account->defaultBank() : ' - ' }}
                             <div class="mt-3">
@@ -235,7 +237,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}</i></th>
+                        <th colspan="6">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}</i></th>
                     </tr>
                 </tfoot>
             </table>

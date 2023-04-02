@@ -14,7 +14,8 @@
             <th>Mata Uang</th>
             <th>Konversi</th>
             <th>Total</th>
-            <th>Pajak</th>
+            <th>PPN</th>
+            <th>PPH</th>
             <th>Grandtotal</th>
             <th>DP</th>
             <th>Sisa</th>
@@ -40,6 +41,7 @@
                 <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
                 <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                 <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
+                <td align="right">{{ number_format($row->wtax,2,',','.') }}</td>
                 <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                 <td align="right">{{ number_format($row->downpayment,2,',','.') }}</td>
                 <td align="right">{{ number_format($row->balance,2,',','.') }}</td>
@@ -50,7 +52,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="20" align="center">
+                <td colspan="21" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->bigInteger('landed_cost_id')->nullable();
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
+            $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');

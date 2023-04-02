@@ -30,10 +30,12 @@ class LandedCost extends Model
         'is_tax',
         'is_include_tax',
         'percent_tax',
+        'is_wtax',
         'note',
         'document',
         'total',
         'tax',
+        'wtax',
         'grandtotal',
         'status',
         'void_id',
@@ -97,6 +99,16 @@ class LandedCost extends Model
 
     public function isTax(){
         $type = match ($this->is_tax) {
+          NULL => 'Tidak',
+          '1' => 'Ya',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function isWtax(){
+        $type = match ($this->is_wtax) {
           NULL => 'Tidak',
           '1' => 'Ya',
           default => 'Invalid',

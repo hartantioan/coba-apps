@@ -224,8 +224,12 @@
                                 <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. tenggat">
                                 <label class="active" for="due_date">Tgl. Tenggat</label>
                             </div>
+                            <div class="input-field col m3 s12">
+                                <input id="pretotal" name="pretotal" type="text" value="0,000" onkeyup="formatRupiah(this);countEach();">
+                                <label class="active" for="pretotal">Nominal Input (Sebelum pajak)</label>
+                            </div>
                             <div class="col m12 s12">
-                                <h4>PPN</h4>
+                                <h5>PPN</h5>
                                 <div class="row">
                                     <div class="input-field col m3 s12">
                                         <div class="switch mb-1">
@@ -256,7 +260,7 @@
                                 </div>
                             </div>
                             <div class="col m12 s12">
-                                <h4>PPH</h4>
+                                <h5>PPH</h5>
                                 <div class="row">
                                     <div class="input-field col m3 s12">
                                         <div class="switch mb-1">
@@ -276,11 +280,11 @@
                                 </div>
                             </div>
                             <div class="col m12 s12">
-                                <h4>Nominal</h4>
+                                <h5>Nominal (Auto fill)</h5>
                                 <div class="row">
                                     <div class="input-field col m3 s12">
-                                        <input id="total" name="total" type="text" value="0,000" onkeyup="formatRupiah(this);countEach();">
-                                        <label class="active" for="total">Total (Sebelum Pajak) <i>*Isi disini</i></label>
+                                        <input id="total" name="total" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
+                                        <label class="active" for="total">Total</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <input id="tax" name="tax" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
@@ -554,6 +558,9 @@
                     </td>
                 </tr>
             `);
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }
             arrQty = [];
         }
     }
@@ -589,7 +596,7 @@
 
     function countEach(){
         
-        var tax = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, total = parseFloat($('#total').val().replaceAll(".", "").replaceAll(",","."));
+        var tax = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, total = parseFloat($('#pretotal').val().replaceAll(".", "").replaceAll(",",".")), wtax = 0, percent_wtax = parseFloat($('#percent_wtax').val().replaceAll(".", "").replaceAll(",","."));
 
         if($('#is_tax').is(':checked')){
             if($('#is_include_tax').is(':checked')){
@@ -598,15 +605,24 @@
             tax = total * (percent_tax / 100);
         }
 
-        grandtotal = total + tax;
+        if($('#is_wtax').is(':checked')){
+            wtax = total * (percent_wtax / 100);
+        }
+
+        grandtotal = total + tax - wtax;
         
+        $('#total').val(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+        );
         $('#tax').val(
             (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
+        );
+        $('#wtax').val(
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(3).toString().replace('.',','))
         );
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
         );
-
         if($('.nominalitem').length > 0){
             if(arrQty.length > 0){
                 let totalqty = 0;
@@ -616,7 +632,7 @@
 
                 for(let i=0;i<arrQty.length;i++){
                     let totalrow = (parseFloat(arrQty[i]) / totalqty) * total;
-                    $('input[name^="arr_price"]:eq(' + i + ')').val(formatRupiahIni(totalrow.toFixed(3).toString().replace('.',',')));
+                    $('input[name^="arr_price"]:eq(' + i + ')').val(formatRupiahIni(totalrow.toFixed(5).toString().replace('.',',')));
                 }
             }
         }

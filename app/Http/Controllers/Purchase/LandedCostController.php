@@ -100,10 +100,13 @@ class LandedCostController extends Controller
             'is_tax',
             'is_included_tax',
             'percent_tax',
+            'is_wtax',
+            'percent_wtax',
             'note',
             'document',
             'total',
             'tax',
+            'wtax',
             'grandtotal'
         ];
 
@@ -320,18 +323,9 @@ class LandedCostController extends Controller
             $gr = GoodReceiptMain::find($request->good_receipt_id);
             
             $total = str_replace(',','.',str_replace('.','',$request->total));
-            $tax = 0;
-            $grandtotal = 0;
-            $percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
-
-            if($request->is_tax){
-                if($request->is_include_tax){
-                    $total = round($total / (1 + ($percent_tax / 100)),3);
-                }
-                $tax = round($total * ($percent_tax / 100),3);
-            }
-
-            $grandtotal = round($total + $tax,3);
+            $tax = str_replace(',','.',str_replace('.','',$request->tax));
+            $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
+            $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -373,10 +367,13 @@ class LandedCostController extends Controller
                         $query->is_tax = $request->is_tax ? $request->is_tax : NULL;
                         $query->is_include_tax = $request->is_include_tax ? $request->is_include_tax : '0';
                         $query->percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
+                        $query->is_wtax = $request->is_wtax ? $request->is_wtax : NULL;
+                        $query->percent_wtax = str_replace(',','.',str_replace('.','',$request->percent_wtax));
                         $query->note = $request->note;
                         $query->document = $document;
                         $query->total = round($total,3);
                         $query->tax = round($tax,3);
+                        $query->wtax = round($wtax,3);
                         $query->grandtotal = round($grandtotal,3);
 
                         $query->save();
@@ -414,10 +411,13 @@ class LandedCostController extends Controller
                         'is_tax'                    => $request->is_tax ? $request->is_tax : NULL,
                         'is_include_tax'            => $request->is_include_tax ? $request->is_include_tax : '0',
                         'percent_tax'               => str_replace(',','.',str_replace('.','',$request->percent_tax)),
+                        'is_wtax'                   => $request->is_wtax ? $request->is_wtax : NULL,
+                        'percent_wtax'              => str_replace(',','.',str_replace('.','',$request->percent_wtax)),
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/landed_costs') : NULL,
                         'total'                     => round($total,3),
                         'tax'                       => round($tax,3),
+                        'wtax'                      => round($wtax,3),
                         'grandtotal'                => round($grandtotal,3),
                         'status'                    => '1'
                     ]);
@@ -565,6 +565,7 @@ class LandedCostController extends Controller
         $lc['good_receipt_note'] = $lc->goodReceiptMain->code.' - '.$lc->note;
         $lc['total'] = number_format($lc->total,3,',','.');
         $lc['tax'] = number_format($lc->tax,3,',','.');
+        $lc['wtax'] = number_format($lc->wtax,3,',','.');
         $lc['grandtotal'] = number_format($lc->grandtotal,3,',','.');
         $lc['percent_tax'] = number_format($lc->percent_tax,3,',','.');
         $lc['currency_rate'] = number_format($lc->currency_rate,3,',','.');

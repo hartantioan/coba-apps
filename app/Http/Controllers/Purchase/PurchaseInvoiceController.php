@@ -92,11 +92,12 @@ class PurchaseInvoiceController extends Controller
                     'due_date'      => date('d/m/y',strtotime($row->due_date)),
                     'total'         => number_format($row->total,3,',','.'),
                     'tax'           => number_format($row->tax,3,',','.'),
+                    'wtax'          => number_format($row->wtax,3,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,3,',','.'),
                     'department_id' => $row->department_id,
                     'place_id'      => $row->place_id,
                     'is_wtax'       => $row->wtax > 0 ? '1' : '',
-                    'percent_wtax'  => number_format(($row->wtax / $row->total) * 100,3,',','.'),
+                    'percent_wtax'  => number_format($row->percent_wtax,3,',','.'),
                 ];
             }
         }

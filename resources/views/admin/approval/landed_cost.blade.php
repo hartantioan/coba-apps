@@ -253,8 +253,13 @@
                         <td class="right-align"></td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="4">Pajak</td>
+                        <td class="right-align" colspan="4">PPN</td>
                         <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
+                        <td class="right-align"></td>
+                    </tr>
+                    <tr>
+                        <td class="right-align" colspan="4">PPH</td>
+                        <td class="right-align">{{ number_format($data->wtax,3,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>

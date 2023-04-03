@@ -31,6 +31,7 @@ return new class extends Migration
             $table->char('is_include_tax',1)->nullable();
             $table->double('percent_tax')->nullable();
             $table->char('is_wtax',1)->nullable();
+            $table->double('percent_wtax')->nullable();
             $table->text('note')->nullable();
             $table->string('document')->nullable();
             $table->double('total')->nullable();

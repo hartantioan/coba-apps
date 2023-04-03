@@ -133,11 +133,13 @@
                                                         <th colspan="2" class="center">Tanggal</th>
                                                         <th rowspan="2">No. Referensi</th>
                                                         <th colspan="2" class="center">Mata Uang</th>
-                                                        <th colspan="3" class="center">Pajak</th>
+                                                        <th colspan="3" class="center">PPN</th>
+                                                        <th colspan="2" class="center">PPH</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Total</th>
-                                                        <th rowspan="2">Pajak</th>
+                                                        <th rowspan="2">PPN</th>
+                                                        <th rowspan="2">PPH</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
@@ -149,6 +151,8 @@
                                                         <th>Konversi</th>
                                                         <th>Ya/Tidak</th>
                                                         <th>Termasuk</th>
+                                                        <th>Prosentase</th>
+                                                        <th>Ya/Tidak</th>
                                                         <th>Prosentase</th>
                                                     </tr>
                                                 </thead>
@@ -220,31 +224,56 @@
                                 <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. tenggat">
                                 <label class="active" for="due_date">Tgl. Tenggat</label>
                             </div>
-                            <div class="input-field col m3 s12">
-                                <div class="switch mb-1">
-                                    <label class="active" for="is_tax">Ber-PPN?</label>
-                                    <label>
-                                        Tidak
-                                        <input type="checkbox" id="is_tax" name="is_tax" value="1" onclick="countEach();">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
+                            <div class="col m12 s12">
+                                <h4>PPN</h4>
+                                <div class="row">
+                                    <div class="input-field col m3 s12">
+                                        <div class="switch mb-1">
+                                            <label class="active" for="is_tax">Ber-PPN?</label>
+                                            <label>
+                                                Tidak
+                                                <input type="checkbox" id="is_tax" name="is_tax" value="1" onclick="countEach();">
+                                                <span class="lever"></span>
+                                                Ya
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <div class="switch mb-1">
+                                            <label class="active" for="is_include_tax">Termasuk Pajak?</label>
+                                            <label>
+                                                Tidak
+                                                <input type="checkbox" id="is_include_tax" name="is_include_tax" value="1" onclick="countEach();">
+                                                <span class="lever"></span>
+                                                Ya
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);countEach();">
+                                        <label class="active" for="percent_tax">Prosentase PPN</label>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="input-field col m3 s12">
-                                <div class="switch mb-1">
-                                    <label class="active" for="is_include_tax">Termasuk Pajak?</label>
-                                    <label>
-                                        Tidak
-                                        <input type="checkbox" id="is_include_tax" name="is_include_tax" value="1" onclick="countEach();">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
+                            <div class="col m12 s12">
+                                <h4>PPH</h4>
+                                <div class="row">
+                                    <div class="input-field col m3 s12">
+                                        <div class="switch mb-1">
+                                            <label class="active" for="is_wtax">Ber-PPH?</label>
+                                            <label>
+                                                Tidak
+                                                <input type="checkbox" id="is_wtax" name="is_wtax" value="1" onclick="countEach();">
+                                                <span class="lever"></span>
+                                                Ya
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="percent_wtax" name="percent_wtax" type="text" value="0" onkeyup="formatRupiah(this);countEach();">
+                                        <label class="active" for="percent_wtax">Prosentase PPH</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);countEach();">
-                                <label class="active" for="percent_tax">Prosentase Tax</label>
                             </div>
                             <div class="col m12 s12">
                                 <h4>Nominal</h4>
@@ -255,7 +284,11 @@
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <input id="tax" name="tax" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
-                                        <label class="active" for="tax">Pajak</label>
+                                        <label class="active" for="tax">PPN</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="wtax" name="wtax" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
+                                        <label class="active" for="wtax">PPH</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <input id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
@@ -648,10 +681,13 @@
                 { name: 'is_tax', className: 'center-align' },
                 { name: 'is_include_tax', className: 'center-align' },
                 { name: 'percent_tax', className: 'center-align' },
+                { name: 'is_wtax', className: 'center-align' },
+                { name: 'percent_wtax', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'document', className: 'center-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
+                { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },

@@ -31,6 +31,7 @@ class LandedCost extends Model
         'is_include_tax',
         'percent_tax',
         'is_wtax',
+        'percent_wtax',
         'note',
         'document',
         'total',

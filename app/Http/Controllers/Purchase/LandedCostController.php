@@ -245,10 +245,13 @@ class LandedCostController extends Controller
                     $val->isTax(),
                     $val->isIncludeTax(),
                     number_format($val->percent_tax,3,',','.'),
+                    $val->isWtax(),
+                    number_format($val->percent_wtax,3,',','.'),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     number_format($val->total,3,',','.'),
                     number_format($val->tax,3,',','.'),
+                    number_format($val->wtax,3,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     '

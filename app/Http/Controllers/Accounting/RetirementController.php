@@ -7,8 +7,8 @@ use App\Models\Department;
 use App\Models\Place;
 use App\Models\User;
 use App\Models\Asset;
-use App\Models\Capitalization;
-use App\Models\CapitalizationDetail;
+use App\Models\Retirement;
+use App\Models\RetirementDetail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -20,7 +20,7 @@ use App\Exports\ExportCapitalization;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 
-class CapitalizationController extends Controller
+class RetirementController extends Controller
 {
     protected $dataplaces;
 
@@ -33,8 +33,8 @@ class CapitalizationController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Kapitalisasi Aset',
-            'content'   => 'admin.accounting.capitalization',
+            'title'     => 'Purna Operasi Aset',
+            'content'   => 'admin.accounting.retirement',
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
             'currency'  => Currency::where('status','1')->get(),
         ];
@@ -60,9 +60,9 @@ class CapitalizationController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Capitalization::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = Retirement::whereIn('place_id',$this->dataplaces)->count();
         
-        $query_data = Capitalization::where(function($query) use ($search, $request) {
+        $query_data = Retirement::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -80,7 +80,7 @@ class CapitalizationController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = Capitalization::where(function($query) use ($search, $request) {
+        $total_filtered = Retirement::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -136,7 +136,7 @@ class CapitalizationController extends Controller
     }
 
     public function getCode(Request $request){
-        $code = Capitalization::generateCode();
+        $code = Retirement::generateCode();
 
         return response()->json([
             'code'  => $code
@@ -145,7 +145,7 @@ class CapitalizationController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'code' 				    => $request->temp ? ['required', Rule::unique('capitalizations', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:capitalizations,code',
+			'code' 				    => $request->temp ? ['required', Rule::unique('retirements', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:retirements,code',
 			'post_date'			    => 'required',
 			'place_id'		        => 'required',
             'currency_id'		    => 'required',
@@ -174,6 +174,8 @@ class CapitalizationController extends Controller
             'arr_unit.array'                    => 'Satuan harus dalam bentuk array.',
             'arr_total.required'                => 'Total tidak boleh kosong',
             'arr_total.array'                   => 'Total harus dalam bentuk array.',
+            'arr_coa.required'                  => 'Coa tidak boleh kosong',
+            'arr_coa.array'                     => 'Coa harus dalam bentuk array.',
 		]);
 
         if($validation->fails()) {
@@ -191,7 +193,7 @@ class CapitalizationController extends Controller
 
 			if($request->temp){
                 
-                $query = Capitalization::where('code',CustomHelper::decrypt($request->temp))->first();
+                $query = Retirement::where('code',CustomHelper::decrypt($request->temp))->first();
 
                 if($query->approval()){
                     foreach($query->approval()->approvalMatrix as $row){
@@ -214,7 +216,7 @@ class CapitalizationController extends Controller
                     $query->grandtotal = $grandtotal;
                     $query->save();
 
-                    foreach($query->capitalizationDetail as $row){
+                    foreach($query->retirementDetail as $row){
                         $row->delete();
                     }
 
@@ -227,8 +229,8 @@ class CapitalizationController extends Controller
                     ]);
                 }
 			}else{
-                $query = Capitalization::create([
-                    'code'			=> Capitalization::generateCode(),
+                $query = Retirement::create([
+                    'code'			=> Retirement::generateCode(),
                     'user_id'		=> session('bo_id'),
                     'place_id'      => $request->place_id,
                     'currency_id'   => $request->currency_id,
@@ -243,29 +245,25 @@ class CapitalizationController extends Controller
 			if($query) {
                 
                 foreach($request->arr_asset_id as $key => $row){
-                    CapitalizationDetail::create([
-                        'capitalization_id'     => $query->id,
+                    RetirementDetail::create([
+                        'retirement_id'         => $query->id,
                         'asset_id'              => $row,
                         'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                         'unit_id'               => $request->arr_unit[$key],
-                        'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                        'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                        'note'                  => $request->arr_note[$key]
-                    ]);
-                    Asset::find(intval($row))->update([
-                        'date'      => $query->post_date,
-                        'nominal'   => str_replace(',','.',str_replace('.','',$request->arr_total[$key]))
+                        'retirement_nominal'    => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                        'note'                  => $request->arr_note[$key],
+                        'coa_id'                => $request->arr_coa[$key]
                     ]);
                 }
 
-                CustomHelper::sendApproval('capitalizations',$query->id,$query->note);
-                CustomHelper::sendNotification('capitalizations',$query->id,'Pengajuan Kapitalisasi No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval('retirements',$query->id,$query->note);
+                CustomHelper::sendNotification('retirements',$query->id,'Pengajuan retirement No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
-                    ->performedOn(new Capitalization())
+                    ->performedOn(new Retirement())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit purchase request.');
+                    ->log('Add / edit retirement.');
 
 				$response = [
 					'status'    => 200,
@@ -283,30 +281,30 @@ class CapitalizationController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = Capitalization::find($request->id);
+        $data   = Retirement::find($request->id);
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Aset</th>
-                                <th class="center-align">Harga</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Unit</th>
-                                <th class="center-align">Total</th>
+                                <th class="center-align">Nominal Retirement</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Coa</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->capitalizationDetail as $key => $row){
+        foreach($data->retirementDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->asset->code.' - '.$row->asset->name.'</td>
-                <td class="right-align">'.number_format($row->price,3,',','.').'</td>
-                <td class="center-align">'.$row->qty.'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
-                <td class="right-align">'.number_format($row->total,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->retirement_nominal,3,',','.').'</td>
                 <td>'.$row->note.'</td>
+                <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
             </tr>';
         }
         

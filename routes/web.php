@@ -40,6 +40,7 @@ use App\Http\Controllers\Inventory\GoodReceiptPOController;
 
 use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
+use App\Http\Controllers\Accounting\RetirementController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -587,6 +588,20 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[CapitalizationController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [CapitalizationController::class, 'voidStatus'])->middleware('operation.access:capitalization,void');
                     Route::post('destroy', [CapitalizationController::class, 'destroy'])->middleware('operation.access:capitalization,delete');
+                });
+
+                Route::prefix('retirement')->middleware('operation.access:retirement,view')->group(function () {
+                    Route::get('/',[RetirementController::class, 'index']);
+                    Route::get('datatable',[RetirementController::class, 'datatable']);
+                    Route::get('row_detail',[RetirementController::class, 'rowDetail']);
+                    Route::post('show', [RetirementController::class, 'show']);
+                    Route::post('print',[RetirementController::class, 'print']);
+                    Route::post('get_code',[RetirementController::class, 'getCode']);
+                    Route::get('export',[RetirementController::class, 'export']);
+                    Route::post('create',[RetirementController::class, 'create'])->middleware('operation.access:retirement,update');
+                    Route::get('approval/{id}',[RetirementController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [RetirementController::class, 'voidStatus'])->middleware('operation.access:retirement,void');
+                    Route::post('destroy', [RetirementController::class, 'destroy'])->middleware('operation.access:retirement,delete');
                 });
             });
 

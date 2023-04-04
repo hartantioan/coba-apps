@@ -123,6 +123,11 @@ class PurchaseInvoiceController extends Controller
             'currency_rate',
             'document',
             'note',
+            'tax_no',
+            'tax_cut_no',
+            'cut_date',
+            'spk_no',
+            'invoice_no',
             'subtotal',
             'percent_discount',
             'nominal_discount',
@@ -151,6 +156,10 @@ class PurchaseInvoiceController extends Controller
                             ->orWhere('downpayment', 'like', "%$search%")
                             ->orWhere('balance', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('tax_no', 'like', "%$search%")
+                            ->orWhere('tax_cut_no', 'like', "%$search%")
+                            ->orWhere('spk_no', 'like', "%$search%")
+                            ->orWhere('invoice_no', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -209,6 +218,10 @@ class PurchaseInvoiceController extends Controller
                             ->orWhere('downpayment', 'like', "%$search%")
                             ->orWhere('balance', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('tax_no', 'like', "%$search%")
+                            ->orWhere('tax_cut_no', 'like', "%$search%")
+                            ->orWhere('spk_no', 'like', "%$search%")
+                            ->orWhere('invoice_no', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -273,6 +286,11 @@ class PurchaseInvoiceController extends Controller
                     number_format($val->currency_rate,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->note,
+                    $val->tax_no,
+                    $val->tax_cut_no,
+                    date('d/m/y',strtotime($val->cut_date)),
+                    $val->spk_no,
+                    $val->invoice_no,
                     number_format($val->subtotal,3,',','.'),
                     number_format($val->percent_discount,3,',','.'),
                     number_format($val->nominal_discount,3,',','.'),
@@ -411,6 +429,11 @@ class PurchaseInvoiceController extends Controller
                         $query->balance = round($balance,3);
                         $query->document = $document;
                         $query->note = $request->note;
+                        $query->tax_no = $request->tax_no;
+                        $query->tax_cut_no = $request->tax_cut_no;
+                        $query->cut_date = $request->cut_date;
+                        $query->spk_no = $request->spk_no;
+                        $query->invoice_no = $request->invoice_no;
 
                         $query->save();
 
@@ -451,7 +474,12 @@ class PurchaseInvoiceController extends Controller
                         'balance'                   => round($balance,3),
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
-                        'status'                    => '1'
+                        'status'                    => '1',
+                        'tax_no'                    => $request->tax_no,
+                        'tax_cut_no'                => $request->tax_cut_no,
+                        'cut_date'                  => $request->cut_date,
+                        'spk_no'                    => $request->spk_no,
+                        'invoice_no'                => $request->invoice_no
                     ]);
 
                     DB::commit();
@@ -610,10 +638,10 @@ class PurchaseInvoiceController extends Controller
 
         foreach($pi->purchaseInvoiceDetail as $row){
             $arr[] = [
-                'code'                      => CustomHelper::encrypt($row->goodReceiptMain->code),
-                'rawcode'                   => $row->goodReceiptMain->code,
-                'post_date'                 => date('d/m/y',strtotime($row->goodReceiptMain->post_date)),
-                'due_date'                  => date('d/m/y',strtotime($row->goodReceiptMain->due_date)),
+                'code'                      => $row->good_receipt_main_id ? CustomHelper::encrypt($row->goodReceiptMain->code) : CustomHelper::encrypt($row->landedCost->code),
+                'rawcode'                   => $row->good_receipt_main_id ? $row->goodReceiptMain->code : $row->landedCost->code,
+                'post_date'                 => $row->good_receipt_main_id ? date('d/m/y',strtotime($row->goodReceiptMain->post_date)) : date('d/m/y',strtotime($row->landedCost->post_date)),
+                'due_date'                  => $row->good_receipt_main_id ? date('d/m/y',strtotime($row->goodReceiptMain->due_date)) : date('d/m/y',strtotime($row->landedCost->due_date)),
                 'type'                      => $row->good_receipt_main_id ? 'good_receipt' : 'landed_cost',
                 'total'                     => number_format($row->total,3,',','.'),
                 'tax'                       => number_format($row->tax,3,',','.'),
@@ -734,6 +762,10 @@ class PurchaseInvoiceController extends Controller
                             ->orWhere('downpayment', 'like', "%$request->search%")
                             ->orWhere('balance', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
+                            ->orWhere('tax_no', 'like', "%$request->search%")
+                            ->orWhere('tax_cut_no', 'like', "%$request->search%")
+                            ->orWhere('spk_no', 'like', "%$request->search%")
+                            ->orWhere('invoice_no', 'like', "%$request->search%")
                             ->orWhereHas('user',function($query) use($request){
                                 $query->where('name','like',"%$request->search%")
                                     ->orWhere('employee_no','like',"%$request->search%");

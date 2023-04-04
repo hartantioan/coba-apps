@@ -151,6 +151,11 @@
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Keterangan</th>
+                                                        <th rowspan="2">No.Faktur Pajak</th>
+                                                        <th rowspan="2">No.Bukti Potong</th>
+                                                        <th rowspan="2">Tgl.Bukti Potong</th>
+                                                        <th rowspan="2">No.SPK</th>
+                                                        <th rowspan="2">No.Invoice</th>
                                                         <th rowspan="2">Subtotal</th>
                                                         <th colspan="2" class="center-align">Diskon</th>
                                                         <th rowspan="2">Total</th>
@@ -243,6 +248,26 @@
                             <div class="input-field col m3 s12">
                                 <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
                                 <label class="active" for="document_date">Tgl. Dokumen</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak...">
+                                <label class="active" for="tax_no">No. Faktur Pajak</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="tax_cut_no" name="tax_cut_no" type="text" placeholder="Nomor bukti potong...">
+                                <label class="active" for="tax_cut_no">No. Bukti Potong</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="cut_date" name="cut_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Bukti potong">
+                                <label class="active" for="cut_date">Tgl. Bukti Potong</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
+                                <label class="active" for="spk_no">No. SPK</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
+                                <label class="active" for="invoice_no">No. Invoice</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -694,6 +719,11 @@
                 { name: 'currency_rate', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', className: 'center-align' },
+                { name: 'tax_no', className: 'center-align' },
+                { name: 'tax_cut_no', className: 'center-align' },
+                { name: 'cut_date', className: 'center-align' },
+                { name: 'spk_no', className: 'center-align' },
+                { name: 'invoice_no', className: 'center-align' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'percent_discount', className: 'right-align' },
                 { name: 'nominal_discount', className: 'right-align' },
@@ -898,6 +928,11 @@
                 $('#due_date').val(response.due_date);
                 $('#document_date').val(response.document_date);                
                 $('#note').val(response.note);
+                $('#tax_no').val(response.tax_no);
+                $('#tax_cut_no').val(response.tax_cut_no);
+                $('#cut_date').val(response.cut_date);
+                $('#spk_no').val(response.spk_no);
+                $('#invoice_no').val(response.invoice_no);
                 $('#downpayment').val(response.downpayment);
                 
                 if(response.details.length > 0){

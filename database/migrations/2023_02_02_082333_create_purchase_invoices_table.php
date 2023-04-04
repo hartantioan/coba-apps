@@ -41,6 +41,11 @@ return new class extends Migration
             $table->bigInteger('void_id')->nullable();
             $table->string('void_note')->nullable();
             $table->timestamp('void_date')->nullable();
+            $table->string('tax_no',155)->nullable();
+            $table->string('tax_cut_no',155)->nullable();
+            $table->date('cut_date')->nullable();
+            $table->string('spk_no',155)->nullable();
+            $table->string('invoice_no',155)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 

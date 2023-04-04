@@ -131,7 +131,7 @@
                                     <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="active" for="coa_id">Coa Pengakuan Aset</label>
+                            <label class="active" for="coa_id">Coa Pengakuan Aset (Kapitalisasi)</label>
                         </div>
                         <div class="input-field col s6">
                             <select class="select2 browser-default" id="depreciation_coa_id" name="depreciation_coa_id">

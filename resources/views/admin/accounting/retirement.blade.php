@@ -88,7 +88,7 @@
                                                         <th>Pabrik/Kantor</th>
                                                         <th>Mata Uang</th>
                                                         <th>Konversi</th>
-                                                        <th>Tgl.Kapitalisasi</th>
+                                                        <th>Tanggal</th>
                                                         <th>Keterangan</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -169,24 +169,25 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="col s12">
-                            <table class="bordered">
+                        <div class="col s12" style="overflow:auto;">
+                            <table class="bordered" style="width:1500px;">
                                 <thead>
                                     <tr>
                                         <th class="center">No.</th>
                                         <th class="center">Kode Aset</th>
                                         <th class="center">Nama Aset</th>
-                                        <th class="center">Harga@</th>
                                         <th class="center">Qty</th>
                                         <th class="center">Unit</th>
-                                        <th class="center">Total</th>
+                                        <th class="center">Nominal Aset</th>
+                                        <th class="center">Nominal Retirement</th>
                                         <th class="center">Keterangan</th>
+                                        <th class="center">Coa</th>
                                         <th class="center">Hapus</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-asset">
                                     <tr id="empty-detail">
-                                        <td colspan="9" class="center">
+                                        <td colspan="10" class="center">
                                             Pilih aset untuk memulai...
                                         </td>
                                     </tr>
@@ -294,20 +295,13 @@
         });
     });
 
-    function count(){
-        $('input[name^="arr_price"]').each(function(index){
-            let price = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), qty = parseFloat($('input[name^="arr_qty"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-            $('input[name^="arr_total"]').eq(index).val(formatRupiahIni((price * qty).toFixed(3).toString().replace('.',',')));
-        });
-    }
-
     function resetDetailForm(){
         $('.row_asset').each(function(){
             $(this).remove();
         });
         $('#body-asset').empty().append(`
             <tr id="empty-detail">
-                <td colspan="9" class="center">
+                <td colspan="10" class="center">
                     Pilih aset untuk memulai...
                 </td>
             </tr>
@@ -332,19 +326,22 @@
                         ` + $("#asset_id").select2('data')[0].name + `
                     </td>
                     <td class="center">
-                        <input type="text" id="arr_price` + count + `" name="arr_price[]" value="0" onkeyup="formatRupiah(this);count();">
-                    </td>
-                    <td class="center">
-                        <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="0" onkeyup="formatRupiah(this);count();">
+                        <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="0" onkeyup="formatRupiah(this);">
                     </td>
                     <td class="center">
                         <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                     </td>
+                    <td class="right-align">
+                        ` + $("#asset_id").select2('data')[0].nominal + `
+                    </td>
                     <td class="center">
-                        <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);" readonly>
+                        <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);">
                     </td>
                     <td>
                         <input name="arr_note[]" type="text" placeholder="Keterangan">
+                    </td>
+                    <td class="center">
+                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                     </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
@@ -353,7 +350,13 @@
                     </td>
                 </tr>
             `);
+            if($("#asset_id").select2('data')[0].unit_id){
+                $('#arr_unit' + count).append(`
+                    <option value="` + $("#asset_id").select2('data')[0].unit_id + `">` + $("#asset_id").select2('data')[0].unit_name + `</option>
+                `);
+            }
             select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
+            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
             $('#asset_id').empty();
             $('#place_id').val($("#asset_id").select2('data')[0].place_id);
         }

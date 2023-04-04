@@ -40,7 +40,12 @@ class PurchaseInvoice extends Model
         'status',
         'void_id',
         'void_note',
-        'void_date'
+        'void_date',
+        'tax_no',
+        'tax_cut_no',
+        'cut_date',
+        'spk_no',
+        'invoice_no'
     ];
 
     public function user()

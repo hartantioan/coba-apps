@@ -66,4 +66,15 @@ class Asset extends Model
     {
         return $this->belongsTo('App\Models\Coa', 'cost_coa_id', 'id')->withTrashed();
     }
+
+    public function getUnitFromCapitalization()
+    {
+        $cek = CapitalizationDetail::where('asset_id',$this->id)->whereHas('capitalization')->first();
+
+        if($cek){
+            return $cek;
+        }else{
+            return '';
+        }
+    }
 }

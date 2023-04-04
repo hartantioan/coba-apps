@@ -21,6 +21,11 @@
             <th>Sisa</th>
             <th>Dok.</th>
             <th>Ket.</th>
+            <th>No.FP</th>
+            <th>No.Potong</th>
+            <th>Tgl.Potong</th>
+            <th>No.SPK</th>
+            <th>No.Invoice</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -47,6 +52,11 @@
                 <td align="right">{{ number_format($row->balance,2,',','.') }}</td>
                 <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
                 <td>{{ $row->note }}</td>
+                <td>{{ $row->tax_no }}</td>
+                <td>{{ $row->tax_cut_no }}</td>
+                <td>{{ date('d/m/y',strtotime($row->cut_date)) }}</td>
+                <td>{{ $row->spk_no }}</td>
+                <td>{{ $row->invoice_no }}</td>
                 <td>{!! $row->statusRaw() !!}</td>
             </tr>
         @endforeach

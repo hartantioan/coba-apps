@@ -34,7 +34,8 @@ class AppServiceProvider extends ServiceProvider
             'good_receipts'             => 'App\Models\GoodReceipt',
             'landed_costs'              => 'App\Models\LandedCost',
             'good_receipt_mains'        => 'App\Models\GoodReceiptMain',
-            'journals'                  => 'App\Models\Journal'
+            'journals'                  => 'App\Models\Journal',
+            'capitalizations'           => 'App\Models\Capitalization'
         ]);
     }
 }

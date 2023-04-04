@@ -38,6 +38,9 @@ return new class extends Migration
             $table->string('document')->nullable();
             $table->text('note')->nullable();
             $table->char('status', 1)->nullable();
+            $table->bigInteger('void_id')->nullable();
+            $table->string('void_note')->nullable();
+            $table->timestamp('void_date')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 

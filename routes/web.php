@@ -25,6 +25,7 @@ use App\Http\Controllers\MasterData\AllowanceController;
 use App\Http\Controllers\MasterData\CoaController;
 use App\Http\Controllers\MasterData\CurrencyController;
 use App\Http\Controllers\MasterData\AssetController;
+use App\Http\Controllers\MasterData\AssetGroupController;
 use App\Http\Controllers\MasterData\UnitController;
 use App\Http\Controllers\MasterData\BankController;
 use App\Http\Controllers\MasterData\ProjectController;
@@ -38,6 +39,7 @@ use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 
 use App\Http\Controllers\Accounting\JournalController;
+use App\Http\Controllers\Accounting\CapitalizationController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -100,6 +102,8 @@ Route::prefix('admin')->group(function () {
             Route::get('region', [Select2Controller::class, 'region']);
             Route::get('project', [Select2Controller::class, 'project']);
             Route::get('business_partner', [Select2Controller::class, 'businessPartner']);
+            Route::get('asset', [Select2Controller::class, 'asset']);
+            Route::get('unit', [Select2Controller::class, 'unit']);
         });
 
         Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -383,6 +387,16 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [CoaController::class, 'destroy'])->middleware('operation.access:coa,delete');
                 });
 
+                Route::prefix('asset_group')->middleware('operation.access:asset_group,view')->group(function () {
+                    Route::get('/',[AssetGroupController::class, 'index']);
+                    Route::get('datatable',[AssetGroupController::class, 'datatable']);
+                    Route::post('show', [AssetGroupController::class, 'show']);
+                    Route::post('print', [AssetGroupController::class, 'print']);
+                    Route::get('export', [AssetGroupController::class, 'export']);
+                    Route::post('create',[AssetGroupController::class, 'create'])->middleware('operation.access:asset_group,update');
+                    Route::post('destroy', [AssetGroupController::class, 'destroy'])->middleware('operation.access:asset_group,delete');
+                });
+
                 Route::prefix('asset')->middleware('operation.access:asset,view')->group(function () {
                     Route::get('/',[AssetController::class, 'index']);
                     Route::get('datatable',[AssetController::class, 'datatable']);
@@ -559,6 +573,23 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::prefix('accounting')->middleware('direct.access')->group(function () {
+
+            Route::prefix('acAsset')->group(function () {
+                Route::prefix('capitalization')->middleware('operation.access:capitalization,view')->group(function () {
+                    Route::get('/',[CapitalizationController::class, 'index']);
+                    Route::get('datatable',[CapitalizationController::class, 'datatable']);
+                    Route::get('row_detail',[CapitalizationController::class, 'rowDetail']);
+                    Route::post('show', [CapitalizationController::class, 'show']);
+                    Route::post('print',[CapitalizationController::class, 'print']);
+                    Route::post('get_code',[CapitalizationController::class, 'getCode']);
+                    Route::get('export',[CapitalizationController::class, 'export']);
+                    Route::post('create',[CapitalizationController::class, 'create'])->middleware('operation.access:capitalization,update');
+                    Route::get('approval/{id}',[CapitalizationController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [CapitalizationController::class, 'voidStatus'])->middleware('operation.access:capitalization,void');
+                    Route::post('destroy', [CapitalizationController::class, 'destroy'])->middleware('operation.access:capitalization,delete');
+                });
+            });
+
             Route::prefix('journal')->middleware('operation.access:journal,view')->group(function () {
                 Route::get('/',[JournalController::class, 'index']);
                 Route::get('datatable',[JournalController::class, 'datatable']);

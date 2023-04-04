@@ -136,7 +136,7 @@ class JournalController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->account->name,
+                    $val->account_id ? $val->account->name : '-',
                     date('d/m/y',strtotime($val->post_date)),
                     $val->note,
                     $val->lookable_type == 'good_receipts' ? $val->lookable->goodReceiptMain->code : ($val->lookable_type ? $val->lookable->code : '-'),

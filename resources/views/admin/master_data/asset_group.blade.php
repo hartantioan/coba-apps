@@ -19,7 +19,16 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
+                            <i class="material-icons hide-on-med-and-up">local_printshop</i>
+                            <span class="hide-on-small-onl">Print</span>
+                            <i class="material-icons right">local_printshop</i>
+                        </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                            <span class="hide-on-small-onl">Excel</span>
+                            <i class="material-icons right">view_list</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -54,16 +63,13 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
+                                                        <th>Kode</th>
                                                         <th>Nama</th>
-                                                        <th>Grup</th>
-                                                        <th>Tgl.Kapitalisasi</th>
-                                                        <th>Nominal</th>
-                                                        <th>Metode</th>
-                                                        <th>Coa Biaya</th>
-                                                        <th>Keterangan</th>
+                                                        <th>Parent</th>
+                                                        <th>Coa Pengakuan Aset</th>
+                                                        <th>Coa Akumulasi Penyusutan</th>
+                                                        <th>Periode Penyusutan (Bln)</th>
                                                         <th>Status</th>
-                                                        <th>Pabrik/Kantor</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -74,7 +80,6 @@
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -82,100 +87,66 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;width:80%;">
+<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit {{ $title }}</h4>
+                <h4>Add/Edit Group {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col m4 s6">
+                        <div class="input-field col s6">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <input id="code" name="code" type="text" placeholder="Kode group">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col m4 s6">
-                            <select class="form-control" id="place_id" name="place_id">
-                                <option value="">--Kosong--</option>
-                                @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="plant_id">Pabrik/Kantor</label>
-                        </div>
-                        <div class="input-field col m4 s6">
-                            <input id="name" name="name" type="text" placeholder="Nama">
+                        <div class="input-field col s6">
+                            <input id="name" name="name" type="text" placeholder="Nama Group">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col m4 s6">
-                            <select class="select2 browser-default" id="asset_group_id" name="asset_group_id">
-                                @foreach($group->whereNull('parent_id') as $c)
-                                        @if(!$c->childSub()->exists())
-                                            <option value="{{ $c->id }}"> - {{ $c->name.' COA '.$c->coa->code.' - '.$c->coa->name }}</option>
-                                        @else
-                                            <optgroup label=" - {{ $c->code.' - '.$c->name }}">
-                                            @foreach($c->childSub as $bc)
-                                                @if(!$bc->childSub()->exists())
-                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name.' COA '.$bc->coa->code.' - '.$bc->coa->name }}</option>
-                                                @else
-                                                    <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
-                                                        @foreach($bc->childSub as $bcc)
-                                                            @if(!$bcc->childSub()->exists())
-                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name.' COA '.$bcc->coa->code.' - '.$bcc->coa->name }}</option>
-                                                            @else
-                                                                <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
-                                                                    @foreach($bcc->childSub as $bccc)
-                                                                        @if(!$bccc->childSub()->exists())
-                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name.' COA '.$bccc->coa->code.' - '.$bccc->coa->name }}</option>
-                                                                        @else
-                                                                            <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
-                                                                                @foreach($bccc->childSub as $bcccc)
-                                                                                    @if(!$bcccc->childSub()->exists())
-                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name.' COA '.$bcccc->coa->code.' - '.$bcccc->coa->name }}</option>
-                                                                                    @endif
-                                                                                @endforeach
-                                                                            </optgroup>
-                                                                        @endif
-                                                                    @endforeach
-                                                                </optgroup>
-                                                            @endif
-                                                        @endforeach
-                                                    </optgroup>
-                                                @endif
+                        <div class="input-field col s6">
+                            <select class="select2 browser-default" id="parent_id" name="parent_id">
+                                <option value="">Parent (Utama)</option>
+                                @foreach($parent as $m)
+                                    <option value="{{ $m->id }}">{{ $m->name }}</option>
+                                    @foreach($m->childSub as $m2)
+                                        <option value="{{ $m2->id }}"> - {{ $m2->name }}</option>
+                                        @foreach($m2->childSub as $m3)
+                                            <option value="{{ $m3->id }}"> - - {{ $m3->name }}</option>
+                                            @foreach($m3->childSub as $m4)
+                                                <option value="{{ $m4->id }}"> - - - {{ $m4->name }}</option>
                                             @endforeach
-                                            </optgroup>
-                                        @endif
+                                        @endforeach
+                                    @endforeach
                                 @endforeach
                             </select>
-                            <label class="active" for="asset_group_id">Grup Aset</label>
+                            <label class="active" for="parent_id">Parent Menu</label>
                         </div>
-                        <div class="input-field col m4 s12">
-                            <select class="form-control" id="method" name="method">
-                                <option value="1">Straight Line</option>
-                                <option value="2">Declining Balance</option>
+                        <div class="input-field col s6">
+                            <select class="select2 browser-default" id="coa_id" name="coa_id">
+                                <option value="">-- Pilih Coa --</option>
+                                @foreach($coa as $c)
+                                    <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
+                                @endforeach
                             </select>
-                            <label class="" for="method">Metode Hitung</label>
+                            <label class="active" for="coa_id">Coa Pengakuan Aset</label>
                         </div>
-                        <div class="input-field col m4 s12">
-                            <select class="browser-default" id="cost_coa_id" name="cost_coa_id"></select>
-                            <label class="active" for="cost_coa_id">Coa Biaya</label>
+                        <div class="input-field col s6">
+                            <select class="select2 browser-default" id="depreciation_coa_id" name="depreciation_coa_id">
+                                <option value="">-- Pilih Coa --</option>
+                                @foreach($coa as $c)
+                                    <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="active" for="depreciation_coa_id">Coa Akumulasi Penyusutan</label>
                         </div>
-                        <div class="input-field col m4 s6">
-                            <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. kapitalisasi" readonly>
-                            <label class="active" for="date">Tgl. Kapitalisasi (Dari form kapitalisasi)</label>
+                        <div class="input-field col s6">
+                            <input id="depreciation_period" name="depreciation_period" type="number" step="1" value="0">
+                            <label class="active" for="depreciation_period">Periode Akumulasi Penyusutan (Bulan)</label>
                         </div>
-                        <div class="input-field col m4 s6">
-                            <input id="nominal" name="nominal" type="text" placeholder="Nominal Kapitalisasi" value="0" onkeyup="formatRupiah(this)" readonly>
-                            <label class="active" for="nominal">Nominal Awal (Dari form kapitalisasi)</label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
-                            <label class="active" for="note">Keterangan</label>
-                        </div>
-                        <div class="input-field col m4 s12">
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -216,7 +187,7 @@
                 
             },
             onOpenEnd: function(modal, trigger) { 
-                $('#name').focus();
+                $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -224,21 +195,21 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#coa_id,#depreciation_coa_id').val('').trigger('change');
                 M.updateTextFields();
             }
         });
-        $('#place_id').val("{{ session('bo_place_id') }}").formSelect();
-        select2ServerSide('#cost_coa_id', '{{ url("admin/select2/coa") }}');
-        $("#asset_group_id").select2({
-            dropdownAutoWidth: true,
+
+        $(".select2").select2({
+            /* dropdownAutoWidth: true, */
             width: '100%',
         });
     });
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
-            "responsive": false,
             "scrollX": true,
+            "responsive": false,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -267,17 +238,14 @@
                 }
             },
             columns: [
-                { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'id', searchable: false, className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'asset_group_id', className: 'center-align' },
-                { name: 'date', className: 'center-align' },
-                { name: 'nominal', className: 'center-align' },
-                { name: 'method', className: 'center-align' },
-                { name: 'coa_cost', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
+                { name: 'parent', className: 'center-align' },
+                { name: 'coa', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'dep_coa_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'dep_acc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'place', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -286,7 +254,6 @@
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-        
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -313,6 +280,12 @@
             success: function(response) {
                 loadingClose('.modal-content');
                 if(response.status == 200) {
+                    $('#parent_id').empty();
+
+                    $.each(response.data, function(i, val) {
+                        $('#parent_id').append(val);
+                    });
+
                     success();
                     M.toast({
                         html: response.message
@@ -381,25 +354,21 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
+                
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#asset_group_id').val(response.asset_group_id).trigger('change');
-                $('#date').val(response.date);
-                $('#nominal').val(response.nominal);
-                $('#method').val(response.method).formSelect();
-                $('#cost_coa_id').empty();
-                $('#cost_coa_id').append(`
-                    <option value="` + response.cost_coa_id + `">` + response.cost_coa_name + `</option>
-                `);
-                $('#note').val(response.note);
+                $('#parent_id').val(response.parent_id).trigger('change');
+                $('#coa_id').val(response.coa_id).trigger('change');
+                $('#depreciation_coa_id').val(response.depreciation_coa_id).trigger('change');
+                $('#depreciation_period').val(response.depreciation_period);
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
                 }
+
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();
@@ -457,5 +426,36 @@
                 });
             }
         });
+    }
+
+    function print(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        $.ajax({
+            type : "POST",
+            url  : '{{ Request::url() }}/print',
+            data : {
+                search : search,
+                status : status
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            cache: false,
+            success: function(data){
+                var w = window.open('about:blank');
+                w.document.open();
+                w.document.write(data);
+                w.document.close();
+            }
+        });
+    }
+
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

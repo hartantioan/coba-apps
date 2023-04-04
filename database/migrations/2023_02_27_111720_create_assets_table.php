@@ -22,8 +22,8 @@ return new class extends Migration
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('item_id')->nullable();
             $table->string('name',155)->nullable();
-            $table->date('date_start')->nullable();
-            $table->date('date_end')->nullable();
+            $table->bigInteger('asset_group_id')->nullable();
+            $table->date('date')->nullable();
             $table->double('nominal')->nullable();
             $table->char('method',1)->nullable();
             $table->bigInteger('cost_coa_id')->nullable();

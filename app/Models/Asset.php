@@ -18,11 +18,9 @@ class Asset extends Model
         'code',
         'user_id',
         'place_id',
-        'department_id',
-        'item_id',
         'name',
-        'date_start',
-        'date_end',
+        'asset_group_id',
+        'date',
         'nominal',
         'method',
         'cost_coa_id',
@@ -55,19 +53,13 @@ class Asset extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public function item()
-    {
-        return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
-    }
-
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
-
-    public function department()
+    public function assetGroup()
     {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\AssetGroup', 'asset_group_id', 'id')->withTrashed();
     }
 
     public function costCoa()

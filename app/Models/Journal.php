@@ -109,6 +109,7 @@ class Journal extends Model
     public static function generateCode()
     {
         $query = Journal::selectRaw('RIGHT(code, 11) as code')
+            ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
             ->get();

@@ -9,6 +9,7 @@
     /*width: calc(100% - 45px) !important;*/
     width: 100% !important;
     /*margin-left: 45px;*/
+    height: 3.6rem !important;
 }
 
 .select2-container .select2-selection--single {

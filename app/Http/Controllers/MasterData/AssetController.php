@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
+use App\Models\AssetGroup;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class AssetController extends Controller
             'title'         => 'Aset',
             'content'       => 'admin.master_data.asset',
             'place'         => Place::where('status','1')->get(),
-            'department'    => Department::where('status','1')->get()
+            'group'         => AssetGroup::where('status','1')->get()
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -32,17 +33,15 @@ class AssetController extends Controller
         $column = [
             'id',
             'code',
-            'item_id',
             'name',
-            'date_start',
-            'date_end',
+            'asset_group_id',
+            'date',
             'nominal',
             'method',
             'cost_coa_id',
             'note',
             'status',
             'place_id',
-            'department_id'
         ];
 
         $start  = $request->start;
@@ -96,17 +95,15 @@ class AssetController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->item->name,
                     $val->name,
-                    date('d/m/y',strtotime($val->date_start)),
-                    date('d/m/y',strtotime($val->date_end)),
-                    number_format($val->nominal,3,',','.'),
+                    $val->assetGroup->name.' - '.$val->assetGroup->coa->name,
+                    $val->date ? date('d/m/y',strtotime($val->date)) : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
+                    $val->nominal > 0 ? number_format($val->nominal,3,',','.') : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
                     $val->method(),
                     $val->costCoa->name,
                     $val->note,
                     $val->status(),
                     $val->place_id ? $val->place->name.' - '.$val->place->company->name : '-',
-                    $val->department_id ? $val->department->name : '-',
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -132,24 +129,20 @@ class AssetController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('assets', 'code')->ignore($request->temp)] : 'required|unique:assets,code',
-            'item_id'           => 'required',
-            'name'              => 'required',
-            'date_start'        => 'required',
-            'date_end'          => 'required',
-            'nominal'           => 'required',
-            'method'            => 'required',
-            'cost_coa_id'       => 'required'
+            'code' 				    => $request->temp ? ['required', Rule::unique('assets', 'code')->ignore($request->temp)] : 'required|unique:assets,code',
+            'name'                  => 'required',
+            'nominal'               => 'required',
+            'method'                => 'required',
+            'cost_coa_id'           => 'required',
+            'asset_group_id'        => 'required',
         ], [
-            'code.required' 	    => 'Kode tidak boleh kosong.',
-            'code.unique'           => 'Kode telah terpakai.',
-            'item_id.required'      => 'Item tidak boleh kosong.',
-            'name.required'         => 'Nama tidak boleh kosong.',
-            'date_start.required'   => 'Tgl mulai hitung tidak boleh kosong.',
-            'date_end.required'     => 'Tgl akhir hitung tidak boleh kosong.',
-            'nominal.required'      => 'Nominal tidak boleh kosong.',
-            'method.required'       => 'Metode hitung tidak boleh kosong.',
-            'cost_coa_id.required'  => 'Coa biaya tidak boleh kosong.'
+            'code.required' 	            => 'Kode tidak boleh kosong.',
+            'code.unique'                   => 'Kode telah terpakai.',
+            'name.required'                 => 'Nama tidak boleh kosong.',
+            'nominal.required'              => 'Nominal tidak boleh kosong.',
+            'method.required'               => 'Metode hitung tidak boleh kosong.',
+            'cost_coa_id.required'          => 'Coa pengakuan aset tidak boleh kosong.',
+            'asset_group_id.required'       => 'Grup aset tidak boleh kosong.'
         ]);
 
         if($validation->fails()) {
@@ -165,11 +158,9 @@ class AssetController extends Controller
                     $query->code            = $request->code;
                     $query->user_id	        = session('bo_id');
                     $query->place_id        = $request->place_id ? $request->place_id : NULL;
-                    $query->department_id   = $request->department_id ? $request->department_id : NULL;
-                    $query->item_id         = $request->item_id;
                     $query->name	        = $request->name;
-                    $query->date_start	    = $request->date_start;
-                    $query->date_end	    = $request->date_end;
+                    $query->asset_group_id	= $request->asset_group_id;
+                    $query->date	        = $request->date;
                     $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
                     $query->method          = $request->method;
                     $query->cost_coa_id     = $request->cost_coa_id;
@@ -187,11 +178,9 @@ class AssetController extends Controller
                         'code'              => $request->code,
                         'user_id'			=> session('bo_id'),
                         'place_id'          => $request->place_id ? $request->place_id : NULL,
-                        'department_id'     => $request->department_id ? $request->department_id : NULL,
-                        'item_id'           => $request->item_id,
                         'name'              => $request->name,
-                        'date_start'        => $request->date_start,
-                        'date_end'          => $request->date_end,
+                        'asset_group_id'    => $request->asset_group_id,
+                        'date'              => $request->date,
                         'nominal'           => str_replace(',','.',str_replace('.','',$request->nominal)),
                         'method'            => $request->method,
                         'cost_coa_id'       => $request->cost_coa_id,
@@ -229,7 +218,6 @@ class AssetController extends Controller
 
     public function show(Request $request){
         $asset = Asset::find($request->id);
-        $asset['item_name'] = $asset->item->name;
         $asset['cost_coa_name'] = $asset->costCoa->name;
         $asset['nominal'] = number_format($asset->nominal,3,',','.');
         				

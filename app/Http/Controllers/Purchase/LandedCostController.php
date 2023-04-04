@@ -633,7 +633,7 @@ class LandedCostController extends Controller
     
                 CustomHelper::sendNotification('landed_costs',$query->id,'Purchase Order Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('landed_costs',$query->id);
-                CustomHelper::removeJournal('landed_costs',$query->id);
+                /* CustomHelper::removeJournal('landed_costs',$query->id); */
 
                 $response = [
                     'status'  => 200,
@@ -695,7 +695,7 @@ class LandedCostController extends Controller
             }
 
             $query->landedCostDetail()->delete();
-            CustomHelper::removeJournal('landed_costs',$query->id);
+            /* CustomHelper::removeJournal('landed_costs',$query->id); */
 
             activity()
                 ->performedOn(new PurchaseOrder())

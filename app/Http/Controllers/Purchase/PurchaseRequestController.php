@@ -528,9 +528,6 @@ class PurchaseRequestController extends Controller
                         'document'      => $request->file('file') ? $request->file('file')->store('public/purchase_requests') : NULL,
                     ]);
 
-                    CustomHelper::sendApproval('purchase_requests',$query->id,$query->note);
-                    CustomHelper::sendNotification('purchase_requests',$query->id,'Pengajuan Purchase Request No. '.$query->code,$query->note,session('bo_id'));
-
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
@@ -557,6 +554,9 @@ class PurchaseRequestController extends Controller
                         DB::rollback();
                     }
                 }
+
+                CustomHelper::sendApproval('purchase_requests',$query->id,$query->note);
+                CustomHelper::sendNotification('purchase_requests',$query->id,'Pengajuan Purchase Request No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new PurchaseRequest())

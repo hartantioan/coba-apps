@@ -4,6 +4,7 @@ namespace App\Helpers;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalTable;
 use App\Models\ApprovalSource;
+use App\Models\Capitalization;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
 use App\Models\User;
@@ -413,6 +414,45 @@ class CustomHelper {
 									$arrCoa[] = [
 										'coa_id'	=> $rowdetail->item->itemGroup->coa_id,
 										'total'		=> $rowdetail->nominal
+									];
+								}
+							}
+							
+							foreach($arrCoa as $row){
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $row['coa_id'],
+									'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+									'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+									'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
+									'type'			=> '1',
+									'nominal'		=> $row['total']
+								]);
+							}
+						}
+					}
+
+					if($table_name == 'capitalizations'){
+						$arrCoa = [];
+
+						$cp = Capitalization::find($data->id);
+						
+						if($cp){
+							foreach($cp->capitalizationDetail as $row){
+								$index = -1;
+
+								foreach($arrCoa as $key => $rowcek){
+									if($rowcek['coa_id'] == $row->asset->assetGroup->coa_id){
+										$index = $key;
+									}
+								}
+
+								if($index >= 0){
+									$arrCoa[$index]['total'] += $row->total;
+								}else{
+									$arrCoa[] = [
+										'coa_id'	=> $row->asset->assetGroup->coa_id,
+										'total'		=> $row->total
 									];
 								}
 							}

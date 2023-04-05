@@ -226,7 +226,7 @@ class FundRequestController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
@@ -244,18 +244,26 @@ class FundRequestController extends Controller
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
                             }
-                            $document = $request->file('file')->store('public/purchase_requests');
+                            $document = $request->file('file')->store('public/fund_requests');
                         } else {
                             $document = $query->document;
                         }
                         
+                        $query->user_id = session('bo_id');
+                        $query->place_id = $request->place_id;
+                        $query->department_id = $request->department_id;
+                        $query->account_id = $request->account_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->required_date = $request->required_date;
+                        $query->currency_id = $request->currency_id;
+                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->note = $request->note;
+                        $query->termin_note = $request->termin_note;
+                        $query->payment_type = $request->payment_type;
+                        $query->name_account = $request->name_account;
+                        
                         $query->document = $document;
-                        $query->project_id = $request->project_id ? $request->project_id : NULL;
-                        $query->place_id = $request->place_id;
                         $query->save();
 
                         foreach($query->purchaseRequestDetail as $row){

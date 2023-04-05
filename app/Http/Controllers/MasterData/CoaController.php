@@ -12,6 +12,9 @@ use App\Models\Company;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportCoa;
+use Maatwebsite\Excel\Concerns\ToModel;
+
+use App\Imports\ImportCoa;
 
 class CoaController extends Controller
 {
@@ -356,5 +359,61 @@ class CoaController extends Controller
         $type = $request->type ? $request->type : '';
 		
 		return Excel::download(new ExportCoa($search,$status,$company,$type), 'coa_'.uniqid().'.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => [
+                'required',
+                'mimes:xlsx',
+                'max:2048',
+                function ($attribute, $value, $fail) {
+                    $rows = Excel::toArray([], $value)[0];
+                    if (count($rows) < 2) {
+                        $fail('The file must contain at least two rows.');
+                    }
+                }
+            ]
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'status' => 432,
+                'error'  => $validator->errors()
+            ];
+            return response()->json($response);
+        }
+
+        try {
+            Excel::import(new ImportCoa, $request->file('file'));
+
+            return response()->json(['message' => 'Import successful!']);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = [
+                    'row' => $failure->row(),
+                    'attribute' => $failure->attribute(),
+                    'errors' => $failure->errors(),
+                    'values' => $failure->values(),
+                ];
+            }
+            $response = [
+                'status' => 422,
+                'error'  => $errors
+            ];
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            $response = [
+                'status'  => 500,
+                'message' => "Data failed to save"
+                //'Data failed to save.'
+            ];
+            return response()->json($response);
+        }
     }
 }

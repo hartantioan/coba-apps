@@ -10,10 +10,20 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
+
 use App\Models\Asset;
 use App\Models\Place;
 use App\Models\Department;
+
+use App\Imports\ImportAsset;
+
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\Importable;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Validators\ValidationException;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
 
 class AssetController extends Controller
 {
@@ -246,5 +256,61 @@ class AssetController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function import(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => [
+                'required',
+                'mimes:xlsx',
+                'max:2048',
+                function ($attribute, $value, $fail) {
+                    $rows = Excel::toArray([], $value)[0];
+                    if (count($rows) < 2) {
+                        $fail('The file must contain at least two rows.');
+                    }
+                }
+            ]
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'status' => 432,
+                'error'  => $validator->errors()
+            ];
+            return response()->json($response);
+        }
+
+        try {
+            Excel::import(new ImportAsset, $request->file('file'));
+
+            return response()->json(['message' => 'Import successful!']);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = [
+                    'row' => $failure->row(),
+                    'attribute' => $failure->attribute(),
+                    'errors' => $failure->errors(),
+                    'values' => $failure->values(),
+                ];
+            }
+            $response = [
+                'status' => 422,
+                'error'  => $errors
+            ];
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            $response = [
+                'status'  => 500,
+                'message' => "Data failed to save"
+                //'Data failed to save.'
+            ];
+            return response()->json($response);
+        }
     }
 }

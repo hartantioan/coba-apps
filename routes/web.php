@@ -277,6 +277,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [ItemController::class, 'show']);
                     Route::post('print',[ItemController::class, 'print']);
                     Route::get('export',[ItemController::class, 'export']);
+                    Route::post('import',[ItemController::class, 'import']);
                     Route::post('create',[ItemController::class, 'create'])->middleware('operation.access:item,update');
                     Route::post('destroy', [ItemController::class, 'destroy'])->middleware('operation.access:item,delete');
                 });
@@ -394,6 +395,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [CoaController::class, 'show']);
                     Route::post('print',[CoaController::class, 'print']);
                     Route::get('export',[CoaController::class, 'export']);
+                    Route::post('import',[CoaController::class, 'import']);
                     Route::post('create',[CoaController::class, 'create'])->middleware('operation.access:coa,update');
                     Route::post('destroy', [CoaController::class, 'destroy'])->middleware('operation.access:coa,delete');
                 });
@@ -414,6 +416,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [AssetController::class, 'show']);
                     Route::post('create',[AssetController::class, 'create'])->middleware('operation.access:asset,update');
                     Route::post('destroy', [AssetController::class, 'destroy'])->middleware('operation.access:asset,delete');
+                    Route::post('import', [AssetController::class, 'import']);
                 });
 
                 Route::prefix('currency')->middleware('operation.access:currency,view')->group(function () {

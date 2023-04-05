@@ -570,19 +570,22 @@
                                 ` + val.asset_name + `
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_price` + count + `" name="arr_price[]" value="` + val.price + `" onkeyup="formatRupiah(this);count();">
-                            </td>
-                            <td class="center">
-                                <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + val.qty + `" onkeyup="formatRupiah(this);count();">
+                                <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + val.qty + `" onkeyup="formatRupiah(this);">
                             </td>
                             <td class="center">
                                 <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                             </td>
+                            <td class="right-align">
+                                ` + val.asset_nominal + `
+                            </td>
                             <td class="center">
-                                <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly>
+                                <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.retirement_nominal + `" onkeyup="formatRupiah(this);">
                             </td>
                             <td>
                                 <input name="arr_note[]" type="text" placeholder="Keterangan" value="` + val.note + `">
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                             </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
@@ -595,7 +598,10 @@
                         <option value="` + val.unit_id + `">` + val.unit_name + `</option>
                     `);
                     select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
-                    $('#asset_id').empty();
+                    $('#arr_coa' + count).append(`
+                        <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                    `);
+                    select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                 });
 
                 $('.modal-content').scrollTop(0);

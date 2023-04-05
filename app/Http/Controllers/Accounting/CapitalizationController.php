@@ -427,7 +427,7 @@ class CapitalizationController extends Controller
                 if($row->status == '2'){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Landed coast telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                        'message' => 'Kapitalisasi telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
                     ]);
                 }
             }

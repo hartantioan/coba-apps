@@ -127,7 +127,7 @@
 				<thead>
 					<tr align="center">
 						<th>No</th>
-                        <th>No Kapitalisasi</th>
+                        <th>No.Retirement</th>
 						<th>Pengguna</th>
 						<th>Pabrik/Kantor</th>
                         <th>Mata Uang</th>
@@ -155,25 +155,29 @@
                                 <table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:13px;">
                                     <thead>
                                         <tr align="center">
+                                            <th></th>
                                             <th>No.</th>
                                             <th>Aset</th>
-                                            <th>Harga</th>
                                             <th>Qty</th>
                                             <th>Satuan</th>
-                                            <th>Total</th>
+                                            <th>Nominal Aset</th>
+                                            <th>Nominal Retirement</th>
                                             <th>Keterangan</th>
+                                            <th>Coa</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($row->capitalizationDetail as $key1 => $rowdetail)
+                                        @foreach($row->retirementDetail as $key1 => $rowdetail)
                                             <tr>
+                                                <td></td>
                                                 <td align="center">{{ $key1 + 1 }}</td>
                                                 <td>{{ $rowdetail->asset->name }}</td>
-                                                <td align="right">{{ number_format($rowdetail->price,3,',','.') }}</td>
                                                 <td align="center">{{ number_format($rowdetail->qty,3,',','.') }}</td>
                                                 <td align="center">{{ $rowdetail->unit->code }}</td>
-                                                <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
+                                                <td align="right">{{ number_format($rowdetail->asset->nominal,3,',','.') }}</td>
+                                                <td align="right">{{ number_format($rowdetail->retirement_nominal,3,',','.') }}</td>
                                                 <td>{{ $rowdetail->note }}</td>
+                                                <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

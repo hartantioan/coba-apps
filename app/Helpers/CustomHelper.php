@@ -5,8 +5,10 @@ use App\Models\ApprovalMatrix;
 use App\Models\ApprovalTable;
 use App\Models\ApprovalSource;
 use App\Models\Capitalization;
+use App\Models\Coa;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
+use App\Models\Retirement;
 use App\Models\User;
 use App\Models\Notification;
 use App\Models\Menu;
@@ -351,6 +353,63 @@ class CustomHelper {
 				}
 			}
 
+		}elseif($table_name == 'retirements'){
+			$ret = Retirement::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'place_id'		=> $ret->place_id,
+				'lookable_type'	=> 'retirements',
+				'lookable_id'	=> $ret->id,
+				'currency_id'	=> $ret->currency_id,
+				'currency_rate'	=> $ret->currency_rate,
+				'post_date'		=> $ret->post_date,
+				'note'			=> $ret->code,
+				'status'		=> '3'
+			]);
+
+			foreach($ret->retirementDetail as $row){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->asset->assetGroup->depreciation_coa_id,
+					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+					'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+					'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> $row->retirement_nominal,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->asset->assetGroup->coa_id,
+					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+					'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+					'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> $row->retirement_nominal,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->coa_id,
+					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+					'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+					'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> $row->retirement_nominal,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> Coa::where('code','100.01.01.99.03')->first()->id,
+					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+					'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+					'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> $row->retirement_nominal,
+				]);
+			}
 		}else{
 
 			if(isset($data->currency_id)){

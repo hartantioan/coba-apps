@@ -30,6 +30,8 @@ use App\Http\Controllers\MasterData\UnitController;
 use App\Http\Controllers\MasterData\BankController;
 use App\Http\Controllers\MasterData\ProjectController;
 
+use App\Http\Controllers\Personal\FundRequestController;
+
 use App\Http\Controllers\Purchase\PurchaseRequestController;
 use App\Http\Controllers\Purchase\PurchaseOrderController;
 use App\Http\Controllers\Purchase\PurchaseDownPaymentController;
@@ -121,15 +123,23 @@ Route::prefix('admin')->group(function () {
                 Route::post('update_notification', [NotificationController::class, 'updateNotification']);
             });
 
-            Route::prefix('purchase_request')->group(function () {
+            Route::prefix('personal_purchase_request')->group(function () {
                 Route::get('/',[PurchaseRequestController::class, 'userIndex']);
                 Route::get('datatable',[PurchaseRequestController::class, 'userDatatable']);
                 Route::get('row_detail',[PurchaseRequestController::class, 'userRowDetail']);
                 Route::post('show', [PurchaseRequestController::class, 'userShow']);
-                Route::post('print',[PurchaseRequestController::class, 'userPrint']);
-                Route::get('export',[PurchaseRequestController::class, 'userExport']);
                 Route::post('create',[PurchaseRequestController::class, 'userCreate']);
                 Route::post('destroy', [PurchaseRequestController::class, 'userDestroy']);
+            });
+
+            Route::prefix('personal_fund_request')->group(function () {
+                Route::get('/',[FundRequestController::class, 'userIndex']);
+                Route::get('datatable',[FundRequestController::class, 'userDatatable']);
+                Route::get('row_detail',[FundRequestController::class, 'userRowDetail']);
+                Route::post('show', [FundRequestController::class, 'userShow']);
+                Route::post('create',[FundRequestController::class, 'userCreate']);
+                Route::post('get_account_info', [FundRequestController::class, 'getAccountInfo']);
+                Route::post('destroy', [FundRequestController::class, 'userDestroy']);
             });
         });
 
@@ -553,6 +563,19 @@ Route::prefix('admin')->group(function () {
                 Route::post('void_status', [PurchaseInvoiceController::class, 'voidStatus'])->middleware('operation.access:purchase_invoice,void');
                 Route::get('approval/{id}',[PurchaseInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('destroy', [PurchaseInvoiceController::class, 'destroy'])->middleware('operation.access:purchase_invoice,delete');
+            });
+            
+            Route::prefix('purchase_memo')->middleware('operation.access:purchase_memo,view')->group(function () {
+                Route::get('/',[PurchaseMemoController::class, 'index']);
+                Route::get('datatable',[PurchaseMemoController::class, 'datatable']);
+                Route::get('row_detail',[PurchaseMemoController::class, 'rowDetail']);
+                Route::post('show', [PurchaseMemoController::class, 'show']);
+                Route::post('print',[PurchaseMemoController::class, 'print']);
+                Route::get('export',[PurchaseMemoController::class, 'export']);
+                Route::post('create',[PurchaseMemoController::class, 'create'])->middleware('operation.access:purchase_memo,update');
+                Route::post('void_status', [PurchaseMemoController::class, 'voidStatus'])->middleware('operation.access:purchase_memo,void');
+                Route::get('approval/{id}',[PurchaseMemoController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('destroy', [PurchaseMemoController::class, 'destroy'])->middleware('operation.access:purchase_memo,delete');
             });
         });
 

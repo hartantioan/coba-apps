@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ExportCapitalization;
+use App\Exports\ExportRetirement;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 
@@ -152,7 +152,6 @@ class RetirementController extends Controller
             'currency_rate'		    => 'required',
             'note'		            => 'required',
             'arr_asset_id'          => 'required|array',
-            'arr_price'             => 'required|array',
             'arr_qty'               => 'required|array',
             'arr_unit'              => 'required|array',
             'arr_total'             => 'required|array',
@@ -166,8 +165,6 @@ class RetirementController extends Controller
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'arr_asset_id.required'             => 'Aset tidak boleh kosong',
             'arr_asset_id.array'                => 'Aset harus dalam bentuk array.',
-            'arr_price.required'                => 'Harga tidak boleh kosong',
-            'arr_price.array'                   => 'Harga harus dalam bentuk array.',
             'arr_qty.required'                  => 'Qty tidak boleh kosong',
             'arr_qty.array'                     => 'Qty harus dalam bentuk array.',
             'arr_unit.required'                 => 'Satuan tidak boleh kosong',
@@ -344,12 +341,12 @@ class RetirementController extends Controller
     }
 
     public function show(Request $request){
-        $cap = Capitalization::where('code',CustomHelper::decrypt($request->id))->first();
-        $cap['currency_rate'] = number_format($cap->currency_rate,3,',','.');
+        $ret = Retirement::where('code',CustomHelper::decrypt($request->id))->first();
+        $ret['currency_rate'] = number_format($ret->currency_rate,3,',','.');
 
         $arr = [];
         
-        foreach($cap->capitalizationDetail as $row){
+        foreach($ret->retirementDetail as $row){
             $arr[] = [
                 'asset_id'          => $row->asset_id,
                 'asset_code'        => $row->asset->code,
@@ -357,19 +354,21 @@ class RetirementController extends Controller
                 'qty'               => $row->qty,
                 'unit_id'           => $row->unit_id,
                 'unit_name'         => $row->unit->name,
-                'price'             => number_format($row->price,3,',','.'),
-                'total'             => number_format($row->total,3,',','.'),
-                'note'              => $row->note
+                'asset_nominal'     => number_format($row->asset->nominal,3,',','.'),
+                'retirement_nominal'=> number_format($row->retirement_nominal,3,',','.'),
+                'note'              => $row->note,
+                'coa_id'            => $row->coa_id,
+                'coa_name'          => $row->coa->code.' - '.$row->coa->name
             ];
         }
 
-        $cap['details'] = $arr;
+        $ret['details'] = $arr;
         				
-		return response()->json($cap);
+		return response()->json($ret);
     }
 
     public function voidStatus(Request $request){
-        $query = Capitalization::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = Retirement::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(in_array($query->status,['4','5'])){
@@ -384,22 +383,15 @@ class RetirementController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-
-                foreach($query->capitalizationDetail as $row){
-                    Asset::find($row->asset_id)->update([
-                        'date'      => NULL,
-                        'nominal'   => 0
-                    ]);
-                }
     
                 activity()
-                    ->performedOn(new Capitalization())
+                    ->performedOn(new Retirement())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the capitalization data');
+                    ->log('Void the retirement data');
     
-                CustomHelper::sendNotification('capitalizations',$query->id,'Kapitalisasi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('capitalizations',$query->id);
+                CustomHelper::sendNotification('retirements',$query->id,'Retirement No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('retirements',$query->id);
                 /* CustomHelper::removeJournal('capitalizations',$query->id); */
 
                 $response = [
@@ -418,14 +410,14 @@ class RetirementController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = Capitalization::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = Retirement::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Landed coast telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                        'message' => 'Retirement telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
                     ]);
                 }
             }
@@ -440,21 +432,17 @@ class RetirementController extends Controller
         
         if($query->delete()) {
 
-            CustomHelper::removeApproval('capitalizations',$query->id);
+            CustomHelper::removeApproval('retirements',$query->id);
             
-            foreach($query->capitalizationDetail as $row){
-                Asset::find($row->asset_id)->update([
-                    'date'      => NULL,
-                    'nominal'   => 0
-                ]);
+            foreach($query->retirementDetail as $row){
                 $row->delete();
             }
 
             activity()
-                ->performedOn(new Capitalization())
+                ->performedOn(new Retirement())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the capitalization data');
+                ->log('Delete the retirement data');
 
             $response = [
                 'status'  => 200,
@@ -473,8 +461,8 @@ class RetirementController extends Controller
     public function print(Request $request){
 
         $data = [
-            'title' => 'ASSET CAPITALIZATION REPORT',
-            'data' => Capitalization::where(function($query) use ($request) {
+            'title' => 'ASSET RETIREMENT REPORT',
+            'data' => Retirement::where(function($query) use ($request) {
                 if($request->search) {
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
@@ -490,24 +478,24 @@ class RetirementController extends Controller
             ->get()
 		];
 		
-		return view('admin.print.accounting.capitalization', $data);
+		return view('admin.print.accounting.retirement', $data);
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportCapitalization($request->search,$request->status,$this->dataplaces), 'capitalization_'.uniqid().'.xlsx');
+		return Excel::download(new ExportRetirement($request->search,$request->status,$this->dataplaces), 'retirement_'.uniqid().'.xlsx');
     }
 
     public function approval(Request $request,$id){
         
-        $cap = Capitalization::where('code',CustomHelper::decrypt($id))->first();
+        $cap = Retirement::where('code',CustomHelper::decrypt($id))->first();
                 
         if($cap){
             $data = [
-                'title'     => 'Print Capitalization',
+                'title'     => 'Print Retirement',
                 'data'      => $cap
             ];
 
-            return view('admin.approval.capitalization', $data);
+            return view('admin.approval.retirement', $data);
         }else{
             abort(404);
         }

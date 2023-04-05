@@ -56,6 +56,12 @@ class Menu extends Model
         return $passed;
     }
 
+    public function hasTable(){
+        if($this->table_name){
+            
+        }
+    }
+
     public function fullName(){
         $name = '';
 

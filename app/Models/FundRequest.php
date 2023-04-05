@@ -8,44 +8,38 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class PurchaseInvoice extends Model
+class FundRequest extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'purchase_invoices';
+    protected $table = 'fund_requests';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
-        'account_id',
         'place_id',
         'department_id',
+        'account_id',
         'post_date',
         'due_date',
-        'document_date',
-        'type',
+        'required_date',
         'currency_id',
         'currency_rate',
-        'subtotal',
-        'discount',
+        'note',
+        'termin_note',
+        'payment_type',
+        'name_account',
+        'no_account',
+        'document',
         'total',
         'tax',
         'wtax',
         'grandtotal',
-        'downpayment',
-        'balance',
-        'document',
-        'note',
         'status',
         'void_id',
         'void_note',
-        'void_date',
-        'tax_no',
-        'tax_cut_no',
-        'cut_date',
-        'spk_no',
-        'invoice_no'
+        'void_date'
     ];
 
     public function user()
@@ -53,28 +47,18 @@ class PurchaseInvoice extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public function voidUser()
+    public function account()
     {
-        return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
     }
-
-    public function account(){
-        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
-    }
-
-    public function type(){
-        $type = match ($this->type) {
-          '1' => 'Cash',
-          '2' => 'Credit',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
     public function currency()
     {
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
+    }
+
+    public function voidUser()
+    {
+        return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
     public function place()
@@ -87,22 +71,22 @@ class PurchaseInvoice extends Model
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
+    public function fundRequestDetail()
+    {
+        return $this->hasMany('App\Models\FundRequestDetail');
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
-    public function purchaseInvoiceDetail()
-    {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail');
-    }
-
     public function status(){
         $status = match ($this->status) {
-          '1' => '<span class="amber medium-small white-text padding-1">Menunggu</span>',
-          '2' => '<span class="cyan medium-small white-text padding-1">Proses</span>',
-          '3' => '<span class="green medium-small white-text padding-1">Selesai</span>',
-          '4' => '<span class="red medium-small white-text padding-1">Ditolak</span>',
-          '5' => '<span class="red darken-4 medium-small white-text padding-1">Void</span>',
+          '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
+          '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
+          '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
+          '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
+          '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
@@ -139,9 +123,21 @@ class PurchaseInvoice extends Model
         }
 	}
 
+    public function paymentType(){
+        $type = match ($this->payment_type) {
+          '1' => 'Tunai',
+          '2' => 'Transfer',
+          '3' => 'CEK',
+          '4' => 'BG',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
     public static function generateCode()
     {
-        $query = PurchaseInvoice::selectRaw('RIGHT(code, 9) as code')
+        $query = FundRequest::selectRaw('RIGHT(code, 9) as code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();
@@ -154,13 +150,13 @@ class PurchaseInvoice extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'POIN-'.date('y').date('m').date('d').'-';
+        $pre = 'FR-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type','purchase_invoices')->where('lookable_id',$this->id)->first();
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
         if($source){
             return $source;
         }else{

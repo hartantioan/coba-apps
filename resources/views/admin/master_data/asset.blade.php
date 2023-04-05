@@ -66,17 +66,15 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Code</th>
-                                                        <th>Item</th>
                                                         <th>Nama</th>
-                                                        <th>Tgl.Mulai</th>
-                                                        <th>Tgl.Berakhir</th>
+                                                        <th>Grup</th>
+                                                        <th>Tgl.Kapitalisasi</th>
                                                         <th>Nominal</th>
                                                         <th>Metode</th>
                                                         <th>Coa Biaya</th>
                                                         <th>Keterangan</th>
                                                         <th>Status</th>
                                                         <th>Pabrik/Kantor</th>
-                                                        <th>Departemen</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -121,33 +119,50 @@
                             <label class="" for="plant_id">Pabrik/Kantor</label>
                         </div>
                         <div class="input-field col m4 s6">
-                            <select class="form-control" id="department_id" name="department_id">
-                                <option value="">--Kosong--</option>
-                                @foreach ($department as $rowdepartment)
-                                    <option value="{{ $rowdepartment->id }}" {{ $rowdepartment->id == session('bo_deparment_id') ? 'selected' : '' }}>{{ $rowdepartment->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="department_id">Departemen</label>
-                        </div>
-                        <div class="input-field col m4 s6">
-                            <select class="browser-default" id="item_id" name="item_id"></select>
-                            <label class="active" for="item_id">Item</label>
-                        </div>
-                        <div class="input-field col m4 s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col m4 s6">
-                            <input id="date_start" name="date_start" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. mulai hitung depresiasi">
-                            <label class="active" for="date_start">Tgl. Mulai</label>
-                        </div>
-                        <div class="input-field col m4 s6">
-                            <input id="date_end" name="date_end" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. akhir hitung depresiasi">
-                            <label class="active" for="date_end">Tgl. Akhir</label>
-                        </div>
-                        <div class="input-field col m4 s6">
-                            <input id="nominal" name="nominal" type="text" placeholder="Nominal Awal" value="0" onkeyup="formatRupiah(this)">
-                            <label class="active" for="nominal">Nominal Awal</label>
+                            <select class="select2 browser-default" id="asset_group_id" name="asset_group_id">
+                                @foreach($group->whereNull('parent_id') as $c)
+                                        @if(!$c->childSub()->exists())
+                                            <option value="{{ $c->id }}"> - {{ $c->name.' COA '.$c->coa->code.' - '.$c->coa->name }}</option>
+                                        @else
+                                            <optgroup label=" - {{ $c->code.' - '.$c->name }}">
+                                            @foreach($c->childSub as $bc)
+                                                @if(!$bc->childSub()->exists())
+                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name.' COA '.$bc->coa->code.' - '.$bc->coa->name }}</option>
+                                                @else
+                                                    <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
+                                                        @foreach($bc->childSub as $bcc)
+                                                            @if(!$bcc->childSub()->exists())
+                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name.' COA '.$bcc->coa->code.' - '.$bcc->coa->name }}</option>
+                                                            @else
+                                                                <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
+                                                                    @foreach($bcc->childSub as $bccc)
+                                                                        @if(!$bccc->childSub()->exists())
+                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name.' COA '.$bccc->coa->code.' - '.$bccc->coa->name }}</option>
+                                                                        @else
+                                                                            <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
+                                                                                @foreach($bccc->childSub as $bcccc)
+                                                                                    @if(!$bcccc->childSub()->exists())
+                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name.' COA '.$bcccc->coa->code.' - '.$bcccc->coa->name }}</option>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            </optgroup>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @endif
+                                                        @endforeach
+                                                    </optgroup>
+                                                @endif
+                                            @endforeach
+                                            </optgroup>
+                                        @endif
+                                @endforeach
+                            </select>
+                            <label class="active" for="asset_group_id">Grup Aset</label>
                         </div>
                         <div class="input-field col m4 s12">
                             <select class="form-control" id="method" name="method">
@@ -160,8 +175,16 @@
                             <select class="browser-default" id="cost_coa_id" name="cost_coa_id"></select>
                             <label class="active" for="cost_coa_id">Coa Biaya</label>
                         </div>
+                        <div class="input-field col m4 s6">
+                            <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. kapitalisasi" readonly>
+                            <label class="active" for="date">Tgl. Kapitalisasi (Dari form kapitalisasi)</label>
+                        </div>
+                        <div class="input-field col m4 s6">
+                            <input id="nominal" name="nominal" type="text" placeholder="Nominal Kapitalisasi" value="0" onkeyup="formatRupiah(this)" readonly>
+                            <label class="active" for="nominal">Nominal Awal (Dari form kapitalisasi)</label>
+                        </div>
                         <div class="input-field col m4 s12">
-                            <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="form-control"></textarea>
+                            <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
                             <label class="active" for="note">Keterangan</label>
                         </div>
                         <div class="input-field col m4 s12">
@@ -367,9 +390,11 @@
         });
 
         $('#place_id').val("{{ session('bo_place_id') }}").formSelect();
-        $('#department_id').val("{{ session('bo_department_id') }}").formSelect();
-        select2ServerSide('#item_id', '{{ url("admin/select2/asset_item") }}');
         select2ServerSide('#cost_coa_id', '{{ url("admin/select2/coa") }}');
+        $("#asset_group_id").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
     });
 
     function loadDataTable() {
@@ -406,17 +431,15 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
-                { name: 'item', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'date_start', className: 'center-align' },
-                { name: 'date_end', className: 'center-align' },
+                { name: 'asset_group_id', className: 'center-align' },
+                { name: 'date', className: 'center-align' },
                 { name: 'nominal', className: 'center-align' },
                 { name: 'method', className: 'center-align' },
                 { name: 'coa_cost', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'department', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -524,13 +547,8 @@
                 $('#code').val(response.code);
                 $('#name').val(response.name);
                 $('#place_id').val(response.place_id).formSelect();
-                $('#department_id').val(response.department_id).formSelect();
-                $('#item_id').empty();
-                $('#item_id').append(`
-                    <option value="` + response.item_id + `">` + response.item_name + `</option>
-                `);
-                $('#date_start').val(response.date_start);
-                $('#date_end').val(response.date_end);
+                $('#asset_group_id').val(response.asset_group_id).trigger('change');
+                $('#date').val(response.date);
                 $('#nominal').val(response.nominal);
                 $('#method').val(response.method).formSelect();
                 $('#cost_coa_id').empty();

@@ -13,43 +13,40 @@ return new class extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('purchase_invoices'))
-        Schema::create('purchase_invoices', function (Blueprint $table) {
+        Schema::create('fund_requests', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 50)->unique();
+            $table->string('code',155)->unique();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('account_id')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
+            $table->bigInteger('account_id')->nullable();
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
-            $table->date('document_date')->nullable();
-            $table->char('type', 1)->nullable();
+            $table->date('required_date')->nullable();
             $table->bigInteger('currency_id')->nullable();
             $table->double('currency_rate')->nullable();
-            $table->double('subtotal')->nullable();
-            $table->double('discount')->nullable();
+            $table->string('note')->nullable();
+            $table->string('termin_note')->nullable();
+            $table->char('payment_type',1)->nullable();
+            $table->string('name_account')->nullable();
+            $table->string('no_account')->nullable();
+            $table->string('document')->nullable();
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
             $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
-            $table->double('downpayment')->nullable();
-            $table->double('balance')->nullable();
-            $table->string('document')->nullable();
-            $table->text('note')->nullable();
-            $table->char('status', 1)->nullable();
+            $table->char('status','1')->nullable();
             $table->bigInteger('void_id')->nullable();
             $table->string('void_note')->nullable();
             $table->timestamp('void_date')->nullable();
-            $table->string('tax_no',155)->nullable();
-            $table->string('tax_cut_no',155)->nullable();
-            $table->date('cut_date')->nullable();
-            $table->string('spk_no',155)->nullable();
-            $table->string('invoice_no',155)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'place_id', 'department_id', 'currency_id']);
+            $table->index(['user_id']);
+            $table->index(['place_id']);
+            $table->index(['department_id']);
+            $table->index(['account_id']);
+            $table->index(['currency_id']);
         });
     }
 
@@ -60,6 +57,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('purchase_invoices');
+        Schema::dropIfExists('fund_requests');
     }
 };
+

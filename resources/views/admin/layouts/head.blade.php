@@ -30,7 +30,7 @@
 	<link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/quill/quill.snow.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/quill/quill.bubble.css') }}">
 	<link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2.min.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2-materialize.css?v=10') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2-materialize.css?v=12') }}" type="text/css">
     <!-- END: VENDOR CSS-->
     <!-- BEGIN: Page Level CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=2') }}">

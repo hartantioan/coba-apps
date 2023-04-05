@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">NO # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Retirement # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -128,17 +128,13 @@
                         <small>Diajukan:</small>
                         <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
-                    <div class="mr-2">
-                        <small>Hingga:</small>
-                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
-                    </div>
                 </div>
             </div>
         </div>
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Landed Cost</h5>
+                <h5 class="indigo-text">Retirement Aset Perusahaan</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="40%">
@@ -146,7 +142,7 @@
         </div>
         <table border="0" width="100%" class="mt-3">
             <tr>
-                <td width="33%" class="left-align" style="vertical-align: top !important;">
+                <td width="50%" class="left-align" style="vertical-align: top !important;">
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
@@ -174,50 +170,22 @@
                         </tr>
                     </table>
                 </td>
-                <td width="33%" class="left-align" style="vertical-align: top !important;">
+                <td width="50%" class="left-align" style="vertical-align: top !important;">
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Vendor
+                                Pabrik/Kantor
                             </td>
                             <td width="60%">
-                                {{ $data->vendor->name }}
+                                {{ $data->place->name.' - '.$data->place->company->name }}
                             </td>
                         </tr>
                         <tr>
                             <td width="40%">
-                                Alamat
+                                Catatan
                             </td>
                             <td width="60%">
-                                {{ $data->vendor->address }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="40%">
-                                Telepon
-                            </td>
-                            <td width="60%">
-                                {{ $data->vendor->phone.' / '.$data->vendor->office_no }}
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                <td width="33%" class="left-align" style="vertical-align: top !important;">
-                    <table border="0" width="100%">
-                        <tr>
-                            <td width="40%">
-                                Lampiran
-                            </td>
-                            <td width="60%">
-                                <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="40%">
-                                Status
-                            </td>
-                            <td width="60%">
-                                {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                                {{ $data->note }}
                             </td>
                         </tr>
                     </table>
@@ -228,52 +196,36 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">No</th>
-                        <th class="center">Item</th>
+                        <th class="center">No.</th>
+                        <th class="center">Aset</th>
                         <th class="center">Qty</th>
                         <th class="center">Satuan</th>
-                        <th class="center">Harga Total</th>
-                        <th class="center">Harga Satuan</th>
+                        <th class="center">Nominal Aset</th>
+                        <th class="center">Nominal Retirement</th>
+                        <th class="center">Keterangan</th>
+                        <th class="center">Coa</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->landedCostDetail as $key => $row)
-                    <tr>
-                        <td class="center">{{ ($key + 1) }}</td>
-                        <td>{{ $row->item->name }}</td>
-                        <td class="center">{{ $row->qty }}</td>
-                        <td class="center">{{ $row->item->uomUnit->code }}</td>
-                        <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
-                        <td class="right-align">{{ number_format(round($row->nominal / $row->qty,3),3,',','.') }}</td>
-                    </tr>
+                    @foreach($data->retirementDetail as $key => $row)
+                        <tr>
+                            <td class="center-align">{{ $key + 1 }}</td>
+                            <td>{{ $row->asset->name }}</td>
+                            <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                            <td class="center-align">{{ $row->unit->code }}</td>
+                            <td class="right-align">{{ number_format($row->asset->nominal,3,',','.') }}</td>
+                            <td class="right-align">{{ number_format($row->retirement_nominal,3,',','.') }}</td>
+                            <td>{{ $row->note }}</td>
+                            <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                        </tr>
                     @endforeach
-                    <tr>
-                        <td class="right-align" colspan="4">Total</td>
-                        <td class="right-align">{{ number_format($data->total,3,',','.') }}</td>
-                        <td class="right-align"></td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="4">PPN</td>
-                        <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
-                        <td class="right-align"></td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="4">PPH</td>
-                        <td class="right-align">{{ number_format($data->wtax,3,',','.') }}</td>
-                        <td class="right-align"></td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="4">Grandtotal</td>
-                        <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
-                        <td class="right-align"></td>
-                    </tr>
                 </tbody>
             </table>
         </div>
         <div class="invoice-subtotal mt-3">
             <div class="row">
                 <div class="col m6 s6 l6">
-                    {!! ucwords(strtolower($data->user->place->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
+                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
                     Catatan : {{ $data->note }}
@@ -286,7 +238,7 @@
                         @if($data->user->signature)
                             <div>{!! $data->user->signature() !!}</div>
                         @endif
-                        <div class="mt-6">{{ $data->user->name }}</div>
+                        <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                         <div class="mt-1">{{ $data->user->position->name.' '.$data->user->department->name }}</div>
                     </td>
                     @if($data->approval())
@@ -296,7 +248,7 @@
                             @if($row->user->signature)
                                 <div>{!! $row->user->signature() !!}</div>
                             @endif
-                            <div class="mt-5">{{ $row->user->name }}</div>
+                            <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
                             <div class="mt-1">{{ $row->user->position->name.' - '.$row->user->department->name }}</div>
                         </td>
                     @endforeach

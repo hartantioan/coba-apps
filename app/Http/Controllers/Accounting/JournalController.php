@@ -136,12 +136,13 @@ class JournalController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->account->name,
+                    $val->account_id ? $val->account->name : '-',
                     date('d/m/y',strtotime($val->post_date)),
                     $val->note,
                     $val->lookable_type == 'good_receipts' ? $val->lookable->goodReceiptMain->code : ($val->lookable_type ? $val->lookable->code : '-'),
                     $val->status(),
                     !$val->lookable_id ? '
+                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -174,7 +175,7 @@ class JournalController extends Controller
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Perusahaan</th>
-                                <th class="center-align">Pabrik/Plant</th>
+                                <th class="center-align">Pabrik/Kantor</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
@@ -563,5 +564,21 @@ class JournalController extends Controller
 
     public function export(Request $request){
 		return Excel::download(new ExportJournal($request->search,$request->status,$request->place,$request->account,$request->currency,$this->dataplaces), 'journal_'.uniqid().'.xlsx');
+    }
+
+    public function approval(Request $request,$id){
+        
+        $cap = Journal::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($cap){
+            $data = [
+                'title'     => 'Print Journal',
+                'data'      => $cap
+            ];
+
+            return view('admin.approval.journal', $data);
+        }else{
+            abort(404);
+        }
     }
 }

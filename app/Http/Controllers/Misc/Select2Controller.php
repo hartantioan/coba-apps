@@ -6,6 +6,8 @@ use App\Models\Region;
 use App\Models\Warehouse;
 use App\Models\Country;
 use App\Models\Item;
+use App\Models\Asset;
+use App\Models\Unit;
 use App\Models\Coa;
 use App\Models\User;
 use App\Models\Bank;
@@ -258,6 +260,35 @@ class Select2Controller extends Controller {
                 'name'          => $d->name,
                 'uom'           => $d->uomUnit->code,
                 'buy_unit'      => $d->buyUnit->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function asset(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Asset::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            $capital = $d->getUnitFromCapitalization();
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+                'name'          => $d->name,
+                'unit_name'     => $capital ? $capital->unit->name : '',
+                'unit_id'       => $capital ? $capital->unit_id : '',
+                'nominal'       => $d->nominal > 0 ? number_format($d->nominal,3,',','.') : '0,000',
+                'price'         => $capital ? number_format($capital->price,3,',','.') : '0,000',
+                'place_id'      => $d->place_id
             ];
         }
 
@@ -528,6 +559,26 @@ class Select2Controller extends Controller {
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%")
                     ->orWhere('note', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function unit(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Unit::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
                 })
                 ->where('status','1')->get();
 

@@ -25,9 +25,12 @@ use App\Http\Controllers\MasterData\AllowanceController;
 use App\Http\Controllers\MasterData\CoaController;
 use App\Http\Controllers\MasterData\CurrencyController;
 use App\Http\Controllers\MasterData\AssetController;
+use App\Http\Controllers\MasterData\AssetGroupController;
 use App\Http\Controllers\MasterData\UnitController;
 use App\Http\Controllers\MasterData\BankController;
 use App\Http\Controllers\MasterData\ProjectController;
+
+use App\Http\Controllers\Personal\FundRequestController;
 
 use App\Http\Controllers\Purchase\PurchaseRequestController;
 use App\Http\Controllers\Purchase\PurchaseOrderController;
@@ -38,6 +41,8 @@ use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 
 use App\Http\Controllers\Accounting\JournalController;
+use App\Http\Controllers\Accounting\CapitalizationController;
+use App\Http\Controllers\Accounting\RetirementController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -100,6 +105,8 @@ Route::prefix('admin')->group(function () {
             Route::get('region', [Select2Controller::class, 'region']);
             Route::get('project', [Select2Controller::class, 'project']);
             Route::get('business_partner', [Select2Controller::class, 'businessPartner']);
+            Route::get('asset', [Select2Controller::class, 'asset']);
+            Route::get('unit', [Select2Controller::class, 'unit']);
         });
 
         Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -116,15 +123,23 @@ Route::prefix('admin')->group(function () {
                 Route::post('update_notification', [NotificationController::class, 'updateNotification']);
             });
 
-            Route::prefix('purchase_request')->group(function () {
+            Route::prefix('personal_purchase_request')->group(function () {
                 Route::get('/',[PurchaseRequestController::class, 'userIndex']);
                 Route::get('datatable',[PurchaseRequestController::class, 'userDatatable']);
                 Route::get('row_detail',[PurchaseRequestController::class, 'userRowDetail']);
                 Route::post('show', [PurchaseRequestController::class, 'userShow']);
-                Route::post('print',[PurchaseRequestController::class, 'userPrint']);
-                Route::get('export',[PurchaseRequestController::class, 'userExport']);
                 Route::post('create',[PurchaseRequestController::class, 'userCreate']);
                 Route::post('destroy', [PurchaseRequestController::class, 'userDestroy']);
+            });
+
+            Route::prefix('personal_fund_request')->group(function () {
+                Route::get('/',[FundRequestController::class, 'userIndex']);
+                Route::get('datatable',[FundRequestController::class, 'userDatatable']);
+                Route::get('row_detail',[FundRequestController::class, 'userRowDetail']);
+                Route::post('show', [FundRequestController::class, 'userShow']);
+                Route::post('create',[FundRequestController::class, 'userCreate']);
+                Route::post('get_account_info', [FundRequestController::class, 'getAccountInfo']);
+                Route::post('destroy', [FundRequestController::class, 'userDestroy']);
             });
         });
 
@@ -385,6 +400,16 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [CoaController::class, 'destroy'])->middleware('operation.access:coa,delete');
                 });
 
+                Route::prefix('asset_group')->middleware('operation.access:asset_group,view')->group(function () {
+                    Route::get('/',[AssetGroupController::class, 'index']);
+                    Route::get('datatable',[AssetGroupController::class, 'datatable']);
+                    Route::post('show', [AssetGroupController::class, 'show']);
+                    Route::post('print', [AssetGroupController::class, 'print']);
+                    Route::get('export', [AssetGroupController::class, 'export']);
+                    Route::post('create',[AssetGroupController::class, 'create'])->middleware('operation.access:asset_group,update');
+                    Route::post('destroy', [AssetGroupController::class, 'destroy'])->middleware('operation.access:asset_group,delete');
+                });
+
                 Route::prefix('asset')->middleware('operation.access:asset,view')->group(function () {
                     Route::get('/',[AssetController::class, 'index']);
                     Route::get('datatable',[AssetController::class, 'datatable']);
@@ -542,6 +567,19 @@ Route::prefix('admin')->group(function () {
                 Route::get('approval/{id}',[PurchaseInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('destroy', [PurchaseInvoiceController::class, 'destroy'])->middleware('operation.access:purchase_invoice,delete');
             });
+            
+            Route::prefix('purchase_memo')->middleware('operation.access:purchase_memo,view')->group(function () {
+                Route::get('/',[PurchaseMemoController::class, 'index']);
+                Route::get('datatable',[PurchaseMemoController::class, 'datatable']);
+                Route::get('row_detail',[PurchaseMemoController::class, 'rowDetail']);
+                Route::post('show', [PurchaseMemoController::class, 'show']);
+                Route::post('print',[PurchaseMemoController::class, 'print']);
+                Route::get('export',[PurchaseMemoController::class, 'export']);
+                Route::post('create',[PurchaseMemoController::class, 'create'])->middleware('operation.access:purchase_memo,update');
+                Route::post('void_status', [PurchaseMemoController::class, 'voidStatus'])->middleware('operation.access:purchase_memo,void');
+                Route::get('approval/{id}',[PurchaseMemoController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('destroy', [PurchaseMemoController::class, 'destroy'])->middleware('operation.access:purchase_memo,delete');
+            });
         });
 
         Route::prefix('inventory')->middleware('direct.access')->group(function () {
@@ -562,6 +600,37 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::prefix('accounting')->middleware('direct.access')->group(function () {
+
+            Route::prefix('acAsset')->group(function () {
+                Route::prefix('capitalization')->middleware('operation.access:capitalization,view')->group(function () {
+                    Route::get('/',[CapitalizationController::class, 'index']);
+                    Route::get('datatable',[CapitalizationController::class, 'datatable']);
+                    Route::get('row_detail',[CapitalizationController::class, 'rowDetail']);
+                    Route::post('show', [CapitalizationController::class, 'show']);
+                    Route::post('print',[CapitalizationController::class, 'print']);
+                    Route::post('get_code',[CapitalizationController::class, 'getCode']);
+                    Route::get('export',[CapitalizationController::class, 'export']);
+                    Route::post('create',[CapitalizationController::class, 'create'])->middleware('operation.access:capitalization,update');
+                    Route::get('approval/{id}',[CapitalizationController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [CapitalizationController::class, 'voidStatus'])->middleware('operation.access:capitalization,void');
+                    Route::post('destroy', [CapitalizationController::class, 'destroy'])->middleware('operation.access:capitalization,delete');
+                });
+
+                Route::prefix('retirement')->middleware('operation.access:retirement,view')->group(function () {
+                    Route::get('/',[RetirementController::class, 'index']);
+                    Route::get('datatable',[RetirementController::class, 'datatable']);
+                    Route::get('row_detail',[RetirementController::class, 'rowDetail']);
+                    Route::post('show', [RetirementController::class, 'show']);
+                    Route::post('print',[RetirementController::class, 'print']);
+                    Route::post('get_code',[RetirementController::class, 'getCode']);
+                    Route::get('export',[RetirementController::class, 'export']);
+                    Route::post('create',[RetirementController::class, 'create'])->middleware('operation.access:retirement,update');
+                    Route::get('approval/{id}',[RetirementController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [RetirementController::class, 'voidStatus'])->middleware('operation.access:retirement,void');
+                    Route::post('destroy', [RetirementController::class, 'destroy'])->middleware('operation.access:retirement,delete');
+                });
+            });
+
             Route::prefix('journal')->middleware('operation.access:journal,view')->group(function () {
                 Route::get('/',[JournalController::class, 'index']);
                 Route::get('datatable',[JournalController::class, 'datatable']);

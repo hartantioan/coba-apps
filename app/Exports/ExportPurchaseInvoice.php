@@ -37,6 +37,10 @@ class ExportPurchaseInvoice implements FromView
                             ->orWhere('downpayment', 'like', "%$this->search%")
                             ->orWhere('balance', 'like', "%$this->search%")
                             ->orWhere('note', 'like', "%$this->search%")
+                            ->orWhere('tax_no', 'like', "%$this->search%")
+                            ->orWhere('tax_cut_no', 'like', "%$this->search%")
+                            ->orWhere('spk_no', 'like', "%$this->search%")
+                            ->orWhere('invoice_no', 'like', "%$this->search%")
                             ->orWhereHas('user',function($query){
                                 $query->where('name','like',"%$this->search%")
                                     ->orWhere('employee_no','like',"%$this->search%");

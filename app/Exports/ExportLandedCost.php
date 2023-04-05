@@ -40,7 +40,8 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
         'KONVERSI',
         'CATATAN',
         'TOTAL',
-        'PAJAK',
+        'PPN',
+        'PPH',
         'GRANDTOTAL',
         'STATUS'
     ];
@@ -120,7 +121,8 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                 'konversi'      => $row->currency_rate,
                 'catatan'       => $row->note,
                 'total'         => $row->total,
-                'pajak'         => $row->tax,
+                'ppn'           => $row->tax,
+                'pph'           => $row->wtax,
                 'grandtotal'    => $row->grandtotal,
                 'status'        => $row->statusRaw()
             ];

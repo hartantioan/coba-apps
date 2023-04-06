@@ -82,7 +82,7 @@
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pabrik/Kantor</th>
                                                         <th rowspan="2">Departemen</th>
-                                                        <th rowspan="2">Supplier/Vendor</th>
+                                                        <th rowspan="2">Partner Bisnis</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
@@ -90,6 +90,10 @@
                                                         <th rowspan="2">Tipe Pembayaran</th>
                                                         <th rowspan="2">Rekening Penerima</th>
                                                         <th rowspan="2">Bank & No.Rek</th>
+                                                        <th rowspan="2">Total</th>
+                                                        <th rowspan="2">PPN</th>
+                                                        <th rowspan="2">PPH</th>
+                                                        <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
@@ -256,23 +260,29 @@
                                     <thead>
                                         <tr>
                                             <td>Total</td>
-                                            <td class="right-align"><span id="total">0,000</span></td>
+                                            <td class="right-align" colspan="2"><span id="total">0,000</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPN</td>
                                             <td class="right-align">
-                                                <input id="tax" name="tax" type="text" value="0,000" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                                                <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);count();" style="text-align:right;width:100px;margin-right: 20px;height: 2rem;"><span class="right" style="margin-top: 25px;">%</span>
+                                            </td>
+                                            <td class="right-align">
+                                                <input id="tax" name="tax" type="text" value="0,000" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>PPH</td>
                                             <td class="right-align">
-                                                <input id="wtax" name="wtax" type="text" value="0,000" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                                                <input id="percent_wtax" name="percent_wtax" type="text" value="0" onkeyup="formatRupiah(this);count();" style="text-align:right;width:100px;margin-right: 20px;height: 2rem;"><span class="right" style="margin-top: 25px;">%</span>
+                                            </td>
+                                            <td class="right-align">
+                                                <input id="wtax" name="wtax" type="text" value="0,000" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
-                                            <td class="right-align"><span id="grandtotal">0,000</span></td>
+                                            <td class="right-align" colspan="2"><span id="grandtotal">0,000</span></td>
                                         </tr>
                                     </thead>
                                 </table>
@@ -359,6 +369,7 @@
 
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
+            count();
         });
 
         select2ServerSide('#account_id', '{{ url("admin/select2/business_partner") }}');
@@ -374,14 +385,18 @@
     }
 
     function count(){
-        let totalall = 0, grandtotal = 0, tax = parseFloat($('#tax').val().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat($('#wtax').val().replaceAll(".", "").replaceAll(",","."));
+        let totalall = 0, grandtotal = 0, tax = 0, wtax = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), percent_wtax = parseFloat($('#percent_wtax').val().replaceAll(".", "").replaceAll(",","."));
         $('input[name^="arr_qty"]').each(function(index){
             let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), price = parseFloat($('input[name^="arr_price"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
             let total = qty * price;
             $('input[name^="arr_total"]').eq(index).val(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
             totalall += total;
         });
+        tax = totalall * (percent_tax / 100);
+        wtax = totalall * (percent_wtax / 100);
         grandtotal = totalall + tax - wtax;
+        $('#tax').val(formatRupiahIni(tax.toFixed(3).toString().replace('.',',')));
+        $('#wtax').val(formatRupiahIni(wtax.toFixed(3).toString().replace('.',',')));
         $('#total').text(formatRupiahIni(totalall.toFixed(3).toString().replace('.',',')));
         $('#grandtotal').text(formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',',')));
     }
@@ -471,6 +486,10 @@
                 { name: 'payment_type', className: 'center-align' },
                 { name: 'name_account', className: 'center-align' },
                 { name: 'no_account', className: 'center-align' },
+                { name: 'total', className: 'center-align' },
+                { name: 'tax', className: 'center-align' },
+                { name: 'wtax', className: 'center-align' },
+                { name: 'grandtotal', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -595,7 +614,7 @@
                     success: function(response) {
                         loadingClose('.modal-content');
                         if(response.status == 200) {
-                            success();
+                            /* success(); */
                             M.toast({
                                 html: response.message
                             });
@@ -674,13 +693,16 @@
                 $('#due_date').removeAttr('min');
                 $('#required_date').removeAttr('min');
                 $('#place_id').val(response.place_id).formSelect();
-
-                if(response.project_id){
-                    $('#project_id').empty();
-                    $('#project_id').append(`
-                        <option value="` + response.project_id + `">` + response.project_name + `</option>
-                    `);
-                }
+                $('#department_id').val(response.department_id).formSelect();
+                $('#termin_note').val(response.termin_note);
+                $('#payment_type').val(response.payment_type).formSelect();
+                $('#name_account').val(response.name_account);
+                $('#no_account').val(response.no_account);
+                $('#currency_id').val(response.currency_id).formSelect();
+                $('#currency_rate').val(response.currency_rate);
+                $('#account_id').empty().append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
+                `).trigger('change');
 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
@@ -692,22 +714,19 @@
                         $('#last-row-item').before(`
                             <tr class="row_item">
                                 <td>
-                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                    <input name="arr_item[]" type="text" placeholder="Keterangan Barang" value="` + val.item + `">
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this)">
+                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);count();">
                                 </td>
                                 <td class="center">
-                                    <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                    <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
+                                </td>>
+                                <td class="center">
+                                    <input type="text" id="arr_price` + count + `" name="arr_price[]" value="` + val.price + `" onkeyup="formatRupiah(this);count();" style="text-align:right;">
                                 </td>
-                                <td>
-                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `">
-                                </td>
-                                <td>
-                                    <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
-                                </td>
-                                <td>
-                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                <td class="center">
+                                    <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -716,20 +735,17 @@
                                 </td>
                             </tr>
                         `);
-                        $('#arr_item' + count).append(`
-                            <option value="` + val.item_id + `">` + val.item_name + `</option>
+                        $('#arr_unit' + count).append(`
+                            <option value="` + val.unit_id + `">` + val.unit_name + `</option>
                         `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-                        $('#arr_warehouse' + count).append(`
-                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
-                        `);
-                        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                        select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
                     });
                 }
                 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
+                count();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

@@ -83,16 +83,29 @@
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pabrik/Kantor</th>
+                                                        <th rowspan="2">Departemen</th>
+                                                        <th rowspan="2">Partner Bisnis</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
+                                                        <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
+                                                        <th rowspan="2">Termin</th>
+                                                        <th rowspan="2">Tipe Pembayaran</th>
+                                                        <th rowspan="2">Rekening Penerima</th>
+                                                        <th rowspan="2">Bank & No.Rek</th>
+                                                        <th rowspan="2">Total</th>
+                                                        <th rowspan="2">PPN</th>
+                                                        <th rowspan="2">PPH</th>
+                                                        <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
-                                                        <th rowspan="2">Operasi</th>
+                                                        <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
                                                         <th>Pengajuan</th>
                                                         <th>Kadaluwarsa</th>
                                                         <th>Pemakaian</th>
+                                                        <th>Kode</th>
+                                                        <th>Konversi</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -196,16 +209,28 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'name', className: 'center-align' },
+                { name: 'user_id', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
+                { name: 'department_id', className: 'center-align' },
+                { name: 'account_id', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_due', className: 'center-align' },
                 { name: 'date_use', className: 'center-align' },
-                { name: 'note', className: '' },
+                { name: 'currency_id', className: 'center-align' },
+                { name: 'currency_rate', className: 'center-align' },
+                { name: 'note', className: 'center-align' },
+                { name: 'termin_note', className: 'center-align' },
+                { name: 'payment_type', className: 'center-align' },
+                { name: 'name_account', className: 'center-align' },
+                { name: 'no_account', className: 'center-align' },
+                { name: 'total', className: 'center-align' },
+                { name: 'tax', className: 'center-align' },
+                { name: 'wtax', className: 'center-align' },
+                { name: 'grandtotal', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [

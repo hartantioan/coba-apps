@@ -30,7 +30,8 @@ use App\Http\Controllers\MasterData\UnitController;
 use App\Http\Controllers\MasterData\BankController;
 use App\Http\Controllers\MasterData\ProjectController;
 
-use App\Http\Controllers\Personal\FundRequestController;
+use App\Http\Controllers\Finance\FundRequestController;
+use App\Http\Controllers\Finance\PaymentRequestController;
 
 use App\Http\Controllers\Purchase\PurchaseRequestController;
 use App\Http\Controllers\Purchase\PurchaseOrderController;
@@ -596,6 +597,33 @@ Route::prefix('admin')->group(function () {
                 Route::get('approval/{id}',[GoodReceiptPOController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                 Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
+            });
+        });
+
+        Route::prefix('finance')->middleware('direct.access')->group(function () {
+            Route::prefix('fund_request')->middleware('operation.access:fund_request,view')->group(function () {
+                Route::get('/',[FundRequestController::class, 'index']);
+                Route::get('datatable',[FundRequestController::class, 'datatable']);
+                Route::get('row_detail',[FundRequestController::class, 'rowDetail']);
+                Route::post('show', [FundRequestController::class, 'show']);
+                Route::post('print',[FundRequestController::class, 'print']);
+                Route::get('export',[FundRequestController::class, 'export']);
+                Route::post('create',[FundRequestController::class, 'create'])->middleware('operation.access:fund_request,update');
+                Route::post('void_status', [FundRequestController::class, 'voidStatus'])->middleware('operation.access:fund_request,void');
+                Route::get('approval/{id}',[FundRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+            });
+
+            Route::prefix('payment_request')->middleware('operation.access:payment_request,view')->group(function () {
+                Route::get('/',[PaymentRequestController::class, 'index']);
+                Route::post('get_fund_request', [PaymentRequestController::class, 'getFundRequest']);
+                Route::get('datatable',[PaymentRequestController::class, 'datatable']);
+                Route::get('row_detail',[PaymentRequestController::class, 'rowDetail']);
+                Route::post('show', [PaymentRequestController::class, 'show']);
+                Route::post('print',[PaymentRequestController::class, 'print']);
+                Route::get('export',[PaymentRequestController::class, 'export']);
+                Route::post('create',[PaymentRequestController::class, 'voidStatus'])->middleware('operation.access:payment_request,void');
+                Route::get('approval/{id}',[PaymentRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('destroy', [PaymentRequestController::class, 'destroy'])->middleware('operation.access:payment_request,delete');
             });
         });
 

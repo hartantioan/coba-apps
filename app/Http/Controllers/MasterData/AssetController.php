@@ -286,6 +286,7 @@ class AssetController extends Controller
             Excel::import(new ImportAsset, $request->file('file'));
 
             return response()->json(['message' => 'Import successful!']);
+            
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
 
@@ -308,7 +309,6 @@ class AssetController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => "Data failed to save"
-                //'Data failed to save.'
             ];
             return response()->json($response);
         }

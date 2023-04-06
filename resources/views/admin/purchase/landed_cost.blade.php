@@ -227,6 +227,7 @@
                             <div class="input-field col m3 s12">
                                 <input id="pretotal" name="pretotal" type="text" value="0,000" onkeyup="formatRupiah(this);countEach();">
                                 <label class="active" for="pretotal">Nominal Input (Sebelum pajak)</label>
+                                <small class="errorTxt1"><div class="error">Isi disini untuk memulai.</div></small>
                             </div>
                             <div class="col m12 s12">
                                 <h5>PPN</h5>
@@ -306,7 +307,7 @@
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Harga per Produk</h4>
-                                    <h6 class="center">Perhitungan otomatis akan didasarkan pada satuan stok/produksi (UOM) dan dihitung berdasarkan harga landed cost sebelum pajak. Silahkan masukkan nilai *Total*. Anda juga bisa memasukkan data nominal per barang secara langsung.</h6>
+                                    <h6 class="center">Perhitungan otomatis akan didasarkan pada satuan stok/produksi (UOM) dan dihitung berdasarkan harga landed cost sebelum pajak. Silahkan masukkan nilai *Nominal Input (Sebelum pajak)* untuk memulai. Anda juga bisa memasukkan data nominal per barang secara langsung.</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered">
                                             <thead>

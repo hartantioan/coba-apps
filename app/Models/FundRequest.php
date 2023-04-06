@@ -156,7 +156,7 @@ class FundRequest extends Model
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
+        $source = ApprovalSource::where('lookable_type','fund_requests')->where('lookable_id',$this->id)->whereHas('approvalMatrix')->first();
         if($source){
             return $source;
         }else{

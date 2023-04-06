@@ -26,7 +26,6 @@ return new class extends Migration
             $table->double('percent_tax')->nullable();
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
-            $table->date('document_date')->nullable();
             $table->char('status', 1)->nullable();
             $table->char('type', 1)->nullable();
             $table->bigInteger('currency_id')->nullable();

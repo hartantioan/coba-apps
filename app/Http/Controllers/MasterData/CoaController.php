@@ -182,13 +182,14 @@ class CoaController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'code' 				=> $request->temp ? ['required', Rule::unique('coas', 'code')->ignore($request->temp)] : 'required|unique:coas,code',
+			/* 'code' 				=> $request->temp ? ['required', Rule::unique('coas', 'code')->ignore($request->temp)] : 'required|unique:coas,code', */
+            'code'              => 'required',
             'name'              => 'required',
             'company_id'        => 'required',
 			'level'		        => 'required',
 		], [
 			'code.required' 	    => 'Kode tidak boleh kosong.',
-            'code.unique' 	        => 'Kode telah terpakai.',
+            /* 'code.unique' 	        => 'Kode telah terpakai.', */
 			'name.required' 	    => 'Nama tidak boleh kosong.',
             'company_id.required'   => 'Perusahaan tidak boleh kosong.',
 			'level.required'	    => 'Level tidak boleh kosong.',

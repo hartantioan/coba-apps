@@ -108,6 +108,7 @@ Route::prefix('admin')->group(function () {
             Route::get('business_partner', [Select2Controller::class, 'businessPartner']);
             Route::get('asset', [Select2Controller::class, 'asset']);
             Route::get('unit', [Select2Controller::class, 'unit']);
+            Route::get('coa_cash_bank', [Select2Controller::class, 'coaCashBank']);
         });
 
         Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -615,13 +616,15 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('payment_request')->middleware('operation.access:payment_request,view')->group(function () {
                 Route::get('/',[PaymentRequestController::class, 'index']);
-                Route::post('get_fund_request', [PaymentRequestController::class, 'getFundRequest']);
+                Route::post('get_account_data', [PaymentRequestController::class, 'getAccountData']);
                 Route::get('datatable',[PaymentRequestController::class, 'datatable']);
                 Route::get('row_detail',[PaymentRequestController::class, 'rowDetail']);
                 Route::post('show', [PaymentRequestController::class, 'show']);
                 Route::post('print',[PaymentRequestController::class, 'print']);
                 Route::get('export',[PaymentRequestController::class, 'export']);
-                Route::post('create',[PaymentRequestController::class, 'voidStatus'])->middleware('operation.access:payment_request,void');
+                Route::post('remove_used_data', [PaymentRequestController::class, 'removeUsedData']);
+                Route::post('create',[PaymentRequestController::class, 'create'])->middleware('operation.access:payment_request,update');
+                Route::post('void_status', [PaymentRequestController::class, 'voidStatus'])->middleware('operation.access:payment_request,void');
                 Route::get('approval/{id}',[PaymentRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('destroy', [PaymentRequestController::class, 'destroy'])->middleware('operation.access:payment_request,delete');
             });

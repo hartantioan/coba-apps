@@ -37,7 +37,8 @@ class AppServiceProvider extends ServiceProvider
             'journals'                  => 'App\Models\Journal',
             'capitalizations'           => 'App\Models\Capitalization',
             'retirements'               => 'App\Models\Retirement',
-            'fund_requests'             => 'App\Models\FundRequest'
+            'fund_requests'             => 'App\Models\FundRequest',
+            'payment_requests'          => 'App\Models\PaymentRequest'
         ]);
     }
 }

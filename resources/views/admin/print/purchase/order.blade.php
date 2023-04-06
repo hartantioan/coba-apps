@@ -133,7 +133,7 @@
                         <th rowspan="2">PO NO.</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Supplier</th>
-						<th colspan="3">Tanggal</th>
+						<th colspan="2">Tanggal</th>
 						<th colspan="3">Penerima</th>
                         <th rowspan="2">Dok.Ref</th>
                         <th rowspan="2">Dok.Att</th>
@@ -152,7 +152,6 @@
                     <tr align="center">
 						<th>Pengajuan</th>
 						<th>Kirim</th>
-                        <th>Dokumen</th>
 						<th>Nama</th>
 						<th>Alamat</th>
                         <th>Telepon</th>
@@ -171,7 +170,6 @@
 							<td>{{ $row->supplier->name }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->delivery_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
 							<td>{{ $row->receiver_name }}</td>
                             <td>{{ $row->receiver_address }}</td>
                             <td>{{ $row->receiver_phone }}</td>

@@ -78,7 +78,6 @@ class PurchaseDownPaymentController extends Controller
             'document',
             'post_date',
             'due_date',
-            'document_date',
             'currency_id',
             'currency_rate',
             'note',
@@ -103,7 +102,6 @@ class PurchaseDownPaymentController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
@@ -171,7 +169,6 @@ class PurchaseDownPaymentController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
@@ -248,7 +245,6 @@ class PurchaseDownPaymentController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->due_date)),
-                    date('d M Y',strtotime($val->document_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
@@ -291,7 +287,6 @@ class PurchaseDownPaymentController extends Controller
             'department_id'             => 'required',
             'post_date'                 => 'required',
             'due_date'                  => 'required',
-            'document_date'             => 'required',
             'currency_id'               => 'required',
             'currency_rate'             => 'required',
             'subtotal'                  => 'required',
@@ -302,7 +297,6 @@ class PurchaseDownPaymentController extends Controller
             'department_id.required'            => 'Departemen tidak boleh kosong.',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
-            'document_date.required'            => 'Tgl dokumen tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
 		]);
@@ -375,7 +369,6 @@ class PurchaseDownPaymentController extends Controller
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
-                        $query->document_date = $request->document_date;
                         $query->note = $request->note;
                         $query->subtotal = round($subtotal,3);
                         $query->discount = $discount;
@@ -417,7 +410,6 @@ class PurchaseDownPaymentController extends Controller
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'post_date'                 => $request->post_date,
                         'due_date'                  => $request->due_date,
-                        'document_date'             => $request->document_date,
                         'note'                      => $request->note,
                         'subtotal'                  => round($subtotal,3),
                         'discount'                  => $discount,
@@ -697,7 +689,6 @@ class PurchaseDownPaymentController extends Controller
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('post_date', 'like', "%$request->search%")
                             ->orWhere('due_date', 'like', "%$request->search%")
-                            ->orWhere('document_date', 'like', "%$request->search%")
                             ->orWhere('grandtotal', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
                             ->orWhereHas('purchaseDownPaymentDetail',function($query) use($request){

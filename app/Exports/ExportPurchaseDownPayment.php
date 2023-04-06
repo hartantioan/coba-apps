@@ -37,7 +37,6 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
         'SUPPLIER',
         'TGL.POST',
         'TGL.TENGGAT',
-        'TGL.DOKUMEN',
         'TIPE',
         'MATA UANG',
         'KONVERSI',
@@ -58,7 +57,6 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
                     $query->where('code', 'like', "%$this->search%")
                         ->orWhere('post_date', 'like', "%$this->search%")
                         ->orWhere('due_date', 'like', "%$this->search%")
-                        ->orWhere('document_date', 'like', "%$this->search%")
                         ->orWhere('grandtotal', 'like', "%$this->search%")
                         ->orWhere('note', 'like', "%$this->search%")
                         ->orWhereHas('purchaseDownPaymentDetail',function($query){
@@ -123,7 +121,6 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
                 'supplier'      => $row->supplier->name,
                 'post_date'     => $row->post_date,
                 'due_date'      => $row->due_date,
-                'document_date' => $row->document_date,
                 'tipe'          => $row->type(),
                 'currency'      => $row->currency->code,
                 'convert'       => $row->currency_rate,

@@ -8,46 +8,35 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class PurchaseOrder extends Model
+class PaymentRequest extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'purchase_orders';
+    protected $table = 'payment_requests';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
         'account_id',
-        'purchasing_type',
-        'shipping_type',
         'place_id',
-        'department_id',
-        'is_tax',
-        'is_include_tax',
-        'document_no',
-        'document_po',
-        'percent_tax',
-        'payment_type',
-        'payment_term',
+        'coa_source_id',
+        'post_date',
+        'due_date',
+        'pay_date',
         'currency_id',
         'currency_rate',
-        'post_date',
-        'delivery_date',
-        'note',
-        'subtotal',
-        'discount',
-        'total',
-        'tax',
-        'wtax',
+        'admin',
         'grandtotal',
+        'document',
+        'account_bank',
+        'account_no',
+        'account_name',
+        'note',
         'status',
         'void_id',
         'void_note',
         'void_date',
-        'receiver_name',
-        'receiver_address',
-        'receiver_phone'
     ];
 
     public function user()
@@ -60,72 +49,8 @@ class PurchaseOrder extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function supplier(){
+    public function account(){
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
-    }
-
-    public function purchasingType(){
-        $type = match ($this->purchasing_type) {
-          '1' => 'Standart PO',
-          '2' => 'Planned PO',
-          '3' => 'Blanked PO',
-          '4' => 'Contract PO',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function paymentType(){
-        $type = match ($this->payment_type) {
-          '1' => 'Cash',
-          '2' => 'Credit',
-          '3' => 'CBD',
-          '4' => 'DP',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function shippingType(){
-        $type = match ($this->shipping_type) {
-          '1' => 'Franco',
-          '2' => 'Loco',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function isIncludeTax(){
-        $type = match ($this->is_include_tax) {
-          '0' => 'Tidak',
-          '1' => 'Termasuk',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function isTax(){
-        $type = match ($this->is_tax) {
-          NULL => 'Tidak',
-          '1' => 'Ya',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function place()
-    {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function department()
-    {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
     public function currency()
@@ -133,13 +58,23 @@ class PurchaseOrder extends Model
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
-    public function purchaseOrderDetail()
+    public function place()
     {
-        return $this->hasMany('App\Models\PurchaseOrderDetail');
+        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function coaSource()
+    {
+        return $this->belongsTo('App\Models\Coa', 'coa_source_id', 'id')->withTrashed();
     }
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function paymentRequestDetail()
+    {
+        return $this->hasMany('App\Models\PaymentRequestDetail');
     }
 
     public function status(){
@@ -170,24 +105,24 @@ class PurchaseOrder extends Model
 
     public function attachment() 
     {
-        if($this->document_po !== NULL && Storage::exists($this->document_po)) {
-            $document_po = asset(Storage::url($this->document_po));
+        if($this->document !== NULL && Storage::exists($this->document)) {
+            $document = asset(Storage::url($this->document));
         } else {
-            $document_po = asset('website/empty.png');
+            $document = asset('website/empty.png');
         }
 
-        return $document_po;
+        return $document;
     }
 
     public function deleteFile(){
-		if(Storage::exists($this->document_po)) {
-            Storage::delete($this->document_po);
+		if(Storage::exists($this->document)) {
+            Storage::delete($this->document);
         }
 	}
 
     public static function generateCode()
     {
-        $query = PurchaseOrder::selectRaw('RIGHT(code, 9) as code')
+        $query = PaymentRequest::selectRaw('RIGHT(code, 9) as code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();
@@ -200,13 +135,13 @@ class PurchaseOrder extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'PO-'.date('y').date('m').date('d').'-';
+        $pre = 'PYR-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type','purchase_orders')->where('lookable_id',$this->id)->first();
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->first();
         if($source){
             return $source;
         }else{
@@ -225,20 +160,6 @@ class PurchaseOrder extends Model
             return $html;
         }else{
             return '';
-        }
-    }
-
-    public function hasBalance(){
-        $qty = 0;
-
-        foreach($this->purchaseOrderDetail as $row){
-            $qty += $row->getBalanceReceipt();
-        }
-
-        if($qty > 0){
-            return true;
-        }else{
-            return false;
         }
     }
 }

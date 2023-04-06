@@ -26,7 +26,6 @@ class PurchaseDownPayment extends Model
         'percent_tax',
         'post_date',
         'due_date',
-        'document_date',
         'status',
         'type',
         'currency_id',

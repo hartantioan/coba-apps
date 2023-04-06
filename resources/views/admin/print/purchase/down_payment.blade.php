@@ -133,7 +133,7 @@
                         <th rowspan="2">PODP NO.</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Supplier</th>
-						<th colspan="3">Tanggal</th>
+						<th colspan="2">Tanggal</th>
                         <th rowspan="2">Lampiran</th>
                         <th rowspan="2">Pembayaran</th>
                         <th colspan="2">Mata Uang</th>
@@ -148,7 +148,6 @@
                     <tr align="center">
 						<th>Pengajuan</th>
 						<th>Tenggat</th>
-                        <th>Dokumen</th>
                         <th>Kode</th>
                         <th>Konversi</th>
 					</tr>
@@ -162,7 +161,6 @@
 							<td>{{ $row->supplier->name }}</td>
 							<td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
 							<td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
-							<td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
 							<td><a href="{{ $row->attachment() }}">File</a></td>
 							<td>{{ $row->type() }}</td>
 							<td>{{ $row->currency->symbol }}</td>

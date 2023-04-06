@@ -1,0 +1,512 @@
+<?php
+
+namespace App\Http\Controllers\Finance;
+use App\Http\Controllers\Controller;
+use App\Models\PaymentRequest;
+use App\Models\PaymentRequestDetail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\FundRequest;
+use App\Models\FundRequestDetail;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseInvoiceDetail;
+use App\Models\PurchaseDownPayment;
+use App\Models\PurchaseDownPaymentDetail;
+use App\Models\Currency;
+use App\Models\ItemCogs;
+use App\Helpers\CustomHelper;
+use App\Exports\ExportPaymentRequest;
+use App\Models\Place;
+use App\Models\User;
+use App\Models\Department;
+
+class PaymentRequestController extends Controller
+{
+
+    protected $dataplaces;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user->userPlaceArray();
+    }
+    public function index()
+    {
+        $data = [
+            'title'         => 'Permintaan Pembayaran',
+            'content'       => 'admin.finance.payment_request',
+            'currency'      => Currency::where('status','1')->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+        ];
+
+        return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function datatable(Request $request){
+        $column = [
+            'id',
+            'code',
+            'user_id',
+            'account_id',
+            'place_id',
+            'coa_source_id',
+            'post_date',
+            'due_date',
+            'pay_date',
+            'currency_id',
+            'currency_rate',
+            'total',
+            'wtax',
+            'tax',
+            'grandtotal',
+            'pay',
+            'admin',
+            'document',
+            'account_bank',
+            'account_no',
+            'account_name',
+            'note',
+        ];
+
+        $start  = $request->start;
+        $length = $request->length;
+        $order  = $column[$request->input('order.0.column')];
+        $dir    = $request->input('order.0.dir');
+        $search = $request->input('search.value');
+
+        $total_data = PaymentRequest::whereIn('place_id',$this->dataplaces)->count();
+        
+        $query_data = PaymentRequest::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('total', 'like', "%$search%")
+                            ->orWhere('tax', 'like', "%$search%")
+                            ->orWhere('wtax', 'like', "%$search%")
+                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('pay', 'like', "%$search%")
+                            ->orWhere('admin', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('account_bank', 'like', "%$search%")
+                            ->orWhere('account_no', 'like', "%$search%")
+                            ->orWhere('account_name', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('paymentRequestDetail',function($query) use($search, $request){
+                                $query->whereHas('fundRequest',function($query) use($search, $request){
+                                    $query->where('code','like',"%$search%");
+                                })->orWhereHas('purchaseDownPayment',function($query) use($search, $request){
+                                    $query->where('code','like',"%$search%");
+                                })->orWhereHas('purchaseInvoice',function($query) use($search, $request){
+                                    $query->where('code','like',"%$search%");
+                                });
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
+                if($request->account_id){
+                    $query->whereIn('account_id',$request->account_id);
+                }
+
+                if($request->currency_id){
+                    $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if($request->place_id){
+                    $query->where('place_id',$request->place_id);
+                }
+            })
+            ->whereIn('place_id',$this->dataplaces)
+            ->offset($start)
+            ->limit($length)
+            ->orderBy($order, $dir)
+            ->get();
+
+        $total_filtered = PurchaseInvoice::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('total', 'like', "%$search%")
+                            ->orWhere('tax', 'like', "%$search%")
+                            ->orWhere('wtax', 'like', "%$search%")
+                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('pay', 'like', "%$search%")
+                            ->orWhere('admin', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('account_bank', 'like', "%$search%")
+                            ->orWhere('account_no', 'like', "%$search%")
+                            ->orWhere('account_name', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('paymentRequestDetail',function($query) use($search, $request){
+                                $query->whereHas('fundRequest',function($query) use($search, $request){
+                                    $query->where('code','like',"%$search%");
+                                })->orWhereHas('purchaseDownPayment',function($query) use($search, $request){
+                                    $query->where('code','like',"%$search%");
+                                })->orWhereHas('purchaseInvoice',function($query) use($search, $request){
+                                    $query->where('code','like',"%$search%");
+                                });
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
+                if($request->account_id){
+                    $query->whereIn('account_id',$request->account_id);
+                }
+
+                if($request->currency_id){
+                    $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if($request->place_id){
+                    $query->where('place_id',$request->place_id);
+                }
+            })
+            ->whereIn('place_id',$this->dataplaces)
+            ->count();
+
+        $response['data'] = [];
+        if($query_data <> FALSE) {
+            $nomor = $start + 1;
+            foreach($query_data as $val) {
+                $response['data'][] = [
+                    '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
+                    $val->code,
+                    $val->user->name,
+                    $val->account->name,
+                    $val->place->name.' - '.$val->place->company->name,
+                    $val->coaSource->name,
+                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/y',strtotime($val->due_date)),
+                    date('d/m/y',strtotime($val->pay_date)),
+                    $val->currency->code,
+                    number_format($val->currency_rate,2,',','.'),
+                    number_format($val->total,3,',','.'),
+                    number_format($val->tax,3,',','.'),
+                    number_format($val->wtax,3,',','.'),
+                    number_format($val->grandtotal,3,',','.'),
+                    number_format($val->pay,3,',','.'),
+                    number_format($val->admin,3,',','.'),
+                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    $val->account_bank,
+                    $val->account_no,
+                    $val->account_name,
+                    $val->note,
+                    $val->status(),
+                    '
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
+					'
+                ];
+
+                $nomor++;
+            }
+        }
+
+        $response['recordsTotal'] = 0;
+        if($total_data <> FALSE) {
+            $response['recordsTotal'] = $total_data;
+        }
+
+        $response['recordsFiltered'] = 0;
+        if($total_filtered <> FALSE) {
+            $response['recordsFiltered'] = $total_filtered;
+        }
+
+        return response()->json($response);
+    }
+
+    public function getAccountData(Request $request){
+        $data = User::find($request->id);
+
+        $banks = [];
+        $details = [];
+
+        if($data){
+            foreach($data->userBank()->orderByDesc('is_default')->get() as $row){
+                $banks[] = [
+                    'bank_id'   => $row->bank_id,
+                    'name'      => $row->name,
+                    'bank_name' => $row->bank->name,
+                    'no'        => $row->no,
+                ];
+            }
+
+            foreach($data->fundRequest as $row){
+                if(!$row->used()->exists()){
+                    CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
+                    $details[] = [
+                        'id'            => $row->id,
+                        'type'          => 'fund_requests',
+                        'code'          => CustomHelper::encrypt($row->code),
+                        'rawcode'       => $row->code,
+                        'post_date'     => $row->post_date,
+                        'due_date'      => $row->due_date,
+                        'place_id'      => $row->place_id,
+                        'total'         => number_format($row->total,3,',','.'),
+                        'tax'           => number_format($row->tax,3,',','.'),
+                        'wtax'          => number_format($row->wtax,3,',','.'),
+                        'grandtotal'    => number_format($row->grandtotal,3,',','.'),
+                        'balance'       => '0,000'
+                    ];
+                }
+            }
+
+            foreach($data->purchaseDownPayment as $row){
+                if(!$row->used()->exists()){
+                    CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
+                    $details[] = [
+                        'id'            => $row->id,
+                        'type'          => 'purchase_down_payments',
+                        'code'          => CustomHelper::encrypt($row->code),
+                        'rawcode'       => $row->code,
+                        'post_date'     => $row->post_date,
+                        'due_date'      => $row->due_date,
+                        'place_id'      => $row->place_id,
+                        'total'         => number_format($row->total,3,',','.'),
+                        'tax'           => number_format($row->tax,3,',','.'),
+                        'wtax'          => number_format($row->wtax,3,',','.'),
+                        'grandtotal'    => number_format($row->grandtotal,3,',','.'),
+                        'balance'       => '0,000'
+                    ];
+                }
+            }
+
+            foreach($data->purchaseInvoice as $row){
+                if(!$row->used()->exists()){
+                    CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
+                    $details[] = [
+                        'id'            => $row->id,
+                        'type'          => 'purchase_invoices',
+                        'code'          => CustomHelper::encrypt($row->code),
+                        'rawcode'       => $row->code,
+                        'post_date'     => $row->post_date,
+                        'due_date'      => $row->due_date,
+                        'place_id'      => $row->place_id,
+                        'total'         => number_format($row->total,3,',','.'),
+                        'tax'           => number_format($row->tax,3,',','.'),
+                        'wtax'          => number_format($row->wtax,3,',','.'),
+                        'grandtotal'    => number_format($row->grandtotal,3,',','.'),
+                        'balance'       => number_format($row->balance,3,',','.'),
+                    ];
+                }
+            }
+        }
+
+        $data['banks'] = $banks;
+        $data['details'] = $details;
+
+        return response()->json($data);
+    }
+
+    public function create(Request $request){
+        $validation = Validator::make($request->all(), [
+			'account_id' 			=> 'required',
+            'place_id'              => 'required',
+            'coa_source_id'         => 'required',
+            'post_date'             => 'required',
+            'due_date'              => 'required',
+            'pay_date'              => 'required',
+            'currency_id'           => 'required',
+            'currency_rate'         => 'required',
+            'admin'                 => 'required',
+            'grandtotal'            => 'required',
+            'arr_type'              => 'required|array',
+            'arr_code'              => 'required|array',
+            'arr_pay'               => 'required|array',
+		], [
+			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
+            'place_id.required'                 => 'Penempatan pabrik/kantor tidak boleh kosong.',
+            'coa_source_id.required'            => 'Kas/Bank tidak boleh kosong.',
+            'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
+            'due_date.required'                 => 'Tanggal tenggat tidak boleh kosong.',
+            'pay_date.required'                 => 'Tanggal bayar tidak boleh kosong.',
+            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+            'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
+            'admin.required'                    => 'Biaya admin tidak boleh kosong, minimal 0.',
+            'grandtotal.required'               => 'Total bayar tidak boleh kosong.',
+            'arr_type.required'                 => 'Tipe dokumen tidak boleh kosong.',
+            'arr_type.array'                    => 'Tipe dokumen harus dalam bentuk array.',
+            'arr_code.required'                 => 'Kode tidak boleh kosong.',
+            'arr_code.array'                    => 'Kode harus dalam bentuk array.',
+            'arr_pay.required'                  => 'Baris bayar tidak boleh kosong.',
+            'arr_pay.array'                     => 'Baris bayar harus dalam bentuk array.',
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            
+			if($request->temp){
+                DB::beginTransaction();
+                try {
+                    $query = PaymentRequest::where('code',CustomHelper::decrypt($request->temp))->first();
+
+                    if($query->approval()){
+                        foreach($query->approval()->approvalMatrix as $row){
+                            if($row->status == '2'){
+                                return response()->json([
+                                    'status'  => 500,
+                                    'message' => 'Purchase Order Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
+                                ]);
+                            }
+                        }
+                    }
+
+                    if($query->status == '1'){
+
+                        if($request->has('document')) {
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
+                            }
+                            $document = $request->file('document')->store('public/payment_requests');
+                        } else {
+                            $document = $query->document;
+                        }
+
+                        $query->user_id = session('bo_id');
+                        $query->account_id = $request->account_id;
+                        $query->place_id = $request->place_id;
+                        $query->post_date = $request->post_date;
+                        $query->due_date = $request->due_date;
+                        $query->pay_date = $request->pay_date;
+                        $query->currency_id = $request->currency_id;
+                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
+                        $query->admin = str_replace(',','.',str_replace('.','',$request->admin));
+                        $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                        $query->document = $document;
+                        $query->account_bank = $request->account_bank;
+                        $query->account_no = $request->account_no;
+                        $query->account_name = $request->account_name;
+                        $query->note = $request->note;
+
+                        $query->save();
+
+                        foreach($query->paymentRequestDetail as $row){
+                            $row->delete();
+                        }
+
+                        DB::commit();
+                    }else{
+                        return response()->json([
+                            'status'  => 500,
+					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}else{
+                DB::beginTransaction();
+                try {
+                    $query = PaymentRequest::create([
+                        'code'			            => PaymentRequest::generateCode(),
+                        'user_id'		            => session('bo_id'),
+                        'account_id'                => $request->account_id,
+                        'place_id'                  => $request->place_id,
+                        'coa_source_id'             => $request->coa_source_id,
+                        'post_date'                 => $request->post_date,
+                        'due_date'                  => $request->due_date,
+                        'pay_date'                  => $request->pay_date,
+                        'currency_id'               => $request->currency_id,
+                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
+                        'admin'                     => str_replace(',','.',str_replace('.','',$request->admin)),
+                        'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
+                        'document'                  => $request->file('document') ? $request->file('document')->store('public/payment_requests') : NULL,
+                        'account_bank'              => $request->account_bank,
+                        'account_no'                => $request->account_no,
+                        'account_name'              => $request->account_name,
+                        'note'                      => $request->note,
+                        'status'                    => '1',
+                    ]);
+
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}
+			
+			if($query) {
+                
+                if($request->arr_type){
+                    DB::beginTransaction();
+                    try {
+                        foreach($request->arr_type as $key => $row){
+                            PaymentRequestDetail::create([
+                                'payment_request_id'            => $query->id,
+                                'fund_request_id'               => $row == 'fund_requests' ? FundRequest::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
+                                'purchase_down_payment_id'      => $row == 'purchase_down_payments' ? PurchaseDownPayment::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
+                                'purchase_invoice_id'           => $row == 'purchase_invoices' ? PurchaseInvoice::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
+                                'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
+                                'note'                          => $request->arr_note[$key]
+                            ]);
+                        }
+                        DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
+                    }
+                }
+
+                CustomHelper::sendApproval('payment_requests',$query->id,$query->note);
+                CustomHelper::sendNotification('payment_requests',$query->id,'Permintaan Pembayaran No. '.$query->code,$query->note,session('bo_id'));
+
+                activity()
+                    ->performedOn(new PaymentRequest())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit payment request.');
+
+				$response = [
+					'status'    => 200,
+					'message'   => 'Data successfully saved.',
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+		
+		return response()->json($response);
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->table,$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
+    }
+}

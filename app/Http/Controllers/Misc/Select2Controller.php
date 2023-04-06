@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Misc;
 
 use App\Models\Region;
+use App\Models\Place;
 use App\Models\Warehouse;
 use App\Models\Country;
 use App\Models\Item;
@@ -148,7 +149,8 @@ class Select2Controller extends Controller {
     }
 
     public function coa(Request $request)
-    {
+    {   
+        $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
         $response = [];
         $search   = $request->search;
         $data = Coa::where(function($query) use($search){
@@ -156,12 +158,38 @@ class Select2Controller extends Controller {
                     ->orWhere('name', 'like', "%$search%");
                 /* })->whereDoesntHave('childSub') */
                  })->where('level',5)
-                ->where('status','1')->get();
+                ->where('status','1')
+                ->whereIn('company_id',$arrCompany)
+                ->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function coaCashBank(Request $request)
+    {
+        $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
+        $response = [];
+        $search   = $request->search;
+        $data = Coa::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                 })->where('level',5)
+                ->where('status','1')
+                ->whereIn('company_id',$arrCompany)
+                ->where('code','like',"100.01.01%")
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name.' - '.$d->company->name,
             ];
         }
 

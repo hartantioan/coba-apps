@@ -11,8 +11,8 @@
         padding: 5px !important;
     }
 
-    .switch {
-        height: 3.45rem !important;
+    .browser-default {
+        height: 2rem !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -73,62 +73,20 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_type" style="font-size:1rem;">Tipe :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_type" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Cash</option>
-                                                        <option value="2">Transfer</option>
-                                                        <option value="3">Giro/Check</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_place" style="font-size:1rem;">Pabrik/Kantor :</label>
+                                                <label for="filter_place" style="font-size:1rem;">Pabrik :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_place" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
-                                                        @foreach ($place as $row)
-                                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->company->name }}</option>
+                                                        @foreach ($place as $rowplace)
+                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_department" style="font-size:1rem;">Departemen :</label>
+                                                <label for="filter_account" style="font-size:1rem;">Partner Bisnis :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_department" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        @foreach ($department as $rowdepartment)
-                                                            <option value="{{ $rowdepartment->id }}">{{ $rowdepartment->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_is_tax" style="font-size:1rem;">Ber-PPN? :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_is_tax" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Ya</option>
-                                                        <option value="2">Tidak</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_is_include_ppn" style="font-size:1rem;">Termasuk PPN? :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_is_include_ppn" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Ya</option>
-                                                        <option value="0">Tidak</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_supplier" style="font-size:1rem;">Supplier :</label>
-                                                <div class="input-field">
-                                                    <select class="browser-default" id="filter_supplier" name="filter_supplier" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
+                                                    <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
@@ -164,29 +122,29 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
-                                                        <th rowspan="2">Supplier</th>
+                                                        <th rowspan="2">Partner Bisnis</th>
                                                         <th rowspan="2">Pabrik/Kantor</th>
-                                                        <th rowspan="2">Departemen</th>
-                                                        <th colspan="3" class="center-align">Pajak</th>
-                                                        <th rowspan="2">Tipe</th>
-                                                        <th rowspan="2">Dokumen</th>
-                                                        <th colspan="2" class="center-align">Tanggal</th>
+                                                        <th rowspan="2">Kas/Bank</th>
+                                                        <th colspan="3" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
-                                                        <th rowspan="2">Keterangan</th>
-                                                        <th rowspan="2">Subtotal</th>
-                                                        <th rowspan="2">Diskon</th>
                                                         <th rowspan="2">Total</th>
-                                                        <th rowspan="2">Pajak</th>
+                                                        <th rowspan="2">PPN</th>
+                                                        <th rowspan="2">PPH</th>
                                                         <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">Bayar</th>
+                                                        <th rowspan="2">Admin</th>
+                                                        <th rowspan="2">Dokumen</th>
+                                                        <th rowspan="2">Bank Rekening</th>
+                                                        <th rowspan="2">No Rekening</th>
+                                                        <th rowspan="2">Pemilik Rekening</th>
+                                                        <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>Ya/Tidak</th>
-                                                        <th>Termasuk</th>
-                                                        <th>Prosentase</th>
                                                         <th>Post</th>
                                                         <th>Tenggat</th>
+                                                        <th>Bayar</th>
                                                         <th>Kode</th>
                                                         <th>Konversi</th>
                                                     </tr>
@@ -219,42 +177,37 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getPurchaseOrder(this.value);"></select>
-                                <label class="active" for="supplier_id">Supplier</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="type" name="type">
-                                    <option value="1">Cash</option>
-                                    <option value="2">Transfer</option>
-                                    <option value="3">Giro/Check</option>
-                                </select>
-                                <label class="" for="type">Tipe</label>
+                                <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
+                                <label class="active" for="account_id">Partner Bisnis</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="place_id" name="place_id">
                                     <option value="">--Kosong--</option>
                                     @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="plant_id">Pabrik</label>
+                                <label class="" for="place_id">Pabrik/Kantor</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="department_id" name="department_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($department as $rowdepartment)
-                                        <option value="{{ $rowdepartment->id }}" {{ $rowdepartment->id == session('bo_department_id') ? 'selected' : '' }}>{{ $rowdepartment->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="department_id">Departemen</label>
+                                <select class="browser-default" id="coa_source_id" name="coa_source_id"></select>
+                                <label class="active" for="account_id">Kas / Bank</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
+                                <input id="top" name="top" min="0" type="number" value="0" readonly>
+                                <label class="active" for="top">TOP (hari) Autofill</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
                                 <label class="active" for="due_date">Tgl. Kadaluarsa</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="pay_date" name="pay_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar">
+                                <label class="active" for="pay_date">Tgl. Bayar</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -277,66 +230,57 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="input-field col m3 s12">
-                                <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
-                                <label class="active" for="percent_tax">Prosentase Tax</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <div class="switch mb-1">
-                                    <label class="active" for="is_tax">Ber-PPN?</label>
-                                    <label>
-                                        Tidak
-                                        <input type="checkbox" id="is_tax" name="is_tax" value="1" onclick="countAll();">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
+                            <div class="col m12">
+                                <h6>Rekening (Jika transfer)</h6>
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
+                                        <option value="">--Pilih Partner Bisnis-</option>
+                                    </select>
+                                    <label class="" for="user_bank_id">Pilih Dari Daftar</label>
                                 </div>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <div class="switch mb-1">
-                                    <label class="active" for="is_include_tax">Termasuk Pajak?</label>
-                                    <label>
-                                        Tidak
-                                        <input type="checkbox" id="is_include_tax" name="is_include_tax" value="1" onclick="countAll();">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
+                                <div class="input-field col m3 s12">
+                                    <input id="account_bank" name="account_bank" type="text" placeholder="Bank Tujuan">
+                                    <label class="active" for="account_bank">Bank Tujuan</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="account_no" name="account_no" type="text" placeholder="No Rekening Tujuan">
+                                    <label class="active" for="account_no">No Rekening</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="account_name" name="account_name" type="text" placeholder="Nama Pemilik Rekening">
+                                    <label class="active" for="account_name">Nama Pemilik Rekening</label>
                                 </div>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h4>Detail Purchase Order (Centang jika ada)</h4>
+                                    <h6>Detail Req. Dana / Uang Muka Pembelian / Invoice Pembelian</h6>
                                     <div style="overflow:auto;">
-                                        <table class="bordered">
+                                        <table class="bordered" style="max-width:1650px !important;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center">
+                                                    <th class="center" width="10%">
                                                         <label>
                                                             <input type="checkbox" onclick="chooseAll(this)">
                                                             <span>Semua</span>
                                                         </label>
                                                     </th>
-                                                    <th class="center">PO No.</th>
+                                                    <th class="center">Referensi</th>
                                                     <th class="center">Tgl.Post</th>
-                                                    <th class="center">Tgl.Kirim</th>
-                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Tgl.Tenggat</th>
                                                     <th class="center">Total</th>
-                                                    <th class="center">Uang Muka</th>
+                                                    <th class="center">PPN</th>
+                                                    <th class="center">PPH</th>
+                                                    <th class="center">Grandtotal</th>
+                                                    <th class="center">Bayar</th>
+                                                    <th class="center">Keterangan</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="body-purchase">
-                                                <tr id="empty-purchase">
-                                                    <td colspan="7" class="center">
-                                                        Pilih supplier untuk memulai...
+                                            <tbody id="body-detail">
+                                                <tr id="empty-detail">
+                                                    <td colspan="10" class="center">
+                                                        Pilih supplier/vendor untuk memulai...
                                                     </td>
                                                 </tr>
-                                                <!-- <tr id="last-row-purchase">
-                                                    <td colspan="8" class="center">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addPurchaseOrder()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Purchase Order
-                                                        </a>
-                                                    </td>
-                                                </tr> -->
                                             </tbody>
                                         </table>
                                     </div>
@@ -347,34 +291,22 @@
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m4 s12">
-
+                                <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
                             </div>
                             <div class="input-field col m4 s12">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
-                                            <td width="50%">Subtotal</td>
-                                            <td width="50%" class="right-align">
-                                                <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Discount</td>
+                                            <td>Biaya Admin</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="discount" name="discount" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <input class="browser-default" id="admin" name="admin" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Total</td>
-                                            <td class="right-align"><span id="total">0,000</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pajak</td>
-                                            <td class="right-align"><span id="tax">0,000</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><h6>Grandtotal</h6></td>
-                                            <td class="right-align"><h6><span id="grandtotal">0,000</span></h6></td>
+                                            <td>Total Bayar</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                            </td>
                                         </tr>
                                     </thead>
                                 </table>
@@ -448,12 +380,19 @@
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ date("Y-m-d") }}');
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
+                $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -462,16 +401,20 @@
                     $(this).remove();
                 });
                 M.updateTextFields();
-                $('#body-purchase').empty().append(`
-                    <tr id="empty-purchase">
-                        <td colspan="7" class="center">
-                            Pilih supplier untuk memulai...
+                $('#body-detail').empty().append(`
+                    <tr id="empty-detail">
+                        <td colspan="10" class="center">
+                            Pilih supplier/vendor untuk memulai...
                         </td>
                     </tr>
                 `);
-                $('#supplier_id').empty();
-                $('#total,#tax,#grandtotal').text('0,000');
-                $('#subtotal').val('0,000');
+                $('#account_id').empty();
+                $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
+                $('#subtotal,#discount,#downpayment').val('0,000');
+                $('#list-used-data').empty();
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -487,17 +430,28 @@
             }
         });
 
-        select2ServerSide('#supplier_id,#filter_supplier', '{{ url("admin/select2/supplier") }}');
+        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
+        select2ServerSide('#coa_source_id', '{{ url("admin/select2/coa_cash_bank") }}');
     });
 
-    function getPurchaseOrder(val){
-        if(val){
+    function getRekening(){
+        if($('#user_bank_id').val()){
+            $('#account_bank').val($('#user_bank_id').find(':selected').data('bank'));
+            $('#account_no').val($('#user_bank_id').find(':selected').data('no'));
+            $('#account_name').val($('#user_bank_id').find(':selected').data('name'));
+        }else{
+            $('#account_bank,#account_no,#account_name').val('');
+        }
+    }
+
+    function getAccountInfo(){
+        if($('#account_id').val()){
             $.ajax({
-                url: '{{ Request::url() }}/get_purchase_order',
+                url: '{{ Request::url() }}/get_account_data',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    supplier: val
+                    id: $('#account_id').val()
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -507,41 +461,90 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    
-                    if(response.length > 0){
-                        $('#empty-purchase').remove();
-                        $.each(response, function(i, val) {
+
+                    $('#body-detail').empty();
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
                             var count = makeid(10);
-                            $('#body-purchase').append(`
-                                <tr class="row_purchase">
+                            $('#list-used-data').append(`
+                                <div class="chip purple darken-4 gradient-shadow white-text">
+                                    ` + val.rawcode + `
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `)">close</i>
+                                </div>
+                            `);
+                            $('#body-detail').append(`
+                                <tr class="row_detail">
+                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                     <td class="center-align">
                                         <label>
-                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.po_code + `" onclick="countAll()" data-id="` + count + `">
+                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
                                             <span>Pilih</span>
                                         </label>
                                     </td>
                                     <td>
-                                        ` + val.po_no + `
+                                        ` + val.rawcode + `
                                     </td>
                                     <td class="center">
                                         ` + val.post_date + `
                                     </td>
                                     <td class="center">
-                                        ` + val.delivery_date + `
+                                        ` + val.due_date + `
                                     </td>
-                                    <td class="center">
-                                        <input name="arr_note[]" class="browser-default" type="text" value="-" style="width:100%;" id="rowNote` + count + `">
+                                    <td class="right-align">
+                                        ` + val.total + `
                                     </td>
-                                    <td class="center">
+                                    <td class="right-align">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="right-align" id="row_wtax` + count + `">
+                                        ` + val.wtax + `
+                                    </td>
+                                    <td class="right-align" id="row_grandtotal` + count + `">
                                         ` + val.grandtotal + `
                                     </td>
                                     <td class="center">
-                                        <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                        <input id="arr_pay` + count + `" name="arr_pay[]" class="browser-default" type="text" value=" `+ val.balance + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                    </td>
+                                    <td class="center">
+                                        <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;">
                                     </td>
                                 </tr>
                             `);
-                        });
+
+                            $('#place_id').val(val.place_id).formSelect();
+                        });                        
+                    }else{
+                        $('#body-detail').empty().append(`
+                            <tr id="empty-detail">
+                                <td colspan="10" class="center">
+                                    Pilih supplier/vendor untuk memulai...
+                                </td>
+                            </tr>
+                        `);
+
+                        $('#grandtotal,#admin').val('0,000');
                     }
+                    
+                    $('#user_bank_id').empty();
+                    if(response.banks.length > 0){
+                        $('#user_bank_id').append(`
+                            <option value="">--Pilih dari daftar-</option>
+                        `);
+                        $.each(response.banks, function(i, val) {
+                            $('#user_bank_id').append(`
+                                <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bank="` + val.bank_name + `" data-no="` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
+                            `);
+                        });                        
+                    }else{
+                        $('#user_bank_id').append(`
+                            <option value="">--Pilih Partner Bisnis-</option>
+                        `);
+                    }
+                    $('#user_bank_id').formSelect();
+
+                    $('#top').val(response.top);
+
+                    addDays();
                     
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
@@ -557,59 +560,33 @@
                 }
             });
         }else{
-            $('#body-purchase').append(`
-                <tr id="empty-purchase">
-                    <td colspan="7" class="center">
-                        Pilih supplier untuk memulai...
+            $('#body-detail').empty().append(`
+                <tr id="empty-detail">
+                    <td colspan="10" class="center">
+                        Pilih supplier/vendor untuk memulai...
                     </td>
                 </tr>
             `);
-            $('.row_purchase').each(function(){
-                $(this).remove();
-            });
+            $('#deposit').val('0,000');
+            $('#top').val('0');
+            $('#due_date').val('');
+            $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
         }
     }
 
     function countAll(){
-
-        let subtotal = 0, discount = 0, total = 0, tax = 0, grandtotal = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), ada = false;
-
+        var pay = 0, admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",","."));
+        
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
                 if($(element).is(':checked')){
-                    ada = true;
-                    subtotal += parseFloat($('#rowNominal' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
+                    pay += parseFloat($('#arr_pay' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
                 }
             });
         }
-
-        if(ada == true){
-            $('#subtotal').val(formatRupiahIni(subtotal.toFixed(3).toString().replace('.',',')));
-        }else{
-            subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",","."));
-        }        
-
-        total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
-
-        if($('#is_tax').is(':checked')){
-            if($('#is_include_tax').is(':checked')){
-                total = total / (1 + (percent_tax / 100));
-            }
-            tax = total * (percent_tax / 100);
-        }
-
-        grandtotal = total + tax;
-
-        $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
-        );
-        $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
-        );
-        $('#grandtotal').text(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
-        );
+        pay += admin;
+        $('#grandtotal').val(formatRupiahIni(pay.toFixed(3).toString().replace('.',',')));
     }
 
     function chooseAll(element){
@@ -629,6 +606,35 @@
         countAll();
     }
 
+    function removeUsedData(table,id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id,
+                table : table
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_item[data-id="' + id + '"]').remove();
+                countAll();
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "responsive": false,
@@ -644,13 +650,8 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
-                    type : $('#filter_type').val(),
-                    'supplier_id[]' : $('#filter_supplier').val(),
+                    'account_id[]' : $('#filter_account').val(),
                     place_id : $('#filter_place').val(),
-                    plant_id : $('#filter_plant').val(),
-                    department_id : $('#filter_department').val(),
-                    is_tax : $('#filter_is_tax').val(),
-                    is_include_tax : $('#filter_is_include_tax').val(),
                     'currency_id[]' : $('#filter_currency').val(),
                 },
                 beforeSend: function() {
@@ -672,24 +673,25 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
-                { name: 'supplier_id', className: 'center-align' },
+                { name: 'account_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
-                { name: 'department_id', className: 'center-align' },
-                { name: 'is_tax', className: 'center-align' },
-                { name: 'is_include_tax', className: 'center-align' },
-                { name: 'percent_tax', className: 'center-align' },
-                { name: 'type', className: 'center-align' },
-                { name: 'document', className: 'center-align' },
+                { name: 'coa_source_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'due_date', className: 'center-align' },
+                { name: 'pay_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
-                { name: 'subtotal', className: 'right-align' },
-                { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
+                { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
+                { name: 'pay', className: 'right-align' },
+                { name: 'admin', className: 'right-align' },
+                { name: 'document', className: 'center-align' },
+                { name: 'account_bank', className: 'right-align' },
+                { name: 'account_no', className: 'right-align' },
+                { name: 'account_name', className: 'right-align' },
+                { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -742,14 +744,16 @@
                 var formData = new FormData($('#form_data')[0]);
 
                 formData.delete("arr_code[]");
-                formData.delete("arr_nominal[]");
+                formData.delete("arr_type[]");
+                formData.delete("arr_pay[]");
                 formData.delete("arr_note[]");
 
                 $('input[name^="arr_code"]').each(function(){
                     if($(this).is(':checked')){
                         formData.append('arr_code[]',$(this).val());
-                        formData.append('arr_nominal[]',$('#rowNominal' + $(this).data('id')).val());
-                        formData.append('arr_note[]',$('#rowNote' + $(this).data('id')).val());
+                        formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_pay[]',$('#arr_pay' + $(this).data('id')).val());
+                        formData.append('arr_note[]',$('#arr_note' + $(this).data('id')).val());
                     }
                 });
 
@@ -862,9 +866,9 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#supplier_id').empty();
-                $('#supplier_id').append(`
-                    <option value="` + response.account_id + `">` + response.supplier_name + `</option>
+                $('#account_id').empty();
+                $('#account_id').append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
                 $('#type').val(response.type).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
@@ -873,64 +877,78 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
-                $('#percent_tax').val(response.percent_tax);
-                
-                if(response.is_tax == '1'){
-                    $('#is_tax').prop( "checked", true);
-                }else{
-                    $('#is_tax').prop( "checked", false);
-                }
-
-                if(response.is_include_tax == '1'){
-                    $('#is_include_tax').prop( "checked", true);
-                }else{
-                    $('#is_include_tax').prop( "checked", false);
-                }
-                
+                $('#document_date').val(response.document_date);                
                 $('#note').val(response.note);
-                $('#grandtotal').text(response.grandtotal);
-                $('#total').text(response.total);
-                $('#tax').text(response.tax);
-                $('#subtotal').val(response.subtotal);
-                $('#discount').text(response.discount);
+                $('#tax_no').val(response.tax_no);
+                $('#tax_cut_no').val(response.tax_cut_no);
+                $('#cut_date').val(response.cut_date);
+                $('#spk_no').val(response.spk_no);
+                $('#invoice_no').val(response.invoice_no);
+                $('#downpayment').val(response.downpayment);
                 
                 if(response.details.length > 0){
-                    $('#body-purchase').empty();
+                    $('#body-detail').empty();
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        $('#body-purchase').append(`
-                            <tr class="row_purchase">
+                        $('#body-detail').append(`
+                            <tr class="row_detail">
+                                <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
                                 <td class="center-align">
                                     <label>
-                                        <input type="checkbox" checked id="check` + count + `" name="arr_code[]" value="` + val.purchase_order_encrypt + `" onclick="countAll()" data-id="` + count + `">
+                                        <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
                                         <span>Pilih</span>
                                     </label>
                                 </td>
                                 <td>
-                                    ` + val.purchase_order_code + `
+                                    ` + val.rawcode + `
                                 </td>
                                 <td class="center">
                                     ` + val.post_date + `
                                 </td>
                                 <td class="center">
-                                    ` + val.delivery_date + `
+                                    ` + val.due_date + `
                                 </td>
-                                <td class="center">
-                                    <input name="arr_note[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="rowNote` + count + `">
-                                </td>
-                                <td class="center">
+                                <td class="right-align">
                                     ` + val.total + `
                                 </td>
+                                <td class="right-align">
+                                    ` + val.tax + `
+                                </td>
+                                <td class="right-align" id="row_wtax` + count + `">
+                                    ` + val.wtax + `
+                                </td>
+                                <td class="right-align" id="row_grandtotal` + count + `">
+                                    ` + val.grandtotal + `
+                                </td>
                                 <td class="center">
-                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.total_dp + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                    <div class="switch mb-0">
+                                        <label>
+                                            Tidak
+                                            <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="applyWtax('` + count + `');countAll();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </td>
+                                <td class="center">
+                                    <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);applyWtax('` + count + `');countAll();" style="width:100px;">
                                 </td>
                             </tr>
                         `);
+                        if(val.is_wtax){
+                            $('#arr_is_wtax' + count).prop( "checked", true);
+                        }
+                        $('#arr_percent_wtax' + count).val(val.percent_wtax);
                     });
                 }
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
+                countAll();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -1029,7 +1047,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
         $.ajax({
             type : "POST",
@@ -1040,9 +1058,7 @@
                 type : type,
                 place : place,
                 department : department,
-                is_tax : is_tax,
-                is_include_tax : is_include_tax,
-                'supplier[]' : supplier,
+                'account[]' : account,
                 'currency[]' : currency
             },
             headers: {
@@ -1059,8 +1075,14 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&place=" + place + "&department=" + department + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&supplier=" + supplier + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&place=" + place + "&department=" + department + "&account=" + account + "&currency=" + currency;
+    }
+
+    function addDays(){
+        var result = new Date($('#post_date').val());
+        result.setDate(result.getDate() + parseInt($('#top').val()));
+        $('#due_date').val(result.toISOString().split('T')[0]);
     }
 </script>

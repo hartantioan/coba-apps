@@ -16,9 +16,8 @@ class PaymentRequestDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'payment_request_id',
-        'fund_request_id',
-        'purchase_down_payment_id',
-        'purchase_invoice_id',
+        'lookable_type',
+        'lookable_id',
         'nominal',
         'note',
     ];
@@ -28,16 +27,18 @@ class PaymentRequestDetail extends Model
         return $this->belongsTo('App\Models\PaymentRequest', 'payment_request_id', 'id')->withTrashed();
     }
     
-    public function fundRequest()
-    {
-        return $this->belongsTo('App\Models\FundRequest', 'fund_request_id', 'id')->withTrashed();
+    public function lookable(){
+        return $this->morphTo();
     }
 
-    public function purchaseDownPayment(){
-        return $this->belongsTo('App\Models\PurchaseDownPayment','purchase_down_payment_id','id')->withTrashed();
-    }
-
-    public function purchaseInvoice(){
-        return $this->belongsTo('App\Models\PurchaseInvoice','purchase_invoice_id','id')->withTrashed();
+    public function type(){
+        $type = match ($this->lookable_type) {
+            'fund_requests'             => 'Permohonan Dana',
+            'purchase_invoices'         => 'AP Invoice',
+            'purchase_down_payments'    => 'AP Down Payment',
+            default                     => 'Belum ditentukan',
+          };
+  
+          return $type;
     }
 }

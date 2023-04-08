@@ -127,12 +127,8 @@
                                                         <th rowspan="2">Kas/Bank</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
-                                                        <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPH</th>
-                                                        <th rowspan="2">Grandtotal</th>
-                                                        <th rowspan="2">Bayar</th>
                                                         <th rowspan="2">Admin</th>
+                                                        <th rowspan="2">Bayar</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Bank Rekening</th>
                                                         <th rowspan="2">No Rekening</th>
@@ -140,6 +136,7 @@
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
+                                                        <th rowspan="2">Kas/Bank Keluar</th>
                                                     </tr>
                                                     <tr>
                                                         <th>Post</th>
@@ -681,12 +678,8 @@
                 { name: 'pay_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
-                { name: 'total', className: 'right-align' },
-                { name: 'tax', className: 'right-align' },
-                { name: 'wtax', className: 'right-align' },
-                { name: 'grandtotal', className: 'right-align' },
-                { name: 'pay', className: 'right-align' },
                 { name: 'admin', className: 'right-align' },
+                { name: 'grandtotal', className: 'right-align' },
                 { name: 'document', className: 'center-align' },
                 { name: 'account_bank', className: 'right-align' },
                 { name: 'account_no', className: 'right-align' },
@@ -694,6 +687,7 @@
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'cash_bank_out', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
@@ -866,25 +860,24 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#account_id').empty();
-                $('#account_id').append(`
+                $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
-                $('#type').val(response.type).formSelect();
+                $('#coa_source_id').empty().append(`
+                    <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
+                `);
                 $('#place_id').val(response.place_id).formSelect();
-                $('#department_id').val(response.department_id).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
-                $('#document_date').val(response.document_date);                
+                $('#pay_date').val(response.pay_date);                
                 $('#note').val(response.note);
-                $('#tax_no').val(response.tax_no);
-                $('#tax_cut_no').val(response.tax_cut_no);
-                $('#cut_date').val(response.cut_date);
-                $('#spk_no').val(response.spk_no);
-                $('#invoice_no').val(response.invoice_no);
-                $('#downpayment').val(response.downpayment);
+                $('#account_bank').val(response.account_bank);
+                $('#account_no').val(response.account_no);
+                $('#account_name').val(response.account_name);
+                $('#admin').val(response.admin);
+                $('#grandtotal').val(response.grandtotal);
                 
                 if(response.details.length > 0){
                     $('#body-detail').empty();
@@ -893,10 +886,6 @@
                         $('#body-detail').append(`
                             <tr class="row_detail">
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
-                                <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
-                                <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
-                                <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
                                 <td class="center-align">
                                     <label>
                                         <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
@@ -925,26 +914,35 @@
                                     ` + val.grandtotal + `
                                 </td>
                                 <td class="center">
-                                    <div class="switch mb-0">
-                                        <label>
-                                            Tidak
-                                            <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="applyWtax('` + count + `');countAll();">
-                                            <span class="lever"></span>
-                                            Ya
-                                        </label>
-                                    </div>
+                                    <input id="arr_pay` + count + `" name="arr_pay[]" class="browser-default" type="text" value=" `+ val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
                                 </td>
                                 <td class="center">
-                                    <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);applyWtax('` + count + `');countAll();" style="width:100px;">
+                                    <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
                                 </td>
                             </tr>
                         `);
-                        if(val.is_wtax){
-                            $('#arr_is_wtax' + count).prop( "checked", true);
-                        }
-                        $('#arr_percent_wtax' + count).val(val.percent_wtax);
                     });
                 }
+
+                $('#user_bank_id').empty();
+                if(response.banks.length > 0){
+                    $('#user_bank_id').append(`
+                        <option value="">--Pilih dari daftar-</option>
+                    `);
+                    $.each(response.banks, function(i, val) {
+                        $('#user_bank_id').append(`
+                            <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bank="` + val.bank_name + `" data-no="` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
+                        `);
+                    });                        
+                }else{
+                    $('#user_bank_id').append(`
+                        <option value="">--Pilih Partner Bisnis-</option>
+                    `);
+                }
+                $('#user_bank_id').formSelect();
+
+                $('#top').val(response.top);
+
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -1047,7 +1045,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), place = $('#filter_place').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
         $.ajax({
             type : "POST",
@@ -1055,9 +1053,7 @@
             data : {
                 search : search,
                 status : status,
-                type : type,
                 place : place,
-                department : department,
                 'account[]' : account,
                 'currency[]' : currency
             },
@@ -1075,9 +1071,9 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), place = $('#filter_place').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&place=" + place + "&department=" + department + "&account=" + account + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&place=" + place + "&account=" + account + "&currency=" + currency;
     }
 
     function addDays(){

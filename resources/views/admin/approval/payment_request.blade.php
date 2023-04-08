@@ -129,12 +129,12 @@
                         <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
                     <div class="mr-2">
-                        <small>Hingga:</small>
+                        <small>Tenggat:</small>
                         <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
                     </div>
                     <div>
-                        <small>Dipakai:</small>
-                        <span>{{ date('d/m/y',strtotime($data->required_date)) }}</span>
+                        <small>Dibayar:</small>
+                        <span>{{ date('d/m/y',strtotime($data->pay_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Permohonan Dana</h5>
+                <h5 class="indigo-text">Permintaan Pembayaran</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -184,6 +184,12 @@
                 <h6 class="invoice-from">Lain-lain</h6>
                 <div class="row">
                     <div class="col s3">
+                        Bisnis Partner
+                    </div>
+                    <div class="col s9">
+                        {{ $data->account->name }}
+                    </div>
+                    <div class="col s3">
                         Lampiran
                     </div>
                     <div class="col s9">
@@ -204,40 +210,45 @@
         <table class="bordered">
             <thead>
                 <tr>
-                    <th class="center">Item</th>
-                    <th class="center">Jum.</th>
-                    <th class="center">Sat.</th>
-                    <th class="center">Harga @</th>
-                    <th class="center">Harga Total.</th>
+                    <th class="center">Referensi</th>
+                    <th class="center">Tipe</th>
+                    <th class="center">Keterangan</th>
+                    <th class="center">Bayar</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data->fundRequestDetail as $row)
+                @php
+                    $total = 0;
+                @endphp
+                @foreach($data->paymentRequestDetail as $row)
                 <tr>
+                    <td>{{ $row->lookable->code }}</td>
+                    <td class="center-align">{{ $row->type() }}</td>
                     <td>{{ $row->note }}</td>
-                    <td class="center-align">{{ $row->qty }}</td>
-                    <td class="center-align">{{ $row->unit->code }}</td>
-                    <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
-                    <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
                 </tr>
+                @php
+                    $total += $row->nominal;
+                @endphp
                 @endforeach
                 <tr>
-                    <td colspan="4" class="right-align">Total</td>
-                    <td class="right-align">{{ number_format($data->total,3,',','.') }}</td>
+                    <td colspan="3" class="right-align">Total</td>
+                    <td class="right-align">{{ number_format($total,3,',','.') }}</td>
                 </tr>
                 <tr>
-                    <td colspan="4" class="right-align">PPN</td>
-                    <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
+                    <td colspan="3" class="right-align">Admin</td>
+                    <td class="right-align">{{ number_format($data->admin,3,',','.') }}</td>
                 </tr>
                 <tr>
-                    <td colspan="4" class="right-align">PPH</td>
-                    <td class="right-align">{{ number_format($data->wtax,3,',','.') }}</td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="right-align">Grandtotal</td>
+                    <td colspan="3" class="right-align">Grandtotal</td>
                     <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
                 </tr>
             </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                </tr>
+            </tfoot>
         </table>
     </div>
     <!-- invoice subtotal -->

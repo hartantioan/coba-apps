@@ -95,6 +95,9 @@ class PurchaseInvoice extends Model
     {
         return $this->hasMany('App\Models\PurchaseInvoiceDetail');
     }
+    public function hasPaymentRequestDetail(){
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table);
+    }
 
     public function status(){
         $status = match ($this->status) {

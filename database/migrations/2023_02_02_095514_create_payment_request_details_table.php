@@ -17,9 +17,8 @@ return new class extends Migration
         Schema::create('payment_request_details', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('payment_request_id')->nullable();
-            $table->bigInteger('fund_request_id')->nullable();
-            $table->bigInteger('purchase_down_payment_id')->nullable();
-            $table->bigInteger('purchase_invoice_id')->nullable();
+            $table->string('lookable_type',155)->nullable();
+            $table->bigInteger('lookable_id')->nullable();
             $table->double('nominal')->nullable();
             $table->string('note')->nullable();
             $table->timestamps();

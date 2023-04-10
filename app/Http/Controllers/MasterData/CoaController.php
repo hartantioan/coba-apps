@@ -140,7 +140,7 @@ class CoaController extends Controller
                 }
 
                 $response['data'][] = [
-                    $nomor,
+                    $val->id,
                     $pretext.$val->code,
                     $val->name,
                     $val->company->name,

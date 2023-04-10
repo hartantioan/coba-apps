@@ -18,18 +18,26 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50)->unique();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('branch_id')->nullable();
+            $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('account_id')->nullable();
             $table->bigInteger('payment_request_id')->nullable();
-            $table->date('posting_date')->nullable();
-            $table->date('due_date')->nullable();
-            $table->date('document_date')->nullable();
-            $table->double('nominal')->nullable();
-            $table->bigInteger('coa_id')->nullable();
+            $table->bigInteger('coa_source_id')->nullable();
+            $table->bigInteger('currency_id')->nullable();
+            $table->double('currency_rate')->nullable();
+            $table->date('post_date')->nullable();
+            $table->date('pay_date')->nullable();
+            $table->double('admin')->nullable();
+            $table->double('grandtotal')->nullable();
             $table->string('document')->nullable();
             $table->text('note')->nullable();
             $table->char('status', 1)->nullable();
+            $table->bigInteger('void_id')->nullable();
+            $table->string('void_note')->nullable();
+            $table->timestamp('void_date')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['user_id','account_id','place_id','coa_source_id','currency_id','payment_request_id'],'outgoing_payment_index');
         });
     }
 

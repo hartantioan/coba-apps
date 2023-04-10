@@ -51,7 +51,7 @@ table.bordered th {
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <div class="card-panel">
+                            {{-- <div class="card-panel">
                                 <div class="row">
                                     <div class="col s12 ">
                                         <div class="card-alert card cyan lighten-5">
@@ -66,7 +66,7 @@ table.bordered th {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">

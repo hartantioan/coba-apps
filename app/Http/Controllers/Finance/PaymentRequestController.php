@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
+use App\Models\Coa;
 use App\Models\PaymentRequest;
 use App\Models\PaymentRequestDetail;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,7 @@ use App\Exports\ExportPaymentRequest;
 use App\Models\Place;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\OutgoingPayment;
 use Illuminate\Database\Eloquent\Builder;
 
 class PaymentRequestController extends Controller
@@ -133,7 +135,7 @@ class PaymentRequestController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = PurchaseInvoice::where(function($query) use ($search, $request) {
+        $total_filtered = PaymentRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -210,8 +212,8 @@ class PaymentRequestController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					',
-                    $val->status == '2' ?
-                    '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="cashBankOut(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">screen_share</i></button>' : $val->statusRaw()
+                    $val->status == '2' && !$val->outgoingPayment()->exists() ?
+                    '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="cashBankOut(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">screen_share</i></button>' : ($val->outgoingPayment()->exists() ? $val->outgoingPayment->code : $val->statusRaw() )
                 ];
 
                 $nomor++;
@@ -262,7 +264,9 @@ class PaymentRequestController extends Controller
                         'tax'           => number_format($row->tax,3,',','.'),
                         'wtax'          => number_format($row->wtax,3,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,3,',','.'),
-                        'balance'       => '0,000'
+                        'balance'       => '0,000',
+                        'coa_id'        => '',
+                        'coa_name'      => ''
                     ];
                 }
             }
@@ -270,6 +274,7 @@ class PaymentRequestController extends Controller
             foreach($data->purchaseDownPayment as $row){
                 if(!$row->used()->exists()){
                     CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
+                    $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->place->company_id)->first();
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'purchase_down_payments',
@@ -282,7 +287,9 @@ class PaymentRequestController extends Controller
                         'tax'           => number_format($row->tax,3,',','.'),
                         'wtax'          => number_format($row->wtax,3,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,3,',','.'),
-                        'balance'       => '0,000'
+                        'balance'       => '0,000',
+                        'coa_id'        => $coa ? $coa->id : '',
+                        'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
                     ];
                 }
             }
@@ -290,6 +297,7 @@ class PaymentRequestController extends Controller
             foreach($data->purchaseInvoice as $row){
                 if(!$row->used()->exists()){
                     CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
+                    $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->place->company_id)->first();
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'purchase_invoices',
@@ -303,6 +311,8 @@ class PaymentRequestController extends Controller
                         'wtax'          => number_format($row->wtax,3,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,3,',','.'),
                         'balance'       => number_format($row->balance,3,',','.'),
+                        'coa_id'        => $coa ? $coa->id : '',
+                        'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
                     ];
                 }
             }
@@ -329,6 +339,7 @@ class PaymentRequestController extends Controller
             'arr_type'              => 'required|array',
             'arr_code'              => 'required|array',
             'arr_pay'               => 'required|array',
+            'arr_coa'               => 'required|array',
 		], [
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
             'place_id.required'                 => 'Penempatan pabrik/kantor tidak boleh kosong.',
@@ -346,6 +357,8 @@ class PaymentRequestController extends Controller
             'arr_code.array'                    => 'Kode harus dalam bentuk array.',
             'arr_pay.required'                  => 'Baris bayar tidak boleh kosong.',
             'arr_pay.array'                     => 'Baris bayar harus dalam bentuk array.',
+            'arr_coa.required'                  => 'Baris coa tidak boleh kosong.',
+            'arr_coa.array'                     => 'Baris coa harus dalam bentuk array.',
 		]);
 
         if($validation->fails()) {
@@ -464,6 +477,7 @@ class PaymentRequestController extends Controller
                                 'payment_request_id'            => $query->id,
                                 'lookable_type'                 => $row,
                                 'lookable_id'                   => $idDetail,
+                                'coa_id'                        => $request->arr_coa[$key],
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
                                 'note'                          => $request->arr_note[$key]
                             ]);
@@ -520,6 +534,7 @@ class PaymentRequestController extends Controller
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Bayar</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Coa</th>
                             </tr>
                         </thead><tbody>';
         
@@ -531,6 +546,7 @@ class PaymentRequestController extends Controller
                 <td class="center-align">'.$row->type().'</td>
                 <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
+                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
             </tr>';
         }
         
@@ -605,7 +621,9 @@ class PaymentRequestController extends Controller
                 'wtax'          => number_format($row->lookable->wtax,3,',','.'),
                 'grandtotal'    => number_format($row->lookable->grandtotal,3,',','.'),
                 'nominal'       => number_format($row->nominal,3,',','.'),
-                'note'          => $row->note
+                'note'          => $row->note,
+                'coa_id'        => $row->coa_id,
+                'coa_name'      => $row->coa->code.' - '.$row->coa->name
             ];
         }
 
@@ -776,5 +794,108 @@ class PaymentRequestController extends Controller
         }else{
             abort(404);
         }
+    }
+
+    public function getPaymentData(Request $request){
+        $data = PaymentRequest::where('code',CustomHelper::decrypt($request->code))->first();
+
+        if($data){
+            if(!$data->used()->exists() && !$data->outgoingPayment()->exists()){
+                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Permintaan Pembayaran (Payment Request)');
+                return response()->json([
+                    'status'    => 200,
+                    'data'      => $data
+                ]);
+            }elseif($data->outgoingPayment()->exists()){
+                return response()->json([
+                    'status'    => 500,
+                    'message'   => 'Permintaan Pembayaran '.$data->used->lookable->code.' telah memiliki kas bank out.'
+                ]);
+            }else{
+                return response()->json([
+                    'status'    => 500,
+                    'message'   => 'Permintaan Pembayaran '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.'
+                ]);
+            }
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan.',
+            ]);
+        }
+    }
+
+    public function createPay(Request $request){
+        $validation = Validator::make($request->all(), [
+            'pay_date_pay'              => 'required',
+		], [
+            'pay_date_pay.required'     => 'Tanggal bayar tidak boleh kosong.',
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            
+			if($request->tempPay){
+                DB::beginTransaction();
+                try {
+                    $cek = PaymentRequest::where('code',CustomHelper::decrypt($request->tempPay))->first();
+
+                    $query = OutgoingPayment::create([
+                        'code'			            => OutgoingPayment::generateCode(),
+                        'user_id'		            => session('bo_id'),
+                        'place_id'                  => $cek->place_id,
+                        'account_id'                => $cek->account_id,
+                        'payment_request_id'        => $cek->id,
+                        'coa_source_id'             => $cek->coa_source_id,
+                        'post_date'                 => date('Y-m-d'),
+                        'pay_date'                  => $request->pay_date_pay,
+                        'currency_id'               => $cek->currency_id,
+                        'currency_rate'             => $cek->currency_rate,
+                        'admin'                     => $cek->admin,
+                        'grandtotal'                => $cek->grandtotal,
+                        'document'                  => $request->file('documentPay') ? $request->file('documentPay')->store('public/outgoing_payments') : NULL,
+                        'note'                      => $request->notePay,
+                        'status'                    => '2',
+                    ]);
+
+                    $cek->update([
+                        'pay_date'                  => $request->pay_date_pay,
+                    ]);
+
+                    DB::commit();
+                    
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}
+			
+			if($query) {
+
+                CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas Bank Out / Kas Keluar No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendJournal('outgoing_payments',$query->id,$query->account_id);
+
+                activity()
+                    ->performedOn(new OutgoingPayment())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit payment request.');
+
+				$response = [
+					'status'    => 200,
+					'message'   => 'Data successfully saved.',
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+		
+		return response()->json($response);
     }
 }

@@ -55,6 +55,7 @@
                 <th>Referensi</th>
                 <th>Tipe</th>
                 <th>Keterangan</th>
+                <th>Coa</th>
                 <th>Bayar</th>
             </tr>
             @foreach($row->paymentRequestDetail as $key1 => $rowdetail)
@@ -64,6 +65,7 @@
                 <td>{{ $rowdetail->lookable->code }}</td>
                 <td>{{ $rowdetail->type() }}</td>
                 <td>{{ $rowdetail->note }}</td>
+                <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
                 <td align="right">{{ number_format($rowdetail->nominal,2,',','.') }}</td>
             </tr>
             @endforeach

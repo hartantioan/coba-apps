@@ -18,6 +18,7 @@ class PaymentRequestDetail extends Model
         'payment_request_id',
         'lookable_type',
         'lookable_id',
+        'coa_id',
         'nominal',
         'note',
     ];
@@ -25,6 +26,11 @@ class PaymentRequestDetail extends Model
     public function paymentRequest()
     {
         return $this->belongsTo('App\Models\PaymentRequest', 'payment_request_id', 'id')->withTrashed();
+    }
+
+    public function coa()
+    {
+        return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
     
     public function lookable(){

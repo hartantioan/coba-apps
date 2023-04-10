@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('payment_request_id')->nullable();
             $table->string('lookable_type',155)->nullable();
             $table->bigInteger('lookable_id')->nullable();
+            $table->bigInteger('coa_id')->nullable();
             $table->double('nominal')->nullable();
             $table->string('note')->nullable();
             $table->timestamps();

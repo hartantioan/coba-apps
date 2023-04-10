@@ -77,6 +77,11 @@ class PaymentRequest extends Model
         return $this->hasMany('App\Models\PaymentRequestDetail');
     }
 
+    public function outgoingPayment()
+    {
+        return $this->hasOne('App\Models\OutgoingPayment', 'payment_request_id', 'id');
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-1">Menunggu</span>',

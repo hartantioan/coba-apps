@@ -8,6 +8,8 @@ use App\Models\Capitalization;
 use App\Models\Coa;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
+use App\Models\OutgoingPayment;
+use App\Models\Place;
 use App\Models\Retirement;
 use App\Models\User;
 use App\Models\Notification;
@@ -410,12 +412,77 @@ class CustomHelper {
 					'nominal'		=> $row->retirement_nominal,
 				]);
 			}
+		}elseif($table_name == 'outgoing_payments'){
+			$op = OutgoingPayment::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'place_id'		=> $op->place_id,
+				'lookable_type'	=> 'outgoing_payments',
+				'lookable_id'	=> $op->id,
+				'currency_id'	=> $op->currency_id,
+				'currency_rate'	=> $op->currency_rate,
+				'post_date'		=> $op->pay_date,
+				'note'			=> $op->code,
+				'status'		=> '3'
+			]);
+
+			foreach($op->paymentRequest->paymentRequestDetail as $row){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->coa_id,
+					'place_id'		=> isset($row->lookable->place_id) ? $row->lookable->place_id : NULL,
+					'department_id'	=> isset($row->lookable->department_id) ? $row->lookable->department_id : NULL,
+					'warehouse_id'	=> isset($row->lookable->warehouse_id) ? $row->lookable->warehouse_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> $row->nominal,
+				]);
+			}
+
+			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
+				$query->where('table_name',$table_name);
+			})
+			->whereHas('coa', function($query) use($data){
+				$query->where('company_id',Place::find($data->place_id)->company_id);
+			})
+			->where('currency_id',$data->currency_id)->get();
+
+			if(count($journalMap) > 0){
+				$arrdata = get_object_vars($data);
+
+				foreach($journalMap as $row){
+					$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
+
+					if($nominal > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->coa_id,
+							'place_id'		=> $op->place_id,
+							'type'			=> $row->type,
+							'nominal'		=> $nominal
+						]);
+					}
+				}
+			}
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $op->coa_source_id,
+				'place_id'		=> $op->place_id,
+				'type'			=> '2',
+				'nominal'		=> $op->grandtotal,
+			]);
 		}else{
 
 			if(isset($data->currency_id)){
 				$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
 					$query->where('table_name',$table_name);
-				})->where('currency_id',$data->currency_id)->get();
+				})
+				->whereHas('coa', function($query) use($data){
+					$query->where('company_id',Place::find($data->place_id)->company_id);
+				})
+				->where('currency_id',$data->currency_id)->get();
 
 				if(count($journalMap) > 0){
 					

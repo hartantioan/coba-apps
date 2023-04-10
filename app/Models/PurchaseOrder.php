@@ -34,7 +34,6 @@ class PurchaseOrder extends Model
         'currency_rate',
         'post_date',
         'delivery_date',
-        'document_date',
         'note',
         'subtotal',
         'discount',

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Purchase;
+namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
+use App\Models\Currency;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -12,16 +13,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\PurchaseRequest;
-use App\Models\PurchaseRequestDetail;
+use App\Models\FundRequest;
+use App\Models\FundRequestDetail;
 use App\Models\User;
-use App\Models\Warehouse;
 use App\Models\Place;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
-use App\Exports\ExportPurchaseRequest;
+use App\Exports\ExportFundRequest;
 
-class PurchaseRequestController extends Controller
+class FundRequestController extends Controller
 {
     protected $dataplaces;
 
@@ -30,22 +30,12 @@ class PurchaseRequestController extends Controller
 
         $this->dataplaces = $user->userPlaceArray();
     }
+
     public function index()
     {
         $data = [
-            'title'     => 'Purchase Request',
-            'content'   => 'admin.purchase.request',
-        ];
-
-        return view('admin.layouts.index', ['data' => $data]);
-    }
-
-    public function userIndex()
-    {
-        $data = [
-            'title'     => 'Pengajuan Pembelian Barang - Pengguna',
-            'content'   => 'admin.personal.purchase_request',
-            'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'title'     => 'Permohonan Dana',
+            'content'   => 'admin.finance.fund_request',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -56,10 +46,23 @@ class PurchaseRequestController extends Controller
             'id',
             'user_id',
             'code',
+            'place_id',
+            'department_id',
+            'account_id',
             'post_date',
             'due_date',
             'required_date',
+            'currency_id',
+            'currency_rate',
             'note',
+            'termin_note',
+            'payment_type',
+            'name_account',
+            'no_account',
+            'total',
+            'tax',
+            'wtax',
+            'grandtotal'
         ];
 
         $start  = $request->start;
@@ -68,71 +71,45 @@ class PurchaseRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
-
-        $total_data = PurchaseRequest::whereIn('place_id',$dataplaces)->count();
+        $total_data = FundRequest::whereIn('place_id',$this->dataplaces)->count();
         
-        $query_data = PurchaseRequest::where(function($query) use ($search, $request, $dataplaces) {
+        $query_data = FundRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            })
-                            ->orWhereHas('user',function($query) use($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
                 }
 
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                $query->whereIn('place_id',$dataplaces);
             })
+            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = PurchaseRequest::where(function($query) use ($search, $request, $dataplaces) {
+        $total_filtered = FundRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            })
-                            ->orWhereHas('user',function($query) use($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
                 }
 
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                $query->whereIn('place_id',$dataplaces);
             })
+            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -144,10 +121,22 @@ class PurchaseRequestController extends Controller
                     $val->user->name,
                     $val->code,
                     $val->place->name.' - '.$val->place->company->name,
+                    $val->department->name,
+                    $val->account->name,
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->due_date)),
                     date('d M Y',strtotime($val->required_date)),
+                    $val->currency->code,
+                    number_format($val->currency_rate,3,',','.'),
                     $val->note,
+                    $val->termin_note,
+                    $val->paymentType(),
+                    $val->name_account,
+                    $val->no_account,
+                    number_format($val->total,3,',','.'),
+                    number_format($val->tax,3,',','.'),
+                    number_format($val->wtax,3,',','.'),
+                    number_format($val->grandtotal,3,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
@@ -173,11 +162,11 @@ class PurchaseRequestController extends Controller
         return response()->json($response);
     }
 
-    public function rowDetail(Request $request)
-    {
-        $data   = PurchaseRequest::find($request->id);
+    public function rowDetail(Request $request){
+        $data   = FundRequest::find($request->id);
         
-        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="min-width:50%;max-width:70%;">
+        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12">
+                    <table style="max-width:800px;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="6">Daftar Item</th>
@@ -187,25 +176,25 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Tgl.Dipakai</th>
+                                <th class="right-align">Harga Satuan</th>
+                                <th class="right-align">Harga Total</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->purchaseRequestDetail as $key => $row){
+        foreach($data->fundRequestDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.$row->qty.'</td>
-                <td class="center-align">'.$row->item->buyUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.date('d M Y',strtotime($row->required_date)).'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.$row->unit->code.'</td>
+                <td class="center-align">'.number_format($row->price,3,',','.').'</td>
+                <td class="center-align">'.number_format($row->total,3,',','.').'</td>
             </tr>';
         }
         
         $string .= '</tbody></table></div>';
 
-        $string .= '<div class="col s12 mt-1"><table style="min-width:50%;max-width:70%;">
+        $string .= '<div class="col s12 mt-1"><table style="max-width:800px;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>
@@ -218,7 +207,7 @@ class PurchaseRequestController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
+        if($data->approval()){                
             foreach($data->approval()->approvalMatrix as $key => $row){
                 $string .= '<tr>
                     <td class="center-align">'.$row->approvalTable->level.'</td>
@@ -239,18 +228,13 @@ class PurchaseRequestController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
-                ];
-            }elseif($query->purchaseOrderDetailComposition()->exists()){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data telah digunakan pada Purchase Order.'
                 ];
             }else{
                 $query->update([
@@ -261,13 +245,13 @@ class PurchaseRequestController extends Controller
                 ]);
     
                 activity()
-                    ->performedOn(new PurchaseRequest())
+                    ->performedOn(new FundRequest())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the purchase request data');
+                    ->log('Void the fund request data');
     
-                CustomHelper::sendNotification('purchase_requests',$query->id,'Purchase Request No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('purchase_requests',$query->id);
+                CustomHelper::sendNotification('fund_requests',$query->id,'Permohonan Dana No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('fund_requests',$query->id);
 
                 $response = [
                     'status'  => 200,
@@ -287,56 +271,70 @@ class PurchaseRequestController extends Controller
     public function print(Request $request){
 
         $data = [
-            'title' => 'PURCHASE REQUEST REPORT',
-            'data' => PurchaseRequest::where(function ($query) use ($request) {
-                if ($request->search) {
-                    $query->where(function ($query) use ($request) {
+            'title' => 'FUND
+             REQUEST REPORT',
+            'data' => FundRequest::where(function ($query) use ($request) {
+                if($request->search) {
+                    $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('post_date', 'like', "%$request->search%")
                             ->orWhere('due_date', 'like', "%$request->search%")
                             ->orWhere('required_date', 'like', "%$request->search%")
-                            ->orWhere('note', 'like', "%$request->search%")
-                            ->orWhereHas('purchaseRequestDetail',function($query) use($request){
-                                $query->whereHas('item',function($query) use($request){
-                                    $query->where('code', 'like', "%$request->search%")
-                                        ->orWhere('name','like',"%$request->search%");
-                                });
-                            })
-                            ->orWhereHas('user',function($query) use($request){
-                                $query->where('name','like',"%$request->search%")
-                                    ->orWhere('employee_no','like',"%$request->search%");
-                            });
+                            ->orWhere('note', 'like', "%$request->search%");
                     });
-                    
                 }
 
-                if ($request->status) {
-                    $query->where('status',$request->status);
+                if($request->status){
+                    $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
-		return view('admin.print.purchase.request', $data);
+		return view('admin.print.finance.fund_request', $data);
     }
 
     public function export(Request $request){
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';
-
 		
-		return Excel::download(new ExportPurchaseRequest($search,$status,$this->dataplaces), 'purchase_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportFundRequest($search,$status,$this->dataplaces), 'fund_request_'.uniqid().'.xlsx');
+    }
+
+    public function userIndex()
+    {
+        $data = [
+            'title'         => 'Pengajuan Permohonan Dana - Pengguna',
+            'content'       => 'admin.personal.fund_request',
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'department'    => Department::where('status','1')->get(),
+            'currency'      => Currency::where('status','1')->get(),
+        ];
+
+        return view('admin.layouts.index', ['data' => $data]);
     }
 
     public function userDatatable(Request $request){
         $column = [
             'id',
             'code',
+            'place_id',
+            'department_id',
+            'account_id',
             'post_date',
             'due_date',
             'required_date',
+            'currency_id',
+            'currency_rate',
             'note',
+            'termin_note',
+            'payment_type',
+            'name_account',
+            'no_account',
+            'total',
+            'tax',
+            'wtax',
+            'grandtotal'
         ];
 
         $start  = $request->start;
@@ -345,22 +343,16 @@ class PurchaseRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseRequest::where('user_id',session('bo_id'))->count();
+        $total_data = FundRequest::where('user_id',session('bo_id'))->count();
         
-        $query_data = PurchaseRequest::where(function($query) use ($search, $request) {
+        $query_data = FundRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
                 }
 
@@ -374,20 +366,14 @@ class PurchaseRequestController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = PurchaseRequest::where(function($query) use ($search, $request) {
+        $total_filtered = FundRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
                 }
 
@@ -405,16 +391,27 @@ class PurchaseRequestController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
+                    $val->place->name.' - '.$val->place->company->name,
+                    $val->department->name,
+                    $val->account->name,
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->due_date)),
                     date('d M Y',strtotime($val->required_date)),
+                    $val->currency->code,
+                    number_format($val->currency_rate,3,',','.'),
                     $val->note,
+                    $val->termin_note,
+                    $val->paymentType(),
+                    $val->name_account,
+                    $val->no_account,
+                    number_format($val->total,3,',','.'),
+                    number_format($val->tax,3,',','.'),
+                    number_format($val->wtax,3,',','.'),
+                    number_format($val->grandtotal,3,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
-                    $val->project()->exists() ? $val->project->code.' - '.$val->project->name : ' - ',
-                    $val->place->name.' - '.$val->place->company->name,
                     $val->status(),
                     '
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -436,25 +433,65 @@ class PurchaseRequestController extends Controller
         return response()->json($response);
     }
 
+    public function getAccountInfo(Request $request){
+        $data = User::find($request->id);
+
+        $banks = [];
+
+        if($data){
+            foreach($data->userBank()->orderByDesc('is_default')->get() as $row){
+                $banks[] = [
+                    'bank_id'   => $row->bank_id,
+                    'name'      => $row->name,
+                    'bank_name' => $row->bank->name,
+                    'no'        => $row->no,
+                ];
+            }
+        }
+
+        $data['banks'] = $banks;
+
+        return response()->json($data);
+    }
+
     public function userCreate(Request $request){
         $validation = Validator::make($request->all(), [
+            'account_id'                => 'required',
 			'post_date' 				=> 'required',
 			'due_date'			        => 'required',
 			'required_date'		        => 'required',
-            'note'		                => 'required',
-            'arr_item'                  => 'required|array',
             'place_id'                  => 'required',
-            'arr_warehouse'             => 'required|array'
+            'department_id'             => 'required',
+            'note'		                => 'required',
+            'payment_type'		        => 'required',
+            'currency_id'		        => 'required',
+            'currency_rate'		        => 'required',
+            'arr_item'                  => 'required|array',
+            'arr_qty'                   => 'required|array',
+            'arr_unit'                  => 'required|array',
+            'arr_price'                 => 'required|array',
+            'arr_total'                 => 'required|array',
 		], [
+            'account_id.required'               => 'Target Partner Bisnis tidak boleh kosong',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
 			'required_date.required' 			=> 'Tanggal dipakai tidak boleh kosong.',
+            'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
+            'department_id.required'            => 'Departemen tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
+            'payment_type.required'				=> 'Tipe pembayaran tidak boleh kosong',
+            'currency_id.required'				=> 'Mata uang tidak boleh kosong',
+            'currency_rate.required'			=> 'Konversi tidak boleh kosong',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array.',
-            'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
-            'arr_warehouse.required'            => 'Gudang tujuan tidak boleh kosong.',
-            'arr_warehouse.array'               => 'Gudang harus dalam bentuk array.'
+            'arr_qty.required'                  => 'Qty tidak boleh kosong.',
+            'arr_qty.array'                     => 'Qty harus dalam bentuk array.',
+            'arr_unit.required'                 => 'Satuan tidak boleh kosong.',
+            'arr_unit.array'                    => 'Satuan harus dalam bentuk array.',
+            'arr_price.required'                => 'Harga tidak boleh kosong.',
+            'arr_price.array'                   => 'Harga harus dalam bentuk array.',
+            'arr_total.required'                => 'Harga total tidak boleh kosong.',
+            'arr_total.array'                   => 'Harga total harus dalam bentuk array.',
 		]);
 
         if($validation->fails()) {
@@ -464,10 +501,22 @@ class PurchaseRequestController extends Controller
             ];
         } else {
 
+
+            $total = 0; 
+            $grandtotal = 0;
+            $tax = str_replace(',','.',str_replace('.','',$request->tax));
+            $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
+
+            foreach($request->arr_total as $key => $row){
+                $total += str_replace(',','.',str_replace('.','',$row));
+            }
+
+            $grandtotal = $total + $tax - $wtax;
+                    
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
@@ -485,21 +534,33 @@ class PurchaseRequestController extends Controller
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
                             }
-                            $document = $request->file('file')->store('public/purchase_requests');
+                            $document = $request->file('file')->store('public/fund_requests');
                         } else {
                             $document = $query->document;
                         }
                         
+                        $query->user_id = session('bo_id');
+                        $query->place_id = $request->place_id;
+                        $query->department_id = $request->department_id;
+                        $query->account_id = $request->account_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->required_date = $request->required_date;
+                        $query->currency_id = $request->currency_id;
+                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->note = $request->note;
+                        $query->termin_note = $request->termin_note;
+                        $query->payment_type = $request->payment_type;
+                        $query->name_account = $request->name_account;
+                        $query->no_account = $request->no_account;
                         $query->document = $document;
-                        $query->project_id = $request->project_id ? $request->project_id : NULL;
-                        $query->place_id = $request->place_id;
+                        $query->total = $total;
+                        $query->tax = $tax;
+                        $query->wtax = $wtax;
+                        $query->grandtotal = $grandtotal;
                         $query->save();
 
-                        foreach($query->purchaseRequestDetail as $row){
+                        foreach($query->fundRequestDetail as $row){
                             $row->delete();
                         }
 
@@ -516,18 +577,28 @@ class PurchaseRequestController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = PurchaseRequest::create([
-                        'code'			=> PurchaseRequest::generateCode(),
+                    $query = FundRequest::create([
+                        'code'			=> FundRequest::generateCode(),
                         'user_id'		=> session('bo_id'),
                         'place_id'      => $request->place_id,
-                        'department_id'	=> session('bo_department_id'),
-                        'status'        => '1',
+                        'department_id'	=> $request->department_id,
+                        'account_id'    => $request->account_id,
                         'post_date'     => $request->post_date,
                         'due_date'      => $request->due_date,
                         'required_date' => $request->required_date,
+                        'currency_id'   => $request->currency_id,
+                        'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'note'          => $request->note,
-                        'project_id'    => $request->project_id ? $request->project_id : NULL,
-                        'document'      => $request->file('file') ? $request->file('file')->store('public/purchase_requests') : NULL,
+                        'termin_note'   => $request->termin_note,
+                        'payment_type'  => $request->payment_type,
+                        'name_account'  => $request->name_account,
+                        'no_account'    => $request->no_account,
+                        'document'      => $request->file('file') ? $request->file('file')->store('public/fund_requests') : NULL,
+                        'total'         => $total,
+                        'tax'           => $tax,
+                        'wtax'          => $wtax,
+                        'grandtotal'    => $grandtotal,
+                        'status'        => '1',
                     ]);
 
                     DB::commit();
@@ -537,34 +608,31 @@ class PurchaseRequestController extends Controller
 			}
 			
 			if($query) {
-                
-                foreach($request->arr_item as $key => $row){
-                    DB::beginTransaction();
-                    try {
-                        PurchaseRequestDetail::create([
-                            'purchase_request_id'   => $query->id,
-                            'item_id'               => $row,
+                DB::beginTransaction();
+                try {
+                    foreach($request->arr_item as $key => $row){
+                        FundRequestDetail::create([
+                            'fund_request_id'       => $query->id,
+                            'note'                  => $row,
                             'qty'                   => $request->arr_qty[$key],
-                            'note'                  => $request->arr_note[$key],
-                            'required_date'         => $request->arr_required_date[$key],
-                            'place_id'              => session('bo_place_id'),
-                            'department_id'         => session('bo_department_id'),
-                            'warehouse_id'          => $request->arr_warehouse[$key]
+                            'unit_id'               => $request->arr_unit[$key],
+                            'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                            'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                         ]);
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
                     }
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
                 }
 
-                CustomHelper::sendApproval('purchase_requests',$query->id,$query->note);
-                CustomHelper::sendNotification('purchase_requests',$query->id,'Pengajuan Purchase Request No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval('fund_requests',$query->id,$query->note);
+                CustomHelper::sendNotification('fund_requests',$query->id,'Pengajuan Permohonan Dana No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
-                    ->performedOn(new PurchaseRequest())
+                    ->performedOn(new FundRequest())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit purchase request.');
+                    ->log('Add / edit fund request.');
 
 				$response = [
 					'status'    => 200,
@@ -581,11 +649,11 @@ class PurchaseRequestController extends Controller
 		return response()->json($response);
     }
 
-    public function userRowDetail(Request $request)
-    {
-        $data   = PurchaseRequest::find($request->id);
+    public function userRowDetail(Request $request){
+        $data   = FundRequest::find($request->id);
         
-        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table>
+        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12">
+                    <table style="max-width:800px;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="6">Daftar Item</th>
@@ -595,25 +663,25 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Tgl.Dipakai</th>
+                                <th class="right-align">Harga Satuan</th>
+                                <th class="right-align">Harga Total</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->purchaseRequestDetail as $key => $row){
+        foreach($data->fundRequestDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.$row->qty.'</td>
-                <td class="center-align">'.$row->item->buyUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.date('d M Y',strtotime($row->required_date)).'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.$row->unit->code.'</td>
+                <td class="center-align">'.number_format($row->price,3,',','.').'</td>
+                <td class="center-align">'.number_format($row->total,3,',','.').'</td>
             </tr>';
         }
         
         $string .= '</tbody></table></div>';
 
-        $string .= '<div class="col s12 mt-1"><table>
+        $string .= '<div class="col s12 mt-1"><table style="max-width:800px;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>
@@ -647,38 +715,39 @@ class PurchaseRequestController extends Controller
     }
 
     public function userShow(Request $request){
-        $pr = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        $pr['project_id'] = $pr->project_id ? $pr->project_id : '';
-        $pr['project_name'] = $pr->project()->exists() ? $pr->project->code.' - '.$pr->project->name : '';
+        $fr = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $fr['account_name'] = $fr->account->name;
+        $fr['currency_rate'] = number_format($fr->currency_rate,3,',','.');
+        $fr['tax'] = number_format($fr->tax,3,',','.');
+        $fr['wtax'] = number_format($fr->wtax,3,',','.');
 
         $arr = [];
 
-        foreach($pr->purchaseRequestDetail as $row){
+        foreach($fr->fundRequestDetail as $row){
             $arr[] = [
-                'item_id'           => $row->item_id,
-                'item_name'         => $row->item->name,
-                'qty'               => $row->qty,
-                'unit'              => $row->item->buyUnit->code,
-                'note'              => $row->note,
-                'date'              => $row->required_date,
-                'warehouse_name'    => $row->warehouse->name
+                'item'              => $row->note,
+                'qty'               => number_format($row->qty,3,',','.'),
+                'unit_id'           => $row->unit_id,
+                'unit_name'         => $row->unit->code.' - '.$row->unit->name,
+                'price'             => number_format($row->price,3,',','.'),
+                'total'             => number_format($row->total,3,',','.'),
             ];
         }
 
-        $pr['details'] = $arr;
+        $fr['details'] = $arr;
         				
-		return response()->json($pr);
+		return response()->json($fr);
     }
 
     public function userDestroy(Request $request){
-        $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                        'message' => 'Permohonan Dana telah diapprove, anda tidak bisa melakukan perubahan.'
                     ]);
                 }
             }
@@ -687,27 +756,20 @@ class PurchaseRequestController extends Controller
         if(in_array($query->status,['2','3'])){
             return response()->json([
                 'status'  => 500,
-                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
-            ]);
-        }
-        
-        if($query->purchaseOrderDetailComposition()->exists()){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Data telah digunakan pada Purchase Order.'
+                'message' => 'Jurnal / dokumen sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
 
         if($query->delete()) {
             
-            $query->purchaseRequestDetail()->delete();
-            CustomHelper::removeApproval('purchase_requests',$query->id);
+            $query->fundRequestDetail()->delete();
+            CustomHelper::removeApproval('fund_requests',$query->id);
 
             activity()
-                ->performedOn(new PurchaseRequest())
+                ->performedOn(new FundRequest())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the purchase request data');
+                ->log('Delete the fund request data');
 
             $response = [
                 'status'  => 200,
@@ -725,15 +787,15 @@ class PurchaseRequestController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = PurchaseRequest::where('code',CustomHelper::decrypt($id))->first();
+        $pr = FundRequest::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Print Purchase Request',
+                'title'     => 'Print Permohonan Dana',
                 'data'      => $pr
             ];
 
-            return view('admin.approval.purchase_request', $data);
+            return view('admin.approval.fund_request', $data);
         }else{
             abort(404);
         }

@@ -13,11 +13,11 @@
 			}
 			
 			th {
-				font-size:12px;
+				font-size:10px;
 			}
 		
 			.invoice-box {
-				font-size: 16px;
+				font-size: 12px;
 				font-family: 'Lato', sans-serif;
 				color: #555;
 				page-break-after: always;
@@ -84,9 +84,6 @@
 			
 			@media print {
 				@page {size: A4 landscape; }
-                table {
-                    font-size:10px !important;
-                }
 			}
 
 			.invoice-box.rtl {
@@ -126,61 +123,64 @@
 					</td>
 				</tr>
 			</table><br>
-			<table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
+			<table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:10px;">
 				<thead>
 					<tr align="center">
 						<th rowspan="2">No</th>
-                        <th rowspan="2">PODP NO.</th>
                         <th rowspan="2">Pengguna</th>
-						<th rowspan="2">Supplier</th>
-						<th colspan="2">Tanggal</th>
-                        <th rowspan="2">Lampiran</th>
-                        <th rowspan="2">Pembayaran</th>
-                        <th colspan="2">Mata Uang</th>
+						<th rowspan="2">Code</th>
+                        <th rowspan="2">Pabrik/Kantor</th>
+                        <th rowspan="2">Departemen</th>
+                        <th rowspan="2">Partner Bisnis</th>
+                        <th colspan="3" class="center-align">Tanggal</th>
+                        <th colspan="2" class="center-align">Mata Uang</th>
                         <th rowspan="2">Keterangan</th>
+                        <th rowspan="2">Termin</th>
+                        <th rowspan="2">Tipe Pembayaran</th>
+                        <th rowspan="2">Rekening Penerima</th>
+                        <th rowspan="2">Bank & No.Rek</th>
+                        <th rowspan="2">Total</th>
+                        <th rowspan="2">PPN</th>
+                        <th rowspan="2">PPH</th>
+                        <th rowspan="2">Grandtotal</th>
+                        <th rowspan="2">Dokumen</th>
                         <th rowspan="2">Status</th>
-                        <th rowspan="2">Subtotal</th>
-						<th rowspan="2">Diskon</th>
-						<th rowspan="2">Total</th>
-						<th rowspan="2">Pajak</th>
-						<th rowspan="2">Grandtotal</th>
 					</tr>
                     <tr align="center">
 						<th>Pengajuan</th>
-						<th>Tenggat</th>
+                        <th>Kadaluwarsa</th>
+                        <th>Pemakaian</th>
                         <th>Kode</th>
                         <th>Konversi</th>
 					</tr>
 				</thead>
 				<tbody>
 					@foreach($data as $key => $row)
-						<tr align="center">
-							<td>{{ $key+1 }}</td>
-							<td>{{ $row->code }}</td>
-							<td>{{ $row->user->name }}</td>
-							<td>{{ $row->supplier->name }}</td>
-							<td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-							<td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
-							<td><a href="{{ $row->attachment() }}">File</a></td>
-							<td>{{ $row->type() }}</td>
-							<td>{{ $row->currency->symbol }}</td>
-							<td>{{ $row->currency_rate }}</td>
-							<td>{{ $row->note }}</td>
-							<td>{!! $row->statusRaw() !!}</td>
-							<td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
-							<td align="right">{{ number_format($row->discount,2,',','.') }}</td>
-							<td align="right">{{ number_format($row->total,2,',','.') }}</td>
-							<td align="right">{{ number_format($row->tax,2,',','.') }}</td>
-							<td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
-						</tr>
-					@endforeach
-                    @if(count($data) == 0)
-                        <tr>
-                            <td colspan="18" align="center">
-                                Data tidak ditemukan
-                            </td>
+                        <tr align="center">
+                            <td>{{ $key+1 }}</td>
+                            <td>{{ $row->user->name }}</td>
+                            <td>{{ $row->code }}</td>
+                            <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                            <td>{{ $row->department->name }}</td>
+                            <td>{{ $row->account->name }}</td>
+                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                            <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
+                            <td>{{ date('d/m/y',strtotime($row->required_date)) }}</td>
+                            <td>{{ $row->currency->code }}</td>
+                            <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
+                            <td>{{ $row->note }}</td>
+                            <td>{{ $row->termin_note }}</td>
+                            <td>{{ $row->paymentType() }}</td>
+                            <td>{{ $row->name_account }}</td>
+                            <td>{{ $row->no_account }}</td>
+                            <td>{{ number_format($row->total,3,',','.') }}</td>
+                            <td>{{ number_format($row->tax,3,',','.') }}</td>
+                            <td>{{ number_format($row->wtax,3,',','.') }}</td>
+                            <td>{{ number_format($row->grandtotal,3,',','.') }}</td>
+                            <td><a href="{{ $row->attachment() }}">File</a></td>
+                            <td>{!! $row->status() !!}</td>
                         </tr>
-                    @endif
+					@endforeach
 				</tbody>
 			</table>
 		</div>

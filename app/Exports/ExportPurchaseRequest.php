@@ -15,10 +15,11 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search, string $status)
+    public function __construct(string $search, string $status, array $dataplaces)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
+        $this->dataplaces = $dataplaces ? $dataplaces : [];
     }
 
     private $headings = [
@@ -63,7 +64,9 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
                         ->orWhere('name','like',"%$this->search%");
                 });
             }
-        })->get();
+        })
+        ->whereIn('place_id',$this->dataplaces)
+        ->get();
 
         $arr = [];
 

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Misc;
 
+use App\Models\PaymentRequest;
 use App\Models\Region;
+use App\Models\Place;
 use App\Models\Warehouse;
 use App\Models\Country;
 use App\Models\Item;
@@ -148,7 +150,8 @@ class Select2Controller extends Controller {
     }
 
     public function coa(Request $request)
-    {
+    {   
+        $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
         $response = [];
         $search   = $request->search;
         $data = Coa::where(function($query) use($search){
@@ -156,12 +159,38 @@ class Select2Controller extends Controller {
                     ->orWhere('name', 'like', "%$search%");
                 /* })->whereDoesntHave('childSub') */
                  })->where('level',5)
-                ->where('status','1')->get();
+                ->where('status','1')
+                ->whereIn('company_id',$arrCompany)
+                ->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
+                'text' 			=> $d->code.' - '.$d->name.' - '.$d->company->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function coaCashBank(Request $request)
+    {
+        $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
+        $response = [];
+        $search   = $request->search;
+        $data = Coa::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                 })->where('level',5)
+                ->where('status','1')
+                ->whereIn('company_id',$arrCompany)
+                ->where('code','like',"100.01.01%")
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name.' - '.$d->company->name,
             ];
         }
 
@@ -586,6 +615,30 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function paymentRequest(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = PaymentRequest::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('note', 'like', "%$search%");
+                })
+                ->whereDoesntHave('outgoingPayment')
+                ->where('status','2')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->note,
+                'admin'         => number_format($d->admin,3,',','.'),
+                'grandtotal'    => number_format($d->grandtotal,3,',','.'),
+                'code'          => $d->code
             ];
         }
 

@@ -26,7 +26,6 @@ class PurchaseDownPayment extends Model
         'percent_tax',
         'post_date',
         'due_date',
-        'document_date',
         'status',
         'type',
         'currency_id',
@@ -43,6 +42,10 @@ class PurchaseDownPayment extends Model
         'void_note',
         'void_date'
     ];
+
+    public function hasPaymentRequestDetail(){
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table);
+    }
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);

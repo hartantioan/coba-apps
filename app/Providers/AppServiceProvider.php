@@ -36,7 +36,10 @@ class AppServiceProvider extends ServiceProvider
             'good_receipt_mains'        => 'App\Models\GoodReceiptMain',
             'journals'                  => 'App\Models\Journal',
             'capitalizations'           => 'App\Models\Capitalization',
-            'retirements'               => 'App\Models\Retirement'
+            'retirements'               => 'App\Models\Retirement',
+            'fund_requests'             => 'App\Models\FundRequest',
+            'payment_requests'          => 'App\Models\PaymentRequest',
+            'outgoing_payments'         => 'App\Models\OutgoingPayment'
         ]);
     }
 }

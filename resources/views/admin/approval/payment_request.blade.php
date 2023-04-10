@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Permohonan Pembelian # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Permohonan Dana # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -129,12 +129,12 @@
                         <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
                     <div class="mr-2">
-                        <small>Hingga:</small>
+                        <small>Tenggat:</small>
                         <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
                     </div>
                     <div>
-                        <small>Dipakai:</small>
-                        <span>{{ date('d/m/y',strtotime($data->required_date)) }}</span>
+                        <small>Dibayar:</small>
+                        <span>{{ date('d/m/y',strtotime($data->pay_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -142,8 +142,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Purchase Request</h5>
-                <span>Dept. {{ $data->department->name }}</span>
+                <h5 class="indigo-text">Permintaan Pembayaran</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -185,6 +184,18 @@
                 <h6 class="invoice-from">Lain-lain</h6>
                 <div class="row">
                     <div class="col s3">
+                        Bisnis Partner
+                    </div>
+                    <div class="col s9">
+                        {{ $data->account->name }}
+                    </div>
+                    <div class="col s3">
+                        Rek. Tujuan
+                    </div>
+                    <div class="col s9">
+                        {{ $data->account_bank.' - '.$data->account_no.' - '.$data->account_name }}
+                    </div>
+                    <div class="col s3">
                         Lampiran
                     </div>
                     <div class="col s9">
@@ -202,29 +213,52 @@
         <div class="divider mb-3 mt-3"></div>
         <!-- product details table-->
         <div class="invoice-product-details">
-        <table class="bordered">
-            <thead>
-                <tr>
-                    <th class="center">Item</th>
-                    <th class="center">Jum.</th>
-                    <th class="center">Sat.</th>
-                    <th class="center">Catatan</th>
-                    <th class="center">Tgl.Dipakai</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($data->purchaseRequestDetail as $row)
-                <tr>
-                    <td>{{ $row->item->name }}</td>
-                    <td class="center">{{ $row->qty }}</td>
-                    <td class="center">{{ $row->item->buyUnit->code }}</td>
-                    <td>{{ $row->note }}</td>
-                    <td class="indigo-text center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+            <table class="bordered">
+                <thead>
+                    <tr>
+                        <th class="center">Referensi</th>
+                        <th class="center">Tipe</th>
+                        <th class="center">Keterangan</th>
+                        <th class="center">Coa</th>
+                        <th class="center">Bayar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $total = 0;
+                    @endphp
+                    @foreach($data->paymentRequestDetail as $row)
+                    <tr>
+                        <td>{{ $row->lookable->code }}</td>
+                        <td class="center-align">{{ $row->type() }}</td>
+                        <td>{{ $row->note }}</td>
+                        <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                        <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
+                    </tr>
+                    @php
+                        $total += $row->nominal;
+                    @endphp
+                    @endforeach
+                    <tr>
+                        <td colspan="4" class="right-align">Total</td>
+                        <td class="right-align">{{ number_format($total,3,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="right-align">Admin</td>
+                        <td class="right-align">{{ number_format($data->admin,3,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="right-align">Grandtotal</td>
+                        <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     <!-- invoice subtotal -->
     <div class="divider mt-3 mb-3"></div>
         <div class="invoice-subtotal">

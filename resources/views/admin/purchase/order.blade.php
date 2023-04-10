@@ -171,7 +171,7 @@
                                                         <th colspan="2" class="center">Proforma</th>
                                                         <th colspan="2" class="center">Pembayaran</th>
                                                         <th colspan="2" class="center">Mata Uang</th>
-                                                        <th colspan="3" class="center">Tanggal</th>
+                                                        <th colspan="2" class="center">Tanggal</th>
                                                         <th colspan="3" class="center">Penerima</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Subtotal</th>
@@ -192,7 +192,6 @@
                                                         <th>Konversi</th>
                                                         <th>Post</th>
                                                         <th>Kirim</th>
-                                                        <th>Dokumen</th>
                                                         <th>Nama</th>
                                                         <th>Alamat</th>
                                                         <th>Telepon</th>
@@ -313,10 +312,6 @@
                             <div class="input-field col m3 s12">
                                 <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. kirim">
                                 <label class="active" for="due_date">Tgl. Kirim</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
-                                <label class="active" for="document_date">Tgl. Dokumen</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
@@ -497,7 +492,6 @@
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ date("Y-m-d") }}');
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
-                $('#document_date').attr('min','{{ date("Y-m-d") }}');
                 $('#required_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) { 
@@ -792,7 +786,7 @@
 
     function changeDateMinimum(val){
         if(val){
-            $('#due_date,#document_date,#required_date').attr("min",val);
+            $('#due_date,#required_date').attr("min",val);
             $('input[name^="arr_required_date"]').each(function(){
                 $(this).attr("min",val);
             });
@@ -884,7 +878,6 @@
                 { name: 'currency_rate', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'delivery_date', className: 'center-align' },
-                { name: 'document_date', className: 'center-align' },
                 { name: 'receiver_name', className: 'center-align' },
                 { name: 'receiver_address', className: 'center-align' },
                 { name: 'receiver_phone', className: 'center-align' },
@@ -1065,23 +1058,10 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#delivery_date').val(response.delivery_date);
-                $('#document_date').val(response.document_date);
                 $('#percent_tax').val(response.percent_tax);
                 $('#receiver_name').val(response.receiver_name);
                 $('#receiver_address').val(response.receiver_address);
                 $('#receiver_phone').val(response.receiver_phone);
-                
-                if(response.is_tax == '1'){
-                    $('#is_tax').prop( "checked", true);
-                }else{
-                    $('#is_tax').prop( "checked", false);
-                }
-
-                if(response.is_include_tax == '1'){
-                    $('#is_include_tax').prop( "checked", true);
-                }else{
-                    $('#is_include_tax').prop( "checked", false);
-                }
                 
                 $('#note').val(response.note);
                 $('#subtotal').text(response.subtotal);

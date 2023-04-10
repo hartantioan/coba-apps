@@ -191,6 +191,18 @@ class User extends Authenticatable
         return $bank;
     }
 
+    public function fundRequest(){
+        return $this->hasMany('App\Models\FundRequest','account_id','id')->where('status','2');
+    }
+
+    public function purchaseDownPayment(){
+        return $this->hasMany('App\Models\PurchaseDownPayment','account_id','id')->where('status','2');
+    }
+
+    public function purchaseInvoice(){
+        return $this->hasMany('App\Models\PurchaseInvoice','account_id','id')->where('status','2');
+    }
+
     public function userPlace(){
         return $this->hasMany('App\Models\UserPlace');
     }

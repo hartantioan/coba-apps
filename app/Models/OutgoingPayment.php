@@ -8,44 +8,32 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class PurchaseInvoice extends Model
+class OutgoingPayment extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'purchase_invoices';
+    protected $table = 'outgoing_payments';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
-        'account_id',
         'place_id',
-        'department_id',
-        'post_date',
-        'due_date',
-        'document_date',
-        'type',
+        'account_id',
+        'payment_request_id',
+        'coa_source_id',
         'currency_id',
         'currency_rate',
-        'subtotal',
-        'discount',
-        'total',
-        'tax',
-        'wtax',
+        'post_date',
+        'pay_date',
+        'admin',
         'grandtotal',
-        'downpayment',
-        'balance',
         'document',
         'note',
         'status',
         'void_id',
         'void_note',
         'void_date',
-        'tax_no',
-        'tax_cut_no',
-        'cut_date',
-        'spk_no',
-        'invoice_no'
     ];
 
     public function user()
@@ -62,16 +50,6 @@ class PurchaseInvoice extends Model
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }
 
-    public function type(){
-        $type = match ($this->type) {
-          '1' => 'Cash',
-          '2' => 'Credit',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
     public function currency()
     {
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
@@ -82,21 +60,18 @@ class PurchaseInvoice extends Model
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
-    public function department()
+    public function paymentRequest()
     {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\PaymentRequest', 'payment_request_id', 'id')->withTrashed();
+    }
+
+    public function coaSource()
+    {
+        return $this->belongsTo('App\Models\Coa', 'coa_source_id', 'id')->withTrashed();
     }
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
-    }
-
-    public function purchaseInvoiceDetail()
-    {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail');
-    }
-    public function hasPaymentRequestDetail(){
-        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table);
     }
 
     public function status(){
@@ -144,7 +119,7 @@ class PurchaseInvoice extends Model
 
     public static function generateCode()
     {
-        $query = PurchaseInvoice::selectRaw('RIGHT(code, 9) as code')
+        $query = OutgoingPayment::selectRaw('RIGHT(code, 9) as code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();
@@ -157,13 +132,13 @@ class PurchaseInvoice extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'POIN-'.date('y').date('m').date('d').'-';
+        $pre = 'OP-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type','purchase_invoices')->where('lookable_id',$this->id)->first();
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->first();
         if($source){
             return $source;
         }else{

@@ -54,9 +54,6 @@ class PurchaseOrderController extends Controller
             'shipping_type',
             'place_id',
             'department_id',
-            'is_tax',
-            'is_include_tax',
-            'percent_tax',
             'document_no',
             'document_po',
             'payment_type',
@@ -65,7 +62,6 @@ class PurchaseOrderController extends Controller
             'currency_rate',
             'post_date',
             'delivery_date',
-            'document_date',
             'receiver_name',
             'receiver_address',
             'receiver_phone',
@@ -90,7 +86,6 @@ class PurchaseOrderController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('percent_tax', 'like', "%$search%")
                             ->orWhere('document_no', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
@@ -160,7 +155,6 @@ class PurchaseOrderController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('percent_tax', 'like', "%$search%")
                             ->orWhere('document_no', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
@@ -244,7 +238,6 @@ class PurchaseOrderController extends Controller
                     number_format($val->currency_rate,3,',','.'),
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->delivery_date)),
-                    date('d/m/y',strtotime($val->document_date)),
                     $val->receiver_name,
                     $val->receiver_address,
                     $val->receiver_phone,
@@ -324,7 +317,6 @@ class PurchaseOrderController extends Controller
             'currency_rate'             => 'required',
             'post_date'                 => 'required',
             'delivery_date'             => 'required',
-            'document_date'             => 'required',
             'receiver_name'             => 'required',
             'receiver_address'          => 'required',
             'receiver_phone'            => 'required',
@@ -345,7 +337,6 @@ class PurchaseOrderController extends Controller
             'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
             'post_date.required'                => 'Tanggal post tidak boleh kosong.',
             'delivery_date.required'            => 'Tanggal kirim tidak boleh kosong.',
-            'document_date.required'            => 'Tanggal dokumen tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong.',
             'arr_item.array'                    => 'Item harus array.',
             'arr_qty.required'                  => 'Qty tidak boleh kosong.',
@@ -481,7 +472,6 @@ class PurchaseOrderController extends Controller
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->post_date = $request->post_date;
                         $query->delivery_date = $request->delivery_date;
-                        $query->document_date = $request->document_date;
                         $query->note = $request->note;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->savesubtotal));
                         $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
@@ -531,7 +521,6 @@ class PurchaseOrderController extends Controller
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'post_date'                 => $request->post_date,
                         'delivery_date'             => $request->delivery_date,
-                        'document_date'             => $request->document_date,
                         'note'                      => $request->note,
                         'subtotal'                  => str_replace(',','.',str_replace('.','',$request->savesubtotal)),
                         'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),

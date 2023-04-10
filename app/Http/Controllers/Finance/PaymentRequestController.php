@@ -64,12 +64,8 @@ class PaymentRequestController extends Controller
             'pay_date',
             'currency_id',
             'currency_rate',
-            'total',
-            'wtax',
-            'tax',
-            'grandtotal',
-            'pay',
             'admin',
+            'grandtotal',
             'document',
             'account_bank',
             'account_no',
@@ -398,6 +394,7 @@ class PaymentRequestController extends Controller
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
                         $query->place_id = $request->place_id;
+                        $query->coa_source_id = $request->coa_source_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->pay_date = $request->pay_date;
@@ -859,7 +856,7 @@ class PaymentRequestController extends Controller
                         'grandtotal'                => $cek->grandtotal,
                         'document'                  => $request->file('documentPay') ? $request->file('documentPay')->store('public/outgoing_payments') : NULL,
                         'note'                      => $request->notePay,
-                        'status'                    => '2',
+                        'status'                    => '3',
                     ]);
 
                     $cek->update([

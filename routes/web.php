@@ -110,6 +110,7 @@ Route::prefix('admin')->group(function () {
             Route::get('asset', [Select2Controller::class, 'asset']);
             Route::get('unit', [Select2Controller::class, 'unit']);
             Route::get('coa_cash_bank', [Select2Controller::class, 'coaCashBank']);
+            Route::get('payment_request', [Select2Controller::class, 'paymentRequest']);
         });
 
         Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -639,6 +640,8 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [OutgoingPaymentController::class, 'show']);
                 Route::post('print',[OutgoingPaymentController::class, 'print']);
                 Route::get('export',[OutgoingPaymentController::class, 'export']);
+                Route::post('send_used_data',[OutgoingPaymentController::class, 'sendUsedData']);
+                Route::post('remove_used_data', [OutgoingPaymentController::class, 'removeUsedData']);
                 Route::post('create',[OutgoingPaymentController::class, 'create'])->middleware('operation.access:outgoing_payment,update');
                 Route::post('void_status', [OutgoingPaymentController::class, 'voidStatus'])->middleware('operation.access:outgoing_payment,void');
                 Route::get('approval/{id}',[OutgoingPaymentController::class, 'approval'])->withoutMiddleware('direct.access');

@@ -140,7 +140,7 @@ class PurchaseOrder extends Model
 
     public function goodReceipt()
     {
-        return $this->hasMany('App\Models\GoodReceipt');
+        return $this->hasOne('App\Models\GoodReceipt');
     }
 
     public function used(){

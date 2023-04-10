@@ -78,7 +78,7 @@
                                                     <select class="form-control" id="filter_place" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
                                                         @foreach ($place as $rowplace)
-                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
+                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -129,7 +129,7 @@
                                                         <th colspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Admin</th>
-                                                        <th rowspan="2">Bayar</th>
+                                                        <th rowspan="2">Total</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Status</th>
@@ -177,7 +177,7 @@
                                 <select class="form-control" id="place_id" name="place_id">
                                     <option value="">--Kosong--</option>
                                     @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="" for="place_id">Pabrik/Kantor</label>
@@ -189,14 +189,6 @@
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="top" name="top" min="0" type="number" value="0" readonly>
-                                <label class="active" for="top">TOP (hari) Autofill</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                                <label class="active" for="due_date">Tgl. Kadaluarsa</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="pay_date" name="pay_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar">
@@ -223,87 +215,24 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="col m12">
-                                <h6>Rekening (Jika transfer)</h6>
-                                <div class="input-field col m3 s12">
-                                    <select class="form-control" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
-                                        <option value="">--Pilih Partner Bisnis-</option>
-                                    </select>
-                                    <label class="" for="user_bank_id">Pilih Dari Daftar</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input id="account_bank" name="account_bank" type="text" placeholder="Bank Tujuan">
-                                    <label class="active" for="account_bank">Bank Tujuan</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input id="account_no" name="account_no" type="text" placeholder="No Rekening Tujuan">
-                                    <label class="active" for="account_no">No Rekening</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input id="account_name" name="account_name" type="text" placeholder="Nama Pemilik Rekening">
-                                    <label class="active" for="account_name">Nama Pemilik Rekening</label>
-                                </div>
+                            <div class="input-field col m3 s12">
+                                <select class="browser-default" id="payment_request_id" name="payment_request_id" onchange="getPaymentRequest();"></select>
+                                <label class="active" for="user_bank_id">Permintaan Pembayaran (Jika Ada)</label>
                             </div>
-                            <div class="col m12 s12">
-                                <p class="mt-2 mb-2">
-                                    <h6>Detail Req. Dana / Uang Muka Pembelian / Invoice Pembelian</h6>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" style="max-width:1650px !important;">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center" width="10%">
-                                                        <label>
-                                                            <input type="checkbox" onclick="chooseAll(this)">
-                                                            <span>Semua</span>
-                                                        </label>
-                                                    </th>
-                                                    <th class="center">Referensi</th>
-                                                    <th class="center">Tgl.Post</th>
-                                                    <th class="center">Tgl.Tenggat</th>
-                                                    <th class="center">Total</th>
-                                                    <th class="center">PPN</th>
-                                                    <th class="center">PPH</th>
-                                                    <th class="center">Grandtotal</th>
-                                                    <th class="center">Bayar</th>
-                                                    <th class="center">Keterangan</th>
-                                                    <th class="center">Coa</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-detail">
-                                                <tr id="empty-detail">
-                                                    <td colspan="10" class="center">
-                                                        Pilih supplier/vendor untuk memulai...
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </p>
+                            <div class="input-field col m3 s12">
+                                <input id="admin" name="admin" type="text" value="0,000" onkeyup="formatRupiah(this)">
+                                <label class="active" for="admin">Biaya Admin</label>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m3 s12">
+                                <input id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this)">
+                                <label class="active" for="grandtotal">Total Bayar (Keluar)</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m3 s12">
                                 <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <table width="100%" class="bordered">
-                                    <thead>
-                                        <tr>
-                                            <td>Biaya Admin</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="admin" name="admin" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Total Bayar</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr>
-                                    </thead>
-                                </table>
                             </div>
                             <div class="col s12 mt-3">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -388,24 +317,17 @@
                     return 'You will lose all changes made since your last save';
                 };
             },
+            onCloseStart: function(modal, trigger){
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+            },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('.row_purchase').each(function(){
-                    $(this).remove();
-                });
                 M.updateTextFields();
-                $('#body-detail').empty().append(`
-                    <tr id="empty-detail">
-                        <td colspan="10" class="center">
-                            Pilih supplier/vendor untuk memulai...
-                        </td>
-                    </tr>
-                `);
-                $('#account_id').empty();
-                $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
-                $('#subtotal,#discount,#downpayment').val('0,000');
-                $('#list-used-data').empty();
+                $('#account_id,#coa_source_id,#payment_request_id').empty();
+                $('#grandtotal,#admin').val('0,000');
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -426,5 +348,347 @@
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
         select2ServerSide('#coa_source_id', '{{ url("admin/select2/coa_cash_bank") }}');
+        select2ServerSide('#payment_request_id', '{{ url("admin/select2/payment_request") }}');
     });
+
+    function loadDataTable() {
+		window.table = $('#datatable_serverside').DataTable({
+            "responsive": false,
+            "scrollX": true,
+            "stateSave": true,
+            "serverSide": true,
+            "deferRender": true,
+            "destroy": true,
+            "iDisplayInLength": 10,
+            "order": [[0, 'asc']],
+            ajax: {
+                url: '{{ Request::url() }}/datatable',
+                type: 'GET',
+                data: {
+                    status : $('#filter_status').val(),
+                    'account_id[]' : $('#filter_account').val(),
+                    place_id : $('#filter_place').val(),
+                    'currency_id[]' : $('#filter_currency').val(),
+                },
+                beforeSend: function() {
+                    loadingOpen('#datatable_serverside');
+                },
+                complete: function() {
+                    loadingClose('#datatable_serverside');
+                },
+                error: function() {
+                    loadingClose('#datatable_serverside');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            },
+            columns: [
+                { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'code', className: 'center-align' },
+                { name: 'user_id', className: 'center-align' },
+                { name: 'account_id', className: 'center-align' },
+                { name: 'place_id', className: 'center-align' },
+                { name: 'payment_request_id', className: 'center-align' },
+                { name: 'coa_source_id', className: 'center-align' },
+                { name: 'post_date', className: 'center-align' },
+                { name: 'pay_date', className: 'center-align' },
+                { name: 'currency_id', className: 'center-align' },
+                { name: 'currency_rate', className: 'center-align' },
+                { name: 'admin', className: 'right-align' },
+                { name: 'grandtotal', className: 'right-align' },
+                { name: 'document', className: 'center-align' },
+                { name: 'note', className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                'columnsToggle' /* or colvis */
+            ]
+        });
+        $('.dt-buttons').appendTo('#datatable_buttons');
+        
+        $('select[name="datatable_serverside_length"]').addClass('browser-default');
+	}
+
+    function rowDetail(data) {
+        var content = '';
+        $.ajax({
+            url: '{{ Request::url() }}/row_detail',
+            type: 'GET',
+            async: false,
+            data: {
+                id: $(data[0]).data('id')
+            },
+            success: function(response) {
+                content += response;
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+        return content;
+	}
+
+    function getPaymentRequest(){
+        if($('#payment_request_id').val()){
+            $('#admin').val($('#payment_request_id').select2('data')[0].admin);
+            $('#grandtotal').val($('#payment_request_id').select2('data')[0].grandtotal);
+            $('#note').val($('#payment_request_id').select2('data')[0].code);
+            $.ajax({
+                url: '{{ Request::url() }}/send_used_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#payment_request_id').val()
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                        $('#payment_request_id').empty();
+                    }else{
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + response.code + `
+                                <i class="material-icons close data-used" onclick="removeUsedData(` + response.id + `)">close</i>
+                            </div>
+                        `);
+                    }
+                    
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            $('#admin,#grandtotal').val('0,000');
+            $('#note').val('');
+        }
+    }
+
+    function removeUsedData(id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function printPreview(code){
+        $.ajax({
+            url: '{{ Request::url() }}/approval/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                $('#modal2').modal('open');
+                $('#show_print').html(data);
+            }
+        });
+    }
+
+    function show(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+
+                if(response.status == 500){
+                    swal({
+                        title: 'Ups!',
+                        text: response.message,
+                        icon: 'warning'
+                    });
+                    $('#payment_request_id').empty();
+                }else{
+                    $('#modal1').modal('open');
+                    $('#temp').val(id);
+                    $('#account_id').empty().append(`
+                        <option value="` + response.account_id + `">` + response.account_name + `</option>
+                    `);
+                    $('#coa_source_id').empty().append(`
+                        <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
+                    `);
+                    $('#place_id').val(response.place_id).formSelect();
+                    $('#currency_id').val(response.currency_id).formSelect();
+                    $('#currency_rate').val(response.currency_rate);
+                    $('#post_date').val(response.post_date);
+                    $('#pay_date').val(response.pay_date);                
+                    $('#note').val(response.note);
+                    $('#admin').val(response.admin);
+                    $('#grandtotal').val(response.grandtotal);
+                    
+                    if(response.payment_request_id){
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + response.payment_request_code + `
+                                <i class="material-icons close data-used" onclick="removeUsedData(` + response.payment_request_id + `)">close</i>
+                            </div>
+                        `);
+                        $('#payment_request_id').append(`
+                            <option value="` + response.payment_request_id + `">` + response.payment_request_code + `</option>
+                        `);
+                    }
+
+                    $('.modal-content').scrollTop(0);
+                    $('#note').focus();
+                    M.updateTextFields();
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function save(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data')[0]);
+
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
 </script>

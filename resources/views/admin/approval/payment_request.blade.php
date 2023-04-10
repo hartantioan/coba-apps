@@ -213,52 +213,52 @@
         <div class="divider mb-3 mt-3"></div>
         <!-- product details table-->
         <div class="invoice-product-details">
-        <table class="bordered">
-            <thead>
-                <tr>
-                    <th class="center">Referensi</th>
-                    <th class="center">Tipe</th>
-                    <th class="center">Keterangan</th>
-                    <th class="center">Coa</th>
-                    <th class="center">Bayar</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                    $total = 0;
-                @endphp
-                @foreach($data->paymentRequestDetail as $row)
-                <tr>
-                    <td>{{ $row->lookable->code }}</td>
-                    <td class="center-align">{{ $row->type() }}</td>
-                    <td>{{ $row->note }}</td>
-                    <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                    <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
-                </tr>
-                @php
-                    $total += $row->nominal;
-                @endphp
-                @endforeach
-                <tr>
-                    <td colspan="4" class="right-align">Total</td>
-                    <td class="right-align">{{ number_format($total,3,',','.') }}</td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="right-align">Admin</td>
-                    <td class="right-align">{{ number_format($data->admin,3,',','.') }}</td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="right-align">Grandtotal</td>
-                    <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
+            <table class="bordered">
+                <thead>
+                    <tr>
+                        <th class="center">Referensi</th>
+                        <th class="center">Tipe</th>
+                        <th class="center">Keterangan</th>
+                        <th class="center">Coa</th>
+                        <th class="center">Bayar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $total = 0;
+                    @endphp
+                    @foreach($data->paymentRequestDetail as $row)
+                    <tr>
+                        <td>{{ $row->lookable->code }}</td>
+                        <td class="center-align">{{ $row->type() }}</td>
+                        <td>{{ $row->note }}</td>
+                        <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                        <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
+                    </tr>
+                    @php
+                        $total += $row->nominal;
+                    @endphp
+                    @endforeach
+                    <tr>
+                        <td colspan="4" class="right-align">Total</td>
+                        <td class="right-align">{{ number_format($total,3,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="right-align">Admin</td>
+                        <td class="right-align">{{ number_format($data->admin,3,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="right-align">Grandtotal</td>
+                        <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     <!-- invoice subtotal -->
     <div class="divider mt-3 mb-3"></div>
         <div class="invoice-subtotal">

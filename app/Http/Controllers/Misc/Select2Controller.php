@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Misc;
 
+use App\Models\PaymentRequest;
 use App\Models\Region;
 use App\Models\Place;
 use App\Models\Warehouse;
@@ -614,6 +615,30 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function paymentRequest(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = PaymentRequest::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('note', 'like', "%$search%");
+                })
+                ->whereDoesntHave('outgoingPayment')
+                ->where('status','2')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->note,
+                'admin'         => number_format($d->admin,3,',','.'),
+                'grandtotal'    => number_format($d->grandtotal,3,',','.'),
+                'code'          => $d->code
             ];
         }
 

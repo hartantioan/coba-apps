@@ -139,6 +139,11 @@ class PurchaseOrder extends Model
         return $this->hasMany('App\Models\PurchaseOrderDetail');
     }
 
+    public function goodReceipt()
+    {
+        return $this->hasOne('App\Models\GoodReceipt');
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }

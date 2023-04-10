@@ -45,6 +45,7 @@ use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
 use App\Http\Controllers\Accounting\RetirementController;
+use App\Http\Controllers\Accounting\TaxController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -53,6 +54,8 @@ use App\Http\Controllers\Setting\DataAccessController;
 
 use App\Http\Controllers\Misc\Select2Controller;
 use App\Http\Controllers\Misc\NotificationController;
+
+use App\Http\Controllers\ReadXmlTaxController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +71,8 @@ use App\Http\Controllers\Misc\NotificationController;
 Route::get('/', function () {
     return redirect('/admin/login');
 });
+
+Route::get("read-xml", [ReadXmlTaxController::class, "index"]);
 
 Route::prefix('admin')->group(function () {
     Route::prefix('login')->group(function () {
@@ -520,6 +525,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [PurchaseOrderController::class, 'show']);
                 Route::post('print',[PurchaseOrderController::class, 'print']);
                 Route::get('export',[PurchaseOrderController::class, 'export']);
+                Route::get('viewstructuretree',[PurchaseOrderController::class, 'viewStructureTree']);
                 Route::post('get_purchase_request', [PurchaseOrderController::class, 'getPurchaseRequest']);
                 Route::post('remove_used_data', [PurchaseOrderController::class, 'removeUsedData']);
                 Route::post('create',[PurchaseOrderController::class, 'create'])->middleware('operation.access:purchase_order,update');
@@ -680,6 +686,17 @@ Route::prefix('admin')->group(function () {
                 });
             });
 
+            Route::prefix('tax')->middleware('operation.access:tax,view')->group(function () {
+                Route::get('/', [TaxController::class, 'index']);
+                Route::get('datatable', [TaxController::class, 'datatable']);
+                Route::post('show', [TaxController::class, 'show']);
+                Route::post('print', [TaxController::class, 'print']);
+                Route::get('export', [TaxController::class, 'export']);
+                Route::get('row_detail',[TaxController::class, 'rowDetail']);
+                Route::post('store_w_barcode', [TaxController::class, 'store_w_barcode']);
+                Route::post('destroy', [TaxController::class, 'destroy'])->middleware('operation.access:tax,delete');
+            });
+            
             Route::prefix('journal')->middleware('operation.access:journal,view')->group(function () {
                 Route::get('/',[JournalController::class, 'index']);
                 Route::get('datatable',[JournalController::class, 'datatable']);

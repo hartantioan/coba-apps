@@ -63,6 +63,13 @@
                                 </span> --}}
                             </a>
                         </li>
+                        <li>
+                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/personal_fund_request') }}"><i class="material-icons">monetization_on</i> Mohon Dana
+                                <span class="badge badge pill red float-right mr-1 tooltipped" data-position="bottom" data-tooltip="Under construction" style="height:30px !important;margin-top: -5px;">
+                                    <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: -20px;">build</i>
+                                </span>
+                            </a>
+                        </li>
                         <li class="divider" tabindex="0"></li>
                         <li><a class="grey-text text-darken-1" href="user-lock-screen.html"><i class="material-icons">lock_outline</i> Kunci</a></li>
                         <li><a class="grey-text text-darken-1" href="{{ url('admin/logout') }}"><i class="material-icons">keyboard_tab</i> Logout</a></li>

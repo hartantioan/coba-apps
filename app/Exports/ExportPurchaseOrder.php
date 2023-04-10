@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetail;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -9,8 +10,10 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Illuminate\Support\Collection;
 
-class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell, ShouldAutoSize
+class ExportPurchaseOrder implements WithMultipleSheets
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -32,36 +35,9 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
         $this->dataplaces = $dataplaces ? $dataplaces : [];
     }
 
-    private $headings = [
-        'NO',
-        'KODE',
-        'PENGGUNA',
-        'SUPPLIER',
-        'TIPE',
-        'SHIPPING',
-        'PABRIK/KANTOR',
-        'DEPARTEMEN',
-        'DOK.REF',
-        'PEMBAYARAN',
-        'MATA UANG',
-        'KONVERSI',
-        'TGL.POST',
-        'TGL.KIRIM',
-        'NAMA PENERIMA',
-        'ALAMAT PENERIMA',
-        'TELEPON PENERIMA',
-        'CATATAN',
-        'SUBTOTAL',
-        'DISKON',
-        'TOTAL',
-        'PPN',
-        'PPH',
-        'GRANDTOTAL'
-    ];
-
-    public function collection()
+    public function sheets(): array
     {
-        $data = PurchaseOrder::where(function ($query) {
+        $purchaseorder = PurchaseOrder::where(function ($query) {
             if($this->search) {
                 $query->where(function($query){
                     $query->where('code', 'like', "%$this->search%")
@@ -114,40 +90,110 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
             }
         })
         ->whereIn('place_id',$this->dataplaces)
-        ->get();
+        ->get([
+            'id',
+            'code',
+            'user_id',
+            'account_id',
+            'purchasing_type',
+            'shipping_type',
+            'place_id',
+            'department_id',
+            'document_no',
+            'document_po',
+            'payment_type',
+            'payment_term',
+            'currency_id',
+            'currency_rate',
+            'post_date',
+            'delivery_date',
+            'document_date',
+            'note',
+            'subtotal',
+            'discount',
+            'total',
+            'tax',
+            'wtax',
+            'grandtotal',
+            'status',
+            'void_id',
+            'void_note',
+            'void_date',
+            'receiver_name',
+            'receiver_address',
+            'receiver_phone'
+        ]);
 
-        $arr = [];
+        $sheets = [];
 
-        foreach($data as $key => $row){
-            $arr[] = [
-                'id'            => ($key + 1),
-                'code'          => $row->code,
-                'name'          => $row->user->name,
-                'supp'          => $row->supplier->name,
-                'tipe'          => $row->purchasingType(),
-                'ship'          => $row->shippingType(),
-                'pabrik'        => $row->place->name.' - '.$row->place->company->name,
-                'departemen'    => $row->department->name,
-                'dok'           => $row->document_no,
-                'pembayaran'    => $row->paymentType().' '.$row->payment_term.' hari',
-                'mata_uang'     => $row->currency->code,
-                'konversi'      => $row->currency_rate,
-                'tgl_post'      => $row->post_date,
-                'tgl_kirim'     => $row->delivery_date,
-                'receiver_name' => $row->receiver_name,
-                'receiver_add'  => $row->receiver_address,
-                'receiver_phone'=> $row->receiver_phone,
-                'catatan'       => $row->note,
-                'subtotal'      => $row->subtotal,
-                'diskon'        => $row->discount,
-                'total'         => $row->total,
-                'pajak'         => $row->tax,
-                'pajakw'        => $row->wtax,
-                'grandtotal'    => $row->grandtotal
-            ];
+        $sheets[] = new PurchaseOrderSheet($purchaseorder);
+
+        $purchaseorderdetail = PurchaseOrderDetail::whereIn('purchase_order_id', $purchaseorder->pluck('id')->toArray())->get([
+            'purchase_order_id',
+            'item_id',
+            'qty',
+            'price',
+            'percent_discount_1',
+            'percent_discount_2',
+            'discount_3',
+            'subtotal',
+            'note',
+            'is_tax',
+            'is_include_tax',
+            'percent_tax',
+            'is_wtax',
+            'percent_wtax'
+        ]);
+        $sheets[] = new PurchaseOrderDetailSheet($purchaseorderdetail);
+
+
+        return $sheets;
+    }
+}
+
+class PurchaseOrderSheet implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+{
+    private $purchaseorder;
+
+    public function __construct(Collection $purchaseorder)
+    {
+        $this->purchaseorder = $purchaseorder;
+    }
+
+    public function collection()
+    {
+        $arr = new Collection();
+
+        foreach($this->purchaseorder as $key => $row){
+            $arr->push([
+                ($key + 1),
+                $row->code,
+                $row->user->name,
+                $row->supplier->name,
+                $row->purchasingType(),
+                $row->shippingType(),
+                $row->place->name.' - '.$row->place->company->name,
+                $row->department->name,
+                $row->document_no,
+                $row->paymentType().' '.$row->payment_term.' hari',
+                $row->currency->code,
+                $row->currency_rate,
+                $row->post_date,
+                $row->delivery_date,
+                $row->receiver_name,
+                $row->receiver_address,
+                $row->receiver_phone,
+                $row->note,
+                $row->subtotal,
+                $row->discount,
+                $row->total,
+                $row->tax,
+                $row->wtax,
+                $row->grandtotal,
+            ]);
         }
 
-        return collect($arr);
+        return $arr;
     }
 
     public function title(): string
@@ -159,11 +205,102 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Wi
     {
         return 'A1';
     }
-	/**
-	 * @return array
-	 */
-	public function headings() : array
-	{
-		return $this->headings;
-	}
+
+    public function headings(): array
+    {
+        return [
+            'NO',
+            'KODE',
+            'PENGGUNA',
+            'SUPPLIER',
+            'TIPE',
+            'SHIPPING',
+            'PABRIK/KANTOR',
+            'DEPARTEMEN',
+            'DOK.REF',
+            'PEMBAYARAN',
+            'MATA UANG',
+            'KONVERSI',
+            'TGL.POST',
+            'TGL.KIRIM',
+            'NAMA PENERIMA',
+            'ALAMAT PENERIMA',
+            'TELEPON PENERIMA',
+            'CATATAN',
+            'SUBTOTAL',
+            'DISKON',
+            'TOTAL',
+            'PPN',
+            'PPH',
+            'GRANDTOTAL'
+        ];
+    }
+}
+
+class PurchaseOrderDetailSheet implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+{
+    private $purchaseorderdetail;
+
+    public function __construct(Collection $purchaseorderdetail)
+    {
+        $this->purchaseorderdetail = $purchaseorderdetail;
+    }
+
+    public function collection()
+    {
+        $arr = new Collection();
+
+        foreach($this->purchaseorderdetail as $key => $row){
+            $arr->push([
+                ($key + 1),
+                $row->purchaseOrder->code,
+                $row->item->name,
+                $row->qty,
+                $row->price,
+                $row->percent_discount_1,
+                $row->percent_discount_2,
+                $row->discount_3,
+                $row->subtotal,
+                $row->note,
+                $row->isTax(),
+                $row->isIncludeTax(),
+                $row->percent_tax,
+                $row->isWtax(),
+                $row->percent_wtax,
+            ]);
+        }
+
+        return $arr;
+    }
+
+    public function title(): string
+    {
+        return 'Detail Purchase Order';
+    }
+
+    public function startCell(): string
+    {
+        return 'A1';
+    }
+
+    public function headings(): array
+    {
+        return [
+            'NO',
+            'KODE',
+            'NAMA ITEM',
+            'QTY',
+            'PRICE',
+            'DISKON 1(%)',
+            'DISKON 2(%)',
+            'DISKON 3(%)',
+            'SUBTOTAL',
+            'KETERANGAN',
+            'MERUPAKAN PAJAK',
+            'TERMASUK PAJAK',
+            'PERSEN PAJAK',
+            'APAKAH WTAX',
+            'PERSEN WTAX',
+        ];
+    }
 }

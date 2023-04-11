@@ -211,22 +211,24 @@
                 <div class="col s12">
                     <div id="validation_alertImport" style="display:none;"></div>
                 </div>
-                <form action="{{ Request::url() }}/import" method="POST" enctype="multipart/form-data" id="form_dataimport">
+                <form class="row" action="{{ Request::url() }}/import" method="POST" enctype="multipart/form-data" id="form_dataimport">
                     @csrf
-                    <div class="file-field input-field">
-                        <div class="form-group">
-                            <div class="btn">
-                                <span>Choose Excel file to import</span>
-                                <input type="file" class="form-control-file" id="fileExcel" name="file">
-                            </div>
-                            <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text">
-                            </div>
+                    <div class="file-field input-field col m6 s12">
+                        <div class="btn">
+                            <span>Dokumen PO</span>
+                            <input type="file" class="form-control-file" id="fileExcel" name="file">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Import</button>
+                    <div class="input-field col m6 s12">
+                        Download format disini : <a href="{{ asset(Storage::url('format_imports/format_coa.xlsx')) }}" target="_blank">File</a>
+                    </div>
+                    <div class="input-field col m12 s12">
+                        <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
+                    </div>
                 </form>
-                
             </div>
         </div>
     </div>
@@ -266,10 +268,11 @@
                 beforeSend: function() {
                     $('#validation_alertImport').hide();
                     $('#validation_alertImport').html('');
+                    loadingOpen('.modal-content');
                 },
                 success: function(response) {
                     if(response.status == 200) {
-                        success();
+                        successImport();
                         M.toast({
                             html: response.message
                         });
@@ -282,8 +285,8 @@
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
-                                            <p> baris ke ` +val.row+ ` pada kolom ` +val.attribute+ ` </p>
-                                            <p> `+val.errors[0]+`</p>
+                                            <p> Line <b>` + val.row + `</b> in column <b>` + val.attribute + `</b> </p>
+                                            <p> ` + val.errors[0] + `</p>
                                         </div>
                                         <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
                                             <span aria-hidden="true">×</span>
@@ -312,9 +315,9 @@
                             html: response.message
                         });
                     }
+                    loadingClose('.modal-content');
                 },
                 error: function(response) {
-                    console.log(response);
                     var errors = response.responseJSON.errors;
                     var errorMessage = '';
                     if(response.status == 422) {
@@ -349,8 +352,6 @@
                     `).show();
 
                     }
-                    
-                    console.log(errors);
                 }
             });
 
@@ -570,6 +571,11 @@
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
+    }
+
+    function successImport(){
+        loadDataTable();
+        $('#modal2').modal('close');
     }
 
     function show(id){

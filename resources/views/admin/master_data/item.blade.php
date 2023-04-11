@@ -349,11 +349,10 @@
                 icon.first().html('remove');
             }
         });
+
         $('#form_dataimport').submit(function(event) {
             event.preventDefault();
-
             var formData = new FormData(this);
-
             $.ajax({
                 url: $(this).attr('action'),
                 type: $(this).attr('method'),
@@ -364,12 +363,13 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
+                    loadingOpen('.modal-content');
                     $('#validation_alertImport').hide();
                     $('#validation_alertImport').html('');
                 },
                 success: function(response) {
                     if(response.status == 200) {
-                        success();
+                        successImport();
                         M.toast({
                             html: response.message
                         });
@@ -408,13 +408,22 @@
                                 `);
                         });
                     } else {
-                        M.toast({
-                            html: response.message
+                        $.each(response.error, function(i, val) {
+                            $('#validation_alertImport').append(`
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p> ` +val+`</p>
+                                        </div>
+                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                `);
                         });
                     }
+                    loadingClose('.modal-content');
                 },
                 error: function(response) {
-                    console.log(respose);
                     var errors = response.responseJSON.errors;
                     var errorMessage = '';
                     if(response.status == 422) {
@@ -449,14 +458,12 @@
                     `).show();
 
                     }
-                    
-                    console.log(errors);
                 }
             });
-
         });
         
         loadDataTable();
+
         $('#modal2').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -648,6 +655,11 @@
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
+    }
+
+    function successImport(){
+        loadDataTable();
+        $('#modal2').modal('close');
     }
 
     function show(id){

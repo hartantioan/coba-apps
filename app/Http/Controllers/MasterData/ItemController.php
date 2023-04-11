@@ -5,6 +5,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -15,14 +16,9 @@ use App\Models\ItemWarehouse;
 use App\Models\Unit;
 use App\Models\ItemGroup;
 use App\Models\Warehouse;
-
 use Illuminate\Support\Facades\DB;
-
 use App\Imports\ImportItem;
-
 use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 use App\Exports\ExportItem;
 
@@ -436,7 +432,11 @@ class ItemController extends Controller
         try {
             Excel::import(new ImportItem, $request->file('file'));
 
-            return response()->json(['message' => 'Import successful!']);
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Import sukses!'
+            ]);
+
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
 
@@ -457,8 +457,8 @@ class ItemController extends Controller
             return response()->json($response);
         } catch (\Exception $e) {
             $response = [
-                'status'  => 500,
-                'message' => "Data failed to save"
+                'status'    => 500,
+                'error'     => $e->getMessage()
             ];
             return response()->json($response);
         }

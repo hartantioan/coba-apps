@@ -6,20 +6,23 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\Item;
+use App\Models\ItemWarehouse;
 
-use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\ValidationException;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\OnEachRow;
+use Maatwebsite\Excel\Row;
 
-class ImportItem implements ToModel,WithHeadingRow, WithValidation,WithBatchInserts
+class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatchInserts
 {
-    public function model(array $row)
+
+    public function onRow(Row $row)
     {
-        return new Item([
+        $row = $row->toArray();
+
+        $query = Item::create([
             'code' => $row['code'],
             'name' => $row['name'],
             'item_group_id' => $row['item_group_id'],
@@ -34,6 +37,16 @@ class ImportItem implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             'is_service' => $row['is_service'],
             'status' => $row['status']
         ]);
+
+        if($row['warehouse'] && $query){
+            $arrWarehouse = explode(',',$row['warehouse']);
+            foreach($arrWarehouse as $rowwr){
+                ItemWarehouse::create([
+                    'item_id'       => $query->id,
+                    'warehouse_id'  => intval($rowwr),
+                ]);
+            }
+        }
     }
 
     public function rules(): array
@@ -75,6 +88,4 @@ class ImportItem implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
     {
         return 1000;
     }
-
-
 }

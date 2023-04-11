@@ -20,27 +20,27 @@ class ImportCoa implements ToModel,WithHeadingRow, WithValidation,WithBatchInser
     public function model(array $row)
     {
         return new Coa([
-            'code' => $data['code'],
-            'name'=> $data['name'],
-            'company_id'=> $data['company_id'],
-            'parent_id'=> $data['parent_id'],
-            'level'=> $data['level'],
-            'type'=> $data['type'],
-            'is_confidential'=> $data['is_confidential'],
-            'is_control_account'=> $data['is_control_account'],
-            'is_cash_account'=> $data['is_cash_account'],
-            'status'=> $data['status'],
+            'id' => $row['id'],
+            'code' => $row['code'],
+            'name'=> $row['name'],
+            'company_id'=> $row['company_id'],
+            'parent_id'=> $row['parent_id'],
+            'level'=> $row['level'],
+            'is_confidential'=> $row['is_confidential'],
+            'is_control_account'=> $row['is_control_account'],
+            'is_cash_account'=> $row['is_cash_account'],
+            'status'=> $row['status'],
         ]);
     }
     public function rules(): array
     {
         return [
-            '*.code' => 'required|unique:coas,code',
+            '*.id'  => 'required|numeric|unique:coas,id',
+            '*.code' => 'required',
             '*.name' => 'required|string',
             '*.company_id' => 'required|numeric',
             '*.parent_id' => 'nullable',
             '*.level' => 'required|integer',
-            '*.type' => 'required|integer',
             '*.is_confidential' => 'nullable',
             '*.is_control_account' => 'nullable',
             '*.is_cash_account' => 'nullable',

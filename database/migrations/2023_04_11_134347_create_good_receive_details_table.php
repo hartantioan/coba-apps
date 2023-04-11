@@ -13,20 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tax_details', function (Blueprint $table) {
+        Schema::create('good_receive_details', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('tax_id')->nullable();
-            $table->string('item')->nullable();
-            $table->double('price')->nullable();
+            $table->bigInteger('good_receive_id')->nullable();
+            $table->bigInteger('item_id')->nullable();
             $table->double('qty')->nullable();
-            $table->double('subtotal')->nullable();
-            $table->double('discount')->nullable();
+            $table->double('price')->nullable();
             $table->double('total')->nullable();
-            $table->double('tax')->nullable();
-            $table->double('nominal_ppnbm')->nullable();
-            $table->double('ppnbm')->nullable();
+            $table->string('note')->nullable();
+            $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['good_receive_id','item_id','warehouse_id'],'good_receives_details_index');
         });
     }
 
@@ -37,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tax_details');
+        Schema::dropIfExists('good_receive_details');
     }
 };

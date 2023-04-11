@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
 
+use App\Http\Controllers\Personal\ChatController;
+
 use App\Http\Controllers\MasterData\ItemController;
 use App\Http\Controllers\MasterData\ItemGroupController;
 use App\Http\Controllers\MasterData\UserController;
@@ -41,6 +43,7 @@ use App\Http\Controllers\Purchase\LandedCostController;
 use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
+use App\Http\Controllers\Inventory\GoodReceiveController;
 
 use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
@@ -124,6 +127,10 @@ Route::prefix('admin')->group(function () {
                 Route::get('/',[AuthController::class, 'index']);
                 Route::post('update', [AuthController::class, 'update']);
                 Route::post('upload_sign', [AuthController::class, 'uploadSign']);
+            });
+
+            Route::prefix('chat')->group(function () {
+                Route::get('/',[ChatController::class, 'index']);
             });
 
             Route::prefix('notification')->group(function () {
@@ -606,6 +613,19 @@ Route::prefix('admin')->group(function () {
                 Route::get('approval/{id}',[GoodReceiptPOController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                 Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
+            });
+
+            Route::prefix('good_receive')->middleware('operation.access:good_receive,view')->group(function () {
+                Route::get('/',[GoodReceiveController::class, 'index']);
+                Route::get('datatable',[GoodReceiveController::class, 'datatable']);
+                Route::get('row_detail',[GoodReceiveController::class, 'rowDetail']);
+                Route::post('show', [GoodReceiveController::class, 'show']);
+                Route::post('print',[GoodReceiveController::class, 'print']);
+                Route::get('export',[GoodReceiveController::class, 'export']);
+                Route::post('create',[GoodReceiveController::class, 'create'])->middleware('operation.access:good_receive,update');
+                Route::get('approval/{id}',[GoodReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('void_status', [GoodReceiveController::class, 'voidStatus'])->middleware('operation.access:good_receive,void');
+                Route::post('destroy', [GoodReceiveController::class, 'destroy'])->middleware('operation.access:good_receive,delete');
             });
         });
 

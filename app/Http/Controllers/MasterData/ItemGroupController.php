@@ -85,7 +85,7 @@ class ItemGroupController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    $nomor,
+                    $val->id,
                     $val->code,
                     $val->name,
                     $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',

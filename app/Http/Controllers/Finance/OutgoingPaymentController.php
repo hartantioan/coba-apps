@@ -174,9 +174,6 @@ class OutgoingPaymentController extends Controller
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
 
@@ -347,7 +344,7 @@ class OutgoingPaymentController extends Controller
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
                             }
-                            $document = $request->file('document')->store('public/payment_requests');
+                            $document = $request->file('document')->store('public/outgoing_payments');
                         } else {
                             $document = $query->document;
                         }
@@ -365,16 +362,9 @@ class OutgoingPaymentController extends Controller
                         $query->admin = str_replace(',','.',str_replace('.','',$request->admin));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
-                        $query->account_bank = $request->account_bank;
-                        $query->account_no = $request->account_no;
-                        $query->account_name = $request->account_name;
                         $query->note = $request->note;
 
                         $query->save();
-
-                        foreach($query->paymentRequestDetail as $row){
-                            $row->delete();
-                        }
 
                         DB::commit();
                     }else{
@@ -437,5 +427,140 @@ class OutgoingPaymentController extends Controller
 		}
 		
 		return response()->json($response);
+    }
+
+    public function voidStatus(Request $request){
+        $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+            if(in_array($query->status,['4','5'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+    
+                activity()
+                    ->performedOn(new OutgoingPayment())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the outgoing payment data');
+    
+                CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas / Bank Keluar No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('outgoing_payments',$query->id);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function destroy(Request $request){
+        $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query->approval()){
+            foreach($query->approval()->approvalMatrix as $row){
+                if($row->status == '2'){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Kas / Bank Keluar telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+            }
+        }
+
+        if(in_array($query->status,['2','3'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Jurnal / dokumen sudah dalam progres, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+        
+        if($query->delete()) {
+
+            CustomHelper::removeApproval('outgoing_payments',$query->id);
+
+            activity()
+                ->performedOn(new OutgoingPayment())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the outgoing payment data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function print(Request $request){
+
+        $data = [
+            'title' => 'OUTGOING PAYMENT REPORT',
+            'data' => OutgoingPayment::where(function($query) use ($request) {
+                if($request->search) {
+                    $query->where(function($query) use ($request) {
+                        $query->where('code', 'like', "%$request->search%")
+                            ->orWhere('grandtotal', 'like', "%$request->search%")
+                            ->orWhere('admin', 'like', "%$request->search%")
+                            ->orWhere('note', 'like', "%$request->search%")
+                            ->orWhereHas('user',function($query) use($request){
+                                $query->where('name','like',"%$request->search%")
+                                    ->orWhere('employee_no','like',"%$request->search%");
+                            })
+                            ->orWhereHas('account',function($query) use($request){
+                                $query->where('name','like',"%$request->search%")
+                                    ->orWhere('employee_no','like',"%$request->search%");
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
+                if($request->account){
+                    $query->whereIn('account_id',$request->account);
+                }
+
+                if($request->currency){
+                    $query->whereIn('currency_id',$request->currency);
+                }
+
+                if($request->place){
+                    $query->where('place_id',$request->place);
+                }
+            })
+            ->whereIn('place_id',$this->dataplaces)
+            ->get()
+		];
+		
+		return view('admin.print.finance.outgoing_payment', $data);
+    }
+
+    public function export(Request $request){
+		return Excel::download(new ExportOutgoingPayment($request->search,$request->status,$request->place,$request->account,$request->currency,$this->dataplaces), 'outgoing_payment'.uniqid().'.xlsx');
     }
 }

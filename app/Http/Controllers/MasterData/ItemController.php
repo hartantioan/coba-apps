@@ -459,7 +459,6 @@ class ItemController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => "Data failed to save"
-                //'Data failed to save.'
             ];
             return response()->json($response);
         }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class TaxDetail extends Model
 {   
     use HasFactory, SoftDeletes;
-    protected $table = 'tax_details_table';
+    protected $table = 'tax_details';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     

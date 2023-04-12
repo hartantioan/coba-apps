@@ -825,9 +825,7 @@ class GoodReceiptPOController extends Controller
                     
                     if($row->purchaseOrder->purchaseOrderDetail()->exists()){
                         $data_pr = [];
-                        info("masukkkdetail");
                         foreach($row->purchaseOrder->purchaseOrderDetail as $rowdetail){
-                            info("masukdetail2");
                             if($rowdetail->purchaseOrderDetailComposition()->exists()){
                                 foreach($rowdetail->purchaseOrderDetailComposition as $row_purchase_compose){
                                     $pr = [

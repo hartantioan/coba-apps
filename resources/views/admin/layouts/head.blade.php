@@ -31,6 +31,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/quill/quill.bubble.css') }}">
 	<link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2-materialize.css?v=12') }}" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/jquery.orgchart.css') }}">
     <!-- END: VENDOR CSS-->
     <!-- BEGIN: Page Level CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=2') }}">
@@ -48,7 +49,7 @@
 </head>
 <!-- END: Head-->
 
-<body class="vertical-layout page-header-light vertical-menu-collapsible vertical-modern-menu preload-transitions 2-columns menu-collapse" data-open="click" data-menu="vertical-modern-menu" data-col="2-columns">
+<body class="vertical-layout page-header-light vertical-menu-collapsible vertical-modern-menu preload-transitions 2-columns   " data-open="click" data-menu="vertical-modern-menu" data-col="2-columns">
 <div class="loader" id="loader">
 	<div class="preloader-wrapper big active">
 		<div class="spinner-layer spinner-blue-only">

@@ -162,6 +162,7 @@ class GoodReceiptPOController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -796,6 +797,70 @@ class GoodReceiptPOController extends Controller
 
     public function export(Request $request){
 		return Excel::download(new ExportGoodReceipt($request->search,$request->status,$request->warehouse,$this->dataplaces), 'good_receipt_'.uniqid().'.xlsx');
+    }
+    
+    public function viewStructureTree(Request $request){
+        $query = GoodReceiptMain::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+            $data_good_receipt = [
+                'tipe'=>"buka",
+                "Kode" => $query->code,
+                "name" => "Good Receipt",
+                'title'=> $query->code,
+                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($query->code),
+                'children'=>[],
+            ];
+            $data_po = [];
+            foreach($query->goodReceipt as $row){
+                if($row->purchaseOrder()->exists()){
+                    
+                    $po = [
+                        "Kode" => $row->purchaseOrder->code,
+                        'tipe'=>"buka",
+                        "name" => "Purchase Order",
+                        'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),
+                        "title"=>  $row->purchaseOrder->code,
+                    ];
+                    
+                    if($row->purchaseOrder->purchaseOrderDetail()->exists()){
+                        $data_pr = [];
+                        info("masukkkdetail");
+                        foreach($row->purchaseOrder->purchaseOrderDetail as $rowdetail){
+                            info("masukdetail2");
+                            if($rowdetail->purchaseOrderDetailComposition()->exists()){
+                                foreach($rowdetail->purchaseOrderDetailComposition as $row_purchase_compose){
+                                    $pr = [
+                                        "Kode" => $row_purchase_compose->purchaseRequest->code,
+                                        'tipe'=>"buka",
+                                        "name" => "Purchase Request",
+                                        'url'=>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($row_purchase_compose->purchaseRequest->code),
+                                        "title" =>$row_purchase_compose->purchaseRequest->code,
+                                    ];
+                                    $data_pr[] = $pr;
+                                }
+                            }
+                        }
+                        $po["children"] = $data_pr;
+                    }
+                    $data_po[] = $po;
+                }else{
+
+                }
+            }
+            $data_good_receipt["children"] = $data_po;
+            $response = [
+                'status'  => 200,
+                'message' => $data_good_receipt
+            ];
+        } else {
+            $data_good_receipt = [];
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+        return response()->json($response);
     }
 
     public function removeUsedData(Request $request){

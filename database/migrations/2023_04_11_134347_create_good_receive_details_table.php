@@ -21,11 +21,12 @@ return new class extends Migration
             $table->double('price')->nullable();
             $table->double('total')->nullable();
             $table->string('note')->nullable();
+            $table->bigInteger('coa_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['good_receive_id','item_id','warehouse_id'],'good_receives_details_index');
+            $table->index(['good_receive_id','item_id','warehouse_id','coa_id'],'good_receives_details_index');
         });
     }
 

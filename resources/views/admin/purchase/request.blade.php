@@ -2,6 +2,13 @@
     .modal {
         top:0px !important;
     }
+    #chart-container {
+        position: relative;
+        height: 420px;
+        margin: 0.5rem;
+        overflow: auto;
+        text-align:-webkit-right;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -122,10 +129,32 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
+<div id="modal3" class="modal modal-fixed-footer" style="max-height: 75% !important;height: 75% !important;width:75%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="show_structure">
+                <div id="chart-container"></div>
+                <div id="visualisation">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
 
 <!-- END: Page Main-->
 <script>
     $(function() {
+        var $chartContainer = $('#chart-container');
+
+        $chartContainer.on('click', '.node', function(event) {
+            
+            window.open($(this).data('nodeData').url);
+           /*  alert(JSON.stringify($(this).data('nodeData'))); */
+        });
+
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
             var badge = tr.find('button.btn-floating');
@@ -161,7 +190,50 @@
                 $('#show_print').html('');
             }
         });
+        $('#modal3').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#chart-container').empty();
+            }
+        });
     });
+
+    function makeTreeOrg(data){
+        $('#chart-container').orgchart({
+            'nodeContent': 'title',
+            'data': data,
+            'direction': 'r2l',
+        });
+    }
+
+    function viewStructureTree(id){
+        $.ajax({
+            url: '{{ Request::url() }}/viewstructuretree',
+            type: 'GET',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                makeTreeOrg(response.message);
+                $('#modal3').modal('open');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({

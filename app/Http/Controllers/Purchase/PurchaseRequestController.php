@@ -152,6 +152,7 @@ class PurchaseRequestController extends Controller
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
 					'
                 ];
@@ -720,6 +721,74 @@ class PurchaseRequestController extends Controller
             ];
         }
 
+        return response()->json($response);
+    }
+    public function viewStructureTree(Request $request){
+        $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $data_pr = [];
+        if($query) {
+            if($query->purchaseOrderDetailComposition()->exists()){
+               info("masuk sini");
+                $pr = [
+                    "Kode" => $query->code,
+                    'tipe'=>"buka",
+                    "name" => "Purchase Request",
+                    'url'=>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+                    "title" =>$query->code,
+                ];
+                $data_pr[] = $pr;
+               foreach($query->purchaseOrderDetailComposition as $row){
+
+                    if($row->purchaseOrderDetail->exists()){
+                       $po=$row->purchaseOrderDetail->purchaseOrder;
+                       $data_po = [
+                            "Kode" => $po->code,
+                            'tipe'=>"buka",
+                            "name" => "Purchase Order",
+                            'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($po->code),
+                            "title"=>  $po->code,
+                        ];
+                        if($po->goodReceipt()->exists()){
+                            $data_good_receipt = [
+                                'tipe'=>"buka",
+                                "Kode" => $po->goodReceipt->goodReceiptMain->code,
+                                "name" => "Good Receipt",
+                                'title'=> $po->goodReceipt->goodReceiptMain->code,
+                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($po->goodReceipt->goodReceiptMain->code),
+                                'children'=>[],
+                            ];
+                            $data_po["children"] = $data_pr;
+                            $data_good_receipt["children"][] = $data_po;
+                            
+                            $response = [
+                                'status'  => 200,
+                                'message' => $data_good_receipt
+                            ];
+                        }else{
+                            $data_po["children"] = $data_pr;
+                            $response = [
+                                'status'  => 200,
+                                'message' => $data_po
+                            ];
+                            info($data_po);
+                        }
+                    }else{
+                        info("tdkmasuk sini2");
+                    }
+                }
+            }else{
+                info("tidak masuk sini");
+               
+                
+            }
+        } else {
+            info("rusak sini");
+            $data_good_receipt = [];
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
         return response()->json($response);
     }
 

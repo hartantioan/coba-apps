@@ -520,6 +520,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [PurchaseRequestController::class, 'show']);
                 Route::post('print',[PurchaseRequestController::class, 'print']);
                 Route::get('export',[PurchaseRequestController::class, 'export']);
+                Route::get('viewstructuretree',[PurchaseRequestController::class, 'viewStructureTree']);
                 Route::post('create',[PurchaseRequestController::class, 'create'])->middleware('operation.access:purchase_request,update');
                 Route::post('void_status', [PurchaseRequestController::class, 'voidStatus'])->middleware('operation.access:purchase_request,void');
                 Route::get('approval/{id}',[PurchaseRequestController::class, 'approval'])->withoutMiddleware('direct.access');
@@ -607,6 +608,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [GoodReceiptPOController::class, 'show']);
                 Route::post('print',[GoodReceiptPOController::class, 'print']);
                 Route::get('export',[GoodReceiptPOController::class, 'export']);
+                Route::get('viewstructuretree',[GoodReceiptPOController::class, 'viewStructureTree']);
                 Route::post('get_purchase_order', [GoodReceiptPOController::class, 'getPurchaseOrder']);
                 Route::post('remove_used_data', [GoodReceiptPOController::class, 'removeUsedData']);
                 Route::post('create',[GoodReceiptPOController::class, 'create'])->middleware('operation.access:good_receipt_po,update');

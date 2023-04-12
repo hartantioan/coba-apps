@@ -389,7 +389,10 @@ class CoaController extends Controller
         try {
             Excel::import(new ImportCoa, $request->file('file'));
 
-            return response()->json(['message' => 'Import successful!']);
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Import sukses!'
+            ]);
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
 
@@ -412,7 +415,6 @@ class CoaController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => "Data failed to save"
-                //'Data failed to save.'
             ];
             return response()->json($response);
         }

@@ -38,7 +38,7 @@ class GoodReceiptPOController extends Controller
         $data = [
             'title'     => 'Penerimaan Barang PO',
             'content'   => 'admin.inventory.good_receipt',
-            'place'     => Place::where('status','1')->get(),
+            'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
             'department'=> Department::where('status','1')->get(),
         ];
 

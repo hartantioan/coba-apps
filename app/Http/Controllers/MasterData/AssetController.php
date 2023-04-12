@@ -285,9 +285,12 @@ class AssetController extends Controller
         try {
             Excel::import(new ImportAsset, $request->file('file'));
 
-            return response()->json(['message' => 'Import successful!']);
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Import sukses!'
+            ]);
             
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        } catch (ValidationException $e) {
             $failures = $e->failures();
 
             $errors = [];

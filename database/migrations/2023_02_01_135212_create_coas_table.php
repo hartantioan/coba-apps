@@ -21,7 +21,6 @@ return new class extends Migration
             $table->bigInteger('company_id')->nullable();
             $table->bigInteger('parent_id')->nullable();
             $table->integer('level')->nullable();
-            $table->char('type', 1)->nullable();
             $table->char('status', 1)->nullable();
             $table->char('is_confidential', 1)->nullable();
             $table->char('is_control_account', 1)->nullable();

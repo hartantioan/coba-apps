@@ -20,7 +20,6 @@ class Coa extends Model
         'company_id',
         'parent_id',
         'level',
-        'type',
         'status',
         'is_confidential',
         'is_control_account',

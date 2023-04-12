@@ -46,6 +46,7 @@ class NotificationController extends Controller
         foreach($notifs as $row){
             $row['icon'] = $row->icon();
             $row['from_name'] = $row->from_user_id == session('bo_id') ? 'Anda' : $row->fromUser->name;
+            $row['time'] = $row->getTimeAgo();
             $arrnotif[] = $row;
         }
 

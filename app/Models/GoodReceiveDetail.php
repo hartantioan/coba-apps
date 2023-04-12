@@ -21,6 +21,7 @@ class GoodReceiveDetail extends Model
         'price',
         'total',
         'note',
+        'coa_id',
         'warehouse_id'
     ];
 
@@ -37,5 +38,10 @@ class GoodReceiveDetail extends Model
     public function warehouse()
     {
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function coa()
+    {
+        return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
 }

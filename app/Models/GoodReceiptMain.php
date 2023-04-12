@@ -70,6 +70,11 @@ class GoodReceiptMain extends Model
         return $this->hasMany('App\Models\LandedCost');
     }
 
+    public function purchaseInvoiceDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','good_receipt_main_id','id');
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',

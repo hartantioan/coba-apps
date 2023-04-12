@@ -147,7 +147,7 @@ function cekNotif(url){
 											</div>
 										</div>
 									</a>
-									<time class="media-meta grey-text darken-2" style="margin-left: 48px;top:-1px;">2 hours ago</time>
+									<time class="media-meta grey-text darken-2" style="margin-left: 48px;top:-1px;">` + val.time + `</time>
 								</li>
 							`);
 						}

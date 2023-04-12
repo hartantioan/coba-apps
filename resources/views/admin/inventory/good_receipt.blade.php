@@ -16,7 +16,6 @@
         overflow: auto;
         text-align:-webkit-right;
     }
-    .orgchart .middle-level .title { background-color: #006699; }
     .orgchart { background: #fff; }
 </style>
 <!-- BEGIN: Page Main-->

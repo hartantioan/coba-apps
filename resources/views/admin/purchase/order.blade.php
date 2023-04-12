@@ -14,6 +14,7 @@
         overflow: auto;
         text-align:-webkit-right;
     }
+    .orgchart { background: #fff; }
 
 </style>
 <!-- BEGIN: Page Main-->

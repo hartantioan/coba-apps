@@ -16,13 +16,12 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $type = null, string $place = null, string $department = null, string $is_tax = null, string $is_include_tax = null, string $supplier = null, string $currency = null,array $dataplaces = null)
+    public function __construct(string $search = null, string $status = null, string $type = null, string $company = null, string $is_tax = null, string $is_include_tax = null, string $supplier = null, string $currency = null,array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
         $this->type = $type ? $type : '';
-        $this->place = $place ? $place : '';
-        $this->department = $department ? $department : '';
+        $this->company = $company ? $company : '';
         $this->is_tax = $is_tax ? $is_tax : '';
         $this->is_include_tax = $is_include_tax ? $is_include_tax : '';
         $this->supplier = $supplier ? $supplier : '';
@@ -84,13 +83,9 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
                 $query->whereIn('account_id',$this->supplier);
             }
             
-            if($this->place){
-                $query->where('place_id',$this->place);
-            }
-
-            if($this->department){
-                $query->where('department_id',$this->department);
-            }            
+            if($this->company){
+                $query->where('company_id',$this->company);
+            }         
             
             if($this->currency){
                 $query->whereIn('currency_id',$this->currency);
@@ -108,7 +103,6 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
                 $query->where('is_include_tax',$this->is_include_tax);
             }
         })
-        ->whereIn('place_id',$this->dataplaces)
         ->get();
 
         $arr = [];

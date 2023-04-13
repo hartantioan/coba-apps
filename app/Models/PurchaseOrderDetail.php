@@ -29,7 +29,10 @@ class PurchaseOrderDetail extends Model
         'is_include_tax',
         'percent_tax',
         'is_wtax',
-        'percent_wtax'
+        'percent_wtax',
+        'place_id',
+        'department_id',
+        'warehouse_id',
     ];
 
     public function isIncludeTax(){
@@ -71,17 +74,28 @@ class PurchaseOrderDetail extends Model
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }
 
+    public function place(){
+        return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
+    }
+
+    public function department(){
+        return $this->belongsTo('App\Models\Department','department_id','id')->withTrashed();
+    }
+
+    public function warehouse(){
+        return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
+    }
+
+    public function goodReceiptDetail(){
+        return $this->hasMany('App\Models\GoodReceiptDetail');
+    }
+
     public function getBalanceReceipt()
     {
         $item = $this->item_id;
         $po = $this->purchase_order_id;
 
-        $received = GoodReceiptDetail::whereHas('goodReceipt',function($query) use($po){
-            $query->where('purchase_order_id',$po)
-                ->whereHas('goodReceiptMain',function($query){
-                    $query->whereIn('status',['1','2','3']);
-                });
-        })->where('item_id',$item)->sum('qty');
+        $received = $this->goodReceiptDetail()->sum('qty');
 
         $balance = $this->qty - $received;
 
@@ -90,16 +104,6 @@ class PurchaseOrderDetail extends Model
 
     public function purchaseRequestDetail()
     {
-        return $this->hasMany('App\Models\PurchaseRequestDetail','purchase_request_detail_id','id');
-    }
-
-    public function purchaseRequestList(){
-        $content = '';
-
-        foreach($this->purchaseOrderDetailComposition as $row){
-            $content .= $row->purchaseRequest->code.' - '.$row->qty.' '.$this->item->buyUnit->code.'<br>';
-        }
-
-        return $content;
+        return $this->belongsTo('App\Models\PurchaseRequestDetail','purchase_request_detail_id','id');
     }
 }

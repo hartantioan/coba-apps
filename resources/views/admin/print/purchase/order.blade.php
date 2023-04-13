@@ -203,6 +203,9 @@
                                             <th>Discount 2 (%)</th>
                                             <th>Discount 3 (Rp)</th>
                                             <th>Subtotal</th>
+											<th>Pabrik/Kantor</th>
+											<th>Departemen</th>
+											<th>Gudang</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -217,6 +220,9 @@
                                             <td align="right">{{ number_format($rowdetail->percent_discount_2,2,',','.') }}</td>
                                             <td align="right">{{ number_format($rowdetail->discount_3,2,',','.') }}</td>
                                             <td align="right">{{ number_format($rowdetail->subtotal,2,',','.') }}</td>
+											<td>{{ $rowdetail->place->name }}</td>
+											<td>{{ $rowdetail->department->name }}</td>
+											<td>{{ $rowdetail->warehouse->name }}</td>
                                         </tr>
                                         @endforeach
                                     </tbody>

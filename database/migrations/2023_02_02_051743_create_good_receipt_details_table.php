@@ -17,13 +17,17 @@ return new class extends Migration
         Schema::create('good_receipt_details', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('good_receipt_id')->nullable();
+            $table->bigInteger('purchase_order_detail_id')->nullable();
             $table->bigInteger('item_id')->nullable();
             $table->double('qty')->nullable();
             $table->string('note')->nullable();
+            $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('department_id')->nullable();
+            $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['good_receipt_id', 'item_id']);
+            $table->index(['good_receipt_id', 'purchase_order_detail_id', 'item_id', 'place_id', 'department_id', 'warehouse_id'],'grpodetail_index');
         });
     }
 

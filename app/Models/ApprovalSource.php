@@ -17,7 +17,6 @@ class ApprovalSource extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'place_id',
         'date_request',
         'lookable_type',
         'lookable_id',
@@ -26,10 +25,6 @@ class ApprovalSource extends Model
 
     public function user(){
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
-    }
-    
-    public function place(){
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
     public function lookable(){

@@ -18,11 +18,10 @@ return new class extends Migration
             $table->id();
             $table->string('code',155)->unique();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('supplier_id')->nullable();
+            $table->bigInteger('account_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->char('purchasing_type', 1)->nullable();
             $table->char('shipping_type', 1)->nullable();
-            $table->bigInteger('place_id')->nullable();
-            $table->bigInteger('department_id')->nullable();
             $table->string('document_no', 155)->nullable();
             $table->string('document_po')->nullable();
             $table->char('payment_type', 2)->nullable();

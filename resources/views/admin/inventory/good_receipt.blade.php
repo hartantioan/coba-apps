@@ -96,6 +96,7 @@
                                                     <tr>
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Pengguna</th>
+                                                        <th rowspan="2">Supplier/Vendor</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Penerima</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
@@ -140,6 +141,14 @@
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="account_id" name="account_id" onchange="getPurchaseOrderAll(this.value);"></select>
                                 <label class="active" for="account_id">Supplier</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $rowcompany)
+                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
@@ -198,12 +207,15 @@
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan</th>
                                                     <th class="center">Keterangan</th>
+                                                    <th class="center">Pabrik/Kantor</th>
+                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Gudang</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="5" class="center">
+                                                    <td colspan="8" class="center">
                                                         Pilih purchase order untuk memulai...
                                                     </td>
                                                 </tr>
@@ -275,9 +287,7 @@
         var $chartContainer = $('#chart-container');
 
         $chartContainer.on('click', '.node', function(event) {
-            
             window.open($(this).data('nodeData').url);
-           /*  alert(JSON.stringify($(this).data('nodeData'))); */
         });
 
         $('#datatable_serverside').on('click', 'td.details-control', function() {
@@ -330,15 +340,18 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="5" class="center">
+                            <td colspan="8" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
                     `);
                 }
                 $('#purchase_order_id').empty();
+                $('#account_id').empty();
                 M.updateTextFields();
-                $('#list-used-data').empty();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -377,7 +390,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="5" class="center">
+                        <td colspan="8" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -386,6 +399,107 @@
             }
         });
     });
+
+    function getPurchaseOrderAll(val){
+        if(val){
+            $.ajax({
+                url: '{{ Request::url() }}/get_purchase_order_all',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: val
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    if(response.length > 0){
+                        $('#empty-item').remove();
+                        $.each(response, function(i, valmain) {
+                            $('#list-used-data').append(`
+                                <div class="chip purple darken-4 gradient-shadow white-text">
+                                    ` + valmain.code + `
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + valmain.id + `')">close</i>
+                                </div>
+                            `);
+
+                            $.each(valmain.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-item').append(`
+                                    <tr class="row_item" data-po="` + valmain.id + `">
+                                        <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
+                                        <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                        <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
+                                        <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
+                                        <td>
+                                            ` + val.item_name + `
+                                        </td>
+                                        <td>
+                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;">
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.unit + `</span>
+                                        </td>
+                                        <td>
+                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + valmain.code + `" style="width:100%;">
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.place_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.department_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.warehouse_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        });
+                    }
+                    $('#purchase_order_id').empty();
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }
+            $('.row_item').each(function(){
+                $(this).remove();
+            });
+            if($('.row_item').length == 0 && $('#empty-item').length == 0){
+                $('#body-item').append(`
+                    <tr id="empty-item">
+                        <td colspan="8" class="center">
+                            Pilih purchase order untuk memulai...
+                        </td>
+                    </tr>
+                `);
+            }
+        }
+    }
 
     function makeTreeOrg(data){
         $('#chart-container').orgchart({
@@ -454,6 +568,7 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'name', className: 'center-align' },
+                { name: 'account_id', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
@@ -625,9 +740,12 @@
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
                                 $('#body-item').append(`
-                                    <tr class="row_item">
+                                    <tr class="row_item" data-po="` + response.id + `">
                                         <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                        <input type="hidden" name="arr_purchase[]" value="` + response.ecode + `">
+                                        <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
+                                        <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                        <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
+                                        <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
                                         <td>
                                             ` + val.item_name + `
                                         </td>
@@ -639,6 +757,15 @@
                                         </td>
                                         <td>
                                             <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + response.code + `" style="width:100%;">
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.place_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.department_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.warehouse_name + `</span>
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -672,7 +799,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="5" class="center">
+                        <td colspan="8" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -696,7 +823,16 @@
                 
             },
             success: function(response) {
-                
+                $('.row_item[data-po="' + id + '"]').remove();
+                if($('.row_item').length == 0 && $('#empty-item').length == 0){
+                    $('#body-item').append(`
+                        <tr id="empty-item">
+                            <td colspan="8" class="center">
+                                Pilih purchase order untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
             },
             error: function() {
                 swal({
@@ -729,6 +865,10 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#account_id').empty().append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
+                `);
+                $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
                 $('#receiver_name').val(response.receiver_name);
                 $('#post_date').val(response.post_date);
@@ -744,7 +884,10 @@
                         $('#body-item').append(`
                             <tr class="row_item">
                                 <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                <input type="hidden" name="arr_purchase[]" value="` + val.ecode + `">
+                                <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
+                                <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
+                                <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
                                 <td>
                                     ` + val.item_name + `
                                 </td>
@@ -756,6 +899,15 @@
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;">
+                                </td>
+                                <td class="center">
+                                    <span>` + val.place_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.department_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.warehouse_name + `</span>
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">

@@ -52,6 +52,53 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col s12 m12 l12">
+                                <div class="card padding-4 animate fadeLeft">
+                                    <div class="row">
+                                        <div class="col s12 m12">
+                                            <h5>TRIAL HARGA RATA-RATA / COGS / HPP</h5>
+                                            <table class="bordered" style="font-size:10px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center-align">No.</th>
+                                                        <th class="center-align">Pabrik/Kantor</th>
+                                                        <th class="center-align">Gudang</th>
+                                                        <th class="center-align">Qty In</th>
+                                                        <th class="center-align">Price In</th>
+                                                        <th class="center-align">Total In</th>
+                                                        <th class="center-align">Qty Out</th>
+                                                        <th class="center-align">Price Out</th>
+                                                        <th class="center-align">Total Out</th>
+                                                        <th class="center-align">Qty Final</th>
+                                                        <th class="center-align">Price Final</th>
+                                                        <th class="center-align">Total Final</th>
+                                                        <th class="center-align">Referensi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($itemcogs as $key => $row)
+                                                        <tr>
+                                                            <td class="center-align">{{ ($key + 1) }}</td>
+                                                            <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                                                            <td class="center-align">{{ $row->warehouse->name }}</td>
+                                                            <td class="center-align">{{ number_format($row->qty_in,3,',','.').' '.$row->item->uomUnit->code }}</td>
+                                                            <td class="right-align">{{ number_format($row->price_in,2,',','.') }}</td>
+                                                            <td class="right-align">{{ number_format($row->total_in,2,',','.') }}</td>
+                                                            <td class="center-align">{{ number_format($row->qty_out,3,',','.').' '.$row->item->uomUnit->code }}</td>
+                                                            <td class="right-align">{{ number_format($row->price_out,2,',','.') }}</td>
+                                                            <td class="right-align">{{ number_format($row->total_out,2,',','.') }}</td>
+                                                            <td class="center-align">{{ number_format($row->qty_final,3,',','.').' '.$row->item->uomUnit->code }}</td>
+                                                            <td class="right-align">{{ number_format($row->price_final,2,',','.') }}</td>
+                                                            <td class="right-align">{{ number_format($row->total_final,2,',','.') }}</td>
+                                                            <th class="center-align">{{ $row->lookable->code }}</th>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -152,5 +199,5 @@
             </div>
         </div>
     </div>
-	<script src="{{ url('app-assets/js/scripts/intro.js') }}"></script>
+	{{-- <script src="{{ url('app-assets/js/scripts/intro.js') }}"></script> --}}
     <!-- END: Page Main-->

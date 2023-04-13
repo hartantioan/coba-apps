@@ -18,7 +18,6 @@ return new class extends Migration
             $table->id();
             $table->string('code',155)->nullable();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('place_id')->nullable();
             $table->dateTime('date_request')->nullable();
             $table->string('lookable_type',155)->nullable();
             $table->bigInteger('lookable_id')->nullable();

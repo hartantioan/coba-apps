@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Purchase;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -18,9 +19,7 @@ use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseDownPaymentDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseDownPayment;
-use App\Models\Place;
 use App\Models\User;
-use App\Models\Department;
 
 class PurchaseDownPaymentController extends Controller
 {
@@ -38,8 +37,7 @@ class PurchaseDownPaymentController extends Controller
             'title'         => 'Purchase Down Payment',
             'content'       => 'admin.purchase.down_payment',
             'currency'      => Currency::where('status','1')->get(),
-            'place'         => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
-            'department'    => Department::where('status','1')->get()
+            'company'       => Company::where('status','1')->get()
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -69,8 +67,7 @@ class PurchaseDownPaymentController extends Controller
             'code',
             'user_id',
             'account_id',
-            'place_id',
-            'department_id',
+            'company_id',
             'is_tax',
             'is_included_tax',
             'percent_tax',
@@ -94,7 +91,7 @@ class PurchaseDownPaymentController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseDownPayment::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = PurchaseDownPayment::count();
         
         $query_data = PurchaseDownPayment::where(function($query) use ($search, $request) {
                 if($search) {
@@ -133,12 +130,8 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('account_id',$request->supplier_id);
                 }
                 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
-                }
-
-                if($request->department_id){
-                    $query->where('department_id',$request->department_id);
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
                 
                 if($request->is_tax){
@@ -157,7 +150,6 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -200,12 +192,8 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('account_id',$request->supplier_id);
                 }
 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
-                }
-
-                if($request->department_id){
-                    $query->where('department_id',$request->department_id);
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
                 
                 if($request->is_tax){
@@ -224,7 +212,6 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -236,8 +223,7 @@ class PurchaseDownPaymentController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->supplier->name,
-                    $val->place->name.' - '.$val->place->company->name,
-                    $val->department->name,
+                    $val->company->name,
                     $val->isTax(),
                     $val->isIncludeTax(),
                     number_format($val->percent_tax,2,',','.'),
@@ -283,8 +269,7 @@ class PurchaseDownPaymentController extends Controller
         $validation = Validator::make($request->all(), [
 			'supplier_id' 				=> 'required',
 			'type'                      => 'required',
-            'place_id'                  => 'required',
-            'department_id'             => 'required',
+            'company_id'                => 'required',
             'post_date'                 => 'required',
             'due_date'                  => 'required',
             'currency_id'               => 'required',
@@ -293,8 +278,7 @@ class PurchaseDownPaymentController extends Controller
 		], [
 			'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
 			'type.required'                     => 'Tipe tidak boleh kosong',
-            'place_id.required'                 => 'Pabrik tidak boleh kosong.',
-            'department_id.required'            => 'Departemen tidak boleh kosong.',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
@@ -359,8 +343,7 @@ class PurchaseDownPaymentController extends Controller
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->supplier_id;
                         $query->type = $request->type;
-                        $query->place_id = $request->place_id;
-                        $query->department_id = $request->department_id;
+                        $query->company_id = $request->company_id;
                         $query->is_tax = $request->is_tax ? $request->is_tax : NULL;
                         $query->is_include_tax = $request->is_include_tax ? $request->is_include_tax : '0';
                         $query->percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
@@ -400,8 +383,7 @@ class PurchaseDownPaymentController extends Controller
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
                         'type'	                    => $request->type,
-                        'place_id'                  => $request->place_id,
-                        'department_id'             => $request->department_id,
+                        'company_id'                => $request->company_id,
                         'is_tax'                    => $request->is_tax ? $request->is_tax : NULL,
                         'is_include_tax'            => $request->is_include_tax ? $request->is_include_tax : '0',
                         'percent_tax'               => str_replace(',','.',str_replace('.','',$request->percent_tax)),
@@ -716,13 +698,9 @@ class PurchaseDownPaymentController extends Controller
                     $query->whereIn('account_id',$request->supplier);
                 }
                 
-                if($request->place){
-                    $query->where('place_id',$request->place);
-                }
-
-                if($request->department){
-                    $query->where('department_id',$request->department);
-                }            
+                if($request->company){
+                    $query->where('company_id',$request->company);
+                }          
                 
                 if($request->currency){
                     $query->whereIn('currency_id',$request->currency);
@@ -740,7 +718,6 @@ class PurchaseDownPaymentController extends Controller
                     $query->where('is_include_tax',$request->is_include_tax);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -748,6 +725,6 @@ class PurchaseDownPaymentController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPurchaseDownPayment($request->search,$request->status,$request->type,$request->place,$request->department,$request->is_tax,$request->is_include_tax,$request->supplier,$request->currency,$this->dataplaces), 'purchase_down_payment_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseDownPayment($request->search,$request->status,$request->type,$request->company,$request->is_tax,$request->is_include_tax,$request->supplier,$request->currency,$this->dataplaces), 'purchase_down_payment_'.uniqid().'.xlsx');
     }
 }

@@ -270,7 +270,7 @@ class PaymentRequestController extends Controller
             foreach($data->purchaseDownPayment as $row){
                 if(!$row->used()->exists()){
                     CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
-                    $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->place->company_id)->first();
+                    $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->company_id)->first();
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'purchase_down_payments',

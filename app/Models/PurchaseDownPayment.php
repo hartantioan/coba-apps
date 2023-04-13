@@ -19,8 +19,7 @@ class PurchaseDownPayment extends Model
         'code',
         'user_id',
         'account_id',
-        'place_id',
-        'department_id',
+        'company_id',
         'is_tax',
         'is_include_tax',
         'percent_tax',
@@ -106,14 +105,9 @@ class PurchaseDownPayment extends Model
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function company()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function department()
-    {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function purchaseDownPaymentDetail()

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Dashboard;
+use App\Models\ItemCogs;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -12,7 +13,8 @@ class DashboardController extends Controller
     {
         $data = [
             'title'   => 'Dashboard',
-            'content' => 'admin.dashboard.main'
+            'content' => 'admin.dashboard.main',
+            'itemcogs'=> ItemCogs::all(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

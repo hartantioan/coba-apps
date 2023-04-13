@@ -18,7 +18,6 @@ class Journal extends Model
         'user_id',
         'account_id',
         'code',
-        'place_id',
         'lookable_type',
         'lookable_id',
         'currency_id',

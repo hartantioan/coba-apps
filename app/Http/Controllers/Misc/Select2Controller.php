@@ -410,7 +410,6 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->whereIn('place_id',$this->dataplaces)
                 ->where('status','2')->get();
 
         foreach($data as $d) {

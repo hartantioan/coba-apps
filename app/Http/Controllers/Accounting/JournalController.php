@@ -57,7 +57,7 @@ class JournalController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Journal::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = Journal::count();
         
         $query_data = Journal::where(function($query) use ($search, $request) {
                 if($search) {
@@ -80,16 +80,11 @@ class JournalController extends Controller
                     $query->whereIn('account_id',$request->account_id);
                 }
                 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
-                }       
-                
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -114,17 +109,12 @@ class JournalController extends Controller
 
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
-                }
-                
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
-                }       
+                }     
                 
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -139,7 +129,7 @@ class JournalController extends Controller
                     $val->account_id ? $val->account->name : '-',
                     date('d/m/y',strtotime($val->post_date)),
                     $val->note,
-                    $val->lookable_type == 'good_receipts' ? $val->lookable->goodReceiptMain->code : ($val->lookable_type ? $val->lookable->code : '-'),
+                    $val->lookable->code,
                     $val->status(),
                     !$val->lookable_id ? '
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -188,13 +178,13 @@ class JournalController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->coa->name.'</td>
-                <td class="center-align">'.$row->place->company->name.'</td>
-                <td class="center-align">'.$row->place->name.'</td>
+                <td class="center-align">'.$row->coa->company->name.'</td>
+                <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
-                <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,3,',','.') : '').'</td>
-                <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,3,',','.') : '').'</td>
+                <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
             </tr>';
         }
         
@@ -236,7 +226,6 @@ class JournalController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
 			'account_id' 				=> 'required',
-            'place_id' 				    => 'required',
 			'note'                      => 'required',
             'post_date'                 => 'required',
             'due_date'                  => 'required',
@@ -248,7 +237,6 @@ class JournalController extends Controller
             'arr_nominal'               => 'required|array',
 		], [
 			'account_id.required' 				=> 'Target BP tidak boleh kosong.',
-            'place_id.required' 				=> 'Pabrik/Kantor tidak boleh kosong.',
 			'note.required'                     => 'Catatan tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
@@ -307,7 +295,6 @@ class JournalController extends Controller
                     if($query->status == '1'){
 
                         $query->user_id = session('bo_id');
-                        $query->place_id = $request->place_id;
                         $query->account_id = $request->account_id;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
@@ -337,7 +324,6 @@ class JournalController extends Controller
                     
                     $query = Journal::create([
                         'code'			            => Journal::generateCode(),
-                        'place_id'                  => $request->place_id,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'currency_id'               => $request->currency_id,
@@ -404,7 +390,7 @@ class JournalController extends Controller
     public function show(Request $request){
         $jou = Journal::where('code',CustomHelper::decrypt($request->id))->first();
         $jou['account_name'] = $jou->account->name;
-        $jou['currency_rate'] = number_format($jou->currency_rate,3,',','.');
+        $jou['currency_rate'] = number_format($jou->currency_rate,2,',','.');
 
         $arr = [];
         
@@ -419,7 +405,7 @@ class JournalController extends Controller
                 'department_id'     => $row->department_id,
                 'warehouse_id'      => $row->warehouse_id,
                 'warehouse_name'    => $row->warehouse_id ? $row->warehouse->name : '',
-                'nominal'           => number_format($row->nominal,3,',','.')
+                'nominal'           => number_format($row->nominal,2,',','.')
             ];
         }
 
@@ -546,16 +532,11 @@ class JournalController extends Controller
                     $query->whereIn('account_id',$request->account_id);
                 }
                 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
-                }       
-                
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -563,7 +544,7 @@ class JournalController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportJournal($request->search,$request->status,$request->place,$request->account,$request->currency,$this->dataplaces), 'journal_'.uniqid().'.xlsx');
+		return Excel::download(new ExportJournal($request->search,$request->status,$request->account,$request->currency,$this->dataplaces), 'journal_'.uniqid().'.xlsx');
     }
 
     public function approval(Request $request,$id){

@@ -39,7 +39,8 @@ class AppServiceProvider extends ServiceProvider
             'retirements'               => 'App\Models\Retirement',
             'fund_requests'             => 'App\Models\FundRequest',
             'payment_requests'          => 'App\Models\PaymentRequest',
-            'outgoing_payments'         => 'App\Models\OutgoingPayment'
+            'outgoing_payments'         => 'App\Models\OutgoingPayment',
+            'good_receives'             => 'App\Models\GoodReceive',
         ]);
     }
 }

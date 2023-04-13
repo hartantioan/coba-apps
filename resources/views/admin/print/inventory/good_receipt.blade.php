@@ -134,8 +134,6 @@
                         <th rowspan="2">Pengguna</th>
 						<th colspan="3">Tanggal</th>
 						<th rowspan="2">Penerima</th>
-                        <th rowspan="2">Cabang</th>
-                        <th rowspan="2">Gudang</th>
                         <th rowspan="2">Dokumen</th>
                         <th rowspan="2">Catatan</th>
                         <th rowspan="2">Status</th>
@@ -156,14 +154,12 @@
                             <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
 							<td>{{ $row->receiver_name }}</td>
-                            <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
-                            <td>{{ $row->warehouse->name }}</td>
                             <td><a href="{{ $row->attachment() }}" target="_blank">File</a></td>
                             <td>{{ $row->note }}</td>
                             <td>{!! $row->statusRaw() !!}</td>
                         </tr>
                         <tr>
-                            <td colspan="12" style="border-right-style: none !important;">
+                            <td colspan="10" style="border-right-style: none !important;">
 								<table border="1" cellpadding="2" cellspacing="0">
 									<thead>
 										<tr align="center">
@@ -217,7 +213,7 @@
 					@endforeach
                     @if(count($data) == 0)
                         <tr>
-                            <td colspan="12" align="center">
+                            <td colspan="10" align="center">
                                 Data tidak ditemukan
                             </td>
                         </tr>

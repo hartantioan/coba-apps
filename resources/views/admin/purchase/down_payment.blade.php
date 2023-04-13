@@ -585,7 +585,7 @@
         }
 
         if(ada == true){
-            $('#subtotal').val(formatRupiahIni(subtotal.toFixed(3).toString().replace('.',',')));
+            $('#subtotal').val(formatRupiahIni(subtotal.toFixed(2).toString().replace('.',',')));
         }else{
             subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",","."));
         }        
@@ -602,13 +602,13 @@
         grandtotal = total + tax;
 
         $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
         $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
         );
         $('#grandtotal').text(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );
     }
 

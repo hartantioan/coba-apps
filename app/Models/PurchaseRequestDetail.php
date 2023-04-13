@@ -48,9 +48,7 @@ class PurchaseRequestDetail extends Model
     public function qtyBalance(){
         $qty = $this->qty;
 
-        foreach(PurchaseOrderDetailComposition::where('pr_id',$this->purchase_request_id)->whereHas('purchaseOrderDetail',function($query){ 
-            $query->where('item_id',$this->item_id);
-        })->get() as $row){
+        foreach($this->purchaseOrderDetail as $row){
             $qty -= $row->qty;
         }
 
@@ -60,5 +58,10 @@ class PurchaseRequestDetail extends Model
     public function warehouse()
     {
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function purchaseOrderDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseOrderDetail', 'purchase_request_detail_id', 'id');
     }
 }

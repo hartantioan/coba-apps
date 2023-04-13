@@ -219,10 +219,10 @@
                     <tr>
                         <td class="center-align">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->goodReceiptMain()->exists() ? $row->goodReceiptMain->code : $row->landedCost->code  }}</td>
-                        <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->tax,3,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->wtax,3,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->grandtotal,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->wtax,2,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
                     </tr>
                     @endforeach
                     <tr>

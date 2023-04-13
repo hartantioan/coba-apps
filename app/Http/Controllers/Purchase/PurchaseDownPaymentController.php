@@ -240,7 +240,7 @@ class PurchaseDownPaymentController extends Controller
                     $val->department->name,
                     $val->isTax(),
                     $val->isIncludeTax(),
-                    number_format($val->percent_tax,3,',','.'),
+                    number_format($val->percent_tax,2,',','.'),
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     date('d M Y',strtotime($val->post_date)),
@@ -248,10 +248,10 @@ class PurchaseDownPaymentController extends Controller
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
-                    number_format($val->subtotal,3,',','.'),
-                    number_format($val->discount,3,',','.'),
-                    number_format($val->total,3,',','.'),
-                    number_format($val->tax,3,',','.'),
+                    number_format($val->subtotal,2,',','.'),
+                    number_format($val->discount,2,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->tax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     '
@@ -497,8 +497,8 @@ class PurchaseDownPaymentController extends Controller
                     <td class="center-align">'.date('d/m/y',strtotime($row->purchaseOrder->post_date)).'</td>
                     <td class="center-align">'.date('d/m/y',strtotime($row->purchaseOrder->delivery_date)).'</td>
                     <td class="center-align">'.$row->note.'</td>
-                    <td class="right-align">'.number_format($row->purchaseOrder->grandtotal,3,',','.').'</td>
-                    <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+                    <td class="right-align">'.number_format($row->purchaseOrder->grandtotal,2,',','.').'</td>
+                    <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                 </tr>';
             }
         }else{
@@ -561,12 +561,12 @@ class PurchaseDownPaymentController extends Controller
     public function show(Request $request){
         $pdp = PurchaseDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
         $pdp['supplier_name'] = $pdp->supplier->name;
-        $pdp['subtotal'] = number_format($pdp->subtotal,3,',','.');
-        $pdp['discount'] = number_format($pdp->discount,3,',','.');
-        $pdp['total'] = number_format($pdp->total,3,',','.');
-        $pdp['tax'] = number_format($pdp->tax,3,',','.');
-        $pdp['grandtotal'] = number_format($pdp->grandtotal,3,',','.');
-        $pdp['percent_tax'] = number_format($pdp->percent_tax,3,',','.');
+        $pdp['subtotal'] = number_format($pdp->subtotal,2,',','.');
+        $pdp['discount'] = number_format($pdp->discount,2,',','.');
+        $pdp['total'] = number_format($pdp->total,2,',','.');
+        $pdp['tax'] = number_format($pdp->tax,2,',','.');
+        $pdp['grandtotal'] = number_format($pdp->grandtotal,2,',','.');
+        $pdp['percent_tax'] = number_format($pdp->percent_tax,2,',','.');
 
         $arr = [];
 

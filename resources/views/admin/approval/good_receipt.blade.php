@@ -146,7 +146,7 @@
         </div>
         <table border="0" width="100%" class="mt-3">
             <tr>
-                <td width="33%" class="left-align" style="vertical-align: top !important;">
+                <td width="50%" class="left-align" style="vertical-align: top !important;">
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
@@ -174,35 +174,7 @@
                         </tr>
                     </table>
                 </td>
-                <td width="33%" class="left-align" style="vertical-align: top !important;">
-                    <table border="0" width="100%">
-                        <tr>
-                            <td width="40%">
-                                Pabrik/Kantor
-                            </td>
-                            <td width="60%">
-                                {{ $data->place->name.' - '.$data->place->company->name }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="40%">
-                                Ke Gudang
-                            </td>
-                            <td width="60%">
-                                {{ $data->warehouse->code.' - '.$data->warehouse->name }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="40%">
-                                Alamat Gudang
-                            </td>
-                            <td width="60%">
-                                {{ $data->warehouse->address }}
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                <td width="33%" class="left-align" style="vertical-align: top !important;">
+                <td width="50%" class="left-align" style="vertical-align: top !important;">
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">

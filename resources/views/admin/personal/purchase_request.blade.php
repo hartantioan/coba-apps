@@ -1,3 +1,8 @@
+<style>
+    .modal {
+        top:0px !important;
+    }
+</style>
 <!-- BEGIN: Page Main-->
 <div id="main">
     <div class="row">
@@ -89,7 +94,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 80% !important;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:100%;max-height: 100% !important;height: 100% !important;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -100,11 +105,7 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m4 s12">
-                                <input type="hidden" id="temp" name="temp">
-                                <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1"></textarea>
-                                <label class="active" for="note">Keterangan</label>
-                            </div>
+                            
                             <div class="input-field col m4 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
@@ -138,6 +139,11 @@
                                 <select class="browser-default" id="project_id" name="project_id"></select>
                                 <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                             </div>
+                            <div class="input-field col m4 s12">
+                                <input type="hidden" id="temp" name="temp">
+                                <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
+                                <label class="active" for="note">Keterangan</label>
+                            </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
@@ -150,6 +156,8 @@
                                                 <th class="center">Keterangan</th>
                                                 <th class="center">Tgl.Dipakai</th>
                                                 <th class="center">Gudang Tujuan</th>
+                                                <th class="center">Plant/Pabrik</th>
+                                                <th class="center">Departemen</th>
                                                 <th class="center">Hapus</th>
                                             </tr>
                                         </thead>
@@ -173,6 +181,20 @@
                                                 <td>
                                                     <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]"></select>
                                                 </td>
+                                                <td>
+                                                    <select class="form-control" id="arr_place0" name="arr_place[]">
+                                                        @foreach ($place as $rowplace)
+                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                                        @endforeach
+                                                    </select>    
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" id="arr_department0" name="arr_department[]">
+                                                        @foreach ($department as $rowdept)
+                                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                                        @endforeach
+                                                    </select>    
+                                                </td>
                                                 <td class="center">
                                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                         <i class="material-icons">delete</i>
@@ -180,7 +202,7 @@
                                                 </td>
                                             </tr>
                                             <tr id="last-row-item">
-                                                <td colspan="6" class="center">
+                                                <td colspan="9" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -262,6 +284,7 @@
             $(this).closest('tr').remove();
         });
 
+        $('#arr_place0,#arr_department0').formSelect();
         select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
         select2ServerSide('#arr_warehouse0', '{{ url("admin/select2/warehouse") }}');
@@ -293,6 +316,20 @@
                 <td>
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                 </td>
+                <td>
+                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                        @foreach ($place as $rowplace)
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                        @foreach ($department as $rowdept)
+                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -300,6 +337,8 @@
                 </td>
             </tr>
         `);
+        $('#arr_place' + count).formSelect();
+        $('#arr_department' + count).formSelect();
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
         select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
     }
@@ -537,6 +576,20 @@
                                 <td>
                                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                                 </td>
+                                <td>
+                                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                        @foreach ($department as $rowdept)
+                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -552,6 +605,8 @@
                             <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
                         `);
                         select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                        $('#arr_place' + count).val(val.place_id).formSelect();
+                        $('#arr_department' + count).val(val.department_id).formSelect();
                     });
                 }
                 

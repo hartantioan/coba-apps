@@ -46,6 +46,7 @@ class PurchaseRequestController extends Controller
             'title'     => 'Pengajuan Pembelian Barang - Pengguna',
             'content'   => 'admin.personal.purchase_request',
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'department'=> Department::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -445,7 +446,9 @@ class PurchaseRequestController extends Controller
             'note'		                => 'required',
             'arr_item'                  => 'required|array',
             'place_id'                  => 'required',
-            'arr_warehouse'             => 'required|array'
+            'arr_warehouse'             => 'required|array',
+            'arr_place'                 => 'required|array',
+            'arr_department'            => 'required|array'
 		], [
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
@@ -455,7 +458,11 @@ class PurchaseRequestController extends Controller
             'arr_item.array'                    => 'Item harus dalam bentuk array.',
             'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
             'arr_warehouse.required'            => 'Gudang tujuan tidak boleh kosong.',
-            'arr_warehouse.array'               => 'Gudang harus dalam bentuk array.'
+            'arr_warehouse.array'               => 'Gudang harus dalam bentuk array.',
+            'arr_place.required'                => 'Penempatan tujuan tidak boleh kosong.',
+            'arr_place.array'                   => 'Penempatan harus dalam bentuk array.',
+            'arr_department.required'           => 'Departemen tujuan tidak boleh kosong.',
+            'arr_department.array'              => 'Departemen harus dalam bentuk array.'
 		]);
 
         if($validation->fails()) {
@@ -548,8 +555,8 @@ class PurchaseRequestController extends Controller
                             'qty'                   => $request->arr_qty[$key],
                             'note'                  => $request->arr_note[$key],
                             'required_date'         => $request->arr_required_date[$key],
-                            'place_id'              => session('bo_place_id'),
-                            'department_id'         => session('bo_department_id'),
+                            'place_id'              => $request->arr_place[$key],
+                            'department_id'         => $request->arr_department[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key]
                         ]);
                         DB::commit();
@@ -589,7 +596,7 @@ class PurchaseRequestController extends Controller
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table>
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="6">Daftar Item</th>
+                                <th class="center-align" colspan="8">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -598,6 +605,8 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Tgl.Dipakai</th>
+                                <th class="center-align">Pabrik/Plant</th>
+                                <th class="center-align">Departemen</th>
                             </tr>
                         </thead><tbody>';
         
@@ -609,6 +618,8 @@ class PurchaseRequestController extends Controller
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.date('d M Y',strtotime($row->required_date)).'</td>
+                <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
+                <td class="center-align">'.$row->department->name.'</td>
             </tr>';
         }
         
@@ -662,7 +673,9 @@ class PurchaseRequestController extends Controller
                 'unit'              => $row->item->buyUnit->code,
                 'note'              => $row->note,
                 'date'              => $row->required_date,
-                'warehouse_name'    => $row->warehouse->name
+                'warehouse_name'    => $row->warehouse->name,
+                'place_id'          => $row->place_id,
+                'department_id'     => $row->department_id
             ];
         }
 

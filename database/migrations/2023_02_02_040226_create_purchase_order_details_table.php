@@ -17,6 +17,7 @@ return new class extends Migration
         Schema::create('purchase_order_details', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('purchase_order_id')->nullable();
+            $table->bigInteger('purchase_request_detail_id')->nullable();
             $table->bigInteger('item_id')->nullable();
             $table->double('qty')->nullable();
             $table->double('price')->nullable();
@@ -33,7 +34,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['purchase_order_id', 'item_id']);
+            $table->index(['purchase_order_id', 'item_id', 'purchase_request_detail_id'],'podt_index');
         });
     }
 

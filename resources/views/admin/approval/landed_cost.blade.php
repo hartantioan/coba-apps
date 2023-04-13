@@ -243,28 +243,28 @@
                         <td>{{ $row->item->name }}</td>
                         <td class="center">{{ $row->qty }}</td>
                         <td class="center">{{ $row->item->uomUnit->code }}</td>
-                        <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
-                        <td class="right-align">{{ number_format(round($row->nominal / $row->qty,3),3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
+                        <td class="right-align">{{ number_format(round($row->nominal / $row->qty,3),2,',','.') }}</td>
                     </tr>
                     @endforeach
                     <tr>
                         <td class="right-align" colspan="4">Total</td>
-                        <td class="right-align">{{ number_format($data->total,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="4">PPN</td>
-                        <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="4">PPH</td>
-                        <td class="right-align">{{ number_format($data->wtax,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="4">Grandtotal</td>
-                        <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                 </tbody>

@@ -16,6 +16,7 @@ class PurchaseOrderDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'purchase_order_id',
+        'purchase_request_detail_id',
         'item_id',
         'qty',
         'price',
@@ -87,9 +88,9 @@ class PurchaseOrderDetail extends Model
         return $balance;
     }
 
-    public function purchaseOrderDetailComposition()
+    public function purchaseRequestDetail()
     {
-        return $this->hasMany('App\Models\PurchaseOrderDetailComposition','pod_id','id');
+        return $this->hasMany('App\Models\PurchaseRequestDetail','purchase_request_detail_id','id');
     }
 
     public function purchaseRequestList(){

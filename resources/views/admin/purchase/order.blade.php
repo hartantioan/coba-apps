@@ -233,11 +233,11 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <input type="hidden" id="savesubtotal" name="savesubtotal" value="0,000">
-                                <input type="hidden" id="savetotal" name="savetotal" value="0,000">
-                                <input type="hidden" id="savetax" name="savetax" value="0,000">
-                                <input type="hidden" id="savewtax" name="savewtax" value="0,000">
-                                <input type="hidden" id="savegrandtotal" name="savegrandtotal" value="0,000">
+                                <input type="hidden" id="savesubtotal" name="savesubtotal" value="0,00">
+                                <input type="hidden" id="savetotal" name="savetotal" value="0,00">
+                                <input type="hidden" id="savetax" name="savetax" value="0,00">
+                                <input type="hidden" id="savewtax" name="savewtax" value="0,00">
+                                <input type="hidden" id="savegrandtotal" name="savegrandtotal" value="0,00">
                                 <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getTopSupplier();"></select>
                                 <label class="active" for="supplier_id">Supplier</label>
                             </div>
@@ -403,7 +403,7 @@
                                     <thead>
                                         <tr>
                                             <td width="50%">Subtotal</td>
-                                            <td width="50%" class="right-align"><span id="subtotal">0,000</span></td>
+                                            <td width="50%" class="right-align"><span id="subtotal">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>Discount</td>
@@ -413,19 +413,19 @@
                                         </tr>
                                         <tr>
                                             <td>Total</td>
-                                            <td class="right-align"><span id="total">0,000</span></td>
+                                            <td class="right-align"><span id="total">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPN</td>
-                                            <td class="right-align"><span id="tax">0,000</span></td>
+                                            <td class="right-align"><span id="tax">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPH</td>
-                                            <td class="right-align"><span id="wtax">0,000</span></td>
+                                            <td class="right-align"><span id="wtax">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
-                                            <td class="right-align"><span id="grandtotal">0,000</span></td>
+                                            <td class="right-align"><span id="grandtotal">0,00</span></td>
                                         </tr>
                                     </thead>
                                 </table>
@@ -530,7 +530,6 @@
                 icon.first().html('remove');
             }
         });
-        
 
         loadDataTable();
         
@@ -556,12 +555,12 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#savesubtotal,#savetotal,#savetax,#savewtax,#savegrandtotal').val('0,000');
+                $('#savesubtotal,#savetotal,#savetax,#savewtax,#savegrandtotal').val('0,00');
                 $('.row_item').each(function(){
                     $(this).remove();
                 });
                 M.updateTextFields();
-                $('#subtotal,#total,#tax,#grandtotal').text('0,000');
+                $('#subtotal,#total,#tax,#grandtotal').text('0,00');
                 $('#purchase_request_id').empty();
                 $('#list-used-data').empty();
                 window.onbeforeunload = function() {
@@ -592,7 +591,14 @@
                 $('#chart-container').empty();
             }
         });
-    
+        
+        $('#body-item').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
+            countAll();
+        });
+
+        select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}');
+        select2ServerSide('#purchase_request_id', '{{ url("admin/select2/purchase_request") }}');
     });
     
 
@@ -603,7 +609,6 @@
             'direction': 'r2l',
         });
     }
-
 
     function viewStructureTree(id){
         $.ajax({
@@ -697,7 +702,7 @@
                                 
                                 $('#last-row-item').before(`
                                     <tr class="row_item" data-id="` + response.id + `">
-                                        <input type="hidden" name="arr_purchase[]" value="` + response.ecode + `">
+                                        <input type="hidden" name="arr_purchase[]" value="` + val.purchase_request_detail_id + `">
                                         <td>
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                         </td>
@@ -723,7 +728,7 @@
                                             <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
                                         </td>
                                         <td>
-                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + ` ` + response.code + ` ke Gudang ` + val.warehouse_name + `">
+                                            <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + ` ` + response.code + ` ke Gudang ` + val.warehouse_name + `">
                                         </td>
                                         <td>
                                             <div class="switch mb-0">
@@ -826,7 +831,7 @@
                     <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
                 </td>
                 <td>
-                    <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ...">
+                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
                 </td>
                 <td>
                     <div class="switch mb-0">
@@ -1201,7 +1206,7 @@
                                     <span id="arr_subtotal` + count + `" class="arr_subtotal">` + val.subtotal + `</span>
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
+                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                                 </td>
                                 <td>
                                     <div class="switch mb-0">
@@ -1387,10 +1392,10 @@
         var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));
         var finalpricedisc3 = finalpricedisc2 - disc3;
 
-        if((finalpricedisc3 * qty).toFixed(3) >= 0){
-            $('#arr_subtotal' + id).text(formatRupiahIni((finalpricedisc3 * qty).toFixed(3).toString().replace('.',',')));
+        if((finalpricedisc3 * qty).toFixed(2) >= 0){
+            $('#arr_subtotal' + id).text(formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
         }else{
-            $('#arr_subtotal' + id).text('-' + formatRupiahIni((finalpricedisc3 * qty).toFixed(3).toString().replace('.',',')));
+            $('#arr_subtotal' + id).text('-' + formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
         }
 
         countAll();
@@ -1432,34 +1437,34 @@
         });
 
         $('#subtotal').text(
-            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(3).toString().replace('.',','))
+            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
         );
         $('#savesubtotal').val(
-            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(3).toString().replace('.',','))
+            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
         );
         $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
         $('#savetotal').val(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
         $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
         );
         $('#savetax').val(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
         );
         $('#wtax').text(
-            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(3).toString().replace('.',','))
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
         );
         $('#savewtax').val(
-            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(3).toString().replace('.',','))
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
         );
         $('#grandtotal').text(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );
         $('#savegrandtotal').val(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );
     }
 

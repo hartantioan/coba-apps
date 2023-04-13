@@ -142,7 +142,8 @@ class Select2Controller extends Controller {
                 'text' 			=> $d->code.' - '.$d->name,
                 'code'          => $d->code,
                 'name'          => $d->name,
-                'uom'           => $d->uomUnit->code 
+                'uom'           => $d->uomUnit->code,
+                'price_list'    => $d->currentCogs($this->dataplaces)
             ];
         }
 

@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Permohonan Pembelian # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Barang Masuk # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -128,22 +128,13 @@
                         <small>Diajukan:</small>
                         <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
-                    <div class="mr-2">
-                        <small>Hingga:</small>
-                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
-                    </div>
-                    <div>
-                        <small>Dipakai:</small>
-                        <span>{{ date('d/m/y',strtotime($data->required_date)) }}</span>
-                    </div>
                 </div>
             </div>
         </div>
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Purchase Request</h5>
-                <span>Dept. {{ $data->department->name }}</span>
+                <h5 class="indigo-text">Barang Masuk</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -208,22 +199,24 @@
                     <th class="center">Item</th>
                     <th class="center">Jum.</th>
                     <th class="center">Sat.</th>
-                    <th class="center">Catatan</th>
-                    <th class="center">Tgl.Dipakai</th>
-                    <th class="center">Pabrik/Kantor</th>
-                    <th class="center">Departemen</th>
+                    <th class="center">Harga @</th>
+                    <th class="center">Harga Total.</th>
+                    <th class="center">Coa</th>
+                    <th class="center">Gudang</th>
+                    <th class="center">Keterangan</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data->purchaseRequestDetail as $row)
+                @foreach($data->goodReceiveDetail as $row)
                 <tr>
-                    <td>{{ $row->item->name }}</td>
-                    <td class="center">{{ $row->qty }}</td>
-                    <td class="center">{{ $row->item->buyUnit->code }}</td>
+                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                    <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                    <td class="center-align">{{ $row->item->uomUnit->code }}</td>
+                    <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
+                    <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                    <td class="center-align">{{ $row->warehouse->name }}</td>
                     <td>{{ $row->note }}</td>
-                    <td class="indigo-text center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
-                    <td class="center">{{ $row->place->name.' - '.$row->place->company->name }}</td>
-                    <td class="center">{{ $row->department->name }}</td>
                 </tr>
                 @endforeach
             </tbody>

@@ -291,7 +291,7 @@
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="deposit" name="deposit" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
+                                <input id="deposit" name="deposit" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly>
                                 <label class="active" for="deposit">Supp/Ven. Sisa Deposit <i>(Autofill)</i></label>
                             </div>
                             <div class="col m12 s12">
@@ -341,29 +341,29 @@
                                     <thead>
                                         <tr>
                                             <td>Total</td>
-                                            <td class="right-align"><span id="total">0,000</span></td>
+                                            <td class="right-align"><span id="total">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPN</td>
-                                            <td class="right-align"><span id="tax">0,000</span></td>
+                                            <td class="right-align"><span id="tax">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPH</td>
-                                            <td class="right-align"><span id="wtax">0,000</span></td>
+                                            <td class="right-align"><span id="wtax">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
-                                            <td class="right-align"><span id="grandtotal">0,000</span></td>
+                                            <td class="right-align"><span id="grandtotal">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>Uang Muka</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Sisa</td>
-                                            <td class="right-align"><span id="balance">0,000</span></td>
+                                            <td class="right-align"><span id="balance">0,00</span></td>
                                         </tr>
                                     </thead>
                                 </table>
@@ -463,8 +463,8 @@
                     </tr>
                 `);
                 $('#account_id').empty();
-                $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
-                $('#subtotal,#discount,#downpayment').val('0,000');
+                $('#total,#tax,#wtax,#grandtotal,#balance').text('0,00');
+                $('#subtotal,#discount,#downpayment').val('0,00');
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -575,7 +575,7 @@
                             </tr>
                         `);
 
-                        $('#total,#tax,#grandtotal,#balance').text('0,000');
+                        $('#total,#tax,#grandtotal,#balance').text('0,00');
                     }
 
                     $('#top').val(response.top);
@@ -603,10 +603,10 @@
                     </td>
                 </tr>
             `);
-            $('#deposit').val('0,000');
+            $('#deposit').val('0,00');
             $('#top').val('0');
             $('#due_date').val('');
-            $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
+            $('#total,#tax,#wtax,#grandtotal,#balance').text('0,00');
         }
     }
 
@@ -616,10 +616,10 @@
             wtax = total * (percent_wtax / 100);
         }
         grandtotal = total + tax - wtax;
-        $('input[name^="arr_wtax"][data-id="' + val + '"]').val(formatRupiahIni(wtax.toFixed(3).toString().replace('.',',')));
-        $('input[name^="arr_grandtotal"][data-id="' + val + '"]').val(formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',',')));
-        $('#row_wtax' + val).text(formatRupiahIni(wtax.toFixed(3).toString().replace('.',',')));
-        $('#row_grandtotal' + val).text(formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',',')));
+        $('input[name^="arr_wtax"][data-id="' + val + '"]').val(formatRupiahIni(wtax.tofixed(2).toString().replace('.',',')));
+        $('input[name^="arr_grandtotal"][data-id="' + val + '"]').val(formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',',')));
+        $('#row_wtax' + val).text(formatRupiahIni(wtax.tofixed(2).toString().replace('.',',')));
+        $('#row_grandtotal' + val).text(formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',',')));
     }
 
     function countAll(){
@@ -627,7 +627,7 @@
         
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
-                let element = $(this);
+                let element = $(this);tofixed(3)
                 if($(element).is(':checked')){
                     ada = true;                    
                     total += parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
@@ -640,14 +640,14 @@
 
         balance = grandtotal - downpayment;
 
-        $('#total').text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
-        $('#tax').text(formatRupiahIni(tax.toFixed(3).toString().replace('.',',')));
-        $('#wtax').text(formatRupiahIni(wtax.toFixed(3).toString().replace('.',',')));
+        $('#total').text(formatRupiahIni(total.tofixed(2).toString().replace('.',',')));
+        $('#tax').text(formatRupiahIni(tax.tofixed(2).toString().replace('.',',')));
+        $('#wtax').text(formatRupiahIni(wtax.tofixed(2).toString().replace('.',',')));
         $('#grandtotal').text(
-            formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
+            formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',','))
         );
         $('#balance').text(
-            (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(3).toString().replace('.',','))
+            (balance >= 0 ? '' : '-') + formatRupiahIni(balance.tofixed(2).toString().replace('.',','))
         );
     }
 

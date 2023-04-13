@@ -69,7 +69,7 @@ class LandedCostController extends Controller
                         $details[] = [
                             'item_id'       => $row->item_id,
                             'item_name'     => $row->item->code.' - '.$row->item->name,
-                            'qty'           => number_format($row->qtyConvert(),3,',','.'),
+                            'qty'           => number_format($row->qtyConvert(),2,',','.'),
                             'qtyRaw'        => $row->qtyConvert(),
                             'unit'          => $row->item->uomUnit->code,
                         ];
@@ -247,14 +247,14 @@ class LandedCostController extends Controller
                     number_format($val->currency_rate,2,',','.'),
                     $val->isTax(),
                     $val->isIncludeTax(),
-                    number_format($val->percent_tax,3,',','.'),
+                    number_format($val->percent_tax,2,',','.'),
                     $val->isWtax(),
-                    number_format($val->percent_wtax,3,',','.'),
+                    number_format($val->percent_wtax,2,',','.'),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
-                    number_format($val->total,3,',','.'),
-                    number_format($val->tax,3,',','.'),
-                    number_format($val->wtax,3,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->tax,2,',','.'),
+                    number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     '
@@ -498,8 +498,8 @@ class LandedCostController extends Controller
                     <td>'.$row->item->code.' - '.$row->item->name.'</td>
                     <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                     <td class="center-align">'.$row->item->uomUnit->code.'</td>
-                    <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
-                    <td class="right-align">'.number_format(round($row->nominal / $row->qty,3),3,',','.').'</td>
+                    <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+                    <td class="right-align">'.number_format(round($row->nominal / $row->qty,3),2,',','.').'</td>
                 </tr>';
             }
         }else{
@@ -563,12 +563,12 @@ class LandedCostController extends Controller
         $lc = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
         $lc['vendor_name'] = $lc->vendor->name;
         $lc['good_receipt_note'] = $lc->goodReceiptMain->code.' - '.$lc->note;
-        $lc['total'] = number_format($lc->total,3,',','.');
-        $lc['tax'] = number_format($lc->tax,3,',','.');
-        $lc['wtax'] = number_format($lc->wtax,3,',','.');
-        $lc['grandtotal'] = number_format($lc->grandtotal,3,',','.');
-        $lc['percent_tax'] = number_format($lc->percent_tax,3,',','.');
-        $lc['currency_rate'] = number_format($lc->currency_rate,3,',','.');
+        $lc['total'] = number_format($lc->total,2,',','.');
+        $lc['tax'] = number_format($lc->tax,2,',','.');
+        $lc['wtax'] = number_format($lc->wtax,2,',','.');
+        $lc['grandtotal'] = number_format($lc->grandtotal,2,',','.');
+        $lc['percent_tax'] = number_format($lc->percent_tax,2,',','.');
+        $lc['currency_rate'] = number_format($lc->currency_rate,2,',','.');
 
         $arr = [];
 
@@ -578,7 +578,7 @@ class LandedCostController extends Controller
                 'item_name'                 => $row->item->name.' - '.$row->item->name,
                 'qtyRaw'                    => $row->qty,
                 'qty'                       => number_format($row->qty,3,',','.'),
-                'nominal'                   => number_format($row->nominal,3,',','.'),
+                'nominal'                   => number_format($row->nominal,2,',','.'),
                 'unit'                      => $row->item->uomUnit->code,
             ];
         }

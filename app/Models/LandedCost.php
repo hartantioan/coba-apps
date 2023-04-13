@@ -183,7 +183,7 @@ class LandedCost extends Model
 
     public function approval(){
         $source = ApprovalSource::where('lookable_type','landed_costs')->where('lookable_id',$this->id)->first();
-        if($source){
+        if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{
             return '';

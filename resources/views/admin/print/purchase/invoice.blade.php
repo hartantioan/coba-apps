@@ -166,7 +166,7 @@
                             <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
 							<td>{{ $row->type() }}</td>
                             <td>{{ $row->currency->symbol }}</td>
-                            <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
+                            <td>{{ number_format($row->currency_rate,2,',','.') }}</td>
                             <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                             <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
 							<td align="right">{{ number_format($row->wtax,2,',','.') }}</td>

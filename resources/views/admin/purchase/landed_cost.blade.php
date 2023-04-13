@@ -585,13 +585,13 @@
         grandtotal = total + tax;
         
         $('#total').val(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(total.tofixed(2).toString().replace('.',','))
         );
         $('#tax').val(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.tofixed(2).toString().replace('.',','))
         );
         $('#grandtotal').val(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',','))
         );
     }
 
@@ -613,16 +613,16 @@
         grandtotal = total + tax - wtax;
         
         $('#total').val(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.tofixed(2).toString().replace('.',','))
         );
         $('#tax').val(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.tofixed(2).toString().replace('.',','))
         );
         $('#wtax').val(
-            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(3).toString().replace('.',','))
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.tofixed(2).toString().replace('.',','))
         );
         $('#grandtotal').val(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',','))
         );
         if($('.nominalitem').length > 0){
             if(arrQty.length > 0){
@@ -1048,16 +1048,16 @@
         grandtotal = total + tax;
         
         $('#subtotal').text(
-            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(3).toString().replace('.',','))
+            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.tofixed(2).toString().replace('.',','))
         );
         $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.tofixed(2).toString().replace('.',','))
         );
         $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(3).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.tofixed(2).toString().replace('.',','))
         );
         $('#grandtotal').text(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',','))
         );
     }
 

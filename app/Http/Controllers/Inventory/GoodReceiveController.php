@@ -22,7 +22,7 @@ use App\Models\Place;
 use App\Models\Department;
 use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
-use App\Exports\ExportGoodReceipt;
+use App\Exports\ExportGoodReceive;
 
 class GoodReceiveController extends Controller
 {
@@ -283,8 +283,8 @@ class GoodReceiveController extends Controller
                         GoodReceiveDetail::create([
                             'good_receive_id'       => $query->id,
                             'item_id'               => $row,
-                            'qty'                   => $request->arr_qty[$key],
-                            'price'                 => $request->arr_price[$key],
+                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                             'total'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
                             'coa_id'                => $request->arr_coa[$key],
@@ -294,7 +294,7 @@ class GoodReceiveController extends Controller
                     }
 
                     CustomHelper::sendApproval('good_receives',$query->id,$query->note);
-                    CustomHelper::sendNotification('good_receives',$query->id,'Pengajuan Penerimaan Barang No. '.$query->code,$query->note,session('bo_id'));
+                    CustomHelper::sendNotification('good_receives',$query->id,'Barang Masuk No. '.$query->code,$query->note,session('bo_id'));
                     
                     DB::commit();
                 }catch(\Exception $e){
@@ -302,7 +302,7 @@ class GoodReceiveController extends Controller
                 }
 
                 activity()
-                    ->performedOn(new GoodReceiptMain())
+                    ->performedOn(new GoodReceive())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Add / edit penerimaan barang.');
@@ -320,5 +320,251 @@ class GoodReceiveController extends Controller
 		}
 		
 		return response()->json($response);
+    }
+
+    public function rowDetail(Request $request){
+        $data   = GoodReceive::find($request->id);
+        
+        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12">
+                    <table style="max-width:800px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="9">Daftar Item</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Item</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="right-align">Harga Satuan</th>
+                                <th class="right-align">Harga Total</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Coa</th>
+                                <th class="center-align">Gudang</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        foreach($data->goodReceiveDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->item->name.'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                <td class="center-align">'.number_format($row->price,3,',','.').'</td>
+                <td class="center-align">'.number_format($row->total,3,',','.').'</td>
+                <td class="center-align">'.$row->note.'</td>
+                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="center-align">'.$row->warehouse->name.'</td>
+            </tr>';
+        }
+        
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="max-width:800px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="4">Approval</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Level</th>
+                                <th class="center-align">Kepada</th>
+                                <th class="center-align">Status</th>
+                                <th class="center-align">Catatan</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        if($data->approval()){                
+            foreach($data->approval()->approvalMatrix as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.$row->approvalTable->level.'</td>
+                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
+                    <td class="center-align">'.$row->note.'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="4">Approval tidak ditemukan.</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div></div>';
+		
+        return response()->json($string);
+    }
+
+    public function show(Request $request){
+        $gr = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $gr['currency_rate'] = number_format($gr->currency_rate,3,',','.');
+
+        $arr = [];
+        
+        foreach($gr->goodReceiveDetail as $row){
+            $arr[] = [
+                'item_id'       => $row->item_id,
+                'item_name'     => $row->item->code.' - '.$row->item->name,
+                'qty'           => number_format($row->qty,3,',','.'),
+                'unit'          => $row->item->uomUnit->code,
+                'price'         => number_format($row->price,3,',','.'),
+                'total'         => number_format($row->total,3,',','.'),
+                'coa_id'        => $row->coa_id,
+                'coa_name'      => $row->coa->code.' - '.$row->coa->name,
+                'warehouse_id'  => $row->warehouse_id,
+                'warehouse_name'=> $row->warehouse->name,
+                'note'          => $row->note,
+            ];
+        }
+
+        $gr['details'] = $arr;
+        				
+		return response()->json($gr);
+    }
+
+    public function voidStatus(Request $request){
+        $query = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+            if(in_array($query->status,['4','5'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+
+                CustomHelper::removeJournal('good_receives',$query->id);
+                CustomHelper::removeCogs('good_receives',$query->id);
+    
+                activity()
+                    ->performedOn(new GoodReceive())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the good receive data');
+    
+                CustomHelper::sendNotification('good_receives',$query->id,'Barang Masuk No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('good_receives',$query->id);
+                
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function destroy(Request $request){
+        $query = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query->approval()){
+            foreach($query->approval()->approvalMatrix as $row){
+                if($row->status == '2'){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Purchase Order telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+            }
+        }
+
+        if(in_array($query->status,['2','3'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+        
+        if($query->delete()) {
+
+            CustomHelper::removeJournal('good_receives',$query->id);
+            CustomHelper::removeCogs('good_receives',$query->id);
+
+            $query->goodReceiveDetail()->delete();
+
+            CustomHelper::removeApproval('good_receipt_mains',$query->id);
+
+            activity()
+                ->performedOn(new GoodReceive())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the good receive data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function approval(Request $request,$id){
+        
+        $gr = GoodReceive::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($gr){
+            $data = [
+                'title'     => 'Print Good Receive (Barang Masuk)',
+                'data'      => $gr
+            ];
+
+            return view('admin.approval.good_receive', $data);
+        }else{
+            abort(404);
+        }
+    }
+
+    public function print(Request $request){
+
+        $data = [
+            'title' => 'GOOD RECEIVE REPORT',
+            'data' => GoodReceive::where(function ($query) use ($request) {
+                if($request->search) {
+                    $query->where(function($query) use ($request) {
+                        $query->where('code', 'like', "%$request->search%")
+                            ->orWhere('post_date', 'like', "%$request->search%")
+                            ->orWhere('note', 'like', "%$request->search%")
+                            ->orWhereHas('goodReceiveDetail', function($query) use($request){
+                                $query->whereHas('item',function($query) use($request){
+                                    $query->where('code', 'like', "%$request->search%")
+                                        ->orWhere('name','like',"%$request->search%");
+                                });
+                            })
+                            ->orWhereHas('user',function($query) use($request){
+                                $query->where('name','like',"%$request->search%")
+                                    ->orWhere('employee_no','like',"%$request->search%");
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+            })
+            ->whereIn('place_id',$this->dataplaces)
+            ->get()
+		];
+		
+		return view('admin.print.inventory.good_receive', $data);
+    }
+
+    public function export(Request $request){
+		return Excel::download(new ExportGoodReceive($request->search,$request->status,$this->dataplaces), 'good_receive_'.uniqid().'.xlsx');
     }
 }

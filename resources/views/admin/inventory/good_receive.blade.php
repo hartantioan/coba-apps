@@ -130,15 +130,15 @@
                                 <select class="form-control" id="place_id" name="place_id">
                                     <option value="">--Kosong--</option>
                                     @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}" data-name="{{ $rowplace->name.' - '.$rowplace->company->name }}" data-address="{{ $rowplace->address }}">{{ $rowplace->name }}</option>
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="" for="place_id">Pabrik/Kantor</label>
                             </div>
                             
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}">
-                                <label class="active" for="post_date">Tgl. Diterima</label>
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}">
+                                <label class="active" for="post_date">Tgl. Post</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="currency_id" name="currency_id">
@@ -166,15 +166,15 @@
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="width:1800px !important;">
+                                        <table class="bordered" style="min-width:1800px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center" width="20%">Item</th>
                                                     <th class="center" width="10%">Qty</th>
                                                     <th class="center">Satuan UOM</th>
-                                                    <th class="center" width="15%">Harga</th>
+                                                    <th class="center" width="15%">Harga HPP</th>
                                                     <th class="center" width="15%">Total</th>
-                                                    <th class="center">Keterangan</th>
+                                                    <th class="center" width="10%">Keterangan</th>
                                                     <th class="center" width="20%">Coa Kredit</th>
                                                     <th class="center" width="20%">Gudang</th>
                                                     <th class="center">Hapus</th>
@@ -229,6 +229,8 @@
         <i class="material-icons">add</i>
     </a>
 </div>
+
+<datalist id="tempPrice"></datalist>
 
 <!-- END: Page Main-->
 <script>
@@ -309,6 +311,11 @@
 
     function getRowUnit(val){
         $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
+        $.each($("#arr_item" + val).select2('data')[0].price_list, function(i, val) {
+            $('#tempPrice').append(`
+                <option value="` + val.price + `">` + val.description + `</option>
+            `);
+        });
     }
 
     function loadDataTable() {
@@ -405,7 +412,7 @@
                     <span id="arr_unit` + count + `">-</span>
                 </td>
                 <td class="center">
-                    <input name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                    <input list="tempPrice" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
                 </td>
                 <td class="right-align">
                     <span id="arr_total` + count + `" class="arr_total">0</span>
@@ -520,5 +527,241 @@
                 });
             }
         });
+    }
+
+    function success(){
+        loadDataTable();
+        $('#modal1').modal('close');
+    }
+
+    function show(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+
+                $('#empty-item').remove();
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal1').modal('open');
+                $('#temp').val(id);
+                $('#place_id').val(response.place_id).formSelect();
+                $('#note').val(response.note);
+                $('#post_date').val(response.post_date);
+                $('#currency_id').val(response.currency_id).formSelect();
+                $('#currency_rate').val(response.currency_rate);
+                $('#post_date').removeAttr('min');
+                
+                if(response.details.length > 0){
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        $('#last-row-item').before(`
+                            <tr class="row_item">
+                                <input type="hidden" name="arr_purchase[]" value="0">
+                                <td>
+                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                </td>
+                                <td>
+                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                </td>
+                                <td class="center">
+                                    <span id="arr_unit` + count + `">` + val.unit + `</span>
+                                </td>
+                                <td class="center">
+                                    <input name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                                </td>
+                                <td class="right-align">
+                                    <span id="arr_total` + count + `" class="arr_total">` + val.total + `</span>
+                                </td>
+                                <td>
+                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                        $('#arr_item' + count).append(`
+                            <option value="` + val.item_id + `">` + val.item_name + `</option>
+                        `);
+                        $('#arr_coa' + count).append(`
+                            <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                        `);
+                        $('#arr_warehouse' + count).append(`
+                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                        `);
+                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                    });
+                }
+                
+                $('.modal-content').scrollTop(0);
+                $('#note').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function voidStatus(id){
+        var msg = '';
+        swal({
+            title: "Alasan mengapa anda menutup!",
+            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/void_status',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, msg : message },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function destroy(id){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Anda tidak bisa mengembalikan data yang terhapus!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/destroy',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function printPreview(code){
+        $.ajax({
+            url: '{{ Request::url() }}/approval/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                $('#modal2').modal('open');
+                $('#show_print').html(data);
+            }
+        });
+    }
+
+    function printData(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        $.ajax({
+            type : "POST",
+            url  : '{{ Request::url() }}/print',
+            data : {
+                search : search,
+                status : status,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            cache: false,
+            success: function(data){
+                var w = window.open('about:blank');
+                w.document.open();
+                w.document.write(data);
+                w.document.close();
+            }
+        });
+    }
+
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

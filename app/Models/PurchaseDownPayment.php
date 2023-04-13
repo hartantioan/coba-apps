@@ -186,7 +186,7 @@ class PurchaseDownPayment extends Model
 
     public function approval(){
         $source = ApprovalSource::where('lookable_type','purchase_down_payments')->where('lookable_id',$this->id)->first();
-        if($source){
+        if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{
             return '';

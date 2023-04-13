@@ -50,7 +50,7 @@ class PurchaseInvoiceController extends Controller
 
     public function getGoodReceiptLandedCost(Request $request){
         $account = User::find($request->id);
-        $account['deposit'] = number_format($account->deposit,3,',','.');
+        $account['deposit'] = number_format($account->deposit,2,',','.');
 
         $details = [];
         $type = '';
@@ -69,14 +69,14 @@ class PurchaseInvoiceController extends Controller
                     'rawcode'       => $row->goodReceiptMain->code,
                     'post_date'     => date('d/m/y',strtotime($row->goodReceiptMain->post_date)),
                     'due_date'      => date('d/m/y',strtotime($row->goodReceiptMain->due_date)),
-                    'total'         => number_format($row->total,3,',','.'),
-                    'tax'           => number_format($row->tax,3,',','.'),
-                    'wtax'          => number_format($row->wtax,3,',','.'),
-                    'grandtotal'    => number_format($row->grandtotal,3,',','.'),
+                    'total'         => number_format($row->total,2,',','.'),
+                    'tax'           => number_format($row->tax,2,',','.'),
+                    'wtax'          => number_format($row->wtax,2,',','.'),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'department_id' => $row->department_id,
                     'place_id'      => $row->place_id,
                     'is_wtax'       => $row->wtax > 0 ? '1' : '',
-                    'percent_wtax'  => number_format(($row->wtax / $row->total) * 100,3,',','.'),
+                    'percent_wtax'  => number_format(($row->wtax / $row->total) * 100,2,',','.'),
                 ];
             }
         }elseif($account->type == '4'){
@@ -90,14 +90,14 @@ class PurchaseInvoiceController extends Controller
                     'rawcode'       => $row->code,
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'due_date'      => date('d/m/y',strtotime($row->due_date)),
-                    'total'         => number_format($row->total,3,',','.'),
-                    'tax'           => number_format($row->tax,3,',','.'),
-                    'wtax'          => number_format($row->wtax,3,',','.'),
-                    'grandtotal'    => number_format($row->grandtotal,3,',','.'),
+                    'total'         => number_format($row->total,2,',','.'),
+                    'tax'           => number_format($row->tax,2,',','.'),
+                    'wtax'          => number_format($row->wtax,2,',','.'),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'department_id' => $row->department_id,
                     'place_id'      => $row->place_id,
                     'is_wtax'       => $row->wtax > 0 ? '1' : '',
-                    'percent_wtax'  => number_format($row->percent_wtax,3,',','.'),
+                    'percent_wtax'  => number_format($row->percent_wtax,2,',','.'),
                 ];
             }
         }
@@ -291,15 +291,15 @@ class PurchaseInvoiceController extends Controller
                     date('d/m/y',strtotime($val->cut_date)),
                     $val->spk_no,
                     $val->invoice_no,
-                    number_format($val->subtotal,3,',','.'),
-                    number_format($val->percent_discount,3,',','.'),
-                    number_format($val->nominal_discount,3,',','.'),
-                    number_format($val->total,3,',','.'),
-                    number_format($val->tax,3,',','.'),
-                    number_format($val->wtax,3,',','.'),
-                    number_format($val->grandtotal,3,',','.'),
-                    number_format($val->downpayment,3,',','.'),
-                    number_format($val->balance,3,',','.'),
+                    number_format($val->subtotal,2,',','.'),
+                    number_format($val->percent_discount,2,',','.'),
+                    number_format($val->nominal_discount,2,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->tax,2,',','.'),
+                    number_format($val->wtax,2,',','.'),
+                    number_format($val->grandtotal,2,',','.'),
+                    number_format($val->downpayment,2,',','.'),
+                    number_format($val->balance,2,',','.'),
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -561,10 +561,10 @@ class PurchaseInvoiceController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.($row->goodReceiptMain()->exists() ? $row->goodReceiptMain->code : $row->landedCost->code).'</td>
-                    <td class="right-align">'.number_format($row->total,3,',','.').'</td>
-                    <td class="right-align">'.number_format($row->tax,3,',','.').'</td>
-                    <td class="right-align">'.number_format($row->wtax,3,',','.').'</td>
-                    <td class="right-align">'.number_format($row->grandtotal,3,',','.').'</td>
+                    <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                    <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                    <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
+                    <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
                 </tr>';
             }
         }else{
@@ -627,12 +627,12 @@ class PurchaseInvoiceController extends Controller
     public function show(Request $request){
         $pi = PurchaseInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         $pi['account_name'] = $pi->account->name;
-        $pi['total'] = number_format($pi->total,3,',','.');
-        $pi['tax'] = number_format($pi->tax,3,',','.');
-        $pi['wtax'] = number_format($pi->wtax,3,',','.');
-        $pi['grandtotal'] = number_format($pi->grandtotal,3,',','.');
-        $pi['downpayment'] = number_format($pi->downpayment,3,',','.');
-        $pi['currency_rate'] = number_format($pi->currency_rate,3,',','.');
+        $pi['total'] = number_format($pi->total,2,',','.');
+        $pi['tax'] = number_format($pi->tax,2,',','.');
+        $pi['wtax'] = number_format($pi->wtax,2,',','.');
+        $pi['grandtotal'] = number_format($pi->grandtotal,2,',','.');
+        $pi['downpayment'] = number_format($pi->downpayment,2,',','.');
+        $pi['currency_rate'] = number_format($pi->currency_rate,2,',','.');
 
         $arr = [];
 
@@ -643,12 +643,12 @@ class PurchaseInvoiceController extends Controller
                 'post_date'                 => $row->good_receipt_main_id ? date('d/m/y',strtotime($row->goodReceiptMain->post_date)) : date('d/m/y',strtotime($row->landedCost->post_date)),
                 'due_date'                  => $row->good_receipt_main_id ? date('d/m/y',strtotime($row->goodReceiptMain->due_date)) : date('d/m/y',strtotime($row->landedCost->due_date)),
                 'type'                      => $row->good_receipt_main_id ? 'good_receipt' : 'landed_cost',
-                'total'                     => number_format($row->total,3,',','.'),
-                'tax'                       => number_format($row->tax,3,',','.'),
-                'wtax'                      => number_format($row->wtax,3,',','.'),
-                'grandtotal'                => number_format($row->grandtotal,3,',','.'),
+                'total'                     => number_format($row->total,2,',','.'),
+                'tax'                       => number_format($row->tax,2,',','.'),
+                'wtax'                      => number_format($row->wtax,2,',','.'),
+                'grandtotal'                => number_format($row->grandtotal,2,',','.'),
                 'is_wtax'                   => $row->wtax > 0 ? '1' : '',
-                'percent_wtax'              => number_format($row->percent_wtax,3,',','.'),
+                'percent_wtax'              => number_format($row->percent_wtax,2,',','.'),
             ];
         }
 

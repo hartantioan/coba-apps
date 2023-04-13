@@ -107,7 +107,7 @@ class Capitalization extends Model
 
     public function approval(){
         $source = ApprovalSource::where('lookable_type','capitalizations')->where('lookable_id',$this->id)->first();
-        if($source){
+        if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{
             return '';

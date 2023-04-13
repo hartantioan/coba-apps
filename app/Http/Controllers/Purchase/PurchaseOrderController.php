@@ -15,7 +15,6 @@ use App\Models\Currency;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetail;
-use App\Models\PurchaseOrderDetailComposition;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseOrder;
 use App\Models\Place;
@@ -235,19 +234,19 @@ class PurchaseOrderController extends Controller
                     $val->paymentType(),
                     $val->payment_term,
                     $val->currency->name,
-                    number_format($val->currency_rate,3,',','.'),
+                    number_format($val->currency_rate,2,',','.'),
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->delivery_date)),
                     $val->receiver_name,
                     $val->receiver_address,
                     $val->receiver_phone,
                     $val->note,
-                    number_format($val->subtotal,3,',','.'),
-                    number_format($val->discount,3,',','.'),
-                    number_format($val->total,3,',','.'),
-                    number_format($val->tax,3,',','.'),
-                    number_format($val->wtax,3,',','.'),
-                    number_format($val->grandtotal,3,',','.'),
+                    number_format($val->subtotal,2,',','.'),
+                    number_format($val->discount,2,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->tax,2,',','.'),
+                    number_format($val->wtax,2,',','.'),
+                    number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -277,23 +276,23 @@ class PurchaseOrderController extends Controller
 
     public function getPurchaseRequest(Request $request){
         $data = PurchaseRequest::where('id',$request->id)->where('status','2')->first();
-        $data['ecode'] = CustomHelper::encrypt($data->code);
 
         if($data->used()->exists()){
             $data['status'] = '500';
             $data['message'] = 'Purchase Request '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
             if($data->hasBalance()){
-                $ud = CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
+                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
                 $details = [];
                 foreach($data->purchaseRequestDetail as $row){
                     $details[] = [
-                        'item_id'           => $row->item_id,
-                        'item_name'         => $row->item->code.' - '.$row->item->name,
-                        'unit'              => $row->item->buyUnit->code,
-                        'qty'               => $row->qtyBalance(),
-                        'note'              => $row->note,
-                        'warehouse_name'    => $row->warehouse->code.' - '.$row->warehouse->name
+                        'purchase_request_detail_id'    => $row->id,
+                        'item_id'                       => $row->item_id,
+                        'item_name'                     => $row->item->code.' - '.$row->item->name,
+                        'unit'                          => $row->item->buyUnit->code,
+                        'qty'                           => number_format($row->qtyBalance(),3,',','.'),
+                        'note'                          => $row->note,
+                        'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name
                     ];
                 }
 
@@ -360,79 +359,6 @@ class PurchaseOrderController extends Controller
             ];
         } else {
             
-            #start_count
-            
-            $arrDetail = [];
-
-            foreach($request->arr_item as $key => $row){
-                $index = -1;
-                $detail_pr = [];
-
-                foreach($arrDetail as $keycek => $rowcek){
-                    if($row == $rowcek['item_id']){
-                        $index = $keycek;
-                    }
-                }
-
-                $qty = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-                $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
-                $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
-                $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
-                $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
-
-                $finalpricedisc1 = $price - ($price * ($disc1 / 100));
-                $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
-                $finalpricedisc3 = $finalpricedisc2 - $disc3;
-
-                $rowsubtotal = round($finalpricedisc3 * $qty,3);
-
-                if($index >= 0){
-                    $arrDetail[$index]['detail_pr'][] = [
-                        'pr_code'       => $request->arr_purchase[$key],
-                        'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))
-                    ];
-                    $arrDetail[$index] = [
-                        'item_id'               => $arrDetail[$index]['item_id'],
-                        'qty'                   => $arrDetail[$index]['qty'] + str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                        'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                        'percent_discount_1'    => str_replace(',','.',str_replace('.','',$request->arr_disc1[$key])),
-                        'percent_discount_2'    => str_replace(',','.',str_replace('.','',$request->arr_disc2[$key])),
-                        'discount_3'            => str_replace(',','.',str_replace('.','',$request->arr_disc3[$key])),
-                        'subtotal'              => $arrDetail[$index]['subtotal'] + $rowsubtotal,
-                        'note'                  => $arrDetail[$index]['note'].', '.$request->arr_note[$key],
-                        'is_tax'                => $request->arr_is_tax[$key] == '1' ? '1' : NULL,
-                        'is_include_tax'        => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
-                        'percent_tax'           => str_replace(',','.',str_replace('.','',$request->arr_percent_tax[$key])),
-                        'is_wtax'               => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
-                        'percent_wtax'          => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
-                        'detail_pr'             => $arrDetail[$index]['detail_pr']
-                    ];
-                }else{
-                    $detail_pr[] = [
-                        'pr_code'       => $request->arr_purchase[$key],
-                        'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))
-                    ];
-                    $arrDetail[] = [
-                        'item_id'               => $row,
-                        'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                        'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                        'percent_discount_1'    => str_replace(',','.',str_replace('.','',$request->arr_disc1[$key])),
-                        'percent_discount_2'    => str_replace(',','.',str_replace('.','',$request->arr_disc2[$key])),
-                        'discount_3'            => str_replace(',','.',str_replace('.','',$request->arr_disc3[$key])),
-                        'subtotal'              => $rowsubtotal,
-                        'note'                  => $request->arr_note[$key],
-                        'is_tax'                => $request->arr_is_tax[$key] == '1' ? '1' : NULL,
-                        'is_include_tax'        => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
-                        'percent_tax'           => str_replace(',','.',str_replace('.','',$request->arr_percent_tax[$key])),
-                        'is_wtax'               => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
-                        'percent_wtax'          => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
-                        'detail_pr'             => $detail_pr,
-                    ];
-                }
-            }
-
-            #end_count
-
 			if($request->temp){
                 DB::beginTransaction();
                 try {
@@ -487,9 +413,6 @@ class PurchaseOrderController extends Controller
                         $query->save();
 
                         foreach($query->PurchaseOrderDetail as $row){
-                            foreach($row->purchaseOrderDetailComposition as $composition){
-                                $composition->delete();
-                            }
                             $row->delete();
                         }
 
@@ -546,37 +469,40 @@ class PurchaseOrderController extends Controller
                 DB::beginTransaction();
                 try {
                 
-                    foreach($arrDetail as $key => $row){
-                        
-                        $querydetail = PurchaseOrderDetail::create([
-                            'purchase_order_id'     => $query->id,
-                            'item_id'               => $row['item_id'],
-                            'qty'                   => $row['qty'],
-                            'price'                 => $row['price'],
-                            'percent_discount_1'    => $row['percent_discount_1'],
-                            'percent_discount_2'    => $row['percent_discount_2'],
-                            'discount_3'            => $row['discount_3'],
-                            'subtotal'              => $row['subtotal'],
-                            'note'                  => $row['note'],
-                            'is_tax'                => $row['is_tax'],
-                            'is_include_tax'        => $row['is_include_tax'],
-                            'percent_tax'           => $row['percent_tax'],
-                            'is_wtax'               => $row['is_wtax'],
-                            'percent_wtax'          => $row['percent_wtax'],
-                        ]);
+                    foreach($request->arr_item as $key => $row){
+            
+                        $qty = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                        $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
+                        $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
+                        $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
+                        $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
+        
+                        $finalpricedisc1 = $price - ($price * ($disc1 / 100));
+                        $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
+                        $finalpricedisc3 = $finalpricedisc2 - $disc3;
+        
+                        $rowsubtotal = round($finalpricedisc3 * $qty,3);
 
-                        foreach($row['detail_pr'] as $rowpr){
-                            if($rowpr['pr_code'] !== '0'){
-                                $pr = PurchaseRequest::where('code',CustomHelper::decrypt($rowpr['pr_code']))->first();
-                                if($pr){
-                                    PurchaseOrderDetailComposition::create([
-                                        'pod_id'    => $querydetail->id,
-                                        'pr_id'     => $pr->id,
-                                        'qty'       => $rowpr['qty']
-                                    ]);
-                                    CustomHelper::removeUsedData($pr->getTable(),$pr->id);
-                                }
-                            }
+                        $querydetail = PurchaseOrderDetail::create([
+                            'purchase_order_id'             => $query->id,
+                            'purchase_request_detail_id'    => $request->arr_purchase[$key],
+                            'item_id'                       => $row,
+                            'qty'                           => $qty,
+                            'price'                         => $price,
+                            'percent_discount_1'            => $disc1,
+                            'percent_discount_2'            => $disc2,
+                            'discount_3'                    => $disc3,
+                            'subtotal'                      => $rowsubtotal,
+                            'note'                          => $request->arr_note[$key],
+                            'is_tax'                        => $request->arr_is_tax[$key] == '1' ? '1' : NULL,
+                            'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
+                            'percent_tax'                   => str_replace(',','.',str_replace('.','',$request->arr_percent_tax[$key])),
+                            'is_wtax'                       => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
+                            'percent_wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
+                        ]);
+                        
+                        if($querydetail->purchaseRequestDetail()->exists()){
+                            CustomHelper::removeUsedData('purchase_requests',$querydetail->purchaseRequestDetail->purchase_order_id);
                         }
                     }
 
@@ -636,13 +562,13 @@ class PurchaseOrderController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.$row->qty.'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>
-                <td class="right-align">'.number_format($row->price,3,',','.').'</td>
-                <td class="center-align">'.number_format($row->percent_discount_1,3,',','.').'</td>
-                <td class="center-align">'.number_format($row->percent_discount_2,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->discount_3,3,',','.').'</td>
-                <td class="right-align">'.number_format($row->subtotal,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->price,2,',','.').'</td>
+                <td class="center-align">'.number_format($row->percent_discount_1,2,',','.').'</td>
+                <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->subtotal,2,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
             </tr>
             <tr>
@@ -690,60 +616,35 @@ class PurchaseOrderController extends Controller
     public function show(Request $request){
         $po = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
         $po['supplier_name'] = $po->supplier->name;
-        $po['subtotal'] = number_format($po->subtotal,3,',','.');
-        $po['discount'] = number_format($po->discount,3,',','.');
-        $po['total'] = number_format($po->total,3,',','.');
-        $po['tax'] = number_format($po->tax,3,',','.');
-        $po['wtax'] = number_format($po->wtax,3,',','.');
-        $po['grandtotal'] = number_format($po->grandtotal,3,',','.');
+        $po['subtotal'] = number_format($po->subtotal,2,',','.');
+        $po['discount'] = number_format($po->discount,2,',','.');
+        $po['total'] = number_format($po->total,2,',','.');
+        $po['tax'] = number_format($po->tax,2,',','.');
+        $po['wtax'] = number_format($po->wtax,2,',','.');
+        $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
 
         $arr = [];
 
         foreach($po->purchaseOrderDetail as $row){
-            if($row->purchaseOrderDetailComposition()->exists()){
-                foreach($row->purchaseOrderDetailComposition as $rowcompos){
-                    $arr[] = [
-                        'id'        => $rowcompos->pr_id,
-                        'ecode'     => CustomHelper::encrypt($rowcompos->purchaseRequest->code),
-                        'code'      => $rowcompos->purchaseRequest->code,
-                        'item_id'   => $row->item_id,
-                        'item_name' => $row->item->name,
-                        'qty'       => $rowcompos->qty,
-                        'unit'      => $row->item->buyUnit->code,
-                        'note'      => $row->note,
-                        'price'     => number_format($row->price,3,',','.'),
-                        'disc1'     => number_format($row->percent_discount_1,3,',','.'),
-                        'disc2'     => number_format($row->percent_discount_2,3,',','.'),
-                        'disc3'     => number_format($row->discount_3,3,',','.'),
-                        'subtotal'  => number_format($rowcompos->qty * $row->price,3,',','.'),
-                        'is_tax'    => $row->is_tax ? $row->is_tax : '',
-                        'is_include_tax' => $row->is_include_tax ? $row->is_include_tax : '',
-                        'percent_tax' => number_format($row->percent_tax,3,',','.'),
-                        'is_wtax'    => $row->is_wtax ? $row->is_wtax : '',
-                        'percent_wtax' => number_format($row->percent_wtax,3,',','.'),
-                    ];
-                }
-            }else{
-                $arr[] = [
-                    'id'        => 0,
-                    'ecode'     => 0,
-                    'item_id'   => $row->item_id,
-                    'item_name' => $row->item->name,
-                    'qty'       => $row->qty,
-                    'unit'      => $row->item->buyUnit->code,
-                    'note'      => $row->note,
-                    'price'     => number_format($row->price,3,',','.'),
-                    'disc1'     => number_format($row->percent_discount_1,3,',','.'),
-                    'disc2'     => number_format($row->percent_discount_2,3,',','.'),
-                    'disc3'     => number_format($row->discount_3,3,',','.'),
-                    'subtotal'  => number_format($row->subtotal,3,',','.'),
-                    'is_tax'    => $row->is_tax ? $row->is_tax : '',
-                    'is_include_tax' => $row->is_include_tax ? $row->is_include_tax : '',
-                    'percent_tax' => number_format($row->percent_tax,3,',','.'),
-                    'is_wtax'    => $row->is_wtax ? $row->is_wtax : '',
-                    'percent_wtax' => number_format($row->percent_wtax,3,',','.'),
-                ];
-            }
+            $arr[] = [
+                'id'                                => $row->purchaseRequestDetail->purchase_request_id,
+                'purchase_request_detail_id'        => $row->purchase_request_detail_id,
+                'item_id'                           => $row->item_id,
+                'item_name'                         => $row->item->name,
+                'qty'                               => number_format($row->qty,3,',','.'),
+                'unit'                              => $row->item->buyUnit->code,
+                'note'                              => $row->note,
+                'price'                             => number_format($row->price,2,',','.'),
+                'disc1'                             => number_format($row->percent_discount_1,2,',','.'),
+                'disc2'                             => number_format($row->percent_discount_2,2,',','.'),
+                'disc3'                             => number_format($row->discount_3,2,',','.'),
+                'subtotal'                          => number_format($row->subtotal,2,',','.'),
+                'is_tax'                            => $row->is_tax ? $row->is_tax : '',
+                'is_include_tax'                    => $row->is_include_tax ? $row->is_include_tax : '',
+                'percent_tax'                       => number_format($row->percent_tax,2,',','.'),
+                'is_wtax'                           => $row->is_wtax ? $row->is_wtax : '',
+                'percent_wtax'                      => number_format($row->percent_wtax,2,',','.'),
+            ];
         }
 
         $po['details'] = $arr;
@@ -917,7 +818,6 @@ class PurchaseOrderController extends Controller
         
         if($query->delete()) {
 
-            $query->purchaseOrderDetail()->purchaseOrderDetailComposition()->delete();
             $query->purchaseOrderDetail()->delete();
 
             CustomHelper::removeApproval('purchase_orders',$query->id);

@@ -75,12 +75,6 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_warehouse" style="font-size:1rem;">Gudang :</label>
-                                                <div class="input-field">
-                                                    <select class="browser-default" id="filter_warehouse" name="filter_warehouse" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </li>
@@ -105,8 +99,6 @@
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Penerima</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
-                                                        <th rowspan="2">Pabrik/Kantor</th>
-                                                        <th rowspan="2">Gudang</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
@@ -146,6 +138,10 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
+                                <select class="browser-default" id="account_id" name="account_id" onchange="getPurchaseOrderAll(this.value);"></select>
+                                <label class="active" for="account_id">Supplier</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
                                 <label class="active" for="receiver_name">Nama Penerima</label>
                             </div>
@@ -161,19 +157,6 @@
                             <div class="input-field col m3 s12">
                                 <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
                                 <label class="active" for="document_date">Tgl. Dokumen</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="place_id" name="place_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}" data-name="{{ $rowplace->name.' - '.$rowplace->company->name }}" data-address="{{ $rowplace->address }}">{{ $rowplace->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="place_id">Pabrik/Kantor</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="browser-default" id="warehouse_id" name="warehouse_id"></select>
-                                <label class="active" for="warehouse_id">Gudang Tujuan</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -344,14 +327,16 @@
                 $('.row_item').each(function(){
                     $(this).remove();
                 });
-                $('#body-item').append(`
-                    <tr id="empty-item">
-                        <td colspan="5" class="center">
-                            Pilih purchase order untuk memulai...
-                        </td>
-                    </tr>
-                `);
-                $('#warehouse_id,#purchase_order_id').empty();
+                if($('#empty-item').length == 0){
+                    $('#body-item').append(`
+                        <tr id="empty-item">
+                            <td colspan="5" class="center">
+                                Pilih purchase order untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+                $('#purchase_order_id').empty();
                 M.updateTextFields();
                 $('#list-used-data').empty();
                 window.onbeforeunload = function() {
@@ -383,8 +368,8 @@
             }
         });
 
-        select2ServerSide('#filter_warehouse,#warehouse_id', '{{ url("admin/select2/warehouse") }}');
         select2ServerSide('#purchase_order_id', '{{ url("admin/select2/purchase_order") }}');
+        select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
@@ -450,7 +435,6 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
-                    'warehouse[]' : $('#filter_warehouse').val()
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -475,8 +459,6 @@
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_due', className: 'center-align' },
                 { name: 'date_doc', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
-                { name: 'warehouse', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -631,9 +613,6 @@
                     }else{
                         if(response.details.length > 0){
                             $('#receiver_name').val(response.receiver_name);
-                            $('#place_id').val(response.place_id).formSelect();
-                            $('#department_id').val(response.department_id).formSelect();
-
                             $('#empty-item').remove();
 
                             $('#list-used-data').append(`
@@ -690,7 +669,7 @@
             $('.row_item').each(function(){
                 $(this).remove();
             });
-            if($('.row_item').length == 0){
+            if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
                         <td colspan="5" class="center">
@@ -745,8 +724,6 @@
                 $('.row_item').each(function(){
                     $(this).remove();
                 });
-
-                $('#empty-item').remove();
             },
             success: function(response) {
                 loadingClose('#main');
@@ -760,11 +737,6 @@
                 $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
                 $('#document_date').removeAttr('min');
-                $('#place_id').val(response.place_id).formSelect();
-                $('#warehouse_id').empty();
-                $('#warehouse_id').append(`
-                    <option value="` + response.warehouse_id + `">` + response.warehouse_name + `</option>
-                `);
                 
                 if(response.details.length > 0){
                     $.each(response.details, function(i, val) {
@@ -794,6 +766,8 @@
                         `);
                     });
                 }
+
+                $('#empty-item').remove();
                 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
@@ -916,7 +890,6 @@
     function printData(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        var warehouse = $('#filter_warehouse').val();
         
         $.ajax({
             type : "POST",
@@ -924,7 +897,6 @@
             data : {
                 search : search,
                 status : status,
-                'warehouse[]' : warehouse
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -942,8 +914,7 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        var warehouse = $('#filter_warehouse').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&warehouse=" + warehouse;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

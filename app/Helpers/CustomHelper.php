@@ -8,6 +8,7 @@ use App\Models\Capitalization;
 use App\Models\Coa;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
+use App\Models\GoodReceive;
 use App\Models\OutgoingPayment;
 use App\Models\Place;
 use App\Models\Retirement;
@@ -315,7 +316,7 @@ class CustomHelper {
 							$rowdetail->qtyConvert(),
 							$rowtotal,
 							'IN',
-							$rowgr->post_date
+							$rgr->post_date
 						);
 
 						self::sendStock(
@@ -473,6 +474,62 @@ class CustomHelper {
 				'type'			=> '2',
 				'nominal'		=> $op->grandtotal,
 			]);
+		}elseif($table_name == 'good_receives'){
+			$gr = GoodReceive::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'place_id'		=> $gr->place_id,
+				'lookable_type'	=> 'good_receives',
+				'lookable_id'	=> $gr->id,
+				'currency_id'	=> $gr->currency_id,
+				'currency_rate'	=> $gr->currency_rate,
+				'post_date'		=> $gr->post_date,
+				'note'			=> $gr->code,
+				'status'		=> '3'
+			]);
+
+			foreach($gr->goodReceiveDetail as $row){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->item->itemGroup->coa_id,
+					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $row->total,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->coa_id,
+					'place_id'		=> $data->place_id,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '2',
+					'nominal'		=> $row->total,
+				]);
+
+				self::sendCogs('good_receives',
+					$gr->id,
+					$gr->place->company_id,
+					$gr->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					$row->total,
+					'IN',
+					$gr->post_date
+				);
+
+				self::sendStock(
+					$gr->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					'IN'
+				);
+			}
+			
 		}else{
 
 			if(isset($data->currency_id)){

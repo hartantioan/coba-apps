@@ -2,11 +2,12 @@
 
 namespace App\Exports;
 
-use App\Models\GoodReceiptMain;
+use App\Models\GoodReceive;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Illuminate\Database\Eloquent\Builder;
 
-class ExportGoodReceipt implements FromView
+class ExportGoodReceive implements FromView
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -21,22 +22,17 @@ class ExportGoodReceipt implements FromView
 
     public function view(): View
     {
-        return view('admin.exports.good_receipt', [
-            'data' => GoodReceiptMain::where(function ($query) {
+        return view('admin.exports.good_receive', [
+            'data' => GoodReceive::where(function($query) {
                 if($this->search) {
                     $query->where(function($query) {
                         $query->where('code', 'like', "%$this->search%")
                             ->orWhere('post_date', 'like', "%$this->search%")
-                            ->orWhere('due_date', 'like', "%$this->search%")
-                            ->orWhere('document_date', 'like', "%$this->search%")
-                            ->orWhere('receiver_name', 'like', "%$this->search%")
                             ->orWhere('note', 'like', "%$this->search%")
-                            ->orWhereHas('goodReceipt', function($query){
-                                $query->whereHas('goodReceiptDetail',function($query){
-                                    $query->whereHas('item',function($query){
-                                        $query->where('code', 'like', "%$this->search%")
-                                            ->orWhere('name','like',"%$this->search%");
-                                    });
+                            ->orWhereHas('goodReceiveDetail', function($query){
+                                $query->whereHas('item',function($query){
+                                    $query->where('code', 'like', "%$this->search%")
+                                        ->orWhere('name','like',"%$this->search%");
                                 });
                             })
                             ->orWhereHas('user',function($query){
@@ -45,14 +41,12 @@ class ExportGoodReceipt implements FromView
                             });
                     });
                 }
-    
+
                 if($this->status){
                     $query->where('status', $this->status);
                 }
             })
-            ->whereHas('goodReceipt', function($query){
-                $query->whereIn('place_id',$this->dataplaces);
-            })
+            ->whereIn('place_id',$this->dataplaces)
             ->get()
         ]);
     }

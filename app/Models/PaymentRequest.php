@@ -147,7 +147,7 @@ class PaymentRequest extends Model
 
     public function approval(){
         $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->first();
-        if($source){
+        if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{
             return '';

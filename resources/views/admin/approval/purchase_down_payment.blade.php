@@ -263,23 +263,23 @@
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">Subtotal</td>
-                        <td class="right-align">{{ number_format($data->subtotal,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->subtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">Diskon</td>
-                        <td class="right-align">{{ number_format($data->discount,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->discount,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">Total</td>
-                        <td class="right-align">{{ number_format($data->total,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">Pajak</td>
-                        <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2"><h6>Grandtotal</h6></td>
-                        <td class="right-align"><h6>{{ number_format($data->grandtotal,3,',','.') }}</h6></td>
+                        <td class="right-align"><h6>{{ number_format($data->grandtotal,2,',','.') }}</h6></td>
                     </tr>
                 </tbody>
                 <tfoot>

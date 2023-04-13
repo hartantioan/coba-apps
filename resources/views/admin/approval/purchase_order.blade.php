@@ -251,14 +251,14 @@
                     <tr>
                         <td class="center-align">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item->name }}</td>
-                        <td class="center-align">{{ $row->qty }}</td>
+                        <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="center-align">{{ $row->item->buyUnit->code }}</td>
                         <td class="center-align">{{ $row->note }}</td>
-                        <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
-                        <td class="center-align">{{ number_format($row->percent_discount_1,3,',','.') }}</td>
-                        <td class="center-align">{{ number_format($row->percent_discount_2,3,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->discount_3,3,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->subtotal,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
+                        <td class="center-align">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
+                        <td class="center-align">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->discount_3,2,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->subtotal,2,',','.') }}</td>
                     </tr>
                     @endforeach
                     <tr>
@@ -272,27 +272,27 @@
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">Subtotal</td>
-                        <td class="right-align">{{ number_format($data->subtotal,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->subtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">Diskon</td>
-                        <td class="right-align">{{ number_format($data->discount,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->discount,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">Total</td>
-                        <td class="right-align">{{ number_format($data->total,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">PPN</td>
-                        <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">PPH</td>
-                        <td class="right-align">{{ number_format($data->wtax,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2"><h6>Grandtotal</h6></td>
-                        <td class="right-align"><h6>{{ number_format($data->grandtotal,3,',','.') }}</h6></td>
+                        <td class="right-align"><h6>{{ number_format($data->grandtotal,2,',','.') }}</h6></td>
                     </tr>
                 </tbody>
                 <tfoot>

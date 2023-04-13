@@ -18,12 +18,10 @@ class GoodReceiptMain extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'place_id',
         'receiver_name',
         'post_date',
         'due_date',
         'document_date',
-        'warehouse_id',
         'document',
         'note',
         'status',
@@ -48,16 +46,6 @@ class GoodReceiptMain extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
-    }
-
-    public function place()
-    {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function warehouse()
-    {
-        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 
     public function voidUser()
@@ -140,7 +128,7 @@ class GoodReceiptMain extends Model
 
     public function approval(){
         $source = ApprovalSource::where('lookable_type','good_receipt_mains')->where('lookable_id',$this->id)->first();
-        if($source){
+        if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{
             return '';

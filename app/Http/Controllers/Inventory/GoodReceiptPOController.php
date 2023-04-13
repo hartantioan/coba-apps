@@ -55,8 +55,6 @@ class GoodReceiptPOController extends Controller
             'post_date',
             'due_date',
             'document_date',
-            'place_id',
-            'warehouse_id',
             'note',
         ];
 
@@ -66,7 +64,9 @@ class GoodReceiptPOController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReceiptMain::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = GoodReceiptMain::whereHas('goodReceipt', function($query) use($search, $request){
+            $query->whereIn('place_id',$this->dataplaces);
+        })->count();
         
         $query_data = GoodReceiptMain::where(function($query) use ($search, $request) {
                 if($search) {
@@ -95,12 +95,10 @@ class GoodReceiptPOController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                if($request->warehouse){
-                    $query->whereIn('warehouse_id', $request->warehouse);
-                }
             })
-            ->whereIn('place_id',$this->dataplaces)
+            ->whereHas('goodReceipt', function($query) use($search, $request){
+                $query->whereIn('place_id',$this->dataplaces);
+            })
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -133,12 +131,10 @@ class GoodReceiptPOController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                if($request->warehouse){
-                    $query->whereIn('warehouse_id', $request->warehouse);
-                }
             })
-            ->whereIn('place_id',$this->dataplaces)
+            ->whereHas('goodReceipt', function($query) use($search, $request){
+                $query->whereIn('place_id',$this->dataplaces);
+            })
             ->count();
 
         $response['data'] = [];
@@ -153,8 +149,6 @@ class GoodReceiptPOController extends Controller
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->due_date)),
                     date('d M Y',strtotime($val->document_date)),
-                    $val->place->name,
-                    $val->warehouse->name,
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -192,7 +186,7 @@ class GoodReceiptPOController extends Controller
             $data['status'] = '500';
             $data['message'] = 'Purchase Order '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
-            if($data->hasBalance()){
+            /* if($data->hasBalance()){ */
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Receipt');
                 $details = [];
                 foreach($data->purchaseOrderDetail as $row){
@@ -205,10 +199,10 @@ class GoodReceiptPOController extends Controller
                 }
 
                 $data['details'] = $details;
-            }else{
+            /* }else{
                 $data['status'] = '500';
                 $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
-            }
+            } */
         }
 
         return response()->json($data);
@@ -216,21 +210,17 @@ class GoodReceiptPOController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'place_id'                  => 'required',
 			'receiver_name'			    => 'required',
 			'post_date'		            => 'required',
 			'due_date'		            => 'required',
             'document_date'		        => 'required',
-            'warehouse_id'              => 'required',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
 		], [
-            'place_id.required'                 => 'Penempatan tidak boleh kosong.',
             'receiver_name.required'            => 'Nama penerima tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
             'document_date.required' 			=> 'Tanggal dokumen tidak boleh kosong.',
-			'warehouse_id.required'				=> 'Gudang tujuan tidak boleh kosong',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array',
             'arr_qty.required'                  => 'Qty item tidak boleh kosong',
@@ -369,8 +359,6 @@ class GoodReceiptPOController extends Controller
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
-                        $query->place_id = $purchase_order->place_id;
-                        $query->warehouse_id = $request->warehouse_id;
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->total = $totalall;
@@ -406,8 +394,6 @@ class GoodReceiptPOController extends Controller
                         'post_date'             => $request->post_date,
                         'due_date'              => $request->due_date,
                         'document_date'         => $request->document_date,
-                        'place_id'		        => $purchase_order->place_id,
-                        'warehouse_id'          => $request->warehouse_id,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_receipts') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
@@ -788,7 +774,9 @@ class GoodReceiptPOController extends Controller
                     $query->whereIn('warehouse_id', $request->warehouse);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
+            ->whereHas('goodReceipt', function($query) use($request){
+                $query->whereIn('place_id',$this->dataplaces);
+            })
             ->get()
 		];
 		
@@ -796,7 +784,7 @@ class GoodReceiptPOController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportGoodReceipt($request->search,$request->status,$request->warehouse,$this->dataplaces), 'good_receipt_'.uniqid().'.xlsx');
+		return Excel::download(new ExportGoodReceipt($request->search,$request->status,$this->dataplaces), 'good_receipt_'.uniqid().'.xlsx');
     }
     
     public function viewStructureTree(Request $request){

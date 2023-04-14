@@ -84,23 +84,12 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_place" style="font-size:1rem;">Pabrik/Kantor :</label>
+                                                <label for="filter_company" style="font-size:1rem;">Pabrik/Kantor :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_place" onchange="loadDataTable()">
+                                                    <select class="form-control" id="filter_company" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
-                                                        @foreach ($place as $row)
-                                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->company->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_department" style="font-size:1rem;">Departemen :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_department" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        @foreach ($department as $rowdepartment)
-                                                            <option value="{{ $rowdepartment->id }}">{{ $rowdepartment->name }}</option>
+                                                        @foreach ($company as $rowcompany)
+                                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -165,8 +154,7 @@
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Supplier</th>
-                                                        <th rowspan="2">Pabrik/Kantor</th>
-                                                        <th rowspan="2">Departemen</th>
+                                                        <th rowspan="2">Perusahaan</th>
                                                         <th colspan="3" class="center-align">Pajak</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th rowspan="2">Dokumen</th>
@@ -231,22 +219,12 @@
                                 <label class="" for="type">Tipe</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="place_id" name="place_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $rowcompany)
+                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="plant_id">Pabrik</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="department_id" name="department_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($department as $rowdepartment)
-                                        <option value="{{ $rowdepartment->id }}" {{ $rowdepartment->id == session('bo_department_id') ? 'selected' : '' }}>{{ $rowdepartment->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="department_id">Departemen</label>
+                                <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
@@ -646,9 +624,7 @@
                     status : $('#filter_status').val(),
                     type : $('#filter_type').val(),
                     'supplier_id[]' : $('#filter_supplier').val(),
-                    place_id : $('#filter_place').val(),
-                    plant_id : $('#filter_plant').val(),
-                    department_id : $('#filter_department').val(),
+                    company_id : $('#filter_company').val(),
                     is_tax : $('#filter_is_tax').val(),
                     is_include_tax : $('#filter_is_include_tax').val(),
                     'currency_id[]' : $('#filter_currency').val(),
@@ -673,8 +649,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'supplier_id', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
-                { name: 'department_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'is_tax', className: 'center-align' },
                 { name: 'is_include_tax', className: 'center-align' },
                 { name: 'percent_tax', className: 'center-align' },
@@ -867,8 +842,7 @@
                     <option value="` + response.account_id + `">` + response.supplier_name + `</option>
                 `);
                 $('#type').val(response.type).formSelect();
-                $('#place_id').val(response.place_id).formSelect();
-                $('#department_id').val(response.department_id).formSelect();
+                $('#company_id').val(response.company_id).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
@@ -1029,7 +1003,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
         
         $.ajax({
             type : "POST",
@@ -1038,8 +1012,7 @@
                 search : search,
                 status : status,
                 type : type,
-                place : place,
-                department : department,
+                company : company,
                 is_tax : is_tax,
                 is_include_tax : is_include_tax,
                 'supplier[]' : supplier,
@@ -1059,8 +1032,8 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&place=" + place + "&department=" + department + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&supplier=" + supplier + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&company=" + company + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&supplier=" + supplier + "&currency=" + currency;
     }
 </script>

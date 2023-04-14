@@ -552,7 +552,7 @@ class PurchaseRequestController extends Controller
                         PurchaseRequestDetail::create([
                             'purchase_request_id'   => $query->id,
                             'item_id'               => $row,
-                            'qty'                   => $request->arr_qty[$key],
+                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
                             'required_date'         => $request->arr_required_date[$key],
                             'place_id'              => $request->arr_place[$key],

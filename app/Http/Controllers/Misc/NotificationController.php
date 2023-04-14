@@ -33,13 +33,7 @@ class NotificationController extends Controller
 
         $user = User::find(session('bo_id'));
 
-        $dataplaces = $user->userPlaceArray();
-
-        $approvals = ApprovalMatrix::where('user_id',session('bo_id'))->where('status','1')->where(function($query) use($dataplaces){ 
-            $query->whereHas('approvalSource',function($query) use($dataplaces){ 
-                $query->whereIn('place_id',$dataplaces); 
-            });
-        })->count();
+        $approvals = ApprovalMatrix::where('user_id',session('bo_id'))->where('status','1')->count();
 
         $arrnotif = [];
 

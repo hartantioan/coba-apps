@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('code', 155)->unique();
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('account_id')->nullable();
-            $table->bigInteger('good_receipt_main_id')->nullable();
+            $table->bigInteger('good_receipt_id')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->date('post_date')->nullable();
@@ -45,7 +45,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'good_receipt_main_id', 'place_id']);
+            $table->index(['user_id', 'account_id', 'good_receipt_id', 'place_id']);
         });
     }
 

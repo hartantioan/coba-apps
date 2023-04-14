@@ -200,47 +200,27 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">PO No.</th>
-                        <th class="center">Supplier</th>
-                        <th class="center">Perusahaan</th>
+                        <th class="center">No</th>
+                        <th class="center">Item</th>
+                        <th class="center">Jum.</th>
+                        <th class="center">Sat.</th>
+                        <th class="center">Catatan</th>
                         <th class="center">Pabrik/Kantor</th>
                         <th class="center">Departemen</th>
+                        <th class="center">Gudang</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->goodReceipt as $key => $row)
-                    <tr align="center" style="background-color:#eee;">
-                        <td class="center">{{ $row->purchaseOrder->code }}</td>
-                        <td class="center">{{ $row->supplier->name }}</td>
-                        <td class="center">{{ $row->company->name }}</td>
-                        <td class="center">{{ $row->place->name }}</td>
-                        <td class="center">{{ $row->department->name }}</td>
-                    </tr>
+                    @foreach($data->goodReceiptDetail as $keydetail => $rowdetail)
                     <tr>
-                        <td colspan="5" style="border-right-style: none !important;">
-                            <table class="bordered">
-                                <thead>
-                                    <tr>
-                                        <th class="center">No</th>
-                                        <th class="center">Item</th>
-                                        <th class="center">Jum.</th>
-                                        <th class="center">Sat.</th>
-                                        <th class="center">Catatan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($row->goodReceiptDetail as $keydetail => $rowdetail)
-                                    <tr>
-                                        <td class="center">{{ ($keydetail + 1) }}</td>
-                                        <td>{{ $rowdetail->item->name }}</td>
-                                        <td class="center">{{ $rowdetail->qty }}</td>
-                                        <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
-                                        <td>{{ $rowdetail->note }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </td>
+                        <td class="center">{{ ($keydetail + 1) }}</td>
+                        <td>{{ $rowdetail->item->name }}</td>
+                        <td class="center">{{ $rowdetail->qty }}</td>
+                        <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
+                        <td>{{ $rowdetail->note }}</td>
+                        <td class="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+                        <td class="center">{{ $rowdetail->department->name }}</td>
+                        <td class="center">{{ $rowdetail->warehouse->name }}</td>
                     </tr>
                     @endforeach
                 </tbody>

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\PurchaseOrder;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
+use App\Models\PurchaseOrderDetail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -15,7 +17,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\GoodReceipt;
-use App\Models\GoodReceiptMain;
 use App\Models\User;
 use App\Models\Place;
 use App\Models\Department;
@@ -38,6 +39,7 @@ class GoodReceiptPOController extends Controller
         $data = [
             'title'     => 'Penerimaan Barang PO',
             'content'   => 'admin.inventory.good_receipt',
+            'company'   => Company::where('status','1')->get(),
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
             'department'=> Department::where('status','1')->get(),
         ];
@@ -49,6 +51,7 @@ class GoodReceiptPOController extends Controller
         $column = [
             'id',
             'user_id',
+            'account_id',
             'code',
             'account_id',
             'receiver_name',
@@ -64,11 +67,9 @@ class GoodReceiptPOController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReceiptMain::whereHas('goodReceipt', function($query) use($search, $request){
-            $query->whereIn('place_id',$this->dataplaces);
-        })->count();
+        $total_data = GoodReceipt::count();
         
-        $query_data = GoodReceiptMain::where(function($query) use ($search, $request) {
+        $query_data = GoodReceipt::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -77,12 +78,10 @@ class GoodReceiptPOController extends Controller
                             ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodReceipt', function($query) use($search, $request){
-                                $query->whereHas('goodReceiptDetail',function($query) use($search, $request){
-                                    $query->whereHas('item',function($query) use($search, $request){
-                                        $query->where('code', 'like', "%$search%")
-                                            ->orWhere('name','like',"%$search%");
-                                    });
+                            ->orWhereHas('goodReceiptDetail',function($query) use($search, $request){
+                                $query->whereHas('item',function($query) use($search, $request){
+                                    $query->where('code', 'like', "%$search%")
+                                        ->orWhere('name','like',"%$search%");
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -95,16 +94,13 @@ class GoodReceiptPOController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-            })
-            ->whereHas('goodReceipt', function($query) use($search, $request){
-                $query->whereIn('place_id',$this->dataplaces);
             })
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = GoodReceiptMain::where(function($query) use ($search, $request) {
+        $total_filtered = GoodReceipt::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -113,12 +109,10 @@ class GoodReceiptPOController extends Controller
                             ->orWhere('document_date', 'like', "%$search%")
                             ->orWhere('receiver_name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodReceipt', function($query) use($search, $request){
-                                $query->whereHas('goodReceiptDetail',function($query) use($search, $request){
-                                    $query->whereHas('item',function($query) use($search, $request){
-                                        $query->where('code', 'like', "%$search%")
-                                            ->orWhere('name','like',"%$search%");
-                                    });
+                            ->orWhereHas('goodReceiptDetail',function($query) use($search, $request){
+                                $query->whereHas('item',function($query) use($search, $request){
+                                    $query->where('code', 'like', "%$search%")
+                                        ->orWhere('name','like',"%$search%");
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -131,9 +125,6 @@ class GoodReceiptPOController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-            })
-            ->whereHas('goodReceipt', function($query) use($search, $request){
-                $query->whereIn('place_id',$this->dataplaces);
             })
             ->count();
 
@@ -144,6 +135,7 @@ class GoodReceiptPOController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->user->name,
+                    $val->account->name,
                     $val->code,
                     $val->receiver_name,
                     date('d M Y',strtotime($val->post_date)),
@@ -180,36 +172,80 @@ class GoodReceiptPOController extends Controller
 
     public function getPurchaseOrder(Request $request){
         $data = PurchaseOrder::where('id',$request->id)->where('status','2')->first();
-        $data['ecode'] = CustomHelper::encrypt($data->code);
 
         if($data->used()->exists()){
             $data['status'] = '500';
             $data['message'] = 'Purchase Order '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
-            /* if($data->hasBalance()){ */
+            if($data->hasBalance()){
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Receipt');
                 $details = [];
                 foreach($data->purchaseOrderDetail as $row){
                     $details[] = [
-                        'item_id'   => $row->item_id,
-                        'item_name' => $row->item->code.' - '.$row->item->name,
-                        'qty'       => $row->getBalanceReceipt(),
-                        'unit'      => $row->item->buyUnit->code
+                        'purchase_order_detail_id'  => $row->id,
+                        'item_id'                   => $row->item_id,
+                        'item_name'                 => $row->item->code.' - '.$row->item->name,
+                        'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
+                        'unit'                      => $row->item->buyUnit->code,
+                        'place_id'                  => $row->place_id,
+                        'place_name'                => $row->place->name.' - '.$row->place->company->name,
+                        'department_id'             => $row->department_id,
+                        'department_name'           => $row->department->name,
+                        'warehouse_id'              => $row->warehouse_id,
+                        'warehouse_name'            => $row->warehouse->name,
                     ];
                 }
 
                 $data['details'] = $details;
-            /* }else{
+            }else{
                 $data['status'] = '500';
                 $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
-            } */
+            }
         }
 
         return response()->json($data);
     }
 
+    public function getPurchaseOrderAll(Request $request){
+        $rows = PurchaseOrder::where('account_id',$request->id)->where('status','2')->get();
+        
+        $arrdata = [];
+        
+        foreach($rows as $data){
+            if(!$data->used()->exists()){
+                if($data->hasBalance()){
+                    CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Receipt');
+                    $details = [];
+
+                    foreach($data->purchaseOrderDetail as $row){
+                        $details[] = [
+                            'purchase_order_detail_id'  => $row->id,
+                            'item_id'                   => $row->item_id,
+                            'item_name'                 => $row->item->code.' - '.$row->item->name,
+                            'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
+                            'unit'                      => $row->item->buyUnit->code,
+                            'place_id'                  => $row->place_id,
+                            'place_name'                => $row->place->name.' - '.$row->place->company->name,
+                            'department_id'             => $row->department_id,
+                            'department_name'           => $row->department->name,
+                            'warehouse_id'              => $row->warehouse_id,
+                            'warehouse_name'            => $row->warehouse->name,
+                        ];
+                    }
+    
+                    $data['details'] = $details;
+                    $arrdata[] = $data;
+                }
+            }
+        }
+
+        return response()->json($arrdata);
+    }
+
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'account_id'                => 'required',
+            'company_id'                => 'required',
 			'receiver_name'			    => 'required',
 			'post_date'		            => 'required',
 			'due_date'		            => 'required',
@@ -217,6 +253,8 @@ class GoodReceiptPOController extends Controller
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
 		], [
+            'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'receiver_name.required'            => 'Nama penerima tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
@@ -234,13 +272,6 @@ class GoodReceiptPOController extends Controller
             ];
         } else {
             
-            $total = 0;
-            $bobot = 0;
-            $tax = 0;
-            $wtax = 0;
-            $grandtotal = 0;
-            $discount = 0;
-            $subtotal = 0;
             $totalall = 0;
             $taxall = 0;
             $wtaxall = 0;
@@ -249,43 +280,31 @@ class GoodReceiptPOController extends Controller
             $arrDetail = [];
 
             foreach($request->arr_purchase as $key => $row){
-                $index = -1;
-                $detail_po = [];
 
-                foreach($arrDetail as $keycek => $rowcek){
-                    if(CustomHelper::decrypt($row) == $rowcek['po']->code){
-                        $index = $keycek;
-                    }
-                }
+                $pod = PurchaseOrderDetail::find(intval($row));
 
-                $purchase_order = PurchaseOrder::where('code',CustomHelper::decrypt($request->arr_purchase[$key]))->first();
+                if($pod){
 
-                if($purchase_order){
-
-                    $discount = $purchase_order->discount;
-                    $subtotal = $purchase_order->subtotal;
+                    $discount = $pod->purchaseOrder->discount;
+                    $subtotal = $pod->purchaseOrder->subtotal;
 
                     $rowprice = 0;
 
-                    $datarow = $purchase_order->purchaseOrderDetail()->where('item_id',$request->arr_item[$key])->first();
-
-                    if($datarow){
-                        $bobot = $datarow->subtotal / $subtotal;
-                        $rowprice = round($datarow->subtotal / $datarow->qty,3);
-                    }
+                    $bobot = $pod->subtotal / $subtotal;
+                    $rowprice = round($pod->subtotal / $pod->qty,3);
 
                     $total = ($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount);
 
-                    if($datarow->is_tax == '1' && $datarow->is_include_tax == '1'){
-                        $total = $total / (1 + ($datarow->percent_tax / 100));
+                    if($pod->is_tax == '1' && $pod->is_include_tax == '1'){
+                        $total = $total / (1 + ($pod->percent_tax / 100));
                     }
 
-                    if($datarow->is_tax == '1'){
-                        $tax = round($total * ($datarow->percent_tax / 100),3);
+                    if($pod->is_tax == '1'){
+                        $tax = round($total * ($pod->percent_tax / 100),3);
                     }
 
-                    if($datarow->is_wtax == '1'){
-                        $wtax = round($total * ($datarow->percent_wtax / 100),3);
+                    if($pod->is_wtax == '1'){
+                        $wtax = round($total * ($pod->percent_wtax / 100),3);
                     }
 
                     $grandtotal = $total + $tax - $wtax;
@@ -294,44 +313,13 @@ class GoodReceiptPOController extends Controller
                     $taxall += $tax;
                     $wtaxall += $wtax;
                     $grandtotalall += $grandtotal;
-
-                    if($index >= 0){
-                        $arrDetail[$index]['detail'][] = [
-                            'item_id'           => $request->arr_item[$key],
-                            'qty'               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'note'              => $request->arr_note[$key],
-                        ];
-                        
-                        $arrDetail[$index] = [
-                            'po'                => $purchase_order,
-                            'detail'            => $arrDetail[$index]['detail'],
-                            'total'             => $arrDetail[$index]['total'] + round($total,3),
-                            'tax'               => $arrDetail[$index]['tax'] + $tax,
-                            'wtax'              => $arrDetail[$index]['wtax'] + $wtax,
-                            'grandtotal'        => $arrDetail[$index]['grandtotal'] + $grandtotal,
-                        ];
-                    }else{
-                        $detail_po[] = [
-                            'item_id'           => $request->arr_item[$key],
-                            'qty'               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'note'              => $request->arr_note[$key],
-                        ];
-                        $arrDetail[] = [
-                            'po'                => $purchase_order,
-                            'detail'            => $detail_po,
-                            'total'             => round($total,3),
-                            'tax'               => $tax,
-                            'wtax'              => $wtax,
-                            'grandtotal'        => $grandtotal
-                        ];
-                    }
                 }
             }
 
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = GoodReceiptMain::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = GoodReceipt::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
@@ -355,6 +343,8 @@ class GoodReceiptPOController extends Controller
                         }
                         
                         $query->user_id = session('bo_id');
+                        $query->account_id = $request->account_id;
+                        $query->company_id = $request->company_id;
                         $query->receiver_name = $request->receiver_name;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
@@ -367,10 +357,7 @@ class GoodReceiptPOController extends Controller
                         $query->grandtotal = $grandtotalall;
                         $query->save();
 
-                        foreach($query->goodReceipt as $row){
-                            foreach($row->goodReceiptDetail as $rowdetail){
-                                $rowdetail->delete();
-                            }
+                        foreach($query->goodReceiptDetail as $row){
                             $row->delete();
                         }
 
@@ -387,9 +374,11 @@ class GoodReceiptPOController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = GoodReceiptMain::create([
-                        'code'			        => GoodReceiptMain::generateCode(),
+                    $query = GoodReceipt::create([
+                        'code'			        => GoodReceipt::generateCode(),
                         'user_id'		        => session('bo_id'),
+                        'account_id'            => $request->account_id,
+                        'company_id'            => $request->company_id,
                         'receiver_name'         => $request->receiver_name,
                         'post_date'             => $request->post_date,
                         'due_date'              => $request->due_date,
@@ -412,37 +401,21 @@ class GoodReceiptPOController extends Controller
 			if($query) {
                 DB::beginTransaction();
                 try {
-                    foreach($arrDetail as $key => $row){
-                        
-                        $querydetail = GoodReceipt::create([
-                            'good_receipt_main_id'      => $query->id,
-                            'purchase_order_id'         => $row['po']->id,
-                            'account_id'                => $row['po']->account_id,
-                            'company_id'                => $row['po']->place->company_id,
-                            'place_id'                  => $row['po']->place_id,
-                            'department_id'             => $row['po']->department_id,
-                            'currency_id'               => $row['po']->currency_id,
-                            'currency_rate'             => $row['po']->currency_rate,
-                            'total'                     => $row['total'],
-                            'tax'                       => $row['tax'],
-                            'wtax'                      => $row['wtax'],
-                            'grandtotal'                => $row['grandtotal']
+                    foreach($request->arr_purchase as $key => $row){
+                        GoodReceiptDetail::create([
+                            'good_receipt_id'           => $query->id,
+                            'purchase_order_detail_id'  => $row,
+                            'item_id'                   => $request->arr_item[$key],
+                            'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'note'                      => $request->arr_note[$key],
+                            'place_id'                  => $request->arr_place[$key],
+                            'department_id'             => $request->arr_department[$key],
+                            'warehouse_id'              => $request->arr_warehouse[$key]
                         ]);
-                        
-                        foreach($row['detail'] as $rowdetail){
-                            GoodReceiptDetail::create([
-                                'good_receipt_id'       => $querydetail->id,
-                                'item_id'               => $rowdetail['item_id'],
-                                'qty'                   => $rowdetail['qty'],
-                                'note'                  => $rowdetail['note']
-                            ]);
-                        }
-
-                        CustomHelper::removeUsedData('purchase_orders',$row['po']->id);
                     }
 
-                    CustomHelper::sendApproval('good_receipt_mains',$query->id,$query->note);
-                    CustomHelper::sendNotification('good_receipt_mains',$query->id,'Pengajuan Penerimaan Barang No. '.$query->code,$query->note,session('bo_id'));
+                    CustomHelper::sendApproval('good_receipts',$query->id,$query->note);
+                    CustomHelper::sendNotification('good_receipts',$query->id,'Pengajuan Penerimaan Barang No. '.$query->code,$query->note,session('bo_id'));
                     
                     DB::commit();
                 }catch(\Exception $e){
@@ -450,7 +423,7 @@ class GoodReceiptPOController extends Controller
                 }
 
                 activity()
-                    ->performedOn(new GoodReceiptMain())
+                    ->performedOn(new GoodReceipt())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Add / edit penerimaan barang.');
@@ -472,65 +445,38 @@ class GoodReceiptPOController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = GoodReceiptMain::find($request->id);
+        $data   = GoodReceipt::find($request->id);
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4">
                         <div class="col s12">
                             <table class="bordered">
                                 <thead>
                                     <tr>
-                                        <th class="center">PO No.</th>
-                                        <th class="center">Supplier</th>
-                                        <th class="center">Perusahaan</th>
-                                        <th class="center">Pabrik/Kantor</th>
-                                        <th class="center">Departemen</th>
+                                        <th class="center-align" colspan="5">Daftar Item</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="center-align">No.</th>
+                                        <th class="center-align">Item</th>
+                                        <th class="center-align">Qty</th>
+                                        <th class="center-align">Satuan</th>
+                                        <th class="center-align">Keterangan</th>
                                     </tr>
                                 </thead>
                                 <tbody>';
-
-        foreach($data->goodReceipt as $row){
-            $string .= '
-            <tr align="center" style="background-color:#eee;">
-                <td class="center">'.$row->purchaseOrder->code.'</td>
-                <td class="center">'.$row->supplier->name.'</td>
-                <td class="center">'.$row->company->name.'</td>
-                <td class="center">'.$row->place->name.'</td>
-                <td class="center">'.$row->department->name.'</td>
-            </tr>
-            <tr>
-                <td colspan="5" style="border-right-style: none !important;">
-            ';
-
-            $string .='<table style="max-width:500px;">
-                            <thead>
-                                <tr>
-                                    <th class="center-align" colspan="5">Daftar Item</th>
-                                </tr>
-                                <tr>
-                                    <th class="center-align">No.</th>
-                                    <th class="center-align">Item</th>
-                                    <th class="center-align">Qty</th>
-                                    <th class="center-align">Satuan</th>
-                                    <th class="center-align">Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody>';
         
-            foreach($row->goodReceiptDetail as $key => $rowdetail){
-                $string .= '<tr>
-                    <td class="center-align">'.($key + 1).'</td>
-                    <td class="center-align">'.$rowdetail->item->name.'</td>
-                    <td class="center-align">'.$rowdetail->qty.'</td>
-                    <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
-                    <td class="center-align">'.$rowdetail->note.'</td>
-                </tr>';
-            }
-            
-            $string .= '</tbody></table>';
-
-            $string .= '</td></tr>';
+        foreach($data->goodReceiptDetail as $key => $rowdetail){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$rowdetail->item->name.'</td>
+                <td class="center-align">'.$rowdetail->qty.'</td>
+                <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
+                <td class="center-align">'.$rowdetail->note.'</td>
+            </tr>';
         }
         
+        $string .= '</tbody></table>';
+
+        $string .= '</td></tr>';
 
         $string .= '</tbody></table></div><div class="col s12 mt-1"><table style="max-width:500px;">
                         <thead>
@@ -601,7 +547,7 @@ class GoodReceiptPOController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = GoodReceiptMain::where('code',CustomHelper::decrypt($id))->first();
+        $pr = GoodReceipt::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
@@ -616,23 +562,26 @@ class GoodReceiptPOController extends Controller
     }
 
     public function show(Request $request){
-        $grm = GoodReceiptMain::where('code',CustomHelper::decrypt($request->id))->first();
-        $grm['warehouse_name'] = $grm->warehouse->name;
+        $grm = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+        $grm['account_name'] = $grm->account->name;
 
         $arr = [];
         
-        foreach($grm->goodReceipt as $row){
-            foreach($row->goodReceiptDetail as $rowdetail){
-                $arr[] = [
-                    'code'      => $row->purchaseOrder->code,
-                    'ecode'     => CustomHelper::encrypt($row->purchaseOrder->code),
-                    'item_id'   => $rowdetail->item_id,
-                    'item_name' => $rowdetail->item->name,
-                    'qty'       => $rowdetail->qty,
-                    'unit'      => $rowdetail->item->buyUnit->code,
-                    'note'      => $rowdetail->note,
-                ];
-            }
+        foreach($grm->goodReceiptDetail as $row){
+            $arr[] = [
+                'purchase_order_detail_id'  => $row->purchase_order_detail_id,
+                'item_id'       => $row->item_id,
+                'item_name'     => $row->item->name,
+                'qty'           => $row->qty,
+                'unit'          => $row->item->buyUnit->code,
+                'note'          => $row->note,
+                'place_id'      => $row->place_id,
+                'place_name'    => $row->place->name.' - '.$row->place->company->name,
+                'department_id' => $row->department_id,
+                'department_name'   => $row->department->name,
+                'warehouse_id'  => $row->warehouse_id,
+                'warehouse_name'=> $row->warehouse->name
+            ];
         }
 
         $grm['details'] = $arr;
@@ -657,19 +606,16 @@ class GoodReceiptPOController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                foreach($query->goodReceipt as $gr){
-                    CustomHelper::removeJournal('good_receipts',$gr->id);
-                    CustomHelper::removeCogs('good_receipts',$gr->id);
-                }
+                CustomHelper::removeJournal('good_receipts',$query->id);
+                CustomHelper::removeCogs('good_receipts',$query->id);
+                CustomHelper::sendNotification('good_receipts',$query->id,'Good Receipt No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('good_receipts',$query->id);
     
                 activity()
                     ->performedOn(new GoodReceipt())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the good receipt data');
-    
-                CustomHelper::sendNotification('good_receipt_mains',$query->id,'Good Receipt No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('good_receipt_mains',$query->id);
                 
                 $response = [
                     'status'  => 200,
@@ -709,14 +655,11 @@ class GoodReceiptPOController extends Controller
         
         if($query->delete()) {
 
-            foreach($query->goodReceipt as $gr){
-                CustomHelper::removeJournal('good_receipts',$gr->id);
-                CustomHelper::removeCogs('good_receipts',$gr->id);
-            }
+            CustomHelper::removeJournal('good_receipts',$query->id);
+            CustomHelper::removeCogs('good_receipts',$query->id);
+            CustomHelper::removeApproval('good_receipts',$query->id);
 
             $query->goodReceiptDetail()->delete();
-
-            CustomHelper::removeApproval('good_receipt_mains',$query->id);
 
             activity()
                 ->performedOn(new GoodReceipt())

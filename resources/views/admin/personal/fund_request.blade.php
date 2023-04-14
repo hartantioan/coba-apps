@@ -614,7 +614,7 @@
                     success: function(response) {
                         loadingClose('.modal-content');
                         if(response.status == 200) {
-                            /* success(); */
+                            success();
                             M.toast({
                                 html: response.message
                             });

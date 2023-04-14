@@ -228,6 +228,7 @@ class MenuController extends Controller
                         'status'            => $request->status ? $request->status : '2',
                         'is_maintenance'    => $request->maintenance ? $request->maintenance : '2'
                     ]);
+                    
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
@@ -243,6 +244,12 @@ class MenuController extends Controller
                     ->log('Add / edit menu.');
 
                 $newdata = [];
+
+                if($query->table_name){
+                    $updateApprovalTable = ApprovalTable::where('menu_id',$query->id)->where('table_name',$query->table_name)->update([
+                        'table_name'    => $query->table_name
+                    ]);
+                }
 
                 $newdata[] = '<option value="">Parent (Utama)</option>';
 

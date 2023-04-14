@@ -610,6 +610,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('export',[GoodReceiptPOController::class, 'export']);
                 Route::get('viewstructuretree',[GoodReceiptPOController::class, 'viewStructureTree']);
                 Route::post('get_purchase_order', [GoodReceiptPOController::class, 'getPurchaseOrder']);
+                Route::post('get_purchase_order_all', [GoodReceiptPOController::class, 'getPurchaseOrderAll']);
                 Route::post('remove_used_data', [GoodReceiptPOController::class, 'removeUsedData']);
                 Route::post('create',[GoodReceiptPOController::class, 'create'])->middleware('operation.access:good_receipt_po,update');
                 Route::get('approval/{id}',[GoodReceiptPOController::class, 'approval'])->withoutMiddleware('direct.access');

@@ -455,7 +455,9 @@
                 $('#account_id').empty();
                 $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
                 $('#subtotal,#discount,#downpayment').val('0,000');
-                $('#list-used-data').empty();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -637,6 +639,9 @@
                 }
             });
         }else{
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }
             $('#body-detail').empty().append(`
                 <tr id="empty-detail">
                     <td colspan="10" class="center">

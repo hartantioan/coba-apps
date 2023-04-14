@@ -169,7 +169,7 @@ class ItemController extends Controller
             'buy_convert'       => 'required',
             'sell_unit'         => 'required',
             'sell_convert'      => 'required',
-            /* 'warehouse_id'      => 'required', */
+            'warehouse_id'      => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah dipakai',
@@ -180,7 +180,7 @@ class ItemController extends Controller
             'buy_convert.required'      => 'Satuan konversi beli ke stok tidak boleh kosong.',
             'sell_unit.required'        => 'Satuan jual tidak boleh kosong.',
             'sell_convert.required'     => 'Satuan konversi jual ke stok tidak boleh kosong.',
-            /* 'warehouse_id.required'     => 'Gudang tidak boleh kosong.', */
+            'warehouse_id.required'     => 'Gudang tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {

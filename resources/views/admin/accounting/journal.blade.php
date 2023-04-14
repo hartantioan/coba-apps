@@ -73,17 +73,6 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_place" style="font-size:1rem;">Pabrik/Kantor :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_place" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        @foreach ($place as $rowplace)
-                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
                                                 <label for="filter_account" style="font-size:1rem;">Target BP :</label>
                                                 <div class="input-field">
                                                     <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
@@ -147,14 +136,6 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col m3 s12">
-                            <select class="form-control" id="place_id" name="place_id">
-                                @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->id }}" data-name="{{ $rowplace->name.' - '.$rowplace->company->name }}" data-address="{{ $rowplace->address }}">{{ $rowplace->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="place_id">Pabrik/Kantor</label>
-                        </div>
                         <div class="input-field col m3 s12">
                             <input type="hidden" id="temp" name="temp">
                             <select class="browser-default" id="account_id" name="account_id"></select>
@@ -431,8 +412,8 @@
             }
         });
 
-        $('#totalDebit').text(formatRupiahIni(totalDebit.toFixed(3).toString().replace('.',',')));
-        $('#totalCredit').text(formatRupiahIni(totalCredit.toFixed(3).toString().replace('.',',')));
+        $('#totalDebit').text(formatRupiahIni(totalDebit.toFixed(2).toString().replace('.',',')));
+        $('#totalCredit').text(formatRupiahIni(totalCredit.toFixed(2).toString().replace('.',',')));
     }
 
     function getRowUnit(val){
@@ -485,7 +466,6 @@
                 data: {
                     status : $('#filter_status').val(),
                     'account_id[]' : $('#filter_account').val(),
-                    place_id : $('#filter_place').val(),
                     'currency_id[]' : $('#filter_currency').val(),
                 },
                 beforeSend: function() {
@@ -646,7 +626,6 @@
                 $('#modal1').modal('open');
                 
                 $('#temp').val(id);
-                $('#place_id').val(response.place_id).formSelect();
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
@@ -804,9 +783,9 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), place = $('#filter_place').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&place=" + place + "&account=" + account + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&account=" + account + "&currency=" + currency;
     }
 
     function printPreview(code){

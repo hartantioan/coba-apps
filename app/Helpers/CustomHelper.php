@@ -6,6 +6,7 @@ use App\Models\ApprovalTable;
 use App\Models\ApprovalSource;
 use App\Models\Capitalization;
 use App\Models\Coa;
+use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
@@ -147,7 +148,6 @@ class CustomHelper {
 		$source = ApprovalSource::create([
 			'code'			=> strtoupper(uniqid()),
 			'user_id'		=> session('bo_id'),
-			'place_id'		=> $data->place_id,
 			'date_request'	=> date('Y-m-d H:i:s'),
 			'lookable_type'	=> $table_name,
 			'lookable_id'	=> $table_id,
@@ -192,8 +192,8 @@ class CustomHelper {
 				'status'	=> '2'
 			]);
 
-			if($table_name == 'good_receipt_mains'){
-				self::sendJournal('good_receipt_mains',$data->id,null);
+			if($table_name == 'good_receipts'){
+				self::sendJournal('good_receipts',$data->id,null);
 			}else{
 				self::sendJournal($table_name,$table_id,$data->account_id);
 			}
@@ -256,103 +256,80 @@ class CustomHelper {
 
 		$data = DB::table($table_name)->where('id',$table_id)->first();
 
-		if($table_name == 'good_receipt_mains'){
+		if($table_name == 'good_receipts'){
 
-			$rgr = GoodReceiptMain::find($table_id);
+			$gr = GoodReceipt::find($table_id);
 
-			foreach($rgr->goodReceipt as $rowgr){
+			$arrdata = json_decode(json_encode($gr), true);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'account_id'	=> $gr->account_id,
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> 'good_receipts',
+				'lookable_id'	=> $gr->id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+
+			$arrCoa = [];
+
+			foreach($gr->goodReceiptDetail as $rowdetail){
+				$index = -1;
+
+				$rowtotal = $rowdetail->getRowTotal() * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate;
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+					'place_id'		=> $rowdetail->place_id,
+					'department_id'	=> $rowdetail->department_id,
+					'warehouse_id'	=> $rowdetail->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $rowtotal
+				]);
+
+				self::sendCogs('good_receipts',
+					$gr->id,
+					$gr->company_id,
+					$rowdetail->place_id,
+					$rowdetail->warehouse_id,
+					$rowdetail->item_id,
+					$rowdetail->qtyConvert(),
+					$rowtotal,
+					'IN',
+					$gr->post_date
+				);
+
+				self::sendStock(
+					$rowdetail->place_id,
+					$rowdetail->warehouse_id,
+					$rowdetail->item_id,
+					$rowdetail->qtyConvert(),
+					'IN'
+				);
 
 				$journalMap = MenuCoa::whereHas('menu', function($query){
-					$query->where('table_name','good_receipt_mains');
-				})->where('currency_id',$rowgr->currency_id)->get();
+					$query->where('table_name','good_receipts');
+				})
+				->whereHas('coa', function($query) use($data){
+					$query->where('company_id',$data->company_id);
+				})
+				->where('currency_id',$rowdetail->purchaseOrderDetail->purchaseOrder->currency_id)->get();
 
-				if(count($journalMap) > 0){
-					$arrdata = json_decode(json_encode($rowgr), true);
+				foreach($journalMap as $row){
+					$nominal = $rowtotal * ($row->percentage / 100);
 
-					$query = Journal::create([
-						'user_id'		=> session('bo_id'),
-						'account_id'	=> $rowgr->account_id,
-						'code'			=> Journal::generateCode(),
-						'place_id'		=> $rowgr->place_id,
-						'lookable_type'	=> 'good_receipts',
-						'lookable_id'	=> $rowgr->id,
-						'currency_id'	=> $rowgr->currency_id,
-						'currency_rate'	=> $rowgr->currency_rate,
-						'post_date'		=> $data->post_date,
-						'note'			=> $data->code,
-						'status'		=> '3'
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->coa_id,
+						'place_id'		=> $rowdetail->place_id,
+						'department_id'	=> $rowdetail->department_id,
+						'warehouse_id'	=> $rowdetail->warehouse_id,
+						'type'			=> '2',
+						'nominal'		=> $rowtotal
 					]);
-
-					$arrCoa = [];
-
-					$rgrd = GoodReceiptDetail::where('good_receipt_id',$rowgr->id)->get();
-
-					foreach($rgrd as $rowdetail){
-						$index = -1;
-
-						$rowtotal = $rowdetail->getRowTotal() * $rowdetail->goodReceipt->purchaseOrder->currency_rate;
-
-						foreach($arrCoa as $key => $rowcek){
-							if($rowcek['coa_id'] == $rowdetail->item->itemGroup->coa_id){
-								$index = $key;
-							}
-						}
-
-						if($index >= 0){
-							$arrCoa[$index]['total'] += $rowtotal;
-						}else{
-							$arrCoa[] = [
-								'coa_id'	=> $rowdetail->item->itemGroup->coa_id,
-								'total'		=> $rowtotal
-							];
-						}
-
-						self::sendCogs('good_receipts',
-							$rowgr->id,
-							$rowgr->company_id,
-							$rowgr->place_id,
-							$rgr->warehouse_id,
-							$rowdetail->item_id,
-							$rowdetail->qtyConvert(),
-							$rowtotal,
-							'IN',
-							$rgr->post_date
-						);
-
-						self::sendStock(
-							$rowgr->place_id,
-							$rgr->warehouse_id,
-							$rowdetail->item_id,
-							$rowdetail->qtyConvert(),
-							'IN'
-						);
-					}
-					
-					foreach($arrCoa as $row){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row['coa_id'],
-							'place_id'		=> isset($rowgr->place_id) ? $rowgr->place_id : NULL,
-							'department_id'	=> isset($rowgr->department_id) ? $rowgr->department_id : NULL,
-							'warehouse_id'	=> isset($rgr->warehouse_id) ? $rgr->warehouse_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> $row['total']
-						]);
-					}
-
-					foreach($journalMap as $row){
-						$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
-
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->coa_id,
-							'place_id'		=> isset($rowgr->place_id) ? $rowgr->place_id : NULL,
-							'department_id'	=> isset($rowgr->department_id) ? $rowgr->department_id : NULL,
-							'warehouse_id'	=> isset($rgr->warehouse_id) ? $rgr->warehouse_id : NULL,
-							'type'			=> $row->type,
-							'nominal'		=> $nominal
-						]);
-					}
 				}
 			}
 
@@ -537,7 +514,7 @@ class CustomHelper {
 					$query->where('table_name',$table_name);
 				})
 				->whereHas('coa', function($query) use($data){
-					$query->where('company_id',Place::find($data->place_id)->company_id);
+					$query->where('company_id',$data->company_id);
 				})
 				->where('currency_id',$data->currency_id)->get();
 
@@ -549,7 +526,6 @@ class CustomHelper {
 						'user_id'		=> session('bo_id'),
 						'account_id'	=> $account_id,
 						'code'			=> Journal::generateCode(),
-						'place_id'		=> $data->place_id,
 						'lookable_type'	=> $table_name,
 						'lookable_id'	=> $table_id,
 						'currency_id'	=> $data->currency_id,
@@ -697,18 +673,18 @@ class CustomHelper {
 		$data = ItemCogs::where('lookable_type',$table_name)->where('lookable_id',$table_id)->get();
 
 		if($data){
-			$datatable = DB::table($table_name)->where('id',$table_id)->first();
-
 			foreach($data as $row){
 				$item_id = $row->item_id;
+				$place_id = $row->place_id;
+				$warehouse_id = $row->warehouse_id;
 				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
 				$type = $row->qty_in ? 'IN' : 'OUT';
-
+				
 				$row->delete();
 
-				self::resetCogsItem($datatable->place_id,$item_id);
+				self::resetCogsItem($place_id,$item_id);
 
-				self::resetStock($datatable->place_id,$datatable->warehouse_id,$item_id,$qty,$type);
+				self::resetStock($place_id,$warehouse_id,$item_id,$qty,$type);
 			}
 		}
 	}

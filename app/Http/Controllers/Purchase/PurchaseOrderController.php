@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\Department;
+use App\Models\Place;
 use App\Models\UsedData;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -17,9 +20,7 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseOrder;
-use App\Models\Place;
 use App\Models\User;
-use App\Models\Department;
 
 class PurchaseOrderController extends Controller
 {
@@ -36,8 +37,9 @@ class PurchaseOrderController extends Controller
             'title'         => 'Purchase Order',
             'content'       => 'admin.purchase.order',
             'currency'      => Currency::where('status','1')->get(),
-            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'department'    => Department::where('status','1')->get()
+            'company'       => Company::where('status','1')->get(),
+            'place'         => Place::where('status','1')->get(),
+            'department'    => Department::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -51,8 +53,7 @@ class PurchaseOrderController extends Controller
             'supplier_id',
             'purchasing_type',
             'shipping_type',
-            'place_id',
-            'department_id',
+            'company_id',
             'document_no',
             'document_po',
             'payment_type',
@@ -79,7 +80,7 @@ class PurchaseOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PurchaseOrder::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = PurchaseOrder::count();
         
         $query_data = PurchaseOrder::where(function($query) use ($search, $request) {
                 if($search) {
@@ -115,12 +116,8 @@ class PurchaseOrderController extends Controller
                     $query->whereIn('account_id',$request->supplier_id);
                 }
                 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
-                }
-
-                if($request->department_id){
-                    $query->where('department_id',$request->department_id);
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
 
                 if($request->is_tax){
@@ -144,7 +141,6 @@ class PurchaseOrderController extends Controller
                 }
 
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -184,12 +180,8 @@ class PurchaseOrderController extends Controller
                     $query->whereIn('account_id',$request->supplier_id);
                 }
                 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
-                }
-
-                if($request->department_id){
-                    $query->where('department_id',$request->department_id);
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
 
                 if($request->is_tax){
@@ -212,7 +204,6 @@ class PurchaseOrderController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -227,8 +218,7 @@ class PurchaseOrderController extends Controller
                     $val->supplier->name,
                     $val->purchasingType(),
                     $val->shippingType(),
-                    $val->place->name.' - '.$val->place->company->name,
-                    $val->department->name,
+                    $val->company->name,
                     $val->document_no,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->paymentType(),
@@ -292,7 +282,10 @@ class PurchaseOrderController extends Controller
                         'unit'                          => $row->item->buyUnit->code,
                         'qty'                           => number_format($row->qtyBalance(),3,',','.'),
                         'note'                          => $row->note,
-                        'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name
+                        'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
+                        'warehouse_id'                  => $row->warehouse_id,
+                        'place_id'                      => $row->place_id,
+                        'department_id'                 => $row->department_id,
                     ];
                 }
 
@@ -389,8 +382,7 @@ class PurchaseOrderController extends Controller
                         $query->account_id = $request->supplier_id;
                         $query->purchasing_type = $request->purchasing_type;
                         $query->shipping_type = $request->shipping_type;
-                        $query->place_id = $request->place_id;
-                        $query->department_id = $request->department_id;
+                        $query->company_id = $request->company_id;
                         $query->document_no = $request->document_no;
                         $query->document_po = $document;
                         $query->payment_type = $request->payment_type;
@@ -435,8 +427,7 @@ class PurchaseOrderController extends Controller
                         'account_id'                => $request->supplier_id,
                         'purchasing_type'	        => $request->purchasing_type,
                         'shipping_type'             => $request->shipping_type,
-                        'place_id'                  => $request->place_id,
-                        'department_id'             => $request->department_id,
+                        'company_id'                => $request->company_id,
                         'document_no'               => $request->document_no,
                         'document_po'               => $request->file('document_po') ? $request->file('document_po')->store('public/purchase_orders') : NULL,
                         'payment_type'              => $request->payment_type,
@@ -499,10 +490,13 @@ class PurchaseOrderController extends Controller
                             'percent_tax'                   => str_replace(',','.',str_replace('.','',$request->arr_percent_tax[$key])),
                             'is_wtax'                       => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
                             'percent_wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
+                            'place_id'                      => $request->arr_place[$key],
+                            'department_id'                 => $request->arr_department[$key],
+                            'warehouse_id'                  => $request->arr_warehouse[$key]
                         ]);
                         
                         if($querydetail->purchaseRequestDetail()->exists()){
-                            CustomHelper::removeUsedData('purchase_requests',$querydetail->purchaseRequestDetail->purchase_order_id);
+                            CustomHelper::removeUsedData('purchase_requests',$querydetail->purchaseRequestDetail->purchase_request_id);
                         }
                     }
 
@@ -542,7 +536,7 @@ class PurchaseOrderController extends Controller
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="10">Daftar Item</th>
+                                <th class="center-align" colspan="14">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -555,6 +549,10 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Discount 3 (Rp)</th>
                                 <th class="center-align">Subtotal</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Pabrik/Kantor</th>
+                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Referensi</th>
                             </tr>
                         </thead><tbody>';
         
@@ -570,11 +568,10 @@ class PurchaseOrderController extends Controller
                 <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->subtotal,2,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
-            </tr>
-            <tr>
-                <td class="center-align" colspan="10">
-                    '.$row->purchaseRequestList().'
-                </td>
+                <td class="center-align">'.$row->place->name.'</td>
+                <td class="center-align">'.$row->department->name.'</td>
+                <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.($row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : ' - ').'</td>
             </tr>';
         }
         
@@ -644,6 +641,10 @@ class PurchaseOrderController extends Controller
                 'percent_tax'                       => number_format($row->percent_tax,2,',','.'),
                 'is_wtax'                           => $row->is_wtax ? $row->is_wtax : '',
                 'percent_wtax'                      => number_format($row->percent_wtax,2,',','.'),
+                'warehouse_id'                      => $row->warehouse_id,
+                'warehouse_name'                    => $row->warehouse->name,
+                'place_id'                          => $row->place_id,
+                'department_id'                     => $row->department_id,
             ];
         }
 
@@ -880,12 +881,8 @@ class PurchaseOrderController extends Controller
                     $query->whereIn('account_id',$request->supplier);
                 }
                 
-                if($request->place){
-                    $query->where('place_id',$request->place_id);
-                }
-
-                if($request->department){
-                    $query->where('department_id',$request->department);
+                if($request->company){
+                    $query->where('company_id',$request->company);
                 }
 
                 if($request->payment){
@@ -896,7 +893,6 @@ class PurchaseOrderController extends Controller
                     $query->whereIn('currency_id',$request->currency);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -904,7 +900,7 @@ class PurchaseOrderController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPurchaseOrder($request->search,$request->status,$request->type,$request->shipping,$request->place,$request->department,$request->is_tax,$request->is_include_tax,$request->payment,$request->supplier,$request->currency,$this->dataplaces), 'purchase_order_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseOrder($request->search,$request->status,$request->type,$request->shipping,$request->company,$request->is_tax,$request->is_include_tax,$request->payment,$request->supplier,$request->currency,$this->dataplaces), 'purchase_order_'.uniqid().'.xlsx');
     }
 
     public function removeUsedData(Request $request){

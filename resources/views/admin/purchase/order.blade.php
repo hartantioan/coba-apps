@@ -99,23 +99,12 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_place" style="font-size:1rem;">Pabrik/Kantor :</label>
+                                                <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_place" onchange="loadDataTable()">
+                                                    <select class="form-control" id="filter_company" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
-                                                        @foreach ($place as $rowplace)
-                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_department" style="font-size:1rem;">Departemen :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_department" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        @foreach ($department as $rowdepartment)
-                                                            <option value="{{ $rowdepartment->id }}">{{ $rowdepartment->name }}</option>
+                                                        @foreach ($company as $rowcompany)
+                                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -174,8 +163,7 @@
                                                         <th rowspan="2">Supplier</th>
                                                         <th rowspan="2">Tipe PO</th>
                                                         <th rowspan="2">Pengiriman</th>
-                                                        <th rowspan="2">Pabrik/Kantor</th>
-                                                        <th rowspan="2">Departemen</th>
+                                                        <th rowspan="2">Perusahaan</th>
                                                         <th colspan="2" class="center">Proforma</th>
                                                         <th colspan="2" class="center">Pembayaran</th>
                                                         <th colspan="2" class="center">Mata Uang</th>
@@ -221,7 +209,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
                 <h4>Add/Edit {{ $title }}</h4>
@@ -258,22 +246,12 @@
                                 <label class="" for="shipping_type">Tipe Pengiriman</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="place_id" name="place_id" onchange="getReceiverInformation();">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}" data-name="{{ $rowplace->name.' - '.$rowplace->company->name }}" data-address="{{ $rowplace->address }}">{{ $rowplace->name }}</option>
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $rowcompany)
+                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="place_id">Pabrik/Kantor</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="department_id" name="department_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($department as $rowdepartment)
-                                        <option value="{{ $rowdepartment->id }}">{{ $rowdepartment->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="department_id">Departemen</label>
+                                <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="document_no" name="document_no" type="text" placeholder="No. Dokumen">
@@ -358,7 +336,7 @@
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="width:2500px !important;">
+                                        <table class="bordered" style="width:2500px;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -375,12 +353,15 @@
                                                     <th class="center" width="25px">% PPN</th>
                                                     <th class="center">Ber-PPH?</th>
                                                     <th class="center" width="25px">% PPH</th>
+                                                    <th class="center">Pabrik/Kantor</th>
+                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Gudang</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="15" class="center">
+                                                    <td colspan="18" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> New Item
                                                         </a>
@@ -486,7 +467,7 @@
         chartContainer.on('click', '.node', function(event) {
             
             window.open($(this).data('nodeData').url);
-           /*  alert(JSON.stringify($(this).data('nodeData'))); */
+
         });
         
         
@@ -494,21 +475,6 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
-        var datascource = {
-        'name': 'Lao Lao',
-        'title': 'general manager',
-        'children': [
-            { 'name': 'Bo Miao', 'title': 'department manager' },
-            { 'name': 'Su Miao', 'title': 'department manager',
-            'children': [
-                { 'name': 'Tie Hua', 'title': 'senior engineer' },
-                { 'name': 'Hei Hei', 'title': 'senior engineer' }
-            ]
-            },
-            { 'name': 'Hong Miao', 'title': 'department manager' },
-            { 'name': 'Chun Miao', 'title': 'department manager' }
-        ]
-        };
 
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
@@ -560,7 +526,7 @@
                     $(this).remove();
                 });
                 M.updateTextFields();
-                $('#subtotal,#total,#tax,#grandtotal').text('0,00');
+                $('#subtotal,#total,#tax,#grandtotal,#wtax').text('0,00');
                 $('#purchase_request_id').empty();
                 $('#list-used-data').empty();
                 window.onbeforeunload = function() {
@@ -597,7 +563,7 @@
             countAll();
         });
 
-        select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}');
+        select2ServerSide('#supplier_id,#filter_supplier', '{{ url("admin/select2/supplier") }}');
         select2ServerSide('#purchase_request_id', '{{ url("admin/select2/purchase_request") }}');
     });
     
@@ -650,15 +616,6 @@
             $('#payment_term').val('0');
         }
     }
-    
-    function getReceiverInformation(){
-        if($('#place_id').val()){
-            $('#receiver_name').val($('#place_id').find(':selected').data('name'));
-            $('#receiver_address').val($('#place_id').find(':selected').data('address'));
-        }else{
-            $('#receiver_name,#receiver_address').val('');
-        }
-    }
 
     function getPurchaseRequest(){
         let nil = $('#purchase_request_id').val();
@@ -689,8 +646,6 @@
                         $('#purchase_request_id').empty();
                     }else{
                         if(response.details.length > 0){
-                            $('#place_id').val(response.place_id).formSelect();
-                            $('#department_id').val(response.department_id).formSelect();
                             $('#list-used-data').append(`
                                 <div class="chip purple darken-4 gradient-shadow white-text">
                                     ` + response.code + `
@@ -766,6 +721,23 @@
                                         <td>
                                             <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
                                         </td>
+                                        <td>
+                                            <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                                @foreach ($place as $rowplace)
+                                                    <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td>
+                                            <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                                @foreach ($department as $rowdept)
+                                                    <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                        </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
@@ -776,7 +748,13 @@
                                 $('#arr_item' + count).append(`
                                     <option value="` + val.item_id + `">` + val.item_name + `</option>
                                 `);
+                                $('#arr_warehouse' + count).append(`
+                                    <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                                `);
                                 select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                                select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                                $('#arr_place' + count).val(val.place_id).formSelect();
+                                $('#arr_department' + count).val(val.department_id).formSelect();
                             });
                         }
 
@@ -869,6 +847,23 @@
                 <td>
                     <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
                 </td>
+                <td>
+                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                        @foreach ($place as $rowplace)
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                        @foreach ($department as $rowdept)
+                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -877,6 +872,8 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+        $('#arr_place' + count + ',#arr_department' + count).formSelect();
     }
 
     function changeDateMinimum(val){
@@ -934,8 +931,7 @@
                     purchasing_type : $('#filter_type').val(),
                     shipping_type : $('#filter_shipping').val(),
                     'supplier_id[]' : $('#filter_supplier').val(),
-                    place_id : $('#filter_place').val(),
-                    department_id : $('#filter_department').val(),
+                    company_id : $('#filter_company').val(),
                     is_tax : $('#filter_is_tax').val(),
                     is_include_tax : $('#filter_is_include_tax').val(),
                     payment_type : $('#filter_payment').val(),
@@ -963,8 +959,7 @@
                 { name: 'supplier_id', className: 'center-align' },
                 { name: 'purchasing_type', className: 'center-align' },
                 { name: 'shipping_type', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
-                { name: 'department_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'document_no', className: 'center-align' },
                 { name: 'document_po', className: 'center-align' },
                 { name: 'payment_tye', className: 'center-align' },
@@ -1144,8 +1139,7 @@
                 `);
                 $('#purchasing_type').val(response.purchasing_type).formSelect();
                 $('#shipping_type').val(response.shipping_type).formSelect();
-                $('#place_id').val(response.place_id).formSelect();
-                $('#department_id').val(response.department_id).formSelect();
+                $('#company_id').val(response.company_id).formSelect();
                 $('#document_no').val(response.document_no);
                 $('#payment_type').val(response.payment_type).formSelect();
                 $('#payment_term').val(response.payment_term);
@@ -1244,6 +1238,23 @@
                                 <td>
                                     <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="` + val.percent_wtax + `" onkeyup="formatRupiah(this);countAll();">
                                 </td>
+                                <td>
+                                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                        @foreach ($department as $rowdept)
+                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
                                         <i class="material-icons">delete</i>
@@ -1264,6 +1275,13 @@
                         if(val.is_wtax){
                             $('#arr_is_wtax' + count).prop( "checked", true);
                         }
+                        
+                        $('#arr_warehouse' + count).append(`
+                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                        `);
+                        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                        $('#arr_place' + count).val(val.place_id).formSelect();
+                        $('#arr_department' + count).val(val.department_id).formSelect();
                     });
                 }
                 
@@ -1469,7 +1487,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), company = $('#filter_company').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
         
         $.ajax({
             type : "POST",
@@ -1479,8 +1497,7 @@
                 status : status,
                 type : type,
                 shipping : shipping,
-                place : place,
-                department : department,
+                company : company,
                 payment : payment,
                 'supplier[]' : supplier,
                 'currency[]' : currency
@@ -1499,8 +1516,8 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), company = $('#filter_company').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&shipping=" + shipping + "&place=" + place + "&department=" + department + "&payment=" + payment + "&supplier=" + supplier + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&shipping=" + shipping + "&company=" + company + "&payment=" + payment + "&supplier=" + supplier + "&currency=" + currency;
     }
 </script>

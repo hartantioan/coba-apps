@@ -19,14 +19,13 @@ class ExportPurchaseOrder implements WithMultipleSheets
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $type = null, string $shipping = null, string $place = null, string $department = null, string $is_tax = null, string $is_include_tax = null, string $payment = null, string $supplier = null, string $currency = null,array $dataplaces = null)
+    public function __construct(string $search = null, string $status = null, string $type = null, string $shipping = null, string $company = null, string $is_tax = null, string $is_include_tax = null, string $payment = null, string $supplier = null, string $currency = null,array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
         $this->type = $type ? $type : '';
         $this->shipping = $shipping ? $shipping : '';
-        $this->place = $place ? $place : '';
-        $this->department = $department ? $department : '';
+        $this->company = $company ? $company : '';
         $this->is_tax = $is_tax ? $is_tax : '';
         $this->is_include_tax = $is_include_tax ? $is_include_tax : '';
         $this->payment = $payment ? $payment : '';
@@ -67,12 +66,8 @@ class ExportPurchaseOrder implements WithMultipleSheets
                 $query->where('shipping_type',$this->shipping);
             }
             
-            if($this->place){
-                $query->where('place_id',$this->place);
-            }
-
-            if($this->department){
-                $query->where('department_id',$this->department);
+            if($this->company){
+                $query->where('company_id',$this->company);
             }
 
             if($this->payment){
@@ -89,7 +84,6 @@ class ExportPurchaseOrder implements WithMultipleSheets
                 $query->whereIn('currency_id',$arrCurr);
             }
         })
-        ->whereIn('place_id',$this->dataplaces)
         ->get([
             'id',
             'code',
@@ -97,8 +91,7 @@ class ExportPurchaseOrder implements WithMultipleSheets
             'account_id',
             'purchasing_type',
             'shipping_type',
-            'place_id',
-            'department_id',
+            'company_id',
             'document_no',
             'document_po',
             'payment_type',
@@ -172,8 +165,7 @@ class PurchaseOrderSheet implements FromCollection, WithTitle, WithHeadings, Wit
                 $row->supplier->name,
                 $row->purchasingType(),
                 $row->shippingType(),
-                $row->place->name.' - '.$row->place->company->name,
-                $row->department->name,
+                $row->company->name,
                 $row->document_no,
                 $row->paymentType().' '.$row->payment_term.' hari',
                 $row->currency->code,
@@ -215,8 +207,7 @@ class PurchaseOrderSheet implements FromCollection, WithTitle, WithHeadings, Wit
             'SUPPLIER',
             'TIPE',
             'SHIPPING',
-            'PABRIK/KANTOR',
-            'DEPARTEMEN',
+            'PERUSAHAAN',
             'DOK.REF',
             'PEMBAYARAN',
             'MATA UANG',

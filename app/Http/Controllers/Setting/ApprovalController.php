@@ -241,11 +241,7 @@ class ApprovalController extends Controller
 
         $total_data = ApprovalMatrix::where('user_id',session('bo_id'))
                         ->whereIn('status',['1','2'])
-                        ->where(function($query) use($dataplaces){ 
-                            $query->whereHas('approvalSource',function($query) use($dataplaces){ 
-                                $query->whereIn('place_id',$dataplaces); 
-                            });
-                        })->count();
+                        ->count();
         
         $query_data = ApprovalMatrix::where(function($query) use ($search, $request, $dataplaces) {
                 if($search) {
@@ -269,8 +265,6 @@ class ApprovalController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                $query->whereHas('approvalSource',function($query) use($dataplaces){ $query->whereIn('place_id',$dataplaces); });
             })
             ->whereIn('status',['1','2'])
             ->where('user_id',session('bo_id'))
@@ -301,8 +295,6 @@ class ApprovalController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                $query->whereHas('approvalSource',function($query) use($dataplaces){ $query->whereIn('place_id',$dataplaces); });
             })
             ->whereIn('status',['1','2'])
             ->where('user_id',session('bo_id'))

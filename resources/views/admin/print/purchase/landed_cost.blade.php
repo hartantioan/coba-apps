@@ -134,7 +134,7 @@
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Vendor</th>
                         <th rowspan="2">GR No.</th>
-                        <th rowspan="2">Penempatan</th>
+                        <th rowspan="2">Perusahaan</th>
 						<th colspan="2">Tanggal</th>
                         <th rowspan="2">Referensi</th>
                         <th colspan="2">Mata Uang</th>
@@ -167,8 +167,8 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
 							<td>{{ $row->vendor->name }}</td>
-                            <td>{{ $row->goodReceiptMain()->exists() ? $row->goodReceiptMain->code : '-' }}</td>
-                            <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                            <td>{{ $row->goodReceipt->code }}</td>
+                            <td>{{ $row->company->name }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                             <td>{{ $row->reference }}</td>
@@ -192,6 +192,9 @@
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
+											<th>Site</th>
+											<th>Departemen</th>
+											<th>Gudang</th>
                                             <th>Item</th>
                                             <th>Qty</th>
                                             <th>Satuan</th>
@@ -202,6 +205,9 @@
                                     <tbody>
                                         @foreach($row->landedCostDetail as $key => $rowdetail)
                                         <tr align="center">
+											<td>{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+											<td>{{ $rowdetail->department->name }}</td>
+											<td>{{ $rowdetail->warehouse->name }}</td>
                                             <td>{{ $rowdetail->item->name }}</td>
                                             <td>{{ $rowdetail->qty }}</td>
                                             <td>{{ $rowdetail->item->uomUnit->code }}</td>

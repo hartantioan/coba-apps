@@ -21,6 +21,7 @@ return new class extends Migration
             $table->bigInteger('item_id')->nullable();
             $table->double('qty')->nullable();
             $table->string('note')->nullable();
+            $table->string('remark')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();

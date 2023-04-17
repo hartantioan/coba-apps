@@ -46,7 +46,6 @@ class ExportGoodReceive implements FromView
                     $query->where('status', $this->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
         ]);
     }

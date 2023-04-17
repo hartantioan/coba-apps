@@ -210,7 +210,7 @@
                     <th class="center">Sat.</th>
                     <th class="center">Catatan</th>
                     <th class="center">Tgl.Dipakai</th>
-                    <th class="center">Pabrik/Kantor</th>
+                    <th class="center">Site</th>
                     <th class="center">Departemen</th>
                 </tr>
             </thead>

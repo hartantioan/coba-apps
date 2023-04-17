@@ -134,6 +134,18 @@ class GoodReceipt extends Model
         return $this->hasMany('App\Models\PurchaseInvoiceDetail','good_receipt_id','id');
     }
 
+    public function balanceInvoice(){
+        $total = $this->grandtotal;
+
+        foreach($this->purchaseInvoiceDetail()->whereHas('purchaseInvoice', function($query){
+            $query->whereIn('status',['2','3']);
+        })->get() as $row){
+            $total -= $row->grandtotal;
+        }
+
+        return $total;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-1">Menunggu</span>',

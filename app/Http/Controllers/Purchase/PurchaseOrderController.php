@@ -549,7 +549,7 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Discount 3 (Rp)</th>
                                 <th class="center-align">Subtotal</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Pabrik/Kantor</th>
+                                <th class="center-align">Site</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Referensi</th>

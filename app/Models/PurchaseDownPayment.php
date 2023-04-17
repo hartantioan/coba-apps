@@ -115,6 +115,23 @@ class PurchaseDownPayment extends Model
         return $this->hasMany('App\Models\PurchaseDownPaymentDetail');
     }
 
+    public function purchaseInvoiceDp()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDp');
+    }
+
+    public function balanceDp(){
+        $total = $this->grandtotal;
+
+        foreach($this->purchaseInvoiceDp()->whereHas('purchaseInvoice', function($query){
+            $query->whereIn('status',['2','3']);
+        })->get() as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-1">Menunggu</span>',

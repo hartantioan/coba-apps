@@ -129,7 +129,7 @@
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Vendor</th>
                                                         <th rowspan="2">GR No.</th>
-                                                        <th rowspan="2">Pabrik/Kantor</th>
+                                                        <th rowspan="2">Perusahaan</th>
                                                         <th colspan="2" class="center">Tanggal</th>
                                                         <th rowspan="2">No. Referensi</th>
                                                         <th colspan="2" class="center">Mata Uang</th>
@@ -190,6 +190,14 @@
                             <div class="input-field col m3 s12">
                                 <select class="browser-default" id="vendor_id" name="vendor_id"></select>
                                 <label class="active" for="vendor_id">Vendor/Ekspedisi</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $row)
+                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="reference" name="reference" type="text" placeholder="No. Referensi">
@@ -307,7 +315,7 @@
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Harga per Produk</h4>
-                                    <h6 class="center">Perhitungan otomatis akan didasarkan pada satuan stok/produksi (UOM) dan dihitung berdasarkan harga landed cost sebelum pajak. Silahkan masukkan nilai *Nominal Input (Sebelum pajak)* untuk memulai. Anda juga bisa memasukkan data nominal per barang secara langsung.</h6>
+                                    <h6 class="center">Perhitungan otomatis akan didasarkan pada satuan stok/produksi (UOM) dan dihitung berdasarkan harga landed cost sebelum pajak serta proposional qty. Silahkan masukkan nilai *Nominal Input (Sebelum pajak)* untuk memulai. Anda juga bisa memasukkan data nominal per barang secara langsung.</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered">
                                             <thead>
@@ -316,11 +324,14 @@
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan (UOM)</th>
                                                     <th class="center">Harga Total</th>
+                                                    <th class="center">Site</th>
+                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Gudang</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="4" class="center">
+                                                    <td colspan="7" class="center">
                                                         Silahkan pilih penerimaan barang / good receipt po...
                                                     </td>
                                                 </tr>
@@ -432,11 +443,14 @@
                 });
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="4" class="center">
+                        <td colspan="7" class="center">
                             Silahkan pilih penerimaan barang / good receipt po...
                         </td>
                     </tr>
                 `);
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
                 M.updateTextFields();
                 $('#total,#tax,#grandtotal').text('0,000');
                 $('#good_receipt_id').empty();
@@ -517,6 +531,10 @@
                                     <tr class="row_item">
                                         <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
+                                        <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                        <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
+                                        <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
+                                        <input type="hidden" name="arr_good_receipt[]" value="` + val.good_receipt_detail_id + `">
                                         <td>
                                         ` + val.item_name + ` 
                                         </td>
@@ -529,9 +547,20 @@
                                         <td class="center">
                                             <input name="arr_price[]" class="browser-default nominalitem" type="text" value="0" onkeyup="formatRupiah(this);countRow();" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`">
                                         </td>
+                                        <td class="center">
+                                            ` + val.place_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.department_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.warehouse_name + `
+                                        </td>
                                     </tr>
                                 `);
                             });
+
+                            countEach();
                         }
                     }
                     
@@ -554,7 +583,7 @@
             });
             $('#body-item').append(`
                 <tr id="last-row-item">
-                    <td colspan="4" class="center">
+                    <td colspan="7" class="center">
                         Silahkan pilih penerimaan barang / good receipt po...
                     </td>
                 </tr>
@@ -613,16 +642,16 @@
         grandtotal = total + tax - wtax;
         
         $('#total').val(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.tofixed(2).toString().replace('.',','))
+            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
         );
         $('#tax').val(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.tofixed(2).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
         );
         $('#wtax').val(
-            (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.tofixed(2).toString().replace('.',','))
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',','))
         );
         $('#grandtotal').val(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
         if($('.nominalitem').length > 0){
             if(arrQty.length > 0){
@@ -689,7 +718,7 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'vendor_id', className: 'center-align' },
                 { name: 'good_receipt_id', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'due_date', className: 'center-align' },
                 { name: 'no_reference', className: 'center-align' },
@@ -857,6 +886,7 @@
                 $('#reference').val(response.reference);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
+                $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
                 $('#percent_tax').val(response.percent_tax);
@@ -894,6 +924,10 @@
                             <tr class="row_item">
                                 <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
+                                <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
+                                <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
+                                <input type="hidden" name="arr_good_receipt[]" value="` + val.good_receipt_detail_id + `">
                                 <td>
                                     ` + val.item_name + ` 
                                 </td>
@@ -905,6 +939,15 @@
                                 </td>
                                 <td class="center">
                                     <input name="arr_price[]" class="browser-default nominalitem" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countRow();" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`">
+                                </td>
+                                <td class="center">
+                                    ` + val.place_name + `
+                                </td>
+                                <td class="center">
+                                    ` + val.department_name + `
+                                </td>
+                                <td class="center">
+                                    ` + val.warehouse_name + `
                                 </td>
                             </tr>
                         `);

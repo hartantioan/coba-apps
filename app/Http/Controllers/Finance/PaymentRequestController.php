@@ -338,7 +338,7 @@ class PaymentRequestController extends Controller
             'arr_coa'               => 'required|array',
 		], [
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
-            'place_id.required'                 => 'Penempatan pabrik/kantor tidak boleh kosong.',
+            'place_id.required'                 => 'Penempatan Site tidak boleh kosong.',
             'coa_source_id.required'            => 'Kas/Bank tidak boleh kosong.',
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
             'due_date.required'                 => 'Tanggal tenggat tidak boleh kosong.',

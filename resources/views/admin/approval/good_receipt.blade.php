@@ -178,6 +178,14 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
+                                Penerima
+                            </td>
+                            <td width="60%">
+                                {{ $data->receiver_name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
                                 Lampiran
                             </td>
                             <td width="60%">
@@ -204,8 +212,9 @@
                         <th class="center">Item</th>
                         <th class="center">Jum.</th>
                         <th class="center">Sat.</th>
-                        <th class="center">Catatan</th>
-                        <th class="center">Pabrik/Kantor</th>
+                        <th class="center">Keterangan</th>
+                        <th class="center">Remark</th>
+                        <th class="center">Site</th>
                         <th class="center">Departemen</th>
                         <th class="center">Gudang</th>
                     </tr>
@@ -218,6 +227,7 @@
                         <td class="center">{{ $rowdetail->qty }}</td>
                         <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
                         <td>{{ $rowdetail->note }}</td>
+                        <td>{{ $rowdetail->remark }}</td>
                         <td class="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
                         <td class="center">{{ $rowdetail->department->name }}</td>
                         <td class="center">{{ $rowdetail->warehouse->name }}</td>

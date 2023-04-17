@@ -61,7 +61,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="center-align">No.</th>
-                                                        <th class="center-align">Pabrik/Kantor</th>
+                                                        <th class="center-align">Item</th>
+                                                        <th class="center-align">Site</th>
                                                         <th class="center-align">Gudang</th>
                                                         <th class="center-align">Qty In</th>
                                                         <th class="center-align">Price In</th>
@@ -79,6 +80,7 @@
                                                     @foreach($itemcogs as $key => $row)
                                                         <tr>
                                                             <td class="center-align">{{ ($key + 1) }}</td>
+                                                            <td class="center-align">{{ $row->item->name }}</td>
                                                             <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
                                                             <td class="center-align">{{ $row->warehouse->name }}</td>
                                                             <td class="center-align">{{ number_format($row->qty_in,3,',','.').' '.$row->item->uomUnit->code }}</td>

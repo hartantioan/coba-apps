@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Misc;
 
+use App\Models\GoodReceipt;
 use App\Models\PaymentRequest;
 use App\Models\Region;
 use App\Models\Place;
@@ -15,7 +16,6 @@ use App\Models\User;
 use App\Models\Bank;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
-use App\Models\GoodReceiptMain;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -382,10 +382,12 @@ class Select2Controller extends Controller {
                 ->where('status','2')->get();
 
         foreach($data as $d) {
-            $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->note,
-            ];
+            if($d->hasBalance()){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note,
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);
@@ -501,16 +503,14 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = GoodReceiptMain::where(function($query) use($search){
+        $data = GoodReceipt::where(function($query) use($search){
                     $query->where(function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodReceipt', function($query) use($search){
-                                $query->whereHas('goodReceiptDetail',function($query) use($search){
-                                    $query->whereHas('item',function($query) use($search){
-                                        $query->where('code', 'like', "%$search%")
-                                            ->orWhere('name','like',"%$search%");
-                                    });
+                            ->orWhereHas('goodReceiptDetail',function($query) use($search){
+                                $query->whereHas('item',function($query) use($search){
+                                    $query->where('code', 'like', "%$search%")
+                                        ->orWhere('name','like',"%$search%");
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search){
@@ -520,7 +520,6 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->whereIn('place_id',$this->dataplaces)
                 ->where('status','2')->get();
 
         foreach($data as $d) {

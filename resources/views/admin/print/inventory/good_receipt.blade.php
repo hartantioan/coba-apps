@@ -132,6 +132,7 @@
 						<th rowspan="2">No</th>
                         <th rowspan="2">GR NO.</th>
                         <th rowspan="2">Pengguna</th>
+						<th rowspan="2">Bisnis Partner</th>
 						<th colspan="3">Tanggal</th>
 						<th rowspan="2">Penerima</th>
                         <th rowspan="2">Dokumen</th>
@@ -150,6 +151,7 @@
                             <td>{{ $key+1 }}</td>
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
+							<td>{{ $row->account->name }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
@@ -159,51 +161,31 @@
                             <td>{!! $row->statusRaw() !!}</td>
                         </tr>
                         <tr>
-                            <td colspan="10" style="border-right-style: none !important;">
+                            <td colspan="11" style="border-right-style: none !important;">
 								<table border="1" cellpadding="2" cellspacing="0">
 									<thead>
 										<tr align="center">
-											<th>PO No.</th>
-											<th>Supplier</th>
-											<th>Perusahaan</th>
-											<th>Pabrik/Kantor</th>
+											<th>No</th>
+											<th>Item</th>
+											<th>Jum.</th>
+											<th>Sat.</th>
+											<th>Catatan</th>
+											<th>Site</th>
 											<th>Departemen</th>
+											<th>Gudang</th>
 										</tr>
 									</thead>
 									<tbody>
-										@foreach($row->goodReceipt as $rgr)
-										<tr align="center" style="background-color:#eee;">
-											<td>{{ $rgr->purchaseOrder->code }}</td>
-											<td>{{ $rgr->supplier->name }}</td>
-											<td>{{ $rgr->company->name }}</td>
-											<td>{{ $rgr->place->name }}</td>
-											<td>{{ $rgr->department->name }}</td>
-										</tr>
+										@foreach($row->goodReceiptDetail as $keydetail => $rowdetail)
 										<tr>
-											<td colspan="5" style="border-right-style: none !important;">
-												<table border="1" cellpadding="2" cellspacing="0">
-													<thead>
-														<tr align="center">
-															<th>No</th>
-															<th>Item</th>
-															<th>Jum.</th>
-															<th>Sat.</th>
-															<th>Catatan</th>
-														</tr>
-													</thead>
-													<tbody>
-														@foreach($rgr->goodReceiptDetail as $keydetail => $rowdetail)
-														<tr>
-															<td align="center">{{ ($keydetail + 1) }}</td>
-															<td>{{ $rowdetail->item->name }}</td>
-															<td align="center">{{ $rowdetail->qty }}</td>
-															<td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
-															<td>{{ $rowdetail->note }}</td>
-														</tr>
-														@endforeach
-													</tbody>
-												</table>
-											</td>
+											<td align="center">{{ ($keydetail + 1) }}</td>
+											<td>{{ $rowdetail->item->name }}</td>
+											<td align="center">{{ $rowdetail->qty }}</td>
+											<td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
+											<td>{{ $rowdetail->note }}</td>
+											<td align="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+											<td align="center">{{ $rowdetail->department->name }}</td>
+											<td align="center">{{ $rowdetail->warehouse->name }}</td>
 										</tr>
 										@endforeach
 									</tbody>
@@ -213,7 +195,7 @@
 					@endforeach
                     @if(count($data) == 0)
                         <tr>
-                            <td colspan="10" align="center">
+                            <td colspan="11" align="center">
                                 Data tidak ditemukan
                             </td>
                         </tr>

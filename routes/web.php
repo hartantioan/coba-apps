@@ -58,8 +58,6 @@ use App\Http\Controllers\Setting\DataAccessController;
 use App\Http\Controllers\Misc\Select2Controller;
 use App\Http\Controllers\Misc\NotificationController;
 
-use App\Http\Controllers\ReadXmlTaxController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes

@@ -19,11 +19,35 @@ class LandedCostDetail extends Model
         'item_id',
         'qty',
         'nominal',
+        'place_id',
+        'department_id',
+        'warehouse_id',
+        'good_receipt_detail_id',
     ];
 
     public function landedCost()
     {
         return $this->belongsTo('App\Models\LandedCost', 'landed_cost_id', 'id')->withTrashed();
+    }
+
+    public function goodReceiptDetail()
+    {
+        return $this->belongsTo('App\Models\GoodReceiptDetail', 'good_receipt_detail_id', 'id')->withTrashed();
+    }
+
+    public function place()
+    {
+        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function department()
+    {
+        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 
     public function item(){

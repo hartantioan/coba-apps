@@ -20,8 +20,7 @@ class LandedCost extends Model
         'user_id',
         'account_id',
         'good_receipt_id',
-        'place_id',
-        'department_id',
+        'company_id',
         'post_date',
         'due_date',
         'reference',
@@ -73,14 +72,9 @@ class LandedCost extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function company()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function department()
-    {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function landedCostDetail()
@@ -202,5 +196,22 @@ class LandedCost extends Model
         }else{
             return '';
         }
+    }
+
+    public function purchaseInvoiceDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','landed_cost_id','id');
+    }
+
+    public function balanceInvoice(){
+        $total = $this->grandtotal;
+
+        foreach($this->purchaseInvoiceDetail()->whereHas('purchaseInvoice', function($query){
+            $query->whereIn('status',['2','3']);
+        })->get() as $row){
+            $total -= $row->grandtotal;
+        }
+
+        return $total;
     }
 }

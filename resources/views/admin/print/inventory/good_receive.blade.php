@@ -147,7 +147,7 @@
                             <td>{{ $key+1 }}</td>
                             <td>{{ $row->user->name }}</td>
                             <td>{{ $row->code }}</td>
-                            <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                            <td>{{ $row->company->name }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ $row->currency->code }}</td>
                             <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
@@ -167,6 +167,8 @@
                                             <th>Harga Total</th>
                                             <th>Keterangan</th>
                                             <th>Coa</th>
+											<th>Site</th>
+											<th>Depertemen</th>
                                             <th>Gudang</th>
                                         </tr>
                                     </thead>
@@ -180,6 +182,8 @@
                                             <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
                                             <td>{{ $rowdetail->note }}</td>
                                             <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
+											<td>{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+											<td>{{ $rowdetail->department->name }}</td>
                                             <td>{{ $rowdetail->warehouse->name }}</td>
                                         </tr>
                                         @endforeach

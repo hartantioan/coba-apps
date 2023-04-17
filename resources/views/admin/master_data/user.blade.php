@@ -256,6 +256,10 @@
                             <input id="top_internal" name="top_internal" type="number" min="0" step="1" value="0">
                             <label class="active" for="top_internal">TOP Internal</label>
                         </div>
+                        <div class="input-field col s3 other_inputs" style="display:none;">
+                            <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
+                            <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
+                        </div>
                         <div class="input-field col s3">
                             <select class="browser-default" id="province_id" name="province_id"></select>
                             <label class="active" for="province_id">Provinsi</label>
@@ -1312,6 +1316,7 @@
                     $('#limit_credit').val(response.limit_credit);
                     $('#top').val(response.top);
                     $('#top_internal').val(response.top_internal);
+                    $('#tolerance_gr').val(response.tolerance_gr);
                 }
 
                 $('.row_bank').remove();

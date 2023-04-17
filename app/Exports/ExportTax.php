@@ -69,7 +69,6 @@ class ExportTax implements WithMultipleSheets
         ]);
 
         $sheets = [];
-
         
         $sheets[] = new TaxSheet($taxes);
 

@@ -19,8 +19,7 @@ class PurchaseInvoice extends Model
         'code',
         'user_id',
         'account_id',
-        'place_id',
-        'department_id',
+        'company_id',
         'post_date',
         'due_date',
         'document_date',
@@ -77,14 +76,9 @@ class PurchaseInvoice extends Model
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function company()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function department()
-    {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function used(){
@@ -95,6 +89,12 @@ class PurchaseInvoice extends Model
     {
         return $this->hasMany('App\Models\PurchaseInvoiceDetail');
     }
+
+    public function purchaseInvoiceDp()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDp');
+    }
+
     public function hasPaymentRequestDetail(){
         return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table);
     }

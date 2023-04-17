@@ -136,6 +136,7 @@ class GoodReceiptPOController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->user->name,
                     $val->account->name,
+                    $val->company->name,
                     $val->code,
                     $val->receiver_name,
                     date('d M Y',strtotime($val->post_date)),
@@ -276,14 +277,27 @@ class GoodReceiptPOController extends Controller
             $taxall = 0;
             $wtaxall = 0;
             $grandtotalall = 0;
-
-            $arrDetail = [];
+            $overtolerance = false;
+            $wtax = 0;
+            $total = 0;
+            $grandtotal = 0;
+            $tax = 0;
 
             foreach($request->arr_purchase as $key => $row){
 
                 $pod = PurchaseOrderDetail::find(intval($row));
 
                 if($pod){
+
+                    $tolerance_gr = User::find($request->account_id)->tolerance_gr;
+
+                    if($tolerance_gr){
+                        $balance = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) - $pod->qty;
+                        $percent_balance = round(($balance / $pod->qty) * 100,2);
+                        if($percent_balance > $tolerance_gr){
+                            $overtolerance = true;
+                        }
+                    }
 
                     $discount = $pod->purchaseOrder->discount;
                     $subtotal = $pod->purchaseOrder->subtotal;
@@ -316,6 +330,13 @@ class GoodReceiptPOController extends Controller
                 }
             }
 
+            if($overtolerance){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
+                ]);
+            }
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {
@@ -326,7 +347,7 @@ class GoodReceiptPOController extends Controller
                             if($row->status == '2'){
                                 return response()->json([
                                     'status'  => 500,
-                                    'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                                    'message' => 'Purchase Order / Pembelian telah diapprove, anda tidak bisa melakukan perubahan.'
                                 ]);
                             }
                         }
@@ -408,6 +429,7 @@ class GoodReceiptPOController extends Controller
                             'item_id'                   => $request->arr_item[$key],
                             'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                      => $request->arr_note[$key],
+                            'remark'                    => $request->arr_remark[$key],
                             'place_id'                  => $request->arr_place[$key],
                             'department_id'             => $request->arr_department[$key],
                             'warehouse_id'              => $request->arr_warehouse[$key]
@@ -449,10 +471,10 @@ class GoodReceiptPOController extends Controller
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4">
                         <div class="col s12">
-                            <table class="bordered">
+                            <table class="bordered" style="width:auto;">
                                 <thead>
                                     <tr>
-                                        <th class="center-align" colspan="5">Daftar Item</th>
+                                        <th class="center-align" colspan="9">Daftar Item</th>
                                     </tr>
                                     <tr>
                                         <th class="center-align">No.</th>
@@ -460,6 +482,10 @@ class GoodReceiptPOController extends Controller
                                         <th class="center-align">Qty</th>
                                         <th class="center-align">Satuan</th>
                                         <th class="center-align">Keterangan</th>
+                                        <th class="center-align">Remark</th>
+                                        <th class="center-align">Site</th>
+                                        <th class="center-align">Departemen</th>
+                                        <th class="center-align">Gudang</th>
                                     </tr>
                                 </thead>
                                 <tbody>';
@@ -468,9 +494,13 @@ class GoodReceiptPOController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$rowdetail->item->name.'</td>
-                <td class="center-align">'.$rowdetail->qty.'</td>
+                <td class="center-align">'.number_format($rowdetail->qty,3,',','.').'</td>
                 <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
+                <td class="center-align">'.$rowdetail->remark.'</td>
+                <td class="center-align">'.$rowdetail->place->name.' - '.$rowdetail->place->company->name.'</td>
+                <td class="center-align">'.$rowdetail->department->name.'</td>
+                <td class="center-align">'.$rowdetail->warehouse->name.'</td>
             </tr>';
         }
         
@@ -685,7 +715,7 @@ class GoodReceiptPOController extends Controller
 
         $data = [
             'title' => 'GOOD RECEIPT PO REPORT',
-            'data' => GoodReceiptMain::where(function ($query) use ($request) {
+            'data' => GoodReceipt::where(function ($query) use ($request) {
                 if($request->search) {
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
@@ -694,12 +724,10 @@ class GoodReceiptPOController extends Controller
                             ->orWhere('document_date', 'like', "%$request->search%")
                             ->orWhere('receiver_name', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
-                            ->orWhereHas('goodReceipt', function($query) use($request){
-                                $query->whereHas('goodReceiptDetail',function($query) use($request){
-                                    $query->whereHas('item',function($query) use($request){
-                                        $query->where('code', 'like', "%$request->search%")
-                                            ->orWhere('name','like',"%$request->search%");
-                                    });
+                            ->orWhereHas('goodReceiptDetail',function($query) use($request){
+                                $query->whereHas('item',function($query) use($request){
+                                    $query->where('code', 'like', "%$request->search%")
+                                        ->orWhere('name','like',"%$request->search%");
                                 });
                             })
                             ->orWhereHas('user',function($query) use($request){
@@ -717,9 +745,6 @@ class GoodReceiptPOController extends Controller
                     $query->whereIn('warehouse_id', $request->warehouse);
                 }
             })
-            ->whereHas('goodReceipt', function($query) use($request){
-                $query->whereIn('place_id',$this->dataplaces);
-            })
             ->get()
 		];
 		
@@ -731,7 +756,7 @@ class GoodReceiptPOController extends Controller
     }
     
     public function viewStructureTree(Request $request){
-        $query = GoodReceiptMain::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             $data_good_receipt = [

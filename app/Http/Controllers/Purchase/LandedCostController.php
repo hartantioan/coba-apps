@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\GoodReceipt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -13,7 +15,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\LandedCost;
 use App\Models\LandedCostDetail;
 use App\Models\PurchaseOrder;
-use App\Models\GoodReceiptMain;
 use App\Models\Currency;
 use App\Models\ItemCogs;
 use App\Helpers\CustomHelper;
@@ -35,13 +36,14 @@ class LandedCostController extends Controller
             'title'         => 'Landed Cost',
             'content'       => 'admin.purchase.landed_cost',
             'currency'      => Currency::where('status','1')->get(),
+            'company'       => Company::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
     }
 
     public function getGoodReceipt(Request $request){
-        $data = GoodReceiptMain::find($request->id);
+        $data = GoodReceipt::find($request->id);
         
         if($data->used()->exists()){
             $data['status'] = '500';
@@ -51,30 +53,21 @@ class LandedCostController extends Controller
 
             $details = [];
             
-            foreach($data->goodReceipt as $gr){
-                foreach($gr->goodReceiptDetail as $row){
-
-                    $index = -1;
-
-                    foreach($details as $key => $rowcek){
-                        if($rowcek['item_id'] == $row->item_id){
-                            $index = $key;
-                        }
-                    }
-
-                    if($index >= 0){
-                        $details[$index]['qty'] = number_format($details[$index]['qtyRaw'] + $row->qtyConvert(),3,',','.');
-                        $details[$index]['qtyRaw'] = $details[$index]['qtyRaw'] + $row->qtyConvert();
-                    }else{
-                        $details[] = [
-                            'item_id'       => $row->item_id,
-                            'item_name'     => $row->item->code.' - '.$row->item->name,
-                            'qty'           => number_format($row->qtyConvert(),2,',','.'),
-                            'qtyRaw'        => $row->qtyConvert(),
-                            'unit'          => $row->item->uomUnit->code,
-                        ];
-                    }
-                }
+            foreach($data->goodReceiptDetail as $row){
+                $details[] = [
+                    'item_id'                   => $row->item_id,
+                    'item_name'                 => $row->item->code.' - '.$row->item->name,
+                    'qty'                       => number_format($row->qtyConvert(),5,',','.'),
+                    'qtyRaw'                    => $row->qtyConvert(),
+                    'unit'                      => $row->item->uomUnit->code,
+                    'place_name'                => $row->place->name.' - '.$row->place->company->name,
+                    'department_name'           => $row->department->name,
+                    'warehouse_name'            => $row->warehouse->name,
+                    'place_id'                  => $row->place_id,
+                    'department_id'             => $row->department_id,
+                    'warehouse_id'              => $row->warehouse_id,
+                    'good_receipt_detail_id'    => $row->id
+                ];
             }
 
             $data['details'] = $details;
@@ -91,7 +84,7 @@ class LandedCostController extends Controller
             'account_id',
             'purchase_order_id',
             'good_receipt_id',
-            'place_id',
+            'company_id',
             'post_date',
             'due_date',
             'reference',
@@ -116,7 +109,7 @@ class LandedCostController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = LandedCost::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = LandedCost::count();
         
         $query_data = LandedCost::where(function($query) use ($search, $request) {
                 if($search) {
@@ -169,7 +162,6 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -226,7 +218,6 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -238,8 +229,8 @@ class LandedCostController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->vendor->name,
-                    $val->goodReceiptMain->code,
-                    $val->place->name.' - '.$val->place->company->name,
+                    $val->goodReceipt->code,
+                    $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->due_date)),
                     $val->reference,
@@ -285,6 +276,7 @@ class LandedCostController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
 			'good_receipt_id' 			=> 'required',
+            'company_id' 			    => 'required',
 			'vendor_id'                 => 'required',
             'post_date'                 => 'required',
             'due_date'                  => 'required',
@@ -298,6 +290,7 @@ class LandedCostController extends Controller
             'arr_qty'                   => 'required|array'
 		], [
 			'good_receipt_id.required' 			=> 'Good receipt tidak boleh kosong.',
+            'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
 			'vendor_id.required'                => 'Vendor/ekspedisi tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
@@ -320,7 +313,7 @@ class LandedCostController extends Controller
             ];
         } else {
 
-            $gr = GoodReceiptMain::find($request->good_receipt_id);
+            $gr = GoodReceipt::find($request->good_receipt_id);
             
             $total = str_replace(',','.',str_replace('.','',$request->total));
             $tax = str_replace(',','.',str_replace('.','',$request->tax));
@@ -356,9 +349,8 @@ class LandedCostController extends Controller
 
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->vendor_id;
-                        $query->good_receipt_main_id = $gr->id;
-                        $query->place_id = $gr->place_id;
-                        $query->department_id = $gr->department_id;
+                        $query->good_receipt_id = $gr->id;
+                        $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->reference = $request->reference;
@@ -400,9 +392,8 @@ class LandedCostController extends Controller
                         'code'			            => LandedCost::generateCode(),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->vendor_id,
-                        'good_receipt_main_id'	    => $gr->id,
-                        'place_id'                  => $gr->place_id,
-                        'department_id'             => $gr->department_id,
+                        'good_receipt_id'	        => $gr->id,
+                        'company_id'                => $request->company_id,
                         'post_date'                 => $request->post_date,
                         'due_date'                  => $request->due_date,
                         'reference'                 => $request->reference,
@@ -431,25 +422,29 @@ class LandedCostController extends Controller
 			if($query) {
                 
                 if($request->arr_item){
-                    foreach($request->arr_item as $key => $row){
-                        DB::beginTransaction();
-                        try {
+                    DB::beginTransaction();
+                    try {
+                        foreach($request->arr_item as $key => $row){
                             LandedCostDetail::create([
                                 'landed_cost_id'        => $query->id,
                                 'item_id'               => $row,
                                 'qty'                   => floatval($request->arr_qty[$key]),
                                 'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                                'place_id'              => $request->arr_place[$key],
+                                'department_id'         => $request->arr_department[$key],
+                                'warehouse_id'          => $request->arr_warehouse[$key],
+                                'good_receipt_detail_id'=> $request->arr_good_receipt[$key],
                             ]);
-                            DB::commit();
-                        }catch(\Exception $e){
-                            DB::rollback();
                         }
+                        DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
                     }
                 }
 
                 CustomHelper::sendApproval('landed_costs',$query->id,$query->note);
                 CustomHelper::sendNotification('landed_costs',$query->id,'Pengajuan Landed Cost No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::removeUsedData($query->goodReceiptMain->getTable(),$query->goodReceiptMain->id);
+                CustomHelper::removeUsedData('good_receipts',$query->goodReceipt->id);
 
                 activity()
                     ->performedOn(new LandedCost())
@@ -488,6 +483,9 @@ class LandedCostController extends Controller
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Harga Total</th>
                                 <th class="center-align">Harga Satuan</th>
+                                <th class="center-align">Site</th>
+                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Gudang</th>
                             </tr>
                         </thead><tbody>';
         
@@ -500,6 +498,9 @@ class LandedCostController extends Controller
                     <td class="center-align">'.$row->item->uomUnit->code.'</td>
                     <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     <td class="right-align">'.number_format(round($row->nominal / $row->qty,3),2,',','.').'</td>
+                    <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
+                    <td class="center-align">'.$row->department->name.'</td>
+                    <td class="center-align">'.$row->warehouse->name.'</td>
                 </tr>';
             }
         }else{
@@ -562,7 +563,7 @@ class LandedCostController extends Controller
     public function show(Request $request){
         $lc = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
         $lc['vendor_name'] = $lc->vendor->name;
-        $lc['good_receipt_note'] = $lc->goodReceiptMain->code.' - '.$lc->note;
+        $lc['good_receipt_note'] = $lc->goodReceipt->code.' - '.$lc->note;
         $lc['total'] = number_format($lc->total,2,',','.');
         $lc['tax'] = number_format($lc->tax,2,',','.');
         $lc['wtax'] = number_format($lc->wtax,2,',','.');
@@ -578,8 +579,15 @@ class LandedCostController extends Controller
                 'item_name'                 => $row->item->name.' - '.$row->item->name,
                 'qtyRaw'                    => $row->qty,
                 'qty'                       => number_format($row->qty,3,',','.'),
-                'nominal'                   => number_format($row->nominal,2,',','.'),
+                'nominal'                   => number_format($row->nominal,5,',','.'),
                 'unit'                      => $row->item->uomUnit->code,
+                'place_name'                => $row->place->name.' - '.$row->place->company->name,
+                'department_name'           => $row->department->name,
+                'warehouse_name'            => $row->warehouse->name,
+                'place_id'                  => $row->place_id,
+                'department_id'             => $row->department_id,
+                'warehouse_id'              => $row->warehouse_id,
+                'good_receipt_detail_id'    => $row->good_receipt_detail_id,
             ];
         }
 
@@ -609,20 +617,17 @@ class LandedCostController extends Controller
                 foreach($query->landedCostDetail as $rowdetail){
                     $pricelc = $rowdetail->nominal / $rowdetail->qty;
     
-                    foreach($query->goodReceiptMain->goodReceipt as $gr){
-                        $pricenew = 0;
-                        $itemdata = NULL;
-                        $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$gr->id)->where('place_id',$query->place_id)->where('item_id',$rowdetail->item_id)->first();
-                        if($itemdata){
-                            $pricenew = $itemdata->price_in - $pricelc;
-                            $itemdata->update([
-                                'price_in'	=> $pricenew,
-                                'total_in'	=> round($pricenew * $itemdata->qty_in,3),
-                            ]);
-                        }
+                    $pricenew = 0;
+                    $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$rowdetail->goodReceiptDetail->good_receipt_id)->where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->first();
+                    if($itemdata){
+                        $pricenew = $pricelc - $itemdata->price_in;
+                        $itemdata->update([
+                            'price_in'	=> $pricenew,
+                            'total_in'	=> round($pricenew * $itemdata->qty_in,3),
+                        ]);
                     }
     
-                    CustomHelper::resetCogsItem($query->place_id,$rowdetail->item_id);
+                    CustomHelper::resetCogsItem($rowdetail->place_id,$rowdetail->item_id);
                 }
     
                 activity()
@@ -633,7 +638,7 @@ class LandedCostController extends Controller
     
                 CustomHelper::sendNotification('landed_costs',$query->id,'Purchase Order Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('landed_costs',$query->id);
-                /* CustomHelper::removeJournal('landed_costs',$query->id); */
+                CustomHelper::removeJournal('landed_costs',$query->id);
 
                 $response = [
                     'status'  => 200,
@@ -678,24 +683,22 @@ class LandedCostController extends Controller
             foreach($query->landedCostDetail as $rowdetail){
                 $pricelc = $rowdetail->nominal / $rowdetail->qty;
 
-                foreach($query->goodReceiptMain->goodReceipt as $gr){
-                    $pricenew = 0;
-					$itemdata = NULL;
-                    $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$gr->id)->where('place_id',$query->place_id)->where('item_id',$rowdetail->item_id)->first();
-                    if($itemdata){
-                        $pricenew = $itemdata->price_in - $pricelc;
-                        $itemdata->update([
-                            'price_in'	=> $pricenew,
-                            'total_in'	=> round($pricenew * $itemdata->qty_in,3),
-                        ]);
-                    }
+                $pricenew = 0;
+                $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$rowdetail->goodReceiptDetail->good_receipt_id)->where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->first();
+                if($itemdata){
+                    $pricenew = $pricelc - $itemdata->price_in;
+                    $itemdata->update([
+                        'price_in'	=> $pricenew,
+                        'total_in'	=> round($pricenew * $itemdata->qty_in,3),
+                    ]);
                 }
 
-                CustomHelper::resetCogsItem($query->place_id,$rowdetail->item_id);
+                CustomHelper::resetCogsItem($rowdetail->place_id,$rowdetail->item_id);
             }
 
             $query->landedCostDetail()->delete();
-            /* CustomHelper::removeJournal('landed_costs',$query->id); */
+            
+            CustomHelper::removeJournal('landed_costs',$query->id);
 
             activity()
                 ->performedOn(new PurchaseOrder())
@@ -741,9 +744,6 @@ class LandedCostController extends Controller
                             ->orWhereHas('user',function($query) use($request){
                                 $query->where('name','like',"%$request->search%")
                                     ->orWhere('employee_no','like',"%$request->search%");
-                            })
-                            ->orWhereHas('goodReceiptMain',function($query) use($request){
-                                $query->where('code','like',"%$request->search%");
                             });
                     });
                 }
@@ -772,7 +772,6 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -784,7 +783,7 @@ class LandedCostController extends Controller
     }
     
     public function removeUsedData(Request $request){
-        CustomHelper::removeUsedData('good_receipt_mains',$request->id);
+        CustomHelper::removeUsedData('good_receipts',$request->id);
         return response()->json([
             'status'    => 200,
             'message'   => ''

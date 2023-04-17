@@ -13,13 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('work_order_attachments'))
-        Schema::create('work_order_attachments', function (Blueprint $table) {
+        Schema::create('purchase_invoice_dps', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('work_order_id')->nullable();
-            $table->string('description')->nullable();
+            $table->bigInteger('purchase_invoice_id')->nullable();
+            $table->bigInteger('purchase_down_payment_id')->nullable();
+            $table->double('nominal')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['purchase_invoice_id','purchase_down_payment_id'],'pinvoice_dp_index');
         });
     }
 
@@ -30,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('work_order_attachments');
+        Schema::dropIfExists('purchase_invoice_dps');
     }
 };

@@ -20,6 +20,7 @@ class GoodReceiptDetail extends Model
         'item_id',
         'qty',
         'note',
+        'remark',
         'place_id',
         'department_id',
         'warehouse_id',

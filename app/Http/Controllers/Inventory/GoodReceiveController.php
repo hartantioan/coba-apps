@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
+use App\Models\Place;
 use App\Models\PurchaseOrder;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
@@ -18,7 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\GoodReceive;
 use App\Models\GoodReceiveDetail;
 use App\Models\User;
-use App\Models\Place;
+use App\Models\Company;
 use App\Models\Department;
 use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
@@ -39,8 +40,10 @@ class GoodReceiveController extends Controller
         $data = [
             'title'     => 'Barang Masuk',
             'content'   => 'admin.inventory.good_receive',
-            'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
+            'company'   => Company::where('status','1')->get(),
+            'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'currency'  => Currency::where('status','1')->get(),
+            'department'=> Department::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -51,7 +54,7 @@ class GoodReceiveController extends Controller
             'id',
             'code',
             'user_id',
-            'place_id',
+            'company_id',
             'post_date',
             'currency_id',
             'currency_rate',
@@ -64,7 +67,7 @@ class GoodReceiveController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReceive::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = GoodReceive::count();
         
         $query_data = GoodReceive::where(function($query) use ($search, $request) {
                 if($search) {
@@ -89,7 +92,6 @@ class GoodReceiveController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -118,7 +120,6 @@ class GoodReceiveController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -129,7 +130,7 @@ class GoodReceiveController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->place->name,
+                    $val->company->name,
                     date('d M Y',strtotime($val->post_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,3,',','.'),
@@ -163,7 +164,7 @@ class GoodReceiveController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'place_id'                  => 'required',
+            'company_id'                => 'required',
 			'post_date'		            => 'required',
 			'currency_id'		        => 'required',
             'currency_rate'		        => 'required',
@@ -173,7 +174,7 @@ class GoodReceiveController extends Controller
             'arr_coa'                   => 'required|array',
             'arr_warehouse'             => 'required|array',
 		], [
-            'place_id.required'                 => 'Penempatan tidak boleh kosong.',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'currency_id.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
             'Currency_rate.required' 			=> 'Tanggal dokumen tidak boleh kosong.',
@@ -230,7 +231,7 @@ class GoodReceiveController extends Controller
                         }
                         
                         $query->user_id = session('bo_id');
-                        $query->place_id = $request->place_id;
+                        $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
@@ -259,7 +260,7 @@ class GoodReceiveController extends Controller
                     $query = GoodReceive::create([
                         'code'			        => GoodReceive::generateCode(),
                         'user_id'		        => session('bo_id'),
-                        'place_id'		        => $request->place_id,
+                        'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,
                         'currency_id'           => $request->currency_id,
                         'currency_rate'         => str_replace(',','.',str_replace('.','',$request->currency_rate)),
@@ -288,7 +289,9 @@ class GoodReceiveController extends Controller
                             'total'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
                             'coa_id'                => $request->arr_coa[$key],
-                            'warehouse_id'          => $request->arr_warehouse[$key]
+                            'warehouse_id'          => $request->arr_warehouse[$key],
+                            'place_id'              => $request->arr_place[$key],
+                            'department_id'         => $request->arr_department[$key]
                         ]);
 
                     }
@@ -329,7 +332,7 @@ class GoodReceiveController extends Controller
                     <table style="max-width:800px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="9">Daftar Item</th>
+                                <th class="center-align" colspan="11">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -340,6 +343,8 @@ class GoodReceiveController extends Controller
                                 <th class="right-align">Harga Total</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Coa</th>
+                                <th class="center-align">Site</th>
+                                <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                             </tr>
                         </thead><tbody>';
@@ -354,6 +359,8 @@ class GoodReceiveController extends Controller
                 <td class="center-align">'.number_format($row->total,3,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
+                <td class="center-align">'.$row->department->name.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
             </tr>';
         }
@@ -409,6 +416,8 @@ class GoodReceiveController extends Controller
                 'total'         => number_format($row->total,3,',','.'),
                 'coa_id'        => $row->coa_id,
                 'coa_name'      => $row->coa->code.' - '.$row->coa->name,
+                'place_id'      => $row->place_id,
+                'department_id' => $row->department_id,
                 'warehouse_id'  => $row->warehouse_id,
                 'warehouse_name'=> $row->warehouse->name,
                 'note'          => $row->note,
@@ -557,7 +566,6 @@ class GoodReceiveController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		

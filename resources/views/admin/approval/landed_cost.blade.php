@@ -229,6 +229,9 @@
                 <thead>
                     <tr>
                         <th class="center">No</th>
+                        <th class="center">Site</th>
+                        <th class="center">Departemen</th>
+                        <th class="center">Gudang</th>
                         <th class="center">Item</th>
                         <th class="center">Qty</th>
                         <th class="center">Satuan</th>
@@ -240,6 +243,9 @@
                     @foreach($data->landedCostDetail as $key => $row)
                     <tr>
                         <td class="center">{{ ($key + 1) }}</td>
+                        <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                        <td>{{ $row->department->name }}</td>
+                        <td>{{ $row->warehouse->name }}</td>
                         <td>{{ $row->item->name }}</td>
                         <td class="center">{{ $row->qty }}</td>
                         <td class="center">{{ $row->item->uomUnit->code }}</td>
@@ -248,26 +254,31 @@
                     </tr>
                     @endforeach
                     <tr>
-                        <td class="right-align" colspan="4">Total</td>
+                        <td class="right-align" colspan="7">Total</td>
                         <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="4">PPN</td>
+                        <td class="right-align" colspan="7">PPN</td>
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="4">PPH</td>
+                        <td class="right-align" colspan="7">PPH</td>
                         <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="4">Grandtotal</td>
+                        <td class="right-align" colspan="7">Grandtotal</td>
                         <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="9">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.ucwords($data->currency->document_text) }}</i></th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
         <div class="invoice-subtotal mt-3">
@@ -286,8 +297,8 @@
                         @if($data->user->signature)
                             <div>{!! $data->user->signature() !!}</div>
                         @endif
-                        <div class="mt-6">{{ $data->user->name }}</div>
-                        <div class="mt-1">{{ $data->user->position->name.' '.$data->user->department->name }}</div>
+                        <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
+                        <div class="mt-1">{{ $data->user->position->name.' - '.$data->user->department->name }}</div>
                     </td>
                     @if($data->approval())
                     @foreach ($data->approval()->approvalMatrix()->where('status','2')->get() as $row)
@@ -296,7 +307,7 @@
                             @if($row->user->signature)
                                 <div>{!! $row->user->signature() !!}</div>
                             @endif
-                            <div class="mt-5">{{ $row->user->name }}</div>
+                            <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
                             <div class="mt-1">{{ $row->user->position->name.' - '.$row->user->department->name }}</div>
                         </td>
                     @endforeach

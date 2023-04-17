@@ -97,6 +97,7 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Supplier/Vendor</th>
+                                                        <th rowspan="2">Perusahaan</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Penerima</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
@@ -207,7 +208,8 @@
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan</th>
                                                     <th class="center">Keterangan</th>
-                                                    <th class="center">Pabrik/Kantor</th>
+                                                    <th class="center">Remark</th>
+                                                    <th class="center">Site</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Hapus</th>
@@ -215,7 +217,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="8" class="center">
+                                                    <td colspan="9" class="center">
                                                         Pilih purchase order untuk memulai...
                                                     </td>
                                                 </tr>
@@ -340,7 +342,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="8" class="center">
+                            <td colspan="9" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -390,7 +392,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="8" class="center">
+                        <td colspan="9" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -441,13 +443,16 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
                                         </td>
                                         <td>
                                             <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + valmain.code + `" style="width:100%;">
+                                        </td>
+                                        <td>
+                                            <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="-" style="width:100%;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.place_name + `</span>
@@ -492,7 +497,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="8" class="center">
+                        <td colspan="9" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -569,6 +574,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'name', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
@@ -750,13 +756,16 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;">
+                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.unit + `</span>
                                         </td>
                                         <td>
                                             <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + response.code + `" style="width:100%;">
+                                        </td>
+                                        <td>
+                                            <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="-" style="width:100%;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.place_name + `</span>
@@ -799,7 +808,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="8" class="center">
+                        <td colspan="9" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -827,7 +836,7 @@
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="8" class="center">
+                            <td colspan="9" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -892,13 +901,16 @@
                                     ` + val.item_name + `
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;">
+                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;">
+                                </td>
+                                <td>
+                                    <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.remark + `"  style="width:100%;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.place_name + `</span>

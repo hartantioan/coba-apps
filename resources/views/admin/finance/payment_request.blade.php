@@ -123,7 +123,7 @@
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Partner Bisnis</th>
-                                                        <th rowspan="2">Pabrik/Kantor</th>
+                                                        <th rowspan="2">Site</th>
                                                         <th rowspan="2">Kas/Bank</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
@@ -184,7 +184,7 @@
                                         <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="place_id">Pabrik/Kantor</label>
+                                <label class="" for="place_id">Site</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="browser-default" id="coa_source_id" name="coa_source_id"></select>

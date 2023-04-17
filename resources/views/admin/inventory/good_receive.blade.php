@@ -9,6 +9,10 @@
     table.bordered th {
         padding: 5px !important;
     }
+
+    .select2-dropdown {
+        width: 200px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -80,8 +84,13 @@
                                             <i class="material-icons left">refresh</i>
                                         </button>
                                     </h4>
-                                    <div class="row mt-2">
+                                    <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card purple">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Harga yand anda masukkan disini akan mempengaruhi nilai rata-rata barang dan qty stock saat ini.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
@@ -89,7 +98,7 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Pengguna</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Perusahaan</th>
                                                         <th>Tanggal</th>
                                                         <th>Mata Uang</th>
                                                         <th>Konversi</th>
@@ -115,7 +124,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
                 <h4>Add/Edit {{ $title }}</h4>
@@ -127,13 +136,12 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="form-control" id="place_id" name="place_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $rowcompany)
+                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="place_id">Pabrik/Kantor</label>
+                                <label class="" for="company_id">Perusahaan</label>
                             </div>
                             
                             <div class="input-field col m3 s12">
@@ -169,20 +177,22 @@
                                         <table class="bordered" style="min-width:1800px !important;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center" width="20%">Item</th>
-                                                    <th class="center" width="10%">Qty</th>
+                                                    <th class="center">Item</th>
+                                                    <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
-                                                    <th class="center" width="15%">Harga HPP</th>
-                                                    <th class="center" width="15%">Total</th>
-                                                    <th class="center" width="10%">Keterangan</th>
-                                                    <th class="center" width="20%">Coa Kredit</th>
-                                                    <th class="center" width="20%">Gudang</th>
+                                                    <th class="center">Harga HPP</th>
+                                                    <th class="center">Total</th>
+                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Coa Kredit</th>
+                                                    <th class="center">Site</th>
+                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Gudang</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="9" class="center">
+                                                    <td colspan="11" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </a>
@@ -423,6 +433,20 @@
                 <td class="center">
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
+                <td>
+                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                        @foreach ($place as $rowplace)
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                        @foreach ($department as $rowdept)
+                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
                 <td class="center">
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                 </td>
@@ -436,6 +460,9 @@
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+        $('#arr_place' + count).formSelect();
+        $('#arr_department' + count).formSelect();
+        M.updateTextFields();
     }
 
     function countRow(id){
@@ -557,7 +584,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#place_id').val(response.place_id).formSelect();
+                $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
                 $('#currency_id').val(response.currency_id).formSelect();
@@ -591,6 +618,20 @@
                                 <td class="center">
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                 </td>
+                                <td>
+                                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                        @foreach ($department as $rowdept)
+                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                                 </td>
@@ -613,6 +654,8 @@
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                        $('#arr_place' + count).val(val.place_id).formSelect();
+                        $('#arr_department' + count).val(val.department_id).formSelect();
                     });
                 }
                 

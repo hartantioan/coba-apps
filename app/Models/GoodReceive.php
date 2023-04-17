@@ -18,7 +18,7 @@ class GoodReceive extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'place_id',
+        'company_id',
         'post_date',
         'currency_id',
         'currency_rate',
@@ -48,9 +48,9 @@ class GoodReceive extends Model
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function company()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function goodReceiveDetail()

@@ -47,6 +47,7 @@ return new class extends Migration
             $table->double('limit_credit')->nullable();
             $table->integer('top')->nullable();
             $table->integer('top_internal')->nullable();
+            $table->double('tolerance_gr')->nullable();
             $table->char('gender',1)->nullable();
             $table->char('married_status',1)->nullable();
             $table->char('married_date')->nullable();

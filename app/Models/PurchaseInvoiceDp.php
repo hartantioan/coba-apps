@@ -7,34 +7,26 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class PurchaseInvoiceDetail extends Model
+class PurchaseInvoiceDp extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'purchase_invoice_details';
+    protected $table = 'purchase_invoice_dps';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'purchase_invoice_id',
-        'good_receipt_id',
-        'landed_cost_id',
-        'total',
-        'tax',
-        'wtax',
-        'grandtotal',
+        'purchase_down_payment_id',
+        'nominal',
     ];
 
     public function purchaseInvoice()
     {
         return $this->belongsTo('App\Models\PurchaseInvoice', 'purchase_invoice_id', 'id')->withTrashed();
     }
-    
-    public function landedCost()
-    {
-        return $this->belongsTo('App\Models\LandedCost', 'landed_cost_id', 'id')->withTrashed();
-    }
 
-    public function goodReceipt(){
-        return $this->belongsTo('App\Models\GoodReceipt','good_receipt_id','id')->withTrashed();
+    public function purchaseDownPayment()
+    {
+        return $this->belongsTo('App\Models\PurchaseDownPayment', 'purchase_down_payment_id', 'id')->withTrashed();
     }
 }

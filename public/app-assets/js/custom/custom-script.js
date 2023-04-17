@@ -57,6 +57,10 @@ function formatRupiahIni(angka){
 	return rupiah;
 }
 
+function roundTwoDecimal(val){
+	return (Math.round(val*100)/100);
+}
+
 function loadingOpen(element){
 	$(element).waitMe({
 		effect: 'timer',
@@ -78,7 +82,7 @@ function select2ServerSide(selector, endpoint) {
 		minimumInputLength: 1,
 		allowClear: true,
 		cache: true,
-		width: '100%',
+		width: 'resolve',
 		dropdownParent: $('body').parent(),
 		ajax: {
 			url: endpoint,

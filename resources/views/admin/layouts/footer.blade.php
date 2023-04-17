@@ -23,7 +23,7 @@
     <script src="{{ url('app-assets/js/custom/waitMe.min.js') }}"></script>
     <script src="{{ url('app-assets/js/plugins.js?v=7') }}"></script>
     <script src="{{ url('app-assets/js/search.js?v=11') }}"></script>
-    <script src="{{ url('app-assets/js/custom/custom-script.js?v=54') }}"></script>
+    <script src="{{ url('app-assets/js/custom/custom-script.js?v=57') }}"></script>
     @if(session('bo_id'))
         <script>
             $(function() {

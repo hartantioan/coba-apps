@@ -83,23 +83,12 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_place" style="font-size:1rem;">Pabrik :</label>
+                                                <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_place" onchange="loadDataTable()">
+                                                    <select class="form-control" id="filter_company" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
-                                                        @foreach ($place as $rowplace)
-                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_department" style="font-size:1rem;">Departemen :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_department" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        @foreach ($department as $rowdepartment)
-                                                            <option value="{{ $rowdepartment->id }}">{{ $rowdepartment->name }}</option>
+                                                        @foreach ($company as $rowcompany)
+                                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -144,8 +133,7 @@
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Sup/Ven</th>
-                                                        <th rowspan="2">Pabrik/Kantor</th>
-                                                        <th rowspan="2">Departemen</th>
+                                                        <th rowspan="2">Perusahaan</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
@@ -216,30 +204,20 @@
                                 <label class="" for="type">Tipe</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="place_id" name="place_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $rowcompany)
+                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="place_id">Pabrik/Kantor</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="department_id" name="department_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($department as $rowdepartment)
-                                        <option value="{{ $rowdepartment->id }}" {{ $rowdepartment->id == session('bo_department_id') ? 'selected' : '' }}>{{ $rowdepartment->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="department_id">Departemen</label>
+                                <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="top" name="top" min="0" type="number" value="0" readonly>
-                                <label class="active" for="top">TOP (hari) Autofill</label>
+                                <input id="top" name="top" min="0" type="number" value="0" onkeyup="addDays();">
+                                <label class="active" for="top">TOP (hari) Autofill dari TOP Master Data</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
@@ -296,9 +274,9 @@
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h4>Detail Good Receipt PO / Landed Cost</h4>
+                                    <h5>Detail Good Receipt PO / Landed Cost</h5>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="width:1500px !important;">
+                                        <table class="bordered" style="width:1600px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">
@@ -314,13 +292,42 @@
                                                     <th class="center">PPN</th>
                                                     <th class="center">PPH</th>
                                                     <th class="center">Grandtotal</th>
-                                                    <th class="center">Ber-PPH?</th>
-                                                    <th class="center">% PPH</th>
+                                                    <th class="center">Keterangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="empty-detail">
-                                                    <td colspan="10" class="center">
+                                                    <td colspan="9" class="center">
+                                                        Pilih supplier/vendor untuk memulai...
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </p>
+                            </div>
+                            <div class="col m12 s12">
+                                <p class="mt-2 mb-2">
+                                    <h5>Detail Down Payment Bisnis Partner</h5>
+                                    <div style="overflow:auto;">
+                                        <table class="bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">
+                                                        <label>
+                                                            <input type="checkbox" onclick="chooseAllDp(this)">
+                                                            <span>Semua</span>
+                                                        </label>
+                                                    </th>
+                                                    <th class="center">Purchase DP No.</th>
+                                                    <th class="center">Tgl.Post</th>
+                                                    <th class="center">Nominal</th>
+                                                    <th class="center">Dipakai</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-detail-dp">
+                                                <tr id="empty-detail-dp">
+                                                    <td colspan="5" class="center">
                                                         Pilih supplier/vendor untuk memulai...
                                                     </td>
                                                 </tr>
@@ -457,7 +464,7 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="10" class="center">
+                        <td colspan="9" class="center">
                             Pilih supplier/vendor untuk memulai...
                         </td>
                     </tr>
@@ -504,8 +511,8 @@
                 success: function(response) {
                     loadingClose('.modal-content');
 
-                    $('#deposit,#downpayment').val(response.deposit);
-                    $('#body-detail').empty();
+                    $('#deposit').val(response.deposit);
+                    $('#body-detail,#body-detail-dp').empty();
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
@@ -543,24 +550,12 @@
                                     <td class="right-align" id="row_grandtotal` + count + `">
                                         ` + val.grandtotal + `
                                     </td>
-                                    <td class="center">
-                                        <div class="switch mb-0">
-                                            <label>
-                                                Tidak
-                                                <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="applyWtax('` + count + `');countAll();">
-                                                <span class="lever"></span>
-                                                Ya
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td class="center">
-                                        <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);applyWtax('` + count + `');countAll();" style="width:100px;">
+                                    <td>
+                                        ` + val.info + `
                                     </td>
                                 </tr>
                             `);
 
-                            $('#place_id').val(val.place_id).formSelect();
-                            $('#department_id').val(val.department_id).formSelect();
                             if(val.is_wtax){
                                 $('#arr_is_wtax' + count).prop( "checked", true);
                             }
@@ -569,13 +564,51 @@
                     }else{
                         $('#body-detail').empty().append(`
                             <tr id="empty-detail">
-                                <td colspan="10" class="center">
+                                <td colspan="9" class="center">
                                     Pilih supplier/vendor untuk memulai...
                                 </td>
                             </tr>
                         `);
 
                         $('#total,#tax,#grandtotal,#balance').text('0,00');
+                    }
+
+                    if(response.downpayments.length > 0){
+                        $.each(response.downpayments, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-detail-dp').append(`
+                                <tr class="row_detail_dp">
+                                    <td class="center-align">
+                                        <label>
+                                            <input type="checkbox" id="check` + count + `" name="arr_dp_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
+                                            <span>Pilih</span>
+                                        </label>
+                                    </td>
+                                    <td class="center">
+                                        ` + val.rawcode + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
+                                    </td>
+                                </tr>
+                            `);
+                        });                        
+                    }else{
+                        $('#body-detail-dp').empty().append(`
+                            <tr id="empty-detail-dp">
+                                <td colspan="5" class="center">
+                                    Pilih supplier/vendor untuk memulai...
+                                </td>
+                            </tr>
+                        `);
+
+                        $('#downpayment').val('0,00');
                     }
 
                     $('#top').val(response.top);
@@ -598,7 +631,7 @@
         }else{
             $('#body-detail').empty().append(`
                 <tr id="empty-detail">
-                    <td colspan="10" class="center">
+                    <td colspan="9" class="center">
                         Pilih supplier/vendor untuk memulai...
                     </td>
                 </tr>
@@ -616,18 +649,18 @@
             wtax = total * (percent_wtax / 100);
         }
         grandtotal = total + tax - wtax;
-        $('input[name^="arr_wtax"][data-id="' + val + '"]').val(formatRupiahIni(wtax.tofixed(2).toString().replace('.',',')));
-        $('input[name^="arr_grandtotal"][data-id="' + val + '"]').val(formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',',')));
-        $('#row_wtax' + val).text(formatRupiahIni(wtax.tofixed(2).toString().replace('.',',')));
-        $('#row_grandtotal' + val).text(formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',',')));
+        $('input[name^="arr_wtax"][data-id="' + val + '"]').val(formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',',')));
+        $('input[name^="arr_grandtotal"][data-id="' + val + '"]').val(formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',',')));
+        $('#row_wtax' + val).text(formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',',')));
+        $('#row_grandtotal' + val).text(formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',',')));
     }
 
     function countAll(){
-        var total = 0, tax = 0, grandtotal = 0, downpayment = parseFloat($('#downpayment').val().replaceAll(".", "").replaceAll(",",".")), balance = 0, wtax = 0;
+        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0;
         
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
-                let element = $(this);tofixed(3)
+                let element = $(this);
                 if($(element).is(':checked')){
                     ada = true;                    
                     total += parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
@@ -638,16 +671,25 @@
             });
         }
 
+        if($('input[name^="arr_dp_code"]').length > 0){
+            $('input[name^="arr_dp_code"]').each(function(index){
+                if($(this).is(':checked')){
+                    downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                }
+            });
+        }
+
         balance = grandtotal - downpayment;
 
-        $('#total').text(formatRupiahIni(total.tofixed(2).toString().replace('.',',')));
-        $('#tax').text(formatRupiahIni(tax.tofixed(2).toString().replace('.',',')));
-        $('#wtax').text(formatRupiahIni(wtax.tofixed(2).toString().replace('.',',')));
+        $('#downpayment').val(formatRupiahIni(roundTwoDecimal(downpayment).toString().replace('.',',')));
+        $('#total').text(formatRupiahIni(roundTwoDecimal(total).toString().replace('.',',')));
+        $('#tax').text(formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',',')));
+        $('#wtax').text(formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',',')));
         $('#grandtotal').text(
-            formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',','))
+            formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
         $('#balance').text(
-            (balance >= 0 ? '' : '-') + formatRupiahIni(balance.tofixed(2).toString().replace('.',','))
+            (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
         );
     }
 
@@ -660,6 +702,23 @@
             });
         }else{
             $('input[name^="arr_code"]').each(function(){
+                if($(this).is(':checked')){
+                    $(this).prop( "checked", false);
+                }
+            });
+        }
+        countAll();
+    }
+
+    function chooseAllDp(element){
+        if($(element).is(':checked')){
+            $('input[name^="arr_dp_code"]').each(function(){
+                if(!$(this).is(':checked')){
+                    $(this).prop( "checked", true);
+                }
+            });
+        }else{
+            $('input[name^="arr_dp_code"]').each(function(){
                 if($(this).is(':checked')){
                     $(this).prop( "checked", false);
                 }
@@ -685,8 +744,7 @@
                     status : $('#filter_status').val(),
                     type : $('#filter_type').val(),
                     'account_id[]' : $('#filter_account').val(),
-                    place_id : $('#filter_place').val(),
-                    department_id : $('#filter_department').val(),
+                    company_id : $('#filter_company').val(),
                     'currency_id[]' : $('#filter_currency').val(),
                 },
                 beforeSend: function() {
@@ -709,8 +767,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
-                { name: 'department_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'due_date', className: 'center-align' },
                 { name: 'document_date', className: 'center-align' },
@@ -790,8 +847,8 @@
                 formData.delete("arr_tax[]");
                 formData.delete("arr_wtax[]");
                 formData.delete("arr_grandtotal[]");
-                formData.delete("arr_is_wtax[]");
-                formData.delete("arr_percent_wtax[]");
+                formData.delete("arr_dp_code[]");
+                formData.delete("arr_nominal[]");
 
                 $('input[name^="arr_code"]').each(function(){
                     if($(this).is(':checked')){
@@ -801,8 +858,14 @@
                         formData.append('arr_tax[]',$('input[name^="arr_tax"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_wtax[]',$('input[name^="arr_wtax"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
-                        formData.append('arr_is_wtax[]',($('#arr_is_wtax' + $(this).data('id')).is(':checked') ? '1' : '0' ));
-                        formData.append('arr_percent_wtax[]',$('#arr_percent_wtax' + $(this).data('id')).val());
+                        
+                    }
+                });
+
+                $('input[name^="arr_dp_code"]').each(function(index){
+                    if($(this).is(':checked')){
+                        formData.append('arr_dp_code[]',$(this).val());
+                        formData.append('arr_nominal[]',$('input[name^="arr_nominal"]').eq(index).val());
                     }
                 });
 
@@ -920,8 +983,7 @@
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
                 $('#type').val(response.type).formSelect();
-                $('#place_id').val(response.place_id).formSelect();
-                $('#department_id').val(response.department_id).formSelect();
+                $('#company_id').val(response.company_id).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
@@ -973,27 +1035,43 @@
                                 <td class="right-align" id="row_grandtotal` + count + `">
                                     ` + val.grandtotal + `
                                 </td>
-                                <td class="center">
-                                    <div class="switch mb-0">
-                                        <label>
-                                            Tidak
-                                            <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="applyWtax('` + count + `');countAll();">
-                                            <span class="lever"></span>
-                                            Ya
-                                        </label>
-                                    </div>
-                                </td>
-                                <td class="center">
-                                    <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);applyWtax('` + count + `');countAll();" style="width:100px;">
+                                <td>
+                                    ` + val.info + `
                                 </td>
                             </tr>
                         `);
-                        if(val.is_wtax){
-                            $('#arr_is_wtax' + count).prop( "checked", true);
-                        }
-                        $('#arr_percent_wtax' + count).val(val.percent_wtax);
                     });
                 }
+
+                if(response.downpayments.length > 0){
+                    $('#body-detail-dp').empty();
+                    $.each(response.downpayments, function(i, val) {
+                        var count = makeid(10);
+                        $('#body-detail-dp').append(`
+                            <tr class="row_detail_dp">
+                                <td class="center-align">
+                                    <label>
+                                        <input type="checkbox" id="check` + count + `" name="arr_dp_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
+                                        <span>Pilih</span>
+                                    </label>
+                                </td>
+                                <td class="center">
+                                    ` + val.rawcode + `
+                                </td>
+                                <td class="center">
+                                    ` + val.post_date + `
+                                </td>
+                                <td class="center">
+                                    ` + val.grandtotal + `
+                                </td>
+                                <td class="center">
+                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
+                                </td>
+                            </tr>
+                        `);
+                    });                        
+                }
+
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -1096,7 +1174,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
         $.ajax({
             type : "POST",
@@ -1105,8 +1183,7 @@
                 search : search,
                 status : status,
                 type : type,
-                place : place,
-                department : department,
+                company : company,
                 'account[]' : account,
                 'currency[]' : currency
             },
@@ -1124,14 +1201,18 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), place = $('#filter_place').val(), department = $('#filter_department').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&place=" + place + "&department=" + department + "&account=" + account + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&company=" + company + "&account=" + account + "&currency=" + currency;
     }
 
     function addDays(){
-        var result = new Date($('#post_date').val());
-        result.setDate(result.getDate() + parseInt($('#top').val()));
-        $('#due_date').val(result.toISOString().split('T')[0]);
+        if($('#top').val()){
+            var result = new Date($('#post_date').val());
+            result.setDate(result.getDate() + parseInt($('#top').val()));
+            $('#due_date').val(result.toISOString().split('T')[0]);
+        }else{
+            $('#due_date').val(null);
+        }
     }
 </script>

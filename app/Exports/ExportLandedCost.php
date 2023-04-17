@@ -32,7 +32,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
         'PENGGUNA',
         'VENDOR',
         'GR.NO',
-        'PABRIK/KANTOR',
+        'PERUSAHAAN',
         'TGL.POST',
         'TGL.TENGGAT',
         'REFERENSI',
@@ -68,9 +68,6 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                         ->orWhereHas('user',function($query){
                             $query->where('name','like',"%$this->search%")
                                 ->orWhere('employee_no','like',"%$this->search%");
-                        })
-                        ->orWhereHas('goodReceiptMain',function($query){
-                            $query->where('code','like',"%$this->search%");
                         });
                 });
             }
@@ -101,7 +98,6 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                 $query->whereIn('currency_id',$arrCurrency);
             }
         })
-        ->whereIn('place_id',$this->dataplaces)
         ->get();
 
         $arr = [];
@@ -112,8 +108,8 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                 'code'          => $row->code,
                 'name'          => $row->user->name,
                 'vendor'        => $row->vendor->name,
-                'gr'            => $row->goodReceiptMain()->exists() ? $row->goodReceiptMain->code : '-',
-                'cabang'        => $row->place->name.' - '.$row->place->company->name,
+                'gr'            => $row->goodReceipt->code,
+                'company'       => $row->company->name,
                 'tgl_post'      => $row->post_date,
                 'tgl_due'       => $row->due_date,
                 'ref'           => $row->reference,

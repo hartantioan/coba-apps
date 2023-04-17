@@ -133,8 +133,7 @@
                         <th>Inv No.</th>
                         <th>Pengguna</th>
 						<th>Sup/Ven</th>
-						<th>Pabrik/Kantor</th>
-						<th>Dept.</th>
+						<th>Perusahaan</th>
                         <th>Tgl.Post</th>
                         <th>Tgl.Tenggat</th>
                         <th>Tgl.Dokumen</th>
@@ -159,8 +158,7 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
 							<td>{{ $row->account->name }}</td>
-                            <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
-                            <td>{{ $row->department->name }}</td>
+                            <td>{{ $row->company->name }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>

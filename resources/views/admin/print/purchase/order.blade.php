@@ -203,7 +203,7 @@
                                             <th>Discount 2 (%)</th>
                                             <th>Discount 3 (Rp)</th>
                                             <th>Subtotal</th>
-											<th>Pabrik/Kantor</th>
+											<th>Site</th>
 											<th>Departemen</th>
 											<th>Gudang</th>
                                         </tr>

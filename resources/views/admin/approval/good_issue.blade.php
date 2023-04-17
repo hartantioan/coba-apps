@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Permohonan Dana # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Barang Masuk # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -128,21 +128,13 @@
                         <small>Diajukan:</small>
                         <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
-                    <div class="mr-2">
-                        <small>Hingga:</small>
-                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
-                    </div>
-                    <div>
-                        <small>Dipakai:</small>
-                        <span>{{ date('d/m/y',strtotime($data->required_date)) }}</span>
-                    </div>
                 </div>
             </div>
         </div>
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Permohonan Dana</h5>
+                <h5 class="indigo-text">Barang Masuk</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -184,24 +176,6 @@
                 <h6 class="invoice-from">Lain-lain</h6>
                 <div class="row">
                     <div class="col s3">
-                        Bisnis Partner
-                    </div>
-                    <div class="col s9">
-                        {{ $data->account->name }}
-                    </div>
-                    <div class="col s3">
-                        Rekening Penerima
-                    </div>
-                    <div class="col s9">
-                        {{ $data->name_account }}
-                    </div>
-                    <div class="col s3">
-                        No. Rekening
-                    </div>
-                    <div class="col s9">
-                        {{ $data->no_account }}
-                    </div>
-                    <div class="col s3">
                         Lampiran
                     </div>
                     <div class="col s9">
@@ -227,34 +201,28 @@
                     <th class="center">Sat.</th>
                     <th class="center">Harga @</th>
                     <th class="center">Harga Total.</th>
+                    <th class="center">Coa</th>
+                    <th class="center">Site</th>
+                    <th class="center">Departemen</th>
+                    <th class="center">Dari Gudang</th>
+                    <th class="center">Keterangan</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data->fundRequestDetail as $row)
+                @foreach($data->goodReceiveDetail as $row)
                 <tr>
-                    <td>{{ $row->note }}</td>
-                    <td class="center-align">{{ $row->qty }}</td>
-                    <td class="center-align">{{ $row->unit->code }}</td>
+                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                    <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                    <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                     <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
                     <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
+                    <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                    <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                    <td class="center-align">{{ $row->department->name }}</td>
+                    <td class="center-align">{{ $row->warehouse->name }}</td>
+                    <td>{{ $row->note }}</td>
                 </tr>
                 @endforeach
-                <tr>
-                    <td colspan="4" class="right-align">Total</td>
-                    <td class="right-align">{{ number_format($data->total,3,',','.') }}</td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="right-align">PPN</td>
-                    <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="right-align">PPH</td>
-                    <td class="right-align">{{ number_format($data->wtax,3,',','.') }}</td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="right-align">Grandtotal</td>
-                    <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
-                </tr>
             </tbody>
         </table>
     </div>

@@ -44,6 +44,7 @@ use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReceiveController;
+use App\Http\Controllers\Inventory\GoodIssueController;
 
 use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
@@ -627,6 +628,19 @@ Route::prefix('admin')->group(function () {
                 Route::get('approval/{id}',[GoodReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('void_status', [GoodReceiveController::class, 'voidStatus'])->middleware('operation.access:good_receive,void');
                 Route::post('destroy', [GoodReceiveController::class, 'destroy'])->middleware('operation.access:good_receive,delete');
+            });
+
+            Route::prefix('good_issue')->middleware('operation.access:good_issue,view')->group(function () {
+                Route::get('/',[GoodIssueController::class, 'index']);
+                Route::get('datatable',[GoodIssueController::class, 'datatable']);
+                Route::get('row_detail',[GoodIssueController::class, 'rowDetail']);
+                Route::post('show', [GoodIssueController::class, 'show']);
+                Route::post('print',[GoodIssueController::class, 'print']);
+                Route::get('export',[GoodIssueController::class, 'export']);
+                Route::post('create',[GoodIssueController::class, 'create'])->middleware('operation.access:good_issue,update');
+                Route::get('approval/{id}',[GoodIssueController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('void_status', [GoodIssueController::class, 'voidStatus'])->middleware('operation.access:good_issue,void');
+                Route::post('destroy', [GoodIssueController::class, 'destroy'])->middleware('operation.access:good_issue,delete');
             });
         });
 

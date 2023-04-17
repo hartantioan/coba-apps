@@ -13,31 +13,25 @@ return new class extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('outgoing_payments'))
-        Schema::create('outgoing_payments', function (Blueprint $table) {
+        Schema::create('good_issues', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 50)->unique();
+            $table->string('code',155)->unique();
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('company_id')->nullable();
-            $table->bigInteger('account_id')->nullable();
-            $table->bigInteger('payment_request_id')->nullable();
-            $table->bigInteger('coa_source_id')->nullable();
+            $table->date('post_date')->nullable();
             $table->bigInteger('currency_id')->nullable();
             $table->double('currency_rate')->nullable();
-            $table->date('post_date')->nullable();
-            $table->date('pay_date')->nullable();
-            $table->double('admin')->nullable();
-            $table->double('grandtotal')->nullable();
+            $table->string('note')->nullable();
             $table->string('document')->nullable();
-            $table->text('note')->nullable();
-            $table->char('status', 1)->nullable();
+            $table->double('grandtotal')->nullable();
+            $table->char('status','1')->nullable();
             $table->bigInteger('void_id')->nullable();
             $table->string('void_note')->nullable();
             $table->timestamp('void_date')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id','account_id','company_id','coa_source_id','currency_id','payment_request_id'],'outgoing_payment_index');
+            $table->index(['user_id','company_id','currency_id'],'good_issues_index');
         });
     }
 
@@ -48,6 +42,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('outgoing_payments');
+        Schema::dropIfExists('good_issues');
     }
 };

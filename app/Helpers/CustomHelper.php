@@ -6,6 +6,7 @@ use App\Models\ApprovalTable;
 use App\Models\ApprovalSource;
 use App\Models\Capitalization;
 use App\Models\Coa;
+use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
@@ -65,7 +66,7 @@ class CustomHelper {
 			]);
 		}elseif($type == 'OUT'){
 			if($old_data){
-				$priceeach = $old_data->total_final / $qty;
+				$priceeach = $old_data->price_final;
 				$totalout = round($priceeach * $qty,3);
 				$qtybalance = $old_data->qty_final - $qty;
 				$totalfinal = round($qtybalance * $priceeach,3);
@@ -393,8 +394,8 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
+				'account_id'	=> $op->account_id,
 				'code'			=> Journal::generateCode(),
-				'place_id'		=> $op->place_id,
 				'lookable_type'	=> 'outgoing_payments',
 				'lookable_id'	=> $op->id,
 				'currency_id'	=> $op->currency_id,
@@ -408,9 +409,6 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->coa_id,
-					'place_id'		=> isset($row->lookable->place_id) ? $row->lookable->place_id : NULL,
-					'department_id'	=> isset($row->lookable->department_id) ? $row->lookable->department_id : NULL,
-					'warehouse_id'	=> isset($row->lookable->warehouse_id) ? $row->lookable->warehouse_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> $row->nominal,
 				]);
@@ -420,7 +418,7 @@ class CustomHelper {
 				$query->where('table_name',$table_name);
 			})
 			->whereHas('coa', function($query) use($data){
-				$query->where('company_id',Place::find($data->place_id)->company_id);
+				$query->where('company_id',$data->company_id);
 			})
 			->where('currency_id',$data->currency_id)->get();
 
@@ -434,7 +432,6 @@ class CustomHelper {
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
-							'place_id'		=> $op->place_id,
 							'type'			=> $row->type,
 							'nominal'		=> $nominal
 						]);
@@ -445,7 +442,6 @@ class CustomHelper {
 			JournalDetail::create([
 				'journal_id'	=> $query->id,
 				'coa_id'		=> $op->coa_source_id,
-				'place_id'		=> $op->place_id,
 				'type'			=> '2',
 				'nominal'		=> $op->grandtotal,
 			]);
@@ -505,6 +501,65 @@ class CustomHelper {
 					$row->item_id,
 					$row->qty,
 					'IN'
+				);
+			}
+
+		}elseif($table_name == 'good_issues'){
+
+			$gr = GoodIssue::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> 'good_issues',
+				'lookable_id'	=> $gr->id,
+				'currency_id'	=> $gr->currency_id,
+				'currency_rate'	=> $gr->currency_rate,
+				'post_date'		=> $gr->post_date,
+				'note'			=> $gr->code,
+				'status'		=> '3'
+			]);
+
+			foreach($gr->goodIssueDetail as $row){
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->coa_id,
+					'place_id'		=> $row->place_id,
+					'department_id'	=> $row->department_id,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $row->total,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->item->itemGroup->coa_id,
+					'place_id'		=> $row->place_id,
+					'department_id'	=> $row->department_id,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '2',
+					'nominal'		=> $row->total,
+				]);
+
+				self::sendCogs('good_issues',
+					$gr->id,
+					$row->place->company_id,
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					$row->total,
+					'OUT',
+					$gr->post_date
+				);
+
+				self::sendStock(
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					'OUT'
 				);
 			}
 			
@@ -574,6 +629,7 @@ class CustomHelper {
 					}
 				}
 			}
+		}elseif($table_name == 'fund_requests'){
 
 		}else{
 

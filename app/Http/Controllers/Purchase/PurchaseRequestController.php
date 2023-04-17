@@ -505,6 +505,7 @@ class PurchaseRequestController extends Controller
                         $query->document = $document;
                         $query->project_id = $request->project_id ? $request->project_id : NULL;
                         $query->place_id = $request->place_id;
+                        $query->department_id = session('bo_department_id');
                         $query->save();
 
                         foreach($query->purchaseRequestDetail as $row){

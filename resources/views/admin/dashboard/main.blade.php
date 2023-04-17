@@ -107,7 +107,31 @@
                     <div id="intro">
                         <div class="row">
                             <div class="col s12">
-
+                                @php
+                                    /* $prq = [];
+                                    foreach($pr as $key => $row){
+                                        $prq[$key]['code'] = $row->code;
+                                        foreach($row->purchaseRequestDetail as $keykey => $rowprd){
+                                            foreach($rowprd->purchaseOrderDetail as $keydetail => $rowpod){
+                                                $prq[$key]['po'][$keykey]['code'] = $rowpod->purchaseOrder->code.' - poid - '.$rowpod->id.' index '.$keykey;
+                                                foreach($rowpod->goodReceiptDetail as $rowgrd){
+                                                    $prq[$key]['po'][$keykey]['gr'][] = $rowgrd->goodReceipt->code;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    echo json_encode($prq); */
+                                    $arr = [];
+                                    foreach($pr1->purchaseRequestDetail as $keykey => $rowprd){
+                                        foreach($rowprd->purchaseOrderDetail as $keydetail => $rowpod){
+                                            $arr[$key]['po'][$keykey]['code'] = $rowpod->purchaseOrder->code.' - poid - '.$rowpod->id.' index '.$keykey;
+                                            foreach($rowpod->goodReceiptDetail as $rowgrd){
+                                                $arr[$key]['po'][$keykey]['gr'][] = $rowgrd->goodReceipt->code;
+                                            }
+                                        }
+                                    }
+                                    echo json_encode($arr);
+                                @endphp
                                 <div id="img-modal" class="modal white">
                                     <div class="modal-content">
                                         <div class="bg-img-div"></div>

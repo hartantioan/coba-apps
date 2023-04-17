@@ -73,11 +73,11 @@ class Item extends Model
     public function currentCogs($dataplaces){
         $arrPrice = [];
         foreach($dataplaces as $row){
-            $price = ItemCogs::where('item_id',$this->id)->where('company_id',Place::find(intval($row))->company_id)->orderByDesc('id')->first();
+            $price = ItemCogs::where('item_id',$this->id)->where('place_id',intval($row))->orderByDesc('id')->first();
             if($price){
                 $arrPrice[] = [
                     'description'   => $price->company->name.' - '.date('d/m/y',strtotime($price->date)),
-                    'price'         => number_format($price->price_final,3,',','.'),
+                    'price'         => number_format($price->price_final,2,',','.'),
                 ];
             }
         }

@@ -73,12 +73,12 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_place" style="font-size:1rem;">Pabrik :</label>
+                                                <label for="filter_company" style="font-size:1rem;">Pabrik :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_place" onchange="loadDataTable()">
+                                                    <select class="form-control" id="filter_company" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
-                                                        @foreach ($place as $rowplace)
-                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                                        @foreach ($company as $rowcompany)
+                                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -123,7 +123,7 @@
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Partner Bisnis</th>
-                                                        <th rowspan="2">Pabrik/Kantor</th>
+                                                        <th rowspan="2">Perusahaan</th>
                                                         <th rowspan="2">Referensi</th>
                                                         <th rowspan="2">Kas/Bank</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
@@ -174,13 +174,12 @@
                                 <label class="active" for="account_id">Partner Bisnis</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="place_id" name="place_id">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $rowcompany)
+                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="place_id">Pabrik/Kantor</label>
+                                <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="browser-default" id="coa_source_id" name="coa_source_id"></select>
@@ -451,7 +450,7 @@
                 data: {
                     status : $('#filter_status').val(),
                     'account_id[]' : $('#filter_account').val(),
-                    place_id : $('#filter_place').val(),
+                    company_id : $('#filter_company').val(),
                     'currency_id[]' : $('#filter_currency').val(),
                 },
                 beforeSend: function() {
@@ -474,7 +473,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'payment_request_id', className: 'center-align' },
                 { name: 'coa_source_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
@@ -656,7 +655,7 @@
                     $('#coa_source_id').empty().append(`
                         <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
                     `);
-                    $('#place_id').val(response.place_id).formSelect();
+                    $('#company_id').val(response.company_id).formSelect();
                     $('#currency_id').val(response.currency_id).formSelect();
                     $('#currency_rate').val(response.currency_rate);
                     $('#post_date').val(response.post_date);
@@ -777,7 +776,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), place = $('#filter_place').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
         $.ajax({
             type : "POST",
@@ -785,7 +784,7 @@
             data : {
                 search : search,
                 status : status,
-                place : place,
+                company : company,
                 'account[]' : account,
                 'currency[]' : currency
             },
@@ -803,8 +802,8 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), place = $('#filter_place').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&place=" + place + "&account=" + account + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&company=" + company + "&account=" + account + "&currency=" + currency;
     }
 </script>

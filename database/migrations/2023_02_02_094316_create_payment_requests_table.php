@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('code', 50)->unique();
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('account_id')->nullable();
-            $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->bigInteger('coa_source_id')->nullable();
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
@@ -42,7 +42,7 @@ return new class extends Migration
 
             $table->index(['user_id']);
             $table->index(['account_id']);
-            $table->index(['place_id']);
+            $table->index(['company_id']);
             $table->index(['coa_source_id']);
             $table->index(['currency_id']);
         });

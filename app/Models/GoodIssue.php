@@ -8,49 +8,39 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class PaymentRequest extends Model
+class GoodIssue extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'payment_requests';
+    protected $table = 'good_issues';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
-        'account_id',
         'company_id',
-        'coa_source_id',
         'post_date',
-        'due_date',
-        'pay_date',
         'currency_id',
         'currency_rate',
-        'admin',
-        'grandtotal',
-        'document',
-        'account_bank',
-        'account_no',
-        'account_name',
         'note',
+        'document',
+        'grandtotal',
         'status',
         'void_id',
         'void_note',
         'void_date',
     ];
 
-    public function user()
-    {
-        return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    public function used(){
+        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
-    public function voidUser()
-    {
-        return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
+    public function user(){
+        return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
 
-    public function account(){
-        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
+    public function voidUser(){
+        return $this->belongsTo('App\Models\User','void_id','id')->withTrashed();
     }
 
     public function currency()
@@ -63,32 +53,18 @@ class PaymentRequest extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function coaSource()
+    public function goodIssueDetail()
     {
-        return $this->belongsTo('App\Models\Coa', 'coa_source_id', 'id')->withTrashed();
-    }
-
-    public function used(){
-        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
-    }
-
-    public function paymentRequestDetail()
-    {
-        return $this->hasMany('App\Models\PaymentRequestDetail');
-    }
-
-    public function outgoingPayment()
-    {
-        return $this->hasOne('App\Models\OutgoingPayment', 'payment_request_id', 'id');
+        return $this->hasMany('App\Models\GoodIssueDetail');
     }
 
     public function status(){
         $status = match ($this->status) {
-          '1' => '<span class="amber medium-small white-text padding-1">Menunggu</span>',
-          '2' => '<span class="cyan medium-small white-text padding-1">Proses</span>',
-          '3' => '<span class="green medium-small white-text padding-1">Selesai</span>',
-          '4' => '<span class="red medium-small white-text padding-1">Ditolak</span>',
-          '5' => '<span class="red darken-4 medium-small white-text padding-1">Void</span>',
+          '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
+          '2' => '<span class="cyan medium-small white-text padding-3">Proses</span>',
+          '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
+          '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
+          '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
@@ -127,7 +103,7 @@ class PaymentRequest extends Model
 
     public static function generateCode()
     {
-        $query = PaymentRequest::selectRaw('RIGHT(code, 9) as code')
+        $query = GoodIssue::selectRaw('RIGHT(code, 9) as code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();
@@ -140,13 +116,13 @@ class PaymentRequest extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'PYR-'.date('y').date('m').date('d').'-';
+        $pre = 'GI-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->first();
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
         if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{

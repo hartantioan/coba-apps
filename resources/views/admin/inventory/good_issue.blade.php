@@ -88,7 +88,7 @@
                                         <div class="col s12">
                                             <div class="card-alert card purple">
                                                 <div class="card-content white-text">
-                                                    <p>Info : Harga yand anda masukkan disini akan mempengaruhi nilai rata-rata barang dan qty stock saat ini.</p>
+                                                    <p>Info : Harga yand anda masukkan disini akan mempengaruhi qty stock saat ini.</p>
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>
@@ -183,7 +183,7 @@
                                                     <th class="center">Harga HPP</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">Keterangan</th>
-                                                    <th class="center">Coa Kredit</th>
+                                                    <th class="center">Coa Debit</th>
                                                     <th class="center">Site</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
@@ -321,6 +321,7 @@
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
             if($("#arr_item" + val).select2('data')[0].price_list.length){
+                $("#rowPrice" + val).val($("#arr_item" + val).select2('data')[0].price_list[0].price);
                 $('#tempPrice' + val).empty();
                 $.each($("#arr_item" + val).select2('data')[0].price_list, function(i, value) {
                     $('#tempPrice' + val).append(`
@@ -332,6 +333,7 @@
             $('#tempPrice' + val).empty();
         }
     }
+
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -427,7 +429,7 @@
                     <span id="arr_unit` + count + `">-</span>
                 </td>
                 <td class="center">
-                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`" readonly>
                     <datalist id="tempPrice` + count + `"></datalist>
                 </td>
                 <td class="right-align">
@@ -613,7 +615,7 @@
                                     <span id="arr_unit` + count + `">` + val.unit + `</span>
                                 </td>
                                 <td class="center">
-                                    <input name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                                    <input name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`" readonly>
                                     <datalist id="tempPrice` + count + `"></datalist>
                                 </td>
                                 <td class="right-align">

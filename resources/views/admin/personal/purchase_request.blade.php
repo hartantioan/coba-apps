@@ -156,7 +156,7 @@
                                                 <th class="center">Keterangan</th>
                                                 <th class="center">Tgl.Dipakai</th>
                                                 <th class="center">Gudang Tujuan</th>
-                                                <th class="center">Plant/Pabrik</th>
+                                                <th class="center">Site</th>
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Hapus</th>
                                             </tr>

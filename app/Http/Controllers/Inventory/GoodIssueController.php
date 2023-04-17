@@ -16,16 +16,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\GoodReceive;
-use App\Models\GoodReceiveDetail;
+use App\Models\GoodIssue;
+use App\Models\GoodIssueDetail;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Department;
-use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
-use App\Exports\ExportGoodReceive;
+use App\Exports\ExportGoodIssue;
 
-class GoodReceiveController extends Controller
+class GoodIssueController extends Controller
 {
     protected $dataplaces;
 
@@ -38,8 +37,8 @@ class GoodReceiveController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Barang Masuk',
-            'content'   => 'admin.inventory.good_receive',
+            'title'     => 'Barang Keluar',
+            'content'   => 'admin.inventory.good_issue',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'currency'  => Currency::where('status','1')->get(),
@@ -67,15 +66,15 @@ class GoodReceiveController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReceive::count();
+        $total_data = GoodIssue::count();
         
-        $query_data = GoodReceive::where(function($query) use ($search, $request) {
+        $query_data = GoodIssue::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodReceiveDetail', function($query) use($search, $request){
+                            ->orWhereHas('goodIssueDetail', function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -97,13 +96,13 @@ class GoodReceiveController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = GoodReceive::where(function($query) use ($search, $request) {
+        $total_filtered = GoodIssue::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodReceiveDetail', function($query) use($search, $request){
+                            ->orWhereHas('goodIssueDetail', function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -207,7 +206,7 @@ class GoodReceiveController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = GoodReceive::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = GoodIssue::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
@@ -225,7 +224,7 @@ class GoodReceiveController extends Controller
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
                             }
-                            $document = $request->file('file')->store('public/good_receives');
+                            $document = $request->file('file')->store('public/good_issues');
                         } else {
                             $document = $query->document;
                         }
@@ -240,7 +239,7 @@ class GoodReceiveController extends Controller
                         $query->grandtotal = $grandtotal;
                         $query->save();
 
-                        foreach($query->goodReceiveDetail as $row){
+                        foreach($query->goodIssueDetail as $row){
                             $row->delete();
                         }
 
@@ -257,14 +256,14 @@ class GoodReceiveController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = GoodReceive::create([
-                        'code'			        => GoodReceive::generateCode(),
+                    $query = GoodIssue::create([
+                        'code'			        => GoodIssue::generateCode(),
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,
                         'currency_id'           => $request->currency_id,
                         'currency_rate'         => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'document'              => $request->file('document') ? $request->file('document')->store('public/good_receives') : NULL,
+                        'document'              => $request->file('document') ? $request->file('document')->store('public/good_issues') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
                         'grandtotal'            => $grandtotal
@@ -281,8 +280,8 @@ class GoodReceiveController extends Controller
                 try {
                     foreach($request->arr_item as $key => $row){
                         
-                        GoodReceiveDetail::create([
-                            'good_receive_id'       => $query->id,
+                        GoodIssueDetail::create([
+                            'good_issue_id'         => $query->id,
                             'item_id'               => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
@@ -296,8 +295,8 @@ class GoodReceiveController extends Controller
 
                     }
 
-                    CustomHelper::sendApproval('good_receives',$query->id,$query->note);
-                    CustomHelper::sendNotification('good_receives',$query->id,'Barang Masuk No. '.$query->code,$query->note,session('bo_id'));
+                    CustomHelper::sendApproval('good_issues',$query->id,$query->note);
+                    CustomHelper::sendNotification('good_issues',$query->id,'Barang Keluar No. '.$query->code,$query->note,session('bo_id'));
                     
                     DB::commit();
                 }catch(\Exception $e){
@@ -305,10 +304,10 @@ class GoodReceiveController extends Controller
                 }
 
                 activity()
-                    ->performedOn(new GoodReceive())
+                    ->performedOn(new GoodIssue())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit penerimaan barang.');
+                    ->log('Add / edit penggunaan barang.');
 
 				$response = [
 					'status'    => 200,
@@ -326,7 +325,7 @@ class GoodReceiveController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = GoodReceive::find($request->id);
+        $data   = GoodIssue::find($request->id);
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12">
                     <table style="max-width:800px;">
@@ -401,12 +400,12 @@ class GoodReceiveController extends Controller
     }
 
     public function show(Request $request){
-        $gr = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $gr = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
         $gr['currency_rate'] = number_format($gr->currency_rate,3,',','.');
 
         $arr = [];
         
-        foreach($gr->goodReceiveDetail as $row){
+        foreach($gr->goodIssueDetail as $row){
             $arr[] = [
                 'item_id'       => $row->item_id,
                 'item_name'     => $row->item->code.' - '.$row->item->name,
@@ -430,7 +429,7 @@ class GoodReceiveController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(in_array($query->status,['4','5'])){
@@ -446,17 +445,17 @@ class GoodReceiveController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                CustomHelper::removeJournal('good_receives',$query->id);
-                CustomHelper::removeCogs('good_receives',$query->id);
+                CustomHelper::removeJournal('good_issues',$query->id);
+                CustomHelper::removeCogs('good_issues',$query->id);
     
                 activity()
-                    ->performedOn(new GoodReceive())
+                    ->performedOn(new GoodIssue())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the good receive data');
     
-                CustomHelper::sendNotification('good_receives',$query->id,'Barang Masuk No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('good_receives',$query->id);
+                CustomHelper::sendNotification('good_issues',$query->id,'Barang Keluar No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('good_issues',$query->id);
                 
                 $response = [
                     'status'  => 200,
@@ -474,7 +473,7 @@ class GoodReceiveController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
@@ -496,15 +495,15 @@ class GoodReceiveController extends Controller
         
         if($query->delete()) {
 
-            CustomHelper::removeJournal('good_receives',$query->id);
-            CustomHelper::removeCogs('good_receives',$query->id);
+            CustomHelper::removeJournal('good_issues',$query->id);
+            CustomHelper::removeCogs('good_issues',$query->id);
 
-            $query->goodReceiveDetail()->delete();
+            $query->goodIssueDetail()->delete();
 
-            CustomHelper::removeApproval('good_receives',$query->id);
+            CustomHelper::removeApproval('good_issues',$query->id);
 
             activity()
-                ->performedOn(new GoodReceive())
+                ->performedOn(new GoodIssue())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
                 ->log('Delete the good receive data');
@@ -525,15 +524,15 @@ class GoodReceiveController extends Controller
 
     public function approval(Request $request,$id){
         
-        $gr = GoodReceive::where('code',CustomHelper::decrypt($id))->first();
+        $gr = GoodIssue::where('code',CustomHelper::decrypt($id))->first();
                 
         if($gr){
             $data = [
-                'title'     => 'Print Good Receive (Barang Masuk)',
+                'title'     => 'Print Good Receive (Barang Keluar)',
                 'data'      => $gr
             ];
 
-            return view('admin.approval.good_receive', $data);
+            return view('admin.approval.good_issue', $data);
         }else{
             abort(404);
         }
@@ -542,14 +541,14 @@ class GoodReceiveController extends Controller
     public function print(Request $request){
 
         $data = [
-            'title' => 'GOOD RECEIVE REPORT',
-            'data' => GoodReceive::where(function ($query) use ($request) {
+            'title' => 'GOOD ISSUE REPORT',
+            'data' => GoodIssue::where(function ($query) use ($request) {
                 if($request->search) {
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('post_date', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
-                            ->orWhereHas('goodReceiveDetail', function($query) use($request){
+                            ->orWhereHas('goodIssueDetail', function($query) use($request){
                                 $query->whereHas('item',function($query) use($request){
                                     $query->where('code', 'like', "%$request->search%")
                                         ->orWhere('name','like',"%$request->search%");
@@ -569,10 +568,10 @@ class GoodReceiveController extends Controller
             ->get()
 		];
 		
-		return view('admin.print.inventory.good_receive', $data);
+		return view('admin.print.inventory.good_issue', $data);
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportGoodReceive($request->search,$request->status,$this->dataplaces), 'good_receive_'.uniqid().'.xlsx');
+		return Excel::download(new ExportGoodIssue($request->search,$request->status,$this->dataplaces), 'good_issue_'.uniqid().'.xlsx');
     }
 }

@@ -18,7 +18,7 @@ class OutgoingPayment extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'place_id',
+        'company_id',
         'account_id',
         'payment_request_id',
         'coa_source_id',
@@ -55,9 +55,9 @@ class OutgoingPayment extends Model
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function company()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function paymentRequest()

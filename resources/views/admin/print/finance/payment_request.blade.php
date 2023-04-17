@@ -130,7 +130,7 @@
                         <th rowspan="2">Code</th>
                         <th rowspan="2">Pengguna</th>
                         <th rowspan="2">Partner Bisnis</th>
-                        <th rowspan="2">Pabrik/Kantor</th>
+                        <th rowspan="2">Perusahaan</th>
                         <th rowspan="2">Kas/Bank</th>
                         <th colspan="3" class="center-align">Tanggal</th>
                         <th colspan="2" class="center-align">Mata Uang</th>
@@ -158,7 +158,7 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
                             <td>{{ $row->account->name }}</td>
-                            <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                            <td>{{ $row->company->name }}</td>
                             <td>{{ $row->coaSource->name }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>

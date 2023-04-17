@@ -87,7 +87,7 @@ class PurchaseOrderDetail extends Model
     }
 
     public function goodReceiptDetail(){
-        return $this->hasMany('App\Models\GoodReceiptDetail');
+        return $this->hasMany('App\Models\GoodReceiptDetail','purchase_order_detail_id','id');
     }
 
     public function getBalanceReceipt()

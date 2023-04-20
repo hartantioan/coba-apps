@@ -13,11 +13,11 @@
 			}
 			
 			th {
-				font-size:12px;
+				font-size:10px;
 			}
 		
 			.invoice-box {
-				font-size: 16px;
+				font-size: 12px;
 				font-family: 'Lato', sans-serif;
 				color: #555;
 				page-break-after: always;
@@ -123,58 +123,69 @@
 					</td>
 				</tr>
 			</table><br>
-			<table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:13px;">
+			<table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:10px;">
 				<thead>
 					<tr align="center">
-						<th>No</th>
-                        <th>No Kapitalisasi</th>
-						<th>Pengguna</th>
-						<th>Perusahaan</th>
-                        <th>Mata Uang</th>
+						<th rowspan="2">No</th>
+                        <th rowspan="2">Pengguna</th>
+						<th rowspan="2">Code</th>
+                        <th rowspan="2">Perusahaan</th>
+                        <th rowspan="2">Tanggal</th>
+                        <th colspan="2">Mata Uang</th>
+                        <th rowspan="2">Keterangan</th>
+                        <th rowspan="2">Dokumen</th>
+                        <th rowspan="2">Status</th>
+					</tr>
+                    <tr align="center">
+                        <th>Kode</th>
                         <th>Konversi</th>
-                        <th>Tanggal</th>
-                        <th>Keterangan</th>
-                        <th>Status</th>
 					</tr>
 				</thead>
 				<tbody>
 					@foreach($data as $key => $row)
-                        <tr align="center" style="background-color:#d6d5d5;">
+                        <tr align="center">
                             <td>{{ $key+1 }}</td>
-                            <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
+                            <td>{{ $row->code }}</td>
                             <td>{{ $row->company->name }}</td>
+                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ $row->currency->code }}</td>
                             <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                             <td>{{ $row->note }}</td>
+                            <td><a href="{{ $row->attachment() }}">File</a></td>
                             <td>{!! $row->status() !!}</td>
                         </tr>
                         <tr>
-                            <td colspan="12">
-                                <table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:13px;">
+                            <td colspan="10" style="border-right-style: none !important;">
+                                <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
-                                            <th>No.</th>
-                                            <th>Aset</th>
-                                            <th>Harga</th>
+                                            <th>Item</th>
                                             <th>Qty</th>
                                             <th>Satuan</th>
-                                            <th>Total</th>
+                                            <th>Harga Satuan</th>
+                                            <th>Harga Total</th>
                                             <th>Keterangan</th>
+                                            <th>Coa</th>
+											<th>Site</th>
+											<th>Departemen</th>
+                                            <th>Dari Gudang</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($row->capitalizationDetail as $key1 => $rowdetail)
-                                            <tr>
-                                                <td align="center">{{ $key1 + 1 }}</td>
-                                                <td>{{ $rowdetail->asset->name }}</td>
-                                                <td align="right">{{ number_format($rowdetail->price,3,',','.') }}</td>
-                                                <td align="center">{{ number_format($rowdetail->qty,3,',','.') }}</td>
-                                                <td align="center">{{ $rowdetail->unit->code }}</td>
-                                                <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
-                                                <td>{{ $rowdetail->note }}</td>
-                                            </tr>
+                                        @foreach($row->goodIssueDetail as $key1 => $rowdetail)
+                                        <tr align="center">
+                                            <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
+                                            <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                                            <td>{{ $rowdetail->item->uomUnit->code }}</td>
+                                            <td align="right">{{ number_format($rowdetail->price,3,',','.') }}</td>
+                                            <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
+                                            <td>{{ $rowdetail->note }}</td>
+                                            <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
+											<td>{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+											<td>{{ $rowdetail->department->name }}</td>
+                                            <td>{{ $rowdetail->warehouse->name }}</td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                 </table>

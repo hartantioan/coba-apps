@@ -2,6 +2,10 @@
     .modal {
         top:0px !important;
     }
+
+    .select2-dropdown {
+        width: 200px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">

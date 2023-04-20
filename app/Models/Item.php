@@ -84,4 +84,19 @@ class Item extends Model
         
         return $arrPrice;
     }
+
+    public function currentStock($dataplaces){
+        $arrData = [];
+        foreach($dataplaces as $row){
+            $data = ItemStock::where('item_id',$this->id)->where('place_id',intval($row))->get();
+            foreach($data as $detail){
+                $arrData[] = [
+                    'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
+                    'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
+                ];
+            }
+        }
+        
+        return $arrData;
+    }
 }

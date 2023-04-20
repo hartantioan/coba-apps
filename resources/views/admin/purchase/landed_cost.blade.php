@@ -385,7 +385,6 @@
 
 <!-- END: Page Main-->
 <script>
-    var arrQty = [];
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
@@ -520,16 +519,14 @@
                                 $(this).remove();
                             });
 
-                            arrQty = [];
-
                             $('#last-row-item').remove();
 
                             $.each(response.details, function(i, val) {
-                                arrQty.push(val.qtyRaw);
                                 var count = makeid(10);
                                 $('#body-item').append(`
                                     <tr class="row_item">
                                         <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_total[]" value="` + val.totalrow + `">
                                         <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
                                         <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
@@ -591,7 +588,6 @@
             if($('.data-used').length > 0){
                 $('.data-used').trigger('click');
             }
-            arrQty = [];
         }
     }
 
@@ -653,18 +649,16 @@
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
-        if($('.nominalitem').length > 0){
-            if(arrQty.length > 0){
-                let totalqty = 0;
-                for(let i=0;i<arrQty.length;i++){
-                    totalqty += parseFloat(arrQty[i]);
-                }
+        if($('input[name^="arr_total"]').length > 0){
+            let totalall = 0;
+            $('input[name^="arr_total"]').each(function(){
+                totalall += parseFloat($(this).val());
+            });
 
-                for(let i=0;i<arrQty.length;i++){
-                    let totalrow = (parseFloat(arrQty[i]) / totalqty) * total;
-                    $('input[name^="arr_price"]:eq(' + i + ')').val(formatRupiahIni(totalrow.toFixed(5).toString().replace('.',',')));
-                }
-            }
+            $('input[name^="arr_total"]').each(function(index){
+                let totalrow = (parseFloat($(this).val()) / totalall) * total;
+                $('input[name^="arr_price"]:eq(' + index + ')').val(formatRupiahIni(totalrow.toFixed(5).toString().replace('.',',')));
+            })
         }
     }
 

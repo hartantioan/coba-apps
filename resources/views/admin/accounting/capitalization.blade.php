@@ -85,7 +85,7 @@
                                                         <th>#</th>
                                                         <th>No</th>
                                                         <th>Pengguna</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Perusahaan</th>
                                                         <th>Mata Uang</th>
                                                         <th>Konversi</th>
                                                         <th>Tgl.Kapitalisasi</th>
@@ -120,16 +120,12 @@
                     <div class="col s12">
                         <div class="input-field col s4">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Auto generate" readonly>
-                            <label class="active" for="code">Kode</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <select class="form-control" id="place_id" name="place_id">
-                                @foreach($place as $b)
-                                    <option value="{{ $b->id }}">{{ $b->name.' - '.$b->company->name }}</option>
+                            <select class="form-control" id="company_id" name="company_id">
+                                @foreach($company as $rowcompany)
+                                    <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="place_id">Pabrik/Kantor</label>
+                            <label class="" for="company_id">Perusahaan</label>
                         </div>
                         <div class="input-field col s4">
                             <select class="form-control" id="currency_id" name="currency_id">
@@ -176,6 +172,7 @@
                                         <th class="center">No.</th>
                                         <th class="center">Kode Aset</th>
                                         <th class="center">Nama Aset</th>
+                                        <th class="center">Site</th>
                                         <th class="center">Harga@</th>
                                         <th class="center">Qty</th>
                                         <th class="center">Unit</th>
@@ -186,7 +183,7 @@
                                 </thead>
                                 <tbody id="body-asset">
                                     <tr id="empty-detail">
-                                        <td colspan="9" class="center">
+                                        <td colspan="10" class="center">
                                             Pilih aset untuk memulai...
                                         </td>
                                     </tr>
@@ -220,7 +217,7 @@
 </div>
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1" onclick="getCode();">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
     </a>
 </div>
@@ -307,7 +304,7 @@
         });
         $('#body-asset').empty().append(`
             <tr id="empty-detail">
-                <td colspan="9" class="center">
+                <td colspan="10" class="center">
                     Pilih aset untuk memulai...
                 </td>
             </tr>
@@ -330,6 +327,9 @@
                     </td>
                     <td>
                         ` + $("#asset_id").select2('data')[0].name + `
+                    </td>
+                    <td>
+                        ` + $("#asset_id").select2('data')[0].place_name + `
                     </td>
                     <td class="center">
                         <input type="text" id="arr_price` + count + `" name="arr_price[]" value="0" onkeyup="formatRupiah(this);count();">
@@ -647,34 +647,6 @@
                             icon: 'error'
                         });
                     }
-                });
-            }
-        });
-    }
-
-    function getCode(){
-        $.ajax({
-            url: '{{ Request::url() }}/get_code',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {},
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#code');
-            },
-            success: function(response) {
-                loadingClose('#code');
-                $('#code').val(response.code);
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('#code');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
                 });
             }
         });

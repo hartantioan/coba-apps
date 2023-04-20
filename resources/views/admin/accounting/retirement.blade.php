@@ -85,7 +85,7 @@
                                                         <th>#</th>
                                                         <th>No</th>
                                                         <th>Pengguna</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Site</th>
                                                         <th>Mata Uang</th>
                                                         <th>Konversi</th>
                                                         <th>Tanggal</th>

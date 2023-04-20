@@ -105,16 +105,16 @@
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="select2 browser-default" id="parent_id" name="parent_id">
+                            <select class="select2 browser-default" id="parent_id" name="parent_id" onchange="getCoaParent();">
                                 <option value="">Parent (Utama)</option>
                                 @foreach($parent as $m)
-                                    <option value="{{ $m->id }}">{{ $m->name }}</option>
+                                    <option value="{{ $m->id }}" data-coa="{{ $m->coa_id }}">{{ $m->name }}</option>
                                     @foreach($m->childSub as $m2)
-                                        <option value="{{ $m2->id }}"> - {{ $m2->name }}</option>
+                                        <option value="{{ $m2->id }}" data-coa="{{ $m2->coa_id }}"> - {{ $m2->name }}</option>
                                         @foreach($m2->childSub as $m3)
-                                            <option value="{{ $m3->id }}"> - - {{ $m3->name }}</option>
+                                            <option value="{{ $m3->id }}" data-coa="{{ $m3->coa_id }}"> - - {{ $m3->name }}</option>
                                             @foreach($m3->childSub as $m4)
-                                                <option value="{{ $m4->id }}"> - - - {{ $m4->name }}</option>
+                                                <option value="{{ $m4->id }}" data-coa="{{ $m4->coa_id }}"> - - - {{ $m4->name }}</option>
                                             @endforeach
                                         @endforeach
                                     @endforeach
@@ -190,6 +190,14 @@
             width: '100%',
         });
     });
+
+    function getCoaParent(){
+        if($('#parent_id').val()){
+            $('#coa_id').val($("#parent_id").select2().find(":selected").data("coa")).trigger('change');
+        }else{
+            $('#coa_id').val('').trigger('change');
+        }
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({

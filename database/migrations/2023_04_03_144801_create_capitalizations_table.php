@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('code',155)->unique();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->bigInteger('currency_id')->nullable();
             $table->double('currency_rate')->nullable();
             $table->date('post_date')->nullable();
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'place_id', 'currency_id']);
+            $table->index(['user_id', 'company_id', 'currency_id']);
         });
     }
 

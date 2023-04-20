@@ -178,6 +178,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
+                                                    <th class="center">Stok Skrg</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
                                                     <th class="center">Harga HPP</th>
@@ -192,7 +193,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="11" class="center">
+                                                    <td colspan="12" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </a>
@@ -321,7 +322,6 @@
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
             if($("#arr_item" + val).select2('data')[0].price_list.length){
-                $("#rowPrice" + val).val($("#arr_item" + val).select2('data')[0].price_list[0].price);
                 $('#tempPrice' + val).empty();
                 $.each($("#arr_item" + val).select2('data')[0].price_list, function(i, value) {
                     $('#tempPrice' + val).append(`
@@ -329,8 +329,17 @@
                     `);
                 });
             }
+            if($("#arr_item" + val).select2('data')[0].stock_list.length){
+                $('#arr_stock' + val).empty();
+                $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
+                    $('#arr_stock' + val).append(`
+                        ` + value.warehouse + ` - ` + value.qty + `<br>
+                    `);
+                });
+            }
         }else{
             $('#tempPrice' + val).empty();
+            $('#arr_stock' + val).text('-');
         }
     }
 
@@ -371,7 +380,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
@@ -421,6 +430,9 @@
                 <input type="hidden" name="arr_purchase[]" value="0">
                 <td>
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                </td>
+                <td class="center">
+                    <span id="arr_stock` + count + `">-</span>
                 </td>
                 <td>
                     <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
@@ -607,6 +619,9 @@
                                 <input type="hidden" name="arr_purchase[]" value="0">
                                 <td>
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                </td>
+                                <td class="center">
+                                    <span id="arr_stock` + count + `">-</span>
                                 </td>
                                 <td>
                                     <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">

@@ -209,7 +209,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($data->goodReceiveDetail as $row)
+                @foreach($data->goodIssueDetail as $row)
                 <tr>
                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                     <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>

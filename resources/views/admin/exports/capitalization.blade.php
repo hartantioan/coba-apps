@@ -4,7 +4,7 @@
             <th>No</th>
             <th>No Kapitalisasi</th>
             <th>Pengguna</th>
-            <th>Pabrik/Kantor</th>
+            <th>Perusahaan</th>
             <th>Mata Uang</th>
             <th>Konversi</th>
             <th>Tanggal</th>
@@ -18,7 +18,7 @@
                 <td>{{ $key+1 }}</td>
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->user->name }}</td>
-                <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                <td>{{ $row->company->name }}</td>
                 <td>{{ $row->currency->code }}</td>
                 <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
                 <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>

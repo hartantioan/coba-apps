@@ -8,45 +8,36 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class Capitalization extends Model
+class InventoryTransfer extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'capitalizations';
+    protected $table = 'inventory_transfers';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
         'company_id',
-        'currency_id',
-        'currency_rate',
         'post_date',
+        'document',
         'note',
         'status',
-        'grandtotal',
         'void_id',
         'void_note',
-        'void_date'
+        'void_date',
     ];
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
-    public function user()
-    {
-        return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    public function user(){
+        return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
 
-    public function currency()
-    {
-        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
-    }
-
-    public function voidUser()
-    {
-        return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
+    public function voidUser(){
+        return $this->belongsTo('App\Models\User','void_id','id')->withTrashed();
     }
 
     public function company()
@@ -54,9 +45,9 @@ class Capitalization extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function capitalizationDetail()
+    public function inventoryTransferDetail()
     {
-        return $this->hasMany('App\Models\CapitalizationDetail');
+        return $this->hasMany('App\Models\GoodReceiveDetail');
     }
 
     public function status(){
@@ -85,9 +76,26 @@ class Capitalization extends Model
         return $status;
     }
 
+    public function attachment() 
+    {
+        if($this->document !== NULL && Storage::exists($this->document)) {
+            $document = asset(Storage::url($this->document));
+        } else {
+            $document = asset('website/empty.png');
+        }
+
+        return $document;
+    }
+
+    public function deleteFile(){
+		if(Storage::exists($this->document)) {
+            Storage::delete($this->document);
+        }
+	}
+
     public static function generateCode()
     {
-        $query = Capitalization::selectRaw('RIGHT(code, 9) as code')
+        $query = GoodReceive::selectRaw('RIGHT(code, 9) as code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();
@@ -100,13 +108,13 @@ class Capitalization extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'CAP-'.date('y').date('m').date('d').'-';
+        $pre = 'INT-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type','capitalizations')->where('lookable_id',$this->id)->first();
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
         if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{

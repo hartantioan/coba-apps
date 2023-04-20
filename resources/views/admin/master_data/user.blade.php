@@ -44,6 +44,11 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal4">
+                            <i class="material-icons hide-on-med-and-up">file_upload</i>
+                            <span class="hide-on-small-onl">Import</span>
+                            <i class="material-icons right">file_upload</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -380,6 +385,40 @@
     </div>
 </div>
 
+<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:70%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>import Excel</h4>
+                <div class="col s12">
+                    <div id="validation_alertImport" style="display:none;"></div>
+                </div>
+                <form class="row" action="{{ Request::url() }}/import" method="POST" enctype="multipart/form-data" id="form_dataimport">
+                    @csrf
+                    <div class="file-field input-field col m6 s12">
+                        <div class="btn">
+                            <span>File</span>
+                            <input type="file" class="form-control-file" id="fileExcel" name="file">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                    </div>
+                    <div class="input-field col m6 s12">
+                        Download format disini : <a href="{{ asset(Storage::url('format_imports/format_bp.xlsx')) }}" target="_blank">File</a>
+                    </div>
+                    <div class="input-field col m12 s12">
+                        <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:80%;max-width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -393,13 +432,14 @@
                         <input type="hidden" id="tempuseraccess" name="tempuseraccess">
                         <div class="col s12">
                             <ul class="tabs">
-                                <li class="tab col m6"><a class="active" href="#accessform">Akses Form/Menu</a></li>
-                                <li class="tab col m6"><a href="#accessdata">Akses Data</a></li>
+                                <li class="tab col m4"><a class="active" href="#accessform">Akses Form/Menu</a></li>
+                                <li class="tab col m4"><a href="#accessdata">Akses Data</a></li>
+                                <li class="tab col m4"><a href="#copyaccess">Salin Akses ke BP lain</a></li>
                             </ul>
                             <div id="accessform" class="col s12 active">
                                 <p class="mt-2 mb-2">
-                                    <table class="bordered">
-                                        <thead>
+                                    <table class="bordered" id="table-menu-access">
+                                        <thead style="position:sticky;top: -25px !important;background-color:rgb(176, 212, 212) !important;">
                                             <tr>
                                                 <th width="40%" class="center" rowspan="3">Menu</th>
                                                 <th width="60%" class="center" colspan="4">Akses</th>
@@ -660,10 +700,18 @@
                                         </table>
                                     </div>
                                 </div>
-                            </div>             
+                            </div>
+                            <div id="copyaccess" class="col s12">
+                                <h5 align="center">Silahkan pilih target karyawan untuk menerima salinan.</h5>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <select class="browser-default" multiple id="arr_user" name="arr_user[]"></select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="saveAccess();">Simpan <i class="material-icons right">send</i></button>
+                            
                         </div>
                     </div>
                 </form>
@@ -672,6 +720,7 @@
     </div>
     <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <button class="btn waves-effect waves-light right submit" onclick="saveAccess();">Simpan <i class="material-icons right">send</i></button>
     </div>
 </div>
 
@@ -764,12 +813,28 @@
                 $('#tempuseraccess').val('');
                 $('#tempname').text('');
                 $('#form_data_access input:checkbox').prop( "checked", false);
+                $('#arr_user').empty();
+            }
+        });
+
+        $('#modal4').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+                
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#validation_alertImport').hide();
+                $('#validation_alertImport').html('');
             }
         });
 
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
         select2ServerSide('#country_id', '{{ url("admin/select2/country") }}');
+        select2ServerSide('#arr_user', '{{ url("admin/select2/employee") }}');
 
         $('#body-bank').on('click', '.delete-data-bank', function() {
             $(this).closest('tr').remove();
@@ -783,7 +848,118 @@
         });
 
         refreshGroup();
+
+        $('#form_dataimport').submit(function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    $('#validation_alertImport').hide();
+                    $('#validation_alertImport').html('');
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    if(response.status == 200) {
+                        successImport();
+                        M.toast({
+                            html: response.message
+                        });
+                    } else if(response.status == 422) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+
+                        $.each(response.error, function(i, val) {
+                            $('#validation_alertImport').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p> Line <b>` + val.row + `</b> in column <b>` + val.attribute + `</b> </p>
+                                        <p> ` + val.errors[0] + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    }else if(response.status == 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+
+                        $.each(response.error, function(i, val) {
+                            $('#validation_alertImport').append(`
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p>`+val+`</p>
+                                        </div>
+                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                `);
+                        });
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                    loadingClose('.modal-content');
+                    $('#form_dataimport')[0].reset();
+                },
+                error: function(response) {
+                    var errors = response.responseJSON.errors;
+                    var errorMessage = '';
+                    if(response.status == 422) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                        
+                        swal({
+                            title: 'Ups! Validation',
+                            text: 'Check your form.',
+                            icon: 'warning'
+                        });
+
+                        $.each(errors, function(index, error) {
+                        var message = '';
+
+                        $.each(error.errors, function(index, value) {
+                            message += value + '\n';
+                        });
+
+                        errorMessage += errors.file;
+                    });
+
+                    $('#validation_alertImport').html(`
+                        <div class="card-alert card red">
+                            <div class="card-content white-text">
+                                <p>` + errorMessage + `</p>
+                            </div>
+                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    `).show();
+
+                    }
+                }
+            });
+
+        });
     });
+
+    function successImport(){
+        loadDataTable();
+        $('#modal4').modal('close');
+    }
 
     function refreshGroup(){
         $('#group_id').empty();
@@ -852,70 +1028,83 @@
     }
 
     function saveAccess(){
-			
-        var formData = new FormData($('#form_data_access')[0]);
-        
-        $.ajax({
-            url: '{{ Request::url() }}/create_access',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert_access').hide();
-                $('#validation_alert_access').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
+		swal({
+            title: "Apakah anda yakin simpan akses?",
+            text: "Hati-hati dalam menentukan hak akses!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                
+                var formData = new FormData($('#form_data_access')[0]);
+                
+                $.ajax({
+                    url: '{{ Request::url() }}/create_access',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert_access').hide();
+                        $('#validation_alert_access').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
 
-                if(response.status == 200) {
-                    $('#modal3').modal('close');
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert_access').show();
-                    $('.modal-content').scrollTop(0);
-                    
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
+                        if(response.status == 200) {
+                            $('#modal3').modal('close');
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert_access').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
 
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert_access').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert_access').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
                         });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+                    }
                 });
             }
         });

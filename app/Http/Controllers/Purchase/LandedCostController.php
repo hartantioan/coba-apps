@@ -58,6 +58,7 @@ class LandedCostController extends Controller
                     'item_id'                   => $row->item_id,
                     'item_name'                 => $row->item->code.' - '.$row->item->name,
                     'qty'                       => number_format($row->qtyConvert(),5,',','.'),
+                    'totalrow'                  => $row->getRowTotal(),
                     'qtyRaw'                    => $row->qtyConvert(),
                     'unit'                      => $row->item->uomUnit->code,
                     'place_name'                => $row->place->name.' - '.$row->place->company->name,

@@ -348,7 +348,7 @@ class GoodIssueController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->goodReceiveDetail as $key => $row){
+        foreach($data->goodIssueDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->name.'</td>

@@ -615,7 +615,7 @@ class PurchaseRequestController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.$row->qty.'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.date('d M Y',strtotime($row->required_date)).'</td>

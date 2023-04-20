@@ -630,7 +630,43 @@ class CustomHelper {
 				}
 			}
 		}elseif($table_name == 'fund_requests'){
+		
+		}elseif($table_name == 'capitalizations'){		
+			$arrdata = get_object_vars($data);
 
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'account_id'	=> $account_id,
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'currency_id'	=> $data->currency_id,
+				'currency_rate'	=> $data->currency_rate,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+			
+			$cp = Capitalization::find($data->id);
+			if($cp){
+				foreach($cp->capitalizationDetail as $row){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->asset->assetGroup->coa_id,
+						'place_id'		=> $row->asset->place_id,
+						'type'			=> '1',
+						'nominal'		=> $row->total
+					]);
+
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> Coa::where('code','100.01.01.99.03')->where('company_id',$row->asset->place->company_id)->first()->id,
+						'place_id'		=> $row->asset->place_id,
+						'type'			=> '2',
+						'nominal'		=> $row->total
+					]);
+				}
+			}
 		}else{
 
 			if(isset($data->currency_id)){
@@ -658,45 +694,6 @@ class CustomHelper {
 						'note'			=> $data->code,
 						'status'		=> '3'
 					]);
-					
-					if($table_name == 'capitalizations'){
-						$arrCoa = [];
-
-						$cp = Capitalization::find($data->id);
-						
-						if($cp){
-							foreach($cp->capitalizationDetail as $row){
-								$index = -1;
-
-								foreach($arrCoa as $key => $rowcek){
-									if($rowcek['coa_id'] == $row->asset->assetGroup->coa_id){
-										$index = $key;
-									}
-								}
-
-								if($index >= 0){
-									$arrCoa[$index]['total'] += $row->total;
-								}else{
-									$arrCoa[] = [
-										'coa_id'	=> $row->asset->assetGroup->coa_id,
-										'total'		=> $row->total
-									];
-								}
-							}
-							
-							foreach($arrCoa as $row){
-								JournalDetail::create([
-									'journal_id'	=> $query->id,
-									'coa_id'		=> $row['coa_id'],
-									'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
-									'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
-									'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
-									'type'			=> '1',
-									'nominal'		=> $row['total']
-								]);
-							}
-						}
-					}
 
 					foreach($journalMap as $row){
 						$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);

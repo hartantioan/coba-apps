@@ -6,15 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class TaxDetail extends Model
+class DocumentTaxDetail extends Model
 {   
     use HasFactory, SoftDeletes;
-    protected $table = 'tax_details';
+    protected $table = 'document_tax_details';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     
     protected $fillable = [
-        'tax_id',
+        'document_tax_id',
         'item',
         'price',
         'qty',

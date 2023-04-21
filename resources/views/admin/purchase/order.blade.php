@@ -1426,8 +1426,6 @@
 			subtotal += parseFloat($(this).text().replaceAll(".", "").replaceAll(",","."));
 		});
 
-        /* total = subtotal - discount; */
-
         $('.arr_subtotal').each(function(index){
             let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0;
             rowbobot = rownominal / subtotal;

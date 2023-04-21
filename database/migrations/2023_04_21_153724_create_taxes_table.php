@@ -13,15 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('item_groups'))
-        Schema::create('item_groups', function (Blueprint $table) {
+        Schema::create('taxes', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 50)->unique();
-            $table->string('name', 155)->nullable();
-            $table->bigInteger('parent_id')->nullable();
-            $table->bigInteger('coa_id')->nullable();
-            $table->bigInteger('warehouse_id')->nullable();
-            $table->char('status', 1)->nullable();
+            $table->string('code',155)->unique();
+            $table->string('name')->nullable();
+            $table->char('type',1)->nullable();
+            $table->double('percentage')->nullable();
+            $table->char('status',1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
         });
@@ -34,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('item_groups');
+        Schema::dropIfExists('taxes');
     }
 };

@@ -19,11 +19,12 @@ class ItemGroup extends Model
         'name',
         'parent_id',
         'coa_id',
+        'warehouse_id',
         'status'
     ];
 
     public function parentSub(){
-        return $this->belongsTo('App\Models\ItemGroup', 'parent_id', 'id');
+        return $this->belongsTo('App\Models\ItemGroup', 'parent_id', 'id')->withTrashed();
     }
 
     public function childSub(){
@@ -31,7 +32,11 @@ class ItemGroup extends Model
     }
 
     public function coa(){
-        return $this->belongsTo('App\Models\Coa', 'coa_id', 'id');
+        return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
+    }
+
+    public function warehouse(){
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 
     public function status(){

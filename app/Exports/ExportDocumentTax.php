@@ -3,8 +3,8 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Tax;
-use App\Models\TaxDetail;
+use App\Models\DocumentTax;
+use App\Models\DocumentTaxDetail;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Illuminate\Support\Collection;
 
-class ExportTax implements WithMultipleSheets
+class ExportDocumentTax implements WithMultipleSheets
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -29,7 +29,7 @@ class ExportTax implements WithMultipleSheets
     public function sheets(): array
     {
         
-        $taxes = Tax::where(function($query) {
+        $taxes = DocumentTax::where(function($query) {
             $query->where(function($query) {
                 $query->where('code', 'like', "%{$this->search}%")
                     ->orWhere('date', 'like', "%{$this->search}%")
@@ -70,11 +70,11 @@ class ExportTax implements WithMultipleSheets
 
         $sheets = [];
         
-        $sheets[] = new TaxSheet($taxes);
+        $sheets[] = new DocumentTaxSheet($taxes);
 
        
-        $taxDetail = TaxDetail::whereIn('tax_id', $taxes->pluck('id')->toArray())->get([
-            'tax_id',
+        $taxDetail = DocumentTaxDetail::whereIn('document_tax_id', $taxes->pluck('id')->toArray())->get([
+            'document_tax_id',
             'item',
             'price',
             'qty',
@@ -86,7 +86,7 @@ class ExportTax implements WithMultipleSheets
             'ppnbm',
         ]);
 
-        $sheets[] = new TaxDetailSheet($taxDetail);
+        $sheets[] = new DocumentTaxDetailSheet($taxDetail);
 
         return $sheets;
     }
@@ -94,7 +94,7 @@ class ExportTax implements WithMultipleSheets
     
 }
 
-class TaxSheet implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+class DocumentTaxSheet implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
     private $taxes;
 
@@ -142,18 +142,18 @@ class TaxSheet implements FromCollection, WithTitle, WithHeadings, WithCustomSta
     }
 }
 
-class TaxDetailSheet implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+class DocumentTaxDetailSheet implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
     private $taxes;
 
-    public function __construct(Collection $taxDetail)
+    public function __construct(Collection $documentTaxDetail)
     {
-        $this->taxDetail = $taxDetail;
+        $this->documentTaxDetail = $documentTaxDetail;
     }
 
     public function collection()
     {
-        return $this->taxDetail;
+        return $this->documentTaxDetail;
     }
 
     public function title(): string
@@ -169,7 +169,7 @@ class TaxDetailSheet implements FromCollection, WithTitle, WithHeadings, WithCus
     public function headings(): array
     {
         return [
-            'tax_id',
+            'document_tax_id',
             'item',
             'price',
             'qty',

@@ -31,6 +31,7 @@ use App\Http\Controllers\MasterData\AssetGroupController;
 use App\Http\Controllers\MasterData\UnitController;
 use App\Http\Controllers\MasterData\BankController;
 use App\Http\Controllers\MasterData\ProjectController;
+use App\Http\Controllers\MasterData\TaxController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -50,7 +51,7 @@ use App\Http\Controllers\Inventory\GoodIssueController;
 use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
 use App\Http\Controllers\Accounting\RetirementController;
-use App\Http\Controllers\Accounting\TaxController;
+use App\Http\Controllers\Accounting\DocumentTaxController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -137,15 +138,6 @@ Route::prefix('admin')->group(function () {
                 Route::get('/',[NotificationController::class, 'index']);
                 Route::post('refresh', [NotificationController::class, 'refresh']);
                 Route::post('update_notification', [NotificationController::class, 'updateNotification']);
-            });
-
-            Route::prefix('personal_purchase_request')->group(function () {
-                Route::get('/',[PurchaseRequestController::class, 'userIndex']);
-                Route::get('datatable',[PurchaseRequestController::class, 'userDatatable']);
-                Route::get('row_detail',[PurchaseRequestController::class, 'userRowDetail']);
-                Route::post('show', [PurchaseRequestController::class, 'userShow']);
-                Route::post('create',[PurchaseRequestController::class, 'userCreate']);
-                Route::post('destroy', [PurchaseRequestController::class, 'userDestroy']);
             });
 
             Route::prefix('personal_fund_request')->group(function () {
@@ -321,17 +313,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('create',[BomController::class, 'create'])->middleware('operation.access:bom,update');
                     Route::post('destroy', [BomController::class, 'destroy'])->middleware('operation.access:bom,delete');
                 });
-
-                Route::prefix('shift')->middleware('operation.access:shift,view')->group(function () {
-                    Route::get('/',[ShiftController::class, 'index']);
-                    Route::get('datatable',[ShiftController::class, 'datatable']);
-                    Route::get('row_detail',[ShiftController::class, 'rowDetail']);
-                    Route::post('show', [ShiftController::class, 'show']);
-                    Route::post('print',[ShiftController::class, 'print']);
-                    Route::get('export',[ShiftController::class, 'export']);
-                    Route::post('create',[ShiftController::class, 'create'])->middleware('operation.access:shift,update');
-                    Route::post('destroy', [ShiftController::class, 'destroy'])->middleware('operation.access:shift,delete');
-                });
             });
 
             Route::prefix('master_maintenance')->group(function () {
@@ -384,15 +365,15 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('master_hr')->group(function () {
-                Route::prefix('time_shift')->middleware('operation.access:time_shift,view')->group(function () {
-                    Route::get('/',[ShiftController::class, 'indexHr']);
-                    Route::get('datatable',[ShiftController::class, 'datatableHr']);
-                    Route::get('row_detail',[ShiftController::class, 'rowDetailHr']);
-                    Route::post('show', [ShiftController::class, 'showHr']);
+                Route::prefix('shift')->middleware('operation.access:shift,view')->group(function () {
+                    Route::get('/',[ShiftController::class, 'index']);
+                    Route::get('datatable',[ShiftController::class, 'datatable']);
+                    Route::get('row_detail',[ShiftController::class, 'rowDetail']);
+                    Route::post('show', [ShiftController::class, 'show']);
                     Route::post('print',[ShiftController::class, 'print']);
                     Route::get('export',[ShiftController::class, 'export']);
-                    Route::post('create',[ShiftController::class, 'createHr'])->middleware('operation.access:time_shift,update');
-                    Route::post('destroy', [ShiftController::class, 'destroyHr'])->middleware('operation.access:time_shift,delete');
+                    Route::post('create',[ShiftController::class, 'create'])->middleware('operation.access:shift,update');
+                    Route::post('destroy', [ShiftController::class, 'destroy'])->middleware('operation.access:shift,delete');
                 });
                 
                 Route::prefix('allowance')->middleware('operation.access:allowance,view')->group(function () {
@@ -451,6 +432,14 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [BankController::class, 'show']);
                     Route::post('create',[BankController::class, 'create'])->middleware('operation.access:bank,update');
                     Route::post('destroy', [BankController::class, 'destroy'])->middleware('operation.access:bank,delete');
+                });
+
+                Route::prefix('tax')->middleware('operation.access:tax,view')->group(function () {
+                    Route::get('/',[TaxController::class, 'index']);
+                    Route::get('datatable',[TaxController::class, 'datatable']);
+                    Route::post('show', [TaxController::class, 'show']);
+                    Route::post('create',[TaxController::class, 'create'])->middleware('operation.access:tax,update');
+                    Route::post('destroy', [TaxController::class, 'destroy'])->middleware('operation.access:tax,delete');
                 });
             });
 
@@ -525,6 +514,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('create',[PurchaseRequestController::class, 'create'])->middleware('operation.access:purchase_request,update');
                 Route::post('void_status', [PurchaseRequestController::class, 'voidStatus'])->middleware('operation.access:purchase_request,void');
                 Route::get('approval/{id}',[PurchaseRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('destroy', [PurchaseRequestController::class, 'destroy'])->middleware('operation.access:purchase_request,delete');
             });
 
             Route::prefix('purchase_order')->middleware('operation.access:purchase_order,view')->group(function () {
@@ -736,15 +726,15 @@ Route::prefix('admin')->group(function () {
                 });
             });
 
-            Route::prefix('tax')->middleware('operation.access:tax,view')->group(function () {
-                Route::get('/', [TaxController::class, 'index']);
-                Route::get('datatable', [TaxController::class, 'datatable']);
-                Route::post('show', [TaxController::class, 'show']);
-                Route::post('print', [TaxController::class, 'print']);
-                Route::get('export', [TaxController::class, 'export']);
-                Route::get('row_detail',[TaxController::class, 'rowDetail']);
-                Route::post('store_w_barcode', [TaxController::class, 'store_w_barcode']);
-                Route::post('destroy', [TaxController::class, 'destroy'])->middleware('operation.access:tax,delete');
+            Route::prefix('document_tax')->middleware('operation.access:document_tax,view')->group(function () {
+                Route::get('/', [DocumentTaxController::class, 'index']);
+                Route::get('datatable', [DocumentTaxController::class, 'datatable']);
+                Route::post('show', [DocumentTaxController::class, 'show']);
+                Route::post('print', [DocumentTaxController::class, 'print']);
+                Route::get('export', [DocumentTaxController::class, 'export']);
+                Route::get('row_detail',[DocumentTaxController::class, 'rowDetail']);
+                Route::post('store_w_barcode', [DocumentTaxController::class, 'store_w_barcode'])->middleware('operation.access:document_tax,update');
+                Route::post('destroy', [DocumentTaxController::class, 'destroy'])->middleware('operation.access:document_tax,delete');
             });
             
             Route::prefix('journal')->middleware('operation.access:journal,view')->group(function () {

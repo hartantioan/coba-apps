@@ -67,6 +67,7 @@
                                                         <th>Nama</th>
                                                         <th>Parent</th>
                                                         <th>Coa</th>
+                                                        <th>Gudang</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -132,6 +133,15 @@
                             <label class="active" for="coa_id">Coa</label>
                         </div>
                         <div class="input-field col s6">
+                            <select class="select2 browser-default" id="warehouse_id" name="warehouse_id">
+                                <option value="">-- Tidak ada --</option>
+                                @foreach($warehouse as $w)
+                                    <option value="{{ $w->id }}">{{ $w->code.' - '.$w->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="active" for="warehouse_id">Gudang Penempatan</label>
+                        </div>
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -186,7 +196,6 @@
         });
 
         $(".select2").select2({
-            /* dropdownAutoWidth: true, */
             width: '100%',
         });
     });
@@ -235,6 +244,7 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'parent', className: 'center-align' },
                 { name: 'coa', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -350,6 +360,7 @@
                 $('#name').val(response.name);
                 $('#parent_id').val(response.parent_id).trigger('change');
                 $('#coa_id').val(response.coa_id).trigger('change');
+                $('#warehouse_id').val(response.warehouse_id).trigger('change');
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

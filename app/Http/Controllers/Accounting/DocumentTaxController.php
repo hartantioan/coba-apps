@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 
-use App\Exports\ExportTax;
+use App\Exports\ExportDocumentTax;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -13,20 +13,20 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-use App\Models\Tax;
-use App\Models\TaxDetail;
+use App\Models\DocumentTax;
+use App\Models\DocumentTaxDetail;
 
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
-class TaxController extends Controller
+class DocumentTaxController extends Controller
 {
     public function index()
     {
         $data = [
             'title' => 'Faktur',
-            'content' => 'admin.accounting.tax'
+            'content' => 'admin.accounting.document_tax'
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -60,9 +60,9 @@ class TaxController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Tax::count();
+        $total_data = DocumentTax::count();
         
-        $query_data = Tax::where(function($query) use ($search, $request) {
+        $query_data = DocumentTax::where(function($query) use ($search, $request) {
                         $query->where(function($query) use ($search) {
                             $query->where('code', 'like', "%$search%")
                                 ->orWhere('date', 'like', "%$search%")
@@ -89,7 +89,7 @@ class TaxController extends Controller
                     ->get();
         
 
-        $total_filtered = Tax::where(function($query) use ($search, $request) {
+        $total_filtered = DocumentTax::where(function($query) use ($search, $request) {
                 $query->where(function($query) use ($search) {
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('date', 'like', "%$search%")
@@ -158,7 +158,7 @@ class TaxController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = Tax::find($request->id);
+        $data   = DocumentTax::find($request->id);
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>
@@ -179,7 +179,7 @@ class TaxController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->taxDetail as $key => $row){
+        foreach($data->documentTaxDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item.'</td>
@@ -200,17 +200,17 @@ class TaxController extends Controller
     }
 
     public function show(Request $request){
-        $country = Tax::find($request->id);
+        $country = DocumentTax::find($request->id);
         				
 		return response()->json($country);
     }
 
     public function destroy(Request $request){
-        $query = Tax::find($request->id);
+        $query = DocumentTax::find($request->id);
 		
         if($query->delete()) {
             activity()
-                ->performedOn(new Tax())
+                ->performedOn(new DocumentTax())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
                 ->log('Delete the Tax data');
@@ -233,7 +233,7 @@ class TaxController extends Controller
 
         $data = [
             'title' => 'Tax Report',
-            'data' => Tax::where(function ($query) use ($request) {
+            'data' => DocumentTax::where(function ($query) use ($request) {
                 if ($request->search) {
                     $query->where('code', 'like', "%$request->search%")
                         ->orWhere('date', 'like', "%$request->search%")
@@ -255,7 +255,7 @@ class TaxController extends Controller
             })->get()
 		];
 		
-		return view('admin.print.accounting.tax', $data);
+		return view('admin.print.accounting.document_tax', $data);
     }
 
     public function hasNestedArrays($array) {
@@ -281,7 +281,7 @@ class TaxController extends Controller
         }if($finish_date ==''&&$start_date ==''){
             $filename = 'faktur_masukan_';
         }
-		return Excel::download(new ExportTax($search,$request->start_date,$request->finish_date),$filename.uniqid().'.xlsx');
+		return Excel::download(new ExportDocumentTax($search,$request->start_date,$request->finish_date),$filename.uniqid().'.xlsx');
     }
 
     public function store_w_barcode(Request $request){
@@ -314,7 +314,7 @@ class TaxController extends Controller
                 $detail_transaksi_faktur = $phpDataArray['detailTransaksi'];
                 $date = Carbon::createFromFormat('d/m/Y', $phpDataArray['tanggalFaktur'])->format('Y-m-d');
                 try{
-                    $query = Tax::create([
+                    $query = DocumentTax::create([
                                 'transaction_code'=> $phpDataArray['kdJenisTransaksi'],
                                 'replace' => $phpDataArray['fgPengganti'],
                                 'code'=> $phpDataArray['nomorFaktur'],
@@ -352,10 +352,10 @@ class TaxController extends Controller
                                 'ppnbm'=>$data['ppnbm'],
                             ];
                         }
-                        TaxDetail::insert($dataArray);
+                        DocumentTaxDetail::insert($dataArray);
 
                     } else {
-                        TaxDetail::create([
+                        DocumentTaxDetail::create([
                         'tax_id'=>$query->id,
                         'item'=>$detail_transaksi_faktur['nama'],
                         'price'=>$detail_transaksi_faktur['hargaSatuan'],

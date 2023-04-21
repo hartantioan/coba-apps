@@ -19,16 +19,6 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
-                            <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
-                            <i class="material-icons right">local_printshop</i>
-                        </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                            <span class="hide-on-small-onl">Excel</span>
-                            <i class="material-icons right">view_list</i>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -63,15 +53,10 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Kode</th>
-                                                        <th>Oleh</th>
-                                                        <th>Site</th>
-                                                        <th>Departemen</th>
+                                                        <th>Code</th>
                                                         <th>Nama</th>
-                                                        <th>Min Time In</th>
-                                                        <th>Time In</th>
-                                                        <th>Time Out</th>
-                                                        <th>Max Time Out</th>
+                                                        <th>Type</th>
+                                                        <th>Prosentase</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -83,6 +68,7 @@
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -94,33 +80,25 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit Shift</h4>
+                <h4>Add/Edit {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4">
+                        <div class="input-field col s6">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="min_time_in" name="min_time_in" type="text" placeholder="Minimum time in" class="timepicker">
-                            <label class="active" for="min_time_in">Minimum Time In</label>
+                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s4">
-                            <input id="time_in" name="time_in" type="text" placeholder="Time in" class="timepicker">
-                            <label class="active" for="time_in">Time In</label>
+                        <div class="input-field col s6">
+                            <input id="name" name="name" type="text" placeholder="Nama">
+                            <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s4">
-                            <input id="time_out" name="time_out" type="text" placeholder="Time out" class="timepicker">
-                            <label class="active" for="time_out">Time Out</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <input id="max_time_out" name="max_time_out" type="text" placeholder="Maximum time out" class="timepicker">
-                            <label class="active" for="max_time_out">Maximum Time Out</label>
-                        </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
-                                <label for="status">Status</label>
-                                <label class="right">
+                                <label for="order">Status</label>
+                                <label>
                                     Non-Active
                                     <input checked type="checkbox" id="status" name="status" value="1">
                                     <span class="lever"></span>
@@ -141,30 +119,15 @@
     </div>
 </div>
 
+<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
+        <i class="material-icons">add</i>
+    </a>
+</div>
+
 <!-- END: Page Main-->
 <script>
     $(function() {
-        $('#datatable_serverside').on('click', 'td.details-control', function() {
-            var tr    = $(this).closest('tr');
-            var badge = tr.find('button.btn-floating');
-            var icon  = tr.find('i');
-            var row   = table.row(tr);
-
-            if(row.child.isShown()) {
-                row.child.hide();
-                tr.removeClass('shown');
-                badge.first().removeClass('red');
-                badge.first().addClass('green');
-                icon.first().html('add');
-            } else {
-                row.child(rowDetail(row.data())).show();
-                tr.addClass('shown');
-                badge.first().removeClass('green');
-                badge.first().addClass('red');
-                icon.first().html('remove');
-            }
-        });
-        
         loadDataTable();
         
         $('#modal1').modal({
@@ -181,45 +144,15 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#coa_id').val('').trigger('change');
                 M.updateTextFields();
             }
         });
 
-        $('.timepicker').timepicker({
-            container: "body",
-            twelveHour: false
-        });
     });
-
-    function rowDetail(data) {
-        var content = '';
-        $.ajax({
-            url: '{{ Request::url() }}/row_detail',
-            type: 'GET',
-            async: false,
-            data: {
-                id: $(data[0]).data('id')
-            },
-            success: function(response) {
-                content += response;
-            },
-            error: function() {
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-
-        return content;
-	}
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
-            "responsive": false,
-            "scrollX": true,
+            "responsive": true,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -248,30 +181,21 @@
                 }
             },
             columns: [
-                { name: 'id', searchable: false, className: 'center-align' },
+                { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
-                { name: 'user_id', className: 'center-align' },
-                { name: 'place', className: 'center-align' },
-                { name: 'department', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'min_time_in', className: 'center-align' },
-                { name: 'time_in', className: 'center-align' },
-                { name: 'time_out', className: 'center-align' },
-                { name: 'max_time_out', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
+                { name: 'percentage', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
-            "createdRow": function( row, data, dataIndex){
-                if(data[12]){
-                    $(row).addClass('lime accent-1');
-                }
-            },
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle' /* or colvis */
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
+        
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -366,21 +290,16 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
                 $('#temp').val(id);
-                $('#min_time_in').val(response.min_time_in);
-                $('#time_in').val(response.time_in);
-                $('#time_out').val(response.time_out);
-                $('#max_time_out').val(response.max_time_out);
-
+                $('#code').val(response.code);
+                $('#name').val(response.name);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
                 }
-
                 $('.modal-content').scrollTop(0);
-                $('#name').focus();
+                $('#code').focus();
                 M.updateTextFields();
             },
             error: function() {
@@ -436,39 +355,5 @@
                 });
             }
         });
-    }
-
-    function print(){
-        var search = window.table.search();
-        var status = $('#filter_status').val();
-        var type = $('#filter_type').val();
-        
-        $.ajax({
-            type : "POST",
-            url  : '{{ Request::url() }}/print',
-            data : {
-                search : search,
-                status : status,
-                type : type
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            cache: false,
-            success: function(data){
-                var w = window.open('about:blank');
-                w.document.open();
-                w.document.write(data);
-                w.document.close();
-            }
-        });
-    }
-
-    function exportExcel(){
-        var search = window.table.search();
-        var status = $('#filter_status').val();
-        var type = $('#filter_type').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type;
     }
 </script>

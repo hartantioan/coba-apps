@@ -118,7 +118,139 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:100%;max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>Add/Edit {{ $title }}</h4>
+                <form class="row" id="form_data" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            
+                            <div class="input-field col m4 s12">
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                <label class="active" for="post_date">Tgl. Posting</label>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
+                                <label class="active" for="due_date">Tgl. Kadaluwarsa</label>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
+                                <label class="active" for="required_date">Tgl. Dipakai</label>
+                            </div>
+                            <div class="file-field input-field col m4 s12">
+                                <div class="btn">
+                                    <span>File</span>
+                                    <input type="file" name="file" id="file">
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path validate" type="text">
+                                </div>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <select class="form-control" id="place_id" name="place_id">
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="place_id">Site</label>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <select class="browser-default" id="project_id" name="project_id"></select>
+                                <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <input type="hidden" id="temp" name="temp">
+                                <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
+                                <label class="active" for="note">Keterangan</label>
+                            </div>
+                            <div class="col m12 s12">
+                                <p class="mt-2 mb-2">
+                                    <h4>Detail Produk</h4>
+                                    <table class="bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Item</th>
+                                                <th class="center">Qty</th>
+                                                <th class="center">Satuan</th>
+                                                <th class="center">Keterangan</th>
+                                                <th class="center">Tgl.Dipakai</th>
+                                                <th class="center">Gudang Tujuan</th>
+                                                <th class="center">Site</th>
+                                                <th class="center">Departemen</th>
+                                                <th class="center">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-item">
+                                            <tr class="row_item">
+                                                <td>
+                                                    <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
+                                                </td>
+                                                <td>
+                                                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this)">
+                                                </td>
+                                                <td class="center">
+                                                    <span id="arr_satuan0">-</span>
+                                                </td>
+                                                <td>
+                                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
+                                                </td>
+                                                <td>
+                                                    <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
+                                                </td>
+                                                <td>
+                                                    <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]"></select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" id="arr_place0" name="arr_place[]">
+                                                        @foreach ($place as $rowplace)
+                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                                        @endforeach
+                                                    </select>    
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" id="arr_department0" name="arr_department[]">
+                                                        @foreach ($department as $rowdept)
+                                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                                        @endforeach
+                                                    </select>    
+                                                </td>
+                                                <td class="center">
+                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                        <i class="material-icons">delete</i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr id="last-row-item">
+                                                <td colspan="9" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> New Item
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+                            </div>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
+<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -130,6 +262,7 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
+
 <div id="modal3" class="modal modal-fixed-footer" style="max-height: 75% !important;height: 75% !important;width:75%;">
     <div class="modal-content">
         <div class="row">
@@ -145,6 +278,25 @@
     </div>
 </div>
 
+<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="show_detail">
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
+<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
+        <i class="material-icons">add</i>
+    </a>
+</div>
+
 <!-- END: Page Main-->
 <script>
     $(function() {
@@ -153,34 +305,12 @@
         $chartContainer.on('click', '.node', function(event) {
             
             window.open($(this).data('nodeData').url);
-           /*  alert(JSON.stringify($(this).data('nodeData'))); */
-        });
 
-        $('#datatable_serverside').on('click', 'td.details-control', function() {
-            var tr    = $(this).closest('tr');
-            var badge = tr.find('button.btn-floating');
-            var icon  = tr.find('i');
-            var row   = table.row(tr);
-
-            if(row.child.isShown()) {
-                row.child.hide();
-                tr.removeClass('shown');
-                badge.first().removeClass('red');
-                badge.first().addClass('green');
-                icon.first().html('add');
-            } else {
-                row.child(rowDetail(row.data())).show();
-                tr.addClass('shown');
-                badge.first().removeClass('green');
-                badge.first().addClass('red');
-                icon.first().html('remove');
-            }
         });
 
         loadDataTable();
 
-        $('#modal1').modal({
-            /* dismissible: false, */
+        $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
                 
             },
@@ -201,6 +331,48 @@
                 $('#chart-container').empty();
             }
         });
+
+        $('#modal4').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#show_detail').empty();
+            }
+        });
+
+        $('#modal1').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                $('#post_date').attr('min','{{ date("Y-m-d") }}');
+                $('#due_date').attr('min','{{ date("Y-m-d") }}');
+                $('#required_date').attr('min','{{ date("Y-m-d") }}');
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#name').focus();
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#temp').val('');
+                M.updateTextFields();
+                $('#project_id,#warehouse_id').empty();
+                $('.row_item').remove();
+            }
+        });
+
+        $('#body-item').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
+        });
+
+        $('#arr_place0,#arr_department0').formSelect();
+        select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
+        select2ServerSide('#arr_warehouse0', '{{ url("admin/select2/warehouse") }}');
     });
 
     function makeTreeOrg(data){
@@ -291,16 +463,19 @@
 	}
 
     function rowDetail(data) {
-        var content = '';
         $.ajax({
             url: '{{ Request::url() }}/row_detail',
             type: 'GET',
-            async: false,
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
             data: {
-                id: $(data[0]).data('id')
+                id: data
             },
             success: function(response) {
-                content += response;
+                $('#modal4').modal('open');
+                $('#show_detail').html(response);
+                loadingClose('.modal-content');
             },
             error: function() {
                 swal({
@@ -310,74 +485,84 @@
                 });
             }
         });
-
-        return content;
 	}
 
     function save(){
-			
-        var formData = new FormData($('#form_data')[0]);
-        
-        $.ajax({
-            url: '{{ Request::url() }}/create',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    success();
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
-                    
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                
+                var formData = new FormData($('#form_data')[0]);
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
 
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
                         });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+                    }
                 });
             }
         });
@@ -413,7 +598,15 @@
                 $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
                 $('#required_date').removeAttr('min');
-                
+                $('#place_id').val(response.place_id).formSelect();
+
+                if(response.project_id){
+                    $('#project_id').empty();
+                    $('#project_id').append(`
+                        <option value="` + response.project_id + `">` + response.project_name + `</option>
+                    `);
+                }
+
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
                         $(this).remove();
@@ -438,6 +631,23 @@
                                 <td>
                                     <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
                                 </td>
+                                <td>
+                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                </td>
+                                <td>
+                                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                        @foreach ($department as $rowdept)
+                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -449,6 +659,12 @@
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                        $('#arr_warehouse' + count).append(`
+                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                        `);
+                        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                        $('#arr_place' + count).val(val.place_id).formSelect();
+                        $('#arr_department' + count).val(val.department_id).formSelect();
                     });
                 }
                 
@@ -466,6 +682,111 @@
                 });
             }
         });
+    }
+
+    function getRowUnit(val){
+        $('#arr_satuan' + val).text($("#arr_item" + val).select2('data')[0].buy_unit);
+    }
+
+    function destroy(id){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Anda tidak bisa mengembalikan data yang terhapus!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/destroy',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function addItem(){
+        var count = makeid(10);
+        $('#last-row-item').before(`
+            <tr class="row_item">
+                <td>
+                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                </td>
+                <td>
+                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this)">
+                </td>
+                <td class="center">
+                    <span id="arr_satuan` + count + `">-</span>
+                </td>
+                <td>
+                    <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
+                </td>
+                <td>
+                    <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                </td>
+                <td>
+                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                        @foreach ($place as $rowplace)
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
+                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                        @foreach ($department as $rowdept)
+                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        $('#arr_place' + count).formSelect();
+        $('#arr_department' + count).formSelect();
+        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+    }
+
+    function changeDateMinimum(val){
+        if(val){
+            $('#due_date,#required_date').attr("min",val);
+            $('input[name^="arr_required_date"]').each(function(){
+                $(this).attr("min",val);
+            });
+        }
     }
 
     function voidStatus(id){
@@ -521,7 +842,7 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal1').modal('open');
+                $('#modal2').modal('open');
                 $('#show_print').html(data);
             }
         });

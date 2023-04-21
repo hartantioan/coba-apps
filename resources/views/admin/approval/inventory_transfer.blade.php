@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Retirement # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Barang Transfer # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -134,95 +134,93 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Retirement Aset Perusahaan</h5>
+                <h5 class="indigo-text">Barang Transfer</h5>
             </div>
-            <div class="col m6 s12 right-align">
-                <img src="{{ url('website/logo_web_fix.png') }}" width="40%">
+            <div class="col m6 s12">
+                <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
             </div>
         </div>
-        <table border="0" width="100%" class="mt-3">
-            <tr>
-                <td width="50%" class="left-align" style="vertical-align: top !important;">
-                    <table border="0" width="100%">
-                        <tr>
-                            <td width="40%">
-                                Dari
-                            </td>
-                            <td width="60%">
-                                {{ $data->user->name }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="40%">
-                                Posisi
-                            </td>
-                            <td width="60%">
-                                {{ $data->user->position->name }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="40%">
-                                Depart.
-                            </td>
-                            <td width="60%">
-                                {{ $data->user->department->name }}
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                <td width="50%" class="left-align" style="vertical-align: top !important;">
-                    <table border="0" width="100%">
-                        <tr>
-                            <td width="40%">
-                                Site
-                            </td>
-                            <td width="60%">
-                                {{ $data->place->name.' - '.$data->place->company->name }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="40%">
-                                Catatan
-                            </td>
-                            <td width="60%">
-                                {{ $data->note }}
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
+        <div class="divider mb-3 mt-3"></div>
+        <!-- invoice address and contact -->
+        <div class="row invoice-info">
+            <div class="col m6 s6">
+                <h6 class="invoice-from">Dari</h6>
+                <div class="row">
+                    <div class="col s3">
+                        Name
+                    </div>
+                    <div class="col s9">
+                        {{ $data->user->name }}
+                    </div>
+                    <div class="col s3">
+                        Posisi
+                    </div>
+                    <div class="col s9">
+                        {{ $data->user->position->name }}
+                    </div>
+                    <div class="col s3">
+                        Depart.
+                    </div>
+                    <div class="col s9">
+                        {{ $data->user->department->name }}
+                    </div>
+                    <div class="col s3">
+                        HP
+                    </div>
+                    <div class="col s9">
+                        {{ $data->user->phone }}
+                    </div>
+                </div>
+            </div>
+            <div class="col m6 s6">
+                <h6 class="invoice-from">Lain-lain</h6>
+                <div class="row">
+                    <div class="col s3">
+                        Lampiran
+                    </div>
+                    <div class="col s9">
+                        <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
+                    </div>
+                    <div class="col s3">
+                        Status
+                    </div>
+                    <div class="col s9">
+                        {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="divider mb-3 mt-3"></div>
+        <!-- product details table-->
+        <div class="invoice-product-details">
+        <table class="bordered">
+            <thead>
+                <tr>
+                    <th class="center">Item</th>
+                    <th class="center">Jum.</th>
+                    <th class="center">Sat.</th>
+                    <th class="center">Gudang Asal</th>
+                    <th class="center">Gudang Tujuan</th>
+                    <th class="center">Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data->inventoryTransferDetail as $row)
+                <tr>
+                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                    <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
+                    <td class="center-align">{{ $row->item->uomUnit->code }}</td>
+                    <td class="center-align">{{ $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code }}</td>
+                    <td class="center-align">{{ $row->toPlace->code.' - '.$row->toWarehouse->code }}</td>
+                    <td>{{ $row->note }}</td>
+                </tr>
+                @endforeach
+            </tbody>
         </table>
-        <div class="invoice-product-details mt-3">
-            <table class="bordered">
-                <thead>
-                    <tr>
-                        <th class="center">No.</th>
-                        <th class="center">Aset</th>
-                        <th class="center">Qty</th>
-                        <th class="center">Satuan</th>
-                        <th class="center">Nominal Aset</th>
-                        <th class="center">Nominal Retirement</th>
-                        <th class="center">Keterangan</th>
-                        <th class="center">Coa</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($data->retirementDetail as $key => $row)
-                        <tr>
-                            <td class="center-align">{{ $key + 1 }}</td>
-                            <td>{{ $row->asset->name }}</td>
-                            <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
-                            <td class="center-align">{{ $row->unit->code }}</td>
-                            <td class="right-align">{{ number_format($row->asset->nominal,3,',','.') }}</td>
-                            <td class="right-align">{{ number_format($row->retirement_nominal,3,',','.') }}</td>
-                            <td>{{ $row->note }}</td>
-                            <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="invoice-subtotal mt-3">
+    </div>
+    <!-- invoice subtotal -->
+    <div class="divider mt-3 mb-3"></div>
+        <div class="invoice-subtotal">
             <div class="row">
                 <div class="col m6 s6 l6">
                     {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}

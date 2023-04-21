@@ -74,7 +74,7 @@
                                                         <th>Coa Biaya</th>
                                                         <th>Keterangan</th>
                                                         <th>Status</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Site</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -116,7 +116,7 @@
                                     <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="plant_id">Pabrik/Kantor</label>
+                            <label class="" for="plant_id">Site</label>
                         </div>
                         <div class="input-field col m4 s6">
                             <input id="name" name="name" type="text" placeholder="Nama">

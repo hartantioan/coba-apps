@@ -64,7 +64,7 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Kode</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Site</th>
                                                         <th>Departemen</th>
                                                         <th>Nama</th>
                                                         <th>Min Time In</th>
@@ -110,7 +110,7 @@
                                     <option value="{{ $b->id }}">{{ $b->name.' - '.$b->company->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="place_id">Pabrik/Kantor</label>
+                            <label class="" for="place_id">Site</label>
                         </div>
                         <div class="input-field col s4">
                             <select class="form-control" id="department_id" name="department_id">

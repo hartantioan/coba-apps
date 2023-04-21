@@ -129,7 +129,7 @@
 						<th>No</th>
 						<th>Kode</th>
 						<th>Nama</th>
-                        <th>Pabrik/Kantor</th>
+                        <th>Site</th>
                         <th>Departemen</th>
                         <th>Min Time In</th>
                         <th>Time In</th>

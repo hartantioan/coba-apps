@@ -129,7 +129,7 @@
 						<th rowspan="2">No</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Code</th>
-                        <th rowspan="2">Pabrik/Kantor</th>
+                        <th rowspan="2">Site</th>
                         <th rowspan="2">Tanggal</th>
                         <th colspan="2">Mata Uang</th>
                         <th rowspan="2">Keterangan</th>

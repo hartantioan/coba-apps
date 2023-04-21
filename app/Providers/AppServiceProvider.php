@@ -42,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
             'outgoing_payments'         => 'App\Models\OutgoingPayment',
             'good_receives'             => 'App\Models\GoodReceive',
             'good_issues'               => 'App\Models\GoodIssue',
+            'inventory_transfers'       => 'App\Models\InventoryTransfer',
         ]);
     }
 }

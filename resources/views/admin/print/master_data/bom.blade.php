@@ -130,7 +130,7 @@
 						<th>Kode</th>
 						<th>Nama</th>
                         <th>Item</th>
-                        <th>Pabrik/Kantor</th>
+                        <th>Site</th>
                         <th>Qty Output</th>
                         <th>Qty Rencana</th>
                         <th>Tipe</th>

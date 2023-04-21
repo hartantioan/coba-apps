@@ -47,7 +47,7 @@ class InventoryTransfer extends Model
 
     public function inventoryTransferDetail()
     {
-        return $this->hasMany('App\Models\GoodReceiveDetail');
+        return $this->hasMany('App\Models\InventoryTransferDetail');
     }
 
     public function status(){
@@ -95,7 +95,7 @@ class InventoryTransfer extends Model
 
     public static function generateCode()
     {
-        $query = GoodReceive::selectRaw('RIGHT(code, 9) as code')
+        $query = InventoryTransfer::selectRaw('RIGHT(code, 9) as code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();

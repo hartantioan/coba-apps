@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class inventoryTransferDetail extends Model
+class InventoryTransferDetail extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
@@ -46,6 +46,6 @@ class inventoryTransferDetail extends Model
 
     public function itemStock()
     {
-        return $this->belongsTo('App\Models\ItemStock', 'item_stock_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ItemStock', 'item_stock_id', 'id');
     }
 }

@@ -13,11 +13,11 @@
 			}
 			
 			th {
-				font-size:12px;
+				font-size:10px;
 			}
 		
 			.invoice-box {
-				font-size: 16px;
+				font-size: 12px;
 				font-family: 'Lato', sans-serif;
 				color: #555;
 				page-break-after: always;
@@ -83,7 +83,7 @@
 			}
 			
 			@media print {
-				@page {size: A4 portrait; }
+				@page {size: A4 landscape; }
 			}
 
 			.invoice-box.rtl {
@@ -123,15 +123,16 @@
 					</td>
 				</tr>
 			</table><br>
-			<table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:13px;">
+			<table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:10px;">
 				<thead>
 					<tr align="center">
 						<th>No</th>
-						<th>Kode</th>
-						<th>Nama</th>
+                        <th>Pengguna</th>
+						<th>Code</th>
                         <th>Site</th>
-                        <th>Area</th>
-                        <th>Item</th>
+                        <th>Tanggal</th>
+                        <th>Keterangan</th>
+                        <th>Dokumen</th>
                         <th>Status</th>
 					</tr>
 				</thead>
@@ -139,27 +140,40 @@
 					@foreach($data as $key => $row)
                         <tr align="center">
                             <td>{{ $key+1 }}</td>
+                            <td>{{ $row->user->name }}</td>
                             <td>{{ $row->code }}</td>
-                            <td>{{ $row->name }}</td>
-                            <td>{{ $row->place->name }}</td>
-                            <td>{{ $row->area->name }}</td>
-                            <td>{{ $row->item()->exists() ? $row->item->name : '-' }}</td>
+                            <td>{{ $row->company->name }}</td>
+                            <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                            <td>{{ $row->note }}</td>
+                            <td><a href="{{ $row->attachment() }}">File</a></td>
                             <td>{!! $row->status() !!}</td>
                         </tr>
                         <tr>
-                            <td colspan="7">
-                                <h3>List Parts & Spare Parts</h3>
-                                <ol>
-                                @foreach ($row->equipmentPart as $rowp)
-                                    <li>
-                                        {{ $rowp->name.' - '.($rowp->status == '1' ? 'Active' : 'Non-active' ) }}
-                                        @foreach ($rowp->sparepart as $rowsp)
-                                        <ol type="a"> 
-                                            <li>{{ $rowsp->item->name.' Qty '.$rowsp->qty.' '.$rowsp->item->uomUnit->code.' - '.($rowsp->status == '1' ? 'Active' : 'Non-active' ) }}</li>
-                                        </ol>
+                            <td colspan="8" style="border-right-style: none !important;">
+                                <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
+                                    <thead>
+                                        <tr align="center">
+                                            <th>Item</th>
+                                            <th>Qty</th>
+                                            <th>Satuan</th>
+                                            <th>Gudang Asal</th>
+                                            <th>Gudang Tujuan</th>
+                                            <th>Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($row->inventoryTransferDetail as $key1 => $rowdetail)
+                                        <tr align="center">
+                                            <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
+                                            <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                                            <td>{{ $rowdetail->item->uomUnit->code }}</td>
+                                            <td>{{ $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->code }}</td>
+                                            <td>{{ $rowdetail->toPlace->code.' - '.$rowdetail->toWarehouse->code }}</td>
+                                            <td>{{ $rowdetail->note }}</td>
+                                        </tr>
                                         @endforeach
-                                @endforeach
-                                </ol>
+                                    </tbody>
+                                </table>
                             </td>
                         </tr>
 					@endforeach

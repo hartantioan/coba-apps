@@ -11,6 +11,7 @@ use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
+use App\Models\InventoryTransfer;
 use App\Models\OutgoingPayment;
 use App\Models\Place;
 use App\Models\Retirement;
@@ -667,6 +668,81 @@ class CustomHelper {
 					]);
 				}
 			}
+		}elseif($table_name == 'inventory_transfers'){
+			$it = InventoryTransfer::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+
+			foreach($it->inventoryTransferDetail as $rowdetail){
+				$priceout = $rowdetail->item->priceNow($rowdetail->itemStock->place_id);
+				$nominal = $rowdetail->qty * $priceout;
+				
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+					'place_id'		=> $rowdetail->to_place_id,
+					'warehouse_id'	=> $rowdetail->to_warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $nominal,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+					'place_id'		=> $rowdetail->itemStock->place_id,
+					'warehouse_id'	=> $rowdetail->itemStock->warehouse_id,
+					'type'			=> '2',
+					'nominal'		=> $nominal,
+				]);
+
+				self::sendCogs('inventory_transfers',
+					$it->id,
+					$rowdetail->itemStock->place->company_id,
+					$rowdetail->itemStock->place_id,
+					$rowdetail->itemStock->warehouse_id,
+					$rowdetail->item_id,
+					$rowdetail->qty,
+					$nominal,
+					'OUT',
+					$it->post_date
+				);
+
+				self::sendStock(
+					$rowdetail->itemStock->place_id,
+					$rowdetail->itemStock->warehouse_id,
+					$rowdetail->item_id,
+					$rowdetail->qty,
+					'OUT'
+				);
+
+				self::sendCogs('inventory_transfers',
+					$it->id,
+					$rowdetail->toPlace->company_id,
+					$rowdetail->to_place_id,
+					$rowdetail->to_warehouse_id,
+					$rowdetail->item_id,
+					$rowdetail->qty,
+					$nominal,
+					'IN',
+					$it->post_date
+				);
+
+				self::sendStock(
+					$rowdetail->to_place_id,
+					$rowdetail->to_warehouse_id,
+					$rowdetail->item_id,
+					$rowdetail->qty,
+					'IN'
+				);
+			}
 		}else{
 
 			if(isset($data->currency_id)){
@@ -805,6 +881,16 @@ class CustomHelper {
 				'warehouse_id'	=> $warehouse_id,
 				'item_id'		=> $item_id,
 				'qty'			=> $type == 'IN' ? 0 - $qty : $qty,
+			]);
+		}
+	}
+
+	public static function removeStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null){
+		$data = ItemStock::where('place_id',$place_id)->where('warehouse_id',$warehouse_id)->where('item_id',$item_id)->first();
+
+		if($data){
+			$data->update([
+				'qty' => $data->qty - $qty,
 			]);
 		}
 	}

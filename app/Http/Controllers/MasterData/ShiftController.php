@@ -254,7 +254,7 @@ class ShiftController extends Controller
             'department_id'             => 'required',
         ], [
             'name.required'                 => 'Nama Shift tidak boleh kosong.',
-            'place_id.required'             => 'Pabrik/Kantor tidak boleh kosong.',
+            'place_id.required'             => 'Site tidak boleh kosong.',
             'department_id.required'        => 'Departemen tidak boleh kosong',
         ]);
 

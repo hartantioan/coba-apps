@@ -166,7 +166,7 @@ class BomController extends Controller
             'qty_output.required'           => 'Jumlah output produksi tidak boleh kosong',
             'qty_planned.required'          => 'Jumlah rata-rata produksi tidak boleh kosong',
             'type.required'                 => 'Tipe bill of material tidak boleh kosong',
-            'place_id.required'             => 'Pabrik/Kantor tidak boleh kosong',
+            'place_id.required'             => 'Site tidak boleh kosong',
             'arr_item.required'             => 'Material tidak boleh kosong',
             'arr_item.array'                => 'Material haruslah dalam bentuk array',
             'arr_qty.required'              => 'Jumlah material tidak boleh kosong',

@@ -353,7 +353,7 @@
                                                     <th class="center" width="25px">% PPN</th>
                                                     <th class="center">Ber-PPH?</th>
                                                     <th class="center" width="25px">% PPH</th>
-                                                    <th class="center">Pabrik/Kantor</th>
+                                                    <th class="center">Site</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Hapus</th>

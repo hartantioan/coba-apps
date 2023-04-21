@@ -43,6 +43,7 @@ use App\Http\Controllers\Purchase\LandedCostController;
 use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
+use App\Http\Controllers\Inventory\InventoryTransferController;
 use App\Http\Controllers\Inventory\GoodReceiveController;
 use App\Http\Controllers\Inventory\GoodIssueController;
 
@@ -616,6 +617,19 @@ Route::prefix('admin')->group(function () {
                 Route::get('approval/{id}',[GoodReceiptPOController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                 Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
+            });
+
+            Route::prefix('transfer')->middleware('operation.access:transfer,view')->group(function () {
+                Route::get('/',[InventoryTransferController::class, 'index']);
+                Route::get('datatable',[InventoryTransferController::class, 'datatable']);
+                Route::get('row_detail',[InventoryTransferController::class, 'rowDetail']);
+                Route::post('show', [InventoryTransferController::class, 'show']);
+                Route::post('print',[InventoryTransferController::class, 'print']);
+                Route::get('export',[InventoryTransferController::class, 'export']);
+                Route::post('create',[InventoryTransferController::class, 'create'])->middleware('operation.access:transfer,update');
+                Route::get('approval/{id}',[InventoryTransferController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('void_status', [InventoryTransferController::class, 'voidStatus'])->middleware('operation.access:transfer,void');
+                Route::post('destroy', [InventoryTransferController::class, 'destroy'])->middleware('operation.access:transfer,delete');
             });
 
             Route::prefix('good_receive')->middleware('operation.access:good_receive,view')->group(function () {

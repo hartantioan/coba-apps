@@ -65,7 +65,7 @@
                                                         <th>#</th>
                                                         <th>Kode</th>
                                                         <th>Oleh</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Site</th>
                                                         <th>Departemen</th>
                                                         <th>Nama</th>
                                                         <th>Min Time In</th>

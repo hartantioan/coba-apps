@@ -9,6 +9,10 @@
     table.bordered th {
         padding: 5px !important;
     }
+
+    .select2-dropdown {
+        width: 200px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -24,9 +28,7 @@
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(2))) }}</a>
                             </li>
-                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(3))) }}</a>
-                            </li>
-                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(4))) }}
+                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(3))) }}
                             </li>
                         </ol>
                     </div>
@@ -69,29 +71,39 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">
+                                        List Data
+                                        <button class="btn waves-effect waves-light mr-1 float-right btn-small" onclick="loadDataTable()">
+                                            Refresh
+                                            <i class="material-icons left">refresh</i>
+                                        </button>
+                                    </h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card purple">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Data yang anda masukkan disini akan mempengaruhi nilai qty stock saat ini.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>No</th>
+                                                        <th>Code</th>
                                                         <th>Pengguna</th>
-                                                        <th>Site</th>
-                                                        <th>Mata Uang</th>
-                                                        <th>Konversi</th>
+                                                        <th>Perusahaan</th>
                                                         <th>Tanggal</th>
                                                         <th>Keterangan</th>
+                                                        <th>Dokumen</th>
                                                         <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>Operasi</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -101,6 +113,7 @@
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -108,8 +121,8 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
-    <div class="modal-content">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
                 <h4>Add/Edit {{ $title }}</h4>
@@ -118,84 +131,68 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4">
-                            <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Auto generate" readonly>
-                            <label class="active" for="code">Kode</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <select class="form-control" id="place_id" name="place_id">
-                                @foreach($place as $b)
-                                    <option value="{{ $b->id }}">{{ $b->name.' - '.$b->company->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="place_id">Site</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <select class="form-control" id="currency_id" name="currency_id">
-                                @foreach ($currency as $row)
-                                    <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="currency_id">Mata Uang</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                            <label class="active" for="currency_rate">Konversi</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                            <label class="active" for="post_date">Tgl. Posting</label>
-                        </div>
-                        <div class="input-field col m4">
-                            <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                            <label class="active" for="note">Keterangan</label>
-                        </div>
-                        <div class="col m12 s12">
-                            <div class="col m6 s6">
+                        <div class="row">
+                            <div class="input-field col m3 s12">
+                                <input type="hidden" id="temp" name="temp">
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $rowcompany)
+                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="company_id">Perusahaan</label>
+                            </div>
+                            
+                            <div class="input-field col m3 s12">
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}">
+                                <label class="active" for="post_date">Tgl. Post</label>
+                            </div>
+                            <div class="file-field input-field col m3 s12">
+                                <div class="btn">
+                                    <span>Lampiran Bukti</span>
+                                    <input type="file" name="document" id="document">
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path validate" type="text">
+                                </div>
+                            </div>
+                            <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h4>Aset</h4>
-                                    <div class="row">
-                                        <div class="input-field col m6 s6">
-                                            <select class="browser-default" id="asset_id" name="asset_id"></select>
-                                            <label class="active" for="asset_id">Aset</label>
-                                        </div>
-                                        <div class="col m6 s6 mt-4">
-                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addAsset();" href="javascript:void(0);">
-                                                <i class="material-icons left">add</i> Tambah Aset
-                                            </a>
-                                        </div>
+                                    <h4>Detail Produk</h4>
+                                    Coa debit mengikuti coa pada masing-masing grup item.
+                                    <div style="overflow:auto;">
+                                        <table class="bordered" style="min-width:1600px !important;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">Item</th>
+                                                    <th class="center">Ambil Dari</th>
+                                                    <th class="center">Qty</th>
+                                                    <th class="center">Satuan UOM</th>
+                                                    <th class="center">Site Tujuan</th>
+                                                    <th class="center">Gudang Tujuan</th>
+                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-item">
+                                                <tr id="last-row-item">
+                                                    <td colspan="8" class="center">
+                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                            <i class="material-icons left">add</i> Tambah Item
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </p>
                             </div>
-                        </div>
-                        <div class="col s12" style="overflow:auto;">
-                            <table class="bordered" style="width:1500px;">
-                                <thead>
-                                    <tr>
-                                        <th class="center">No.</th>
-                                        <th class="center">Kode Aset</th>
-                                        <th class="center">Nama Aset</th>
-                                        <th class="center">Qty</th>
-                                        <th class="center">Unit</th>
-                                        <th class="center">Nominal Aset</th>
-                                        <th class="center">Nominal Retirement</th>
-                                        <th class="center">Keterangan</th>
-                                        <th class="center">Coa</th>
-                                        <th class="center">Hapus</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body-asset">
-                                    <tr id="empty-detail">
-                                        <td colspan="10" class="center">
-                                            Pilih aset untuk memulai...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <div class="input-field col m4 s12">
+                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <label class="active" for="note">Keterangan</label>
+                            </div>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -221,7 +218,7 @@
 </div>
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1" onclick="getCode();">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
     </a>
 </div>
@@ -229,6 +226,11 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
             var badge = tr.find('button.btn-floating');
@@ -251,23 +253,33 @@
         });
 
         loadDataTable();
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+                $('#post_date').attr('min','{{ date("Y-m-d") }}');
+                $('#due_date').attr('min','{{ date("Y-m-d") }}');
+                $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
-                $('ul.tabs').tabs();
+                window.onbeforeunload = function() {
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
                 M.updateTextFields();
-                resetDetailForm();
+                $('#list-used-data').empty();
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -283,84 +295,141 @@
             }
         });
 
-        select2ServerSide('#asset_id', '{{ url("admin/select2/asset") }}');
-        
-        $("#item_id").on("select2:unselecting", function(e) {
-            $('#code').val('');
-            $('#name').val('');
-        });
-
-        $('#body-asset').on('click', '.delete-data-asset', function() {
+        $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
         });
     });
 
-    function resetDetailForm(){
-        $('.row_asset').each(function(){
-            $(this).remove();
-        });
-        $('#body-asset').empty().append(`
-            <tr id="empty-detail">
-                <td colspan="10" class="center">
-                    Pilih aset untuk memulai...
+    function getRowUnit(val){
+        if($("#arr_item" + val).val()){
+
+            if($("#arr_item" + val).select2('data')[0].stock_list.length){
+                $('#arr_item_stock' + val).empty();
+                $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
+                    $('#arr_item_stock' + val).append(`
+                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                    `);
+                });
+
+                $('#arr_item_stock' + val).formSelect();
+            }
+
+            $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
+        }else{
+            $('#arr_item_stock' + val).empty().formSelect();
+        }
+    }
+
+    function cekRow(val){
+        var qtystock = 0, balance = 0, stockinput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
+        if($('#arr_item_stock' + val).val()){
+            qtystock = parseFloat($('#arr_item_stock' + val).find(':selected').data('qty').replaceAll(".", "").replaceAll(",","."));
+        }
+
+        balance = qtystock - stockinput;
+
+        if(balance < 0){
+            M.toast({
+                html: 'Maaf, stock yang anda masukkan lebih dari stok yang ada pada gudang.'
+            });
+            $('#rowQty' + val).val(formatRupiahIni(qtystock.toFixed(2).toString().replace('.',',')));
+        }
+    }
+
+    function addItem(){
+        var count = makeid(10);
+        $('#last-row-item').before(`
+            <tr class="row_item">
+                <td>
+                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]"></select>
+                </td>
+                <td>
+                    <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);cekRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                </td>
+                <td class="center">
+                    <span id="arr_unit` + count + `">-</span>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                        @foreach ($place as $rowplace)
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                </td>
+                <td>
+                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
                 </td>
             </tr>
         `);
+        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+        $('#arr_place' + count).formSelect();
+        M.updateTextFields();
     }
 
-    function addAsset(){
-        if($('#asset_id').val()){
-            $('#empty-detail').remove();
-            var count = makeid(10);
-            var no = $('.row_asset').length + 1;
-            $('#body-asset').append(`
-                <tr class="row_asset">
-                    <input type="hidden" name="arr_asset_id[]" value="` + $("#asset_id").select2('data')[0].id + `">
-                    <td class="center">
-                        ` + no + `
-                    </td>
-                    <td>
-                        ` + $("#asset_id").select2('data')[0].code + `
-                    </td>
-                    <td>
-                        ` + $("#asset_id").select2('data')[0].name + `
-                    </td>
-                    <td class="center">
-                        <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="0" onkeyup="formatRupiah(this);">
-                    </td>
-                    <td class="center">
-                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
-                    </td>
-                    <td class="right-align">
-                        ` + $("#asset_id").select2('data')[0].nominal + `
-                    </td>
-                    <td class="center">
-                        <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);">
-                    </td>
-                    <td>
-                        <input name="arr_note[]" type="text" placeholder="Keterangan">
-                    </td>
-                    <td class="center">
-                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
-                    </td>
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </td>
-                </tr>
-            `);
-            if($("#asset_id").select2('data')[0].unit_id){
-                $('#arr_unit' + count).append(`
-                    <option value="` + $("#asset_id").select2('data')[0].unit_id + `">` + $("#asset_id").select2('data')[0].unit_name + `</option>
-                `);
-            }
-            select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
-            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-            $('#asset_id').empty();
-            $('#place_id').val($("#asset_id").select2('data')[0].place_id);
-        }
-    }
+    function loadDataTable() {
+		window.table = $('#datatable_serverside').DataTable({
+            "responsive": false,
+            "scrollX": true,
+            "stateSave": true,
+            "serverSide": true,
+            "deferRender": true,
+            "destroy": true,
+            "iDisplayInLength": 10,
+            "order": [[0, 'asc']],
+            ajax: {
+                url: '{{ Request::url() }}/datatable',
+                type: 'GET',
+                data: {
+                    status : $('#filter_status').val(),
+                    'warehouse[]' : $('#filter_warehouse').val()
+                },
+                beforeSend: function() {
+                    loadingOpen('#datatable_serverside');
+                },
+                complete: function() {
+                    loadingClose('#datatable_serverside');
+                },
+                error: function() {
+                    loadingClose('#datatable_serverside');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            },
+            columns: [
+                { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'code', className: 'center-align' },
+                { name: 'name', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
+                { name: 'date', className: 'center-align' },
+                { name: 'note', className: '' },
+                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                'columnsToggle' /* or colvis */
+            ]
+        });
+        $('.dt-buttons').appendTo('#datatable_buttons');
+
+        $('select[name="datatable_serverside_length"]').addClass('browser-default');
+	}
 
     function rowDetail(data) {
         var content = '';
@@ -386,60 +455,8 @@
         return content;
 	}
 
-    function loadDataTable() {
-		window.table = $('#datatable_serverside').DataTable({
-            "responsive": false,
-            "scrollX": true,
-            "stateSave": true,
-            "serverSide": true,
-            "deferRender": true,
-            "destroy": true,
-            "iDisplayInLength": 10,
-            "order": [[0, 'asc']],
-            ajax: {
-                url: '{{ Request::url() }}/datatable',
-                type: 'GET',
-                data: {
-                    status : $('#filter_status').val()
-                },
-                beforeSend: function() {
-                    loadingOpen('#datatable_serverside');
-                },
-                complete: function() {
-                    loadingClose('#datatable_serverside');
-                },
-                error: function() {
-                    loadingClose('#datatable_serverside');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            },
-            columns: [
-                { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'place', className: 'center-align' },
-                { name: 'currency_id', className: 'center-align' },
-                { name: 'currency_rate', className: 'center-align' },
-                { name: 'date', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
-                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
-            ],
-            dom: 'Blfrtip',
-            buttons: [
-                'columnsToggle' /* or colvis */
-            ]
-        });
-        $('.dt-buttons').appendTo('#datatable_buttons');
-        $('select[name="datatable_serverside_length"]').addClass('browser-default');
-	}
-
     function save(){
-		swal({
+        swal({
             title: "Apakah anda yakin ingin simpan?",
             text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
             icon: 'warning',
@@ -450,8 +467,8 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-
                 var formData = new FormData($('#form_data')[0]);
+        
                 $.ajax({
                     url: '{{ Request::url() }}/create',
                     type: 'POST',
@@ -537,75 +554,84 @@
             },
             beforeSend: function() {
                 loadingOpen('#main');
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+
+                $('#empty-item').remove();
             },
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
                 $('#temp').val(id);
-                $('#code').val(response.code);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#currency_id').val(response.currency_id).formSelect();
-                $('#currency_rate').val(response.currency_rate);
-                $('#post_date').val(response.post_date);
+                $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
-
-                resetDetailForm();
-
-                $('#empty-detail').remove();
-
-                $.each(response.details, function(i, val) {
-                    var count = makeid(10);
-                    var no = $('.row_asset').length + 1;
-                    $('#body-asset').append(`
-                        <tr class="row_asset">
-                            <input type="hidden" name="arr_asset_id[]" value="` + val.asset_id + `">
-                            <td class="center">
-                                ` + no + `
+                $('#post_date').val(response.post_date);
+                $('#post_date').removeAttr('min');
+                
+                if(response.details.length > 0){
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        $('#last-row-item').before(`
+                        <tr class="row_item">
+                            <td>
+                                <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                             </td>
                             <td>
-                                ` + val.asset_code + `
+                                <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]"></select>
                             </td>
                             <td>
-                                ` + val.asset_name + `
+                                <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);cekRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + val.qty + `" onkeyup="formatRupiah(this);">
-                            </td>
-                            <td class="center">
-                                <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
-                            </td>
-                            <td class="right-align">
-                                ` + val.asset_nominal + `
-                            </td>
-                            <td class="center">
-                                <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.retirement_nominal + `" onkeyup="formatRupiah(this);">
+                                <span id="arr_unit` + count + `">` + val.unit + `</span>
                             </td>
                             <td>
-                                <input name="arr_note[]" type="text" placeholder="Keterangan" value="` + val.note + `">
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>    
                             </td>
                             <td class="center">
-                                <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                            </td>
+                            <td>
+                                <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                             </td>
                             <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </td>
                         </tr>
-                    `);
-                    $('#arr_unit' + count).append(`
-                        <option value="` + val.unit_id + `">` + val.unit_name + `</option>
-                    `);
-                    select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
-                    $('#arr_coa' + count).append(`
-                        <option value="` + val.coa_id + `">` + val.coa_name + `</option>
-                    `);
-                    select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-                });
+                        `);
+                        $('#arr_item' + count).append(`
+                            <option value="` + val.item_id + `">` + val.item_name + `</option>
+                        `);
+                        $('#arr_warehouse' + count).append(`
+                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                        `);
+                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+                        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                        $('#arr_place' + count).val(val.place_id).formSelect();
+                        
+                        if(val.stock_list.length){
+                            $('#arr_item_stock' + count).empty();
+                            $.each(val.stock_list, function(i, value) {
+                                $('#arr_item_stock' + count).append(`
+                                    <option value="` + value.id + `" data-qty="` + value.qty_raw + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                `);
+                            });
 
+                            $('#arr_item_stock' + count).formSelect();
+                            $('#arr_item_stock' + count).val(val.item_stock_id).formSelect();
+                        }
+                    });
+                }
+                
                 $('.modal-content').scrollTop(0);
-                $('#code').focus();
+                $('#note').focus();
                 M.updateTextFields();
             },
             error: function() {
@@ -661,34 +687,6 @@
         });
     }
 
-    function getCode(){
-        $.ajax({
-            url: '{{ Request::url() }}/get_code',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {},
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#code');
-            },
-            success: function(response) {
-                loadingClose('#code');
-                $('#code').val(response.code);
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('#code');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
     function destroy(id){
         swal({
             title: "Apakah anda yakin?",
@@ -732,6 +730,24 @@
         });
     }
 
+    function printPreview(code){
+        $.ajax({
+            url: '{{ Request::url() }}/approval/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                $('#modal2').modal('open');
+                $('#show_print').html(data);
+            }
+        });
+    }
+
     function printData(){
         var search = window.table.search();
         var status = $('#filter_status').val();
@@ -741,7 +757,7 @@
             url  : '{{ Request::url() }}/print',
             data : {
                 search : search,
-                status : status
+                status : status,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -761,23 +777,5 @@
         var status = $('#filter_status').val();
         
         window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
-    }
-
-    function printPreview(code){
-        $.ajax({
-            url: '{{ Request::url() }}/approval/' + code,
-            type:'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            complete: function() {
-                
-            },
-            success: function(data){
-                loadingClose('.modal-content');
-                $('#modal2').modal('open');
-                $('#show_print').html(data);
-            }
-        });
     }
 </script>

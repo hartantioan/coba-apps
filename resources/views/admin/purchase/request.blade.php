@@ -90,7 +90,7 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Code</th>
-                                                        <th rowspan="2">Pabrik/Kantor</th>
+                                                        <th rowspan="2">Site</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Dokumen</th>

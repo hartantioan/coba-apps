@@ -606,7 +606,7 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Tgl.Dipakai</th>
-                                <th class="center-align">Pabrik/Plant</th>
+                                <th class="center-align">Site</th>
                                 <th class="center-align">Departemen</th>
                             </tr>
                         </thead><tbody>';

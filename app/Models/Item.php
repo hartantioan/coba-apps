@@ -85,14 +85,26 @@ class Item extends Model
         return $arrPrice;
     }
 
+    public function priceNow($place_id){
+        $pricenow = 0;
+        $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->orderByDesc('date')->orderByDesc('id')->first();
+        if($price){
+            $pricenow = $price->price_final;
+        }
+        
+        return $pricenow;
+    }
+
     public function currentStock($dataplaces){
         $arrData = [];
         foreach($dataplaces as $row){
             $data = ItemStock::where('item_id',$this->id)->where('place_id',intval($row))->get();
             foreach($data as $detail){
                 $arrData[] = [
+                    'id'            => $detail->id,
                     'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
                     'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
+                    'qty_raw'       => number_format($detail->qty,3,',','.'),
                 ];
             }
         }

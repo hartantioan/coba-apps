@@ -35,7 +35,6 @@ class ExportCapitalization implements FromView
                 }
 
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
         ]);
     }

@@ -98,6 +98,31 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                        <div class="col s12 m12">
+                                            <h5>TRIAL STOK REALTIME</h5>
+                                            <table class="bordered" style="font-size:10px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center-align">No.</th>
+                                                        <th class="center-align">Item</th>
+                                                        <th class="center-align">Site</th>
+                                                        <th class="center-align">Gudang</th>
+                                                        <th class="center-align">Qty</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($itemstocks as $key => $row)
+                                                        <tr>
+                                                            <td class="center-align">{{ ($key + 1) }}</td>
+                                                            <td class="center-align">{{ $row->item->name }}</td>
+                                                            <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                                                            <td class="center-align">{{ $row->warehouse->name }}</td>
+                                                            <td class="center-align">{{ number_format($row->qty,3,',','.').' '.$row->item->uomUnit->code }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -107,7 +132,46 @@
                     <div id="intro">
                         <div class="row">
                             <div class="col s12">
+                                @php
+                                    /* $prq = [];
+                                    foreach($pr as $key => $row){
+                                        $prq[$key]['code'] = $row->code;
+                                        foreach($row->purchaseRequestDetail as $keykey => $rowprd){
+                                            foreach($rowprd->purchaseOrderDetail as $keydetail => $rowpod){
+                                                $prq[$key]['po'][$keydetail]['code'] = $rowpod->purchaseOrder->code.' - poid - '.$rowpod->id.' index '.$keykey;
+                                                foreach($rowpod->goodReceiptDetail as $rowgrd){
+                                                    $prq[$key]['po'][$keydetail]['gr'][] = $rowgrd->goodReceipt->code;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    echo json_encode($prq);
+                                    $arr = [];
+                                    foreach($pr1->purchaseRequestDetail as $keykey => $rowprd){
+                                        foreach($rowprd->purchaseOrderDetail as $keydetail => $rowpod){
+                                            $arr[$key]['po'][$keydetail]['code'] = $rowpod->purchaseOrder->code.' - poid - '.$rowpod->id.' index '.$keykey;
+                                            foreach($rowpod->goodReceiptDetail as $rowgrd){
+                                                $arr[$key]['po'][$keydetail]['gr'][] = $rowgrd->goodReceipt->code;
+                                            }
+                                        }
+                                    }
+                                    echo json_encode($arr); */
 
+                                    /* $pr = [];
+                                    $gr = [];
+
+                                    foreach($po->purchaseOrderDetail as $row){
+                                        $pr[] = $row->purchaseRequestDetail->purchaseRequest->code;
+                                        foreach($row->goodReceiptDetail as $rowgrd){
+                                            $gr[] = $rowgrd->goodReceipt->code;
+                                        }
+                                    }
+
+                                    $po['pr'] = $pr;
+                                    $po['gr'] = $gr;
+
+                                    echo json_encode($po); */
+                                @endphp
                                 <div id="img-modal" class="modal white">
                                     <div class="modal-content">
                                         <div class="bg-img-div"></div>

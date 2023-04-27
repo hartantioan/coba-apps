@@ -12,14 +12,13 @@ class ExportPurchaseInvoice implements FromView
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $type = null, string $company = null, string $account = null, string $currency = null, array $dataplaces = null)
+    public function __construct(string $search = null, string $status = null, string $type = null, string $company = null, string $account = null, array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
         $this->type = $type ? $type : '';
         $this->company = $company ? $company : '';
         $this->account = $account ? $account : '';
-        $this->currency = $currency ? $currency : '';
         $this->dataplaces = $dataplaces ? $dataplaces : [];
     }
 
@@ -69,11 +68,6 @@ class ExportPurchaseInvoice implements FromView
                 if($this->account){
                     $arrAccount = explode(',',$this->account);
                     $query->whereIn('account_id',$arrAccount);
-                }
-
-                if($this->currency){
-                    $arrCurrency = explode(',',$this->currency);
-                    $query->whereIn('currency_id',$arrCurrency);
                 }
 
                 if($this->company){

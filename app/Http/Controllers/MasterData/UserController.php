@@ -18,7 +18,6 @@ use App\Models\User;
 use App\Models\UserBank;
 use App\Models\UserFile;
 use App\Models\UserData;
-use App\Models\Bank;
 use App\Models\Place;
 use App\Models\Warehouse;
 use App\Models\Department;
@@ -29,6 +28,7 @@ use App\Models\Group;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportUser;
 use App\Helpers\CustomHelper;
+use App\Imports\ImportUser;
 
 class UserController extends Controller
 {
@@ -341,7 +341,7 @@ class UserController extends Controller
                             </tr>
                             <tr>
                                 <th>Deposit</th>
-                                <th>'.$data->deposit.'</th>
+                                <th>'.number_format($data->deposit,0,',','.').'</th>
                             </tr>
                             <tr>
                                 <th>Limit Credit</th>
@@ -611,6 +611,11 @@ class UserController extends Controller
                 
                 if($request->checkboxView){
                     MenuUser::where('user_id',$request->tempuseraccess)->whereNotIn('menu_id',$request->checkboxView)->where('type','view')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->whereNotIn('menu_id',$request->checkboxView)->where('type','view')->delete();
+                        }
+                    }
 
                     foreach($request->checkboxView as $row){
                         $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','view')->count();
@@ -621,13 +626,36 @@ class UserController extends Controller
                                 'type'      => 'view'
                             ]);
                         }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','view')->count();
+                                if($cek2 == 0){
+                                    MenuUser::create([
+                                        'user_id'   => $rowuser,
+                                        'menu_id'   => $row,
+                                        'type'      => 'view'
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }else{
                     MenuUser::where('user_id',$request->tempuseraccess)->where('type','view')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->where('type','view')->delete();
+                        }
+                    }
                 }
 
                 if($request->checkboxUpdate){
                     MenuUser::where('user_id',$request->tempuseraccess)->whereNotIn('menu_id',$request->checkboxUpdate)->where('type','update')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->whereNotIn('menu_id',$request->checkboxUpdate)->where('type','update')->delete();
+                        }
+                    }
 
                     foreach($request->checkboxUpdate as $row){
                         $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','update')->count();
@@ -638,13 +666,36 @@ class UserController extends Controller
                                 'type'      => 'update'
                             ]);
                         }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','update')->count();
+                                if($cek2 == 0){
+                                    MenuUser::create([
+                                        'user_id'   => $rowuser,
+                                        'menu_id'   => $row,
+                                        'type'      => 'update'
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }else{
                     MenuUser::where('user_id',$request->tempuseraccess)->where('type','update')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->where('type','update')->delete();
+                        }
+                    }
                 }
 
                 if($request->checkboxDelete){
                     MenuUser::where('user_id',$request->tempuseraccess)->whereNotIn('menu_id',$request->checkboxDelete)->where('type','delete')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->whereNotIn('menu_id',$request->checkboxDelete)->where('type','delete')->delete();
+                        }
+                    }
 
                     foreach($request->checkboxDelete as $row){
                         $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','delete')->count();
@@ -655,13 +706,36 @@ class UserController extends Controller
                                 'type'      => 'delete'
                             ]);
                         }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','delete')->count();
+                                if($cek2 == 0){
+                                    MenuUser::create([
+                                        'user_id'   => $rowuser,
+                                        'menu_id'   => $row,
+                                        'type'      => 'delete'
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }else{
                     MenuUser::where('user_id',$request->tempuseraccess)->where('type','delete')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->where('type','delete')->delete();
+                        }
+                    }
                 }
 
                 if($request->checkboxVoid){
                     MenuUser::where('user_id',$request->tempuseraccess)->whereNotIn('menu_id',$request->checkboxVoid)->where('type','void')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->whereNotIn('menu_id',$request->checkboxVoid)->where('type','void')->delete();
+                        }
+                    }
 
                     foreach($request->checkboxVoid as $row){
                         $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','void')->count();
@@ -672,13 +746,36 @@ class UserController extends Controller
                                 'type'      => 'void'
                             ]);
                         }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','void')->count();
+                                if($cek2 == 0){
+                                    MenuUser::create([
+                                        'user_id'   => $rowuser,
+                                        'menu_id'   => $row,
+                                        'type'      => 'void'
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }else{
                     MenuUser::where('user_id',$request->tempuseraccess)->where('type','void')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->where('type','void')->delete();
+                        }
+                    }
                 }
 
                 if($request->checkplace){
                     UserPlace::where('user_id',$request->tempuseraccess)->whereNotIn('place_id',$request->checkplace)->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            UserPlace::where('user_id',$rowuser)->whereNotIn('place_id',$request->checkplace)->delete();
+                        }
+                    }
 
                     foreach($request->checkplace as $row){
                         $cek = UserPlace::where('user_id',$request->tempuseraccess)->where('place_id',$row)->count();
@@ -688,13 +785,35 @@ class UserController extends Controller
                                 'place_id'  => $row
                             ]);
                         }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = UserPlace::where('user_id',$rowuser)->where('place_id',$row)->count();
+                                if($cek2 == 0){
+                                    UserPlace::create([
+                                        'user_id'   => $rowuser,
+                                        'place_id'  => $row
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }else{
                     UserPlace::where('user_id',$request->tempuseraccess)->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            UserPlace::where('user_id',$rowuser)->delete();
+                        }
+                    }
                 }
 
                 if($request->checkwarehouse){
                     UserWarehouse::where('user_id',$request->tempuseraccess)->whereNotIn('warehouse_id',$request->checkwarehouse)->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            UserWarehouse::where('user_id',$rowuser)->whereNotIn('warehouse_id',$request->checkwarehouse)->delete();
+                        }
+                    }
 
                     foreach($request->checkwarehouse as $row){
                         $cek = UserWarehouse::where('user_id',$request->tempuseraccess)->where('warehouse_id',$row)->count();
@@ -704,9 +823,26 @@ class UserController extends Controller
                                 'warehouse_id'  => $row
                             ]);
                         }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = UserWarehouse::where('user_id',$rowuser)->where('warehouse_id',$row)->count();
+                                if($cek2 == 0){
+                                    UserWarehouse::create([
+                                        'user_id'   => $rowuser,
+                                        'place_id'  => $row
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }else{
                     UserWarehouse::where('user_id',$request->tempuseraccess)->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            UserWarehouse::where('user_id',$rowuser)->delete();
+                        }
+                    }
                 }
 
                 DB::commit();
@@ -815,5 +951,63 @@ class UserController extends Controller
         $type = $request->type ? $request->type : '';
 		
 		return Excel::download(new ExportUser($search,$status,$type), 'user_'.uniqid().'.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => [
+                'required',
+                'mimes:xlsx',
+                'max:2048',
+                function ($attribute, $value, $fail) {
+                    $rows = Excel::toArray([], $value)[0];
+                    if (count($rows) < 2) {
+                        $fail('The file must contain at least two rows.');
+                    }
+                }
+            ]
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'status' => 432,
+                'error'  => $validator->errors()
+            ];
+            return response()->json($response);
+        }
+
+        try {
+            Excel::import(new ImportUser, $request->file('file'));
+
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Import sukses!'
+            ]);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = [
+                    'row' => $failure->row(),
+                    'attribute' => $failure->attribute(),
+                    'errors' => $failure->errors(),
+                    'values' => $failure->values(),
+                ];
+            }
+            $response = [
+                'status' => 422,
+                'error'  => $errors
+            ];
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            $response = [
+                'status'  => 500,
+                'message' => "Data failed to save"
+            ];
+            return response()->json($response);
+        }
     }
 }

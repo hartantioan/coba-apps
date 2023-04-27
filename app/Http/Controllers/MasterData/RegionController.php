@@ -80,7 +80,7 @@ class RegionController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    $nomor,
+                    $val->id,
                     $val->code,
                     $val->name,
                     $val->parentRegion(),

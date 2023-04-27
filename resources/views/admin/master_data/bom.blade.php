@@ -77,7 +77,7 @@
                                                         <th>Kode</th>
                                                         <th>Nama</th>
                                                         <th>Item</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Site</th>
                                                         <th>Qty Output</th>
                                                         <th>Qty Rencana</th>
                                                         <th>Type</th>
@@ -148,7 +148,7 @@
                                     <option value="{{ $b->id }}">{{ $b->name.' - '.$b->company->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="place_id">Pabrik/Kantor</label>
+                            <label class="" for="place_id">Site</label>
                         </div>
                         <div class="input-field col s4">
                             <div class="switch mb-1">

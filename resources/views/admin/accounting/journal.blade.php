@@ -178,7 +178,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="center">Coa</th>
-                                                <th class="center">Pabrik/Kantor</th>
+                                                <th class="center">Site</th>
                                                 <th class="center">Item</th>
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Gudang</th>
@@ -204,7 +204,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="center">Coa</th>
-                                                <th class="center">Pabrik/Kantor</th>
+                                                <th class="center">Site</th>
                                                 <th class="center">Item</th>
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Gudang</th>

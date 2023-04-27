@@ -20,6 +20,7 @@ class PurchaseDownPayment extends Model
         'user_id',
         'account_id',
         'company_id',
+        'tax_id',
         'is_tax',
         'is_include_tax',
         'percent_tax',
@@ -53,6 +54,11 @@ class PurchaseDownPayment extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function tax()
+    {
+        return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
     }
 
     public function voidUser()

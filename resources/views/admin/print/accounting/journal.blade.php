@@ -130,7 +130,7 @@
                         <th>Pengguna</th>
 						<th>Target BP</th>
 						<th>Kode</th>
-                        <th>Pabrik/Kantor</th>
+                        <th>Site</th>
                         <th>Referensi</th>
                         <th>Mata Uang</th>
                         <th>Konversi</th>
@@ -162,7 +162,7 @@
                                     <thead>
                                         <tr align="center">
                                             <th>Coa</th>
-                                            <th>Pabrik/Plant</th>
+                                            <th>Site</th>
                                             <th>Item</th>
                                             <th>Departemen</th>
                                             <th>Gudang</th>

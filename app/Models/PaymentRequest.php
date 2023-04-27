@@ -19,7 +19,7 @@ class PaymentRequest extends Model
         'code',
         'user_id',
         'account_id',
-        'place_id',
+        'company_id',
         'coa_source_id',
         'post_date',
         'due_date',
@@ -58,9 +58,9 @@ class PaymentRequest extends Model
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function company()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function coaSource()

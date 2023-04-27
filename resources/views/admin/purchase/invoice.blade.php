@@ -99,17 +99,6 @@
                                                     <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_currency" style="font-size:1rem;">Mata Uang :</label>
-                                                <div class="input-field">
-                                                    <select class="select2 browser-default" multiple="multiple" id="filter_currency" name="filter_currency" onchange="loadDataTable()">
-                                                        <option value="" disabled>Semua</option>
-                                                        @foreach ($currency as $row)
-                                                            <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
                                         </div>  
                                     </div>
                                 </li>
@@ -134,9 +123,8 @@
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Sup/Ven</th>
                                                         <th rowspan="2">Perusahaan</th>
-                                                        <th colspan="3" class="center-align">Tanggal</th>
+                                                        <th colspan="4" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Tipe</th>
-                                                        <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">No.Faktur Pajak</th>
@@ -157,10 +145,9 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Post</th>
+                                                        <th>Terima</th>
                                                         <th>Tenggat</th>
                                                         <th>Dokumen</th>
-                                                        <th>Kode</th>
-                                                        <th>Konversi</th>
                                                         <th>Prosentase</th>
                                                         <th>Nominal</th>
                                                     </tr>
@@ -193,7 +180,7 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="getGoodReceiptLandedCost(this.value);"></select>
+                                <select class="browser-default" id="account_id" name="account_id" onchange="getGrLcPo(this.value);"></select>
                                 <label class="active" for="account_id">Supplier / Vendor</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -216,8 +203,12 @@
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="top" name="top" min="0" type="number" value="0" onkeyup="addDays();">
-                                <label class="active" for="top">TOP (hari) Autofill dari TOP Master Data</label>
+                                <input id="received_date" name="received_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Terima" value="{{ date('Y-m-d') }}" onchange="addDays();">
+                                <label class="active" for="received_date">Tgl. Terima</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="top" name="top" min="0" type="number" value="0" onchange="addDays();">
+                                <label class="active" for="top">TOP (hari) Autofill dari GRPO</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
@@ -256,22 +247,6 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="currency_id" name="currency_id">
-                                    @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="currency_id">Mata Uang</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                <label class="active" for="currency_rate">Konversi</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="deposit" name="deposit" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly>
-                                <label class="active" for="deposit">Supp/Ven. Sisa Deposit <i>(Autofill)</i></label>
-                            </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Good Receipt PO / Landed Cost</h5>
@@ -286,6 +261,9 @@
                                                         </label>
                                                     </th>
                                                     <th class="center">GR/LC No.</th>
+                                                    <th class="center">NO.PO</th>
+                                                    <th class="center">No.SJ</th>
+                                                    <th class="center">Item</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Tenggat</th>
                                                     <th class="center">Total</th>
@@ -297,7 +275,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="empty-detail">
-                                                    <td colspan="9" class="center">
+                                                    <td colspan="12" class="center">
                                                         Pilih supplier/vendor untuk memulai...
                                                     </td>
                                                 </tr>
@@ -322,12 +300,13 @@
                                                     <th class="center">Purchase DP No.</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Nominal</th>
+                                                    <th class="center">Sisa</th>
                                                     <th class="center">Dipakai</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail-dp">
                                                 <tr id="empty-detail-dp">
-                                                    <td colspan="5" class="center">
+                                                    <td colspan="6" class="center">
                                                         Pilih supplier/vendor untuk memulai...
                                                     </td>
                                                 </tr>
@@ -359,17 +338,19 @@
                                             <td class="right-align"><span id="wtax">0,00</span></td>
                                         </tr>
                                         <tr>
-                                            <td>Grandtotal</td>
-                                            <td class="right-align"><span id="grandtotal">0,00</span></td>
-                                        </tr>
-                                        <tr>
                                             <td>Uang Muka</td>
                                             <td class="right-align">
                                                 <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Sisa</td>
+                                            <td>Pembulatan</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Grandtotal</td>
                                             <td class="right-align"><span id="balance">0,00</span></td>
                                         </tr>
                                     </thead>
@@ -464,13 +445,13 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="9" class="center">
+                        <td colspan="12" class="center">
                             Pilih supplier/vendor untuk memulai...
                         </td>
                     </tr>
                 `);
                 $('#account_id').empty();
-                $('#total,#tax,#wtax,#grandtotal,#balance').text('0,00');
+                $('#total,#tax,#wtax,#balance').text('0,00');
                 $('#subtotal,#discount,#downpayment').val('0,00');
                 window.onbeforeunload = function() {
                     return null;
@@ -493,7 +474,7 @@
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
     });
 
-    function getGoodReceiptLandedCost(val){
+    function getGrLcPo(val){
         if(val){
             $.ajax({
                 url: '{{ Request::url() }}/get_gr_lc',
@@ -511,7 +492,6 @@
                 success: function(response) {
                     loadingClose('.modal-content');
 
-                    $('#deposit').val(response.deposit);
                     $('#body-detail,#body-detail-dp').empty();
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
@@ -520,8 +500,6 @@
                                 <tr class="row_detail">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
                                     <td class="center-align">
                                         <label>
@@ -529,8 +507,17 @@
                                             <span>Pilih</span>
                                         </label>
                                     </td>
-                                    <td>
+                                    <td class="center">
                                         ` + val.rawcode + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.purchase_no + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.delivery_no + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.list_item + `
                                     </td>
                                     <td class="center">
                                         ` + val.post_date + `
@@ -541,11 +528,12 @@
                                     <td class="right-align">
                                         ` + val.total + `
                                     </td>
-                                    <td class="right-align">
-                                        ` + val.tax + `
+                                    <td class="right-align" id="row_tax` + count + `">
+                                        <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                    
                                     </td>
                                     <td class="right-align" id="row_wtax` + count + `">
-                                        ` + val.wtax + `
+                                        <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
                                     </td>
                                     <td class="right-align" id="row_grandtotal` + count + `">
                                         ` + val.grandtotal + `
@@ -556,21 +544,18 @@
                                 </tr>
                             `);
 
-                            if(val.is_wtax){
-                                $('#arr_is_wtax' + count).prop( "checked", true);
-                            }
-                            $('#arr_percent_wtax' + count).val(val.percent_wtax);
+                            $('#top').val(val.top);
                         });                        
                     }else{
                         $('#body-detail').empty().append(`
                             <tr id="empty-detail">
-                                <td colspan="9" class="center">
+                                <td colspan="12" class="center">
                                     Pilih supplier/vendor untuk memulai...
                                 </td>
                             </tr>
                         `);
 
-                        $('#total,#tax,#grandtotal,#balance').text('0,00');
+                        $('#total,#tax,#balance').text('0,00');
                     }
 
                     if(response.downpayments.length > 0){
@@ -594,7 +579,10 @@
                                         ` + val.grandtotal + `
                                     </td>
                                     <td class="center">
-                                        <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
+                                        ` + val.balance + `
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
                                     </td>
                                 </tr>
                             `);
@@ -602,7 +590,7 @@
                     }else{
                         $('#body-detail-dp').empty().append(`
                             <tr id="empty-detail-dp">
-                                <td colspan="5" class="center">
+                                <td colspan="6" class="center">
                                     Pilih supplier/vendor untuk memulai...
                                 </td>
                             </tr>
@@ -610,8 +598,6 @@
 
                         $('#downpayment').val('0,00');
                     }
-
-                    $('#top').val(response.top);
 
                     addDays();
                     
@@ -631,42 +617,32 @@
         }else{
             $('#body-detail').empty().append(`
                 <tr id="empty-detail">
-                    <td colspan="9" class="center">
+                    <td colspan="12" class="center">
                         Pilih supplier/vendor untuk memulai...
                     </td>
                 </tr>
             `);
-            $('#deposit').val('0,00');
             $('#top').val('0');
             $('#due_date').val('');
-            $('#total,#tax,#wtax,#grandtotal,#balance').text('0,00');
+            $('#total,#tax,#wtax,#balance').text('0,00');
         }
-    }
-
-    function applyWtax(val){
-        let percent_wtax = parseFloat($('#arr_percent_wtax' + val).val().replaceAll(".", "").replaceAll(",",".")), total = parseFloat($('input[name^="arr_total"][data-id="' + val + '"]').val().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('input[name^="arr_tax"][data-id="' + val + '"]').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, wtax=0;
-        if($('#arr_is_wtax' + val).is(':checked')){
-            wtax = total * (percent_wtax / 100);
-        }
-        grandtotal = total + tax - wtax;
-        $('input[name^="arr_wtax"][data-id="' + val + '"]').val(formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',',')));
-        $('input[name^="arr_grandtotal"][data-id="' + val + '"]').val(formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',',')));
-        $('#row_wtax' + val).text(formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',',')));
-        $('#row_grandtotal' + val).text(formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',',')));
     }
 
     function countAll(){
-        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0;
+        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
         
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
+                var rowgrandtotal = 0;
                 let element = $(this);
                 if($(element).is(':checked')){
-                    ada = true;                    
                     total += parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
                     tax += parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
                     wtax += parseFloat($('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                    grandtotal += parseFloat($('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    rowgrandtotal = parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")) + parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")) - parseFloat($('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    grandtotal += rowgrandtotal;
+                    $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',',')));
+                    $('#row_grandtotal' + element.data('id')).text(formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',',')));
                 }
             });
         }
@@ -679,15 +655,12 @@
             });
         }
 
-        balance = grandtotal - downpayment;
+        balance = grandtotal - downpayment + rounding;
 
         $('#downpayment').val(formatRupiahIni(roundTwoDecimal(downpayment).toString().replace('.',',')));
         $('#total').text(formatRupiahIni(roundTwoDecimal(total).toString().replace('.',',')));
         $('#tax').text(formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',',')));
         $('#wtax').text(formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',',')));
-        $('#grandtotal').text(
-            formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
-        );
         $('#balance').text(
             (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
         );
@@ -745,7 +718,6 @@
                     type : $('#filter_type').val(),
                     'account_id[]' : $('#filter_account').val(),
                     company_id : $('#filter_company').val(),
-                    'currency_id[]' : $('#filter_currency').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -769,11 +741,10 @@
                 { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
+                { name: 'received_date', className: 'center-align' },
                 { name: 'due_date', className: 'center-align' },
                 { name: 'document_date', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
-                { name: 'currency_id', className: 'center-align' },
-                { name: 'currency_rate', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'tax_no', className: 'center-align' },
@@ -984,9 +955,8 @@
                 `);
                 $('#type').val(response.type).formSelect();
                 $('#company_id').val(response.company_id).formSelect();
-                $('#currency_id').val(response.currency_id).formSelect();
-                $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
+                $('#received_date').val(response.received_date);
                 $('#due_date').val(response.due_date);
                 $('#document_date').val(response.document_date);                
                 $('#note').val(response.note);
@@ -1014,8 +984,17 @@
                                         <span>Pilih</span>
                                     </label>
                                 </td>
-                                <td>
+                                <td class="center">
                                     ` + val.rawcode + `
+                                </td>
+                                <td class="center">
+                                    ` + val.purchase_no + `
+                                </td>
+                                <td class="center">
+                                    ` + val.delivery_no + `
+                                </td>
+                                <td class="">
+                                    ` + val.list_item + `
                                 </td>
                                 <td class="center">
                                     ` + val.post_date + `
@@ -1026,11 +1005,12 @@
                                 <td class="right-align">
                                     ` + val.total + `
                                 </td>
-                                <td class="right-align">
-                                    ` + val.tax + `
+                                <td class="right-align" id="row_tax` + count + `">
+                                    <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                
                                 </td>
                                 <td class="right-align" id="row_wtax` + count + `">
-                                    ` + val.wtax + `
+                                    <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
                                 </td>
                                 <td class="right-align" id="row_grandtotal` + count + `">
                                     ` + val.grandtotal + `
@@ -1063,6 +1043,9 @@
                                 </td>
                                 <td class="center">
                                     ` + val.grandtotal + `
+                                </td>
+                                <td class="center">
+                                    ` + val.nominal + `
                                 </td>
                                 <td class="center">
                                     <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
@@ -1174,7 +1157,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         
         $.ajax({
             type : "POST",
@@ -1185,7 +1168,6 @@
                 type : type,
                 company : company,
                 'account[]' : account,
-                'currency[]' : currency
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1201,14 +1183,14 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&company=" + company + "&account=" + account + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&company=" + company + "&account=" + account;
     }
 
     function addDays(){
         if($('#top').val()){
-            var result = new Date($('#post_date').val());
+            var result = new Date($('#received_date').val());
             result.setDate(result.getDate() + parseInt($('#top').val()));
             $('#due_date').val(result.toISOString().split('T')[0]);
         }else{

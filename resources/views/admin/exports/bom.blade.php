@@ -5,7 +5,7 @@
             <th>KODE</th>
             <th>NAMA</th>
             <th>ITEM</th>
-            <th>PABRIK/KANTOR</th>
+            <th>SITE</th>
             <th>QTY OUTPUT</th>
             <th>QTY RENCANA</th>
             <th>TIPE</th>

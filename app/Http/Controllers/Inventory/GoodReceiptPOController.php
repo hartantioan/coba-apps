@@ -59,6 +59,7 @@ class GoodReceiptPOController extends Controller
             'due_date',
             'document_date',
             'note',
+            'delivery_no',
         ];
 
         $start  = $request->start;
@@ -143,6 +144,7 @@ class GoodReceiptPOController extends Controller
                     date('d M Y',strtotime($val->due_date)),
                     date('d M Y',strtotime($val->document_date)),
                     $val->note,
+                    $val->delivery_no,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
@@ -173,6 +175,7 @@ class GoodReceiptPOController extends Controller
 
     public function getPurchaseOrder(Request $request){
         $data = PurchaseOrder::where('id',$request->id)->where('status','2')->first();
+        $data['account_name'] = $data->supplier->employee_no.' - '.$data->supplier->name;
 
         if($data->used()->exists()){
             $data['status'] = '500';
@@ -251,6 +254,7 @@ class GoodReceiptPOController extends Controller
 			'post_date'		            => 'required',
 			'due_date'		            => 'required',
             'document_date'		        => 'required',
+            'delivery_no'		        => 'required',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
 		], [
@@ -260,6 +264,7 @@ class GoodReceiptPOController extends Controller
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
             'document_date.required' 			=> 'Tanggal dokumen tidak boleh kosong.',
+            'delivery_no.required' 			    => 'No surat jalan tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array',
             'arr_qty.required'                  => 'Qty item tidak boleh kosong',
@@ -370,6 +375,7 @@ class GoodReceiptPOController extends Controller
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
+                        $query->delivery_no = $request->delivery_no;
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->total = $totalall;
@@ -404,6 +410,7 @@ class GoodReceiptPOController extends Controller
                         'post_date'             => $request->post_date,
                         'due_date'              => $request->due_date,
                         'document_date'         => $request->document_date,
+                        'delivery_no'           => $request->delivery_no,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_receipts') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
@@ -676,7 +683,7 @@ class GoodReceiptPOController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'

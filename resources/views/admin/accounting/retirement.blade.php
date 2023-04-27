@@ -85,7 +85,7 @@
                                                         <th>#</th>
                                                         <th>No</th>
                                                         <th>Pengguna</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Site</th>
                                                         <th>Mata Uang</th>
                                                         <th>Konversi</th>
                                                         <th>Tanggal</th>
@@ -129,7 +129,7 @@
                                     <option value="{{ $b->id }}">{{ $b->name.' - '.$b->company->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="place_id">Pabrik/Kantor</label>
+                            <label class="" for="place_id">Site</label>
                         </div>
                         <div class="input-field col s4">
                             <select class="form-control" id="currency_id" name="currency_id">

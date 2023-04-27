@@ -174,10 +174,11 @@
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:1800px !important;">
+                                        <table class="bordered" style="min-width:2000px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
+                                                    <th class="center">Stok Skrg</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
                                                     <th class="center">Harga HPP</th>
@@ -192,7 +193,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="11" class="center">
+                                                    <td colspan="12" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </a>
@@ -239,8 +240,6 @@
         <i class="material-icons">add</i>
     </a>
 </div>
-
-<datalist id="tempPrice"></datalist>
 
 <!-- END: Page Main-->
 <script>
@@ -320,12 +319,28 @@
     });
 
     function getRowUnit(val){
-        $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
-        $.each($("#arr_item" + val).select2('data')[0].price_list, function(i, val) {
-            $('#tempPrice').append(`
-                <option value="` + val.price + `">` + val.description + `</option>
-            `);
-        });
+        if($("#arr_item" + val).val()){
+            $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
+            if($("#arr_item" + val).select2('data')[0].price_list.length){
+                $('#tempPrice' + val).empty();
+                $.each($("#arr_item" + val).select2('data')[0].price_list, function(i, value) {
+                    $('#tempPrice' + val).append(`
+                        <option value="` + value.price + `">` + value.description + `</option>
+                    `);
+                });
+            }
+            if($("#arr_item" + val).select2('data')[0].stock_list.length){
+                $('#arr_stock' + val).empty();
+                $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
+                    $('#arr_stock' + val).append(`
+                        ` + value.warehouse + ` - ` + value.qty + `<br>
+                    `);
+                });
+            }
+        }else{
+            $('#tempPrice' + val).empty();
+            $('#arr_stock' + val).text('-');
+        }
     }
 
     function loadDataTable() {
@@ -364,7 +379,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
@@ -415,6 +430,9 @@
                 <td>
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                 </td>
+                <td class="center">
+                    <span id="arr_stock` + count + `">-</span>
+                </td>
                 <td>
                     <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                 </td>
@@ -422,7 +440,8 @@
                     <span id="arr_unit` + count + `">-</span>
                 </td>
                 <td class="center">
-                    <input list="tempPrice" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                    <datalist id="tempPrice` + count + `"></datalist>
                 </td>
                 <td class="right-align">
                     <span id="arr_total` + count + `" class="arr_total">0</span>
@@ -600,6 +619,9 @@
                                 <td>
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
+                                <td class="center">
+                                    <span id="arr_stock` + count + `">-</span>
+                                </td>
                                 <td>
                                     <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                 </td>
@@ -608,6 +630,7 @@
                                 </td>
                                 <td class="center">
                                     <input name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
+                                    <datalist id="tempPrice` + count + `"></datalist>
                                 </td>
                                 <td class="right-align">
                                     <span id="arr_total` + count + `" class="arr_total">` + val.total + `</span>

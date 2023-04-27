@@ -26,7 +26,7 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
         'ID',
         'PENGGUNA',
         'KODE',
-        'PABRIK/KANTOR',
+        'SITE',
         'DEPARTEMEN',
         'PARTNER BISNIS',
         'PENGAJUAN',

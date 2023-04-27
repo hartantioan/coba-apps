@@ -18,6 +18,7 @@ class PurchaseOrderDetail extends Model
         'purchase_order_id',
         'purchase_request_detail_id',
         'item_id',
+        'coa_id',
         'qty',
         'price',
         'percent_discount_1',
@@ -30,6 +31,8 @@ class PurchaseOrderDetail extends Model
         'percent_tax',
         'is_wtax',
         'percent_wtax',
+        'tax_id',
+        'wtax_id',
         'place_id',
         'department_id',
         'warehouse_id',
@@ -74,6 +77,10 @@ class PurchaseOrderDetail extends Model
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }
 
+    public function coa(){
+        return $this->belongsTo('App\Models\Coa','coa_id','id')->withTrashed();
+    }
+
     public function place(){
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
@@ -82,12 +89,20 @@ class PurchaseOrderDetail extends Model
         return $this->belongsTo('App\Models\Department','department_id','id')->withTrashed();
     }
 
+    public function tax(){
+        return $this->belongsTo('App\Models\Tax','tax_id','id')->withTrashed();
+    }
+
+    public function wtax(){
+        return $this->belongsTo('App\Models\Tax','wtax_id','id')->withTrashed();
+    }
+
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
     }
 
     public function goodReceiptDetail(){
-        return $this->hasMany('App\Models\GoodReceiptDetail');
+        return $this->hasMany('App\Models\GoodReceiptDetail','purchase_order_detail_id','id');
     }
 
     public function getBalanceReceipt()

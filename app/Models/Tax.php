@@ -4,39 +4,75 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Model;
 
 class Tax extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
+
     protected $table = 'taxes';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
-
     protected $fillable = [
-        'transaction_code',
-        'replace',
         'code',
-        'date',
-        'npwp_number',
-        'npwp_name',
-        'npwp_address',
-        'npwp_target',
-        'npwp_target_name',
-        'npwp_target_address',
-        'total',
-        'tax',
-        'wtax',
-        'approval_status',
-        'tax_status',
-        'reference',
-        'url'
+        'name',
+        'type',
+        'percentage',
+        'is_default_ppn',
+        'is_default_pph',
+        'status'
     ];
 
-    public function taxDetail()
-    {
-        return $this->hasMany('App\Models\TaxDetail');
+    public function status(){
+        switch($this->status) {
+            case '1':
+                $status = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>';
+                break;
+            case '2':
+                $status = '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>';
+                break;
+            default:
+                $status = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>';
+                break;
+        }
+
+        return $status;
+    }
+
+    public function isDefaultPpn(){
+        $default = match ($this->is_default_ppn) {
+          '1' => '<i class="material-icons" style="font-size: inherit !important;color:red;">star</i>',
+          '0' => '',
+          default => 'Invalid',
+        };
+
+        return $default;
+    }
+
+    public function isDefaultPph(){
+        $default = match ($this->is_default_pph) {
+          '1' => '<i class="material-icons" style="font-size: inherit !important;color:red;">star</i>',
+          '0' => '',
+          default => 'Invalid',
+        };
+
+        return $default;
+    }
+
+    public function type(){
+        switch($this->type) {
+            case '+':
+                $type = 'Penambah';
+                break;
+            case '-':
+                $type = 'Pengurang';
+                break;
+            default:
+                $type = 'Invalid';
+                break;
+        }
+
+        return $type;
     }
 }

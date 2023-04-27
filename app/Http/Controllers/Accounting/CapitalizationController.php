@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Currency;
 use App\Models\Department;
 use App\Models\Place;
@@ -35,7 +36,7 @@ class CapitalizationController extends Controller
         $data = [
             'title'     => 'Kapitalisasi Aset',
             'content'   => 'admin.accounting.capitalization',
-            'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
+            'company'   => Company::where('status','1')->get(),
             'currency'  => Currency::where('status','1')->get(),
         ];
 
@@ -47,7 +48,7 @@ class CapitalizationController extends Controller
             'id',
             'code',
             'user_id',
-            'place_id',
+            'company_id',
             'currency_id',
             'currency_rate',
             'post_date',
@@ -60,7 +61,7 @@ class CapitalizationController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Capitalization::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = Capitalization::count();
         
         $query_data = Capitalization::where(function($query) use ($search, $request) {
                 if($search) {
@@ -74,7 +75,6 @@ class CapitalizationController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -92,7 +92,6 @@ class CapitalizationController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -104,7 +103,7 @@ class CapitalizationController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->place->name.' - '.$val->place->company->name,
+                    $val->company->name,
                     $val->currency->code.' - '.$val->currency->name,
                     number_format($val->currency_rate,3,',','.'),
                     date('d M Y',strtotime($val->post_date)),
@@ -135,19 +134,10 @@ class CapitalizationController extends Controller
         return response()->json($response);
     }
 
-    public function getCode(Request $request){
-        $code = Capitalization::generateCode();
-
-        return response()->json([
-            'code'  => $code
-        ]);
-    }
-
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'code' 				    => $request->temp ? ['required', Rule::unique('capitalizations', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:capitalizations,code',
 			'post_date'			    => 'required',
-			'place_id'		        => 'required',
+			'company_id'		    => 'required',
             'currency_id'		    => 'required',
             'currency_rate'		    => 'required',
             'note'		            => 'required',
@@ -157,10 +147,8 @@ class CapitalizationController extends Controller
             'arr_unit'              => 'required|array',
             'arr_total'             => 'required|array',
 		], [
-			'code.required' 				    => 'Kode/No tidak boleh kosong.',
-            'code.unique' 				        => 'Kode/No telah dipakai.',
 			'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
-			'place_id.required' 			    => 'Penempatan tidak boleh kosong.',
+			'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'currency_id.required' 			    => 'Mata uang tidak boleh kosong.',
             'currency_rate.required' 			=> 'Konversi tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
@@ -206,7 +194,7 @@ class CapitalizationController extends Controller
 
                 if($query->status == '1'){
                     $query->user_id = session('bo_id');
-                    $query->place_id = $request->place_id;
+                    $query->company_id = $request->company_id;
                     $query->currency_id = $request->currency_id;
                     $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                     $query->post_date = $request->post_date;
@@ -218,7 +206,7 @@ class CapitalizationController extends Controller
                         $row->delete();
                     }
 
-                    /* CustomHelper::removeJournal('capitalizations',$query->id); */
+                    CustomHelper::removeJournal('capitalizations',$query->id);
 
                 }else{
                     return response()->json([
@@ -230,7 +218,7 @@ class CapitalizationController extends Controller
                 $query = Capitalization::create([
                     'code'			=> Capitalization::generateCode(),
                     'user_id'		=> session('bo_id'),
-                    'place_id'      => $request->place_id,
+                    'company_id'    => $request->company_id,
                     'currency_id'   => $request->currency_id,
                     'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                     'post_date'	    => $request->post_date,
@@ -402,7 +390,7 @@ class CapitalizationController extends Controller
     
                 CustomHelper::sendNotification('capitalizations',$query->id,'Kapitalisasi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('capitalizations',$query->id);
-                /* CustomHelper::removeJournal('capitalizations',$query->id); */
+                CustomHelper::removeJournal('capitalizations',$query->id);
 
                 $response = [
                     'status'  => 200,
@@ -433,7 +421,7 @@ class CapitalizationController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
@@ -443,6 +431,7 @@ class CapitalizationController extends Controller
         if($query->delete()) {
 
             CustomHelper::removeApproval('capitalizations',$query->id);
+            CustomHelper::removeJournal('capitalizations',$query->id);
             
             foreach($query->capitalizationDetail as $row){
                 Asset::find($row->asset_id)->update([
@@ -488,7 +477,6 @@ class CapitalizationController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		

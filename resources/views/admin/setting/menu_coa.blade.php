@@ -117,19 +117,18 @@ table.bordered th {
                         <table class="bordered">
                             <thead>
                                 <tr>
-                                    <th class="center" colspan="5">Debit</th>
+                                    <th class="center" colspan="4">Debit</th>
                                 </tr>
                                 <tr>
                                     <th class="center" width="40%">Coa</th>
                                     <th class="center" width="20%">Kolom</th>
                                     <th class="center" width="15%">Prosentase</th>
-                                    <th class="center" width="20%">Mata Uang</th>
                                     <th class="center" width="5%">Delete</th>
                                 </tr>
                             </thead>
                             <tbody id="body-debit">
                                 <tr id="last-row-debit">
-                                    <td colspan="5" class="center">
+                                    <td colspan="4" class="center">
                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
                                             <i class="material-icons left">add</i> Tambah Debit
                                         </a>
@@ -142,19 +141,18 @@ table.bordered th {
                         <table class="bordered">
                             <thead>
                                 <tr>
-                                    <th class="center" colspan="5">Kredit</th>
+                                    <th class="center" colspan="4">Kredit</th>
                                 </tr>
                                 <tr>
                                     <th class="center" width="40%">Coa</th>
                                     <th class="center" width="20%">Kolom</th>
                                     <th class="center" width="15%">Prosentase</th>
-                                    <th class="center" width="20%">Mata Uang</th>
                                     <th class="center" width="5%">Delete</th>
                                 </tr>
                             </thead>
                             <tbody id="body-credit">
                                 <tr id="last-row-credit">
-                                    <td colspan="5" class="center">
+                                    <td colspan="4" class="center">
                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('2')" href="javascript:void(0);">
                                             <i class="material-icons left">add</i> Tambah Credit
                                         </a>
@@ -177,12 +175,6 @@ table.bordered th {
 
 <!-- END: Page Main-->
 <script>
-    var optioncurrency = '';
-
-    @foreach ($currency as $row)
-        optioncurrency += '<option value="{{ $row->id }}">{{ $row->code}}</option>';
-    @endforeach
-
     $(function() {
         $('#body-debit').on('click', '.delete-data-debit', function() {
             $(this).closest('tr').remove();
@@ -301,9 +293,6 @@ table.bordered th {
                                     <td>
                                         <input type="text" name="arr_percent[]" value="100" step="1" min="1" max="100" class="form-control" onkeyup="formatRupiah(this)" required>
                                     </td>
-                                    <td>
-                                        <select class="form-control" id="arr_currency` + randomString + `" name="arr_currency[]">` + optioncurrency + `</select>
-                                    </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-debit" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
@@ -327,9 +316,6 @@ table.bordered th {
                                     <td>
                                         <input type="text" name="arr_percent[]" value="` + val.percentage + `" step="1" min="1" max="100" class="form-control" onkeyup="formatRupiah(this)">
                                     </td>
-                                    <td>
-                                        <select class="form-control" id="arr_currency` + randomString + `" name="arr_currency[]">` + optioncurrency + `</select>
-                                    </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-credit" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
@@ -344,8 +330,6 @@ table.bordered th {
                         $('#arr_coa' + randomString).append(`
                             <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                         `);
-                        $('#arr_currency' + randomString).formSelect();
-                        $('#arr_currency' + randomString).val(val.currency_id).formSelect();
                     });
                 }
 
@@ -387,9 +371,6 @@ table.bordered th {
                     <td>
                         <input type="text" name="arr_percent[]" value="100" step="1" min="1" max="100" class="form-control" onkeyup="formatRupiah(this)" required>
                     </td>
-                    <td>
-                        <select class="form-control" id="arr_currency` + randomString + `" name="arr_currency[]">` + optioncurrency + `</select>
-                    </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-debit" href="javascript:void(0);">
                             <i class="material-icons">delete</i>
@@ -399,7 +380,6 @@ table.bordered th {
             `);
             select2ServerSide('#arr_coa' + randomString, '{{ url("admin/select2/coa") }}');
             $('#arr_field' + randomString).formSelect();
-            $('#arr_currency' + randomString).formSelect();
         }
 
         if(type == '2'){
@@ -416,9 +396,6 @@ table.bordered th {
                     <td>
                         <input type="text" name="arr_percent[]" value="100" step="1" min="1" max="100" class="form-control" onkeyup="formatRupiah(this)">
                     </td>
-                    <td>
-                        <select class="form-control" id="arr_currency` + randomString + `" name="arr_currency[]">` + optioncurrency + `</select>
-                    </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-credit" href="javascript:void(0);">
                             <i class="material-icons">delete</i>
@@ -428,7 +405,6 @@ table.bordered th {
             `);
             select2ServerSide('#arr_coa' + randomString, '{{ url("admin/select2/coa") }}');
             $('#arr_field' + randomString).formSelect();
-            $('#arr_currency' + randomString).formSelect();
         }
 
         M.updateTextFields();

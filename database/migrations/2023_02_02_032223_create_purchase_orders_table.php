@@ -20,6 +20,7 @@ return new class extends Migration
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('account_id')->nullable();
             $table->bigInteger('company_id')->nullable();
+            $table->char('inventory_type', 1)->nullable();
             $table->char('purchasing_type', 1)->nullable();
             $table->char('shipping_type', 1)->nullable();
             $table->string('document_no', 155)->nullable();

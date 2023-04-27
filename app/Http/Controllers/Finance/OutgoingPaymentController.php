@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\OutgoingPayment;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
@@ -35,7 +36,7 @@ class OutgoingPaymentController extends Controller
             'title'         => 'Kas / Bank Keluar',
             'content'       => 'admin.finance.outgoing_payment',
             'currency'      => Currency::where('status','1')->get(),
-            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'company'       => Company::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -47,7 +48,7 @@ class OutgoingPaymentController extends Controller
             'code',
             'user_id',
             'account_id',
-            'place_id',
+            'company_id',
             'payment_request_id',
             'coa_source_id',
             'post_date',
@@ -66,7 +67,7 @@ class OutgoingPaymentController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = OutgoingPayment::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = OutgoingPayment::count();
         
         $query_data = OutgoingPayment::where(function($query) use ($search, $request) {
                 if($search) {
@@ -101,11 +102,10 @@ class OutgoingPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -144,11 +144,10 @@ class OutgoingPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -160,7 +159,7 @@ class OutgoingPaymentController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->account->name,
-                    $val->place->name.' - '.$val->place->company->name,
+                    $val->company->name,
                     $val->paymentRequest()->exists() ? $val->paymentRequest->code : '-',
                     $val->coaSource->name,
                     date('d/m/y',strtotime($val->post_date)),
@@ -295,7 +294,7 @@ class OutgoingPaymentController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
 			'account_id' 			=> 'required',
-            'place_id'              => 'required',
+            'company_id'            => 'required',
             'coa_source_id'         => 'required',
             'post_date'             => 'required',
             'pay_date'              => 'required',
@@ -305,7 +304,7 @@ class OutgoingPaymentController extends Controller
             'grandtotal'            => 'required',
 		], [
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
-            'place_id.required'                 => 'Penempatan pabrik/kantor tidak boleh kosong.',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'coa_source_id.required'            => 'Kas/Bank tidak boleh kosong.',
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
             'pay_date.required'                 => 'Tanggal bayar tidak boleh kosong.',
@@ -351,7 +350,7 @@ class OutgoingPaymentController extends Controller
 
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
-                        $query->place_id = $request->place_id;
+                        $query->company_id = $request->company_id;
                         $query->coa_source_id = $request->coa_source_id;
                         $query->payment_request_id = $request->payment_request_id ? $request->payment_request_id : NULL;
                         $query->post_date = $request->post_date;
@@ -383,7 +382,7 @@ class OutgoingPaymentController extends Controller
                         'code'			            => OutgoingPayment::generateCode(),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
-                        'place_id'                  => $request->place_id,
+                        'company_id'                => $request->company_id,
                         'coa_source_id'             => $request->coa_source_id,
                         'payment_request_id'        => $request->payment_request_id ? $request->payment_request_id : NULL,
                         'post_date'                 => $request->post_date,
@@ -484,7 +483,7 @@ class OutgoingPaymentController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal / dokumen sudah dalam progres, anda tidak bisa melakukan perubahan.'
@@ -549,11 +548,10 @@ class OutgoingPaymentController extends Controller
                     $query->whereIn('currency_id',$request->currency);
                 }
 
-                if($request->place){
-                    $query->where('place_id',$request->place);
+                if($request->company){
+                    $query->where('company_id',$request->company);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -561,6 +559,6 @@ class OutgoingPaymentController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportOutgoingPayment($request->search,$request->status,$request->place,$request->account,$request->currency,$this->dataplaces), 'outgoing_payment'.uniqid().'.xlsx');
+		return Excel::download(new ExportOutgoingPayment($request->search,$request->status,$request->company,$request->account,$request->currency,$this->dataplaces), 'outgoing_payment'.uniqid().'.xlsx');
     }
 }

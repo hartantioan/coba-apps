@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50)->unique();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->bigInteger('account_id')->nullable();
             $table->bigInteger('payment_request_id')->nullable();
             $table->bigInteger('coa_source_id')->nullable();
@@ -37,7 +37,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id','account_id','place_id','coa_source_id','currency_id','payment_request_id'],'outgoing_payment_index');
+            $table->index(['user_id','account_id','company_id','coa_source_id','currency_id','payment_request_id'],'outgoing_payment_index');
         });
     }
 

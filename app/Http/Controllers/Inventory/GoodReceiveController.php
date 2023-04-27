@@ -487,7 +487,7 @@ class GoodReceiveController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
@@ -496,12 +496,9 @@ class GoodReceiveController extends Controller
         
         if($query->delete()) {
 
-            CustomHelper::removeJournal('good_receives',$query->id);
-            CustomHelper::removeCogs('good_receives',$query->id);
-
             $query->goodReceiveDetail()->delete();
 
-            CustomHelper::removeApproval('good_receipt_mains',$query->id);
+            CustomHelper::removeApproval('good_receives',$query->id);
 
             activity()
                 ->performedOn(new GoodReceive())

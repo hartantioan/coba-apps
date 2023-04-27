@@ -106,6 +106,10 @@
                     <div class="col s12">
                         <div class="input-field col s6">
                             <input type="hidden" id="temp" name="temp">
+                            <input id="code" name="code" type="text" placeholder="Kode unik site...">
+                            <label class="active" for="code">Kode</label>
+                        </div>
+                        <div class="input-field col s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
@@ -124,7 +128,7 @@
                         <div class="input-field col s6">
                             <select class="form-control" id="type" name="type">
                                 <option value="1">Kantor/Office</option>
-                                <option value="2">Pabrik/Plant</option>
+                                <option value="2">Site</option>
                             </select>
                             <label class="" for="type">Tipe</label>
                         </div>
@@ -340,6 +344,7 @@
                 $('#modal1').modal('open');
                 
                 $('#temp').val(id);
+                $('#code').val(response.code);
                 $('#name').val(response.name);
                 $("#address").val(response.address);
                 $("#company_id").val(response.company_id).formSelect();

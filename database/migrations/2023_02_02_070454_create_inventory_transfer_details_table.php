@@ -19,8 +19,14 @@ return new class extends Migration
             $table->bigInteger('inventory_transfer_id')->nullable();
             $table->bigInteger('item_id')->nullable();
             $table->double('qty')->nullable();
+            $table->bigInteger('item_stock_id')->nullable();
+            $table->bigInteger('to_place_id')->nullable();
+            $table->bigInteger('to_warehouse_id')->nullable();
+            $table->string('note')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['inventory_transfer_id','item_id','item_stock_id','to_place_id','to_warehouse_id'],'inventory_transfer_detail_index');
         });
     }
 

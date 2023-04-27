@@ -65,7 +65,7 @@
                                                         <th>#</th>
                                                         <th>Kode</th>
                                                         <th>Nama</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Site</th>
                                                         <th>Area</th>
                                                         <th>Item</th>
                                                         <th>Keterangan</th>
@@ -111,7 +111,7 @@
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach
                             </select>
-                            <label for="plant_id">Pabrik/Kantor</label>
+                            <label for="plant_id">Site</label>
                         </div>
                         <div class="input-field col s6">
                             <select id="area_id" name="area_id">

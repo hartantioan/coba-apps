@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('name', 155)->nullable();
             $table->bigInteger('parent_id')->nullable();
             $table->bigInteger('coa_id')->nullable();
+            $table->bigInteger('warehouse_id')->nullable();
             $table->char('status', 1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');

@@ -134,6 +134,7 @@ class PlaceController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'              => $request->temp ? ['required', Rule::unique('places', 'code')->ignore($request->temp)] : 'required|unique:places,code',
             'name' 				=> 'required',
             'address'           => 'required',
             'company_id'        => 'required',
@@ -141,6 +142,8 @@ class PlaceController extends Controller
             'province_id'       => 'required',
             'city_id'           => 'required'
         ], [
+            'code.required'         => 'Kode tidak boleh kosong.',
+            'code.unique'           => 'Kode telah terpakai.',
             'name.required' 	    => 'Nama tidak boleh kosong.',
             'address.required'      => 'Alamat tidak boleh kosong.',
             'company_id.required'   => 'Cabang tidak boleh kosong.',
@@ -159,6 +162,7 @@ class PlaceController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Place::find($request->temp);
+                    $query->code            = $request->code ? $request->code : $query->code;
                     $query->name            = $request->name;
                     $query->address	        = $request->address;
                     $query->company_id	    = $request->company_id;
@@ -175,7 +179,7 @@ class PlaceController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Place::create([
-                        'code'          => Place::generateCode(),
+                        'code'          => $request->code ? $request->code : Place::generateCode(),
                         'name'			=> $request->name,
                         'address'	    => $request->address,
                         'company_id'    => $request->company_id,

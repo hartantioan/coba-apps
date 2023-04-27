@@ -18,7 +18,7 @@ class Capitalization extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'place_id',
+        'company_id',
         'currency_id',
         'currency_rate',
         'post_date',
@@ -49,9 +49,9 @@ class Capitalization extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function company()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function capitalizationDetail()

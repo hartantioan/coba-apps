@@ -21,6 +21,7 @@ use App\Models\PurchaseOrderDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseOrder;
 use App\Models\User;
+use App\Models\Tax;
 
 class PurchaseOrderController extends Controller
 {
@@ -40,6 +41,8 @@ class PurchaseOrderController extends Controller
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
+            'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -51,6 +54,7 @@ class PurchaseOrderController extends Controller
             'code',
             'user_id',
             'supplier_id',
+            'inventory_type',
             'purchasing_type',
             'shipping_type',
             'company_id',
@@ -102,6 +106,10 @@ class PurchaseOrderController extends Controller
 
                 if($request->status){
                     $query->where('status', $request->status);
+                }
+
+                if($request->inventory_type){
+                    $query->where('inventory_type',$request->inventory_type);
                 }
 
                 if($request->purchasing_type){
@@ -168,6 +176,10 @@ class PurchaseOrderController extends Controller
                     $query->where('status', $request->status);
                 }
 
+                if($request->inventory_type){
+                    $query->where('inventory_type',$request->inventory_type);
+                }
+
                 if($request->purchasing_type){
                     $query->where('purchasing_type',$request->type);
                 }
@@ -216,6 +228,7 @@ class PurchaseOrderController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->supplier->name,
+                    $val->inventoryType(),
                     $val->purchasingType(),
                     $val->shippingType(),
                     $val->company->name,
@@ -300,50 +313,101 @@ class PurchaseOrderController extends Controller
     }
 
     public function create(Request $request){
-        $validation = Validator::make($request->all(), [
-			'supplier_id' 				=> 'required',
-			'purchasing_type'			=> 'required',
-			'shipping_type'		        => 'required',
-			'payment_type'		        => 'required',
-            'payment_term'		        => 'required',
-            'currency_id'               => 'required',
-            'currency_rate'             => 'required',
-            'post_date'                 => 'required',
-            'delivery_date'             => 'required',
-            'receiver_name'             => 'required',
-            'receiver_address'          => 'required',
-            'receiver_phone'            => 'required',
-            'arr_item'                  => 'required|array',
-            'arr_qty'                   => 'required|array',
-            'arr_price'                 => 'required|array',
-            'arr_disc1'                 => 'required|array',
-            'arr_disc2'                 => 'required|array',
-            'arr_disc3'                 => 'required|array',
-            'discount'                  => 'required',
-		], [
-			'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
-			'purchasing_type.required' 			=> 'Tipe PO tidak boleh kosong.',
-            'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
-			'payment_type.required' 			=> 'Tipe pembayaran tidak boleh kosong.',
-			'payment_term.required'				=> 'Termin pembayaran tidak boleh kosong.',
-            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
-            'post_date.required'                => 'Tanggal post tidak boleh kosong.',
-            'delivery_date.required'            => 'Tanggal kirim tidak boleh kosong.',
-            'arr_item.required'                 => 'Item tidak boleh kosong.',
-            'arr_item.array'                    => 'Item harus array.',
-            'arr_qty.required'                  => 'Qty tidak boleh kosong.',
-            'arr_qty.array'                     => 'Qty harus array.',
-            'arr_price.required'                => 'Harga tidak boleh kosong.',
-            'arr_price.array'                   => 'Harga harus array.',
-            'arr_disc1.required'                => 'Diskon 1 tidak boleh kosong.',
-            'arr_disc1.array'                   => 'Diskon 1 harus array.',
-            'arr_disc2.required'                => 'Diskon 2 tidak boleh kosong.',
-            'arr_disc2.array'                   => 'Diskon 2 harus array.',
-            'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
-            'arr_disc3.array'                   => 'Diskon 3 harus array.',
-            'discount.required'                 => 'Diskon akhir tidak boleh kosong.'
-		]);
+        if($request->inventory_type == '1'){
+            $validation = Validator::make($request->all(), [
+                'supplier_id' 				=> 'required',
+                'inventory_type'			=> 'required',
+                'purchasing_type'			=> 'required',
+                'shipping_type'		        => 'required',
+                'payment_type'		        => 'required',
+                'payment_term'		        => 'required',
+                'currency_id'               => 'required',
+                'currency_rate'             => 'required',
+                'post_date'                 => 'required',
+                'delivery_date'             => 'required',
+                'receiver_name'             => 'required',
+                'receiver_address'          => 'required',
+                'receiver_phone'            => 'required',
+                'arr_item'                  => 'required|array',
+                'arr_qty'                   => 'required|array',
+                'arr_price'                 => 'required|array',
+                'arr_disc1'                 => 'required|array',
+                'arr_disc2'                 => 'required|array',
+                'arr_disc3'                 => 'required|array',
+                'discount'                  => 'required',
+            ], [
+                'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
+                'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
+                'purchasing_type.required' 			=> 'Tipe PO tidak boleh kosong.',
+                'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
+                'payment_type.required' 			=> 'Tipe pembayaran tidak boleh kosong.',
+                'payment_term.required'				=> 'Termin pembayaran tidak boleh kosong.',
+                'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+                'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
+                'post_date.required'                => 'Tanggal post tidak boleh kosong.',
+                'delivery_date.required'            => 'Tanggal kirim tidak boleh kosong.',
+                'arr_item.required'                 => 'Item tidak boleh kosong.',
+                'arr_item.array'                    => 'Item harus array.',
+                'arr_qty.required'                  => 'Qty tidak boleh kosong.',
+                'arr_qty.array'                     => 'Qty harus array.',
+                'arr_price.required'                => 'Harga tidak boleh kosong.',
+                'arr_price.array'                   => 'Harga harus array.',
+                'arr_disc1.required'                => 'Diskon 1 tidak boleh kosong.',
+                'arr_disc1.array'                   => 'Diskon 1 harus array.',
+                'arr_disc2.required'                => 'Diskon 2 tidak boleh kosong.',
+                'arr_disc2.array'                   => 'Diskon 2 harus array.',
+                'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
+                'arr_disc3.array'                   => 'Diskon 3 harus array.',
+                'discount.required'                 => 'Diskon akhir tidak boleh kosong.'
+            ]);
+        }elseif($request->inventory_type == '2'){
+            $validation = Validator::make($request->all(), [
+                'supplier_id' 				=> 'required',
+                'inventory_type'			=> 'required',
+                'purchasing_type'			=> 'required',
+                'shipping_type'		        => 'required',
+                'payment_type'		        => 'required',
+                'payment_term'		        => 'required',
+                'currency_id'               => 'required',
+                'currency_rate'             => 'required',
+                'post_date'                 => 'required',
+                'delivery_date'             => 'required',
+                'receiver_name'             => 'required',
+                'receiver_address'          => 'required',
+                'receiver_phone'            => 'required',
+                'arr_coa'                   => 'required|array',
+                'arr_qty'                   => 'required|array',
+                'arr_price'                 => 'required|array',
+                'arr_disc1'                 => 'required|array',
+                'arr_disc2'                 => 'required|array',
+                'arr_disc3'                 => 'required|array',
+                'discount'                  => 'required',
+            ], [
+                'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
+                'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
+                'purchasing_type.required' 			=> 'Tipe PO tidak boleh kosong.',
+                'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
+                'payment_type.required' 			=> 'Tipe pembayaran tidak boleh kosong.',
+                'payment_term.required'				=> 'Termin pembayaran tidak boleh kosong.',
+                'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+                'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
+                'post_date.required'                => 'Tanggal post tidak boleh kosong.',
+                'delivery_date.required'            => 'Tanggal kirim tidak boleh kosong.',
+                'arr_coa.required'                  => 'Coa tidak boleh kosong.',
+                'arr_coa.array'                     => 'Coa harus array.',
+                'arr_qty.required'                  => 'Qty tidak boleh kosong.',
+                'arr_qty.array'                     => 'Qty harus array.',
+                'arr_price.required'                => 'Harga tidak boleh kosong.',
+                'arr_price.array'                   => 'Harga harus array.',
+                'arr_disc1.required'                => 'Diskon 1 tidak boleh kosong.',
+                'arr_disc1.array'                   => 'Diskon 1 harus array.',
+                'arr_disc2.required'                => 'Diskon 2 tidak boleh kosong.',
+                'arr_disc2.array'                   => 'Diskon 2 harus array.',
+                'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
+                'arr_disc3.array'                   => 'Diskon 3 harus array.',
+                'discount.required'                 => 'Diskon akhir tidak boleh kosong.'
+            ]);
+        }
 
         if($validation->fails()) {
             $response = [
@@ -380,6 +444,7 @@ class PurchaseOrderController extends Controller
 
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->supplier_id;
+                        $query->inventory_type = $request->inventory_type;
                         $query->purchasing_type = $request->purchasing_type;
                         $query->shipping_type = $request->shipping_type;
                         $query->company_id = $request->company_id;
@@ -425,6 +490,7 @@ class PurchaseOrderController extends Controller
                         'code'			            => PurchaseOrder::generateCode(),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
+                        'inventory_type'	        => $request->inventory_type,
                         'purchasing_type'	        => $request->purchasing_type,
                         'shipping_type'             => $request->shipping_type,
                         'company_id'                => $request->company_id,
@@ -459,44 +525,84 @@ class PurchaseOrderController extends Controller
 
                 DB::beginTransaction();
                 try {
-                
-                    foreach($request->arr_item as $key => $row){
-            
-                        $qty = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-                        $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
-                        $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
-                        $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
-                        $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
-        
-                        $finalpricedisc1 = $price - ($price * ($disc1 / 100));
-                        $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
-                        $finalpricedisc3 = $finalpricedisc2 - $disc3;
-        
-                        $rowsubtotal = round($finalpricedisc3 * $qty,3);
 
-                        $querydetail = PurchaseOrderDetail::create([
-                            'purchase_order_id'             => $query->id,
-                            'purchase_request_detail_id'    => $request->arr_purchase[$key],
-                            'item_id'                       => $row,
-                            'qty'                           => $qty,
-                            'price'                         => $price,
-                            'percent_discount_1'            => $disc1,
-                            'percent_discount_2'            => $disc2,
-                            'discount_3'                    => $disc3,
-                            'subtotal'                      => $rowsubtotal,
-                            'note'                          => $request->arr_note[$key],
-                            'is_tax'                        => $request->arr_is_tax[$key] == '1' ? '1' : NULL,
-                            'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
-                            'percent_tax'                   => str_replace(',','.',str_replace('.','',$request->arr_percent_tax[$key])),
-                            'is_wtax'                       => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
-                            'percent_wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
-                            'place_id'                      => $request->arr_place[$key],
-                            'department_id'                 => $request->arr_department[$key],
-                            'warehouse_id'                  => $request->arr_warehouse[$key]
-                        ]);
-                        
-                        if($querydetail->purchaseRequestDetail()->exists()){
-                            CustomHelper::removeUsedData('purchase_requests',$querydetail->purchaseRequestDetail->purchase_request_id);
+                    if($request->inventory_type == '1'){
+                        foreach($request->arr_item as $key => $row){
+            
+                            $qty = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                            $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
+                            $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
+                            $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
+                            $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
+            
+                            $finalpricedisc1 = $price - ($price * ($disc1 / 100));
+                            $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
+                            $finalpricedisc3 = $finalpricedisc2 - $disc3;
+            
+                            $rowsubtotal = round($finalpricedisc3 * $qty,3);
+    
+                            $querydetail = PurchaseOrderDetail::create([
+                                'purchase_order_id'             => $query->id,
+                                'purchase_request_detail_id'    => $request->arr_purchase ? $request->arr_purchase[$key] : NULL,
+                                'item_id'                       => $row,
+                                'qty'                           => $qty,
+                                'price'                         => $price,
+                                'percent_discount_1'            => $disc1,
+                                'percent_discount_2'            => $disc2,
+                                'discount_3'                    => $disc3,
+                                'subtotal'                      => $rowsubtotal,
+                                'note'                          => $request->arr_note[$key],
+                                'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
+                                'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
+                                'percent_tax'                   => $request->arr_tax[$key],
+                                'is_wtax'                       => $request->arr_wtax[$key] > 0 ? '1' : NULL,
+                                'percent_wtax'                  => $request->arr_wtax[$key],
+                                'tax_id'                        => $request->arr_tax_id[$key],
+                                'wtax_id'                       => $request->arr_wtax_id[$key],
+                                'place_id'                      => $request->arr_place[$key],
+                                'department_id'                 => $request->arr_department[$key],
+                                'warehouse_id'                  => $request->arr_warehouse[$key]
+                            ]);
+                            
+                            if($querydetail->purchaseRequestDetail()->exists()){
+                                CustomHelper::removeUsedData('purchase_requests',$querydetail->purchaseRequestDetail->purchase_request_id);
+                            }
+                        }
+                    }elseif($request->inventory_type == '2'){
+                        foreach($request->arr_coa as $key => $row){
+            
+                            $qty = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                            $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
+                            $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
+                            $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
+                            $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
+            
+                            $finalpricedisc1 = $price - ($price * ($disc1 / 100));
+                            $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
+                            $finalpricedisc3 = $finalpricedisc2 - $disc3;
+            
+                            $rowsubtotal = round($finalpricedisc3 * $qty,3);
+    
+                            $querydetail = PurchaseOrderDetail::create([
+                                'purchase_order_id'             => $query->id,
+                                'coa_id'                        => $row,
+                                'qty'                           => $qty,
+                                'price'                         => $price,
+                                'percent_discount_1'            => $disc1,
+                                'percent_discount_2'            => $disc2,
+                                'discount_3'                    => $disc3,
+                                'subtotal'                      => $rowsubtotal,
+                                'note'                          => $request->arr_note[$key],
+                                'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
+                                'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
+                                'percent_tax'                   => $request->arr_tax[$key],
+                                'is_wtax'                       => $request->arr_wtax[$key] > 0 ? '1' : NULL,
+                                'percent_wtax'                  => $request->arr_wtax[$key],
+                                'tax_id'                        => $request->arr_tax_id[$key],
+                                'wtax_id'                       => $request->arr_wtax_id[$key],
+                                'place_id'                      => $request->arr_place[$key],
+                                'department_id'                 => $request->arr_department[$key]
+                            ]);
                         }
                     }
 
@@ -540,7 +646,7 @@ class PurchaseOrderController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
+                                <th class="center-align">Item/Coa Biaya</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Price</th>
@@ -559,9 +665,9 @@ class PurchaseOrderController extends Controller
         foreach($data->purchaseOrderDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
+                <td class="center-align">'.($row->item_id ? $row->item->name : $row->coa->name).'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->item->buyUnit->code.'</td>
+                <td class="center-align">'.($row->item_id ? $row->item->buyUnit->code : '-').'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_1,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
@@ -570,7 +676,7 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->place->name.'</td>
                 <td class="center-align">'.$row->department->name.'</td>
-                <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                 <td class="center-align">'.($row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : ' - ').'</td>
             </tr>';
         }
@@ -624,12 +730,14 @@ class PurchaseOrderController extends Controller
 
         foreach($po->purchaseOrderDetail as $row){
             $arr[] = [
-                'id'                                => $row->purchaseRequestDetail->purchase_request_id,
-                'purchase_request_detail_id'        => $row->purchase_request_detail_id,
+                'id'                                => $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchase_request_id : '0',
+                'purchase_request_detail_id'        => $row->purchase_request_detail_id ? $row->purchase_request_detail_id : '0',
                 'item_id'                           => $row->item_id,
-                'item_name'                         => $row->item->name,
+                'coa_id'                            => $row->coa_id,
+                'item_name'                         => $row->item_id ? $row->item->name : '',
+                'coa_name'                          => $row->coa_id ? $row->coa->name : '',
                 'qty'                               => number_format($row->qty,3,',','.'),
-                'unit'                              => $row->item->buyUnit->code,
+                'unit'                              => $row->item_id ? $row->item->buyUnit->code : '-',
                 'note'                              => $row->note,
                 'price'                             => number_format($row->price,2,',','.'),
                 'disc1'                             => number_format($row->percent_discount_1,2,',','.'),
@@ -642,9 +750,11 @@ class PurchaseOrderController extends Controller
                 'is_wtax'                           => $row->is_wtax ? $row->is_wtax : '',
                 'percent_wtax'                      => number_format($row->percent_wtax,2,',','.'),
                 'warehouse_id'                      => $row->warehouse_id,
-                'warehouse_name'                    => $row->warehouse->name,
+                'warehouse_name'                    => $row->warehouse_id ? $row->warehouse->name : '',
                 'place_id'                          => $row->place_id,
                 'department_id'                     => $row->department_id,
+                'tax_id'                            => $row->tax_id,
+                'wtax_id'                           => $row->wtax_id
             ];
         }
 
@@ -810,7 +920,7 @@ class PurchaseOrderController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
@@ -869,6 +979,10 @@ class PurchaseOrderController extends Controller
                     $query->where('status', $request->status);
                 }
 
+                if($request->inventory){
+                    $query->where('inventory_type',$request->inventory);
+                }
+
                 if($request->type){
                     $query->where('purchasing_type',$request->type);
                 }
@@ -900,7 +1014,7 @@ class PurchaseOrderController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPurchaseOrder($request->search,$request->status,$request->type,$request->shipping,$request->company,$request->is_tax,$request->is_include_tax,$request->payment,$request->supplier,$request->currency,$this->dataplaces), 'purchase_order_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseOrder($request->search,$request->status,$request->inventory,$request->type,$request->shipping,$request->company,$request->is_tax,$request->is_include_tax,$request->payment,$request->supplier,$request->currency,$this->dataplaces), 'purchase_order_'.uniqid().'.xlsx');
     }
 
     public function removeUsedData(Request $request){

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\Coa;
+use App\Models\Company;
 use App\Models\PaymentRequest;
 use App\Models\PaymentRequestDetail;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +46,7 @@ class PaymentRequestController extends Controller
             'title'         => 'Permintaan Pembayaran',
             'content'       => 'admin.finance.payment_request',
             'currency'      => Currency::where('status','1')->get(),
-            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'company'       => Company::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -57,7 +58,7 @@ class PaymentRequestController extends Controller
             'code',
             'user_id',
             'account_id',
-            'place_id',
+            'company_id',
             'coa_source_id',
             'post_date',
             'due_date',
@@ -79,7 +80,7 @@ class PaymentRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PaymentRequest::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = PaymentRequest::count();
         
         $query_data = PaymentRequest::where(function($query) use ($search, $request) {
                 if($search) {
@@ -121,11 +122,10 @@ class PaymentRequestController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -171,11 +171,10 @@ class PaymentRequestController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
 
-                if($request->place_id){
-                    $query->where('place_id',$request->place_id);
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -187,7 +186,7 @@ class PaymentRequestController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->account->name,
-                    $val->place->name.' - '.$val->place->company->name,
+                    $val->company->name,
                     $val->coaSource->name,
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->due_date)),
@@ -255,7 +254,6 @@ class PaymentRequestController extends Controller
                         'rawcode'       => $row->code,
                         'post_date'     => $row->post_date,
                         'due_date'      => $row->due_date,
-                        'place_id'      => $row->place_id,
                         'total'         => number_format($row->total,3,',','.'),
                         'tax'           => number_format($row->tax,3,',','.'),
                         'wtax'          => number_format($row->wtax,3,',','.'),
@@ -278,7 +276,6 @@ class PaymentRequestController extends Controller
                         'rawcode'       => $row->code,
                         'post_date'     => $row->post_date,
                         'due_date'      => $row->due_date,
-                        'place_id'      => $row->place_id,
                         'total'         => number_format($row->total,3,',','.'),
                         'tax'           => number_format($row->tax,3,',','.'),
                         'wtax'          => number_format($row->wtax,3,',','.'),
@@ -293,7 +290,7 @@ class PaymentRequestController extends Controller
             foreach($data->purchaseInvoice as $row){
                 if(!$row->used()->exists()){
                     CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
-                    $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->place->company_id)->first();
+                    $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->company_id)->first();
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'purchase_invoices',
@@ -301,7 +298,6 @@ class PaymentRequestController extends Controller
                         'rawcode'       => $row->code,
                         'post_date'     => $row->post_date,
                         'due_date'      => $row->due_date,
-                        'place_id'      => $row->place_id,
                         'total'         => number_format($row->total,3,',','.'),
                         'tax'           => number_format($row->tax,3,',','.'),
                         'wtax'          => number_format($row->wtax,3,',','.'),
@@ -323,7 +319,7 @@ class PaymentRequestController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
 			'account_id' 			=> 'required',
-            'place_id'              => 'required',
+            'company_id'            => 'required',
             'coa_source_id'         => 'required',
             'post_date'             => 'required',
             'due_date'              => 'required',
@@ -338,7 +334,7 @@ class PaymentRequestController extends Controller
             'arr_coa'               => 'required|array',
 		], [
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
-            'place_id.required'                 => 'Penempatan Site tidak boleh kosong.',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'coa_source_id.required'            => 'Kas/Bank tidak boleh kosong.',
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
             'due_date.required'                 => 'Tanggal tenggat tidak boleh kosong.',
@@ -393,7 +389,7 @@ class PaymentRequestController extends Controller
 
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
-                        $query->place_id = $request->place_id;
+                        $query->company_id = $request->company_id;
                         $query->coa_source_id = $request->coa_source_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
@@ -431,7 +427,7 @@ class PaymentRequestController extends Controller
                         'code'			            => PaymentRequest::generateCode(),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
-                        'place_id'                  => $request->place_id,
+                        'company_id'                => $request->company_id,
                         'coa_source_id'             => $request->coa_source_id,
                         'post_date'                 => $request->post_date,
                         'due_date'                  => $request->due_date,
@@ -612,7 +608,6 @@ class PaymentRequestController extends Controller
                 'rawcode'       => $row->lookable->code,
                 'post_date'     => $row->lookable->post_date,
                 'due_date'      => $row->lookable->due_date,
-                'place_id'      => $row->lookable->place_id,
                 'total'         => number_format($row->lookable->total,3,',','.'),
                 'tax'           => number_format($row->lookable->tax,3,',','.'),
                 'wtax'          => number_format($row->lookable->wtax,3,',','.'),
@@ -685,7 +680,7 @@ class PaymentRequestController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal / dokumen sudah dalam progres, anda tidak bisa melakukan perubahan.'
@@ -762,11 +757,10 @@ class PaymentRequestController extends Controller
                     $query->whereIn('currency_id',$request->currency);
                 }
 
-                if($request->place){
-                    $query->where('place_id',$request->place);
+                if($request->company){
+                    $query->where('company_id',$request->company);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -774,7 +768,7 @@ class PaymentRequestController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPaymentRequest($request->search,$request->status,$request->place,$request->account,$request->currency,$this->dataplaces), 'payment_request'.uniqid().'.xlsx');
+		return Excel::download(new ExportPaymentRequest($request->search,$request->status,$request->company,$request->account,$request->currency,$this->dataplaces), 'payment_request'.uniqid().'.xlsx');
     }
     
     public function approval(Request $request,$id){
@@ -844,7 +838,7 @@ class PaymentRequestController extends Controller
                     $query = OutgoingPayment::create([
                         'code'			            => OutgoingPayment::generateCode(),
                         'user_id'		            => session('bo_id'),
-                        'place_id'                  => $cek->place_id,
+                        'company_id'                => $cek->company_id,
                         'account_id'                => $cek->account_id,
                         'payment_request_id'        => $cek->id,
                         'coa_source_id'             => $cek->coa_source_id,

@@ -135,6 +135,8 @@
 						<th rowspan="2">Supplier</th>
 						<th colspan="2">Tanggal</th>
 						<th colspan="3">Penerima</th>
+						<th rowspan="2">Tipe PO</th>
+						<th rowspan="2">Jenis PO</th>
                         <th rowspan="2">Dok.Ref</th>
                         <th rowspan="2">Dok.Att</th>
                         <th rowspan="2">PPN(%)</th>
@@ -173,6 +175,8 @@
 							<td>{{ $row->receiver_name }}</td>
                             <td>{{ $row->receiver_address }}</td>
                             <td>{{ $row->receiver_phone }}</td>
+							<td>{{ $row->inventoryType() }}</td>
+							<td>{{ $row->purchasingType() }}</td>
                             <td>{{ $row->document_no }}</td>
                             <td><a href="{{ $row->attachment() }}">File</a></td>
                             <td>{{ number_format($row->percent_tax,2,',','.') }}</td>
@@ -190,7 +194,7 @@
                             <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan="25" style="border-right-style: none !important;">
+                            <td colspan="27" style="border-right-style: none !important;">
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
@@ -211,9 +215,9 @@
                                     <tbody>
                                         @foreach($row->purchaseOrderDetail as $key => $rowdetail)
                                         <tr>
-                                            <td>{{ $rowdetail->item->name }}</td>
+                                            <td>{{ $rowdetail->item_id ? $rowdetail->item->name : $rowdetail->coa->name }}</td>
                                             <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
-                                            <td>{{ $rowdetail->item->buyUnit->code }}</td>
+                                            <td>{{ $rowdetail->item_id ? $rowdetail->item->buyUnit->code : '-' }}</td>
                                             <td>{{ $rowdetail->note }}</td>
                                             <td align="right">{{ number_format($rowdetail->price,2,',','.') }}</td>
                                             <td align="right">{{ number_format($rowdetail->percent_discount_1,2,',','.') }}</td>
@@ -222,7 +226,7 @@
                                             <td align="right">{{ number_format($rowdetail->subtotal,2,',','.') }}</td>
 											<td>{{ $rowdetail->place->name }}</td>
 											<td>{{ $rowdetail->department->name }}</td>
-											<td>{{ $rowdetail->warehouse->name }}</td>
+											<td>{{ $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-' }}</td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -232,7 +236,7 @@
 					@endforeach
                     @if(count($data) == 0)
                         <tr>
-                            <td colspan="25" align="center">
+                            <td colspan="27" align="center">
                                 Data tidak ditemukan
                             </td>
                         </tr>

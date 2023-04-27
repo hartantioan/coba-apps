@@ -143,7 +143,8 @@ class Select2Controller extends Controller {
                 'code'          => $d->code,
                 'name'          => $d->name,
                 'uom'           => $d->uomUnit->code,
-                'price_list'    => $d->currentCogs($this->dataplaces)
+                'price_list'    => $d->currentCogs($this->dataplaces),
+                'stock_list'    => $d->currentStock($this->dataplaces)
             ];
         }
 
@@ -318,7 +319,8 @@ class Select2Controller extends Controller {
                 'unit_id'       => $capital ? $capital->unit_id : '',
                 'nominal'       => $d->nominal > 0 ? number_format($d->nominal,3,',','.') : '0,000',
                 'price'         => $capital ? number_format($capital->price,3,',','.') : '0,000',
-                'place_id'      => $d->place_id
+                'place_id'      => $d->place_id,
+                'place_name'    => $d->place->name
             ];
         }
 
@@ -345,7 +347,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->name,
+                'text' 			=> $d->employee_no.' - '.$d->name,
                 'top'           => $d->top,
             ];
         }
@@ -412,7 +414,8 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->where('status','2')->get();
+                ->where('status','2')
+                ->where('inventory_type','1')->get();
 
         foreach($data as $d) {
             $response[] = [
@@ -492,7 +495,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->name.' - '.$d->type(),
+                'text' 			=> $d->employee_no.' - '.$d->name.' - '.$d->type(),
             ];
         }
 

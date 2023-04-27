@@ -24,6 +24,7 @@ return new class extends Migration
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
             $table->date('document_date')->nullable();
+            $table->string('delivery_no',155)->nullable();
             $table->string('document')->nullable();
             $table->string('note')->nullable();
             $table->char('status',1)->nullable();

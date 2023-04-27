@@ -64,7 +64,7 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Kode</th>
-                                                        <th>Pabrik/Kantor</th>
+                                                        <th>Site</th>
                                                         <th>Departemen</th>
                                                         <th>Nama</th>
                                                         <th>Min Time In</th>
@@ -110,7 +110,7 @@
                                     <option value="{{ $b->id }}">{{ $b->name.' - '.$b->company->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="place_id">Pabrik/Kantor</label>
+                            <label class="" for="place_id">Site</label>
                         </div>
                         <div class="input-field col s4">
                             <select class="form-control" id="department_id" name="department_id">
@@ -119,6 +119,22 @@
                                 @endforeach
                             </select>
                             <label class="" for="department_id">Departemen</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <input id="min_time_in" name="min_time_in" type="text" placeholder="Minimum time in" class="timepicker">
+                            <label class="active" for="min_time_in">Minimum Time In</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <input id="time_in" name="time_in" type="text" placeholder="Time in" class="timepicker">
+                            <label class="active" for="time_in">Time In</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <input id="time_out" name="time_out" type="text" placeholder="Time out" class="timepicker">
+                            <label class="active" for="time_out">Time Out</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <input id="max_time_out" name="max_time_out" type="text" placeholder="Maximum time out" class="timepicker">
+                            <label class="active" for="max_time_out">Maximum Time Out</label>
                         </div>
                         <div class="input-field col s4">
                             <div class="switch mb-1">
@@ -374,6 +390,10 @@
                 $('#name').val(response.name);
                 $('#place_id').val(response.place_id).formSelect();
                 $('#department_id').val(response.department_id).formSelect();
+                $('#min_time_in').val(response.min_time_in);
+                $('#time_in').val(response.time_in);
+                $('#time_out').val(response.time_out);
+                $('#max_time_out').val(response.max_time_out);
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

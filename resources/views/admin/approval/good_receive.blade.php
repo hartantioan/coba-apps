@@ -204,7 +204,7 @@
                     <th class="center">Coa</th>
                     <th class="center">Site</th>
                     <th class="center">Departemen</th>
-                    <th class="center">Gudang</th>
+                    <th class="center">Ke Gudang</th>
                     <th class="center">Keterangan</th>
                 </tr>
             </thead>

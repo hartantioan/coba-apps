@@ -24,7 +24,7 @@ class ExportShift implements FromCollection, WithTitle, WithHeadings, WithCustom
         'ID',
         'KODE', 
         'NAMA',
-        'PABRIK/KANTOR',
+        'SITE',
         'DEPARTEMEN',
         'MIN TIME IN',
         'TIME IN',

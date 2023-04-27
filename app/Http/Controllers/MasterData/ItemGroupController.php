@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ItemGroup;
 use App\Models\Coa;
+use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -25,7 +26,8 @@ class ItemGroupController extends Controller
             'content'   => 'admin.master_data.item_group',
             'parent'    => ItemGroup::where('status','1')->get(),
             /* 'coa'       => Coa::where('status', '1')->oldest('code')->get() */
-            'coa'       => Coa::where('status', '1')->where('level',5)->oldest('code')->get()
+            'coa'       => Coa::where('status', '1')->where('level',5)->oldest('code')->get(),
+            'warehouse' => Warehouse::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -90,6 +92,7 @@ class ItemGroupController extends Controller
                     $val->name,
                     $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
                     $val->coa->name,
+                    $val->warehouse_id ? $val->warehouse->code.' - '.$val->warehouse->name : '-',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -141,6 +144,7 @@ class ItemGroupController extends Controller
                     $query->name        = $request->name;
                     $query->parent_id   = $request->parent_id ? $request->parent_id : NULL;
                     $query->coa_id      = $request->coa_id;
+                    $query->warehouse_id= $request->warehouse_id;
                     $query->status      = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -155,6 +159,7 @@ class ItemGroupController extends Controller
                         'name'			=> $request->name,
                         'parent_id'     => $request->parent_id ? $request->parent_id : NULL,
                         'coa_id'        => $request->coa_id,
+                        'warehouse_id'  => $request->warehouse_id,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

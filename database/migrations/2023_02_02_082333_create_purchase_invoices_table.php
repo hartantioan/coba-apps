@@ -21,11 +21,10 @@ return new class extends Migration
             $table->bigInteger('account_id')->nullable();
             $table->bigInteger('company_id')->nullable();
             $table->date('post_date')->nullable();
+            $table->date('received_date')->nullable();
             $table->date('due_date')->nullable();
             $table->date('document_date')->nullable();
             $table->char('type', 1)->nullable();
-            $table->bigInteger('currency_id')->nullable();
-            $table->double('currency_rate')->nullable();
             $table->double('subtotal')->nullable();
             $table->double('discount')->nullable();
             $table->double('total')->nullable();
@@ -33,6 +32,7 @@ return new class extends Migration
             $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
             $table->double('downpayment')->nullable();
+            $table->double('rounding')->nullable();
             $table->double('balance')->nullable();
             $table->string('document')->nullable();
             $table->text('note')->nullable();
@@ -48,7 +48,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'company_id', 'currency_id']);
+            $table->index(['user_id', 'account_id', 'company_id']);
         });
     }
 

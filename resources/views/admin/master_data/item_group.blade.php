@@ -67,6 +67,7 @@
                                                         <th>Nama</th>
                                                         <th>Parent</th>
                                                         <th>Coa</th>
+                                                        <th>Gudang</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -105,16 +106,16 @@
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="select2 browser-default" id="parent_id" name="parent_id">
+                            <select class="select2 browser-default" id="parent_id" name="parent_id" onchange="getCoaParent();">
                                 <option value="">Parent (Utama)</option>
                                 @foreach($parent as $m)
-                                    <option value="{{ $m->id }}">{{ $m->name }}</option>
+                                    <option value="{{ $m->id }}" data-coa="{{ $m->coa_id }}">{{ $m->name }}</option>
                                     @foreach($m->childSub as $m2)
-                                        <option value="{{ $m2->id }}"> - {{ $m2->name }}</option>
+                                        <option value="{{ $m2->id }}" data-coa="{{ $m2->coa_id }}"> - {{ $m2->name }}</option>
                                         @foreach($m2->childSub as $m3)
-                                            <option value="{{ $m3->id }}"> - - {{ $m3->name }}</option>
+                                            <option value="{{ $m3->id }}" data-coa="{{ $m3->coa_id }}"> - - {{ $m3->name }}</option>
                                             @foreach($m3->childSub as $m4)
-                                                <option value="{{ $m4->id }}"> - - - {{ $m4->name }}</option>
+                                                <option value="{{ $m4->id }}" data-coa="{{ $m4->coa_id }}"> - - - {{ $m4->name }}</option>
                                             @endforeach
                                         @endforeach
                                     @endforeach
@@ -130,6 +131,15 @@
                                 @endforeach
                             </select>
                             <label class="active" for="coa_id">Coa</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="select2 browser-default" id="warehouse_id" name="warehouse_id">
+                                <option value="">-- Tidak ada --</option>
+                                @foreach($warehouse as $w)
+                                    <option value="{{ $w->id }}">{{ $w->code.' - '.$w->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="active" for="warehouse_id">Gudang Penempatan</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -186,10 +196,17 @@
         });
 
         $(".select2").select2({
-            /* dropdownAutoWidth: true, */
             width: '100%',
         });
     });
+
+    function getCoaParent(){
+        if($('#parent_id').val()){
+            $('#coa_id').val($("#parent_id").select2().find(":selected").data("coa")).trigger('change');
+        }else{
+            $('#coa_id').val('').trigger('change');
+        }
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -227,6 +244,7 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'parent', className: 'center-align' },
                 { name: 'coa', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -342,6 +360,7 @@
                 $('#name').val(response.name);
                 $('#parent_id').val(response.parent_id).trigger('change');
                 $('#coa_id').val(response.coa_id).trigger('change');
+                $('#warehouse_id').val(response.warehouse_id).trigger('change');
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

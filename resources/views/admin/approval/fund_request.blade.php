@@ -184,6 +184,24 @@
                 <h6 class="invoice-from">Lain-lain</h6>
                 <div class="row">
                     <div class="col s3">
+                        Bisnis Partner
+                    </div>
+                    <div class="col s9">
+                        {{ $data->account->name }}
+                    </div>
+                    <div class="col s3">
+                        Rekening Penerima
+                    </div>
+                    <div class="col s9">
+                        {{ $data->name_account }}
+                    </div>
+                    <div class="col s3">
+                        No. Rekening
+                    </div>
+                    <div class="col s9">
+                        {{ $data->no_account }}
+                    </div>
+                    <div class="col s3">
                         Lampiran
                     </div>
                     <div class="col s9">

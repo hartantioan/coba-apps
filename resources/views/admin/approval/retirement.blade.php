@@ -174,7 +174,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Pabrik/Kantor
+                                Site
                             </td>
                             <td width="60%">
                                 {{ $data->place->name.' - '.$data->place->company->name }}

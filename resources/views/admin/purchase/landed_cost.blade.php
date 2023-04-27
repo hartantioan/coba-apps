@@ -241,15 +241,13 @@
                                 <h5>PPN</h5>
                                 <div class="row">
                                     <div class="input-field col m3 s12">
-                                        <div class="switch mb-1">
-                                            <label class="active" for="is_tax">Ber-PPN?</label>
-                                            <label>
-                                                Tidak
-                                                <input type="checkbox" id="is_tax" name="is_tax" value="1" onclick="countEach();">
-                                                <span class="lever"></span>
-                                                Ya
-                                            </label>
-                                        </div>
+                                        <select class="browser-default" id="tax_id" name="tax_id" onchange="countEach();">
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                            @foreach ($tax as $row)
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="tax_id">Pajak PPN</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <div class="switch mb-1">
@@ -262,29 +260,19 @@
                                             </label>
                                         </div>
                                     </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);countEach();">
-                                        <label class="active" for="percent_tax">Prosentase PPN</label>
-                                    </div>
                                 </div>
                             </div>
                             <div class="col m12 s12">
                                 <h5>PPH</h5>
                                 <div class="row">
                                     <div class="input-field col m3 s12">
-                                        <div class="switch mb-1">
-                                            <label class="active" for="is_wtax">Ber-PPH?</label>
-                                            <label>
-                                                Tidak
-                                                <input type="checkbox" id="is_wtax" name="is_wtax" value="1" onclick="countEach();">
-                                                <span class="lever"></span>
-                                                Ya
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="percent_wtax" name="percent_wtax" type="text" value="0" onkeyup="formatRupiah(this);countEach();">
-                                        <label class="active" for="percent_wtax">Prosentase PPH</label>
+                                        <select class="browser-default" id="wtax_id" name="wtax_id" onchange="countEach();">
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                            @foreach ($wtax as $row)
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="wtax_id">Pajak PPH</label>
                                     </div>
                                 </div>
                             </div>
@@ -385,7 +373,6 @@
 
 <!-- END: Page Main-->
 <script>
-    var arrQty = [];
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
@@ -520,16 +507,14 @@
                                 $(this).remove();
                             });
 
-                            arrQty = [];
-
                             $('#last-row-item').remove();
 
                             $.each(response.details, function(i, val) {
-                                arrQty.push(val.qtyRaw);
                                 var count = makeid(10);
                                 $('#body-item').append(`
                                     <tr class="row_item">
                                         <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_total[]" value="` + val.totalrow + `">
                                         <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
                                         <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
@@ -591,7 +576,6 @@
             if($('.data-used').length > 0){
                 $('.data-used').trigger('click');
             }
-            arrQty = [];
         }
     }
 
@@ -626,16 +610,16 @@
 
     function countEach(){
         
-        var tax = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, total = parseFloat($('#pretotal').val().replaceAll(".", "").replaceAll(",",".")), wtax = 0, percent_wtax = parseFloat($('#percent_wtax').val().replaceAll(".", "").replaceAll(",","."));
+        var tax = 0, percent_tax = parseFloat($('#tax_id').val()), grandtotal = 0, total = parseFloat($('#pretotal').val().replaceAll(".", "").replaceAll(",",".")), wtax = 0, percent_wtax = parseFloat($('#wtax_id').val());
 
-        if($('#is_tax').is(':checked')){
+        if($('#tax_id').val() !== '0'){
             if($('#is_include_tax').is(':checked')){
                 total = total / (1 + (percent_tax / 100));
             }
             tax = total * (percent_tax / 100);
         }
 
-        if($('#is_wtax').is(':checked')){
+        if($('#wtax_id').val() !== '0'){
             wtax = total * (percent_wtax / 100);
         }
 
@@ -653,18 +637,16 @@
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
-        if($('.nominalitem').length > 0){
-            if(arrQty.length > 0){
-                let totalqty = 0;
-                for(let i=0;i<arrQty.length;i++){
-                    totalqty += parseFloat(arrQty[i]);
-                }
+        if($('input[name^="arr_total"]').length > 0){
+            let totalall = 0;
+            $('input[name^="arr_total"]').each(function(){
+                totalall += parseFloat($(this).val());
+            });
 
-                for(let i=0;i<arrQty.length;i++){
-                    let totalrow = (parseFloat(arrQty[i]) / totalqty) * total;
-                    $('input[name^="arr_price"]:eq(' + i + ')').val(formatRupiahIni(totalrow.toFixed(5).toString().replace('.',',')));
-                }
-            }
+            $('input[name^="arr_total"]').each(function(index){
+                let totalrow = (parseFloat($(this).val()) / totalall) * total;
+                $('input[name^="arr_price"]:eq(' + index + ')').val(formatRupiahIni(totalrow.toFixed(5).toString().replace('.',',')));
+            })
         }
     }
 
@@ -785,6 +767,14 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]);
+
+                formData.delete('tax_id');
+                formData.delete('wtax_id');
+                formData.append('tax_id',$('#tax_id').find(':selected').data('id'));
+                formData.append('wtax_id',$('#wtax_id').find(':selected').data('id'));
+                formData.append('percent_tax',$('#tax_id').val());
+                formData.append('percent_wtax',$('#wtax_id').val());
+
                 $.ajax({
                     url: '{{ Request::url() }}/create',
                     type: 'POST',
@@ -891,11 +881,8 @@
                 $('#due_date').val(response.due_date);
                 $('#percent_tax').val(response.percent_tax);
                 
-                if(response.is_tax == '1'){
-                    $('#is_tax').prop( "checked", true);
-                }else{
-                    $('#is_tax').prop( "checked", false);
-                }
+                $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
+                $("#wtax_id option[data-id='" + response.wtax_id + "']").prop("selected",true);
 
                 if(response.is_include_tax == '1'){
                     $('#is_include_tax').prop( "checked", true);

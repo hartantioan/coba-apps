@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Dashboard;
 use App\Models\ItemCogs;
+use App\Models\ItemStock;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -12,9 +15,13 @@ class DashboardController extends Controller
     public function index()
     {
         $data = [
-            'title'   => 'Dashboard',
-            'content' => 'admin.dashboard.main',
-            'itemcogs'=> ItemCogs::all(),
+            'title'         => 'Dashboard',
+            'content'       => 'admin.dashboard.main',
+            'itemcogs'      => ItemCogs::all(),
+            'itemstocks'    => ItemStock::all(),
+            /* 'pr'        => PurchaseRequest::all(),
+            'pr1'       => PurchaseRequest::find(5),
+            'po'        => PurchaseOrder::find(1), */
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

@@ -13,11 +13,11 @@ class ExportOutgoingPayment implements FromView
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $place = null, string $account = null, string $currency = null, array $dataplaces = null)
+    public function __construct(string $search = null, string $status = null, string $company = null, string $account = null, string $currency = null, array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
-        $this->place = $place ? $place : '';
+        $this->company = $company ? $company : '';
         $this->account = $account ? $account : '';
         $this->currency = $currency ? $currency : '';
         $this->dataplaces = $dataplaces ? $dataplaces : [];
@@ -58,11 +58,10 @@ class ExportOutgoingPayment implements FromView
                     $query->whereIn('currency_id',$arrCurrency);
                 }
 
-                if($this->place){
-                    $query->where('place_id',$this->place);
+                if($this->company){
+                    $query->where('company_id',$this->company);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
         ]);
     }

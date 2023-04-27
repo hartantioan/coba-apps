@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('purchase_order_id')->nullable();
             $table->bigInteger('purchase_request_detail_id')->nullable();
             $table->bigInteger('item_id')->nullable();
+            $table->bigInteger('coa_id')->nullable();
             $table->double('qty')->nullable();
             $table->double('price')->nullable();
             $table->double('percent_discount_1')->nullable();
@@ -31,13 +32,15 @@ return new class extends Migration
             $table->double('percent_tax')->nullable();
             $table->char('is_wtax',1)->nullable();
             $table->double('percent_tax')->nullable();
+            $table->bigInteger('tax_id')->nullable();
+            $table->bigInteger('wtax_id')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['purchase_order_id', 'item_id', 'purchase_request_detail_id', 'place_id', 'department_id', 'warehouse_id'],'podt_index');
+            $table->index(['purchase_order_id', 'item_id', 'purchase_request_detail_id', 'place_id', 'department_id', 'warehouse_id','tax_id','wtax_id','coa_id'],'podt_index');
         });
     }
 

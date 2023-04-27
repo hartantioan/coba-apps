@@ -26,6 +26,8 @@ class LandedCost extends Model
         'reference',
         'currency_id',
         'currency_rate',
+        'tax_id',
+        'wtax_id',
         'is_tax',
         'is_include_tax',
         'percent_tax',
@@ -55,6 +57,16 @@ class LandedCost extends Model
     public function vendor()
     {
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
+    }
+
+    public function tax()
+    {
+        return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
+    }
+
+    public function wtax()
+    {
+        return $this->belongsTo('App\Models\Tax', 'wtax_id', 'id')->withTrashed();
     }
     
     public function goodReceipt()
@@ -213,5 +225,17 @@ class LandedCost extends Model
         }
 
         return $total;
+    }
+
+    public function getListItem(){
+        $html = '<ol>';
+
+        foreach($this->goodReceipt->goodReceiptDetail as $row){
+            $html .= '<li>'.$row->item->code.' - '.$row->item->name.' Qty. '.$row->qty.' '.$row->item->buyUnit->code.'</li>';
+        }
+
+        $html .= '</ol>';
+
+        return $html;
     }
 }

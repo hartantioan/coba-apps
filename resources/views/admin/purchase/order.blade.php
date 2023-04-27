@@ -15,7 +15,9 @@
         text-align:-webkit-right;
     }
     .orgchart { background: #fff; }
-
+    .select2-container {
+        min-width:250px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -73,6 +75,16 @@
                                                         <option value="3">Selesai</option>
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_inventory" style="font-size:1rem;">Tipe Pembelian :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_inventory" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Persediaan Barang</option>
+                                                        <option value="2">Jasa</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -162,6 +174,7 @@
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Supplier</th>
                                                         <th rowspan="2">Tipe PO</th>
+                                                        <th rowspan="2">Jenis PO</th>
                                                         <th rowspan="2">Pengiriman</th>
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th colspan="2" class="center">Proforma</th>
@@ -230,13 +243,20 @@
                                 <label class="active" for="supplier_id">Supplier</label>
                             </div>
                             <div class="input-field col m3 s12">
+                                <select class="form-control" id="inventory_type" name="inventory_type">
+                                    <option value="1">Persediaan Barang</option>
+                                    <option value="2">Jasa</option>
+                                </select>
+                                <label class="" for="inventory_type">Tipe Pembelian</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <select class="form-control" id="purchasing_type" name="purchasing_type">
                                     <option value="1">Standart PO</option>
                                     <option value="2">Planned PO</option>
                                     <option value="3">Blanked PO</option>
                                     <option value="4">Contract PO</option>
                                 </select>
-                                <label class="" for="purchasing_type">Tipe Pembelian</label>
+                                <label class="" for="purchasing_type">Kategori PO</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="shipping_type" name="shipping_type">
@@ -292,7 +312,7 @@
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -332,44 +352,40 @@
                                     <h6><b>PR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" style="width:2500px;">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">Item</th>
-                                                    <th class="center">Qty</th>
-                                                    <th class="center">Satuan</th>
-                                                    <th class="center">Harga</th>
-                                                    <th class="center">Disc1(%)</th>
-                                                    <th class="center">Disc2(%)</th>
-                                                    <th class="center">Disc3(Rp)</th>
-                                                    <th class="center">Subtotal</th>
-                                                    <th class="center">Keterangan</th>
-                                                    <th class="center">Ber-PPN?</th>
-                                                    <th class="center">Incl.PPN</th>
-                                                    <th class="center" width="25px">% PPN</th>
-                                                    <th class="center">Ber-PPH?</th>
-                                                    <th class="center" width="25px">% PPH</th>
-                                                    <th class="center">Pabrik/Kantor</th>
-                                                    <th class="center">Departemen</th>
-                                                    <th class="center">Gudang</th>
-                                                    <th class="center">Hapus</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-item">
-                                                <tr id="last-row-item">
-                                                    <td colspan="18" class="center">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> New Item
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    <table class="bordered" style="width:2500px;">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Item / Coa Jasa</th>
+                                                <th class="center">Qty</th>
+                                                <th class="center">Satuan</th>
+                                                <th class="center">Harga</th>
+                                                <th class="center">PPN</th>
+                                                <th class="center">Termasuk PPN</th>
+                                                <th class="center">PPH</th>
+                                                <th class="center">Disc1(%)</th>
+                                                <th class="center">Disc2(%)</th>
+                                                <th class="center">Disc3(Rp)</th>
+                                                <th class="center">Subtotal</th>
+                                                <th class="center">Keterangan</th>
+                                                <th class="center">Site</th>
+                                                <th class="center">Departemen</th>
+                                                <th class="center">Gudang</th>
+                                                <th class="center">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-item">
+                                            <tr id="last-row-item">
+                                                <td colspan="16" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> New Item
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </p>
                             </div>
                             <div class="input-field col m4 s12">
@@ -606,7 +622,11 @@
     }
     
     function getRowUnit(val){
-        $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].buy_unit);
+        if($("#arr_item" + val).val()){
+            $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].buy_unit);
+        }else{
+            $('#arr_unit' + val).text('-');
+        }
     }
 
     function getTopSupplier(){
@@ -670,6 +690,28 @@
                                         <td class="center">
                                             <input name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
                                         </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
+                                                <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                                @foreach ($tax as $row)
+                                                    <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <label>
+                                                <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                                                <span>Ya/Tidak</span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
+                                                <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                                                @foreach ($wtax as $row)
+                                                    <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
                                         <td class="center">
                                             <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
                                         </td>
@@ -684,42 +726,6 @@
                                         </td>
                                         <td>
                                             <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + ` ` + response.code + ` ke Gudang ` + val.warehouse_name + `">
-                                        </td>
-                                        <td>
-                                            <div class="switch mb-0">
-                                                <label>
-                                                    Tidak
-                                                    <input id="arr_is_tax` + count + `" type="checkbox" name="arr_is_tax[]" value="1" onclick="countAll();">
-                                                    <span class="lever"></span>
-                                                    Ya
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="switch mb-1">
-                                                <label>
-                                                    Tidak
-                                                    <input id="arr_is_include_tax` + count + `" type="checkbox" name="arr_is_include_tax[]" value="1" onclick="countAll();">
-                                                    <span class="lever"></span>
-                                                    Ya
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <input id="arr_percent_tax` + count + `" name="arr_percent_tax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
-                                        </td>
-                                        <td>
-                                            <div class="switch mb-0">
-                                                <label>
-                                                    Tidak
-                                                    <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="countAll();">
-                                                    <span class="lever"></span>
-                                                    Ya
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
                                         </td>
                                         <td>
                                             <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
@@ -781,99 +787,168 @@
 
     function addItem(){
         var count = makeid(10);
-        $('#last-row-item').before(`
-            <tr class="row_item">
-                <input type="hidden" name="arr_purchase[]" value="0">
-                <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                </td>
-                <td>
-                    <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowQty`+ count +`">
-                </td>
-                <td class="center">
-                    <span id="arr_unit` + count + `">-</span>
-                </td>
-                <td class="center">
-                    <input name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
-                </td>
-                <td class="center">
-                    <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
-                </td>
-                <td class="center">
-                    <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
-                </td>
-                <td class="center">
-                    <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
-                </td>
-                <td class="center">
-                    <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
-                </td>
-                <td>
-                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
-                </td>
-                <td>
-                    <div class="switch mb-0">
+        if($('#inventory_type').val() == '1'){
+            $('#last-row-item').before(`
+                <tr class="row_item">
+                    <input type="hidden" name="arr_purchase[]" value="0">
+                    <td>
+                        <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                    </td>
+                    <td>
+                        <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                    </td>
+                    <td class="center">
+                        <span id="arr_unit` + count + `">-</span>
+                    </td>
+                    <td class="center">
+                        <input name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                    </td>
+                    <td>
+                        <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
+                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                            @foreach ($tax as $row)
+                                <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td>
                         <label>
-                            Tidak
-                            <input id="arr_is_tax` + count + `" type="checkbox" name="arr_is_tax[]" value="1" onclick="countAll();">
-                            <span class="lever"></span>
-                            Ya
+                            <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                            <span>Ya/Tidak</span>
                         </label>
-                    </div>
-                </td>
-                <td>
-                    <div class="switch mb-1">
+                    </td>
+                    <td>
+                        <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
+                            <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                            @foreach ($wtax as $row)
+                                <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="center">
+                        <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                    </td>
+                    <td class="center">
+                        <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                    </td>
+                    <td class="center">
+                        <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                    </td>
+                    <td class="center">
+                        <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
+                    </td>
+                    <td>
+                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
+                    </td>
+                    <td>
+                        <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                            @foreach ($place as $rowplace)
+                                <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                            @endforeach
+                        </select>    
+                    </td>
+                    <td>
+                        <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                            @foreach ($department as $rowdept)
+                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                            @endforeach
+                        </select>    
+                    </td>
+                    <td>
+                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                    </td>
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                </tr>
+            `);
+            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+            select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+            $('#arr_place' + count + ',#arr_department' + count).formSelect();
+            
+        }else if($('#inventory_type').val() == '2'){
+
+            $('#last-row-item').before(`
+                <tr class="row_item">
+                    <input type="hidden" name="arr_purchase[]" value="0">
+                    <td>
+                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                    </td>
+                    <td>
+                        <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                    </td>
+                    <td class="center">
+                        <span id="arr_unit` + count + `">-</span>
+                    </td>
+                    <td class="center">
+                        <input name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                    </td>
+                    <td>
+                        <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
+                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                            @foreach ($tax as $row)
+                                <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td>
                         <label>
-                            Tidak
-                            <input id="arr_is_include_tax` + count + `" type="checkbox" name="arr_is_include_tax[]" value="1" onclick="countAll();">
-                            <span class="lever"></span>
-                            Ya
+                            <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                            <span>Ya/Tidak</span>
                         </label>
-                    </div>
-                </td>
-                <td>
-                    <input id="arr_percent_tax` + count + `" name="arr_percent_tax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
-                </td>
-                <td>
-                    <div class="switch mb-0">
-                        <label>
-                            Tidak
-                            <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="countAll();">
-                            <span class="lever"></span>
-                            Ya
-                        </label>
-                    </div>
-                </td>
-                <td>
-                    <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
-                </td>
-                <td>
-                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
-                        @foreach ($place as $rowplace)
-                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
-                        @endforeach
-                    </select>    
-                </td>
-                <td>
-                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
-                        @foreach ($department as $rowdept)
-                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                        @endforeach
-                    </select>    
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
-        $('#arr_place' + count + ',#arr_department' + count).formSelect();
+                    </td>
+                    <td>
+                        <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
+                            <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                            @foreach ($wtax as $row)
+                                <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="center">
+                        <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                    </td>
+                    <td class="center">
+                        <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                    </td>
+                    <td class="center">
+                        <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                    </td>
+                    <td class="center">
+                        <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
+                    </td>
+                    <td>
+                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
+                    </td>
+                    <td>
+                        <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                            @foreach ($place as $rowplace)
+                                <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                            @endforeach
+                        </select>    
+                    </td>
+                    <td>
+                        <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                            @foreach ($department as $rowdept)
+                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                            @endforeach
+                        </select>    
+                    </td>
+                    <td class="center">
+                        -
+                    </td>
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                </tr>
+            `);
+            $('#arr_place' + count + ',#arr_department' + count).formSelect();
+            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        }
     }
 
     function changeDateMinimum(val){
@@ -928,6 +1003,7 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
+                    inventory_type : $('#filter_inventory').val(),
                     purchasing_type : $('#filter_type').val(),
                     shipping_type : $('#filter_shipping').val(),
                     'supplier_id[]' : $('#filter_supplier').val(),
@@ -957,6 +1033,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'supplier_id', className: 'center-align' },
+                { name: 'inventory_type', className: 'center-align' },
                 { name: 'purchasing_type', className: 'center-align' },
                 { name: 'shipping_type', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
@@ -1029,18 +1106,16 @@
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]);
 
-                formData.delete("arr_is_tax[]");
+                formData.delete("arr_tax[]");
                 formData.delete("arr_is_include_tax[]");
-                formData.delete("arr_percent_tax[]");
-                formData.delete("arr_is_wtax[]");
-                formData.delete("arr_percent_wtax[]");
+                formData.delete("arr_wtax[]");
 
-                $('input[name^="arr_is_tax"]').each(function(index){
-                    formData.append('arr_is_tax[]',($(this).is(':checked') ? '1' : '0' ));
+                $('select[name^="arr_tax"]').each(function(index){
+                    formData.append('arr_tax[]',$(this).val());
+                    formData.append('arr_tax_id[]',$('option:selected',this).data('id'));
+                    formData.append('arr_wtax_id[]',$('select[name^="arr_wtax"]').eq(index).find(':selected').data('id'));
                     formData.append('arr_is_include_tax[]',($('input[name^="arr_is_include_tax"]').eq(index).is(':checked') ? '1' : '0'));
-                    formData.append('arr_percent_tax[]',$('input[name^="arr_percent_tax"]').eq(index).val());
-                    formData.append('arr_is_wtax[]',($('input[name^="arr_is_wtax"]').eq(index).is(':checked') ? '1' : '0' ));
-                    formData.append('arr_percent_wtax[]',$('input[name^="arr_percent_wtax"]').eq(index).val());
+                    formData.append('arr_wtax[]',$('select[name^="arr_wtax"]').eq(index).val());
                 });
 
                 $.ajax({
@@ -1137,6 +1212,7 @@
                 $('#supplier_id').append(`
                     <option value="` + response.account_id + `">` + response.supplier_name + `</option>
                 `);
+                $('#inventory_type').val(response.inventory_type).formSelect();
                 $('#purchasing_type').val(response.purchasing_type).formSelect();
                 $('#shipping_type').val(response.shipping_type).formSelect();
                 $('#company_id').val(response.company_id).formSelect();
@@ -1172,116 +1248,191 @@
 
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        $('#last-row-item').before(`
-                            <tr class="row_item">
-                                <input type="hidden" name="arr_purchase[]" value="` + val.ecode + `">
-                                <td>
-                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                                </td>
-                                <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowQty`+ count +`">
-                                </td>
-                                <td class="center">
-                                    <span id="arr_unit` + count + `">` + val.unit + `</span>
-                                </td>
-                                <td class="center">
-                                    <input name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
-                                </td>
-                                <td class="center">
-                                    <input name="arr_disc1[]" class="browser-default" type="text" value="` + val.disc1 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
-                                </td>
-                                <td class="center">
-                                    <input name="arr_disc2[]" class="browser-default" type="text" value="` + val.disc2 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
-                                </td>
-                                <td class="center">
-                                    <input name="arr_disc3[]" class="browser-default" type="text" value="` + val.disc3 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
-                                </td>
-                                <td class="center">
-                                    <span id="arr_subtotal` + count + `" class="arr_subtotal">` + val.subtotal + `</span>
-                                </td>
-                                <td>
-                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
-                                </td>
-                                <td>
-                                    <div class="switch mb-0">
+                        if(response.inventory_type == '1'){
+                            $('#last-row-item').before(`
+                                <tr class="row_item">
+                                    <input type="hidden" name="arr_purchase[]" value="` + val.purchase_request_detail_id + `">
+                                    <td>
+                                        <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                    </td>
+                                    <td>
+                                        <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        <span id="arr_unit` + count + `">` + val.unit + `</span>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                            @foreach ($tax as $row)
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td>
                                         <label>
-                                            Tidak
-                                            <input id="arr_is_tax` + count + `" type="checkbox" name="arr_is_tax[]" value="1" onclick="countAll();">
-                                            <span class="lever"></span>
-                                            Ya
+                                            <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                                            <span>Ya/Tidak</span>
                                         </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="switch mb-1">
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                                            @foreach ($wtax as $row)
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_disc1[]" class="browser-default" type="text" value="` + val.disc1 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_disc2[]" class="browser-default" type="text" value="` + val.disc2 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_disc3[]" class="browser-default" type="text" value="` + val.disc3 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        <span id="arr_subtotal` + count + `" class="arr_subtotal">` + val.subtotal + `</span>
+                                    </td>
+                                    <td>
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
+                                    </td>
+                                    <td>
+                                        <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td>
+                                        <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                            @foreach ($department as $rowdept)
+                                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                            $('#arr_item' + count).append(`
+                                <option value="` + val.item_id + `">` + val.item_name + `</option>
+                            `);
+                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                            if(val.is_include_tax){
+                                $('#arr_is_include_tax' + count).prop( "checked", true);
+                            }
+                            
+                            $('#arr_warehouse' + count).append(`
+                                <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                            `);
+                            select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                            $('#arr_place' + count).val(val.place_id).formSelect();
+                            $('#arr_department' + count).val(val.department_id).formSelect();
+                            $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
+                            $("#arr_wtax" + count + " option[data-id='" + val.wtax_id + "']").prop("selected",true);
+
+                        }else if(response.inventory_type == '2'){
+
+                            $('#last-row-item').before(`
+                                <tr class="row_item">
+                                    <input type="hidden" name="arr_purchase[]" value="` + val.purchase_request_detail_id + `">
+                                    <td>
+                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                    </td>
+                                    <td>
+                                        <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        <span id="arr_unit` + count + `">` + val.unit + `</span>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                            @foreach ($tax as $row)
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td>
                                         <label>
-                                            Tidak
-                                            <input id="arr_is_include_tax` + count + `" type="checkbox" name="arr_is_include_tax[]" value="1" onclick="countAll();">
-                                            <span class="lever"></span>
-                                            Ya
+                                            <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                                            <span>Ya/Tidak</span>
                                         </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <input id="arr_percent_tax` + count + `" name="arr_percent_tax[]" class="browser-default" type="text" value="` + val.percent_tax + `" onkeyup="formatRupiah(this);countAll();">
-                                </td>
-                                <td>
-                                    <div class="switch mb-0">
-                                        <label>
-                                            Tidak
-                                            <input id="arr_is_wtax` + count + `" type="checkbox" name="arr_is_wtax[]" value="1" onclick="countAll();">
-                                            <span class="lever"></span>
-                                            Ya
-                                        </label>
-                                    </div>
-                                </td>
-                                <td>
-                                    <input id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" class="browser-default" type="text" value="` + val.percent_wtax + `" onkeyup="formatRupiah(this);countAll();">
-                                </td>
-                                <td>
-                                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
-                                        @foreach ($place as $rowplace)
-                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
-                                        @endforeach
-                                    </select>    
-                                </td>
-                                <td>
-                                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
-                                        @foreach ($department as $rowdept)
-                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                                        @endforeach
-                                    </select>    
-                                </td>
-                                <td>
-                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeUsedData('` + val.id + `')">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
-                        $('#arr_item' + count).append(`
-                            <option value="` + val.item_id + `">` + val.item_name + `</option>
-                        `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-                        if(val.is_tax){
-                            $('#arr_is_tax' + count).prop( "checked", true);
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                                            @foreach ($wtax as $row)
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_disc1[]" class="browser-default" type="text" value="` + val.disc1 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_disc2[]" class="browser-default" type="text" value="` + val.disc2 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_disc3[]" class="browser-default" type="text" value="` + val.disc3 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        <span id="arr_subtotal` + count + `" class="arr_subtotal">` + val.subtotal + `</span>
+                                    </td>
+                                    <td>
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
+                                    </td>
+                                    <td>
+                                        <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td>
+                                        <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                            @foreach ($department as $rowdept)
+                                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                            if(val.is_include_tax){
+                                $('#arr_is_include_tax' + count).prop( "checked", true);
+                            }
+                            
+                            $('#arr_coa' + count).append(`
+                                <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                            `);
+                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                            $('#arr_place' + count).val(val.place_id).formSelect();
+                            $('#arr_department' + count).val(val.department_id).formSelect();
+                            $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
+                            $("#arr_wtax" + count + " option[data-id='" + val.wtax_id + "']").prop("selected",true);
                         }
-                        if(val.is_include_tax){
-                            $('#arr_is_include_tax' + count).prop( "checked", true);
-                        }
-                        if(val.is_wtax){
-                            $('#arr_is_wtax' + count).prop( "checked", true);
-                        }
-                        
-                        $('#arr_warehouse' + count).append(`
-                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
-                        `);
-                        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
-                        $('#arr_place' + count).val(val.place_id).formSelect();
-                        $('#arr_department' + count).val(val.department_id).formSelect();
                     });
                 }
                 
@@ -1426,16 +1577,14 @@
 			subtotal += parseFloat($(this).text().replaceAll(".", "").replaceAll(",","."));
 		});
 
-        /* total = subtotal - discount; */
-
         $('.arr_subtotal').each(function(index){
             let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0;
             rowbobot = rownominal / subtotal;
             rowdiscount = discount * rowbobot;
             rownominal -= rowdiscount;
 
-            if($('input[name^="arr_is_tax"]').eq(index).is(':checked')){
-                let percent_tax = parseFloat($('input[name^="arr_percent_tax"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            if($('select[name^="arr_tax"]').eq(index).val() !== '0'){
+                let percent_tax = parseFloat($('select[name^="arr_tax"]').eq(index).val());
                 if($('input[name^="arr_is_include_tax"]').eq(index).is(':checked')){
                     rownominal = rownominal / (1 + (percent_tax / 100));
                 }
@@ -1443,8 +1592,8 @@
                 rowtax = rownominal * (percent_tax / 100);
             }
 
-            if($('input[name^="arr_is_wtax"]').eq(index).is(':checked')){
-                let percent_wtax = parseFloat($('input[name^="arr_percent_wtax"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            if($('select[name^="arr_wtax"]').eq(index).val() !== '0'){
+                let percent_wtax = parseFloat($('select[name^="arr_wtax"]').eq(index).val());
                 rowwtax = rownominal * (percent_wtax / 100);
             }
             
@@ -1487,7 +1636,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), company = $('#filter_company').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), inventory = $('#filter_inventory').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), company = $('#filter_company').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
         
         $.ajax({
             type : "POST",
@@ -1495,6 +1644,7 @@
             data : {
                 search : search,
                 status : status,
+                inventory : inventory,
                 type : type,
                 shipping : shipping,
                 company : company,
@@ -1516,8 +1666,8 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), company = $('#filter_company').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), inventory = $('#filter_inventory').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), company = $('#filter_company').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&shipping=" + shipping + "&company=" + company + "&payment=" + payment + "&supplier=" + supplier + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&inventory=" + inventory + "&type=" + type + "&shipping=" + shipping + "&company=" + company + "&payment=" + payment + "&supplier=" + supplier + "&currency=" + currency;
     }
 </script>

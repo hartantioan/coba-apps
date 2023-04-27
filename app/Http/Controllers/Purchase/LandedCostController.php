@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodReceipt;
+use App\Models\Tax;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -37,6 +38,8 @@ class LandedCostController extends Controller
             'content'       => 'admin.purchase.landed_cost',
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
+            'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -58,6 +61,7 @@ class LandedCostController extends Controller
                     'item_id'                   => $row->item_id,
                     'item_name'                 => $row->item->code.' - '.$row->item->name,
                     'qty'                       => number_format($row->qtyConvert(),5,',','.'),
+                    'totalrow'                  => $row->getRowTotal(),
                     'qtyRaw'                    => $row->qtyConvert(),
                     'unit'                      => $row->item->uomUnit->code,
                     'place_name'                => $row->place->name.' - '.$row->place->company->name,
@@ -356,11 +360,13 @@ class LandedCostController extends Controller
                         $query->reference = $request->reference;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->is_tax = $request->is_tax ? $request->is_tax : NULL;
+                        $query->tax_id = $request->tax_id;
+                        $query->wtax_id = $request->wtax_id;
+                        $query->is_tax = $request->tax_id > 0 ? '1' : NULL;
                         $query->is_include_tax = $request->is_include_tax ? $request->is_include_tax : '0';
-                        $query->percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
-                        $query->is_wtax = $request->is_wtax ? $request->is_wtax : NULL;
-                        $query->percent_wtax = str_replace(',','.',str_replace('.','',$request->percent_wtax));
+                        $query->percent_tax = $request->percent_tax;
+                        $query->is_wtax = $request->wtax_id > 0 ? '1' : NULL;
+                        $query->percent_wtax = $request->percent_wtax;
                         $query->note = $request->note;
                         $query->document = $document;
                         $query->total = round($total,3);
@@ -399,11 +405,13 @@ class LandedCostController extends Controller
                         'reference'                 => $request->reference,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'is_tax'                    => $request->is_tax ? $request->is_tax : NULL,
+                        'tax_id'                    => $request->tax_id,
+                        'wtax_id'                   => $request->wtax_id,
+                        'is_tax'                    => $request->tax_id > 0 ? '1' : NULL,
                         'is_include_tax'            => $request->is_include_tax ? $request->is_include_tax : '0',
-                        'percent_tax'               => str_replace(',','.',str_replace('.','',$request->percent_tax)),
-                        'is_wtax'                   => $request->is_wtax ? $request->is_wtax : NULL,
-                        'percent_wtax'              => str_replace(',','.',str_replace('.','',$request->percent_wtax)),
+                        'percent_tax'               => $request->percent_tax,
+                        'is_wtax'                   => $request->wtax_id > 0 ? '1' : NULL,
+                        'percent_wtax'              => $request->percent_wtax,
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/landed_costs') : NULL,
                         'total'                     => round($total,3),
@@ -669,7 +677,7 @@ class LandedCostController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'

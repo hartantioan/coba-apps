@@ -24,6 +24,7 @@ class GoodReceipt extends Model
         'post_date',
         'due_date',
         'document_date',
+        'delivery_no',
         'document',
         'note',
         'status',
@@ -170,5 +171,29 @@ class GoodReceipt extends Model
         };
 
         return $status;
+    }
+
+    public function getPurchaseCode(){
+        $arrCode = [];
+
+        foreach($this->goodReceiptDetail as $row){
+            if(!in_array($row->purchaseOrderDetail->purchaseOrder->code,$arrCode)){
+                $arrCode[] = $row->purchaseOrderDetail->purchaseOrder->code;
+            }
+        }
+
+        return implode(',',$arrCode);
+    }
+
+    public function getListItem(){
+        $html = '<ol>';
+
+        foreach($this->goodReceiptDetail as $row){
+            $html .= '<li>'.$row->item->code.' - '.$row->item->name.' Qty. '.$row->qty.' '.$row->item->buyUnit->code.'</li>';
+        }
+
+        $html .= '</ol>';
+
+        return $html;
     }
 }

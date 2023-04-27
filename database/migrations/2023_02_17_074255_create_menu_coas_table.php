@@ -19,7 +19,6 @@ return new class extends Migration
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('menu_id')->nullable();
             $table->bigInteger('coa_id')->nullable();
-            $table->bigInteger('currency_id')->nullable();
             $table->string('field_name',155)->nullable();
             $table->char('type',1)->nullable();
             $table->double('percentage')->nullable();

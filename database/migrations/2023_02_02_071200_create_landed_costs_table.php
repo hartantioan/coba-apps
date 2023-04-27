@@ -26,6 +26,8 @@ return new class extends Migration
             $table->string('reference', 155)->nullable();
             $table->bigInteger('currency_id')->nullable();
             $table->double('currency_rate')->nullable();
+            $table->bigInteger('tax_id')->nullable();
+            $table->bigInteger('wtax_id')->nullable();
             $table->char('is_tax',1)->nullable();
             $table->char('is_include_tax',1)->nullable();
             $table->double('percent_tax')->nullable();
@@ -44,7 +46,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'good_receipt_id', 'company_id']);
+            $table->index(['user_id', 'account_id', 'good_receipt_id', 'company_id', 'tax_id', 'wtax_id']);
         });
     }
 

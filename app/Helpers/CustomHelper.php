@@ -315,8 +315,7 @@ class CustomHelper {
 				})
 				->whereHas('coa', function($query) use($data){
 					$query->where('company_id',$data->company_id);
-				})
-				->where('currency_id',$rowdetail->purchaseOrderDetail->purchaseOrder->currency_id)->get();
+				})->get();
 
 				foreach($journalMap as $row){
 					$nominal = $rowtotal * ($row->percentage / 100);
@@ -420,8 +419,7 @@ class CustomHelper {
 			})
 			->whereHas('coa', function($query) use($data){
 				$query->where('company_id',$data->company_id);
-			})
-			->where('currency_id',$data->currency_id)->get();
+			})->get();
 
 			if(count($journalMap) > 0){
 				$arrdata = get_object_vars($data);
@@ -612,8 +610,7 @@ class CustomHelper {
 					})
 					->whereHas('coa', function($query) use($data){
 						$query->where('company_id',$data->company_id);
-					})
-					->where('currency_id',$rowdetail->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_id)->get();
+					})->get();
 	
 					foreach($journalMap as $row){
 						$nominal = $rowdetail->nominal * ($row->percentage / 100);
@@ -745,46 +742,43 @@ class CustomHelper {
 			}
 		}else{
 
-			if(isset($data->currency_id)){
-				$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
-					$query->where('table_name',$table_name);
-				})
-				->whereHas('coa', function($query) use($data){
-					$query->where('company_id',$data->company_id);
-				})
-				->where('currency_id',$data->currency_id)->get();
+			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
+				$query->where('table_name',$table_name);
+			})
+			->whereHas('coa', function($query) use($data){
+				$query->where('company_id',$data->company_id);
+			})->get();
 
-				if(count($journalMap) > 0){
-					
-					$arrdata = get_object_vars($data);
+			if(count($journalMap) > 0){
+				
+				$arrdata = get_object_vars($data);
 
-					$query = Journal::create([
-						'user_id'		=> session('bo_id'),
-						'account_id'	=> $account_id,
-						'code'			=> Journal::generateCode(),
-						'lookable_type'	=> $table_name,
-						'lookable_id'	=> $table_id,
-						'currency_id'	=> $data->currency_id,
-						'currency_rate'	=> $data->currency_rate,
-						'post_date'		=> $data->post_date,
-						'note'			=> $data->code,
-						'status'		=> '3'
-					]);
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'account_id'	=> $account_id,
+					'code'			=> Journal::generateCode(),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'currency_id'	=> $data->currency_id,
+					'currency_rate'	=> $data->currency_rate,
+					'post_date'		=> $data->post_date,
+					'note'			=> $data->code,
+					'status'		=> '3'
+				]);
 
-					foreach($journalMap as $row){
-						$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
+				foreach($journalMap as $row){
+					$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
 
-						if($nominal > 0){
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $row->coa_id,
-								'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
-								'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
-								'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
-								'type'			=> $row->type,
-								'nominal'		=> $nominal
-							]);
-						}
+					if($nominal > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->coa_id,
+							'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+							'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
+							'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
+							'type'			=> $row->type,
+							'nominal'		=> $nominal
+						]);
 					}
 				}
 			}

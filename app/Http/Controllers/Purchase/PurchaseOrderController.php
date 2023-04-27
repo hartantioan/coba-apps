@@ -21,6 +21,7 @@ use App\Models\PurchaseOrderDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseOrder;
 use App\Models\User;
+use App\Models\Tax;
 
 class PurchaseOrderController extends Controller
 {
@@ -40,6 +41,8 @@ class PurchaseOrderController extends Controller
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
+            'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -476,7 +479,7 @@ class PurchaseOrderController extends Controller
 
                         $querydetail = PurchaseOrderDetail::create([
                             'purchase_order_id'             => $query->id,
-                            'purchase_request_detail_id'    => $request->arr_purchase[$key],
+                            'purchase_request_detail_id'    => $request->arr_purchase ? $request->arr_purchase[$key] : NULL,
                             'item_id'                       => $row,
                             'qty'                           => $qty,
                             'price'                         => $price,
@@ -485,11 +488,13 @@ class PurchaseOrderController extends Controller
                             'discount_3'                    => $disc3,
                             'subtotal'                      => $rowsubtotal,
                             'note'                          => $request->arr_note[$key],
-                            'is_tax'                        => $request->arr_is_tax[$key] == '1' ? '1' : NULL,
+                            'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
                             'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
-                            'percent_tax'                   => str_replace(',','.',str_replace('.','',$request->arr_percent_tax[$key])),
-                            'is_wtax'                       => $request->arr_is_wtax[$key] == '1' ? '1' : NULL,
-                            'percent_wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_percent_wtax[$key])),
+                            'percent_tax'                   => $request->arr_tax[$key],
+                            'is_wtax'                       => $request->arr_wtax[$key] > 0 ? '1' : NULL,
+                            'percent_wtax'                  => $request->arr_wtax[$key],
+                            'tax_id'                        => $request->arr_tax_id[$key],
+                            'wtax_id'                       => $request->arr_wtax_id[$key],
                             'place_id'                      => $request->arr_place[$key],
                             'department_id'                 => $request->arr_department[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key]
@@ -624,8 +629,8 @@ class PurchaseOrderController extends Controller
 
         foreach($po->purchaseOrderDetail as $row){
             $arr[] = [
-                'id'                                => $row->purchaseRequestDetail->purchase_request_id,
-                'purchase_request_detail_id'        => $row->purchase_request_detail_id,
+                'id'                                => $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchase_request_id : '0',
+                'purchase_request_detail_id'        => $row->purchase_request_detail_id ? $row->purchase_request_detail_id : '0',
                 'item_id'                           => $row->item_id,
                 'item_name'                         => $row->item->name,
                 'qty'                               => number_format($row->qty,3,',','.'),
@@ -645,6 +650,8 @@ class PurchaseOrderController extends Controller
                 'warehouse_name'                    => $row->warehouse->name,
                 'place_id'                          => $row->place_id,
                 'department_id'                     => $row->department_id,
+                'tax_id'                            => $row->tax_id,
+                'wtax_id'                           => $row->wtax_id
             ];
         }
 
@@ -810,7 +817,7 @@ class PurchaseOrderController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'

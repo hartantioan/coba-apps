@@ -30,6 +30,8 @@ class PurchaseOrderDetail extends Model
         'percent_tax',
         'is_wtax',
         'percent_wtax',
+        'tax_id',
+        'wtax_id',
         'place_id',
         'department_id',
         'warehouse_id',
@@ -80,6 +82,14 @@ class PurchaseOrderDetail extends Model
 
     public function department(){
         return $this->belongsTo('App\Models\Department','department_id','id')->withTrashed();
+    }
+
+    public function tax(){
+        return $this->belongsTo('App\Models\Tax','tax_id','id')->withTrashed();
+    }
+
+    public function wtax(){
+        return $this->belongsTo('App\Models\Tax','wtax_id','id')->withTrashed();
     }
 
     public function warehouse(){

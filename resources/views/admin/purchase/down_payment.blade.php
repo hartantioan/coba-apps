@@ -227,7 +227,7 @@
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -256,19 +256,13 @@
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
-                                <label class="active" for="percent_tax">Prosentase Tax</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <div class="switch mb-1">
-                                    <label class="active" for="is_tax">Ber-PPN?</label>
-                                    <label>
-                                        Tidak
-                                        <input type="checkbox" id="is_tax" name="is_tax" value="1" onclick="countAll();">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
-                                </div>
+                                <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
+                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                    @foreach ($tax as $row)
+                                        <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="active" for="tax_id">Pajak PPN</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <div class="switch mb-1">
@@ -331,7 +325,7 @@
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
-                                            <td width="50%">Subtotal</td>
+                                            <td width="50%">Subtotal <b><i>(Masukkan nominal disini jika tanpa PO)</i></b></td>
                                             <td width="50%" class="right-align">
                                                 <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
@@ -550,7 +544,7 @@
 
     function countAll(){
 
-        let subtotal = 0, discount = 0, total = 0, tax = 0, grandtotal = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), ada = false;
+        let subtotal = 0, discount = 0, total = 0, tax = 0, grandtotal = 0, percent_tax = parseFloat($('#tax_id').val()), ada = false;
 
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
@@ -570,7 +564,7 @@
 
         total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
 
-        if($('#is_tax').is(':checked')){
+        if($('#tax_id').val() !== '0'){
             if($('#is_include_tax').is(':checked')){
                 total = total / (1 + (percent_tax / 100));
             }
@@ -716,9 +710,12 @@
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]);
 
+                formData.delete('tax_id');
                 formData.delete("arr_code[]");
                 formData.delete("arr_nominal[]");
                 formData.delete("arr_note[]");
+                formData.append('tax_id',$('#tax_id').find(':selected').data('id'));
+                formData.append('percent_tax',$('#tax_id').val());
 
                 $('input[name^="arr_code"]').each(function(){
                     if($(this).is(':checked')){
@@ -849,11 +846,7 @@
                 $('#due_date').val(response.due_date);
                 $('#percent_tax').val(response.percent_tax);
                 
-                if(response.is_tax == '1'){
-                    $('#is_tax').prop( "checked", true);
-                }else{
-                    $('#is_tax').prop( "checked", false);
-                }
+                $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
 
                 if(response.is_include_tax == '1'){
                     $('#is_include_tax').prop( "checked", true);

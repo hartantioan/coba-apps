@@ -19,6 +19,8 @@ class Tax extends Model
         'name',
         'type',
         'percentage',
+        'is_default_ppn',
+        'is_default_pph',
         'status'
     ];
 
@@ -36,6 +38,26 @@ class Tax extends Model
         }
 
         return $status;
+    }
+
+    public function isDefaultPpn(){
+        $default = match ($this->is_default_ppn) {
+          '1' => '<i class="material-icons" style="font-size: inherit !important;color:red;">star</i>',
+          '0' => '',
+          default => 'Invalid',
+        };
+
+        return $default;
+    }
+
+    public function isDefaultPph(){
+        $default = match ($this->is_default_pph) {
+          '1' => '<i class="material-icons" style="font-size: inherit !important;color:red;">star</i>',
+          '0' => '',
+          default => 'Invalid',
+        };
+
+        return $default;
     }
 
     public function type(){

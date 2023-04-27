@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->char('type',1)->nullable();
             $table->double('percentage')->nullable();
+            $table->char('is_default',1)->nullable();
             $table->char('status',1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');

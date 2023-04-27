@@ -102,6 +102,7 @@
                                                         <th rowspan="2">Penerima</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>
+                                                        <th rowspan="2">No.Surat Jalan</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Operasi</th>
@@ -140,7 +141,7 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="getPurchaseOrderAll(this.value);"></select>
+                                <select class="browser-default" id="account_id" name="account_id" onchange="/* getPurchaseOrderAll(this.value); */"></select>
                                 <label class="active" for="account_id">Supplier</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -167,6 +168,10 @@
                             <div class="input-field col m3 s12">
                                 <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
                                 <label class="active" for="document_date">Tgl. Dokumen</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Surat Jalan">
+                                <label class="active" for="delivery_no">No. Surat Jalan</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -581,6 +586,7 @@
                 { name: 'date_due', className: 'center-align' },
                 { name: 'date_doc', className: 'center-align' },
                 { name: 'note', className: '' },
+                { name: 'delivery_no', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
@@ -734,6 +740,9 @@
                     }else{
                         if(response.details.length > 0){
                             $('#receiver_name').val(response.receiver_name);
+                            $('#account_id').empty().append(`
+                                <option value="` + response.account_id + `">` + response.account_name + `</option>
+                            `);
                             $('#empty-item').remove();
 
                             $('#list-used-data').append(`
@@ -883,6 +892,7 @@
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
                 $('#document_date').val(response.document_date);
+                $('#delivery_no').val(response.delivery_no);
                 $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
                 $('#document_date').removeAttr('min');

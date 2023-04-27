@@ -20,7 +20,7 @@ class TaxController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Bank',
+            'title'     => 'Pajak',
             'content'   => 'admin.master_data.tax',
         ];
 
@@ -32,6 +32,10 @@ class TaxController extends Controller
             'id',
             'code',
             'name',
+            'type',
+            'percentage',
+            'is_default_ppn',
+            'is_default_pph',
         ];
 
         $start  = $request->start;
@@ -84,6 +88,8 @@ class TaxController extends Controller
                     $val->name,
                     $val->type(),
                     number_format($val->percentage,2,',','.'),
+                    $val->isDefaultPpn(),
+                    $val->isDefaultPph(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -112,10 +118,12 @@ class TaxController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('banks', 'code')->ignore($request->temp)] : 'required|unique:banks,code',
             'name'              => 'required',
+            'type'              => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
             'name.required'         => 'Nama tidak boleh kosong.',
+            'type.required'         => 'Tipe pajak tidak boleh kosong.'
         ]);
 
         if($validation->fails()) {
@@ -124,39 +132,42 @@ class TaxController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-			if($request->temp){
-                DB::beginTransaction();
-                try {
-                    $query = Bank::find($request->temp);
+            DB::beginTransaction();
+            try {
+                if($request->temp){
+                    $query = Tax::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
+                    $query->type            = $request->type;
+                    $query->percentage      = str_replace(',','.',str_replace('.','',$request->percentage));
+                    $query->is_default_ppn  = $request->is_default_ppn ? $request->is_default_ppn : '0';
+                    $query->is_default_pph  = $request->is_default_pph ? $request->is_default_pph : '0';
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
-                    $query = Bank::create([
-                        'code'          => $request->code,
-                        'name'			=> $request->name,
-                        'status'        => $request->status ? $request->status : '2'
+                }else{
+                    $query = Tax::create([
+                        'code'              => $request->code,
+                        'name'			    => $request->name,
+                        'type'              => $request->type,
+                        'percentage'        => str_replace(',','.',str_replace('.','',$request->percentage)),
+                        'is_default_ppn'    => $request->is_default_ppn ? $request->is_default_ppn : '0',
+                        'is_default_pph'    => $request->is_default_pph ? $request->is_default_pph : '0',
+                        'status'            => $request->status ? $request->status : '2'
                     ]);
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
+
+                DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            }
 			
 			if($query) {
 
                 activity()
-                    ->performedOn(new Bank())
+                    ->performedOn(new Tax())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit bank.');
+                    ->log('Add / edit tax master data.');
 
 				$response = [
 					'status'  => 200,
@@ -174,20 +185,21 @@ class TaxController extends Controller
     }
 
     public function show(Request $request){
-        $bank = Bank::find($request->id);
+        $tax = Tax::find($request->id);
+        $tax['percentage'] = number_format($tax->percentage,2,',','.');
         				
-		return response()->json($bank);
+		return response()->json($tax);
     }
 
     public function destroy(Request $request){
-        $query = Bank::find($request->id);
+        $query = Tax::find($request->id);
 		
         if($query->delete()) {
             activity()
-                ->performedOn(new Bank())
+                ->performedOn(new Tax())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the Bank data');
+                ->log('Delete the tax data');
 
             $response = [
                 'status'  => 200,

@@ -341,7 +341,7 @@ class UserController extends Controller
                             </tr>
                             <tr>
                                 <th>Deposit</th>
-                                <th>'.$data->deposit.'</th>
+                                <th>'.number_format($data->deposit,0,',','.').'</th>
                             </tr>
                             <tr>
                                 <th>Limit Credit</th>

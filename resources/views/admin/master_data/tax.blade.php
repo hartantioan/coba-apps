@@ -57,6 +57,8 @@
                                                         <th>Nama</th>
                                                         <th>Type</th>
                                                         <th>Prosentase</th>
+                                                        <th>Default PPN</th>
+                                                        <th>Default PPH</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -96,8 +98,41 @@
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
+                            <input id="percentage" name="percentage" type="text" onkeyup="formatRupiah(this)">
+                            <label class="active" for="prosentase">Prosentase</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="form-control" id="type" name="type">
+                                <option value="+">Penambah</option>
+                                <option value="-">Pengurang</option>
+                            </select>
+                            <label class="" for="type">Tipe</label>
+                        </div>
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
-                                <label for="order">Status</label>
+                                <label for="is_default_ppn">Default PPN</label>
+                                <label>
+                                    Non-Active
+                                    <input type="checkbox" id="is_default_ppn" name="is_default_ppn" value="1">
+                                    <span class="lever"></span>
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
+                                <label for="is_default_pph">Default PPH</label>
+                                <label>
+                                    Non-Active
+                                    <input type="checkbox" id="is_default_pph" name="is_default_pph" value="1">
+                                    <span class="lever"></span>
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
+                                <label for="status">Status</label>
                                 <label>
                                     Non-Active
                                     <input checked type="checkbox" id="status" name="status" value="1">
@@ -115,7 +150,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat">Close</a>
     </div>
 </div>
 
@@ -186,6 +221,8 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'percentage', className: 'center-align' },
+                { name: 'is_default_ppn', className: 'center-align' },
+                { name: 'is_default_pph', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -293,6 +330,18 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#percentage').val(response.percentage);
+                $('#type').val(response.type).formSelect();
+                if(response.is_default_ppn == '1'){
+                    $('#is_default_ppn').prop( "checked", true);
+                }else{
+                    $('#is_default_ppn').prop( "checked", false);
+                }
+                if(response.is_default_pph == '1'){
+                    $('#is_default_pph').prop( "checked", true);
+                }else{
+                    $('#is_default_pph').prop( "checked", false);
+                }
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

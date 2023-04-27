@@ -18,6 +18,7 @@ use App\Models\Currency;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseInvoice;
 use App\Models\User;
+use App\Models\Tax;
 
 class PurchaseInvoiceController extends Controller
 {
@@ -35,7 +36,9 @@ class PurchaseInvoiceController extends Controller
             'title'         => 'Invoice Pembelian',
             'content'       => 'admin.purchase.invoice',
             'currency'      => Currency::where('status','1')->get(),
-            'company'       => Company::where('status','1')->get()
+            'company'       => Company::where('status','1')->get(),
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
+            'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -58,17 +61,35 @@ class PurchaseInvoiceController extends Controller
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'total'         => number_format($row->total,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'balance'       => number_format($row->balanceDp(),2,',','.'),
                 ];
             }
         }
         
         $datagr = GoodReceipt::where('status','2')->where('account_id',$request->id)->get();
-
+        
+        $top = 0;
+        
         foreach($datagr as $row){
             if($row->balanceInvoice() > 0){
                 $info = '';
 
+                $tax_id = 0;
+                $wtax_id = 0;
+                $is_include_tax = '0';
+                $percent_tax = 0;
+                $percent_wtax = 0;
+                
+
                 foreach($row->goodReceiptDetail as $rowdetail){
+                    $tax_id = $rowdetail->purchaseOrderDetail->tax_id;
+                    $wtax_id = $rowdetail->purchaseOrderDetail->wtax_id;
+                    $is_include_tax = $rowdetail->purchaseOrderDetail->is_include_tax;
+                    $percent_tax = $rowdetail->purchaseOrderDetail->percent_tax;
+                    $percent_wtax = $rowdetail->purchaseOrderDetail->percent_wtax;
+                    if($top < $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term){
+                        $top = $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term;
+                    }
                     $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->item->buyUnit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->item->buyUnit->code.'<br>';
                 }
 
@@ -82,7 +103,16 @@ class PurchaseInvoiceController extends Controller
                     'tax'           => number_format($row->tax,2,',','.'),
                     'wtax'          => number_format($row->wtax,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'info'          => $info
+                    'info'          => $info,
+                    'tax_id'        => $tax_id,
+                    'wtax_id'       => $wtax_id,
+                    'is_include_tax'=> $is_include_tax,
+                    'percent_tax'   => $percent_tax,
+                    'percent_wtax'  => $percent_wtax,
+                    'top'           => $top,
+                    'delivery_no'   => 'NO SJ - '.$row->delivery_no,
+                    'purchase_no'   => 'NO PO - '.$row->getPurchaseCode(),
+                    'list_item'     => $row->getListItem(),
                 ];
             }
         }
@@ -101,7 +131,16 @@ class PurchaseInvoiceController extends Controller
                     'tax'           => number_format($row->tax,2,',','.'),
                     'wtax'          => number_format($row->wtax,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'info'          => ''
+                    'info'          => '',
+                    'tax_id'        => $row->tax_id,
+                    'wtax_id'       => $row->wtax_id,
+                    'is_include_tax'=> $row->is_include_tax,
+                    'percent_tax'   => $row->percent_tax,
+                    'percent_wtax'  => $row->percent_wtax,
+                    'top'           => $top,
+                    'delivery_no'   => 'No SJ GRPO - '.$row->goodReceipt->delivery_no,
+                    'purchase_no'   => 'NO PO - '.$row->goodReceipt->getPurchaseCode(),
+                    'list_item'     => $row->getListItem(),
                 ];
             }
         }
@@ -120,6 +159,7 @@ class PurchaseInvoiceController extends Controller
             'account_id',
             'company_id',
             'post_date',
+            'received_date',
             'due_date',
             'document_date',
             'type',
@@ -272,6 +312,7 @@ class PurchaseInvoiceController extends Controller
                     $val->account->name,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/y',strtotime($val->received_date)),
                     date('d/m/y',strtotime($val->due_date)),
                     date('d/m/y',strtotime($val->document_date)),
                     $val->type(),
@@ -325,6 +366,7 @@ class PurchaseInvoiceController extends Controller
 			'type'                  => 'required',
             'company_id'            => 'required',
             'post_date'             => 'required',
+            'received_date'         => 'required',
             'due_date'              => 'required',
             'document_date'         => 'required',
             'currency_id'           => 'required',
@@ -338,6 +380,7 @@ class PurchaseInvoiceController extends Controller
 			'type.required'                     => 'Tipe invoice tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
+            'received_date.required'            => 'Tanggal terima tidak boleh kosong.',
             'due_date.required'                 => 'Tanggal tenggat tidak boleh kosong.',
             'document_date.required'            => 'Tanggal dokumen tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
@@ -365,6 +408,7 @@ class PurchaseInvoiceController extends Controller
             $grandtotal = 0;
             $balance = 0;
             $downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
+            $rounding = str_replace(',','.',str_replace('.','',$request->rounding));
 
             foreach($request->arr_total as $key => $row){
                 $total += str_replace(',','.',str_replace('.','',$row));
@@ -373,7 +417,7 @@ class PurchaseInvoiceController extends Controller
                 $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
             }
 
-            $balance = $grandtotal - $downpayment;
+            $balance = $grandtotal - $downpayment + $rounding;
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -406,6 +450,7 @@ class PurchaseInvoiceController extends Controller
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
+                        $query->received_date = $request->received_date;
                         $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
                         $query->type = $request->type;
@@ -416,6 +461,7 @@ class PurchaseInvoiceController extends Controller
                         $query->wtax = round($wtax,3);
                         $query->grandtotal = round($grandtotal,3);
                         $query->downpayment = round($downpayment,3);
+                        $query->rounding = round($rounding,3);
                         $query->balance = round($balance,3);
                         $query->document = $document;
                         $query->note = $request->note;
@@ -454,6 +500,7 @@ class PurchaseInvoiceController extends Controller
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
                         'post_date'                 => $request->post_date,
+                        'received_date'             => $request->received_date,
                         'due_date'                  => $request->due_date,
                         'document_date'             => $request->document_date,
                         'type'                      => $request->type,
@@ -464,6 +511,7 @@ class PurchaseInvoiceController extends Controller
                         'wtax'                      => round($wtax,3),
                         'grandtotal'                => round($grandtotal,3),
                         'downpayment'               => round($downpayment,3),
+                        'rounding'                  => round($rounding,3),
                         'balance'                   => round($balance,3),
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
@@ -763,7 +811,7 @@ class PurchaseInvoiceController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'

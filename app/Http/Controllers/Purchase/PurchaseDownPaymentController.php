@@ -20,6 +20,7 @@ use App\Models\PurchaseDownPaymentDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseDownPayment;
 use App\Models\User;
+use App\Models\Tax;
 
 class PurchaseDownPaymentController extends Controller
 {
@@ -37,7 +38,8 @@ class PurchaseDownPaymentController extends Controller
             'title'         => 'Purchase Down Payment',
             'content'       => 'admin.purchase.down_payment',
             'currency'      => Currency::where('status','1')->get(),
-            'company'       => Company::where('status','1')->get()
+            'company'       => Company::where('status','1')->get(),
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get()
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -297,11 +299,11 @@ class PurchaseDownPaymentController extends Controller
             $grandtotal = 0;
             $subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
             $discount = str_replace(',','.',str_replace('.','',$request->discount));
-            $percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
+            $percent_tax = $request->percent_tax;
 
             $total = $subtotal - $discount;
 
-            if($request->is_tax){
+            if($request->tax_id > 0){
                 if($request->is_include_tax){
                     $total = $total / (1 + ($percent_tax / 100));
                 }
@@ -344,9 +346,10 @@ class PurchaseDownPaymentController extends Controller
                         $query->account_id = $request->supplier_id;
                         $query->type = $request->type;
                         $query->company_id = $request->company_id;
-                        $query->is_tax = $request->is_tax ? $request->is_tax : NULL;
+                        $query->tax_id = $request->tax_id;
+                        $query->is_tax = $request->tax_id > 0 ? '1' : NULL;
                         $query->is_include_tax = $request->is_include_tax ? $request->is_include_tax : '0';
-                        $query->percent_tax = str_replace(',','.',str_replace('.','',$request->percent_tax));
+                        $query->percent_tax = $request->percent_tax;
                         $query->document = $document;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
@@ -384,9 +387,10 @@ class PurchaseDownPaymentController extends Controller
                         'account_id'                => $request->supplier_id,
                         'type'	                    => $request->type,
                         'company_id'                => $request->company_id,
-                        'is_tax'                    => $request->is_tax ? $request->is_tax : NULL,
+                        'tax_id'                    => $request->tax_id,
+                        'is_tax'                    => $request->tax_id > 0 ? '1' : NULL,
                         'is_include_tax'            => $request->is_include_tax ? $request->is_include_tax : '0',
-                        'percent_tax'               => str_replace(',','.',str_replace('.','',$request->percent_tax)),
+                        'percent_tax'               => $request->percent_tax,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_down_payments') : NULL,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
@@ -410,19 +414,21 @@ class PurchaseDownPaymentController extends Controller
 			if($query) {
                 
                 if($request->arr_code){
-                    foreach($request->arr_code as $key => $row){
-                        DB::beginTransaction();
-                        try {
-                            PurchaseDownPaymentDetail::create([
-                                'purchase_down_payment_id'      => $query->id,
-                                'purchase_order_id'             => PurchaseOrder::where('code',CustomHelper::decrypt($row))->first()->id,
-                                'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                                'note'                          => $request->arr_note[$key]
-                            ]);
-                            DB::commit();
-                        }catch(\Exception $e){
-                            DB::rollback();
+                    DB::beginTransaction();
+                    try {
+                        foreach($request->arr_code as $key => $row){
+                            
+                                PurchaseDownPaymentDetail::create([
+                                    'purchase_down_payment_id'      => $query->id,
+                                    'purchase_order_id'             => PurchaseOrder::where('code',CustomHelper::decrypt($row))->first()->id,
+                                    'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                                    'note'                          => $request->arr_note[$key]
+                                ]);
+                                
                         }
+                        DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
                     }
                 }
 
@@ -627,7 +633,7 @@ class PurchaseDownPaymentController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'

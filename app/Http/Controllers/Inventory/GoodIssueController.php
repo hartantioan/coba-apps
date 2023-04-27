@@ -486,7 +486,7 @@ class GoodIssueController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'

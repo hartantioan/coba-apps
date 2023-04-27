@@ -347,7 +347,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->name,
+                'text' 			=> $d->employee_no.' - '.$d->name,
                 'top'           => $d->top,
             ];
         }

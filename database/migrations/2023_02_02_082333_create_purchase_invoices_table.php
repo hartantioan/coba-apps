@@ -21,6 +21,7 @@ return new class extends Migration
             $table->bigInteger('account_id')->nullable();
             $table->bigInteger('company_id')->nullable();
             $table->date('post_date')->nullable();
+            $table->date('received_date')->nullable();
             $table->date('due_date')->nullable();
             $table->date('document_date')->nullable();
             $table->char('type', 1)->nullable();
@@ -33,6 +34,7 @@ return new class extends Migration
             $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
             $table->double('downpayment')->nullable();
+            $table->double('rounding')->nullable();
             $table->double('balance')->nullable();
             $table->string('document')->nullable();
             $table->text('note')->nullable();

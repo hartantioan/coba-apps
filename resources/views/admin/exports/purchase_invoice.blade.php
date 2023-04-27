@@ -7,6 +7,7 @@
             <th>Sup/Ven</th>
             <th>Perusahaan</th>
             <th>Tgl.Post</th>
+            <th>Tgl.Terima</th>
             <th>Tgl.Tenggat</th>
             <th>Tgl.Dokumen</th>
             <th>Tipe</th>
@@ -37,6 +38,7 @@
                 <td>{{ $row->account->name }}</td>
                 <td>{{ $row->company->name }}</td>
                 <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                <td>{{ date('d/m/y',strtotime($row->received_date)) }}</td>
                 <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                 <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
                 <td>{{ $row->type() }}</td>

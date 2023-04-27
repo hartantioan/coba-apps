@@ -423,7 +423,7 @@ class InventoryTransferController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                if(in_array($query->status,['2','3'])){
+                if(in_array($query->status,['2','3','4','5'])){
                     CustomHelper::removeJournal('inventory_transfers',$query->id);
                     CustomHelper::removeCogs('inventory_transfers',$query->id);
                 }
@@ -466,7 +466,7 @@ class InventoryTransferController extends Controller
             }
         }
 
-        if(in_array($query->status,['2','3'])){
+        if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Barang transfer sudah dalam progres, anda tidak bisa melakukan perubahan.'

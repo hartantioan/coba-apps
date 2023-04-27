@@ -20,6 +20,7 @@ return new class extends Migration
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('account_id')->nullable();
             $table->bigInteger('company_id')->nullable();
+            $table->bigInteger('tax_id')->nullable();
             $table->char('is_tax', 1)->nullable();
             $table->char('is_include_tax', 1)->nullable();
             $table->double('percent_tax')->nullable();
@@ -43,7 +44,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'company_id', 'currency_id']);
+            $table->index(['user_id', 'account_id', 'company_id', 'tax_id', 'currency_id']);
         });
     }
 

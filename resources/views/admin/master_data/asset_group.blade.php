@@ -91,7 +91,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit Group {{ $title }}</h4>
+                <h4>Add/Edit {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -99,11 +99,11 @@
                     <div class="col s12">
                         <div class="input-field col s6">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode group">
+                            <input id="code" name="code" type="text" placeholder="Kode grup">
                             <label class="active" for="code">Kode</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="name" name="name" type="text" placeholder="Nama Group">
+                            <input id="name" name="name" type="text" placeholder="Nama grup">
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">

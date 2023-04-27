@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('purchase_invoice_id')->nullable();
             $table->bigInteger('good_receipt_id')->nullable();
             $table->bigInteger('landed_cost_id')->nullable();
+            $table->bigInteger('purchase_order_id')->nullable();
             $table->double('total')->nullable();
             $table->bigInteger('tax_id')->nullable();
             $table->bigInteger('wtax_id')->nullable();
@@ -31,7 +32,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['purchase_invoice_id', 'purchase_order_id', 'good_receipt_id', 'tax_id', 'wtax_id']);
+            $table->index(['purchase_invoice_id', 'landed_cost_id', 'good_receipt_id', 'purchase_order_id', 'tax_id', 'wtax_id']);
         });
     }
 

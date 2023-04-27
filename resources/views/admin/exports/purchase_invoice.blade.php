@@ -11,8 +11,6 @@
             <th>Tgl.Tenggat</th>
             <th>Tgl.Dokumen</th>
             <th>Tipe</th>
-            <th>Mata Uang</th>
-            <th>Konversi</th>
             <th>Total</th>
             <th>PPN</th>
             <th>PPH</th>
@@ -42,8 +40,6 @@
                 <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                 <td>{{ date('d/m/y',strtotime($row->document_date)) }}</td>
                 <td>{{ $row->type() }}</td>
-                <td>{{ $row->currency->symbol }}</td>
-                <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
                 <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                 <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
                 <td align="right">{{ number_format($row->wtax,2,',','.') }}</td>
@@ -62,7 +58,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="21" align="center">
+                <td colspan="19" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

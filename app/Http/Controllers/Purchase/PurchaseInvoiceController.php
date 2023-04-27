@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoiceDp;
+use App\Models\PurchaseOrder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,6 @@ use App\Models\LandedCost;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseInvoiceDetail;
 use App\Models\GoodReceipt;
-use App\Models\Currency;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseInvoice;
 use App\Models\User;
@@ -35,7 +35,6 @@ class PurchaseInvoiceController extends Controller
         $data = [
             'title'         => 'Invoice Pembelian',
             'content'       => 'admin.purchase.invoice',
-            'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
@@ -66,6 +65,27 @@ class PurchaseInvoiceController extends Controller
             }
         }
         
+        $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','2')->where('account_id',$request->id)->get();
+
+        foreach($datapo as $row){
+            $details[] = [
+                'type'          => 'purchase_order',
+                'code'          => CustomHelper::encrypt($row->code),
+                'rawcode'       => $row->code,
+                'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                'due_date'      => date('d/m/y',strtotime($row->post_date)),
+                'total'         => number_format($row->total,2,',','.'),
+                'tax'           => number_format($row->tax,2,',','.'),
+                'wtax'          => number_format($row->wtax,2,',','.'),
+                'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                'info'          => '',
+                'top'           => $row->payment_term,
+                'delivery_no'   => '-',
+                'purchase_no'   => 'NO PO - '.$row->code,
+                'list_item'     => $row->getListItem(),
+            ];
+        }
+
         $datagr = GoodReceipt::where('status','2')->where('account_id',$request->id)->get();
         
         $top = 0;
@@ -104,11 +124,6 @@ class PurchaseInvoiceController extends Controller
                     'wtax'          => number_format($row->wtax,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'info'          => $info,
-                    'tax_id'        => $tax_id,
-                    'wtax_id'       => $wtax_id,
-                    'is_include_tax'=> $is_include_tax,
-                    'percent_tax'   => $percent_tax,
-                    'percent_wtax'  => $percent_wtax,
                     'top'           => $top,
                     'delivery_no'   => 'NO SJ - '.$row->delivery_no,
                     'purchase_no'   => 'NO PO - '.$row->getPurchaseCode(),
@@ -132,11 +147,6 @@ class PurchaseInvoiceController extends Controller
                     'wtax'          => number_format($row->wtax,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'info'          => '',
-                    'tax_id'        => $row->tax_id,
-                    'wtax_id'       => $row->wtax_id,
-                    'is_include_tax'=> $row->is_include_tax,
-                    'percent_tax'   => $row->percent_tax,
-                    'percent_wtax'  => $row->percent_wtax,
                     'top'           => $top,
                     'delivery_no'   => 'No SJ GRPO - '.$row->goodReceipt->delivery_no,
                     'purchase_no'   => 'NO PO - '.$row->goodReceipt->getPurchaseCode(),
@@ -163,8 +173,6 @@ class PurchaseInvoiceController extends Controller
             'due_date',
             'document_date',
             'type',
-            'currency_id',
-            'currency_rate',
             'document',
             'note',
             'tax_no',
@@ -234,10 +242,6 @@ class PurchaseInvoiceController extends Controller
                     $query->whereIn('account_id',$request->account_id);
                 }
 
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
-                }
-
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
                 }
@@ -291,10 +295,6 @@ class PurchaseInvoiceController extends Controller
                     $query->whereIn('account_id',$request->account_id);
                 }
 
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
-                }
-
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
                 }
@@ -316,8 +316,6 @@ class PurchaseInvoiceController extends Controller
                     date('d/m/y',strtotime($val->due_date)),
                     date('d/m/y',strtotime($val->document_date)),
                     $val->type(),
-                    $val->currency->code,
-                    number_format($val->currency_rate,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->note,
                     $val->tax_no,
@@ -369,8 +367,6 @@ class PurchaseInvoiceController extends Controller
             'received_date'         => 'required',
             'due_date'              => 'required',
             'document_date'         => 'required',
-            'currency_id'           => 'required',
-            'currency_rate'         => 'required',
             'arr_type'                  => 'required|array',
             'arr_total'                 => 'required|array',
             'arr_tax'                   => 'required|array',
@@ -383,8 +379,6 @@ class PurchaseInvoiceController extends Controller
             'received_date.required'            => 'Tanggal terima tidak boleh kosong.',
             'due_date.required'                 => 'Tanggal tenggat tidak boleh kosong.',
             'document_date.required'            => 'Tanggal dokumen tidak boleh kosong.',
-            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
             'arr_type.required'                 => 'Tipe dokumen tidak boleh kosong.',
             'arr_type.array'                    => 'Tipe dokumen harus dalam bentuk array.',
             'arr_total.required'                => 'Nominal total tidak boleh kosong.',
@@ -454,8 +448,6 @@ class PurchaseInvoiceController extends Controller
                         $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
                         $query->type = $request->type;
-                        $query->currency_id = $request->currency_id;
-                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->total = round($total,3);
                         $query->tax = round($tax,3);
                         $query->wtax = round($wtax,3);
@@ -504,8 +496,6 @@ class PurchaseInvoiceController extends Controller
                         'due_date'                  => $request->due_date,
                         'document_date'             => $request->document_date,
                         'type'                      => $request->type,
-                        'currency_id'               => $request->currency_id,
-                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'total'                     => round($total,3),
                         'tax'                       => round($tax,3),
                         'wtax'                      => round($wtax,3),
@@ -717,7 +707,6 @@ class PurchaseInvoiceController extends Controller
         $pi['wtax'] = number_format($pi->wtax,2,',','.');
         $pi['grandtotal'] = number_format($pi->grandtotal,2,',','.');
         $pi['downpayment'] = number_format($pi->downpayment,2,',','.');
-        $pi['currency_rate'] = number_format($pi->currency_rate,2,',','.');
 
         $downpayments = [];
         
@@ -745,6 +734,9 @@ class PurchaseInvoiceController extends Controller
                 'wtax'                      => number_format($row->wtax,2,',','.'),
                 'grandtotal'                => number_format($row->grandtotal,2,',','.'),
                 'info'                      => '-',
+                'delivery_no'               => 'No SJ GRPO - '.($row->good_receipt_id ? $row->goodReceipt->delivery_no : $row->landedCost->goodReceipt->delivery_no),
+                'purchase_no'               => 'NO PO - '.($row->good_receipt_id ? $row->goodReceipt->getPurchaseCode() : $row->landedCost->goodReceipt->getPurchase()),
+                'list_item'                 => $row->good_receipt_id ? $row->goodReceipt->getListItem() : $row->landedCost->getListItem(),
             ];
         }
 
@@ -894,10 +886,6 @@ class PurchaseInvoiceController extends Controller
                     $query->whereIn('account_id',$request->account_id);
                 }
 
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
-                }
-
                 if($request->company){
                     $query->where('company_id',$request->company);
                 }
@@ -909,7 +897,7 @@ class PurchaseInvoiceController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPurchaseInvoice($request->search,$request->status,$request->type,$request->company,$request->account,$request->currency,$this->dataplaces), 'purchase_invoice'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseInvoice($request->search,$request->status,$request->type,$request->company,$request->account,$this->dataplaces), 'purchase_invoice'.uniqid().'.xlsx');
     }
     
 }

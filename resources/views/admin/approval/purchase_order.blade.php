@@ -235,7 +235,7 @@
                 <thead>
                     <tr>
                         <th class="center-align">No.</th>
-                        <th class="center-align">Item</th>
+                        <th class="center-align">Item/Jasa</th>
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                         <th class="center-align">Keterangan</th>
@@ -250,9 +250,9 @@
                     @foreach($data->purchaseOrderDetail as $key => $row)
                     <tr>
                         <td class="center-align">{{ ($key + 1) }}</td>
-                        <td class="center-align">{{ $row->item->name }}</td>
+                        <td class="center-align">{{ $row->item_id ? $row->item->name : $row->coa->name }}</td>
                         <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
-                        <td class="center-align">{{ $row->item->buyUnit->code }}</td>
+                        <td class="center-align">{{ $row->item_id ? $row->item->buyUnit->code : '-' }}</td>
                         <td class="center-align">{{ $row->note }}</td>
                         <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
                         <td class="center-align">{{ number_format($row->percent_discount_1,2,',','.') }}</td>

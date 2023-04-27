@@ -19,10 +19,11 @@ class ExportPurchaseOrder implements WithMultipleSheets
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $type = null, string $shipping = null, string $company = null, string $is_tax = null, string $is_include_tax = null, string $payment = null, string $supplier = null, string $currency = null,array $dataplaces = null)
+    public function __construct(string $search = null, string $status = null, string $inventory = null, string $type = null, string $shipping = null, string $company = null, string $is_tax = null, string $is_include_tax = null, string $payment = null, string $supplier = null, string $currency = null,array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
+        $this->inventory = $inventory ? $inventory : '';
         $this->type = $type ? $type : '';
         $this->shipping = $shipping ? $shipping : '';
         $this->company = $company ? $company : '';
@@ -58,6 +59,10 @@ class ExportPurchaseOrder implements WithMultipleSheets
                 $query->where('status', $this->status);
             }
 
+            if($this->inventory){
+                $query->where('inventory_type',$this->inventory);
+            }
+
             if($this->type){
                 $query->where('purchasing_type',$this->type);
             }
@@ -89,6 +94,7 @@ class ExportPurchaseOrder implements WithMultipleSheets
             'code',
             'user_id',
             'account_id',
+            'inventory_type',
             'purchasing_type',
             'shipping_type',
             'company_id',
@@ -100,7 +106,6 @@ class ExportPurchaseOrder implements WithMultipleSheets
             'currency_rate',
             'post_date',
             'delivery_date',
-            'document_date',
             'note',
             'subtotal',
             'discount',
@@ -124,6 +129,7 @@ class ExportPurchaseOrder implements WithMultipleSheets
         $purchaseorderdetail = PurchaseOrderDetail::whereIn('purchase_order_id', $purchaseorder->pluck('id')->toArray())->get([
             'purchase_order_id',
             'item_id',
+            'coa_id',
             'qty',
             'price',
             'percent_discount_1',
@@ -163,6 +169,7 @@ class PurchaseOrderSheet implements FromCollection, WithTitle, WithHeadings, Wit
                 $row->code,
                 $row->user->name,
                 $row->supplier->name,
+                $row->inventoryType(),
                 $row->purchasingType(),
                 $row->shippingType(),
                 $row->company->name,
@@ -205,7 +212,8 @@ class PurchaseOrderSheet implements FromCollection, WithTitle, WithHeadings, Wit
             'KODE',
             'PENGGUNA',
             'SUPPLIER',
-            'TIPE',
+            'TIPE PO',
+            'JENIS PO',
             'SHIPPING',
             'PERUSAHAAN',
             'DOK.REF',
@@ -245,7 +253,8 @@ class PurchaseOrderDetailSheet implements FromCollection, WithTitle, WithHeading
             $arr->push([
                 ($key + 1),
                 $row->purchaseOrder->code,
-                $row->item->name,
+                $row->item_id ? $row->item->name : '',
+                $row->coa_id ? $row->coa->name : '',
                 $row->qty,
                 $row->price,
                 $row->percent_discount_1,
@@ -280,6 +289,7 @@ class PurchaseOrderDetailSheet implements FromCollection, WithTitle, WithHeading
             'NO',
             'KODE',
             'NAMA ITEM',
+            'NAMA JASA',
             'QTY',
             'PRICE',
             'DISKON 1(%)',

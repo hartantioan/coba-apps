@@ -18,6 +18,7 @@ class PurchaseOrderDetail extends Model
         'purchase_order_id',
         'purchase_request_detail_id',
         'item_id',
+        'coa_id',
         'qty',
         'price',
         'percent_discount_1',
@@ -74,6 +75,10 @@ class PurchaseOrderDetail extends Model
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+    }
+
+    public function coa(){
+        return $this->belongsTo('App\Models\Coa','coa_id','id')->withTrashed();
     }
 
     public function place(){

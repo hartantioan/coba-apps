@@ -246,7 +246,7 @@ class MenuController extends Controller
                 $newdata = [];
 
                 if($query->table_name){
-                    $updateApprovalTable = ApprovalTable::where('menu_id',$query->id)->where('table_name',$query->table_name)->update([
+                    ApprovalTable::where('menu_id',$query->id)->update([
                         'table_name'    => $query->table_name
                     ]);
                 }

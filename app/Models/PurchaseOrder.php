@@ -20,6 +20,7 @@ class PurchaseOrder extends Model
         'user_id',
         'account_id',
         'company_id',
+        'inventory_type',
         'purchasing_type',
         'shipping_type',
         'is_tax',
@@ -69,6 +70,16 @@ class PurchaseOrder extends Model
           '2' => 'Planned PO',
           '3' => 'Blanked PO',
           '4' => 'Contract PO',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function inventoryType(){
+        $type = match ($this->inventory_type) {
+          '1' => 'Inventori',
+          '2' => 'Jasa',
           default => 'Invalid',
         };
 

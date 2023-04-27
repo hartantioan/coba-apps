@@ -184,14 +184,6 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Mata Uang
-                            </td>
-                            <td width="50%">
-                                {{ $data->currency->code.' - '.$data->currency->name }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="50%">
                                 Tgl. Tenggat
                             </td>
                             <td width="50%">
@@ -237,7 +229,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="6">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}</i></th>
+                        <th colspan="6">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

@@ -18,6 +18,7 @@ class PurchaseInvoiceDetail extends Model
         'purchase_invoice_id',
         'good_receipt_id',
         'landed_cost_id',
+        'purchase_order_id',
         'total',
         'tax_id',
         'wtax_id',

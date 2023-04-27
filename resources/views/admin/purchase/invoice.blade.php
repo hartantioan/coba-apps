@@ -99,17 +99,6 @@
                                                     <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_currency" style="font-size:1rem;">Mata Uang :</label>
-                                                <div class="input-field">
-                                                    <select class="select2 browser-default" multiple="multiple" id="filter_currency" name="filter_currency" onchange="loadDataTable()">
-                                                        <option value="" disabled>Semua</option>
-                                                        @foreach ($currency as $row)
-                                                            <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
                                         </div>  
                                     </div>
                                 </li>
@@ -136,7 +125,6 @@
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th colspan="4" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Tipe</th>
-                                                        <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">No.Faktur Pajak</th>
@@ -160,8 +148,6 @@
                                                         <th>Terima</th>
                                                         <th>Tenggat</th>
                                                         <th>Dokumen</th>
-                                                        <th>Kode</th>
-                                                        <th>Konversi</th>
                                                         <th>Prosentase</th>
                                                         <th>Nominal</th>
                                                     </tr>
@@ -194,7 +180,7 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="getGoodReceiptLandedCost(this.value);"></select>
+                                <select class="browser-default" id="account_id" name="account_id" onchange="getGrLcPo(this.value);"></select>
                                 <label class="active" for="account_id">Supplier / Vendor</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -261,18 +247,6 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="currency_id" name="currency_id">
-                                    @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="currency_id">Mata Uang</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                <label class="active" for="currency_rate">Konversi</label>
-                            </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Good Receipt PO / Landed Cost</h5>
@@ -289,6 +263,7 @@
                                                     <th class="center">GR/LC No.</th>
                                                     <th class="center">NO.PO</th>
                                                     <th class="center">No.SJ</th>
+                                                    <th class="center">Item</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Tenggat</th>
                                                     <th class="center">Total</th>
@@ -300,7 +275,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="empty-detail">
-                                                    <td colspan="11" class="center">
+                                                    <td colspan="12" class="center">
                                                         Pilih supplier/vendor untuk memulai...
                                                     </td>
                                                 </tr>
@@ -470,7 +445,7 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="11" class="center">
+                        <td colspan="12" class="center">
                             Pilih supplier/vendor untuk memulai...
                         </td>
                     </tr>
@@ -499,7 +474,7 @@
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
     });
 
-    function getGoodReceiptLandedCost(val){
+    function getGrLcPo(val){
         if(val){
             $.ajax({
                 url: '{{ Request::url() }}/get_gr_lc',
@@ -541,6 +516,9 @@
                                     <td class="center">
                                         ` + val.delivery_no + `
                                     </td>
+                                    <td class="">
+                                        ` + val.list_item + `
+                                    </td>
                                     <td class="center">
                                         ` + val.post_date + `
                                     </td>
@@ -566,19 +544,12 @@
                                 </tr>
                             `);
 
-                            if(val.is_include_tax){
-                                $('#arr_is_include_tax' + count).prop( "checked", true);
-                            }
-                            
-                            $("#arr_tax_id" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
-                            $("#arr_wtax_id" + count + " option[data-id='" + val.wtax_id + "']").prop("selected",true);
-
                             $('#top').val(val.top);
                         });                        
                     }else{
                         $('#body-detail').empty().append(`
                             <tr id="empty-detail">
-                                <td colspan="11" class="center">
+                                <td colspan="12" class="center">
                                     Pilih supplier/vendor untuk memulai...
                                 </td>
                             </tr>
@@ -646,7 +617,7 @@
         }else{
             $('#body-detail').empty().append(`
                 <tr id="empty-detail">
-                    <td colspan="11" class="center">
+                    <td colspan="12" class="center">
                         Pilih supplier/vendor untuk memulai...
                     </td>
                 </tr>
@@ -747,7 +718,6 @@
                     type : $('#filter_type').val(),
                     'account_id[]' : $('#filter_account').val(),
                     company_id : $('#filter_company').val(),
-                    'currency_id[]' : $('#filter_currency').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -775,8 +745,6 @@
                 { name: 'due_date', className: 'center-align' },
                 { name: 'document_date', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
-                { name: 'currency_id', className: 'center-align' },
-                { name: 'currency_rate', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'tax_no', className: 'center-align' },
@@ -987,8 +955,6 @@
                 `);
                 $('#type').val(response.type).formSelect();
                 $('#company_id').val(response.company_id).formSelect();
-                $('#currency_id').val(response.currency_id).formSelect();
-                $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#received_date').val(response.received_date);
                 $('#due_date').val(response.due_date);
@@ -1018,8 +984,17 @@
                                         <span>Pilih</span>
                                     </label>
                                 </td>
-                                <td>
+                                <td class="center">
                                     ` + val.rawcode + `
+                                </td>
+                                <td class="center">
+                                    ` + val.purchase_no + `
+                                </td>
+                                <td class="center">
+                                    ` + val.delivery_no + `
+                                </td>
+                                <td class="">
+                                    ` + val.list_item + `
                                 </td>
                                 <td class="center">
                                     ` + val.post_date + `
@@ -1182,7 +1157,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         
         $.ajax({
             type : "POST",
@@ -1193,7 +1168,6 @@
                 type : type,
                 company : company,
                 'account[]' : account,
-                'currency[]' : currency
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1209,9 +1183,9 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&company=" + company + "&account=" + account + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&company=" + company + "&account=" + account;
     }
 
     function addDays(){

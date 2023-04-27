@@ -414,7 +414,8 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->where('status','2')->get();
+                ->where('status','2')
+                ->where('inventory_type','1')->get();
 
         foreach($data as $d) {
             $response[] = [

@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
 use App\Models\Currency;
+use App\Models\Tax;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -49,8 +50,8 @@ class FundRequestController extends Controller
             'place_id',
             'department_id',
             'account_id',
+            'type',
             'post_date',
-            'due_date',
             'required_date',
             'currency_id',
             'currency_rate',
@@ -78,7 +79,6 @@ class FundRequestController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%");
                     });
@@ -99,7 +99,6 @@ class FundRequestController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%");
                     });
@@ -123,8 +122,8 @@ class FundRequestController extends Controller
                     $val->place->name.' - '.$val->place->company->name,
                     $val->department->name,
                     $val->account->name,
+                    $val->type(),
                     date('d M Y',strtotime($val->post_date)),
-                    date('d M Y',strtotime($val->due_date)),
                     date('d M Y',strtotime($val->required_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,3,',','.'),
@@ -140,8 +139,8 @@ class FundRequestController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
 					'
                 ];
 
@@ -278,7 +277,6 @@ class FundRequestController extends Controller
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('post_date', 'like', "%$request->search%")
-                            ->orWhere('due_date', 'like', "%$request->search%")
                             ->orWhere('required_date', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%");
                     });
@@ -309,6 +307,8 @@ class FundRequestController extends Controller
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'    => Department::where('status','1')->get(),
             'currency'      => Currency::where('status','1')->get(),
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
+            'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -321,8 +321,8 @@ class FundRequestController extends Controller
             'place_id',
             'department_id',
             'account_id',
+            'type',
             'post_date',
-            'due_date',
             'required_date',
             'currency_id',
             'currency_rate',
@@ -350,7 +350,6 @@ class FundRequestController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%");
                     });
@@ -371,7 +370,6 @@ class FundRequestController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%");
                     });
@@ -394,8 +392,8 @@ class FundRequestController extends Controller
                     $val->place->name.' - '.$val->place->company->name,
                     $val->department->name,
                     $val->account->name,
+                    $val->type(),
                     date('d M Y',strtotime($val->post_date)),
-                    date('d M Y',strtotime($val->due_date)),
                     date('d M Y',strtotime($val->required_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,3,',','.'),
@@ -411,8 +409,8 @@ class FundRequestController extends Controller
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light red accent-2 white-text" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
 
@@ -457,8 +455,8 @@ class FundRequestController extends Controller
     public function userCreate(Request $request){
         $validation = Validator::make($request->all(), [
             'account_id'                => 'required',
+            'type'                      => 'required',
 			'post_date' 				=> 'required',
-			'due_date'			        => 'required',
 			'required_date'		        => 'required',
             'place_id'                  => 'required',
             'department_id'             => 'required',
@@ -473,9 +471,9 @@ class FundRequestController extends Controller
             'arr_total'                 => 'required|array',
 		], [
             'account_id.required'               => 'Target Partner Bisnis tidak boleh kosong',
+            'type.required'                     => 'Tipe tidak boleh kosong',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
-			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
-			'required_date.required' 			=> 'Tanggal dipakai tidak boleh kosong.',
+			'required_date.required' 			=> 'Tanggal request pembayaran tidak boleh kosong.',
             'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
             'department_id.required'            => 'Departemen tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
@@ -543,8 +541,8 @@ class FundRequestController extends Controller
                         $query->place_id = $request->place_id;
                         $query->department_id = $request->department_id;
                         $query->account_id = $request->account_id;
+                        $query->type = $request->type;
                         $query->post_date = $request->post_date;
-                        $query->due_date = $request->due_date;
                         $query->required_date = $request->required_date;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
@@ -583,8 +581,8 @@ class FundRequestController extends Controller
                         'place_id'      => $request->place_id,
                         'department_id'	=> $request->department_id,
                         'account_id'    => $request->account_id,
+                        'type'          => $request->type,
                         'post_date'     => $request->post_date,
-                        'due_date'      => $request->due_date,
                         'required_date' => $request->required_date,
                         'currency_id'   => $request->currency_id,
                         'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),

@@ -35,11 +35,11 @@
 
     @media print {
         .invoice-print-area {
-            font-size:13px !important;
+            font-size:11px !important;
         }
 
         table > thead > tr > th {
-            font-size:15px !important;
+            font-size:12px !important;
             font-weight: 800 !important;
         }
 
@@ -128,12 +128,8 @@
                         <small>Diajukan:</small>
                         <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
-                    <div class="mr-2">
-                        <small>Hingga:</small>
-                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
-                    </div>
                     <div>
-                        <small>Dipakai:</small>
+                        <small>Request Pembayaran:</small>
                         <span>{{ date('d/m/y',strtotime($data->required_date)) }}</span>
                     </div>
                 </div>
@@ -150,72 +146,102 @@
         </div>
         <div class="divider mb-3 mt-3"></div>
         <!-- invoice address and contact -->
-        <div class="row invoice-info">
-            <div class="col m6 s6">
-                <h6 class="invoice-from">Dari</h6>
-                <div class="row">
-                    <div class="col s3">
-                        Name
-                    </div>
-                    <div class="col s9">
-                        {{ $data->user->name }}
-                    </div>
-                    <div class="col s3">
-                        Posisi
-                    </div>
-                    <div class="col s9">
-                        {{ $data->user->position->name }}
-                    </div>
-                    <div class="col s3">
-                        Depart.
-                    </div>
-                    <div class="col s9">
-                        {{ $data->user->department->name }}
-                    </div>
-                    <div class="col s3">
-                        HP
-                    </div>
-                    <div class="col s9">
-                        {{ $data->user->phone }}
-                    </div>
-                </div>
-            </div>
-            <div class="col m6 s6">
-                <h6 class="invoice-from">Lain-lain</h6>
-                <div class="row">
-                    <div class="col s3">
-                        Bisnis Partner
-                    </div>
-                    <div class="col s9">
-                        {{ $data->account->name }}
-                    </div>
-                    <div class="col s3">
-                        Rekening Penerima
-                    </div>
-                    <div class="col s9">
-                        {{ $data->name_account }}
-                    </div>
-                    <div class="col s3">
-                        No. Rekening
-                    </div>
-                    <div class="col s9">
-                        {{ $data->no_account }}
-                    </div>
-                    <div class="col s3">
-                        Lampiran
-                    </div>
-                    <div class="col s9">
-                        <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
-                    </div>
-                    <div class="col s3">
-                        Status
-                    </div>
-                    <div class="col s9">
-                        {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <table border="0" width="100%">
+            <tr>
+                <td width="33%" class="left-align">
+                    <table border="0" width="100%">
+                        <tr>
+                            <td width="40%">
+                                Nama
+                            </td>
+                            <td width="60%">
+                                {{ $data->user->name.' - '.$data->user->phone }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
+                                Posisi
+                            </td>
+                            <td width="60%">
+                                {{ $data->user->position->name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
+                                Depart.
+                            </td>
+                            <td width="60%">
+                                {{ $data->user->department->name }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="33%" class="left-align">
+                    <table border="0" width="100%">
+                        <tr>
+                            <td width="40%">
+                                Bisnis Partner
+                            </td>
+                            <td width="60%">
+                                {{ $data->account->name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
+                                Rek. Penerima
+                            </td>
+                            <td width="60%">
+                                {{ $data->name_account }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
+                                No. Rekening
+                            </td>
+                            <td width="60%">
+                                {{ $data->no_account }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
+                                Tipe
+                            </td>
+                            <td width="60%">
+                                {{ $data->type() }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="33%" class="left-align">
+                    <table border="0" width="100%">
+                        <tr>
+                            <td width="40%">
+                                Lampiran
+                            </td>
+                            <td width="60%">
+                                <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
+                                Status
+                            </td>
+                            <td width="60%">
+                                {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
+                                
+                            </td>
+                            <td width="60%">
+                                
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
         <div class="divider mb-3 mt-3"></div>
         <!-- product details table-->
         <div class="invoice-product-details">

@@ -53,14 +53,14 @@ class PurchaseInvoiceController extends Controller
         $datadp = PurchaseDownPayment::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datadp as $row){
-            if($row->balanceDp() > 0){
+            if($row->balanceInvoice() > 0){
                 $downpayments[] = [
                     'rawcode'       => $row->code,
                     'code'          => CustomHelper::encrypt($row->code),
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'total'         => number_format($row->total,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'balance'       => number_format($row->balanceDp(),2,',','.'),
+                    'balance'       => number_format($row->balanceInvoice(),2,',','.'),
                 ];
             }
         }

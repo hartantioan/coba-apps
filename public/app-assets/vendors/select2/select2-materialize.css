@@ -3,7 +3,8 @@
     display: inline-block;
     margin: 0;
     position: relative;
-    vertical-align: middle
+    vertical-align: middle;
+    min-width: 250px !important;
 }
 .select2 {
     /*width: calc(100% - 45px) !important;*/

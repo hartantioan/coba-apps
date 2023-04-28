@@ -144,7 +144,7 @@ class Select2Controller extends Controller {
                 'name'          => $d->name,
                 'uom'           => $d->uomUnit->code,
                 'price_list'    => $d->currentCogs($this->dataplaces),
-                'stock_list'    => $d->currentStock($this->dataplaces)
+                'stock_list'    => $d->currentStock($this->dataplaces),
             ];
         }
 
@@ -264,6 +264,7 @@ class Select2Controller extends Controller {
                 'name'          => $d->name,
                 'uom'           => $d->uomUnit->code,
                 'buy_unit'      => $d->buyUnit->code,
+                'old_prices'    => $d->oldPrices($this->dataplaces),
             ];
         }
 
@@ -384,12 +385,12 @@ class Select2Controller extends Controller {
                 ->where('status','2')->get();
 
         foreach($data as $d) {
-            if($d->hasBalance()){
+            /* if($d->hasBalance()){ */
                 $response[] = [
                     'id'   			=> $d->id,
                     'text' 			=> $d->code.' - '.$d->note,
                 ];
-            }
+            /* } */
         }
 
         return response()->json(['items' => $response]);

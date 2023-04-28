@@ -29,9 +29,9 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
         'SITE',
         'DEPARTEMEN',
         'PARTNER BISNIS',
+        'TIPE',
         'PENGAJUAN',
-        'KADALUARSA',
-        'DIPAKAI',
+        'REQ PEMBAYARAN',
         'MATA UANG',
         'KONVERSI',
         'KETERANGAN',
@@ -53,7 +53,6 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
                 $query->where(function($query) {
                     $query->where('code', 'like', "%$this->search%")
                         ->orWhere('post_date', 'like', "%$this->search%")
-                        ->orWhere('due_date', 'like', "%$this->search%")
                         ->orWhere('required_date', 'like', "%$this->search%")
                         ->orWhere('note', 'like', "%$this->search%");
                 });
@@ -76,8 +75,8 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
                 'place_id'      => $row->place->name.' - '.$row->place->company->name,
                 'department'    => $row->department->name,
                 'bp'            => $row->account->name,
+                'type'          => $row->type(),
                 'post_date'     => $row->post_date,
-                'due_date'      => $row->due_date,
                 'required_date' => $row->required_date,
                 'currency_id'   => $row->currency->code,
                 'currency_rate' => $row->currency_rate,

@@ -247,20 +247,21 @@ class PaymentRequestController extends Controller
             foreach($data->fundRequest as $row){
                 if(!$row->used()->exists()){
                     CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
+                    $coa = Coa::where('code','100.01.03.04.02')->where('company_id',$row->place->company_id)->first();
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'fund_requests',
                         'code'          => CustomHelper::encrypt($row->code),
                         'rawcode'       => $row->code,
-                        'post_date'     => $row->post_date,
-                        'due_date'      => $row->due_date,
-                        'total'         => number_format($row->total,3,',','.'),
-                        'tax'           => number_format($row->tax,3,',','.'),
-                        'wtax'          => number_format($row->wtax,3,',','.'),
-                        'grandtotal'    => number_format($row->grandtotal,3,',','.'),
-                        'balance'       => '0,000',
-                        'coa_id'        => '',
-                        'coa_name'      => ''
+                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'due_date'      => date('d/m/y',strtotime($row->required_date)),
+                        'total'         => number_format($row->total,2,',','.'),
+                        'tax'           => number_format($row->tax,2,',','.'),
+                        'wtax'          => number_format($row->wtax,2,',','.'),
+                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                        'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
+                        'coa_id'        => $row->type == '1' ? ($coa ? $coa->id : '') : '',
+                        'coa_name'      => $row->type == '1' ? ($coa ? $coa->code.' - '.$coa->name : '') : '',
                     ];
                 }
             }
@@ -274,13 +275,13 @@ class PaymentRequestController extends Controller
                         'type'          => 'purchase_down_payments',
                         'code'          => CustomHelper::encrypt($row->code),
                         'rawcode'       => $row->code,
-                        'post_date'     => $row->post_date,
-                        'due_date'      => $row->due_date,
-                        'total'         => number_format($row->total,3,',','.'),
-                        'tax'           => number_format($row->tax,3,',','.'),
-                        'wtax'          => number_format($row->wtax,3,',','.'),
-                        'grandtotal'    => number_format($row->grandtotal,3,',','.'),
-                        'balance'       => '0,000',
+                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'due_date'      => date('d/m/y',strtotime($row->due_date)),
+                        'total'         => number_format($row->total,2,',','.'),
+                        'tax'           => number_format($row->tax,2,',','.'),
+                        'wtax'          => number_format($row->wtax,2,',','.'),
+                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                        'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
                         'coa_id'        => $coa ? $coa->id : '',
                         'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
                     ];
@@ -296,13 +297,13 @@ class PaymentRequestController extends Controller
                         'type'          => 'purchase_invoices',
                         'code'          => CustomHelper::encrypt($row->code),
                         'rawcode'       => $row->code,
-                        'post_date'     => $row->post_date,
-                        'due_date'      => $row->due_date,
-                        'total'         => number_format($row->total,3,',','.'),
-                        'tax'           => number_format($row->tax,3,',','.'),
-                        'wtax'          => number_format($row->wtax,3,',','.'),
-                        'grandtotal'    => number_format($row->grandtotal,3,',','.'),
-                        'balance'       => number_format($row->balance,3,',','.'),
+                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'due_date'      => date('d/m/y',strtotime($row->due_date)),
+                        'total'         => number_format($row->total,2,',','.'),
+                        'tax'           => number_format($row->tax,2,',','.'),
+                        'wtax'          => number_format($row->wtax,2,',','.'),
+                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                        'balance'       => number_format($row->balance,2,',','.'),
                         'coa_id'        => $coa ? $coa->id : '',
                         'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
                     ];

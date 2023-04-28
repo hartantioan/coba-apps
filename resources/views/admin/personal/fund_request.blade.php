@@ -83,7 +83,8 @@
                                                         <th rowspan="2">Site</th>
                                                         <th rowspan="2">Departemen</th>
                                                         <th rowspan="2">Partner Bisnis</th>
-                                                        <th colspan="3" class="center-align">Tanggal</th>
+                                                        <th rowspan="2">Tipe</th>
+                                                        <th colspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Termin</th>
@@ -100,8 +101,7 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Pengajuan</th>
-                                                        <th>Kadaluwarsa</th>
-                                                        <th>Pemakaian</th>
+                                                        <th>Request Pembayaran</th>
                                                         <th>Kode</th>
                                                         <th>Konversi</th>
                                                     </tr>
@@ -138,16 +138,19 @@
                                 <label class="active" for="account_id">Partner Bisnis</label>
                             </div>
                             <div class="input-field col m3 s12">
+                                <select class="form-control" id="type" name="type">
+                                    <option value="1">BS</option>
+                                    <option value="2">OPM</option>
+                                </select>
+                                <label class="" for="type">Tipe Permohonan</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                <label class="active" for="due_date">Tgl. Kadaluwarsa</label>
-                            </div>
-                            <div class="input-field col m3 s12">
                                 <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                <label class="active" for="required_date">Tgl. Dipakai</label>
+                                <label class="active" for="required_date">Tgl. Request Pembayaran</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -260,29 +263,39 @@
                                     <thead>
                                         <tr>
                                             <td>Total</td>
-                                            <td class="right-align" colspan="2"><span id="total">0,000</span></td>
+                                            <td class="right-align" colspan="2"><span id="total">0,00</span></td>
                                         </tr>
                                         <tr>
                                             <td>PPN</td>
                                             <td class="right-align">
-                                                <input id="percent_tax" name="percent_tax" type="text" value="0" onkeyup="formatRupiah(this);count();" style="text-align:right;width:100px;margin-right: 20px;height: 2rem;"><span class="right" style="margin-top: 25px;">%</span>
+                                                <select class="browser-default" id="percent_tax" name="percent_tax" onchange="count();">
+                                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                                    @foreach ($tax as $row)
+                                                        <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }}>{{ $row->name }}</option>
+                                                    @endforeach
+                                                </select>
                                             </td>
                                             <td class="right-align">
-                                                <input id="tax" name="tax" type="text" value="0,000" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                <input id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>PPH</td>
                                             <td class="right-align">
-                                                <input id="percent_wtax" name="percent_wtax" type="text" value="0" onkeyup="formatRupiah(this);count();" style="text-align:right;width:100px;margin-right: 20px;height: 2rem;"><span class="right" style="margin-top: 25px;">%</span>
+                                                <select class="browser-default" id="percent_wtax" name="percent_wtax" onchange="count();">
+                                                    <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                                                    @foreach ($wtax as $row)
+                                                        <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }}>{{ $row->name }}</option>
+                                                    @endforeach
+                                                </select>
                                             </td>
                                             <td class="right-align">
-                                                <input id="wtax" name="wtax" type="text" value="0,000" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                <input id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
-                                            <td class="right-align" colspan="2"><span id="grandtotal">0,000</span></td>
+                                            <td class="right-align" colspan="2"><span id="grandtotal">0,00</span></td>
                                         </tr>
                                     </thead>
                                 </table>
@@ -337,7 +350,6 @@
             dismissible: false,
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ date("Y-m-d") }}');
-                $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#required_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
@@ -389,16 +401,16 @@
         $('input[name^="arr_qty"]').each(function(index){
             let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), price = parseFloat($('input[name^="arr_price"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
             let total = qty * price;
-            $('input[name^="arr_total"]').eq(index).val(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
+            $('input[name^="arr_total"]').eq(index).val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
             totalall += total;
         });
         tax = totalall * (percent_tax / 100);
         wtax = totalall * (percent_wtax / 100);
         grandtotal = totalall + tax - wtax;
-        $('#tax').val(formatRupiahIni(tax.toFixed(3).toString().replace('.',',')));
-        $('#wtax').val(formatRupiahIni(wtax.toFixed(3).toString().replace('.',',')));
-        $('#total').text(formatRupiahIni(totalall.toFixed(3).toString().replace('.',',')));
-        $('#grandtotal').text(formatRupiahIni(grandtotal.toFixed(3).toString().replace('.',',')));
+        $('#tax').val(formatRupiahIni(tax.toFixed(2).toString().replace('.',',')));
+        $('#wtax').val(formatRupiahIni(wtax.toFixed(2).toString().replace('.',',')));
+        $('#total').text(formatRupiahIni(totalall.toFixed(2).toString().replace('.',',')));
+        $('#grandtotal').text(formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',',')));
     }
 
     function addItem(){
@@ -406,7 +418,7 @@
         $('#last-row-item').before(`
             <tr class="row_item">
                 <td>
-                    <input name="arr_item[]" type="text" placeholder="Keterangan Barang">
+                    <textarea class="materialize-textarea" name="arr_item[]" type="text" placeholder="Keterangan Barang"></textarea>
                 </td>
                 <td>
                     <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this);count();">
@@ -415,10 +427,10 @@
                     <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
                 </td>>
                 <td class="center">
-                    <input type="text" id="arr_price` + count + `" name="arr_price[]" value="0,000" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                    <input type="text" id="arr_price` + count + `" name="arr_price[]" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;">
                 </td>
                 <td class="center">
-                    <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
+                    <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,00" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -432,7 +444,7 @@
 
     function changeDateMinimum(val){
         if(val){
-            $('#due_date,#required_date').attr("min",val);
+            $('#required_date').attr("min",val);
             $('input[name^="arr_required_date"]').each(function(){
                 $(this).attr("min",val);
             });
@@ -476,8 +488,8 @@
                 { name: 'place_id', className: 'center-align' },
                 { name: 'department_id', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
-                { name: 'date_due', className: 'center-align' },
                 { name: 'date_use', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
@@ -687,11 +699,10 @@
                 $('#temp').val(id);
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
                 $('#required_date').val(response.required_date);
                 $('#post_date').removeAttr('min');
-                $('#due_date').removeAttr('min');
                 $('#required_date').removeAttr('min');
+                $('#type').val(response.type).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
                 $('#department_id').val(response.department_id).formSelect();
                 $('#termin_note').val(response.termin_note);
@@ -714,7 +725,7 @@
                         $('#last-row-item').before(`
                             <tr class="row_item">
                                 <td>
-                                    <input name="arr_item[]" type="text" placeholder="Keterangan Barang" value="` + val.item + `">
+                                    <textarea class="materialize-textarea" name="arr_item[]" type="text" placeholder="Keterangan Barang">` + val.item + `</textarea>
                                 </td>
                                 <td>
                                     <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);count();">

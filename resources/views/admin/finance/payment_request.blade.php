@@ -537,11 +537,11 @@
                             $('#list-used-data').append(`
                                 <div class="chip purple darken-4 gradient-shadow white-text">
                                     ` + val.rawcode + `
-                                    <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `)">close</i>
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
                                 </div>
                             `);
                             $('#body-detail').append(`
-                                <tr class="row_detail">
+                                <tr class="row_detail" data-code="` + val.rawcode + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                     <td class="center-align">
                                         <label>
@@ -571,7 +571,7 @@
                                         ` + val.grandtotal + `
                                     </td>
                                     <td class="center">
-                                        <input id="arr_pay` + count + `" name="arr_pay[]" class="browser-default" type="text" value=" `+ val.balance + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                        <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.grandtotal + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                     </td>
                                     <td class="center">
                                         <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;">
@@ -653,6 +653,13 @@
         }
     }
 
+    function checkTotal(element){
+        var nil = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")), max = parseFloat($(element).data('grandtotal').replaceAll(".", "").replaceAll(",","."));
+        if(nil > max){
+            $(element).val($(element).data('grandtotal'));
+        }
+    }
+
     function countAll(){
         var pay = 0, admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",","."));
         
@@ -685,7 +692,7 @@
         countAll();
     }
 
-    function removeUsedData(table,id){
+    function removeUsedData(table,id,code){
         $.ajax({
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
@@ -701,7 +708,7 @@
                 
             },
             success: function(response) {
-                $('.row_item[data-id="' + id + '"]').remove();
+                $('.row_detail[data-code="' + code + '"]').remove();
                 countAll();
             },
             error: function() {
@@ -968,7 +975,7 @@
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#body-detail').append(`
-                            <tr class="row_detail">
+                            <tr class="row_detail" data-code="` + val.rawcode + `">
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                 <td class="center-align">
                                     <label>
@@ -1200,7 +1207,7 @@
                     $('#list-used-data-pay').append(`
                         <div class="chip purple darken-4 gradient-shadow white-text">
                             ` + response.data.code + `
-                            <i class="material-icons close data-used-pay" onclick="removeUsedData('payment_requests',` + response.data.id + `)">close</i>
+                            <i class="material-icons close data-used-pay" onclick="removeUsedData('payment_requests',` + response.data.id + `,'` + response.data.code + `')">close</i>
                         </div>
                     `);
                 }else{

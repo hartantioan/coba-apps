@@ -132,7 +132,8 @@
                         <th rowspan="2">Site</th>
                         <th rowspan="2">Departemen</th>
                         <th rowspan="2">Partner Bisnis</th>
-                        <th colspan="3" class="center-align">Tanggal</th>
+						<th rowspan="2">Tipe</th>
+                        <th colspan="2" class="center-align">Tanggal</th>
                         <th colspan="2" class="center-align">Mata Uang</th>
                         <th rowspan="2">Keterangan</th>
                         <th rowspan="2">Termin</th>
@@ -148,8 +149,7 @@
 					</tr>
                     <tr align="center">
 						<th>Pengajuan</th>
-                        <th>Kadaluwarsa</th>
-                        <th>Pemakaian</th>
+                        <th>Req.Pembayaran</th>
                         <th>Kode</th>
                         <th>Konversi</th>
 					</tr>
@@ -163,8 +163,8 @@
                             <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
                             <td>{{ $row->department->name }}</td>
                             <td>{{ $row->account->name }}</td>
+							<td>{{ $row->type() }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                             <td>{{ date('d/m/y',strtotime($row->required_date)) }}</td>
                             <td>{{ $row->currency->code }}</td>
                             <td>{{ number_format($row->currency_rate,3,',','.') }}</td>

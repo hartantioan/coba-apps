@@ -319,10 +319,10 @@
     });
 
     function getRowUnit(val){
+        $('#tempPrice' + val).empty();
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
             if($("#arr_item" + val).select2('data')[0].price_list.length){
-                $('#tempPrice' + val).empty();
                 $.each($("#arr_item" + val).select2('data')[0].price_list, function(i, value) {
                     $('#tempPrice' + val).append(`
                         <option value="` + value.price + `">` + value.description + `</option>

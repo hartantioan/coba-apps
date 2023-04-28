@@ -85,7 +85,8 @@
                                                         <th rowspan="2">Site</th>
                                                         <th rowspan="2">Departemen</th>
                                                         <th rowspan="2">Partner Bisnis</th>
-                                                        <th colspan="3" class="center-align">Tanggal</th>
+                                                        <th rowspan="2">Tipe</th>
+                                                        <th colspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Termin</th>
@@ -102,8 +103,7 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Pengajuan</th>
-                                                        <th>Kadaluwarsa</th>
-                                                        <th>Pemakaian</th>
+                                                        <th>Request Pembayaran</th>
                                                         <th>Kode</th>
                                                         <th>Konversi</th>
                                                     </tr>
@@ -214,8 +214,8 @@
                 { name: 'place_id', className: 'center-align' },
                 { name: 'department_id', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
-                { name: 'date_due', className: 'center-align' },
                 { name: 'date_use', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
@@ -360,10 +360,8 @@
                 $('#temp').val(id);
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
                 $('#required_date').val(response.required_date);
                 $('#post_date').removeAttr('min');
-                $('#due_date').removeAttr('min');
                 $('#required_date').removeAttr('min');
                 
                 if(response.details.length > 0){

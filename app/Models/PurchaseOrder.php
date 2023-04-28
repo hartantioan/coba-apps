@@ -143,6 +143,11 @@ class PurchaseOrder extends Model
         return $this->hasMany('App\Models\PurchaseOrderDetail');
     }
 
+    public function purchaseInvoiceDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','purchase_order_id','id');
+    }
+
     public function goodReceipt()
     {
         return $this->hasOne('App\Models\GoodReceipt');

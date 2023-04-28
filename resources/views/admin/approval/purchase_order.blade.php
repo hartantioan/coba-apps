@@ -238,7 +238,6 @@
                         <th class="center-align">Item/Jasa</th>
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
-                        <th class="center-align">Keterangan</th>
                         <th class="center-align">Harga</th>
                         <th class="center-align">Disc.1 (%)</th>
                         <th class="center-align">Disc.2 (%)</th>
@@ -249,20 +248,22 @@
                 <tbody>
                     @foreach($data->purchaseOrderDetail as $key => $row)
                     <tr>
-                        <td class="center-align">{{ ($key + 1) }}</td>
+                        <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->name : $row->coa->name }}</td>
                         <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->buyUnit->code : '-' }}</td>
-                        <td class="center-align">{{ $row->note }}</td>
                         <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
                         <td class="center-align">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
                         <td class="center-align">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->discount_3,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->subtotal,2,',','.') }}</td>
                     </tr>
+                    <tr>
+                        <td colspan="8">Keterangan : {{ $row->note }}</td>
+                    </tr>
                     @endforeach
                     <tr>
-                        <td colspan="7" rowspan="7">
+                        <td colspan="6" rowspan="7">
                             Rekening :
                             {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">
@@ -297,7 +298,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}</i></th>
+                        <th colspan="9">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}</i></th>
                     </tr>
                 </tfoot>
             </table>

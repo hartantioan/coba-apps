@@ -14,6 +14,8 @@ use App\Models\GoodReceive;
 use App\Models\InventoryTransfer;
 use App\Models\OutgoingPayment;
 use App\Models\Place;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseOrder;
 use App\Models\Retirement;
 use App\Models\User;
 use App\Models\Notification;
@@ -389,6 +391,7 @@ class CustomHelper {
 					'nominal'		=> $row->retirement_nominal,
 				]);
 			}
+
 		}elseif($table_name == 'outgoing_payments'){
 			$op = OutgoingPayment::find($table_id);
 			
@@ -759,15 +762,44 @@ class CustomHelper {
 					'code'			=> Journal::generateCode(),
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
-					'currency_id'	=> $data->currency_id,
-					'currency_rate'	=> $data->currency_rate,
+					'currency_id'	=> isset($data->currency_id) ? $data->currency_id : NULL,
+					'currency_rate'	=> isset($data->currency_rate) ? $data->currency_rate : NULL,
 					'post_date'		=> $data->post_date,
 					'note'			=> $data->code,
 					'status'		=> '3'
 				]);
 
+				$totalOutSide = 0;
+
+				if($table_name == 'purchase_invoices'){
+					$pi = PurchaseInvoice::find($table_id);
+
+					foreach($pi->purchaseInvoiceDetail()->whereNotNull('purchase_order_id')->get() as $row){
+						$po = PurchaseOrder::find($row->purchase_order_id);
+
+						foreach($po->purchaseOrderDetail as $rowpo){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowpo->coa_id,
+								'place_id'		=> $rowpo->place_id,
+								'department_id'	=> $rowpo->department_id,
+								'type'			=> '1',
+								'nominal'		=> $rowpo->subtotal
+							]);
+							$totalOutSide += $rowpo->subtotal;
+						}
+					}
+				}
+
 				foreach($journalMap as $row){
+					
 					$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
+
+					if($totalOutSide > 0){
+						if($row->field_name == 'total'){
+							$nominal -= $totalOutSide;
+						}
+					}
 
 					if($nominal > 0){
 						JournalDetail::create([

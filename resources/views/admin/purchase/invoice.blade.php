@@ -249,7 +249,7 @@
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h5>Detail Good Receipt PO / Landed Cost</h5>
+                                    <h6>Detail Good Receipt PO / Landed Cost / Purchase Order Jasa</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered" style="width:1600px !important;">
                                             <thead>
@@ -260,10 +260,10 @@
                                                             <span>Semua</span>
                                                         </label>
                                                     </th>
-                                                    <th class="center">GR/LC No.</th>
+                                                    <th class="center">GR/LC/PO No.</th>
                                                     <th class="center">NO.PO</th>
                                                     <th class="center">No.SJ</th>
-                                                    <th class="center">Item</th>
+                                                    <th class="center">Item / Coa Jasa</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Tenggat</th>
                                                     <th class="center">Total</th>

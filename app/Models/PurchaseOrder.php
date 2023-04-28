@@ -251,4 +251,16 @@ class PurchaseOrder extends Model
             return false;
         }
     }
+
+    public function getListItem(){
+        $html = '<ol>';
+
+        foreach($this->purchaseOrderDetail as $row){
+            $html .= '<li>'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).' Qty. '.$row->qty.' '.($row->item_id ? $row->item->buyUnit->code : '-').'</li>';
+        }
+
+        $html .= '</ol>';
+
+        return $html;
+    }
 }

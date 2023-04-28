@@ -66,11 +66,6 @@ class PurchaseDownPayment extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function purchaseRequest()
-    {
-        return $this->belongsTo('App\Models\PurchaseRequest', 'purchase_request_id', 'id')->withTrashed();
-    }
-
     public function supplier(){
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }

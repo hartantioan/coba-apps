@@ -10,6 +10,16 @@
     table.bordered th {
         padding: 5px !important;
     }
+    #chart-container,#chart-invoice {
+        position: relative;
+        height: 250px;
+        margin: 0.5rem;
+        overflow: auto;
+        text-align:-webkit-right;
+    }
+    .orgchart .landed-cost .title { background-color: #006699; }
+    .orgchart .landed-cost .content { border-color: #006699; }
+    .orgchart { background: #fff; }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -365,6 +375,19 @@
     </div>
 </div>
 
+<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="col s12" id="show_structure">
+            <div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -378,6 +401,7 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
+
 
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
@@ -459,6 +483,21 @@
             }
         });
 
+        $('#modal3').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#myDiagramDiv').remove();
+                $('#show_structure').append(
+                    `<div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;"></div>
+                    `
+                );
+            }
+        });
+
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             countAll();
@@ -467,6 +506,126 @@
         select2ServerSide('#vendor_id,#filter_vendor', '{{ url("admin/select2/vendor") }}');
         select2ServerSide('#good_receipt_id', '{{ url("admin/select2/good_receipt") }}');
     });
+
+    function makeTreeOrg(data,link){
+        var $ = go.GraphObject.make;
+
+        myDiagram =
+        $(go.Diagram, "myDiagramDiv",
+        {
+            initialContentAlignment: go.Spot.Center,
+            "undoManager.isEnabled": true,
+            layout: $(go.TreeLayout,
+            { 
+                angle: 180,
+                path: go.TreeLayout.PathSource,  
+                setsPortSpot: false, 
+                setsChildPortSpot: false,  
+                arrangement: go.TreeLayout.ArrangementHorizontal
+            })
+        });
+        myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
+            var part = e.subject.part;
+            if (part instanceof go.Link) {
+                
+                console.log("");
+            } else if (part instanceof go.Node) {
+                window.open(part.data.url);
+                console.log("Node clicked: " + part.data.key);
+            }
+        });
+        myDiagram.nodeTemplate =
+        $(go.Node, "Auto",
+            {
+            locationSpot: go.Spot.Center,
+            fromSpot: go.Spot.AllSides,
+            toSpot: go.Spot.AllSides
+            },
+            $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
+                new go.Binding("fill", "color")),
+            $(go.Panel, "Table",
+            { defaultRowSeparatorStroke: "black" },
+        
+            $(go.TextBlock,
+                {
+                row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
+                font: "bold 12pt sans-serif",
+                isMultiline: false, editable: true
+                },
+                new go.Binding("text", "name").makeTwoWay()),
+        
+            $(go.TextBlock, "Properties",
+                { row: 1, font: "italic 10pt sans-serif" },
+                new go.Binding("visible", "visible", function(v) { return !v; }).ofObject("PROPERTIES")),
+            $(go.Panel, "Vertical", { name: "PROPERTIES" },
+                new go.Binding("itemArray", "properties"),
+                {
+                row: 1, margin: 3, stretch: go.GraphObject.Fill,
+                defaultAlignment: go.Spot.Left,
+                
+                }
+            ),
+            $("PanelExpanderButton", "PROPERTIES",
+                { row: 1, column: 1, alignment: go.Spot.TopRight, visible: false },
+                new go.Binding("visible", "properties", function(arr) { return arr.length > 0; })),
+    
+            $(go.TextBlock, "Methods",
+                { row: 2, font: "italic 10pt sans-serif" },
+                new go.Binding("visible", "visible", function(v) { return !v; }).ofObject("METHODS")),
+            $(go.Panel, "Vertical", { name: "METHODS" },
+                new go.Binding("itemArray", "methods"),
+                {
+                row: 2, margin: 3, stretch: go.GraphObject.Fill,
+                defaultAlignment: go.Spot.Left, background: "lightyellow",
+                
+                }
+            ),
+            $("PanelExpanderButton", "METHODS",
+                { row: 2, column: 1, alignment: go.Spot.TopRight, visible: false },
+                new go.Binding("visible", "methods", function(arr) { return arr.length > 0; }))
+            )
+        );
+
+        myDiagram.model = $(go.GraphLinksModel,
+        {
+            copiesArrays: true,
+            copiesArrayObjects: true,
+            nodeDataArray: data,
+            linkDataArray: link
+        });
+            
+            
+    }
+
+    function viewStructureTree(id){
+        $.ajax({
+            url: '{{ Request::url() }}/viewstructuretree',
+            type: 'GET',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                makeTreeOrg(response.message,response.link);
+
+                $('#modal3').modal('open');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     function getGoodReceipt(val){
         if(val){

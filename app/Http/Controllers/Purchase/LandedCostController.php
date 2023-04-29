@@ -256,6 +256,7 @@ class LandedCostController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -797,4 +798,79 @@ class LandedCostController extends Controller
             'message'   => ''
         ]);
     }
+
+    public function viewStructureTree(Request $request){
+        $query = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
+        $data_lc = [];
+        $data_link = [];
+        $data_go_chart = [];
+        if($query) {
+            $lc = [
+                "key" => $query->code,
+                "name" => $query->code,
+                'properties'=> [
+                    ['name'=> "Tanggal :".$query->post_date],
+                 ],
+                 'color'=>"lightblue",
+                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($query->code),
+            ];
+            $data_go_chart[]=$lc;
+            $purchase_invoices = [];
+            if($query->purchaseInvoiceDetail()->exists()){
+                foreach($query->purchaseInvoiceDetail as $row){
+                    $invoice=[
+                        "key"=>$row->code,
+                        "name"=>$row->code,
+                        'properties'=> [
+                            ['name'=> "Tanggal :".$row->code],
+                         ],
+                        'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row->code),
+                    ];
+                    $purchase_invoices[]=$invoice;
+                    $data_go_chart[]=$invoice;
+                    $data_link[]=[
+                        'from'=>$query->code,
+                        'to'=>$row->code,
+                    ];  
+                }
+            }
+            if($query->goodReceipt()->exists()){
+                $data_good_receipt = [
+                    "key" => $query->goodReceipt->code,
+                    'name'=>$query->goodReceipt->code,
+                    'properties'=> [
+                        ['name'=> "Tanggal :".$query->goodReceipt->post_date],
+                     ],
+                    'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($query->goodReceipt->code),
+                ];
+                $data_good_receipt["children"] = $data_lc;
+                $data_go_chart[]=$data_good_receipt;
+                $data_link[]=[
+                    'from'=>$query->goodReceipt->code,
+                    'to'=>$query->code,
+                ];  
+                $response = [
+                    'status'  => 200,
+                    'message' => $data_go_chart,
+                    'link' => $data_link
+                ];
+            }else{
+                $response = [
+                    'status'  => 200,
+                    'message' => $data_go_chart,
+                    'link' => $data_link,
+                ];
+            }
+
+        } else {
+            info("rusak sini");
+            $data_good_receipt = [];
+            $response = [
+                'status'  => 500,
+                'message' => 'Data not Found.'
+            ];
+        }
+        return response()->json($response);
+    }
+
 }

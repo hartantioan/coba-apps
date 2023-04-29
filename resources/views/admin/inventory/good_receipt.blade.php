@@ -9,14 +9,6 @@
     table.bordered th {
         padding: 5px !important;
     }
-    #chart-container {
-        position: relative;
-        height: 420px;
-        margin: 0.5rem;
-        overflow: auto;
-        text-align:-webkit-right;
-    }
-    .orgchart { background: #fff; }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -262,13 +254,11 @@
     </div>
 </div>
 
-<div id="modal3" class="modal modal-fixed-footer" style="max-height: 75% !important;height: 75% !important;width:75%;">
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12" id="show_structure">
-                <div id="chart-container"></div>
-                <div id="visualisation">
-                </div>
+<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content row">
+        <div class="col s12" id="show_structure">
+            <div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
+
             </div>
         </div>
     </div>
@@ -291,11 +281,7 @@
             width: '100%',
         });
 
-        var $chartContainer = $('#chart-container');
 
-        $chartContainer.on('click', '.node', function(event) {
-            window.open($(this).data('nodeData').url);
-        });
 
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
@@ -317,7 +303,7 @@
                 icon.first().html('remove');
             }
         });
-
+        
         loadDataTable();
 
         $('#modal1').modal({
@@ -376,7 +362,6 @@
                 $('#show_print').html('');
             }
         });
-
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
                 
@@ -384,7 +369,11 @@
             onOpenEnd: function(modal, trigger) { 
             },
             onCloseEnd: function(modal, trigger){
-                $('#chart-container').empty();
+                $('#myDiagramDiv').remove();
+                $('#show_structure').append(
+                    `<div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;"></div>
+                    `
+                );
             }
         });
 
@@ -510,13 +499,101 @@
             }
         }
     }
+    var nodeTemplate = function(data) {
+        return `
+            <div class="title">${data.name}</div>
+            <div class="content">${data.title}<br>Tanggal ${data.date}<br> Nominal : ${data.grandtotal}<br></div>
+        `;
+    };
 
-    function makeTreeOrg(data){
-        $('#chart-container').orgchart({
-            'nodeContent': 'title',
-            'data': data,
-            'direction': 'r2l',
+    function makeTreeOrg(data,link){
+        var $ = go.GraphObject.make;
+
+        myDiagram =
+        $(go.Diagram, "myDiagramDiv",
+        {
+            initialContentAlignment: go.Spot.Center,
+            "undoManager.isEnabled": true,
+            layout: $(go.TreeLayout,
+            { 
+                angle: 180,
+                path: go.TreeLayout.PathSource,  
+                setsPortSpot: false, 
+                setsChildPortSpot: false,  
+                arrangement: go.TreeLayout.ArrangementHorizontal
+            })
         });
+        myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
+            var part = e.subject.part;
+            if (part instanceof go.Link) {
+                
+                console.log("");
+            } else if (part instanceof go.Node) {
+                window.open(part.data.url);
+                console.log("Node clicked: " + part.data.key);
+            }
+        });
+        myDiagram.nodeTemplate =
+        $(go.Node, "Auto",
+            {
+            locationSpot: go.Spot.Center,
+            fromSpot: go.Spot.AllSides,
+            toSpot: go.Spot.AllSides
+            },
+            $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
+                new go.Binding("fill", "color")),
+            $(go.Panel, "Table",
+            { defaultRowSeparatorStroke: "black" },
+        
+            $(go.TextBlock,
+                {
+                row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
+                font: "bold 12pt sans-serif",
+                isMultiline: false, editable: true
+                },
+                new go.Binding("text", "name").makeTwoWay()),
+        
+            $(go.TextBlock, "Properties",
+                { row: 1, font: "italic 10pt sans-serif" },
+                new go.Binding("visible", "visible", function(v) { return !v; }).ofObject("PROPERTIES")),
+            $(go.Panel, "Vertical", { name: "PROPERTIES" },
+                new go.Binding("itemArray", "properties"),
+                {
+                row: 1, margin: 3, stretch: go.GraphObject.Fill,
+                defaultAlignment: go.Spot.Left,
+                
+                }
+            ),
+            $("PanelExpanderButton", "PROPERTIES",
+                { row: 1, column: 1, alignment: go.Spot.TopRight, visible: false },
+                new go.Binding("visible", "properties", function(arr) { return arr.length > 0; })),
+    
+            $(go.TextBlock, "Methods",
+                { row: 2, font: "italic 10pt sans-serif" },
+                new go.Binding("visible", "visible", function(v) { return !v; }).ofObject("METHODS")),
+            $(go.Panel, "Vertical", { name: "METHODS" },
+                new go.Binding("itemArray", "methods"),
+                {
+                row: 2, margin: 3, stretch: go.GraphObject.Fill,
+                defaultAlignment: go.Spot.Left, background: "lightyellow",
+                
+                }
+            ),
+            $("PanelExpanderButton", "METHODS",
+                { row: 2, column: 1, alignment: go.Spot.TopRight, visible: false },
+                new go.Binding("visible", "methods", function(arr) { return arr.length > 0; }))
+            )
+        );
+
+        myDiagram.model = $(go.GraphLinksModel,
+        {
+            copiesArrays: true,
+            copiesArrayObjects: true,
+            nodeDataArray: data,
+            linkDataArray: link
+        });
+            
+            
     }
 
     function viewStructureTree(id){
@@ -531,7 +608,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                makeTreeOrg(response.message);
+                makeTreeOrg(response.message,response.link);
                 $('#modal3').modal('open');
             },
             error: function() {

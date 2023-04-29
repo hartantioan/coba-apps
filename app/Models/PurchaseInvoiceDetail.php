@@ -43,4 +43,24 @@ class PurchaseInvoiceDetail extends Model
     public function goodReceipt(){
         return $this->belongsTo('App\Models\GoodReceipt','good_receipt_id','id')->withTrashed();
     }
+
+    public function purchaseOrder(){
+        return $this->belongsTo('App\Models\PurchaseOrder','purchase_order_id','id')->withTrashed();
+    }
+
+    public function getCode(){
+        $code = '';
+
+        if($this->goodReceipt()->exists()){
+            $code = $this->goodReceipt->code;
+        }
+        if($this->landedCost()->exists()){
+            $code = $this->landedCost->code;
+        }
+        if($this->purchaseOrder()->exists()){
+            $code = $this->purchaseOrder->code;
+        }
+
+        return $code;
+    }
 }

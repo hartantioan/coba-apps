@@ -15,9 +15,6 @@
         text-align:-webkit-right;
     }
     .orgchart { background: #fff; }
-    .select2-container {
-        min-width:250px !important;
-    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -287,7 +284,7 @@
                                 </div>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="payment_type" name="payment_type">
+                                <select class="form-control" id="payment_type" name="payment_type" onchange="resetTerm()">
                                     <option value="1">Cash</option>
                                     <option value="2">Credit</option>
                                     <option value="3">CBD</option>
@@ -362,9 +359,21 @@
                                                 <th class="center">Qty</th>
                                                 <th class="center">Satuan</th>
                                                 <th class="center">Harga</th>
-                                                <th class="center">PPN</th>
+                                                <th class="center">
+                                                    PPN
+                                                    <label class="pl-2">
+                                                        <input type="checkbox" onclick="chooseAllPpn(this)">
+                                                        <span style="padding-left: 25px;">Semua</span>
+                                                    </label>
+                                                </th>
                                                 <th class="center">Termasuk PPN</th>
-                                                <th class="center">PPH</th>
+                                                <th class="center">
+                                                    PPH
+                                                    <label class="pl-2">
+                                                        <input type="checkbox" onclick="chooseAllPph(this)">
+                                                        <span style="padding-left: 25px;">Semua</span>
+                                                    </label>
+                                                </th>
                                                 <th class="center">Disc1(%)</th>
                                                 <th class="center">Disc2(%)</th>
                                                 <th class="center">Disc3(Rp)</th>
@@ -592,6 +601,42 @@
         });
     }
 
+    var defaultValuePpn = 0, defaultValuePph;
+
+    function chooseAllPpn(element){
+        if($(element).is(':checked')){
+            $('select[name^="arr_tax"]').each(function(){
+                if(parseFloat($(this).val()) > 0){
+                    defaultValuePpn = $(this).val();
+                }else{
+                    $(this).val(defaultValuePpn.toString()).formSelect();
+                }
+            });
+        }else{
+            $('select[name^="arr_tax"]').each(function(){
+                $(this).val('0');
+            });
+        }
+        countAll();
+    }
+
+    function chooseAllPph(element){
+        if($(element).is(':checked')){
+            $('select[name^="arr_wtax"]').each(function(){
+                if(parseFloat($(this).val()) > 0){
+                    defaultValuePph = $(this).val();
+                }else{
+                    $(this).val(defaultValuePph.toString()).formSelect();
+                }
+            });
+        }else{
+            $('select[name^="arr_wtax"]').each(function(){
+                $(this).val('0');
+            });
+        }
+        countAll();
+    }
+
     function viewStructureTree(id){
         $.ajax({
             url: '{{ Request::url() }}/viewstructuretree',
@@ -622,19 +667,46 @@
     }
     
     function getRowUnit(val){
+        $('#tempPrice' + val).empty();
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].buy_unit);
+            if($("#arr_item" + val).select2('data')[0].old_prices.length > 0){
+                $.each($("#arr_item" + val).select2('data')[0].old_prices, function(i, value) {
+                    if($('#supplier_id').val()){
+                        if(value.supplier_id == $('#supplier_id').val()){
+                            $('#tempPrice' + val).append(`
+                                <option value="` + value.price + `">` + value.purchase_code + ` Supplier ` + value.supplier_name + ` Tgl ` + value.post_date + `</option>
+                            `);
+                        }
+                    }else{
+                        $('#tempPrice' + val).append(`
+                            <option value="` + value.price + `">` + value.purchase_code + ` Supplier ` + value.supplier_name + ` Tgl ` + value.post_date + `</option>
+                        `);
+                    }
+                });
+            }
         }else{
             $('#arr_unit' + val).text('-');
         }
     }
 
+    var tempTerm = 0;
+
+    function resetTerm(){
+        if($('#payment_type').val() == '1'){
+            $('#payment_term').val('0');
+        }else{
+            $('#payment_term').val(tempTerm);
+        }
+    }
+
     function getTopSupplier(){
         if($("#supplier_id").val()){
-            $('#payment_term').val($("#supplier_id").select2('data')[0].top);
+            tempTerm = parseInt($("#supplier_id").select2('data')[0].top);
         }else{
-            $('#payment_term').val('0');
+            tempTerm = 0;
         }
+        resetTerm();
     }
 
     function getPurchaseRequest(){
@@ -688,7 +760,8 @@
                                             <span id="arr_unit` + count + `">` + val.unit + `</span>
                                         </td>
                                         <td class="center">
-                                            <input name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                                            <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                                            <datalist id="tempPrice` + count + `"></datalist>
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
@@ -728,14 +801,14 @@
                                             <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + ` ` + response.code + ` ke Gudang ` + val.warehouse_name + `">
                                         </td>
                                         <td>
-                                            <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                                 @foreach ($place as $rowplace)
                                                     <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
                                                 @endforeach
                                             </select>    
                                         </td>
                                         <td>
-                                            <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                            <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                                                 @foreach ($department as $rowdept)
                                                     <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                                 @endforeach
@@ -761,6 +834,21 @@
                                 select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                                 $('#arr_place' + count).val(val.place_id).formSelect();
                                 $('#arr_department' + count).val(val.department_id).formSelect();
+                                if(val.old_prices.length > 0){
+                                    $.each(val.old_prices, function(i, value) {
+                                        if($('#supplier_id').val()){
+                                            if(value.supplier_id == $('#supplier_id').val()){
+                                                $('#tempPrice' + count).append(`
+                                                    <option value="` + value.price + `">` + value.purchase_code + ` Supplier ` + value.supplier_name + ` Tgl ` + value.post_date + `</option>
+                                                `);
+                                            }
+                                        }else{
+                                            $('#tempPrice' + count).append(`
+                                                <option value="` + value.price + `">` + value.purchase_code + ` Supplier ` + value.supplier_name + ` Tgl ` + value.post_date + `</option>
+                                            `);
+                                        }
+                                    });
+                                }
                             });
                         }
 
@@ -801,7 +889,8 @@
                         <span id="arr_unit` + count + `">-</span>
                     </td>
                     <td class="center">
-                        <input name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                        <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                        <datalist id="tempPrice` + count + `"></datalist>
                     </td>
                     <td>
                         <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
@@ -841,14 +930,14 @@
                         <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
                     </td>
                     <td>
-                        <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                             @foreach ($place as $rowplace)
                                 <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
                             @endforeach
                         </select>    
                     </td>
                     <td>
-                        <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                             @foreach ($department as $rowdept)
                                 <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                             @endforeach

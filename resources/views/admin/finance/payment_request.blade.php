@@ -125,7 +125,9 @@
                                                         <th rowspan="2">Partner Bisnis</th>
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th rowspan="2">Kas/Bank</th>
-                                                        <th colspan="3" class="center-align">Tanggal</th>
+                                                        <th rowspan="2">Tipe Pembayaran</th>
+                                                        <th rowspan="2">No.Cek/BG</th>
+                                                        <th colspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Admin</th>
                                                         <th rowspan="2">Bayar</th>
@@ -140,7 +142,6 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Post</th>
-                                                        <th>Tenggat</th>
                                                         <th>Bayar</th>
                                                         <th>Kode</th>
                                                         <th>Konversi</th>
@@ -190,16 +191,25 @@
                                 <label class="active" for="account_id">Kas / Bank</label>
                             </div>
                             <div class="input-field col m3 s12">
+                                <select class="form-control" id="payment_type" name="payment_type">
+                                    <option value="1">Tunai</option>
+                                    <option value="2">Transfer</option>
+                                    <option value="3">Cek</option>
+                                    <option value="4">BG</option>
+                                </select>
+                                <label class="" for="payment_type">Tipe Pembayaran</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="payment_no" name="payment_no" type="text" value="-">
+                                <label class="active" for="payment_no">No. CEK/BG</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="top" name="top" min="0" type="number" value="0" readonly>
                                 <label class="active" for="top">TOP (hari) Autofill</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                                <label class="active" for="due_date">Tgl. Kadaluarsa</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="pay_date" name="pay_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar">
@@ -422,7 +432,6 @@
             dismissible: false,
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ date("Y-m-d") }}');
-                $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
@@ -537,11 +546,11 @@
                             $('#list-used-data').append(`
                                 <div class="chip purple darken-4 gradient-shadow white-text">
                                     ` + val.rawcode + `
-                                    <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `)">close</i>
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
                                 </div>
                             `);
                             $('#body-detail').append(`
-                                <tr class="row_detail">
+                                <tr class="row_detail" data-code="` + val.rawcode + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                     <td class="center-align">
                                         <label>
@@ -571,7 +580,7 @@
                                         ` + val.grandtotal + `
                                     </td>
                                     <td class="center">
-                                        <input id="arr_pay` + count + `" name="arr_pay[]" class="browser-default" type="text" value=" `+ val.balance + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                        <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.grandtotal + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                     </td>
                                     <td class="center">
                                         <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;">
@@ -619,8 +628,6 @@
                     $('#user_bank_id').formSelect();
 
                     $('#top').val(response.top);
-
-                    addDays();
                     
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
@@ -648,8 +655,14 @@
             `);
             $('#deposit').val('0,000');
             $('#top').val('0');
-            $('#due_date').val('');
             $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
+        }
+    }
+
+    function checkTotal(element){
+        var nil = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")), max = parseFloat($(element).data('grandtotal').replaceAll(".", "").replaceAll(",","."));
+        if(nil > max){
+            $(element).val($(element).data('grandtotal'));
         }
     }
 
@@ -685,7 +698,7 @@
         countAll();
     }
 
-    function removeUsedData(table,id){
+    function removeUsedData(table,id,code){
         $.ajax({
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
@@ -701,7 +714,7 @@
                 
             },
             success: function(response) {
-                $('.row_item[data-id="' + id + '"]').remove();
+                $('.row_detail[data-code="' + code + '"]').remove();
                 countAll();
             },
             error: function() {
@@ -755,8 +768,9 @@
                 { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'coa_source_id', className: 'center-align' },
+                { name: 'payment_type', className: 'center-align' },
+                { name: 'payment_no', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'due_date', className: 'center-align' },
                 { name: 'pay_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
@@ -951,10 +965,11 @@
                     <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
                 `);
                 $('#company_id').val(response.company_id).formSelect();
+                $('#payment_type').val(response.payment_type).formSelect();
+                $('#payment_no').val(response.payment_no);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
                 $('#pay_date').val(response.pay_date);                
                 $('#note').val(response.note);
                 $('#account_bank').val(response.account_bank);
@@ -968,7 +983,7 @@
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#body-detail').append(`
-                            <tr class="row_detail">
+                            <tr class="row_detail" data-code="` + val.rawcode + `">
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                 <td class="center-align">
                                     <label>
@@ -1168,12 +1183,6 @@
         window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&company=" + company + "&account=" + account + "&currency=" + currency;
     }
 
-    function addDays(){
-        var result = new Date($('#post_date').val());
-        result.setDate(result.getDate() + parseInt($('#top').val()));
-        $('#due_date').val(result.toISOString().split('T')[0]);
-    }
-
     function cashBankOut(code){
         $.ajax({
             url: '{{ Request::url() }}/get_payment_data',
@@ -1200,7 +1209,7 @@
                     $('#list-used-data-pay').append(`
                         <div class="chip purple darken-4 gradient-shadow white-text">
                             ` + response.data.code + `
-                            <i class="material-icons close data-used-pay" onclick="removeUsedData('payment_requests',` + response.data.id + `)">close</i>
+                            <i class="material-icons close data-used-pay" onclick="removeUsedData('payment_requests',` + response.data.id + `,'` + response.data.code + `')">close</i>
                         </div>
                     `);
                 }else{

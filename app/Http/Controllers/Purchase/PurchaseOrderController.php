@@ -292,6 +292,7 @@ class PurchaseOrderController extends Controller
                         'purchase_request_detail_id'    => $row->id,
                         'item_id'                       => $row->item_id,
                         'item_name'                     => $row->item->code.' - '.$row->item->name,
+                        'old_prices'                    => $row->item->oldPrices($this->dataplaces),
                         'unit'                          => $row->item->buyUnit->code,
                         'qty'                           => number_format($row->qtyBalance(),3,',','.'),
                         'note'                          => $row->note,

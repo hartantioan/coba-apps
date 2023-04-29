@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
+use App\Models\Company;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -35,6 +36,7 @@ class PurchaseRequestController extends Controller
         $data = [
             'title'     => 'Purchase Request',
             'content'   => 'admin.purchase.request',
+            'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'=> Department::where('status','1')->get(),
         ];
@@ -47,6 +49,7 @@ class PurchaseRequestController extends Controller
             'id',
             'user_id',
             'code',
+            'company_id',
             'post_date',
             'due_date',
             'required_date',
@@ -63,7 +66,7 @@ class PurchaseRequestController extends Controller
 
         $dataplaces = $user->userPlaceArray();
 
-        $total_data = PurchaseRequest::whereIn('place_id',$dataplaces)->count();
+        $total_data = PurchaseRequest::count();
         
         $query_data = PurchaseRequest::where(function($query) use ($search, $request, $dataplaces) {
                 if($search) {
@@ -89,8 +92,6 @@ class PurchaseRequestController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                $query->whereIn('place_id',$dataplaces);
             })
             ->offset($start)
             ->limit($length)
@@ -121,8 +122,6 @@ class PurchaseRequestController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                $query->whereIn('place_id',$dataplaces);
             })
             ->count();
 
@@ -134,10 +133,10 @@ class PurchaseRequestController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->user->name,
                     $val->code,
-                    $val->place->name.' - '.$val->place->company->name,
-                    date('d M Y',strtotime($val->post_date)),
-                    date('d M Y',strtotime($val->due_date)),
-                    date('d M Y',strtotime($val->required_date)),
+                    $val->company->name,
+                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/y',strtotime($val->due_date)),
+                    date('d/m/y',strtotime($val->required_date)),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -190,7 +189,7 @@ class PurchaseRequestController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.$row->qty.'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.date('d M Y',strtotime($row->required_date)).'</td>
@@ -308,7 +307,6 @@ class PurchaseRequestController extends Controller
                     $query->where('status',$request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		
@@ -330,7 +328,7 @@ class PurchaseRequestController extends Controller
 			'required_date'		        => 'required',
             'note'		                => 'required',
             'arr_item'                  => 'required|array',
-            'place_id'                  => 'required',
+            'company_id'                => 'required',
             'arr_warehouse'             => 'required|array',
             'arr_place'                 => 'required|array',
             'arr_department'            => 'required|array'
@@ -341,7 +339,7 @@ class PurchaseRequestController extends Controller
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array.',
-            'place_id.required'                 => 'Penempatan lokasi tidak boleh kosong.',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'arr_warehouse.required'            => 'Gudang tujuan tidak boleh kosong.',
             'arr_warehouse.array'               => 'Gudang harus dalam bentuk array.',
             'arr_place.required'                => 'Penempatan tujuan tidak boleh kosong.',
@@ -389,8 +387,7 @@ class PurchaseRequestController extends Controller
                         $query->note = $request->note;
                         $query->document = $document;
                         $query->project_id = $request->project_id ? $request->project_id : NULL;
-                        $query->place_id = $request->place_id;
-                        $query->department_id = session('bo_department_id');
+                        $query->company_id = $request->company_id;
                         $query->save();
 
                         foreach($query->purchaseRequestDetail as $row){
@@ -413,8 +410,7 @@ class PurchaseRequestController extends Controller
                     $query = PurchaseRequest::create([
                         'code'			=> PurchaseRequest::generateCode(),
                         'user_id'		=> session('bo_id'),
-                        'place_id'      => $request->place_id,
-                        'department_id'	=> session('bo_department_id'),
+                        'company_id'    => $request->company_id,
                         'status'        => '1',
                         'post_date'     => $request->post_date,
                         'due_date'      => $request->due_date,
@@ -558,7 +554,6 @@ class PurchaseRequestController extends Controller
         $data_pr = [];
         if($query) {
             if($query->purchaseOrderDetailComposition()->exists()){
-               info("masuk sini");
                 $pr = [
                     "Kode" => $query->code,
                     'tipe'=>"buka",
@@ -600,19 +595,15 @@ class PurchaseRequestController extends Controller
                                 'status'  => 200,
                                 'message' => $data_po
                             ];
-                            info($data_po);
                         }
                     }else{
-                        info("tdkmasuk sini2");
+
                     }
                 }
             }else{
-                info("tidak masuk sini");
-               
-                
+
             }
         } else {
-            info("rusak sini");
             $data_good_receipt = [];
             $response = [
                 'status'  => 500,

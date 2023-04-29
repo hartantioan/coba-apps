@@ -65,7 +65,6 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
                 });
             }
         })
-        ->whereIn('place_id',$this->dataplaces)
         ->get();
 
         $arr = [];

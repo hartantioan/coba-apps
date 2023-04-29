@@ -129,7 +129,7 @@
 						<th rowspan="2">No</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Kode</th>
-						<th colspan="4">Tanggal</th>
+						<th colspan="3">Tanggal</th>
                         <th rowspan="2">Keterangan</th>
                         <th rowspan="2">Dokumen</th>
                         <th rowspan="2">Status</th>
@@ -137,7 +137,6 @@
                     <tr align="center">
 						<th>Pengajuan</th>
 						<th>Kadaluarsa</th>
-                        <th>Dokumen</th>
                         <th>Pakai</th>
 					</tr>
 				</thead>

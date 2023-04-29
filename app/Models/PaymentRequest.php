@@ -21,8 +21,9 @@ class PaymentRequest extends Model
         'account_id',
         'company_id',
         'coa_source_id',
+        'payment_type',
+        'payment_no',
         'post_date',
-        'due_date',
         'pay_date',
         'currency_id',
         'currency_rate',
@@ -93,6 +94,18 @@ class PaymentRequest extends Model
         };
 
         return $status;
+    }
+
+    public function paymentType(){
+        $payment_type = match ($this->payment_type) {
+          '1' => 'Tunai',
+          '2' => 'Transfer',
+          '3' => 'Cek',
+          '4' => 'BG',
+          default => 'Invalid',
+        };
+
+        return $payment_type;
     }
 
     public function statusRaw(){

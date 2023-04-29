@@ -21,8 +21,8 @@ class FundRequest extends Model
         'place_id',
         'department_id',
         'account_id',
+        'type',
         'post_date',
-        'due_date',
         'required_date',
         'currency_id',
         'currency_rate',
@@ -82,6 +82,28 @@ class FundRequest extends Model
 
     public function hasPaymentRequestDetail(){
         return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function balancePaymentRequest(){
+        $total = $this->grandtotal;
+
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
+            $query->whereIn('status',['2','3']);
+        })->get() as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
+    public function type(){
+        $type = match ($this->type) {
+          '1' => 'BS',
+          '2' => 'OPM',
+          default => 'Invalid',
+        };
+
+        return $type;
     }
 
     public function status(){

@@ -7,7 +7,9 @@
             <th rowspan="2">Partner Bisnis</th>
             <th rowspan="2">Site</th>
             <th rowspan="2">Kas/Bank</th>
-            <th colspan="3" class="center-align">Tanggal</th>
+            <th rowspan="2">Tipe Pembayaran</th>
+            <th rowspan="2">No.Cek/BG</th>
+            <th colspan="2" class="center-align">Tanggal</th>
             <th colspan="2" class="center-align">Mata Uang</th>
             <th rowspan="2">Dokumen</th>
             <th rowspan="2">Bank Rekening</th>
@@ -20,7 +22,6 @@
         </tr>
         <tr align="center">
             <th>Post</th>
-            <th>Tenggat</th>
             <th>Bayar</th>
             <th>Kode</th>
             <th>Konversi</th>
@@ -35,8 +36,9 @@
                 <td>{{ $row->account->name }}</td>
                 <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
                 <td>{{ $row->coaSource->name }}</td>
+                <td>{{ $row->paymentType() }}</td>
+                <td>{{ $row->payment_no }}</td>
                 <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-                <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                 <td>{{ date('d/m/y',strtotime($row->pay_date)) }}</td>
                 <td>{{ $row->currency->code }}</td>
                 <td>{{ number_format($row->currency_rate,3,',','.') }}</td>

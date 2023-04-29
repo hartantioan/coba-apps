@@ -143,7 +143,6 @@
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
                 <h5 class="indigo-text">Purchase Request</h5>
-                <span>Dept. {{ $data->department->name }}</span>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">

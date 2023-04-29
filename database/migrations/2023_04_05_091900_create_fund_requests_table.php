@@ -20,8 +20,8 @@ return new class extends Migration
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('account_id')->nullable();
+            $table->char('type',1)->nullable();
             $table->date('post_date')->nullable();
-            $table->date('due_date')->nullable();
             $table->date('required_date')->nullable();
             $table->bigInteger('currency_id')->nullable();
             $table->double('currency_rate')->nullable();

@@ -72,12 +72,32 @@ class Item extends Model
 
     public function currentCogs($dataplaces){
         $arrPrice = [];
-        foreach($dataplaces as $row){
-            $price = ItemCogs::where('item_id',$this->id)->where('place_id',intval($row))->orderByDesc('id')->first();
-            if($price){
+            
+        $price = ItemCogs::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->orderByDesc('id')->first();
+        if($price){
+            $arrPrice[] = [
+                'description'   => $price->company->name.' - '.date('d/m/y',strtotime($price->date)),
+                'price'         => number_format($price->price_final,2,',','.'),
+            ];
+        }
+        
+        return $arrPrice;
+    }
+
+    public function oldPrices($dataplaces){
+        $arrPrice = [];
+        $po = PurchaseOrder::whereHas('purchaseOrderDetail', function($query) use ($dataplaces){
+                $query->where('item_id',$this->id)->whereIn('place_id',$dataplaces);
+            })->orderByDesc('post_date')->get();
+        
+        foreach($po as $row){
+            foreach($row->purchaseOrderDetail()->where('item_id',$this->id)->get() as $rowdetail){
                 $arrPrice[] = [
-                    'description'   => $price->company->name.' - '.date('d/m/y',strtotime($price->date)),
-                    'price'         => number_format($price->price_final,2,',','.'),
+                    'purchase_code' => $row->code,
+                    'supplier_id'   => $row->account_id,
+                    'supplier_name' => $row->supplier->name,
+                    'price'         => number_format($rowdetail->price,2,',','.'),
+                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
                 ];
             }
         }
@@ -97,16 +117,15 @@ class Item extends Model
 
     public function currentStock($dataplaces){
         $arrData = [];
-        foreach($dataplaces as $row){
-            $data = ItemStock::where('item_id',$this->id)->where('place_id',intval($row))->get();
-            foreach($data as $detail){
-                $arrData[] = [
-                    'id'            => $detail->id,
-                    'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
-                    'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
-                    'qty_raw'       => number_format($detail->qty,3,',','.'),
-                ];
-            }
+
+        $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->get();
+        foreach($data as $detail){
+            $arrData[] = [
+                'id'            => $detail->id,
+                'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
+                'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
+                'qty_raw'       => number_format($detail->qty,3,',','.'),
+            ];
         }
         
         return $arrData;

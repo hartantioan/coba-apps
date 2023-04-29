@@ -128,10 +128,6 @@
                         <small>Diajukan:</small>
                         <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
-                    <div class="mr-2">
-                        <small>Tenggat:</small>
-                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
-                    </div>
                     <div>
                         <small>Dibayar:</small>
                         <span>{{ date('d/m/y',strtotime($data->pay_date)) }}</span>
@@ -189,11 +185,19 @@
                     <div class="col s9">
                         {{ $data->account->name }}
                     </div>
+                    @if($data->payment_type == '2')
                     <div class="col s3">
                         Rek. Tujuan
                     </div>
                     <div class="col s9">
                         {{ $data->account_bank.' - '.$data->account_no.' - '.$data->account_name }}
+                    </div>
+                    @endif
+                    <div class="col s3">
+                        Tipe Pembayaran
+                    </div>
+                    <div class="col s9">
+                        {{ $data->paymentType() }}
                     </div>
                     <div class="col s3">
                         Lampiran

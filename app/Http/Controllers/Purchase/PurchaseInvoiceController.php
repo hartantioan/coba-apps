@@ -53,14 +53,14 @@ class PurchaseInvoiceController extends Controller
         $datadp = PurchaseDownPayment::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datadp as $row){
-            if($row->balanceDp() > 0){
+            if($row->balanceInvoice() > 0){
                 $downpayments[] = [
                     'rawcode'       => $row->code,
                     'code'          => CustomHelper::encrypt($row->code),
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'total'         => number_format($row->total,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'balance'       => number_format($row->balanceDp(),2,',','.'),
+                    'balance'       => number_format($row->balanceInvoice(),2,',','.'),
                 ];
             }
         }
@@ -529,6 +529,7 @@ class PurchaseInvoiceController extends Controller
                                 'purchase_invoice_id'   => $query->id,
                                 'good_receipt_id'       => $row == 'good_receipt' ? GoodReceipt::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
                                 'landed_cost_id'        => $row == 'landed_cost' ? LandedCost::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
+                                'purchase_order_id'     => $row == 'purchase_order' ? PurchaseOrder::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
                                 'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                                 'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
                                 'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
@@ -593,7 +594,7 @@ class PurchaseInvoiceController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">GR. PO / Landed Cost</th>
+                                <th class="center-align">GR. PO / Landed Cost / Purchase Order</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
                                 <th class="center-align">PPH</th>
@@ -605,7 +606,7 @@ class PurchaseInvoiceController extends Controller
             foreach($data->purchaseInvoiceDetail as $key => $row){
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
-                    <td>'.($row->goodReceipt()->exists() ? $row->goodReceipt->code : $row->landedCost->code).'</td>
+                    <td class="center-align">'.($row->getCode()).'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>

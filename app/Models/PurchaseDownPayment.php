@@ -66,11 +66,6 @@ class PurchaseDownPayment extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function purchaseRequest()
-    {
-        return $this->belongsTo('App\Models\PurchaseRequest', 'purchase_request_id', 'id')->withTrashed();
-    }
-
     public function supplier(){
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }
@@ -126,10 +121,22 @@ class PurchaseDownPayment extends Model
         return $this->hasMany('App\Models\PurchaseInvoiceDp');
     }
 
-    public function balanceDp(){
+    public function balanceInvoice(){
         $total = $this->grandtotal;
 
         foreach($this->purchaseInvoiceDp()->whereHas('purchaseInvoice', function($query){
+            $query->whereIn('status',['2','3']);
+        })->get() as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
+    public function balancePaymentRequest(){
+        $total = $this->grandtotal;
+
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
             $query->whereIn('status',['2','3']);
         })->get() as $row){
             $total -= $row->nominal;

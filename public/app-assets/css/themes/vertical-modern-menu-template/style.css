@@ -3893,7 +3893,8 @@ a
 
 html
 {
-    font-family: 'Muli', sans-serif !important;
+    /* font-family: 'Muli', sans-serif !important; */
+    font-family: 'serif' !important;
     font-weight: normal;
     line-height: 1.5;
 

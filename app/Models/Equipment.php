@@ -46,6 +46,10 @@ class Equipment extends Model
     public function equipmentPart(){
         return $this->hasMany('App\Models\EquipmentPart');
     }
+    
+    public function workorder(){
+        return $this->hasMany('App\Models\WorkOrder');
+    }
 
     public function attachment() 
     {

@@ -55,6 +55,10 @@ class Place extends Model
         return $this->belongsTo('App\Models\Region','province_id','id')->withTrashed();
     }
 
+    public function workorder(){
+        return $this->hasMany('App\Models\WorkOrder');
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',

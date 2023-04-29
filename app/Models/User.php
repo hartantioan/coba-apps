@@ -297,4 +297,7 @@ class User extends Authenticatable
             return '';
         }
     }
+    public function workorder(){
+        return $this->hasMany('App\Models\WorkOrder');
+    }
 }

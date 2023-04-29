@@ -34,6 +34,9 @@ class EquipmentPart extends Model
     public function sparepart(){
         return $this->hasMany('App\Models\EquipmentSparePart');
     }
+    public function workOrderPartDetail(){
+        return $this->hasMany('App\Models\WorkOrderPartDetail');
+    }
 
     public function status(){
         switch($this->status) {

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\PurchaseRequest;
+use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequestDetail;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -557,58 +558,119 @@ class PurchaseRequestController extends Controller
     }
     public function viewStructureTree(Request $request){
         $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        $data_pr = [];
+        $data_go_chart = [];
+        $data_link = [];
+        $pr = [
+                'key'   => $query->code,
+                "name"  => $query->code,
+                "color" => "lightblue",
+                'properties'=> [
+                     ['name'=> "Tanggal: ".$query->post_date],
+                     ['name'=> "url", 'type'=> request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code)],
+                  ],
+                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+                "title" =>$query->code,
+            ];
+        $data_go_chart[]=$pr;
+        $data_good_receipts = [];
+        $data_pos=[];
         if($query) {
-            if($query->purchaseOrderDetailComposition()->exists()){
-                $pr = [
-                    "Kode" => $query->code,
-                    'tipe'=>"buka",
-                    "name" => "Purchase Request",
-                    'url'=>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
-                    "title" =>$query->code,
-                ];
-                $data_pr[] = $pr;
-               foreach($query->purchaseOrderDetailComposition as $row){
-
-                    if($row->purchaseOrderDetail->exists()){
-                       $po=$row->purchaseOrderDetail->purchaseOrder;
-                       $data_po = [
-                            "Kode" => $po->code,
-                            'tipe'=>"buka",
-                            "name" => "Purchase Order",
-                            'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($po->code),
-                            "title"=>  $po->code,
+            foreach($query->purchaseRequestDetail as $purchase_request_detail){
+                if($purchase_request_detail->purchaseOrderDetail()->exists()){
+                   foreach($purchase_request_detail->purchaseOrderDetail as $purchase_order_detail){
+                        $po=[
+                            'properties'=> [
+                                ['name'=> "Tanggal: ".$purchase_order_detail->purchaseOrder->post_date],
+                                ['name'=> "url", 'type'=> request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($purchase_order_detail->purchaseOrder->code)],
+                             ],
+                            'key'=>$purchase_order_detail->purchaseOrder->code,
+                            'name'=>$purchase_order_detail->purchaseOrder->code,
+                            'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($purchase_order_detail->purchaseOrder->code),
                         ];
-                        if($po->goodReceipt()->exists()){
-                            $data_good_receipt = [
-                                'tipe'=>"buka",
-                                "Kode" => $po->goodReceipt->goodReceiptMain->code,
-                                "name" => "Good Receipt",
-                                'title'=> $po->goodReceipt->goodReceiptMain->code,
-                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($po->goodReceipt->goodReceiptMain->code),
-                                'children'=>[],
-                            ];
-                            $data_po["children"] = $data_pr;
-                            $data_good_receipt["children"][] = $data_po;
+                        info(count($data_pos));
+                        if(count($data_pos)<1){
+                            $data_pos[]=$po;
+                            $data_go_chart[]=$po;
+                            $data_link[]=[
+                                'from'=>$query->code,
+                                'to'=>$po["key"],
+                            ];  
                             
-                            $response = [
-                                'status'  => 200,
-                                'message' => $data_good_receipt
-                            ];
                         }else{
-                            $data_po["children"] = $data_pr;
-                            $response = [
-                                'status'  => 200,
-                                'message' => $data_po
-                            ];
+                            $found = false;
+                            foreach ($data_pos as $key => $row_pos) {
+                                if ($row_pos["key"] == $po["key"]) {
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                $data_pos[] = $po;
+                                $data_link[]=[
+                                    'from'=>$query->code,
+                                    'to'=>$po["key"],
+                                ];  
+                                $data_go_chart[]=$po;
+                            }
                         }
-                    }else{
+                        
+                        if($purchase_order_detail->goodReceiptDetail()->exists()){
+                            foreach($purchase_order_detail->goodReceiptDetail as $good_receipt_detail){
+                                $data_good_receipt = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
+                                        ['name'=> "url", 'type'=> request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code)],
+                                     ],
+                                    "key" => $good_receipt_detail->goodReceipt->code,
+                                    "name" => $good_receipt_detail->goodReceipt->code,
+                                    
+                                    'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code),
+                                    
+                                ];
+                            }
+                        }
+                
+                        if(count($data_good_receipts)<1){
+                            $data_good_receipts[]=$data_good_receipt;
+                            $data_link[]=[
+                                'from'=>$purchase_order_detail->purchaseOrder->code,
+                                'to'=>$data_good_receipt["key"],
+                            ];
+                            $data_go_chart[]=$data_good_receipt;  
+                        }else{
+                            $found = false;
+                            foreach($data_good_receipts as $tempdg){
+                                if ($tempdg["key"] == $data_good_receipt["key"]) {
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                $data_good_receipts[]=$data_good_receipt;
+                                $data_link[]=[
+                                    'from'=>$purchase_order_detail->purchaseOrder->code,
+                                    'to'=>$data_good_receipt["key"],
+                                ];  
+                                $data_go_chart[]=$data_good_receipt; 
+                            }
+                        }
+                        
 
-                    }
+                    }//selesaiforeachdetailpo
+
+                }//selesai if
+                else{
+                    $data_good_receipts[]=$pr;
                 }
-            }else{
-
             }
+            
+            
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link,
+            ];
+            
         } else {
             $data_good_receipt = [];
             $response = [

@@ -764,55 +764,146 @@ class GoodReceiptPOController extends Controller
     
     public function viewStructureTree(Request $request){
         $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
-        
+        $data_go_chart=[];
+        $data_link=[];
         if($query) {
             $data_good_receipt = [
-                'tipe'=>"buka",
-                "Kode" => $query->code,
-                "name" => "Good Receipt",
-                'title'=> $query->code,
+                "name"=>$query->code,
+                "key" => $query->code,
+                "color"=>"lightblue",
+                'properties'=> [
+                    ['name'=> "Tanggal :".$query->post_date],
+                ],
                 'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($query->code),
-                'children'=>[],
             ];
-            $data_po = [];
-            foreach($query->goodReceipt as $row){
-                if($row->purchaseOrder()->exists()){
+            $data_go_chart[]=$data_good_receipt;
+            $data_pos=[];
+            $data_reqs=[];
+            
+            foreach($query->goodReceiptDetail as $good_receipt_detail){
+                $data_po = [
+                    "key" => $good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
+                    "name" => $good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
+                    'grandtotal'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,
+                    'properties'=> [
+                        ['name'=> "Tanggal :".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
+                    ],
+                    'arrowDirection'=>"left",
+                    'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($good_receipt_detail->purchaseOrderDetail->purchaseOrder->code),
+                ];
+                
+                $purchase_order_detail = $good_receipt_detail->purchaseOrderDetail;
+                
+                if($purchase_order_detail->purchaseRequestDetail()->exists()){
                     
-                    $po = [
-                        "Kode" => $row->purchaseOrder->code,
-                        'tipe'=>"buka",
-                        "name" => "Purchase Order",
-                        'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),
-                        "title"=>  $row->purchaseOrder->code,
+                    $purchase_request_detail=$purchase_order_detail->purchaseRequestDetail;
+                    $pr = [
+                        "key" => $purchase_request_detail->purchaseRequest->code,
+                        "name" => $purchase_request_detail->purchaseRequest->code,
+                        'properties'=> [
+                            ['name'=> "Tanggal :".$purchase_request_detail->purchaseRequest->post_date],
+                        ],
+                        'arrowDirection'=>"left",
+                        'url'=>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($purchase_request_detail->purchaseRequest->code),
                     ];
-                    
-                    if($row->purchaseOrder->purchaseOrderDetail()->exists()){
-                        $data_pr = [];
-                        foreach($row->purchaseOrder->purchaseOrderDetail as $rowdetail){
-                            if($rowdetail->purchaseOrderDetailComposition()->exists()){
-                                foreach($rowdetail->purchaseOrderDetailComposition as $row_purchase_compose){
-                                    $pr = [
-                                        "Kode" => $row_purchase_compose->purchaseRequest->code,
-                                        'tipe'=>"buka",
-                                        "name" => "Purchase Request",
-                                        'url'=>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($row_purchase_compose->purchaseRequest->code),
-                                        "title" =>$row_purchase_compose->purchaseRequest->code,
-                                    ];
-                                    $data_pr[] = $pr;
-                                }
+                    if(count($data_reqs)<1){
+                        $data_reqs[]=$pr;
+                        $data_go_chart[]=$pr;
+                        $data_link[]=[
+                            'from'=>$pr["key"],
+                            'to'=>$data_po["key"],
+                        ];  
+                        
+                    }else{
+                        $found = false;
+                        foreach ($data_reqs as $key => $row_pos) {
+                            if ($row_pos["key"] == $pr["key"]) {
+                                $found = true;
+                                break;
                             }
                         }
-                        $po["children"] = $data_pr;
+                        if (!$found) {
+                            $data_reqs[]=$pr;
+                            $data_go_chart[]=$pr;
+                            $data_link[]=[
+                                'from'=>$pr["key"],
+                                'to'=>$data_po["key"],
+                            ];  
+                        }
                     }
-                    $data_po[] = $po;
+                }
+                if(count($data_pos)<1){
+                    $data_pos[]=$data_po;
+                    $data_go_chart[]=$data_po;
+                    $data_link[]=[
+                        'from'=>$data_po["key"],
+                        'to'=>$query->code,
+                    ];  
+                    
                 }else{
-
+                    $found = false;
+                    foreach ($data_pos as $key => $row_pos) {
+                        if ($row_pos["key"] == $data_po["key"]) {
+                            $found = true;
+                            break;
+                        }
+                    }
+                    if (!$found) {
+                        $data_pos[] = $data_po;
+                        $data_go_chart[]=$data_po;
+                        $data_link[]=[
+                            'from'=>$data_po["key"],
+                            'to'=>$query->code,
+                        ];  
+                    }
                 }
             }
-            $data_good_receipt["children"] = $data_po;
+            //pengambilan inovoice
+            if($query->purchaseInvoiceDetail()->exists()){
+                foreach($query->purchaseInvoiceDetail as $purchase_invoce_detail){
+                    $data_iv = [
+                        "key" => $purchase_invoce_detail->purchaseInvoice->code,
+                        "name" => $purchase_invoce_detail->purchaseInvoice->code,
+                        'grandtotal'=>$purchase_invoce_detail->purchaseInvoice->grandtotal,
+                        'properties'=> [
+                            ['name'=> "Tanggal :".$purchase_invoce_detail->purchaseInvoice->post_date],
+                        ],
+                        'arrowDirection'=>"right",
+                        'url'=>request()->root()."/admin/inventory/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoce_detail->purchaseInvoice->code),
+                    ];
+                    $data_go_chart[]=$data_iv;
+                    $data_link[]=[
+                        'from'=>$query->code,
+                        'to'=>$purchase_invoce_detail->purchaseInvoice->code,
+                    ];  
+                }
+            }
+            
+            //pengambilan landed_cost
+
+            if($query->landedCost()->exists()){
+                foreach($query->landedCost as $landed_cost){
+                    $data_lc=[
+                        "key" => $landed_cost->code,
+                        "name" => $landed_cost->code,
+                        'grandtotal'=>$landed_cost->grandtotal,
+                        'properties'=> [
+                            ['name'=> "Tanggal :".$landed_cost->post_date],
+                        ],
+                        'arrowDirection'=>"right",
+                        'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost->code)
+                    ];
+                    $data_go_chart[]=$data_lc;
+                    $data_link[]=[
+                        'from'=>$query->code,
+                        'to'=>$landed_cost->code,
+                    ]; 
+                }
+            }
             $response = [
                 'status'  => 200,
-                'message' => $data_good_receipt
+                'message' => $data_go_chart,
+                'link'    => $data_link
             ];
         } else {
             $data_good_receipt = [];

@@ -17,6 +17,8 @@ use App\Models\Bank;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
 use App\Models\Project;
+use App\Models\Equipment;
+use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -645,6 +647,50 @@ class Select2Controller extends Controller {
             ];
         }
 
+        return response()->json(['items' => $response]);
+    }
+
+    public function equipment(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Equipment::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+        return response()->json(['items' => $response]);
+    }
+
+    public function workOrder(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = WorkOrder::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhereHas('equipment',function($query) use($search){
+                        $query->where('name','like',"%$search%");
+                    })
+                    ->orWhereHas('user',function($query) use($search){
+                        $query->where('name','like',"%$search%");
+                    });
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'equipment'     => $d->equipment->id
+            ];
+        }
         return response()->json(['items' => $response]);
     }
 }

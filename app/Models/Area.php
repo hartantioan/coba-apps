@@ -34,6 +34,7 @@ class Area extends Model
 
         return $status;
     }
+    
 
     public static function generateCode()
     {
@@ -51,5 +52,9 @@ class Area extends Model
         $no = str_pad($code, 6, 0, STR_PAD_LEFT);
 
         return 'AR'.$no;
+    }
+
+    public function workorder(){
+        return $this->hasMany('App\Models\WorkOrder');
     }
 }

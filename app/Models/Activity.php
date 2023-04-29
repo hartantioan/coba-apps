@@ -26,6 +26,10 @@ class Activity extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id');
     }
 
+    public function workorder(){
+        return $this->hasMany('App\Models\WorkOrder');
+    }
+
     public function status(){
         switch($this->status) {
             case '1':

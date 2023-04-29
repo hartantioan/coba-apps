@@ -244,13 +244,13 @@ class MenuController extends Controller
                     ->log('Add / edit menu.');
 
                 $newdata = [];
-
+                
                 if($query->table_name){
                     ApprovalTable::where('menu_id',$query->id)->update([
                         'table_name'    => $query->table_name
                     ]);
                 }
-
+                
                 $newdata[] = '<option value="">Parent (Utama)</option>';
 
                 foreach(Menu::whereNull('parent_id')->get() as $m){

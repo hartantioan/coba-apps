@@ -61,6 +61,9 @@ use App\Http\Controllers\Setting\DataAccessController;
 use App\Http\Controllers\Misc\Select2Controller;
 use App\Http\Controllers\Misc\NotificationController;
 
+
+use App\Http\Controllers\Maintenance\WorkOrderController;
+use App\Http\Controllers\Maintenance\RequestSparepartController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -76,7 +79,6 @@ Route::get('/', function () {
     return redirect('/admin/login');
 });
 
-Route::get("read-xml", [ReadXmlTaxController::class, "index"]);
 
 Route::prefix('admin')->group(function () {
     Route::prefix('login')->group(function () {
@@ -120,6 +122,8 @@ Route::prefix('admin')->group(function () {
             Route::get('unit', [Select2Controller::class, 'unit']);
             Route::get('coa_cash_bank', [Select2Controller::class, 'coaCashBank']);
             Route::get('payment_request', [Select2Controller::class, 'paymentRequest']);
+            Route::get('equipment', [Select2Controller::class, 'equipment']);
+            Route::get('workorder', [Select2Controller::class, 'workOrder']);
         });
 
         Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -502,6 +506,40 @@ Route::prefix('admin')->group(function () {
             });
         });
 
+        Route::prefix('maintenance')->middleware('direct.access')->group(function () {
+            Route::prefix('work_order')->middleware('operation.access:work_order,view')->group(function () {
+                Route::get('/',[WorkOrderController::class, 'index']);
+                Route::get('datatable',[WorkOrderController::class, 'datatable']);
+                Route::post('get_equipment_part', [WorkOrderController::class, 'getEquipmentPart']);
+                Route::post('create',[WorkOrderController::class, 'create'])->middleware('operation.access:work_order,update');
+                Route::post('show', [WorkOrderController::class, 'show']);
+                Route::get('row_detail',[WorkOrderController::class, 'rowDetail']);
+                Route::get('export',[WorkOrderController::class, 'export']);
+                Route::post('get_decode',[WorkOrderController::class, 'getDecode']);
+                Route::post('delete_attachment',[WorkOrderController::class, 'deleteAttachment']);
+                Route::post('print',[WorkOrderController::class, 'print']);
+                Route::post('save_user',[WorkOrderController::class, 'saveUser']);
+                Route::post('get_pic',[WorkOrderController::class, 'getPIC']);
+                Route::get('approval/{id}',[WorkOrderController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('void_status', [WorkOrderController::class, 'voidStatus'])->middleware('operation.access:work_order,void');
+                Route::post('destroy', [WorkOrderController::class, 'destroy'])->middleware('operation.access:work_order,delete');
+            });
+
+            Route::prefix('request_sparepart')->middleware('operation.access:request_sparepart,view')->group(function () {
+                Route::get('/',[RequestSparepartController::class, 'index']);
+                Route::get('datatable',[RequestSparepartController::class, 'datatable']);
+                Route::post('get_work_order_info', [RequestSparepartController::class, 'getWorkOrderInfo']);
+                Route::post('create',[RequestSparepartController::class, 'create'])->middleware('operation.access:request_sparepart,update');
+                Route::post('show', [RequestSparepartController::class, 'show']);
+                Route::get('row_detail',[RequestSparepartController::class, 'rowDetail']);
+                Route::get('export',[RequestSparepartController::class, 'export']);
+                Route::post('print',[RequestSparepartController::class, 'print']);
+                Route::get('approval/{id}',[RequestSparepartController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('void_status', [RequestSparepartController::class, 'voidStatus'])->middleware('operation.access:request_sparepart,void');
+                Route::post('destroy', [RequestSparepartController::class, 'destroy'])->middleware('operation.access:request_sparepart,delete');
+            });
+        });
+
         Route::prefix('purchase')->middleware('direct.access')->group(function () {
             Route::prefix('purchase_request')->middleware('operation.access:purchase_request,view')->group(function () {
                 Route::get('/',[PurchaseRequestController::class, 'index']);
@@ -540,6 +578,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('row_detail',[PurchaseDownPaymentController::class, 'rowDetail']);
                 Route::post('show', [PurchaseDownPaymentController::class, 'show']);
                 Route::post('print',[PurchaseDownPaymentController::class, 'print']);
+                Route::get('viewstructuretree',[PurchaseDownPaymentController::class, 'viewStructureTree']);
                 Route::get('export',[PurchaseDownPaymentController::class, 'export']);
                 Route::post('create',[PurchaseDownPaymentController::class, 'create'])->middleware('operation.access:purchase_down_payment,update');
                 Route::post('void_status', [PurchaseDownPaymentController::class, 'voidStatus'])->middleware('operation.access:purchase_down_payment,void');
@@ -555,6 +594,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [LandedCostController::class, 'show']);
                 Route::post('print',[LandedCostController::class, 'print']);
                 Route::get('export',[LandedCostController::class, 'export']);
+                Route::get('viewstructuretree',[LandedCostController::class, 'viewStructureTree']);
                 Route::post('remove_used_data', [LandedCostController::class, 'removeUsedData']);
                 Route::post('create',[LandedCostController::class, 'create'])->middleware('operation.access:landed_cost,update');
                 Route::post('void_status', [LandedCostController::class, 'voidStatus'])->middleware('operation.access:landed_cost,void');
@@ -571,6 +611,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [PurchaseInvoiceController::class, 'show']);
                 Route::post('print',[PurchaseInvoiceController::class, 'print']);
                 Route::get('export',[PurchaseInvoiceController::class, 'export']);
+                Route::get('viewstructuretree',[PurchaseInvoiceController::class, 'viewStructureTree']);
                 Route::post('create',[PurchaseInvoiceController::class, 'create'])->middleware('operation.access:purchase_invoice,update');
                 Route::post('void_status', [PurchaseInvoiceController::class, 'voidStatus'])->middleware('operation.access:purchase_invoice,void');
                 Route::get('approval/{id}',[PurchaseInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');

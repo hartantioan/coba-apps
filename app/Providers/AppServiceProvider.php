@@ -43,6 +43,8 @@ class AppServiceProvider extends ServiceProvider
             'good_receives'             => 'App\Models\GoodReceive',
             'good_issues'               => 'App\Models\GoodIssue',
             'inventory_transfers'       => 'App\Models\InventoryTransfer',
+            'work_orders'               => 'App\Models\WorkOrder',
+            'request_spareparts'         => 'App\Models\RequestSparepart',
         ]);
     }
 }

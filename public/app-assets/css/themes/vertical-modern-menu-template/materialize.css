@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------
 	Materialize file contain extended material ui based on theme
 ---------------------------------------------------------------*/
-@import url(https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,500,600);
+/* @import url(https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,500,600); */
 .materialize-red
 {
     background-color: #e51c23 !important;
@@ -3188,7 +3188,8 @@ optgroup,
 select,
 textarea
 {
-    font-family: 'Muli', sans-serif;
+    /* font-family: 'Muli', sans-serif; */
+    font-family: 'serif' !important;
 }
 
 ul:not(.browser-default)
@@ -5640,7 +5641,8 @@ a
 
 html
 {
-    font-family: 'Muli', sans-serif;
+    /* font-family: 'Muli', sans-serif; */
+    font-family: 'serif' !important;
     font-weight: normal;
     line-height: 1.5;
 

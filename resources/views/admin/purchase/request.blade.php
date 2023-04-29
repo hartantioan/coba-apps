@@ -206,14 +206,14 @@
                                                     <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]"></select>
                                                 </td>
                                                 <td>
-                                                    <select class="form-control" id="arr_place0" name="arr_place[]">
+                                                    <select class="browser-default" id="arr_place0" name="arr_place[]">
                                                         @foreach ($place as $rowplace)
                                                             <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
                                                         @endforeach
                                                     </select>    
                                                 </td>
                                                 <td>
-                                                    <select class="form-control" id="arr_department0" name="arr_department[]">
+                                                    <select class="browser-default" id="arr_department0" name="arr_department[]">
                                                         @foreach ($department as $rowdept)
                                                             <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                                         @endforeach
@@ -754,14 +754,14 @@
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                 </td>
                 <td>
-                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                         @foreach ($place as $rowplace)
                             <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
                         @endforeach
                     </select>    
                 </td>
                 <td>
-                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                         @foreach ($department as $rowdept)
                             <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                         @endforeach

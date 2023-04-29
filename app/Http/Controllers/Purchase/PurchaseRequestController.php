@@ -173,7 +173,7 @@ class PurchaseRequestController extends Controller
         $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="6">Daftar Item</th>
+                                <th class="center-align" colspan="9">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -182,6 +182,9 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Tgl.Dipakai</th>
+                                <th class="center-align">Site</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Departemen</th>
                             </tr>
                         </thead><tbody>';
         
@@ -192,7 +195,10 @@ class PurchaseRequestController extends Controller
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.date('d M Y',strtotime($row->required_date)).'</td>
+                <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
+                <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
+                <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.$row->department->name.'</td>
             </tr>';
         }
         

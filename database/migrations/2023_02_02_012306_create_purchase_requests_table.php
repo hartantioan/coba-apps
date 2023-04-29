@@ -19,8 +19,7 @@ return new class extends Migration
             $table->string('code',155)->unique();
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('project_id')->nullable();
-            $table->bigInteger('place_id')->nullable();
-            $table->bigInteger('department_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->char('status', 1)->nullable();
             $table->date('post_date')->nullable();
             $table->date('due_date')->nullable();
@@ -33,7 +32,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'project_id', 'branch_id', 'plant_id', 'department_id', 'warehouse_id']);
+            $table->index(['user_id', 'project_id', 'company_id']);
         });
     }
 

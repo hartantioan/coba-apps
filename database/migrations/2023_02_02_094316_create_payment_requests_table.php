@@ -24,7 +24,6 @@ return new class extends Migration
             $table->char('payment_type',1)->nullable();
             $table->string('payment_no',155)->nullable();
             $table->date('post_date')->nullable();
-            $table->date('due_date')->nullable();
             $table->date('pay_date')->nullable();
             $table->bigInteger('currency_id')->nullable();
             $table->double('currency_rate')->nullable();

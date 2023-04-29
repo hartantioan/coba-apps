@@ -24,7 +24,6 @@ class PaymentRequest extends Model
         'payment_type',
         'payment_no',
         'post_date',
-        'due_date',
         'pay_date',
         'currency_id',
         'currency_rate',

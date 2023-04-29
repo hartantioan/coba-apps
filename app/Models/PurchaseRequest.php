@@ -19,8 +19,7 @@ class PurchaseRequest extends Model
         'code',
         'user_id',
         'project_id',
-        'place_id',
-        'department_id',
+        'company_id',
         'status',
         'post_date',
         'due_date',
@@ -42,19 +41,14 @@ class PurchaseRequest extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function place()
+    public function company()
     {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
     public function project()
     {
         return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
-    }
-
-    public function department()
-    {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
     public function purchaseRequestDetail()

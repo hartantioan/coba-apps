@@ -90,7 +90,7 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Code</th>
-                                                        <th rowspan="2">Site</th>
+                                                        <th rowspan="2">Perusahaan</th>
                                                         <th colspan="3" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Dokumen</th>
@@ -152,12 +152,12 @@
                                 </div>
                             </div>
                             <div class="input-field col m4 s12">
-                                <select class="form-control" id="place_id" name="place_id">
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $row)
+                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="place_id">Site</label>
+                                <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m4 s12">
                                 <select class="browser-default" id="project_id" name="project_id"></select>
@@ -443,7 +443,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'name', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_due', className: 'center-align' },
                 { name: 'date_use', className: 'center-align' },
@@ -598,7 +598,7 @@
                 $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
                 $('#required_date').removeAttr('min');
-                $('#place_id').val(response.place_id).formSelect();
+                $('#company_id').val(response.company_id).formSelect();
 
                 if(response.project_id){
                     $('#project_id').empty();

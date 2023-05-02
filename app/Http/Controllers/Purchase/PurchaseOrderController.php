@@ -537,79 +537,83 @@ class PurchaseOrderController extends Controller
                         foreach($request->arr_item as $key => $row){
             
                             $qty = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-                            $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
-                            $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
-                            $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
-                            $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
-            
-                            $finalpricedisc1 = $price - ($price * ($disc1 / 100));
-                            $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
-                            $finalpricedisc3 = $finalpricedisc2 - $disc3;
-            
-                            $rowsubtotal = round($finalpricedisc3 * $qty,3);
-    
-                            $querydetail = PurchaseOrderDetail::create([
-                                'purchase_order_id'             => $query->id,
-                                'purchase_request_detail_id'    => $request->arr_purchase ? $request->arr_purchase[$key] : NULL,
-                                'item_id'                       => $row,
-                                'qty'                           => $qty,
-                                'price'                         => $price,
-                                'percent_discount_1'            => $disc1,
-                                'percent_discount_2'            => $disc2,
-                                'discount_3'                    => $disc3,
-                                'subtotal'                      => $rowsubtotal,
-                                'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
-                                'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
-                                'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
-                                'percent_tax'                   => $request->arr_tax[$key],
-                                'is_wtax'                       => $request->arr_wtax[$key] > 0 ? '1' : NULL,
-                                'percent_wtax'                  => $request->arr_wtax[$key],
-                                'tax_id'                        => $request->arr_tax_id[$key],
-                                'wtax_id'                       => $request->arr_wtax_id[$key],
-                                'place_id'                      => $request->arr_place[$key],
-                                'department_id'                 => $request->arr_department[$key],
-                                'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
-                            ]);
-                            
-                            if($querydetail->purchaseRequestDetail()->exists()){
-                                CustomHelper::removeUsedData('purchase_requests',$querydetail->purchaseRequestDetail->purchase_request_id);
+                            if($qty > 0){
+                                $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
+                                $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
+                                $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
+                                $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
+                
+                                $finalpricedisc1 = $price - ($price * ($disc1 / 100));
+                                $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
+                                $finalpricedisc3 = $finalpricedisc2 - $disc3;
+                
+                                $rowsubtotal = round($finalpricedisc3 * $qty,3);
+        
+                                $querydetail = PurchaseOrderDetail::create([
+                                    'purchase_order_id'             => $query->id,
+                                    'purchase_request_detail_id'    => $request->arr_purchase ? $request->arr_purchase[$key] : NULL,
+                                    'item_id'                       => $row,
+                                    'qty'                           => $qty,
+                                    'price'                         => $price,
+                                    'percent_discount_1'            => $disc1,
+                                    'percent_discount_2'            => $disc2,
+                                    'discount_3'                    => $disc3,
+                                    'subtotal'                      => $rowsubtotal,
+                                    'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
+                                    'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
+                                    'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
+                                    'percent_tax'                   => $request->arr_tax[$key],
+                                    'is_wtax'                       => $request->arr_wtax[$key] > 0 ? '1' : NULL,
+                                    'percent_wtax'                  => $request->arr_wtax[$key],
+                                    'tax_id'                        => $request->arr_tax_id[$key],
+                                    'wtax_id'                       => $request->arr_wtax_id[$key],
+                                    'place_id'                      => $request->arr_place[$key],
+                                    'department_id'                 => $request->arr_department[$key],
+                                    'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                                ]);
+                                
+                                if($querydetail->purchaseRequestDetail()->exists()){
+                                    CustomHelper::removeUsedData('purchase_requests',$querydetail->purchaseRequestDetail->purchase_request_id);
+                                }
                             }
                         }
                     }elseif($request->inventory_type == '2'){
                         foreach($request->arr_coa as $key => $row){
             
                             $qty = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-                            $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
-                            $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
-                            $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
-                            $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
-            
-                            $finalpricedisc1 = $price - ($price * ($disc1 / 100));
-                            $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
-                            $finalpricedisc3 = $finalpricedisc2 - $disc3;
-            
-                            $rowsubtotal = round($finalpricedisc3 * $qty,3);
-    
-                            $querydetail = PurchaseOrderDetail::create([
-                                'purchase_order_id'             => $query->id,
-                                'coa_id'                        => $row,
-                                'qty'                           => $qty,
-                                'price'                         => $price,
-                                'percent_discount_1'            => $disc1,
-                                'percent_discount_2'            => $disc2,
-                                'discount_3'                    => $disc3,
-                                'subtotal'                      => $rowsubtotal,
-                                'note'                          => $request->arr_note[$key],
-                                'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
-                                'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
-                                'percent_tax'                   => $request->arr_tax[$key],
-                                'is_wtax'                       => $request->arr_wtax[$key] > 0 ? '1' : NULL,
-                                'percent_wtax'                  => $request->arr_wtax[$key],
-                                'tax_id'                        => $request->arr_tax_id[$key],
-                                'wtax_id'                       => $request->arr_wtax_id[$key],
-                                'place_id'                      => $request->arr_place[$key],
-                                'department_id'                 => $request->arr_department[$key]
-                            ]);
+                            if($qty > 0){
+                                $price = str_replace(',','.',str_replace('.','',$request->arr_price[$key]));
+                                $disc1 = str_replace(',','.',str_replace('.','',$request->arr_disc1[$key]));
+                                $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
+                                $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
+                
+                                $finalpricedisc1 = $price - ($price * ($disc1 / 100));
+                                $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
+                                $finalpricedisc3 = $finalpricedisc2 - $disc3;
+                
+                                $rowsubtotal = round($finalpricedisc3 * $qty,3);
+        
+                                $querydetail = PurchaseOrderDetail::create([
+                                    'purchase_order_id'             => $query->id,
+                                    'coa_id'                        => $row,
+                                    'qty'                           => $qty,
+                                    'price'                         => $price,
+                                    'percent_discount_1'            => $disc1,
+                                    'percent_discount_2'            => $disc2,
+                                    'discount_3'                    => $disc3,
+                                    'subtotal'                      => $rowsubtotal,
+                                    'note'                          => $request->arr_note[$key],
+                                    'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
+                                    'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
+                                    'percent_tax'                   => $request->arr_tax[$key],
+                                    'is_wtax'                       => $request->arr_wtax[$key] > 0 ? '1' : NULL,
+                                    'percent_wtax'                  => $request->arr_wtax[$key],
+                                    'tax_id'                        => $request->arr_tax_id[$key],
+                                    'wtax_id'                       => $request->arr_wtax_id[$key],
+                                    'place_id'                      => $request->arr_place[$key],
+                                    'department_id'                 => $request->arr_department[$key]
+                                ]);
+                            }
                         }
                     }
 

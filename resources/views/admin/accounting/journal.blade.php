@@ -218,7 +218,7 @@
                             <div class="col s12" style="overflow:auto;width:100% !important;">
                                 <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="https://www.google.com" target="_blank">disini</a> untuk mengunduh.</h6>
                                 <p class="mt-2 mb-2">
-                                    <table class="bordered" style="min-width:1500px;">
+                                    <table class="bordered" style="min-width:2000px;">
                                         <thead>
                                             <tr>
                                                 <th class="center">Kode Jurnal</th>
@@ -362,6 +362,10 @@
             $(this).closest('tr').remove();
             countAll();
         });
+
+        $('#body-coa-multi').on('click', '.delete-data-coa-multi', function() {
+            $(this).closest('tr').remove();
+        });
     });
 
     function resetDetailForm(){
@@ -472,13 +476,13 @@
                     <input type="text" name="arr_multi_warehouse" placeholder="ID Gudang">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit">
+                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit" value="0">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit">
+                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit" value="0">
                 </td>
                 <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
@@ -585,13 +589,13 @@
                                     <input type="text" name="arr_multi_warehouse" placeholder="ID Gudang">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit">
+                                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit" value="0">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit">
+                                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit" value="0">
                                 </td>
                                 <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>

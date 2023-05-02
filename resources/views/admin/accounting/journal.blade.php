@@ -73,12 +73,6 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_account" style="font-size:1rem;">Target BP :</label>
-                                                <div class="input-field">
-                                                    <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
                                                 <label for="filter_currency" style="font-size:1rem;">Mata Uang :</label>
                                                 <div class="input-field">
                                                     <select class="select2 browser-default" multiple="multiple" id="filter_currency" name="filter_currency" onchange="loadDataTable()">
@@ -104,7 +98,6 @@
                                                         <th>#</th>
                                                         <th>Kode</th>
                                                         <th>Pengguna</th>
-                                                        <th>Target BP</th>
                                                         <th>Tanggal</th>
                                                         <th>Keterangan</th>
                                                         <th>Ref No.</th>
@@ -130,93 +123,76 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit {{ $title }}</h4>
-                <form class="row" id="form_data" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert" style="display:none;"></div>
-                    </div>
-                    <div class="col s12">
-                        <div class="input-field col m3 s12">
-                            <input type="hidden" id="temp" name="temp">
-                            <select class="browser-default" id="account_id" name="account_id"></select>
-                            <label class="active" for="account_id">Target BP</label>
-                        </div>
-                        <div class="input-field col m3 s12">
-                            <input id="note" name="note" type="text" placeholder="Keterangan">
-                            <label class="active" for="note">Keterangan</label>
-                        </div>
-                        <div class="input-field col m3 s12">
-                            <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                            <label class="active" for="post_date">Tgl. Posting</label>
-                        </div>
-                        <div class="input-field col m3 s12">
-                            <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                            <label class="active" for="due_date">Tgl. Kadaluarsa</label>
-                        </div>
-                        <div class="input-field col m3 s12">
-                            <select class="form-control" id="currency_id" name="currency_id">
-                                @foreach ($currency as $row)
-                                    <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="currency_id">Mata Uang</label>
-                        </div>
-                        <div class="input-field col m3 s12">
-                            <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                            <label class="active" for="currency_rate">Konversi</label>
-                        </div>
-                        <div class="col s12 mt-3">
-                            <ul class="tabs tabs-fixed-width tab-demo z-depth-1">
-                                <li class="tab col m3"><a class="active" href="#tabmaterial">Debit</a></li>
-                                <li class="tab col m3"><a href="#tabcost">Kredit</a></li>
-                             </ul>
+                <ul class="tabs">
+                    <li class="tab col m6"><a class="active" href="#inputOne">Input Satu Data</a></li>
+                    <li class="tab col m6"><a href="#inputMulti">Input Multi Data</a></li>
+                </ul>
+                <div id="inputOne" class="col s12 active">
+                    <h4 class="mt-2">Add/Edit Satu {{ $title }}</h4>
+                    <form class="row" id="form_data" onsubmit="return false;">
+                        <div class="col s12">
+                            <div id="validation_alert" style="display:none;"></div>
                         </div>
                         <div class="col s12">
-                            <div id="tabmaterial" class="col s12">
+                            <div class="input-field col m3 s12">
+                                <input type="hidden" id="temp" name="temp">
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $row)
+                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="company_id">Perusahaan</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                
+                                <input id="note" name="note" type="text" placeholder="Keterangan">
+                                <label class="active" for="note">Keterangan</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                <label class="active" for="post_date">Tgl. Posting</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
+                                <label class="active" for="due_date">Tgl. Kadaluarsa</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <select class="form-control" id="currency_id" name="currency_id">
+                                    @foreach ($currency as $row)
+                                        <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="currency_id">Mata Uang</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                <label class="active" for="currency_rate">Konversi</label>
+                            </div>
+                            <div class="col s12" style="overflow:auto;width:100% !important;">
+                                <h6>Detail Coa</h6>
                                 <p class="mt-2 mb-2">
-                                    <table class="bordered">
+                                    <table class="bordered" style="min-width:1500px;">
                                         <thead>
                                             <tr>
                                                 <th class="center">Coa</th>
                                                 <th class="center">Site</th>
+                                                <th class="center">BP</th>
                                                 <th class="center">Item</th>
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Gudang</th>
-                                                <th class="center">Nominal</th>
+                                                <th class="center">Debit</th>
+                                                <th class="center">Kredit</th>
                                                 <th class="center">Hapus</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="body-debit">
-                                            <tr id="last-row-debit">
-                                                <td colspan="7" class="center">
+                                        <tbody id="body-coa">
+                                            <tr id="last-row-coa">
+                                                <td colspan="9" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('1')" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> Tambah Debit
                                                     </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                            </div>
-                            <div id="tabcost" class="col s12">
-                                <p class="mt-2 mb-2">
-                                    <table class="bordered">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">Coa</th>
-                                                <th class="center">Site</th>
-                                                <th class="center">Item</th>
-                                                <th class="center">Departemen</th>
-                                                <th class="center">Gudang</th>
-                                                <th class="center">Nominal</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-credit">
-                                            <tr id="last-row-credit">
-                                                <td colspan="7" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCoa('2')" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Credit
+                                                    <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addCoa('2')" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Kredit
                                                     </a>
                                                 </td>
                                             </tr>
@@ -224,14 +200,68 @@
                                     </table>
                                 </p>
                             </div>
+                            <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebit">0,000</b></h5></div>
+                            <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCredit">0,000</b></h5></div>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            </div>
                         </div>
-                        <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebit">0,000</b></h5></div>
-                        <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCredit">0,000</b></h5></div>
-                        <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                    </form>
+                </div>
+                <div id="inputMulti" class="col s12">
+                    <h4 class="mt-2">Add/Edit Multi {{ $title }}</h4>
+                    <form class="row" id="form_data_multi" onsubmit="return false;">
+                        <div class="col s12">
+                            <div id="validation_alert_multi" style="display:none;"></div>
                         </div>
-                    </div>
-                </form>
+                        <div class="col s12">
+                            <div class="col s12" style="overflow:auto;width:100% !important;">
+                                <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="https://www.google.com" target="_blank">disini</a> untuk mengunduh.</h6>
+                                <p class="mt-2 mb-2">
+                                    <table class="bordered" style="min-width:1500px;">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Kode Jurnal</th>
+                                                <th class="center">Perusahaan</th>
+                                                <th class="center">Keterangan</th>
+                                                <th class="center">Tgl.Post</th>
+                                                <th class="center">Tgl.Tenggat</th>
+                                                <th class="center">Mata Uang</th>
+                                                <th class="center">Konversi</th>
+                                                <th class="center">Coa</th>
+                                                <th class="center">Site</th>
+                                                <th class="center">BP</th>
+                                                <th class="center">Item</th>
+                                                <th class="center">Departemen</th>
+                                                <th class="center">Gudang</th>
+                                                <th class="center">Debit</th>
+                                                <th class="center">Kredit</th>
+                                                <th class="center">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-coa-multi">
+                                            <tr id="last-row-coa-multi">
+                                                <td colspan="16" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Baris
+                                                    </a>
+                                                    <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Multi
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+                            </div>
+                            <div class="col s6 mt-1 center"><h5>Total Debit : <b id="totalDebitMulti">0,000</b></h5></div>
+                            <div class="col s6 mt-1 center"><h5>Total Credit : <b id="totalCreditMulti">0,000</b></h5></div>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit" onclick="saveMulti();">Simpan <i class="material-icons right">send</i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -261,13 +291,6 @@
 
 <!-- END: Page Main-->
 <script>
-    /* document.addEventListener('keydown', (e) => {
-        e = e || window.event;
-        if(e.keyCode == 116 || (e.ctrlKey && e.keyCode == 82)){
-            e.preventDefault();
-        }
-    }); */
-
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
@@ -306,7 +329,7 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
-                $('ul.tabs').tabs();
+                $('.tabs').tabs();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -317,8 +340,6 @@
                 countAll();
             }
         });
-
-        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
@@ -337,7 +358,7 @@
             $('#name').val('');
         });
 
-        $('#body-debit,#body-credit').on('click', '.delete-data-coa', function() {
+        $('#body-coa').on('click', '.delete-data-coa', function() {
             $(this).closest('tr').remove();
             countAll();
         });
@@ -356,24 +377,28 @@
     function addCoa(type){
         var count = makeid(10);
 
-        $('#last-row-' + (type == '1' ? 'debit' : 'credit')).before(`
+        $('#last-row-coa').before(`
             <tr class="row_coa">
                 <input type="hidden" name="arr_type[]" value="` + type + `">
                 <td>
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
                 <td>
-                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
                         @foreach ($place as $row)
                             <option value="{{ $row->id }}">{{ $row->name.' - '.$row->company->name }}</option>
                         @endforeach
                     </select>
                 </td>
                 <td>
+                    <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
+                </td>
+                <td>
                     <select class="browser-default" id="arr_item` + count + `" name="arr_item[]"></select>
                 </td>
                 <td>
-                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
+                        <option value="">--Kosong--</option>
                         @foreach ($department as $row)
                             <option value="{{ $row->id }}">{{ $row->name }}</option>
                         @endforeach
@@ -383,10 +408,13 @@
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                 </td>
                 <td>
-                    <input name="arr_nominal[]" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
+                    ` + (type == '1' ? `<input name="arr_nominal[]" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                </td>
+                <td>
+                    ` + (type == '2' ? `<input name="arr_nominal[]" type="text" value="0" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                 </td>
                 <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" data-type="` + type + `" href="javascript:void(0);">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
@@ -396,8 +424,214 @@
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+        select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
         $('#arr_place' + count).formSelect();
         $('#arr_department' + count).formSelect();
+    }
+
+    function addLine(){
+        $('#last-row-coa-multi').before(`
+            <tr class="row_coa_multi">
+                <td>
+                    <input type="text" name="arr_multi_code" placeholder="Kode Jurnal">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_company" placeholder="ID Perusahaan">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_note" placeholder="Keterangan">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_post_date" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_due_date" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_currency" placeholder="ID Mata Uang">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_conversion" placeholder="Konversi">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_coa" placeholder="ID Coa">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_place" placeholder="ID Site">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_bp" placeholder="ID Partner Bisnis">    
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_item" placeholder="ID Item">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_department" placeholder="ID Departemen">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_warehouse" placeholder="ID Gudang">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit">
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        $('#body-coa-multi :input').off('paste');
+        $('#body-coa-multi :input').on('paste', function (e) {
+            var $start = $(this);
+            var source;
+
+            if (window.clipboardData !== undefined) {
+                source = window.clipboardData;
+            } else {
+                source = e.originalEvent.clipboardData;
+            }
+            var data = source.getData("Text");
+            if (data.length > 0) {
+                if (data.indexOf("\t") > -1) {
+                    var columns = data.split("\n");
+                    $.each(columns, function () {
+                        var values = this.split("\t");
+                        $.each(values, function () {
+                            $start.val(this);
+                            if($start.closest('td').next('td').find('input')[0] != undefined) {
+                                $start = $start.closest('td').next('td').find('input');
+                            }else{
+                                return false;  
+                            }
+                        });
+                        $start = $start.closest('td').parent().next('tr').children('td:first').find('input');
+                    });
+                    e.preventDefault();
+                }
+            }
+        });
+    }
+
+    function addMulti(){
+        var count = 0;
+        swal({
+            title: "Input Jumlah Baris Yang Diinginkan!",
+            text: "Maksimal tambah multi adalah 100 baris.",
+            buttons: true,
+            content: {
+                element: "input",
+                attributes: {
+                    min: 1,
+                    max: 50,
+                    type: "number",
+                    value: 1,
+                }
+            },
+            closeOnClickOutside: false,
+        })
+        .then(() => {
+            if ($('.swal-content__input').val() != "" && $('.swal-content__input').val() != null) {
+                count = parseInt($('.swal-content__input').val());
+                if(parseInt(count) > 50){
+                    swal({
+                        title: 'Baris tidak boleh lebih dari 50.',
+                        icon: 'error'
+                    });
+                }else{
+                    for(var i = 0;i < count;i++){
+                        $('#last-row-coa-multi').before(`
+                            <tr class="row_coa_multi">
+                                <td>
+                                    <input type="text" name="arr_multi_code" placeholder="Kode Jurnal">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_company" placeholder="ID Perusahaan">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_note" placeholder="Keterangan">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_post_date" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_due_date" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_currency" placeholder="ID Mata Uang">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_conversion" placeholder="Konversi">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_coa" placeholder="ID Coa">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_place" placeholder="ID Site">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_bp" placeholder="ID Partner Bisnis">    
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_item" placeholder="ID Item">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_department" placeholder="ID Departemen">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_warehouse" placeholder="ID Gudang">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit">
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                    }
+
+                    $('#body-coa-multi :input').off('paste');
+                    $('#body-coa-multi :input').on('paste', function (e) {
+                        var $start = $(this);
+                        var source;
+
+                        if (window.clipboardData !== undefined) {
+                            source = window.clipboardData;
+                        } else {
+                            source = e.originalEvent.clipboardData;
+                        }
+                        var data = source.getData("Text");
+                        if (data.length > 0) {
+                            if (data.indexOf("\t") > -1) {
+                                var columns = data.split("\n");
+                                $.each(columns, function () {
+                                    var values = this.split("\t");
+                                    $.each(values, function () {
+                                        $start.val(this);
+                                        if($start.closest('td').next('td').find('input')[0] != undefined) {
+                                            $start = $start.closest('td').next('td').find('input');
+                                        }else{
+                                            return false;  
+                                        }
+                                    });
+                                    $start = $start.closest('td').parent().next('tr').children('td:first').find('input');
+                                });
+                                e.preventDefault();
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     function countAll(){
@@ -465,7 +699,6 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
-                    'account_id[]' : $('#filter_account').val(),
                     'currency_id[]' : $('#filter_currency').val(),
                 },
                 beforeSend: function() {
@@ -487,7 +720,6 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'account', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'ref', searchable: false, orderable: false, className: 'center-align' },
@@ -520,6 +752,7 @@
                 formData.delete("arr_type[]");
                 formData.delete("arr_coa[]");
                 formData.delete("arr_place[]");
+                formData.delete("arr_account[]");
                 formData.delete("arr_item[]");
                 formData.delete("arr_department[]");
                 formData.delete("arr_warehouse[]");
@@ -529,6 +762,7 @@
                     formData.append('arr_type[]',$(this).val());
                     formData.append('arr_coa[]',($('select[name^="arr_coa"]').eq(index).val() ? $('select[name^="arr_coa"]').eq(index).val() : 'NULL'));
                     formData.append('arr_place[]',$('select[name^="arr_place"]').eq(index).val());
+                    formData.append('arr_account[]',($('select[name^="arr_account"]').eq(index).val() ? $('select[name^="arr_account"]').eq(index).val() : 'NULL'));
                     formData.append('arr_item[]',($('select[name^="arr_item"]').eq(index).val() ? $('select[name^="arr_item"]').eq(index).val() : 'NULL'));
                     formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
                     formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : 'NULL'));
@@ -626,9 +860,7 @@
                 $('#modal1').modal('open');
                 
                 $('#temp').val(id);
-                $('#account_id').empty().append(`
-                    <option value="` + response.account_id + `">` + response.account_name + `</option>
-                `);
+                $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
@@ -639,24 +871,28 @@
 
                 $.each(response.details, function(i, val) {
                     let count = makeid(10);
-                    $('#last-row-' + (val.type == '1' ? 'debit' : 'credit')).before(`
+                    $('#last-row-coa').before(`
                         <tr class="row_coa">
                             <input type="hidden" name="arr_type[]" value="` + val.type + `">
                             <td>
                                 <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                             </td>
                             <td>
-                                <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
                                     @foreach ($place as $row)
                                         <option value="{{ $row->id }}">{{ $row->name.' - '.$row->company->name }}</option>
                                     @endforeach
                                 </select>
                             </td>
                             <td>
+                                <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
+                            </td>
+                            <td>
                                 <select class="browser-default" id="arr_item` + count + `" name="arr_item[]"></select>
                             </td>
                             <td>
-                                <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
+                                    <option value="">--Kosong--</option>
                                     @foreach ($department as $row)
                                         <option value="{{ $row->id }}">{{ $row->name }}</option>
                                     @endforeach
@@ -666,10 +902,13 @@
                                 <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                             </td>
                             <td>
-                                <input name="arr_nominal[]" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();">
+                                ` + (val.type == '1' ? `<input name="arr_nominal[]" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                            </td>
+                            <td>
+                                ` + (val.type == '2' ? `<input name="arr_nominal[]" type="text" value="` + val.nominal + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
                             </td>
                             <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" data-type="` + val.type + `" href="javascript:void(0);">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </td>
@@ -679,6 +918,7 @@
                     select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                     select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                     select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+                    select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
                     $('#arr_place' + count).formSelect().val(val.place_id).formSelect();
                     $('#arr_department' + count).formSelect().val(val.department_id).formSelect();
                     $('#arr_coa' + count).append(`
@@ -687,6 +927,11 @@
                     if(val.item_id){
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
+                        `);
+                    }
+                    if(val.account_id){
+                        $('#arr_account' + count).append(`
+                            <option value="` + val.account_id + `">` + val.account_name + `</option>
                         `);
                     }
                     if(val.warehouse_id){
@@ -756,10 +1001,51 @@
         });
     }
 
+    function voidStatus(id){
+        var msg = '';
+        swal({
+            title: "Alasan mengapa anda menutup!",
+            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/void_status',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, msg : message },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     function printData(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        var type = $('#filter_type').val();
+        var currency = $('#filter_currency').val();
         
         $.ajax({
             type : "POST",
@@ -767,7 +1053,7 @@
             data : {
                 search : search,
                 status : status,
-                type : type
+                'currency[]' : currency
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -783,9 +1069,9 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), currency = $('#filter_currency').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&account=" + account + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&currency=" + currency;
     }
 
     function printPreview(code){

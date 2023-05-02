@@ -195,8 +195,8 @@ class PaymentRequestController extends Controller
                     date('d/m/y',strtotime($val->pay_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
-                    number_format($val->admin,3,',','.'),
-                    number_format($val->grandtotal,3,',','.'),
+                    number_format($val->admin,2,',','.'),
+                    number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->account_bank,
                     $val->account_no,
@@ -798,9 +798,70 @@ class PaymentRequestController extends Controller
         if($data){
             if(!$data->used()->exists() && !$data->outgoingPayment()->exists()){
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Permintaan Pembayaran (Payment Request)');
+
+                $html = '<div class="row pt-1 pb-1"><div class="col s12"><table>
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="10">Daftar Item</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Referensi</th>
+                                <th class="center-align">Tipe</th>
+                                <th class="center-align">Bayar</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Coa</th>
+                            </tr>
+                        </thead><tbody>';
+        
+                foreach($data->paymentRequestDetail as $key => $row){
+                    
+                    $html .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td class="center-align">'.$row->lookable->code.'</td>
+                        <td class="center-align">'.$row->type().'</td>
+                        <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+                        <td class="center-align">'.$row->note.'</td>
+                        <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    </tr>';
+                }
+                
+                $html .= '</tbody></table></div>';
+
+                $html .= '<div class="col s12 mt-1"><table style="max-width:500px;">
+                                <thead>
+                                    <tr>
+                                        <th class="center-align" colspan="4">Approval</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="center-align">Level</th>
+                                        <th class="center-align">Kepada</th>
+                                        <th class="center-align">Status</th>
+                                        <th class="center-align">Catatan</th>
+                                    </tr>
+                                </thead><tbody>';
+                
+                if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
+                    foreach($data->approval()->approvalMatrix as $key => $row){
+                        $html .= '<tr>
+                            <td class="center-align">'.$row->approvalTable->level.'</td>
+                            <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                            <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
+                            <td class="center-align">'.$row->note.'</td>
+                        </tr>';
+                    }
+                }else{
+                    $html .= '<tr>
+                        <td class="center-align" colspan="4">Approval tidak ditemukan.</td>
+                    </tr>';
+                }
+
+                $html .= '</tbody></table></div></div>';
+
                 return response()->json([
                     'status'    => 200,
-                    'data'      => $data
+                    'data'      => $data,
+                    'html'      => $html,
                 ]);
             }elseif($data->outgoingPayment()->exists()){
                 return response()->json([

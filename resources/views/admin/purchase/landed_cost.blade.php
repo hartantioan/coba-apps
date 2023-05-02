@@ -17,9 +17,6 @@
         overflow: auto;
         text-align:-webkit-right;
     }
-    .orgchart .landed-cost .title { background-color: #006699; }
-    .orgchart .landed-cost .content { border-color: #006699; }
-    .orgchart { background: #fff; }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">

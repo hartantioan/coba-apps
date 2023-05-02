@@ -44,6 +44,11 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="loadDataTable()">
+                            <i class="material-icons hide-on-med-and-up">refresh</i>
+                            <span class="hide-on-small-onl">Refresh</span>
+                            <i class="material-icons right">refresh</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -108,10 +113,6 @@
                                 <div class="card-content">
                                     <h4 class="card-title">
                                         List Data
-                                        <button class="btn waves-effect waves-light mr-1 float-right btn-small" onclick="loadDataTable()">
-                                            Refresh
-                                            <i class="material-icons left">refresh</i>
-                                        </button>
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
@@ -377,6 +378,8 @@
                             <div class="input-field col m12 s12">
                                 <h6><b>Data Terpakai</b> : <i id="list-used-data-pay"></i></h6>
                             </div>
+                            <div class="col s12" id="displayDetail">
+                            </div>
                             <div class="col s12 mt-3">
                                 <button class="btn waves-effect waves-light right submit" onclick="savePay();">Simpan <i class="material-icons right">send</i></button>
                             </div>
@@ -504,6 +507,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#displayDetail').html('');
             }
         });
 
@@ -1212,6 +1216,7 @@
                             <i class="material-icons close data-used-pay" onclick="removeUsedData('payment_requests',` + response.data.id + `,'` + response.data.code + `')">close</i>
                         </div>
                     `);
+                    $('#displayDetail').html(response.html);
                 }else{
                     M.toast({
                         html: response.message

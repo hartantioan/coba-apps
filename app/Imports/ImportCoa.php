@@ -29,6 +29,8 @@ class ImportCoa implements ToModel,WithHeadingRow, WithValidation,WithBatchInser
             'is_confidential'=> $row['is_confidential'],
             'is_control_account'=> $row['is_control_account'],
             'is_cash_account'=> $row['is_cash_account'],
+            'show_journal'=> $row['show_journal'],
+            'bp_journal'=> $row['bp_journal'],
             'status'=> $row['status'],
         ]);
     }
@@ -44,6 +46,8 @@ class ImportCoa implements ToModel,WithHeadingRow, WithValidation,WithBatchInser
             '*.is_confidential' => 'nullable',
             '*.is_control_account' => 'nullable',
             '*.is_cash_account' => 'nullable',
+            '*.show_journal' => 'nullable',
+            '*.bp_journal' => 'nullable',
             '*.status' => 'required',
         ];
     }

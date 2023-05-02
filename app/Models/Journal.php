@@ -16,7 +16,7 @@ class Journal extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'user_id',
-        'account_id',
+        'company_id',
         'code',
         'lookable_type',
         'lookable_id',
@@ -39,8 +39,8 @@ class Journal extends Model
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
-    public function account(){
-        return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
+    public function company(){
+        return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
     
     public function currency(){

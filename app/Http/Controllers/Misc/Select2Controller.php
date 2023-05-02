@@ -383,16 +383,15 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->whereIn('place_id',$this->dataplaces)
                 ->where('status','2')->get();
 
         foreach($data as $d) {
-            /* if($d->hasBalance()){ */
+            if($d->hasBalance()){
                 $response[] = [
                     'id'   			=> $d->id,
                     'text' 			=> $d->code.' - '.$d->note,
                 ];
-            /* } */
+            }
         }
 
         return response()->json(['items' => $response]);

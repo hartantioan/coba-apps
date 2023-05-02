@@ -9,26 +9,6 @@
     table.bordered th {
         padding: 5px !important;
     }
-    .orgchart .good-receipt .title { background-color: #006699; }
-    .orgchart .good-receipt .content { border-color: #006699; }
-    .chart-container {
-        width: 100%;
-        display: inline-block;
-        text-align: center;
-    }
-    .chart-container{
-        margin: 10%
-    }
-    .orgchart { 
-        margin: auto;
-        overflow: visible;
-        background: #fff;
-        border: 0;
-        padding: 0; 
-    }
-    .orgchart .node .content {
-        height: fit-content;
-    }
 </style>
 <div id="main">
     <div class="row">

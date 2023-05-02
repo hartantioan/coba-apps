@@ -191,6 +191,7 @@
                         <th class="center">Coa</th>
                         <th class="center">Perusahaan</th>
                         <th class="center">Site</th>
+                        <th class="center">Bisnis Partner</th>
                         <th class="center">Item</th>
                         <th class="center">Departemen</th>
                         <th class="center">Gudang</th>
@@ -204,6 +205,7 @@
                             <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
                             <td class="center-align">{{ $row->place_id ? $row->place->company->name : '-' }}</td>
                             <td class="center-align">{{ $row->place_id ? $row->place->name : '-' }}</td>
+                            <td class="center-align">{{ $row->account_id ? $row->account->name : '-' }}</td>
                             <td class="center-align">{{ $row->item_id ? $row->item->name : '-' }}</td>
                             <td class="center-align">{{ $row->department_id ? $row->department->name : '-' }}</td>
                             <td class="center-align">{{ $row->warehouse_id ? $row->warehouse->name : '-' }}</td>

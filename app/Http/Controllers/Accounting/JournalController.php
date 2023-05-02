@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Currency;
 use App\Models\Department;
 use App\Models\Place;
@@ -33,6 +34,7 @@ class JournalController extends Controller
         $data = [
             'title'     => 'Jurnal',
             'content'   => 'admin.accounting.journal',
+            'company'   => Company::where('status','1')->get(),
             'currency'  => Currency::where('status','1')->get(),
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
             'department'=> Department::where('status','1')->get(),
@@ -46,7 +48,6 @@ class JournalController extends Controller
             'id',
             'code',
             'user_id',
-            'account_id',
             'post_date',
             'note'
         ];
@@ -66,18 +67,12 @@ class JournalController extends Controller
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name', 'like', "%$search%");
-                            })->orWhereHas('account',function($query) use ($search, $request){
-                                $query->where('name', 'like', "%$search%");
                             });
                     });
                 }
 
                 if($request->status){
                     $query->where('status', $request->status);
-                }
-
-                if($request->account_id){
-                    $query->whereIn('account_id',$request->account_id);
                 }
                 
                 if($request->currency_id){
@@ -97,8 +92,6 @@ class JournalController extends Controller
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name', 'like', "%$search%");
-                            })->orWhereHas('account',function($query) use ($search, $request){
-                                $query->where('name', 'like', "%$search%");
                             });
                     });
                 }
@@ -107,10 +100,6 @@ class JournalController extends Controller
                     $query->where('status', $request->status);
                 }
 
-                if($request->account_id){
-                    $query->whereIn('account_id',$request->account_id);
-                }     
-                
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
                 }
@@ -126,10 +115,9 @@ class JournalController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->account_id ? $val->account->name : '-',
                     date('d/m/y',strtotime($val->post_date)),
                     $val->note,
-                    $val->lookable->code,
+                    $val->lookable_id ? $val->lookable->code : '-',
                     $val->status(),
                     !$val->lookable_id ? '
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -166,6 +154,7 @@ class JournalController extends Controller
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Perusahaan</th>
                                 <th class="center-align">Site</th>
+                                <th class="center-align">Bisnis Partner</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
@@ -177,9 +166,10 @@ class JournalController extends Controller
         foreach($data->journalDetail()->orderBy('id')->get() as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td>'.$row->coa->name.'</td>
+                <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
                 <td class="center-align">'.$row->coa->company->name.'</td>
                 <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
@@ -225,7 +215,7 @@ class JournalController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'account_id' 				=> 'required',
+            'company_id'                => 'required',
 			'note'                      => 'required',
             'post_date'                 => 'required',
             'due_date'                  => 'required',
@@ -236,7 +226,7 @@ class JournalController extends Controller
             'arr_department'            => 'required|array',
             'arr_nominal'               => 'required|array',
 		], [
-			'account_id.required' 				=> 'Target BP tidak boleh kosong.',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong',
 			'note.required'                     => 'Catatan tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
@@ -272,7 +262,7 @@ class JournalController extends Controller
             if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
                 return response()->json([
                     'status'  => 500,
-                    'message' => $totalDebit
+                    'message' => 'Total debit dan kredit selisih '.(number_format($totalDebit - $totalCredit,2,',','.'))
                 ]);
             }
 
@@ -295,7 +285,7 @@ class JournalController extends Controller
                     if($query->status == '1'){
 
                         $query->user_id = session('bo_id');
-                        $query->account_id = $request->account_id;
+                        $query->company_id = $request->company_id;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->post_date = $request->post_date;
@@ -325,8 +315,8 @@ class JournalController extends Controller
                     $query = Journal::create([
                         'code'			            => Journal::generateCode(),
                         'user_id'		            => session('bo_id'),
-                        'account_id'                => $request->account_id,
                         'currency_id'               => $request->currency_id,
+                        'company_id'                => $request->company_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'post_date'                 => $request->post_date,
                         'due_date'                  => $request->due_date,
@@ -350,6 +340,7 @@ class JournalController extends Controller
                                 'journal_id'        => $query->id,
                                 'coa_id'            => $request->arr_coa[$key],
                                 'place_id'          => $request->arr_place[$key],
+                                'account_id'        => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
                                 'item_id'           => $request->arr_item[$key] == 'NULL' ? NULL : $request->arr_item[$key],
                                 'department_id'     => $request->arr_department[$key],
                                 'warehouse_id'      => $request->arr_warehouse[$key] == 'NULL' ? NULL : $request->arr_warehouse[$key],
@@ -389,7 +380,6 @@ class JournalController extends Controller
 
     public function show(Request $request){
         $jou = Journal::where('code',CustomHelper::decrypt($request->id))->first();
-        $jou['account_name'] = $jou->account->name;
         $jou['currency_rate'] = number_format($jou->currency_rate,2,',','.');
 
         $arr = [];
@@ -398,8 +388,10 @@ class JournalController extends Controller
             $arr[] = [
                 'type'              => $row->type,
                 'coa_id'            => $row->coa_id,
-                'coa_name'          => $row->coa->name,
+                'coa_name'          => $row->coa->code.' - '.$row->coa->name.' - '.$row->coa->company->name,
                 'place_id'          => $row->place_id,
+                'account_id'        => $row->account_id ? $row->account_id : '',
+                'account_name'      => $row->account_id ? $row->account->name : '',
                 'item_id'           => $row->item_id ? $row->item_id : '',
                 'item_name'         => $row->item_id ? $row->item->name : '',
                 'department_id'     => $row->department_id,
@@ -518,18 +510,12 @@ class JournalController extends Controller
                             ->orWhere('note', 'like', "%$request->search%")
                             ->orWhereHas('user',function($query) use ($request){
                                 $query->where('name', 'like', "%$request->search%");
-                            })->orWhereHas('account',function($query) use ($request){
-                                $query->where('name', 'like', "%$request->search%");
                             });
                     });
                 }
 
                 if($request->status){
                     $query->where('status', $request->status);
-                }
-
-                if($request->account_id){
-                    $query->whereIn('account_id',$request->account_id);
                 }
                 
                 if($request->currency_id){
@@ -544,7 +530,7 @@ class JournalController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportJournal($request->search,$request->status,$request->account,$request->currency,$this->dataplaces), 'journal_'.uniqid().'.xlsx');
+		return Excel::download(new ExportJournal($request->search,$request->status,$request->currency,$this->dataplaces), 'journal_'.uniqid().'.xlsx');
     }
 
     public function approval(Request $request,$id){

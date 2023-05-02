@@ -335,6 +335,8 @@ class PurchaseOrderController extends Controller
                 'arr_disc1'                 => 'required|array',
                 'arr_disc2'                 => 'required|array',
                 'arr_disc3'                 => 'required|array',
+                'arr_place'                 => 'required|array',
+                'arr_warehouse'             => 'required|array',
                 'discount'                  => 'required',
             ], [
                 'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
@@ -359,6 +361,10 @@ class PurchaseOrderController extends Controller
                 'arr_disc2.array'                   => 'Diskon 2 harus array.',
                 'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
                 'arr_disc3.array'                   => 'Diskon 3 harus array.',
+                'arr_place.required'                => 'Site tidak boleh kosong.',
+                'arr_place.array'                   => 'Site harus array.',
+                'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
+                'arr_warehouse.array'               => 'Gudang harus array.',
                 'discount.required'                 => 'Diskon akhir tidak boleh kosong.'
             ]);
         }elseif($request->inventory_type == '2'){
@@ -552,7 +558,7 @@ class PurchaseOrderController extends Controller
                                 'percent_discount_2'            => $disc2,
                                 'discount_3'                    => $disc3,
                                 'subtotal'                      => $rowsubtotal,
-                                'note'                          => $request->arr_note[$key],
+                                'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                                 'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
                                 'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
                                 'percent_tax'                   => $request->arr_tax[$key],
@@ -562,7 +568,7 @@ class PurchaseOrderController extends Controller
                                 'wtax_id'                       => $request->arr_wtax_id[$key],
                                 'place_id'                      => $request->arr_place[$key],
                                 'department_id'                 => $request->arr_department[$key],
-                                'warehouse_id'                  => $request->arr_warehouse[$key]
+                                'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                             ]);
                             
                             if($querydetail->purchaseRequestDetail()->exists()){

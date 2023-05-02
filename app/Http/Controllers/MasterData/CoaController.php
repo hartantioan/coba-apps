@@ -149,6 +149,8 @@ class CoaController extends Controller
                     $val->is_confidential ? '&#10003;' : '&#10005;',
                     $val->is_control_account ? '&#10003;' : '&#10005;',
                     $val->is_cash_account ? '&#10003;' : '&#10005;',
+                    $val->show_journal ? '&#10003;' : '&#10005;',
+                    $val->bp_journal ? '&#10003;' : '&#10005;',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -214,6 +216,8 @@ class CoaController extends Controller
                     $query->is_confidential = $request->is_confidential ? $request->is_confidential : NULL;
                     $query->is_control_account = $request->is_control_account ? $request->is_control_account : NULL;
                     $query->is_cash_account = $request->is_cash_account ? $request->is_cash_account : NULL;
+                    $query->show_journal = $request->show_journal ? $request->show_journal : NULL;
+                    $query->bp_journal = $request->bp_journal ? $request->bp_journal : NULL;
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -232,6 +236,8 @@ class CoaController extends Controller
                         'is_confidential'       => $request->is_confidential ? $request->is_confidential : NULL,
                         'is_control_account'    => $request->is_control_account ? $request->is_control_account : NULL,
                         'is_cash_account'       => $request->is_cash_account ? $request->is_cash_account : NULL,
+                        'show_journal'          => $request->show_journal ? $request->show_journal : NULL,
+                        'bp_journal'            => $request->bp_journal ? $request->bp_journal : NULL,
                         'status'                => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

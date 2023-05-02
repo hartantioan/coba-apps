@@ -264,7 +264,6 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'account_id'	=> $gr->account_id,
 				'code'			=> Journal::generateCode(),
 				'lookable_type'	=> 'good_receipts',
 				'lookable_id'	=> $gr->id,
@@ -276,16 +275,13 @@ class CustomHelper {
 			$arrCoa = [];
 
 			foreach($gr->goodReceiptDetail as $rowdetail){
-				$index = -1;
-
-				/* $rowtotal = $rowdetail->getRowTotal() * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate; */
-
 				$rowtotal = $rowdetail->getRowTotal();
 
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
 					'place_id'		=> $rowdetail->place_id,
+					'account_id'	=> $gr->account_id,
 					'department_id'	=> $rowdetail->department_id,
 					'warehouse_id'	=> $rowdetail->warehouse_id,
 					'type'			=> '1',
@@ -326,6 +322,7 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->coa_id,
 						'place_id'		=> $rowdetail->place_id,
+						'account_id'	=> $gr->account_id,
 						'department_id'	=> $rowdetail->department_id,
 						'warehouse_id'	=> $rowdetail->warehouse_id,
 						'type'			=> '2',
@@ -397,7 +394,6 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'account_id'	=> $op->account_id,
 				'code'			=> Journal::generateCode(),
 				'lookable_type'	=> 'outgoing_payments',
 				'lookable_id'	=> $op->id,
@@ -412,6 +408,7 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->coa_id,
+					'account_id'	=> $op->account_id,
 					'type'			=> '1',
 					'nominal'		=> $row->nominal,
 				]);
@@ -434,6 +431,7 @@ class CustomHelper {
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
+							'account_id'	=> $op->account_id,
 							'type'			=> $row->type,
 							'nominal'		=> $nominal
 						]);
@@ -444,6 +442,7 @@ class CustomHelper {
 			JournalDetail::create([
 				'journal_id'	=> $query->id,
 				'coa_id'		=> $op->coa_source_id,
+				'account_id'	=> $op->account_id,
 				'type'			=> '2',
 				'nominal'		=> $op->grandtotal,
 			]);
@@ -574,7 +573,6 @@ class CustomHelper {
 			if($lc){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
-					'account_id'	=> $lc->account_id,
 					'code'			=> Journal::generateCode(),
 					'lookable_type'	=> 'landed_costs',
 					'lookable_id'	=> $lc->id,
@@ -602,6 +600,7 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
 						'place_id'		=> $rowdetail->place_id,
+						'account_id'	=> $lc->account_id,
 						'department_id'	=> $rowdetail->department_id,
 						'warehouse_id'	=> $rowdetail->warehouse_id,
 						'type'			=> '1',
@@ -622,6 +621,7 @@ class CustomHelper {
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
 							'place_id'		=> $rowdetail->place_id,
+							'account_id'	=> $lc->account_id,
 							'department_id'	=> $rowdetail->department_id,
 							'warehouse_id'	=> $rowdetail->warehouse_id,
 							'type'			=> '2',
@@ -637,7 +637,6 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'account_id'	=> $account_id,
 				'code'			=> Journal::generateCode(),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
@@ -758,7 +757,6 @@ class CustomHelper {
 
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
-					'account_id'	=> $account_id,
 					'code'			=> Journal::generateCode(),
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
@@ -782,6 +780,7 @@ class CustomHelper {
 								'journal_id'	=> $query->id,
 								'coa_id'		=> $rowpo->coa_id,
 								'place_id'		=> $rowpo->place_id,
+								'account_id'	=> $account_id,
 								'department_id'	=> $rowpo->department_id,
 								'type'			=> '1',
 								'nominal'		=> $rowpo->subtotal
@@ -806,6 +805,7 @@ class CustomHelper {
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
 							'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
+							'account_id'	=> $account_id,
 							'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
 							'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
 							'type'			=> $row->type,

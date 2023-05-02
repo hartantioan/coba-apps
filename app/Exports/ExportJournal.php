@@ -12,11 +12,10 @@ class ExportJournal implements FromView
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $account = null, string $currency = null, array $dataplaces = null)
+    public function __construct(string $search = null, string $status = null, string $currency = null, array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
-        $this->account = $account ? $account : '';
         $this->currency = $currency ? $currency : '';
         $this->dataplaces = $dataplaces ? $dataplaces : [];
     }
@@ -31,19 +30,12 @@ class ExportJournal implements FromView
                             ->orWhere('note', 'like', "%$this->search%")
                             ->orWhereHas('user',function($query){
                                 $query->where('name', 'like', "%$this->search%");
-                            })->orWhereHas('account',function($query){
-                                $query->where('name', 'like', "%$this->search%");
                             });
                     });
                 }
 
                 if($this->status){
                     $query->where('status', $this->status);
-                }
-
-                if($this->account){
-                    $arrAcc = explode(',',$this->account);
-                    $query->whereIn('currency_id',$arrAcc);
                 }
                 
                 if($this->currency){

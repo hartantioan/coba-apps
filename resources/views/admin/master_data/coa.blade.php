@@ -97,6 +97,8 @@
                                                         <th>Akun Rahasia</th>
                                                         <th>Akun Kontrol</th>
                                                         <th>Akun Kas</th>
+                                                        <th>Tampil di Jurnal</th>
+                                                        <th>Wajib BP di Jurnal</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -180,7 +182,29 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
+                                <label for="show_journal">Tampilkan di Form Jurnal</label>
+                                <label class="right">
+                                    Tidak
+                                    <input type="checkbox" id="show_journal" name="show_journal" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
+                                <label for="bp_journal">BP di Form Jurnal</label>
+                                <label class="right">
+                                    Tidak
+                                    <input type="checkbox" id="bp_journal" name="bp_journal" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label class="right">
@@ -481,6 +505,8 @@
                 { name: 'confidential', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'control', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'cash', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'show_journal', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'bp_journal', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -625,6 +651,18 @@
                     $('#is_cash_account').prop( "checked", true);
                 }else{
                     $('#is_cash_account').prop( "checked", false);
+                }
+
+                if(response.show_journal == '1'){
+                    $('#show_journal').prop( "checked", true);
+                }else{
+                    $('#show_journal').prop( "checked", false);
+                }
+
+                if(response.bp_journal == '1'){
+                    $('#bp_journal').prop( "checked", true);
+                }else{
+                    $('#bp_journal').prop( "checked", false);
                 }
 
                 if(response.status == '1'){

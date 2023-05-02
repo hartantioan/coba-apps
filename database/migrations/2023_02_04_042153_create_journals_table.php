@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('journals', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('account_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->string('code', 50)->unique();
             $table->bigInteger('place_id')->nullable();
             $table->string('lookable_type')->nullable();
@@ -34,7 +34,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'place_id', 'account_id', 'lookable_type', 'lookable_id', 'currency_id']);
+            $table->index(['user_id', 'company_id', 'lookable_type', 'lookable_id', 'currency_id']);
         });
     }
 

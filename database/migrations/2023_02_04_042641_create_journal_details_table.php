@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('journal_id')->nullable();
             $table->bigInteger('coa_id')->nullable();
             $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('account_id')->nullable();
             $table->bigInteger('item_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
@@ -27,7 +28,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['journal_id', 'coa_id', 'place_id', 'item_id', 'department_id', 'warehouse_id', 'type']);
+            $table->index(['journal_id', 'coa_id', 'place_id', 'account_id', 'item_id', 'department_id', 'warehouse_id', 'type']);
         });
     }
 

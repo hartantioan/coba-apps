@@ -24,6 +24,8 @@ class Coa extends Model
         'is_confidential',
         'is_control_account',
         'is_cash_account',
+        'show_journal',
+        'bp_journal',
     ];
 
     public function company(){
@@ -44,17 +46,11 @@ class Coa extends Model
     }
 
     public function status(){
-        switch($this->status) {
-            case '1':
-                $status = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>';
-                break;
-            case '2':
-                $status = '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>';
-                break;
-            default:
-                $status = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>';
-                break;
-        }
+        $status = match ($this->status) {
+          '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',
+          '2' => '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>',
+          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+        };
 
         return $status;
     }

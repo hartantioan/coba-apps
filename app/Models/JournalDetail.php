@@ -18,6 +18,7 @@ class JournalDetail extends Model
         'journal_id',
         'coa_id',
         'place_id',
+        'account_id',
         'item_id',
         'department_id',
         'warehouse_id',
@@ -35,6 +36,10 @@ class JournalDetail extends Model
 
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function account(){
+        return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
     }
 
     public function place(){

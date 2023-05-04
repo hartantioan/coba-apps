@@ -870,6 +870,130 @@ class LandedCostController extends Controller
             $added = true;
             while($added){
                 $added=false;
+                //Pengambilan foreign branch gr
+                foreach($data_id_gr as $gr_id){
+                    $query_gr = GoodReceipt::where('id',$gr_id)->first();
+                    foreach($query_gr->goodReceiptDetail as $good_receipt_detail){
+                        $po = [
+                            'properties'=> [
+                                ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
+                            ],
+                            'key'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
+                            'name'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
+                            'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($good_receipt_detail->purchaseOrderDetail->purchaseOrder->code),
+                        ];
+                        if(count($data_pos)<1){
+                            $data_pos[]=$po;
+                            $data_go_chart[]=$po;
+                            $data_link[]=[
+                                'from'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
+                                'to'=>$query_gr->code,
+                            ];
+                            $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
+                            
+                        }else{
+                            $found = false;
+                            foreach ($data_pos as $key => $row_pos) {
+                                if ($row_pos["key"] == $po["key"]) {
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                $data_pos[] = $po;
+                                $data_link[]=[
+                                    'from'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
+                                    'to'=>$query_gr->code,
+                                ];  
+                                $data_go_chart[]=$po;
+                                $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id;
+                            }
+                        }
+
+                    }
+
+                    //landed cost searching
+                    if($query_gr->landedCost()->exists()){
+                        foreach($query_gr->landedCost as $landed_cost){
+                            $data_lc=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal : ".$landed_cost->post_date],
+                                ],
+                                'key'=>$landed_cost->code,
+                                'name'=>$landed_cost->code,
+                                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost->code),    
+                            ];
+                            if(count($data_lcs)<1){
+                                $data_lcs[]=$data_lc;
+                                $data_go_chart[]=$data_lc;
+                                $data_link[]=[
+                                    'from'=>$query_gr->code,
+                                    'to'=>$landed_cost->code,
+                                ];
+                                $data_id_lc = $landed_cost->id;
+                            }else{
+                                $found = false;
+                                foreach ($data_lcs as $key => $row_lc) {
+                                    if ($row_lc["key"] == $data_lc["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data_lcs[]=$data_lc;
+                                    $data_go_chart[]=$data_lc;
+                                    $data_link[]=[
+                                        'from'=>$query_gr->code,
+                                        'to'=>$landed_cost->code,
+                                    ];
+                                    $data_id_lc = $landed_cost->id;
+                                }
+                            }
+                            
+                        }
+                    }
+                    //invoice searching
+                    if($query_gr->purchaseInvoiceDetail()->exists()){
+                        foreach($query_gr->purchaseInvoiceDetail as $invoice_detail){
+                            $invoice_tempura=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal : ".$invoice_detail->purchaseInvoice->post_date],
+                                ],
+                                'key'=>$invoice_detail->purchaseInvoice->code,
+                                'name'=>$invoice_detail->purchaseInvoice->code,
+                                'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
+                            ];
+                            if(count($data_invoices)<1){
+                                $data_invoices[]=$invoice_tempura;
+                                $data_go_chart[]=$invoice_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_gr->code,
+                                    'to'=>$invoice_detail->purchaseInvoice->code,
+                                ];
+                                $data_id_invoice[]=$invoice_detail->purchaseInvoice->id;
+                            }else{
+                                $found = false;
+                                foreach ($data_invoices as $key => $row_invoice) {
+                                    if ($row_invoice["key"] == $invoice_tempura["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data_invoices[]=$invoice_tempura;
+                                    $data_go_chart[]=$invoice_tempura;
+                                    $data_link[]=[
+                                        'from'=>$query_gr->code,
+                                        'to'=>$invoice_detail->purchaseInvoice->code,
+                                    ];
+                                    $data_id_invoice[]=$invoice_detail->purchaseInvoice->id;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
                 foreach($data_id_invoice as $invoice_id){
                     $query_invoice = PurchaseInvoice::where('id',$invoice_id)->first();
                     foreach($query_invoice->purchaseInvoiceDetail as $row){
@@ -1061,7 +1185,7 @@ class LandedCostController extends Controller
                                 ],
                                 "key" => $row_pi->purchaseDownPayment->code,
                                 "name" => $row_pi->purchaseDownPayment->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
+                                'url'=>request()->root()."/admin/inventory/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                             ];
                             $found = false;
                             foreach($data_purchase_downpayment as $data_dp){
@@ -1081,133 +1205,6 @@ class LandedCostController extends Controller
                             }
                         }
                     }
-                }
-
-                //Pengambilan foreign branch gr
-                foreach($data_id_gr as $gr_id){
-                    info($gr_id);
-                    $query_gr = GoodReceipt::where('id',$gr_id)->first();
-                    foreach($query_gr->goodReceiptDetail as $good_receipt_detail){
-                        $po = [
-                            'properties'=> [
-                                ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
-                            ],
-                            'key'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
-                            'name'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
-                            'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($good_receipt_detail->purchaseOrderDetail->purchaseOrder->code),
-                        ];
-                        if(count($data_pos)<1){
-                            $data_pos[]=$po;
-                            $data_go_chart[]=$po;
-                            $data_link[]=[
-                                'from'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
-                                'to'=>$query_gr->code,
-                            ];
-                            info("masukgrpo ke po");
-                            info($po);
-                            $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
-                            
-                        }else{
-                            $found = false;
-                            foreach ($data_pos as $key => $row_pos) {
-                                if ($row_pos["key"] == $po["key"]) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                            if (!$found) {
-                                $data_pos[] = $po;
-                                $data_link[]=[
-                                    'from'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
-                                    'to'=>$query_gr->code,
-                                ];  
-                                $data_go_chart[]=$po;
-                                $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id;
-                            }
-                        }
-
-                    }
-
-                    //landed cost searching
-                    if($query_gr->landedCost()->exists()){
-                        foreach($query_gr->landedCost as $landed_cost){
-                            $data_lc=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal : ".$landed_cost->post_date],
-                                ],
-                                'key'=>$landed_cost->code,
-                                'name'=>$landed_cost->code,
-                                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost->code),    
-                            ];
-                            if(count($data_lcs)<1){
-                                $data_lcs[]=$data_lc;
-                                $data_go_chart[]=$data_lc;
-                                $data_link[]=[
-                                    'from'=>$query_gr->code,
-                                    'to'=>$landed_cost->code,
-                                ];
-                                $data_id_lc = $landed_cost->id;
-                            }else{
-                                $found = false;
-                                foreach ($data_lcs as $key => $row_lc) {
-                                    if ($row_lc["key"] == $data_lc["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_lcs[]=$data_lc;
-                                    $data_go_chart[]=$data_lc;
-                                    $data_link[]=[
-                                        'from'=>$query_gr->code,
-                                        'to'=>$landed_cost->code,
-                                    ];
-                                    $data_id_lc = $landed_cost->id;
-                                }
-                            }
-                            
-                        }
-                    }
-                    //invoice searching
-                    if($query_gr->purchaseInvoiceDetail()->exists()){
-                        foreach($query_gr->purchaseInvoiceDetail as $invoice_detail){
-                            $invoice_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal : ".$invoice_detail->purchaseInvoice->post_date],
-                                ],
-                                'key'=>$invoice_detail->purchaseInvoice->code,
-                                'name'=>$invoice_detail->purchaseInvoice->code,
-                                'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
-                            ];
-                            if(count($data_invoices)<1){
-                                $data_invoices[]=$invoice_tempura;
-                                $data_go_chart[]=$invoice_tempura;
-                                $data_link[]=[
-                                    'from'=>$query_gr->code,
-                                    'to'=>$invoice_detail->purchaseInvoice->code,
-                                ];
-                                $data_id_invoice[]=$invoice_detail->purchaseInvoice->id;
-                            }else{
-                                $found = false;
-                                foreach ($data_invoices as $key => $row_invoice) {
-                                    if ($row_invoice["key"] == $invoice_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_invoices[]=$invoice_tempura;
-                                    $data_go_chart[]=$invoice_tempura;
-                                    $data_link[]=[
-                                        'from'=>$query_gr->code,
-                                        'to'=>$invoice_detail->purchaseInvoice->code,
-                                    ];
-                                    $data_id_invoice[]=$invoice_detail->purchaseInvoice->id;
-                                }
-                            }
-                        }
-                    }
-
                 }
 
                 //Pengambilan foreign branch po

@@ -1346,49 +1346,6 @@ class GoodReceiptPOController extends Controller
                 }
             }
             
-            
-            // //pengambilan inovoice
-            // if($query->purchaseInvoiceDetail()->exists()){
-            //     foreach($query->purchaseInvoiceDetail as $purchase_invoce_detail){
-            //         $data_iv = [
-            //             "key" => $purchase_invoce_detail->purchaseInvoice->code,
-            //             "name" => $purchase_invoce_detail->purchaseInvoice->code,
-            //             'grandtotal'=>$purchase_invoce_detail->purchaseInvoice->grandtotal,
-            //             'properties'=> [
-            //                 ['name'=> "Tanggal :".$purchase_invoce_detail->purchaseInvoice->post_date],
-            //             ],
-            //             'arrowDirection'=>"right",
-            //             'url'=>request()->root()."/admin/inventory/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoce_detail->purchaseInvoice->code),
-            //         ];
-            //         $data_go_chart[]=$data_iv;
-            //         $data_link[]=[
-            //             'from'=>$query->code,
-            //             'to'=>$purchase_invoce_detail->purchaseInvoice->code,
-            //         ];  
-            //     }
-            // }
-            
-            // //pengambilan landed_cost
-
-            // if($query->landedCost()->exists()){
-            //     foreach($query->landedCost as $landed_cost){
-            //         $data_lc=[
-            //             "key" => $landed_cost->code,
-            //             "name" => $landed_cost->code,
-            //             'grandtotal'=>$landed_cost->grandtotal,
-            //             'properties'=> [
-            //                 ['name'=> "Tanggal :".$landed_cost->post_date],
-            //             ],
-            //             'arrowDirection'=>"right",
-            //             'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost->code)
-            //         ];
-            //         $data_go_chart[]=$data_lc;
-            //         $data_link[]=[
-            //             'from'=>$query->code,
-            //             'to'=>$landed_cost->code,
-            //         ]; 
-            //     }
-            // }
             $response = [
                 'status'  => 200,
                 'message' => $data_go_chart,

@@ -22,6 +22,9 @@ return new class extends Migration
                 $table->date('request_date')->nullable();
                 $table->text('summary_issue')->nullable();
                 $table->char('status', 1)->nullable();
+                $table->bigInteger('void_id')->nullable();
+                $table->string('void_note',155)->nullable();
+                $table->date('void_date')->nullable();
                 $table->timestamps();
                 $table->softDeletes('deleted_at');
             });

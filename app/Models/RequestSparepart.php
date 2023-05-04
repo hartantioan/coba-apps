@@ -21,6 +21,9 @@ class RequestSparepart extends Model
         'request_date',
         'summary_issue',
         'status',
+        'void_id',
+        'void_note',
+        'void_date'
     ];
     public function approval(){
         $source = ApprovalSource::where('lookable_type','request_spareparts')->where('lookable_id',$this->id)->first();
@@ -90,5 +93,10 @@ class RequestSparepart extends Model
 
         return $status;
     }
+    public function voidUser()
+    {
+        return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
+    }
+
 
 }

@@ -523,6 +523,21 @@
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
+        $("PanelExpanderButton", "METHODS",
+            { row: 2, column: 1, alignment: go.Spot.TopRight },
+            {
+                visible: true,
+                click: function(e, obj) {
+                    var node = obj.part.parent;
+                    var diagram = node.diagram;
+                    var data = node.data;
+                    diagram.startTransaction("Collapse/Expand Methods");
+                    diagram.model.setDataProperty(data, "isTreeExpanded", !data.isTreeExpanded);
+                    diagram.commitTransaction("Collapse/Expand Methods");
+                }
+            },
+            new go.Binding("visible", "methods", function(arr) { return arr.length > 0; })
+        );
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
@@ -530,6 +545,11 @@
                 console.log("");
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
+                if (part.isTreeExpanded) {
+                    part.collapseTree();
+                } else {
+                    part.expandTree();
+                }
                 console.log("Node clicked: " + part.data.key);
             }
         });
@@ -538,52 +558,65 @@
             {
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
-            toSpot: go.Spot.AllSides
+            toSpot: go.Spot.AllSides,
+            portId: "",  
+
             },
+            { isTreeExpanded: false },  
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
-                new go.Binding("fill", "color")),
+            new go.Binding("fill", "color")),
             $(go.Panel, "Table",
             { defaultRowSeparatorStroke: "black" },
-        
             $(go.TextBlock,
                 {
                 row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
                 font: "bold 12pt sans-serif",
                 isMultiline: false, editable: true
                 },
-                new go.Binding("text", "name").makeTwoWay()),
-        
+                new go.Binding("text", "name").makeTwoWay()
+            ),
             $(go.TextBlock, "Properties",
                 { row: 1, font: "italic 10pt sans-serif" },
-                new go.Binding("visible", "visible", function(v) { return !v; }).ofObject("PROPERTIES")),
+                new go.Binding("visible", "visible", function(v) { return !v; }).ofObject("PROPERTIES")
+            ),
             $(go.Panel, "Vertical", { name: "PROPERTIES" },
                 new go.Binding("itemArray", "properties"),
                 {
                 row: 1, margin: 3, stretch: go.GraphObject.Fill,
                 defaultAlignment: go.Spot.Left,
-                
                 }
             ),
-            $("PanelExpanderButton", "PROPERTIES",
-                { row: 1, column: 1, alignment: go.Spot.TopRight, visible: false },
-                new go.Binding("visible", "properties", function(arr) { return arr.length > 0; })),
-    
-            $(go.TextBlock, "Methods",
-                { row: 2, font: "italic 10pt sans-serif" },
-                new go.Binding("visible", "visible", function(v) { return !v; }).ofObject("METHODS")),
-            $(go.Panel, "Vertical", { name: "METHODS" },
-                new go.Binding("itemArray", "methods"),
-                {
-                row: 2, margin: 3, stretch: go.GraphObject.Fill,
-                defaultAlignment: go.Spot.Left, background: "lightyellow",
-                
-                }
+            
+            $(go.Panel, "Auto",
+                { portId: "r" },
+                { margin: 6 },
+                $(go.Shape, "Circle", { fill: "transparent", stroke: null, desiredSize: new go.Size(8, 8) })
             ),
-            $("PanelExpanderButton", "METHODS",
-                { row: 2, column: 1, alignment: go.Spot.TopRight, visible: false },
-                new go.Binding("visible", "methods", function(arr) { return arr.length > 0; }))
+            ),
+
+            $("TreeExpanderButton",
+            { alignment: go.Spot.Right, alignmentFocus: go.Spot.Right, width: 14, height: 14 }
             )
         );
+        myDiagram.model.root = data[0].key;
+        console.log(data[0].key);
+
+        myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
+        setTimeout(function() {
+            console.log(data[0].key);
+            var rootKey = data[0].key; 
+            var rootNode = myDiagram.findNodeForKey(rootKey);
+            if (rootNode !== null) {
+                rootNode.collapseTree();
+            }
+        }, 100); 
+        });
+
+        myDiagram.layout = $(go.TreeLayout);
+
+        myDiagram.addDiagramListener("InitialLayoutCompleted", e => {
+            e.diagram.findTreeRoots().each(r => r.expandTree(3));
+        });
 
         myDiagram.model = $(go.GraphLinksModel,
         {
@@ -591,8 +624,7 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });
-            
+        });    
             
     }
 

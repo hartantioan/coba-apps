@@ -1110,7 +1110,7 @@ class PurchaseOrderController extends Controller
                                     }
                                     //po yang memiliki request yang sama
                                     if($found){
-                                        $data_link[]=[
+                                        $data_links=[
                                             'from'=>$query_invoice->code,
                                             'to'=>$row_po->code,
                                         ]; 
@@ -1276,6 +1276,23 @@ class PurchaseOrderController extends Controller
                                     break;
                                 }
 
+                            }
+                            if($found){
+                                $data_links=[
+                                    'from'=>$row_pi->purchaseDownPayment->code,
+                                    'to'=>$query_invoice->code,
+                                ];
+                                $found_inlink = false;
+                                foreach($data_link as $key=>$row_link){
+                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                        $found_inlink = true;
+                                        break;
+                                    }
+                                }
+                                if(!$found_inlink){
+                                    $data_link[] = $data_links;
+                                }
+                                
                             }
                             if(!$found){
                                 $data_go_chart[]=$data_down_payment;

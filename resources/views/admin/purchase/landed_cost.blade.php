@@ -560,7 +560,6 @@
             portId: "",  
 
             },
-            { isTreeExpanded: false },  
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",

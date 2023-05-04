@@ -50,7 +50,7 @@ class RequestSparepart extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'RSp-'.date('y').date('m').date('d').'-';
+        $pre = 'RSP-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }

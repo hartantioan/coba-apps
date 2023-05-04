@@ -180,4 +180,14 @@ class PaymentRequest extends Model
             return '';
         }
     }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        if($this->outgoingPayment()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
+    }
 }

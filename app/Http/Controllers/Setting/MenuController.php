@@ -226,7 +226,7 @@ class MenuController extends Controller
                         'parent_id'	        => $request->parent_id ? $request->parent_id : NULL,
                         'order'             => $request->order,
                         'status'            => $request->status ? $request->status : '2',
-                        'is_maintenance'    => $request->maintenance ? $request->maintenance : '2'
+                        'is_maintenance'    => $request->maintenance ? $request->maintenance : NULL
                     ]);
                     
                     DB::commit();

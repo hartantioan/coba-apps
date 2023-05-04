@@ -198,4 +198,18 @@ class GoodReceipt extends Model
 
         return $html;
     }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        if($this->landedCost()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->purchaseInvoiceDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
+    }
 }

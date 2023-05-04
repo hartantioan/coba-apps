@@ -26,7 +26,7 @@ class Activity extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id');
     }
 
-    public function workorder(){
+    public function workOrder(){
         return $this->hasMany('App\Models\WorkOrder')->whereIn('status',['2','3']);
     }
 

@@ -55,7 +55,7 @@ class Place extends Model
         return $this->belongsTo('App\Models\Region','province_id','id')->withTrashed();
     }
 
-    public function workorder(){
+    public function workOrder(){
         return $this->hasMany('App\Models\WorkOrder')->whereIn('status',['2','3']);;
     }
 

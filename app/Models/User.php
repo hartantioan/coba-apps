@@ -297,7 +297,7 @@ class User extends Authenticatable
             return '';
         }
     }
-    public function workorder(){
+    public function workOrder(){
         return $this->hasMany('App\Models\WorkOrder')->whereIn('status',['2','3']);
     }
 }

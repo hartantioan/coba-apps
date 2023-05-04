@@ -162,11 +162,6 @@ class PurchaseOrder extends Model
         return $total;
     }
 
-    public function goodReceipt()
-    {
-        return $this->hasOne('App\Models\GoodReceipt');
-    }
-
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
@@ -281,5 +276,17 @@ class PurchaseOrder extends Model
         $html .= '</ol>';
 
         return $html;
+    }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        foreach($this->purchaseOrderDetail as $row){
+            if($row->goodReceiptDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
+
+        return $hasRelation;
     }
 }

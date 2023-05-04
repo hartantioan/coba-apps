@@ -247,7 +247,7 @@ class PurchaseRequestController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
-            }elseif($query->purchaseOrderDetailComposition()->exists()){
+            }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah digunakan pada Purchase Order.'

@@ -159,4 +159,16 @@ class PurchaseRequest extends Model
             return false;
         }
     }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        foreach($this->purchaseRequestDetail as $row){
+            if($row->purchaseOrderDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
+
+        return $hasRelation;
+    }
 }

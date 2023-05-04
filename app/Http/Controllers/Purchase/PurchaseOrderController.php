@@ -801,6 +801,11 @@ class PurchaseOrderController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Good Receipt PO.'
+                ];
             }else{
                 $query->update([
                     'status'    => '5',

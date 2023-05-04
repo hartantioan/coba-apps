@@ -234,4 +234,18 @@ class PurchaseDownPayment extends Model
             return '';
         }
     }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        if($this->purchaseInvoiceDp()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->hasPaymentRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
+    }
 }

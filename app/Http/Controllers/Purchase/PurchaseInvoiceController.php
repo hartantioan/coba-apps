@@ -759,6 +759,11 @@ class PurchaseInvoiceController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Payment Request.'
+                ];
             }else{
 
                 $query->update([

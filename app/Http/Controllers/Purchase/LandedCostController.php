@@ -615,8 +615,12 @@ class LandedCostController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Purchase Invoice.'
+                ];
             }else{
-
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),

@@ -588,6 +588,11 @@ class PurchaseDownPaymentController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Payment Request / Purchase Invoice sebagai DP.'
+                ];
             }else{
                 CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
                 CustomHelper::removeApproval('purchase_down_payments',$query->id);

@@ -205,4 +205,14 @@ class FundRequest extends Model
             return '';
         }
     }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        if($this->hasPaymentRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
+    }
 }

@@ -240,4 +240,14 @@ class LandedCost extends Model
 
         return $html;
     }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        if($this->purchaseInvoiceDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        return $hasRelation;
+    }
 }

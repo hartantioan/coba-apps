@@ -37,6 +37,21 @@ class PaymentRequestDetail extends Model
         return $this->morphTo();
     }
 
+    public function purchaseDownPayment()
+    {
+        return $this->belongsTo('App\Models\PurchaseDownPayment', 'lookable_id', 'id')->where('lookable_type','purchase_down_payments')->withTrashed();
+    }
+
+    public function purchaseInvoice()
+    {
+        return $this->belongsTo('App\Models\PurchaseInvoice', 'lookable_id', 'id')->where('lookable_type','purchase_invoices')->withTrashed();
+    }
+
+    public function fundRequest()
+    {
+        return $this->belongsTo('App\Models\FundRequest', 'lookable_id', 'id')->where('lookable_type','fund_requests')->withTrashed();
+    }
+
     public function type(){
         $type = match ($this->lookable_type) {
             'fund_requests'             => 'Permohonan Dana',

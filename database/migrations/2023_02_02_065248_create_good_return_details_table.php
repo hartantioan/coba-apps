@@ -17,10 +17,13 @@ return new class extends Migration
         Schema::create('good_return_details', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('good_return_id')->nullable();
+            $table->bigInteger('good_receipt_detail_id')->nullable();
             $table->bigInteger('item_id')->nullable();
             $table->double('qty')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['good_return_id', 'good_receipt_detail_id', 'item_id'],'good_returns_details_index');
         });
     }
 

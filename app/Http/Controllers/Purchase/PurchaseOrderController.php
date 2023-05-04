@@ -846,8 +846,9 @@ class PurchaseOrderController extends Controller
 
         $data_id_po = [];
         $data_id_gr = [];
-        $data_id_lc = [];
         $data_id_invoice=[];
+
+        $data_purchase_downpayment=[];
 
         $data_pos = [];
 
@@ -1042,7 +1043,7 @@ class PurchaseOrderController extends Controller
                                 ],
                                 'key'=>$invoice_detail->purchaseInvoice->code,
                                 'name'=>$invoice_detail->purchaseInvoice->code,
-                                'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
+                                'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
                             ];
                             if(count($data_invoices)<1){
                                 $data_invoices[]=$invoice_tempura;
@@ -1266,13 +1267,24 @@ class PurchaseOrderController extends Controller
                                 ],
                                 "key" => $row_pi->purchaseDownPayment->code,
                                 "name" => $row_pi->purchaseDownPayment->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
+                                'url'=>request()->root()."/admin/inventory/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                             ];
-                            $data_go_chart[]=$data_down_payment;
-                            $data_link[]=[
-                                'from'=>$row_pi->purchaseDownPayment->code,
-                                'to'=>$query_invoice->code,
-                            ];
+                            $found = false;
+                            foreach($data_purchase_downpayment as $data_dp){
+                                if($data_dp["key"]==$data_down_payment["key"]){
+                                    $found= true;
+                                    break;
+                                }
+
+                            }
+                            if(!$found){
+                                $data_go_chart[]=$data_down_payment;
+                                $data_link[]=[
+                                    'from'=>$row_pi->purchaseDownPayment->code,
+                                    'to'=>$query_invoice->code,
+                                ];
+                                $data_purchase_downpayment[]=$data_down_payment;
+                            }
                         }
                     }
                 }
@@ -1280,11 +1292,11 @@ class PurchaseOrderController extends Controller
                 //Pengambilan foreign branch po
                 foreach($data_id_po as $po_id){
                     $query_po = PurchaseOrder::find($po_id);
-                    info($query_po);
+                   
                     foreach($query_po->purchaseOrderDetail as $purchase_order_detail){
-                        info($purchase_order_detail);
+                       
                         if($purchase_order_detail->purchaseRequestDetail()->exists()){
-                            info("halo");
+                        
                             $pr_tempura=[
                                 'key'   => $purchase_order_detail->purchaseRequestDetail->purchaseRequest->code,
                                 "name"  => $purchase_order_detail->purchaseRequestDetail->purchaseRequest->code,

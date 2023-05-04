@@ -1101,7 +1101,7 @@ class PurchaseDownPaymentController extends Controller
                                 ],
                                 "key" => $row_pi->purchaseDownPayment->code,
                                 "name" => $row_pi->purchaseDownPayment->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
+                                'url'=>request()->root()."/admin/inventory/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                             ];
                             $found = false;
                             foreach($data_purchase_downpayment as $data_dp){
@@ -1217,7 +1217,7 @@ class PurchaseDownPaymentController extends Controller
                                 ],
                                 'key'=>$invoice_detail->purchaseInvoice->code,
                                 'name'=>$invoice_detail->purchaseInvoice->code,
-                                'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
+                                'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
                             ];
                             if(count($data_invoices)<1){
                                 $data_invoices[]=$invoice_tempura;

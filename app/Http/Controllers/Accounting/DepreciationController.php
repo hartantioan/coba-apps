@@ -1,15 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Accounting;
+use App\Exports\ExportDepreciation;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\Currency;
-use App\Models\Department;
 use App\Models\Place;
 use App\Models\User;
 use App\Models\Asset;
-use App\Models\Capitalization;
-use App\Models\CapitalizationDetail;
+use App\Models\Depreciation;
+use App\Models\DepreciationDetail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -17,11 +16,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ExportCapitalization;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 
-class CapitalizationController extends Controller
+class DepreciationController extends Controller
 {
     protected $dataplaces;
 
@@ -34,10 +32,9 @@ class CapitalizationController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Kapitalisasi Aset',
-            'content'   => 'admin.accounting.capitalization',
+            'title'     => 'Depresiasi Aset',
+            'content'   => 'admin.accounting.depreciation',
             'company'   => Company::where('status','1')->get(),
-            'currency'  => Currency::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -49,9 +46,8 @@ class CapitalizationController extends Controller
             'code',
             'user_id',
             'company_id',
-            'currency_id',
-            'currency_rate',
             'post_date',
+            'period',
             'note',
         ];
 
@@ -61,9 +57,9 @@ class CapitalizationController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Capitalization::count();
+        $total_data = Depreciation::count();
         
-        $query_data = Capitalization::where(function($query) use ($search, $request) {
+        $query_data = Depreciation::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -80,7 +76,7 @@ class CapitalizationController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = Capitalization::where(function($query) use ($search, $request) {
+        $total_filtered = Depreciation::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -104,9 +100,8 @@ class CapitalizationController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    $val->currency->code.' - '.$val->currency->name,
-                    number_format($val->currency_rate,3,',','.'),
-                    date('d M Y',strtotime($val->post_date)),
+                    date('d/m/y',strtotime($val->post_date)),
+                    date('F Y',strtotime($val->period)),
                     $val->note,
                     $val->status(),
                     '
@@ -134,34 +129,45 @@ class CapitalizationController extends Controller
         return response()->json($response);
     }
 
+    public function preview(Request $request){
+        $data = Asset::whereNotNull('book_balance')->where('book_balance','>',0)->whereHas('place', function($query) use($request){
+            $query->where('company_id',$request->company_id);
+        })->get();
+
+        $arr = [];
+
+        foreach($data as $row){
+            if(!$row->checkDepreciationByMonth($request->period)){
+                $arr[] = [
+                    'asset_id'      => $row->id,
+                    'asset_code'    => $row->code,
+                    'asset_name'    => $row->name,
+                    'asset_place'   => $row->place->name,
+                    'method'        => $row->method,
+                    'method_name'   => $row->method(),
+                    'nominal'       => number_format($row->nominalDepreciation(),2,',','.'),
+                ];
+            }
+        }
+
+        return response()->json($arr);
+    }
+
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'post_date'			    => 'required',
 			'company_id'		    => 'required',
-            'currency_id'		    => 'required',
-            'currency_rate'		    => 'required',
+            'period'		        => 'required',
             'note'		            => 'required',
             'arr_asset_id'          => 'required|array',
-            'arr_price'             => 'required|array',
-            'arr_qty'               => 'required|array',
-            'arr_unit'              => 'required|array',
             'arr_total'             => 'required|array',
 		], [
-			'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
 			'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'currency_id.required' 			    => 'Mata uang tidak boleh kosong.',
-            'currency_rate.required' 			=> 'Konversi tidak boleh kosong.',
+            'period.required' 			        => 'Periode tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'arr_asset_id.required'             => 'Aset tidak boleh kosong',
             'arr_asset_id.array'                => 'Aset harus dalam bentuk array.',
-            'arr_price.required'                => 'Harga tidak boleh kosong',
-            'arr_price.array'                   => 'Harga harus dalam bentuk array.',
-            'arr_qty.required'                  => 'Qty tidak boleh kosong',
-            'arr_qty.array'                     => 'Qty harus dalam bentuk array.',
-            'arr_unit.required'                 => 'Satuan tidak boleh kosong',
-            'arr_unit.array'                    => 'Satuan harus dalam bentuk array.',
-            'arr_total.required'                => 'Total tidak boleh kosong',
-            'arr_total.array'                   => 'Total harus dalam bentuk array.',
+            'arr_total.required'                => 'Nominal total tidak boleh kosong',
+            'arr_total.array'                   => 'Nominal total harus dalam bentuk array.',
 		]);
 
         if($validation->fails()) {
@@ -171,22 +177,17 @@ class CapitalizationController extends Controller
             ];
         } else {
 
-            $grandtotal = 0;
-
-            foreach($request->arr_total as $row){
-                $grandtotal += str_replace(',','.',str_replace('.','',$row));
-            }
 
 			if($request->temp){
                 
-                $query = Capitalization::where('code',CustomHelper::decrypt($request->temp))->first();
+                $query = Depreciation::where('code',CustomHelper::decrypt($request->temp))->first();
 
                 if($query->approval()){
                     foreach($query->approval()->approvalMatrix as $row){
                         if($row->status == '2'){
                             return response()->json([
                                 'status'  => 500,
-                                'message' => 'Kapitalisasi aset telah diapprove, anda tidak bisa melakukan perubahan.'
+                                'message' => 'Depresiasi aset telah diapprove, anda tidak bisa melakukan perubahan.'
                             ]);
                         }
                     }
@@ -195,63 +196,48 @@ class CapitalizationController extends Controller
                 if($query->status == '1'){
                     $query->user_id = session('bo_id');
                     $query->company_id = $request->company_id;
-                    $query->currency_id = $request->currency_id;
-                    $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                    $query->post_date = $request->post_date;
+                    $query->post_date = date('Y-m-d');
+                    $query->period = $request->period;
                     $query->note = $request->note;
-                    $query->grandtotal = $grandtotal;
                     $query->save();
 
-                    foreach($query->capitalizationDetail as $row){
+                    foreach($query->depreciationDetail as $row){
                         $row->delete();
                     }
-
-                    CustomHelper::removeJournal('capitalizations',$query->id);
 
                 }else{
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Status kapitalisasi sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                        'message' => 'Status depresiasi aset sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                     ]);
                 }
 			}else{
-                $query = Capitalization::create([
-                    'code'			=> Capitalization::generateCode(),
+                $query = Depreciation::create([
+                    'code'			=> Depreciation::generateCode(),
                     'user_id'		=> session('bo_id'),
                     'company_id'    => $request->company_id,
-                    'currency_id'   => $request->currency_id,
-                    'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                    'post_date'	    => $request->post_date,
+                    'post_date'	    => date('Y-m-d'),
+                    'period'        => $request->period,
                     'status'        => '1',
                     'note'          => $request->note,
-                    'grandtotal'    => $grandtotal
                 ]);
 			}
 			
 			if($query) {
                 
                 foreach($request->arr_asset_id as $key => $row){
-                    CapitalizationDetail::create([
-                        'capitalization_id'     => $query->id,
+                    DepreciationDetail::create([
+                        'depreciation_id'       => $query->id,
                         'asset_id'              => $row,
-                        'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                        'unit_id'               => $request->arr_unit[$key],
-                        'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                        'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                        'note'                  => $request->arr_note[$key]
-                    ]);
-                    Asset::find(intval($row))->update([
-                        'date'          => $query->post_date,
-                        'nominal'       => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                        'book_balance'  => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                        'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                     ]);
                 }
 
-                CustomHelper::sendApproval('capitalizations',$query->id,$query->note);
-                CustomHelper::sendNotification('capitalizations',$query->id,'Pengajuan Kapitalisasi No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval('depreciations',$query->id,$query->note);
+                CustomHelper::sendNotification('depreciations',$query->id,'Pengajuan Depresiasi No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
-                    ->performedOn(new Capitalization())
+                    ->performedOn(new Depreciation())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Add / edit purchase request.');
@@ -272,30 +258,24 @@ class CapitalizationController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = Capitalization::find($request->id);
+        $data   = Depreciation::find($request->id);
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Aset</th>
-                                <th class="center-align">Harga</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">Unit</th>
-                                <th class="center-align">Total</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Depresiasi Ke</th>
+                                <th class="center-align">Nominal</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->capitalizationDetail as $key => $row){
+        foreach($data->depreciationDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->asset->code.' - '.$row->asset->name.'</td>
-                <td class="right-align">'.number_format($row->price,3,',','.').'</td>
-                <td class="center-align">'.$row->qty.'</td>
-                <td class="center-align">'.$row->unit->code.'</td>
-                <td class="right-align">'.number_format($row->total,3,',','.').'</td>
-                <td>'.$row->note.'</td>
+                <td class="center-align">'.$row->depreciationNumber().' / '.$row->asset->assetGroup->depreciation_period.'</td>
+                <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
             </tr>';
         }
         
@@ -335,32 +315,29 @@ class CapitalizationController extends Controller
     }
 
     public function show(Request $request){
-        $cap = Capitalization::where('code',CustomHelper::decrypt($request->id))->first();
-        $cap['currency_rate'] = number_format($cap->currency_rate,3,',','.');
+        $dpr = Depreciation::where('code',CustomHelper::decrypt($request->id))->first();
 
         $arr = [];
         
-        foreach($cap->capitalizationDetail as $row){
+        foreach($dpr->depreciationDetail as $row){
             $arr[] = [
-                'asset_id'          => $row->asset_id,
-                'asset_code'        => $row->asset->code,
-                'asset_name'        => $row->asset->name,
-                'qty'               => $row->qty,
-                'unit_id'           => $row->unit_id,
-                'unit_name'         => $row->unit->name,
-                'price'             => number_format($row->price,3,',','.'),
-                'total'             => number_format($row->total,3,',','.'),
-                'note'              => $row->note
+                'asset_id'      => $row->asset_id,
+                'asset_code'    => $row->asset->code,
+                'asset_name'    => $row->asset->name,
+                'asset_place'   => $row->asset->place->name,
+                'method'        => $row->asset->method,
+                'method_name'   => $row->asset->method(),
+                'nominal'       => number_format($row->nominal,2,',','.'),
             ];
         }
 
-        $cap['details'] = $arr;
+        $dpr['details'] = $arr;
         				
-		return response()->json($cap);
+		return response()->json($dpr);
     }
 
     public function voidStatus(Request $request){
-        $query = Capitalization::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = Depreciation::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(in_array($query->status,['4','5'])){
@@ -376,23 +353,21 @@ class CapitalizationController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                foreach($query->capitalizationDetail as $row){
-                    Asset::find($row->asset_id)->update([
-                        'date'          => NULL,
-                        'nominal'       => NULL,
-                        'book_balance'  => NULL,
-                    ]);
+                if(in_array($query->status,['2','3'])){
+                    foreach($query->depreciationDetail as $row){
+                        CustomHelper::updateBalanceAsset($row->asset_id,$row->nominal,'IN');
+                    }
                 }
     
                 activity()
-                    ->performedOn(new Capitalization())
+                    ->performedOn(new Depreciation())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the capitalization data');
+                    ->log('Void the depreciation data');
     
-                CustomHelper::sendNotification('capitalizations',$query->id,'Kapitalisasi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('capitalizations',$query->id);
-                CustomHelper::removeJournal('capitalizations',$query->id);
+                CustomHelper::sendNotification('depreciations',$query->id,'Depresiasi Aset No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('depreciations',$query->id);
+                CustomHelper::removeJournal('depreciations',$query->id);
 
                 $response = [
                     'status'  => 200,
@@ -410,7 +385,7 @@ class CapitalizationController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = Capitalization::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = Depreciation::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
@@ -432,23 +407,15 @@ class CapitalizationController extends Controller
         
         if($query->delete()) {
 
-            CustomHelper::removeApproval('capitalizations',$query->id);
-            CustomHelper::removeJournal('capitalizations',$query->id);
+            CustomHelper::removeApproval('depreciations',$query->id);
             
-            foreach($query->capitalizationDetail as $row){
-                Asset::find($row->asset_id)->update([
-                    'date'          => NULL,
-                    'nominal'       => NULL,
-                    'book_balance'  => NULL,
-                ]);
-                $row->delete();
-            }
+            $query->depreciationDetail()->delete();
 
             activity()
-                ->performedOn(new Capitalization())
+                ->performedOn(new Depreciation())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the capitalization data');
+                ->log('Delete the depreciation data');
 
             $response = [
                 'status'  => 200,
@@ -467,8 +434,8 @@ class CapitalizationController extends Controller
     public function print(Request $request){
 
         $data = [
-            'title' => 'ASSET CAPITALIZATION REPORT',
-            'data' => Capitalization::where(function($query) use ($request) {
+            'title' => 'ASSET DEPRECIATION REPORT',
+            'data' => Depreciation::where(function($query) use ($request) {
                 if($request->search) {
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
@@ -483,24 +450,24 @@ class CapitalizationController extends Controller
             ->get()
 		];
 		
-		return view('admin.print.accounting.capitalization', $data);
+		return view('admin.print.accounting.depreciation', $data);
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportCapitalization($request->search,$request->status,$this->dataplaces), 'capitalization_'.uniqid().'.xlsx');
+		return Excel::download(new ExportDepreciation($request->search,$request->status,$this->dataplaces), 'depreciation_'.uniqid().'.xlsx');
     }
-
+    
     public function approval(Request $request,$id){
         
-        $cap = Capitalization::where('code',CustomHelper::decrypt($id))->first();
+        $dpr = Depreciation::where('code',CustomHelper::decrypt($id))->first();
                 
-        if($cap){
+        if($dpr){
             $data = [
-                'title'     => 'Print Capitalization',
-                'data'      => $cap
+                'title'     => 'Print Depreciation',
+                'data'      => $dpr
             ];
 
-            return view('admin.approval.capitalization', $data);
+            return view('admin.approval.depreciation', $data);
         }else{
             abort(404);
         }

@@ -193,15 +193,15 @@ class User extends Authenticatable
     }
 
     public function fundRequest(){
-        return $this->hasMany('App\Models\FundRequest','account_id','id')->where('status','2');
+        return $this->hasMany('App\Models\FundRequest','account_id','id')->whereIn('status',['2','3']);
     }
 
     public function purchaseDownPayment(){
-        return $this->hasMany('App\Models\PurchaseDownPayment','account_id','id')->where('status','2');
+        return $this->hasMany('App\Models\PurchaseDownPayment','account_id','id')->whereIn('status',['2','3']);
     }
 
     public function purchaseInvoice(){
-        return $this->hasMany('App\Models\PurchaseInvoice','account_id','id')->where('status','2');
+        return $this->hasMany('App\Models\PurchaseInvoice','account_id','id')->whereIn('status',['2','3']);
     }
 
     public function userPlace(){
@@ -265,7 +265,7 @@ class User extends Authenticatable
     }
 
     public function availablePurchaseOrder(){
-        return $this->hasMany('App\Models\PurchaseOrder','account_id','id')->where('status','2');
+        return $this->hasMany('App\Models\PurchaseOrder','account_id','id')->whereIn('status',['2','3']);
     }
 
     public function checkMenu($id,$type){
@@ -298,6 +298,6 @@ class User extends Authenticatable
         }
     }
     public function workorder(){
-        return $this->hasMany('App\Models\WorkOrder');
+        return $this->hasMany('App\Models\WorkOrder')->whereIn('status',['2','3']);
     }
 }

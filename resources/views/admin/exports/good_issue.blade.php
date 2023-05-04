@@ -6,14 +6,9 @@
             <th rowspan="2">Code</th>
             <th rowspan="2">Perusahaan</th>
             <th rowspan="2">Tanggal</th>
-            <th colspan="2">Mata Uang</th>
             <th rowspan="2">Keterangan</th>
             <th rowspan="2">Dokumen</th>
             <th rowspan="2">Status</th>
-        </tr>
-        <tr align="center">
-            <th>Kode</th>
-            <th>Konversi</th>
         </tr>
     </thead>
     <tbody>
@@ -24,8 +19,6 @@
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->company->name }}</td>
                 <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-                <td>{{ $row->currency->code }}</td>
-                <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
                 <td>{{ $row->note }}</td>
                 <td><a href="{{ $row->attachment() }}">File</a></td>
                 <td>{!! $row->status() !!}</td>

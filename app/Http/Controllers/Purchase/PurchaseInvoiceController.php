@@ -68,22 +68,24 @@ class PurchaseInvoiceController extends Controller
         $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','2')->where('account_id',$request->id)->get();
 
         foreach($datapo as $row){
-            $details[] = [
-                'type'          => 'purchase_order',
-                'code'          => CustomHelper::encrypt($row->code),
-                'rawcode'       => $row->code,
-                'post_date'     => date('d/m/y',strtotime($row->post_date)),
-                'due_date'      => date('d/m/y',strtotime($row->post_date)),
-                'total'         => number_format($row->total,2,',','.'),
-                'tax'           => number_format($row->tax,2,',','.'),
-                'wtax'          => number_format($row->wtax,2,',','.'),
-                'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                'info'          => '',
-                'top'           => $row->payment_term,
-                'delivery_no'   => '-',
-                'purchase_no'   => 'NO PO - '.$row->code,
-                'list_item'     => $row->getListItem(),
-            ];
+            if($row->balanceInvoice() > 0){
+                $details[] = [
+                    'type'          => 'purchase_order',
+                    'code'          => CustomHelper::encrypt($row->code),
+                    'rawcode'       => $row->code,
+                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                    'due_date'      => date('d/m/y',strtotime($row->post_date)),
+                    'total'         => number_format($row->total,2,',','.'),
+                    'tax'           => number_format($row->tax,2,',','.'),
+                    'wtax'          => number_format($row->wtax,2,',','.'),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'info'          => '',
+                    'top'           => $row->payment_term,
+                    'delivery_no'   => '-',
+                    'purchase_no'   => 'NO PO - '.$row->code,
+                    'list_item'     => $row->getListItem(),
+                ];
+            }
         }
 
         $datagr = GoodReceipt::where('status','2')->where('account_id',$request->id)->get();

@@ -27,8 +27,9 @@ return new class extends Migration
             $table->double('nominal')->nullable();
             $table->char('method',1)->nullable();
             $table->bigInteger('cost_coa_id')->nullable();
-            $table->string('note')->nullable;
+            $table->string('note')->nullable();
             $table->char('status',1)->nullable();
+            $table->double('book_balance')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 

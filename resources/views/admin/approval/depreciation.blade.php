@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Retirement # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Depresiasi Aset # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -134,7 +134,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Retirement Aset Perusahaan</h5>
+                <h5 class="indigo-text">Depresiasi Aset Perusahaan</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="40%">
@@ -182,6 +182,14 @@
                         </tr>
                         <tr>
                             <td width="40%">
+                                Periode
+                            </td>
+                            <td width="60%">
+                                {{ date('F Y',strtotime($data->period)) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
                                 Catatan
                             </td>
                             <td width="60%">
@@ -197,26 +205,20 @@
                 <thead>
                     <tr>
                         <th class="center">No.</th>
-                        <th class="center">Aset</th>
-                        <th class="center">Qty</th>
-                        <th class="center">Satuan</th>
-                        <th class="center">Nominal Aset</th>
-                        <th class="center">Nominal Retirement</th>
-                        <th class="center">Keterangan</th>
-                        <th class="center">Coa</th>
+                        <th class="center">Nama Aset</th>
+                        <th class="center">Kode Aset</th>
+                        <th class="center">Dep. Ke</th>
+                        <th class="center">Nominal Dep.</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->retirementDetail as $key => $row)
+                    @foreach($data->depreciationDetail as $key => $row)
                         <tr>
                             <td class="center-align">{{ $key + 1 }}</td>
                             <td>{{ $row->asset->name }}</td>
-                            <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
-                            <td class="center-align">{{ $row->unit->code }}</td>
-                            <td class="right-align">{{ number_format($row->asset->nominal,3,',','.') }}</td>
-                            <td class="right-align">{{ number_format($row->retirement_nominal,3,',','.') }}</td>
-                            <td>{{ $row->note }}</td>
-                            <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                            <td>{{ $row->asset->code }}</td>
+                            <td class="center">{{ $row->depreciationNumber().' / '.$row->asset->assetGroup->depreciation_period }}</td>
+                            <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
                         </tr>
                     @endforeach
                 </tbody>

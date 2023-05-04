@@ -200,7 +200,7 @@
                                                 <td>
                                                     <select class="browser-default" id="arr_place0" name="arr_place[]">
                                                         @foreach ($place as $rowplace)
-                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                                         @endforeach
                                                     </select>    
                                                 </td>
@@ -728,7 +728,7 @@
                                 <td>
                                     <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
                                         @foreach ($place as $rowplace)
-                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                         @endforeach
                                     </select>    
                                 </td>
@@ -847,7 +847,7 @@
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                         @foreach ($place as $rowplace)
-                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                         @endforeach
                     </select>    
                 </td>

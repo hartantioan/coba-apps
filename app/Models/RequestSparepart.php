@@ -23,7 +23,7 @@ class RequestSparepart extends Model
         'status',
     ];
     public function approval(){
-        $source = ApprovalSource::where('lookable_type','purchase_orders')->where('lookable_id',$this->id)->first();
+        $source = ApprovalSource::where('lookable_type','request_spareparts')->where('lookable_id',$this->id)->first();
         if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{

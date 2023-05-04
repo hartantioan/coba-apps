@@ -108,7 +108,7 @@
                         <div class="input-field col s6">
                             <select id="place_id" name="place_id">
                                 @foreach($place as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
                                 @endforeach
                             </select>
                             <label for="plant_id">Site</label>

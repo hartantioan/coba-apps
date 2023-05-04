@@ -78,6 +78,11 @@
                                     <h4 class="card-title">List Data</h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card purple">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Data yang anda tambahkan disini akan mempengaruhi nilai awal dan saldo buku aset terpilih.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>

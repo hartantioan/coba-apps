@@ -107,7 +107,7 @@
                         <div class="input-field col s4">
                             <select class="form-control" id="place_id" name="place_id">
                                 @foreach($place as $b)
-                                    <option value="{{ $b->id }}">{{ $b->name.' - '.$b->company->name }}</option>
+                                    <option value="{{ $b->id }}">{{ $b->code }}</option>
                                 @endforeach
                             </select>
                             <label class="" for="place_id">Site</label>

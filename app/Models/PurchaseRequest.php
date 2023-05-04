@@ -56,11 +56,6 @@ class PurchaseRequest extends Model
         return $this->hasMany('App\Models\PurchaseRequestDetail');
     }
 
-    public function purchaseOrderDetailComposition()
-    {
-        return $this->hasMany('App\Models\PurchaseOrderDetailComposition','pr_id','id');
-    }
-
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }

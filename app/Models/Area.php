@@ -55,6 +55,6 @@ class Area extends Model
     }
 
     public function workorder(){
-        return $this->hasMany('App\Models\WorkOrder');
+        return $this->hasMany('App\Models\WorkOrder')->whereIn('status',['2','3']);
     }
 }

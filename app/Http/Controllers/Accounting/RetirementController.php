@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use App\Models\Department;
-use App\Models\Place;
+use App\Models\Company;
 use App\Models\User;
 use App\Models\Asset;
 use App\Models\Retirement;
@@ -35,7 +35,7 @@ class RetirementController extends Controller
         $data = [
             'title'     => 'Purna Operasi Aset',
             'content'   => 'admin.accounting.retirement',
-            'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
+            'company'   => Company::where('status','1')->get(),
             'currency'  => Currency::where('status','1')->get(),
         ];
 
@@ -47,7 +47,7 @@ class RetirementController extends Controller
             'id',
             'code',
             'user_id',
-            'place_id',
+            'company_id',
             'currency_id',
             'currency_rate',
             'post_date',
@@ -60,7 +60,7 @@ class RetirementController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Retirement::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = Retirement::count();
         
         $query_data = Retirement::where(function($query) use ($search, $request) {
                 if($search) {
@@ -74,7 +74,6 @@ class RetirementController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -92,7 +91,6 @@ class RetirementController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->count();
 
         $response['data'] = [];
@@ -104,7 +102,7 @@ class RetirementController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->place->name.' - '.$val->place->company->name,
+                    $val->company->name,
                     $val->currency->code.' - '.$val->currency->name,
                     number_format($val->currency_rate,3,',','.'),
                     date('d M Y',strtotime($val->post_date)),
@@ -147,7 +145,7 @@ class RetirementController extends Controller
         $validation = Validator::make($request->all(), [
 			'code' 				    => $request->temp ? ['required', Rule::unique('retirements', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:retirements,code',
 			'post_date'			    => 'required',
-			'place_id'		        => 'required',
+			'company_id'		    => 'required',
             'currency_id'		    => 'required',
             'currency_rate'		    => 'required',
             'note'		            => 'required',
@@ -159,7 +157,7 @@ class RetirementController extends Controller
 			'code.required' 				    => 'Kode/No tidak boleh kosong.',
             'code.unique' 				        => 'Kode/No telah dipakai.',
 			'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
-			'place_id.required' 			    => 'Penempatan tidak boleh kosong.',
+			'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'currency_id.required' 			    => 'Mata uang tidak boleh kosong.',
             'currency_rate.required' 			=> 'Konversi tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
@@ -197,7 +195,7 @@ class RetirementController extends Controller
                         if($row->status == '2'){
                             return response()->json([
                                 'status'  => 500,
-                                'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                                'message' => 'Purna operasi aset telah diapprove, anda tidak bisa melakukan perubahan.'
                             ]);
                         }
                     }
@@ -205,7 +203,7 @@ class RetirementController extends Controller
 
                 if($query->status == '1'){
                     $query->user_id = session('bo_id');
-                    $query->place_id = $request->place_id;
+                    $query->company_id = $request->company_id;
                     $query->currency_id = $request->currency_id;
                     $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                     $query->post_date = $request->post_date;
@@ -222,14 +220,14 @@ class RetirementController extends Controller
                 }else{
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Status purchase request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                        'message' => 'Status purna operasi aset sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                     ]);
                 }
 			}else{
                 $query = Retirement::create([
                     'code'			=> Retirement::generateCode(),
                     'user_id'		=> session('bo_id'),
-                    'place_id'      => $request->place_id,
+                    'company_id'    => $request->company_id,
                     'currency_id'   => $request->currency_id,
                     'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                     'post_date'	    => $request->post_date,
@@ -392,7 +390,14 @@ class RetirementController extends Controller
     
                 CustomHelper::sendNotification('retirements',$query->id,'Retirement No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('retirements',$query->id);
-                /* CustomHelper::removeJournal('capitalizations',$query->id); */
+                if(in_array($query->status,['2','3'])){
+                    CustomHelper::removeJournal('retirements',$query->id);
+                    foreach($query->retirementDetail as $row){
+                        Asset::find($row->asset_id)->update([
+                            'book_balance' => $row->asset->balanceBookRaw(),
+                        ]);
+                    }
+                }
 
                 $response = [
                     'status'  => 200,
@@ -474,7 +479,6 @@ class RetirementController extends Controller
                     $query->where('status', $request->status);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
             ->get()
 		];
 		

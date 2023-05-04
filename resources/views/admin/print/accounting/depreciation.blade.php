@@ -127,12 +127,11 @@
 				<thead>
 					<tr align="center">
 						<th>No</th>
-                        <th>No.Retirement</th>
+                        <th>No Depresiasi</th>
 						<th>Pengguna</th>
 						<th>Perusahaan</th>
-                        <th>Mata Uang</th>
-                        <th>Konversi</th>
-                        <th>Tanggal</th>
+                        <th>Tgl.Post</th>
+                        <th>Periode</th>
                         <th>Keterangan</th>
                         <th>Status</th>
 					</tr>
@@ -144,40 +143,33 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
                             <td>{{ $row->company->name }}</td>
-                            <td>{{ $row->currency->code }}</td>
-                            <td>{{ number_format($row->currency_rate,3,',','.') }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
+                            <td>{{ date('F Y',strtotime($row->period)) }}</td>
                             <td>{{ $row->note }}</td>
                             <td>{!! $row->status() !!}</td>
                         </tr>
                         <tr>
-                            <td colspan="12">
+                            <td colspan="8">
                                 <table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:13px;">
                                     <thead>
                                         <tr align="center">
-                                            <th></th>
                                             <th>No.</th>
                                             <th>Aset</th>
-                                            <th>Qty</th>
-                                            <th>Satuan</th>
-                                            <th>Nominal Aset</th>
-                                            <th>Nominal Retirement</th>
-                                            <th>Keterangan</th>
-                                            <th>Coa</th>
+                                            <th>Tgl.Kapitalisasi</th>
+                                            <th>Nominal Kapitalisasi</th>
+                                            <th>Dep. Ke</th>
+                                            <th>Nominal Depresiasi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($row->retirementDetail as $key1 => $rowdetail)
+                                        @foreach($row->depreciationDetail as $key1 => $rowdetail)
                                             <tr>
-                                                <td></td>
                                                 <td align="center">{{ $key1 + 1 }}</td>
-                                                <td>{{ $rowdetail->asset->name }}</td>
-                                                <td align="center">{{ number_format($rowdetail->qty,3,',','.') }}</td>
-                                                <td align="center">{{ $rowdetail->unit->code }}</td>
-                                                <td align="right">{{ number_format($rowdetail->asset->nominal,3,',','.') }}</td>
-                                                <td align="right">{{ number_format($rowdetail->retirement_nominal,3,',','.') }}</td>
-                                                <td>{{ $rowdetail->note }}</td>
-                                                <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
+                                                <td align="center">{{ $rowdetail->asset->code.' - '.$rowdetail->asset->name }}</td>
+                                                <td align="center">{{ date('d/m/y',strtotime($rowdetail->asset->date)) }}</td>
+                                                <td align="right">{{ number_format($rowdetail->asset->nominal,2,',','.') }}</td>
+                                                <td align="center">{{ $rowdetail->depreciationNumber().' / '.$rowdetail->asset->assetGroup->depreciation_period }}</td>
+                                                <td align="right">{{ number_format($rowdetail->nominal,2,',','.') }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

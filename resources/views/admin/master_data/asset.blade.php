@@ -70,6 +70,7 @@
                                                         <th>Grup</th>
                                                         <th>Tgl.Kapitalisasi</th>
                                                         <th>Nominal</th>
+                                                        <th>Saldo Buku</th>
                                                         <th>Metode</th>
                                                         <th>Coa Biaya</th>
                                                         <th>Keterangan</th>
@@ -113,7 +114,7 @@
                             <select class="form-control" id="place_id" name="place_id">
                                 <option value="">--Kosong--</option>
                                 @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                    <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->code }}</option>
                                 @endforeach
                             </select>
                             <label class="" for="plant_id">Site</label>
@@ -439,6 +440,7 @@
                 { name: 'asset_group_id', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'nominal', className: 'center-align' },
+                { name: 'book_balance', className: 'center-align' },
                 { name: 'method', className: 'center-align' },
                 { name: 'coa_cost', className: 'center-align' },
                 { name: 'note', className: 'center-align' },

@@ -81,7 +81,9 @@ class FundRequest extends Model
     }
 
     public function hasPaymentRequestDetail(){
-        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table);
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function balancePaymentRequest(){

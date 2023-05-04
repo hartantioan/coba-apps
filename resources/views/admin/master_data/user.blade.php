@@ -208,7 +208,7 @@
                         <div class="input-field col s3 employee_inputs">
                             <select id="place_id" name="place_id">
                                 @foreach($place as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
                                 @endforeach
                             </select>
                             <label for="place_id">Penempatan</label>

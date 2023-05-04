@@ -35,7 +35,9 @@ class EquipmentPart extends Model
         return $this->hasMany('App\Models\EquipmentSparePart');
     }
     public function workOrderPartDetail(){
-        return $this->hasMany('App\Models\WorkOrderPartDetail');
+        return $this->hasMany('App\Models\WorkOrderPartDetail')->whereHas('workOrder',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function status(){

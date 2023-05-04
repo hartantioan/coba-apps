@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
-use App\Models\Currency;
+use App\Models\ItemCogs;
 use App\Models\Place;
 use App\Models\PurchaseOrder;
 use App\Models\ApprovalMatrix;
@@ -41,7 +41,6 @@ class GoodIssueController extends Controller
             'content'   => 'admin.inventory.good_issue',
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'currency'  => Currency::where('status','1')->get(),
             'department'=> Department::where('status','1')->get(),
         ];
 
@@ -55,8 +54,6 @@ class GoodIssueController extends Controller
             'user_id',
             'company_id',
             'post_date',
-            'currency_id',
-            'currency_rate',
             'note',
         ];
 
@@ -131,8 +128,6 @@ class GoodIssueController extends Controller
                     $val->user->name,
                     $val->company->name,
                     date('d M Y',strtotime($val->post_date)),
-                    $val->currency->code,
-                    number_format($val->currency_rate,3,',','.'),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -165,9 +160,6 @@ class GoodIssueController extends Controller
         $validation = Validator::make($request->all(), [
             'company_id'                => 'required',
 			'post_date'		            => 'required',
-			'currency_id'		        => 'required',
-            'currency_rate'		        => 'required',
-            'arr_price'                 => 'required|array',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_coa'                   => 'required|array',
@@ -175,11 +167,7 @@ class GoodIssueController extends Controller
 		], [
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
-			'currency_id.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
-            'Currency_rate.required' 			=> 'Tanggal dokumen tidak boleh kosong.',
 			'warehouse_id.required'				=> 'Gudang tujuan tidak boleh kosong',
-            'arr_price.required'                => 'Harga satuan tidak boleh kosong',
-            'arr_price.array'                   => 'Harga satuan harus dalam bentuk array',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array',
             'arr_qty.required'                  => 'Qty item tidak boleh kosong',
@@ -200,7 +188,13 @@ class GoodIssueController extends Controller
             $grandtotal = 0;
 
             foreach($request->arr_item as $key => $row){
-                $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                $price = NULL;
+                $price = ItemCogs::where('item_id',intval($row))->where('place_id',intval($request->arr_place[$key]))->orderByDesc('id')->first();
+                $rowprice = 0;
+                if($price){
+                    $rowprice = $price->price_final;
+                }
+                $grandtotal += $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
             }
 
 			if($request->temp){
@@ -213,7 +207,7 @@ class GoodIssueController extends Controller
                             if($row->status == '2'){
                                 return response()->json([
                                     'status'  => 500,
-                                    'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                                    'message' => 'Barang keluar telah diapprove, anda tidak bisa melakukan perubahan.'
                                 ]);
                             }
                         }
@@ -232,8 +226,6 @@ class GoodIssueController extends Controller
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
-                        $query->currency_id = $request->currency_id;
-                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->grandtotal = $grandtotal;
@@ -247,7 +239,7 @@ class GoodIssueController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status barang keluar sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -261,8 +253,6 @@ class GoodIssueController extends Controller
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,
-                        'currency_id'           => $request->currency_id,
-                        'currency_rate'         => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_issues') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
@@ -279,13 +269,19 @@ class GoodIssueController extends Controller
                 DB::beginTransaction();
                 try {
                     foreach($request->arr_item as $key => $row){
-                        
+                        $price = NULL;
+                        $price = ItemCogs::where('item_id',intval($row))->where('place_id',intval($request->arr_place[$key]))->orderByDesc('id')->first();
+                        $rowprice = 0;
+                        if($price){
+                            $rowprice = $price->price_final;
+                        }
+
                         GoodIssueDetail::create([
                             'good_issue_id'         => $query->id,
                             'item_id'               => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                            'total'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'price'                 => $rowprice,
+                            'total'                 => $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
                             'coa_id'                => $request->arr_coa[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key],
@@ -401,7 +397,6 @@ class GoodIssueController extends Controller
 
     public function show(Request $request){
         $gr = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
-        $gr['currency_rate'] = number_format($gr->currency_rate,3,',','.');
 
         $arr = [];
         

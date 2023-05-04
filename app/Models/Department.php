@@ -36,21 +36,7 @@ class Department extends Model
         return $status;
     }
 
-    public function menu(){
-        return $this->hasMany('App\Models\MenuDepartment');
-    }
-
     public function user(){
         return $this->hasMany('App\Models\User');
-    }
-
-    public function checkMenu($id){
-        $cek = MenuDepartment::where('menu_id', $id)->where('department_id', $this->id)->first();
-
-        if($cek){
-            return true;
-        }else{
-            return false;
-        }
     }
 }

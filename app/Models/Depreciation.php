@@ -8,23 +8,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class Retirement extends Model
+class Depreciation extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'retirements';
+    protected $table = 'depreciations';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
-        'code',
         'user_id',
+        'code',
         'company_id',
-        'currency_id',
-        'currency_rate',
         'post_date',
+        'period',
         'note',
         'status',
-        'grandtotal',
         'void_id',
         'void_note',
         'void_date'
@@ -39,11 +37,6 @@ class Retirement extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public function currency()
-    {
-        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
-    }
-
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
@@ -54,9 +47,9 @@ class Retirement extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function retirementDetail()
+    public function depreciationDetail()
     {
-        return $this->hasMany('App\Models\RetirementDetail');
+        return $this->hasMany('App\Models\DepreciationDetail');
     }
 
     public function status(){
@@ -87,7 +80,7 @@ class Retirement extends Model
 
     public static function generateCode()
     {
-        $query = Retirement::selectRaw('RIGHT(code, 9) as code')
+        $query = Depreciation::selectRaw('RIGHT(code, 9) as code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();
@@ -100,14 +93,14 @@ class Retirement extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'RET-'.date('y').date('m').date('d').'-';
+        $pre = 'DPR-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type','retirements')->where('lookable_id',$this->id)->first();
-        if($source){
+        $source = ApprovalSource::where('lookable_type','capitalizations')->where('lookable_id',$this->id)->first();
+        if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{
             return '';

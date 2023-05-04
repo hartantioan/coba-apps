@@ -2,11 +2,11 @@
 
 namespace App\Exports;
 
-use App\Models\Retirement;
+use App\Models\Depreciation;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 
-class ExportRetirement implements FromView
+class ExportDepreciation implements FromView
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -21,8 +21,8 @@ class ExportRetirement implements FromView
 
     public function view(): View
     {
-        return view('admin.exports.retirement', [
-            'data' => Retirement::where(function($query){
+        return view('admin.exports.depreciation', [
+            'data' => Depreciation::where(function($query){
                 if($this->search) {
                     $query->where(function($query) {
                         $query->where('code', 'like', "%$this->search%")

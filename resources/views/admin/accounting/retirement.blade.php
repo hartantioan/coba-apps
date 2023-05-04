@@ -85,7 +85,7 @@
                                                         <th>#</th>
                                                         <th>No</th>
                                                         <th>Pengguna</th>
-                                                        <th>Site</th>
+                                                        <th>Perusahaan</th>
                                                         <th>Mata Uang</th>
                                                         <th>Konversi</th>
                                                         <th>Tanggal</th>
@@ -124,12 +124,12 @@
                             <label class="active" for="code">Kode</label>
                         </div>
                         <div class="input-field col s4">
-                            <select class="form-control" id="place_id" name="place_id">
-                                @foreach($place as $b)
-                                    <option value="{{ $b->id }}">{{ $b->name.' - '.$b->company->name }}</option>
+                            <select class="form-control" id="company_id" name="company_id">
+                                @foreach($company as $b)
+                                    <option value="{{ $b->id }}">{{ $b->code.' - '.$b->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="place_id">Site</label>
+                            <label class="" for="company_id">Perusahaan</label>
                         </div>
                         <div class="input-field col s4">
                             <select class="form-control" id="currency_id" name="currency_id">
@@ -179,9 +179,9 @@
                                         <th class="center">Qty</th>
                                         <th class="center">Unit</th>
                                         <th class="center">Nominal Aset</th>
-                                        <th class="center">Nominal Retirement</th>
+                                        <th class="center">Nominal Retirement/Jual</th>
                                         <th class="center">Keterangan</th>
-                                        <th class="center">Coa</th>
+                                        <th class="center">Coa Debit Setelah Akumulasi</th>
                                         <th class="center">Hapus</th>
                                     </tr>
                                 </thead>
@@ -310,55 +310,64 @@
 
     function addAsset(){
         if($('#asset_id').val()){
-            $('#empty-detail').remove();
-            var count = makeid(10);
-            var no = $('.row_asset').length + 1;
-            $('#body-asset').append(`
-                <tr class="row_asset">
-                    <input type="hidden" name="arr_asset_id[]" value="` + $("#asset_id").select2('data')[0].id + `">
-                    <td class="center">
-                        ` + no + `
-                    </td>
-                    <td>
-                        ` + $("#asset_id").select2('data')[0].code + `
-                    </td>
-                    <td>
-                        ` + $("#asset_id").select2('data')[0].name + `
-                    </td>
-                    <td class="center">
-                        <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="0" onkeyup="formatRupiah(this);">
-                    </td>
-                    <td class="center">
-                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
-                    </td>
-                    <td class="right-align">
-                        ` + $("#asset_id").select2('data')[0].nominal + `
-                    </td>
-                    <td class="center">
-                        <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);">
-                    </td>
-                    <td>
-                        <input name="arr_note[]" type="text" placeholder="Keterangan">
-                    </td>
-                    <td class="center">
-                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
-                    </td>
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </td>
-                </tr>
-            `);
-            if($("#asset_id").select2('data')[0].unit_id){
-                $('#arr_unit' + count).append(`
-                    <option value="` + $("#asset_id").select2('data')[0].unit_id + `">` + $("#asset_id").select2('data')[0].unit_name + `</option>
+            if(parseFloat($("#asset_id").select2('data')[0].book_balance) > 0){
+                $('#empty-detail').remove();
+                var count = makeid(10);
+                var no = $('.row_asset').length + 1;
+                $('#body-asset').append(`
+                    <tr class="row_asset">
+                        <input type="hidden" name="arr_asset_id[]" value="` + $("#asset_id").select2('data')[0].id + `">
+                        <td class="center">
+                            ` + no + `
+                        </td>
+                        <td>
+                            ` + $("#asset_id").select2('data')[0].code + `
+                        </td>
+                        <td>
+                            ` + $("#asset_id").select2('data')[0].name + `
+                        </td>
+                        <td class="center">
+                            <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + $("#asset_id").select2('data')[0].qty_balance + `" onkeyup="formatRupiah(this);">
+                        </td>
+                        <td class="center">
+                            <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
+                        </td>
+                        <td class="right-align">
+                            ` + $("#asset_id").select2('data')[0].nominal + `
+                        </td>
+                        <td class="center">
+                            <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);">
+                        </td>
+                        <td>
+                            <input name="arr_note[]" type="text" placeholder="Keterangan">
+                        </td>
+                        <td class="center">
+                            <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                        </td>
+                        <td class="center">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
                 `);
+                if($("#asset_id").select2('data')[0].unit_id){
+                    $('#arr_unit' + count).append(`
+                        <option value="` + $("#asset_id").select2('data')[0].unit_id + `">` + $("#asset_id").select2('data')[0].unit_name + `</option>
+                    `);
+                }
+                select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
+                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                $('#asset_id').empty();
+                $('#place_id').val($("#asset_id").select2('data')[0].place_id);
+
+            }else{
+                swal({
+                    title: 'Saldo buku aset 0!',
+                    text: 'Mohon maaf nilai aset telah 0, anda tidak bisa menambahkannya.',
+                    icon: 'error'
+                });
             }
-            select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
-            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-            $('#asset_id').empty();
-            $('#place_id').val($("#asset_id").select2('data')[0].place_id);
         }
     }
 
@@ -421,7 +430,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'place', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
@@ -544,7 +553,7 @@
                 
                 $('#temp').val(id);
                 $('#code').val(response.code);
-                $('#place_id').val(response.place_id).formSelect();
+                $('#company_id').val(response.company_id).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);

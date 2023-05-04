@@ -149,7 +149,7 @@
                             <div class="input-field col m6 s12">
                                 <select class="form-control" id="place_id" name="place_id">
                                     @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                     @endforeach
                                 </select>    
                                 <label for="place_id">Pabrik/Kantor</label>

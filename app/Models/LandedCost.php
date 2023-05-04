@@ -212,7 +212,9 @@ class LandedCost extends Model
 
     public function purchaseInvoiceDetail()
     {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail','landed_cost_id','id');
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','landed_cost_id','id')->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function balanceInvoice(){

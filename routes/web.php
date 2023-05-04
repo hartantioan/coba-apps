@@ -52,6 +52,7 @@ use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
 use App\Http\Controllers\Accounting\RetirementController;
 use App\Http\Controllers\Accounting\DocumentTaxController;
+use App\Http\Controllers\Accounting\DepreciationController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -765,6 +766,20 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [RetirementController::class, 'voidStatus'])->middleware('operation.access:retirement,void');
                     Route::post('destroy', [RetirementController::class, 'destroy'])->middleware('operation.access:retirement,delete');
                 });
+
+                Route::prefix('depreciation')->middleware('operation.access:depreciation,view')->group(function () {
+                    Route::get('/',[DepreciationController::class, 'index']);
+                    Route::get('datatable',[DepreciationController::class, 'datatable']);
+                    Route::get('row_detail',[DepreciationController::class, 'rowDetail']);
+                    Route::post('show', [DepreciationController::class, 'show']);
+                    Route::post('preview', [DepreciationController::class, 'preview']);
+                    Route::post('print',[DepreciationController::class, 'print']);
+                    Route::get('export',[DepreciationController::class, 'export']);
+                    Route::post('create',[DepreciationController::class, 'create'])->middleware('operation.access:depreciation,update');
+                    Route::get('approval/{id}',[DepreciationController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [DepreciationController::class, 'voidStatus'])->middleware('operation.access:depreciation,void');
+                    Route::post('destroy', [DepreciationController::class, 'destroy'])->middleware('operation.access:depreciation,delete');
+                });
             });
 
             Route::prefix('document_tax')->middleware('operation.access:document_tax,view')->group(function () {
@@ -786,6 +801,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('print',[JournalController::class, 'print']);
                 Route::get('export',[JournalController::class, 'export']);
                 Route::post('create',[JournalController::class, 'create'])->middleware('operation.access:journal,update');
+                Route::post('create_multi',[JournalController::class, 'createMulti'])->middleware('operation.access:journal,update');
                 Route::get('approval/{id}',[JournalController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('void_status', [JournalController::class, 'voidStatus'])->middleware('operation.access:journal,void');
                 Route::post('destroy', [JournalController::class, 'destroy'])->middleware('operation.access:journal,delete');

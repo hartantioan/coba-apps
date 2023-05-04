@@ -378,6 +378,124 @@ class JournalController extends Controller
 		return response()->json($response);
     }
 
+    public function createMulti(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_multi_code'                          => 'required|array',
+		], [
+            'arr_multi_code.required'                 => 'Kode multi tidak boleh kosong.',
+            'arr_multi_code.array'                    => 'Kode multi harus dalam bentuk array.',
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            
+            $totalDebit = 0; 
+            $totalCredit = 0;
+            foreach($request->arr_multi_debit as $key => $row){
+                $totalDebit += floatval($row);
+            }
+
+            foreach($request->arr_multi_kredit as $key => $row){
+                $totalCredit += floatval($row);
+            }
+
+            if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Total debit dan kredit selisih '.(number_format($totalDebit - $totalCredit,2,',','.'))
+                ]);
+            }
+
+            $cekSameCode = Journal::whereIn('code',$request->arr_multi_code)->count();
+
+            if($cekSameCode > 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Kode jurnal telah terpakai, silahkan gunakan yang lainnya.'
+                ]);
+            }
+        
+            DB::beginTransaction();
+            try {
+
+                $temp = '';
+                foreach($request->arr_multi_code as $key => $row){
+
+                    if($temp !== $row){
+                        $query = Journal::create([
+                            'code'			            => $row,
+                            'user_id'		            => session('bo_id'),
+                            'currency_id'               => $request->arr_multi_currency[$key] ? $request->arr_multi_currency[$key] : NULL,
+                            'company_id'                => $request->arr_multi_company[$key] ? $request->arr_multi_company[$key] : NULL,
+                            'currency_rate'             => $request->arr_multi_conversion[$key] ? $request->arr_multi_conversion[$key] : NULL,
+                            'post_date'                 => $request->arr_multi_post_date[$key] ? date('Y-m-d',strtotime($request->arr_multi_post_date[$key])) : NULL,
+                            'due_date'                  => $request->arr_multi_due_date[$key] ? date('Y-m-d',strtotime($request->arr_multi_due_date[$key])) : NULL,
+                            'note'                      => $request->arr_multi_note[$key] ? $request->arr_multi_note[$key] : NULL,
+                            'status'                    => '1'
+                        ]);
+
+                        CustomHelper::sendApproval('journals',$query->id,$query->note);
+                        CustomHelper::sendNotification('journals',$query->id,'Pengajuan Jurnal No. '.$query->code,$query->note,session('bo_id'));
+
+                        activity()
+                            ->performedOn(new Journal())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query)
+                            ->log('Add / edit journal.');
+                    }
+
+                    if($query) {
+                
+                        if(floatval($request->arr_multi_debit[$key]) > 0){
+                            JournalDetail::create([
+                                'journal_id'        => $query->id,
+                                'coa_id'            => $request->arr_multi_coa[$key],
+                                'place_id'          => $request->arr_multi_place[$key],
+                                'account_id'        => $request->arr_multi_bp[$key],
+                                'item_id'           => $request->arr_multi_item[$key],
+                                'department_id'     => $request->arr_multi_department[$key],
+                                'warehouse_id'      => $request->arr_multi_warehouse[$key],
+                                'type'              => '1',
+                                'nominal'           => floatval($request->arr_multi_debit[$key]),
+                            ]);
+                        }
+
+                        if(floatval($request->arr_multi_kredit[$key]) > 0){
+                            JournalDetail::create([
+                                'journal_id'        => $query->id,
+                                'coa_id'            => $request->arr_multi_coa[$key],
+                                'place_id'          => $request->arr_multi_place[$key],
+                                'account_id'        => $request->arr_multi_bp[$key],
+                                'item_id'           => $request->arr_multi_item[$key],
+                                'department_id'     => $request->arr_multi_department[$key],
+                                'warehouse_id'      => $request->arr_multi_warehouse[$key],
+                                'type'              => '2',
+                                'nominal'           => floatval($request->arr_multi_kredit[$key]),
+                            ]);
+                        }
+                    }
+                    
+                    $temp = $row;
+                }
+
+                $response = [
+					'status'    => 200,
+					'message'   => 'Data successfully saved.',
+				];
+
+                DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            }
+        }
+
+        return response()->json($response);
+    }
+
     public function show(Request $request){
         $jou = Journal::where('code',CustomHelper::decrypt($request->id))->first();
         $jou['currency_rate'] = number_format($jou->currency_rate,2,',','.');

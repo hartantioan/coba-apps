@@ -113,7 +113,7 @@ class WorkOrder extends Model
         return $this->hasMany('App\Models\WorkOrderPartDetail');
     }
     public function requestSparepart(){
-        return $this->hasMany('App\Models\RequestSparepart');
+        return $this->hasMany('App\Models\RequestSparepart')->whereIn('status',['2','3']);
     }
     public function workOrderPersonInChargeDetail(){
         return $this->hasMany('App\Models\WorkOrderPersonInChargeDetail');

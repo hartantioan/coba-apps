@@ -4,8 +4,10 @@ namespace App\Helpers;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalTable;
 use App\Models\ApprovalSource;
+use App\Models\Asset;
 use App\Models\Capitalization;
 use App\Models\Coa;
+use App\Models\Depreciation;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
@@ -348,45 +350,72 @@ class CustomHelper {
 			]);
 
 			foreach($ret->retirementDetail as $row){
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->asset->assetGroup->depreciation_coa_id,
-					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
-					'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
-					'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
-					'type'			=> '1',
-					'nominal'		=> $row->retirement_nominal,
-				]);
+				$totalDepre = $row->asset->nominal - $row->asset->book_balance;
+
+				if($totalDepre > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->asset->assetGroup->depreciation_coa_id,
+						'place_id'		=> $row->asset->place_id,
+						'type'			=> '1',
+						'nominal'		=> $totalDepre,
+					]);
+				}
+
+				if($row->asset->book_balance > 0 && $row->retirement_nominal == 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->coa_id,
+						'place_id'		=> $row->asset->place_id,
+						'type'			=> '1',
+						'nominal'		=> $row->asset->book_balance,
+					]);
+				}
+
+				if($row->retirement_nominal > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->coa_id,
+						'place_id'		=> $row->asset->place_id,
+						'type'			=> '1',
+						'nominal'		=> $row->retirement_nominal,
+					]);
+
+					$balanceProfitLoss = ($totalDepre + $row->retirement_nominal) - $row->asset->nominal;
+					$coaProfitLoss = Coa::where('code','700.01.01.01.04')->where('status','1')->where('company_id',$row->asset->place->company_id)->first();
+
+					if($coaProfitLoss){
+						if($balanceProfitLoss > 0){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coaProfitLoss->id,
+								'place_id'		=> $row->asset->place_id,
+								'type'			=> '2',
+								'nominal'		=> $balanceProfitLoss,
+							]);
+						}
+
+						if($balanceProfitLoss < 0){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coaProfitLoss->id,
+								'place_id'		=> $row->asset->place_id,
+								'type'			=> '1',
+								'nominal'		=> abs($balanceProfitLoss),
+							]);
+						}
+					}
+				}
 
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->asset->assetGroup->coa_id,
-					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
-					'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
-					'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
+					'place_id'		=> $row->asset->place_id,
 					'type'			=> '2',
-					'nominal'		=> $row->retirement_nominal,
+					'nominal'		=> $row->asset->nominal,
 				]);
 
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->coa_id,
-					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
-					'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
-					'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
-					'type'			=> '1',
-					'nominal'		=> $row->retirement_nominal,
-				]);
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> Coa::where('code','100.01.01.99.03')->first()->id,
-					'place_id'		=> isset($data->place_id) ? $data->place_id : NULL,
-					'department_id'	=> isset($data->department_id) ? $data->department_id : NULL,
-					'warehouse_id'	=> isset($data->warehouse_id) ? $data->warehouse_id : NULL,
-					'type'			=> '2',
-					'nominal'		=> $row->retirement_nominal,
-				]);
+				self::updateBalanceAsset($row->asset_id,$row->asset->book_balance,'OUT');
 			}
 
 		}elseif($table_name == 'outgoing_payments'){
@@ -514,8 +543,6 @@ class CustomHelper {
 				'code'			=> Journal::generateCode(),
 				'lookable_type'	=> 'good_issues',
 				'lookable_id'	=> $gr->id,
-				'currency_id'	=> $gr->currency_id,
-				'currency_rate'	=> $gr->currency_rate,
 				'post_date'		=> $gr->post_date,
 				'note'			=> $gr->code,
 				'status'		=> '3'
@@ -668,6 +695,7 @@ class CustomHelper {
 				}
 			}
 		}elseif($table_name == 'inventory_transfers'){
+
 			$it = InventoryTransfer::find($table_id);
 
 			$query = Journal::create([
@@ -742,6 +770,41 @@ class CustomHelper {
 					'IN'
 				);
 			}
+		}elseif($table_name == 'depreciations'){
+
+			$dpr = Depreciation::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+
+			foreach($dpr->depreciationDetail as $row){
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->asset->cost_coa_id,
+					'place_id'		=> $row->asset->place_id,
+					'type'			=> '1',
+					'nominal'		=> $row->nominal,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->asset->assetGroup->depreciation_coa_id,
+					'place_id'		=> $row->asset->place_id,
+					'type'			=> '2',
+					'nominal'		=> $row->nominal,
+				]);
+				
+				self::updateBalanceAsset($row->asset_id,$row->nominal,'OUT');
+			}
+
 		}else{
 
 			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
@@ -767,6 +830,7 @@ class CustomHelper {
 					'status'		=> '3'
 				]);
 
+				#start untuk po tipe biaya / jasa
 				$totalOutSide = 0;
 
 				if($table_name == 'purchase_invoices'){
@@ -785,10 +849,34 @@ class CustomHelper {
 								'type'			=> '1',
 								'nominal'		=> $rowpo->subtotal
 							]);
+							
 							$totalOutSide += $rowpo->subtotal;
 						}
 					}
+
+					#start journal rounding
+					if($pi->rounding > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> Coa::where('code','700.01.01.01.05')->where('company_id',$pi->company_id)->first()->id,
+							'account_id'	=> $account_id,
+							'type'			=> '1',
+							'nominal'		=> abs($pi->rounding),
+						]);
+					}
+					
+					if($pi->rounding < 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> Coa::where('code','700.01.01.01.05')->where('company_id',$pi->company_id)->first()->id,
+							'account_id'	=> $account_id,
+							'type'			=> '2',
+							'nominal'		=> abs($pi->rounding),
+						]);
+					}
+					#end journal rounding
 				}
+				#end untuk po tipe biaya / jasa
 
 				foreach($journalMap as $row){
 					
@@ -907,6 +995,16 @@ class CustomHelper {
 				'warehouse_id'	=> $warehouse_id,
 				'item_id'		=> $item_id,
 				'qty'			=> $type == 'IN' ? 0 - $qty : $qty,
+			]);
+		}
+	}
+
+	public static function updateBalanceAsset($asset_id = null, $nominal = null, $type = null){
+		$asset = Asset::find($asset_id);
+		
+		if($asset){
+			$asset->update([
+				'book_balance' => $type == 'OUT' ? round($asset->book_balance - $nominal,3) : round($asset->book_balance + $nominal,3),
 			]);
 		}
 	}

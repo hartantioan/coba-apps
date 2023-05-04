@@ -145,8 +145,23 @@ class PurchaseOrder extends Model
 
     public function purchaseInvoiceDetail()
     {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail','purchase_order_id','id');
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','purchase_order_id','id')->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
+
+    public function balanceInvoice(){
+        $total = $this->grandtotal;
+
+        foreach($this->purchaseInvoiceDetail()->whereHas('purchaseInvoice', function($query){
+            $query->whereIn('status',['2','3']);
+        })->get() as $row){
+            $total -= $row->grandtotal;
+        }
+
+        return $total;
+    }
+
     public function goodReceipt()
     {
         return $this->hasOne('App\Models\GoodReceipt');

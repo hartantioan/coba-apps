@@ -248,7 +248,7 @@ class GoodReceiveController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status barang masuk sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){

@@ -25,7 +25,8 @@ class Asset extends Model
         'method',
         'cost_coa_id',
         'note',
-        'status'
+        'status',
+        'book_balance',
     ];
 
     public function status(){
@@ -67,6 +68,76 @@ class Asset extends Model
         return $this->belongsTo('App\Models\Coa', 'cost_coa_id', 'id')->withTrashed();
     }
 
+    public function depreciationDetail(){
+        return $this->hasMany('App\Models\DepreciationDetail')->whereHas('depreciation',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function capitalizationDetail(){
+        return $this->hasMany('App\Models\CapitalizationDetail')->whereHas('capitalization',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function retirementDetail(){
+        return $this->hasMany('App\Models\RetirementDetail')->whereHas('retirement',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balanceBookRaw(){
+        $total = $this->nominal;
+
+        foreach($this->depreciationDetail as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
+    public function qtyBalance(){
+        $total = 0;
+
+        foreach($this->capitalizationDetail as $row){
+            $total += $row->qty;
+        }
+
+        foreach($this->retirementDetail as $row){
+            $total -= $row->qty;
+        }
+
+        return $total;
+    }
+
+    public function nominalDepreciation(){
+        $nominal = 0;
+
+        if($this->method == '1'){
+            $depreciation = round($this->nominal / $this->assetGroup->depreciation_period,3);
+            $balance = $this->book_balance - $depreciation;
+            if($balance > 0){
+                $nominal = $depreciation;
+            }else{
+                $nominal = $this->book_balance;
+            }
+        }
+
+        return $nominal;
+    }
+
+    public function checkDepreciationByMonth($month){
+        $check = Depreciation::where('period',$month)->whereHas('depreciationDetail',function($query){
+            $query->where('asset_id',$this->id);
+        })->whereIn('status',['2','3'])->count();
+
+        if($check > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
     public function getUnitFromCapitalization()
     {
         $cek = CapitalizationDetail::where('asset_id',$this->id)->whereHas('capitalization')->first();

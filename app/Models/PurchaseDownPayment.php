@@ -44,7 +44,9 @@ class PurchaseDownPayment extends Model
     ];
 
     public function hasPaymentRequestDetail(){
-        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table);
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function used(){
@@ -118,7 +120,9 @@ class PurchaseDownPayment extends Model
 
     public function purchaseInvoiceDp()
     {
-        return $this->hasMany('App\Models\PurchaseInvoiceDp');
+        return $this->hasMany('App\Models\PurchaseInvoiceDp')->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function balanceInvoice(){

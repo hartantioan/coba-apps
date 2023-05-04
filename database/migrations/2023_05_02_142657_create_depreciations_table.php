@@ -13,24 +13,22 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('retirements', function (Blueprint $table) {
+        Schema::create('depreciations', function (Blueprint $table) {
             $table->id();
-            $table->string('code',155)->unique();
             $table->bigInteger('user_id')->nullable();
+            $table->string('code',155)->unique();
             $table->bigInteger('company_id')->nullable();
-            $table->bigInteger('currency_id')->nullable();
-            $table->double('currency_rate')->nullable();
             $table->date('post_date')->nullable();
+            $table->string('period',7)->nullable();
             $table->string('note')->nullable();
-            $table->char('status','1')->nullable();
-            $table->double('grandtotal')->nullable();
+            $table->char('status',1)->nullable();
             $table->bigInteger('void_id')->nullable();
             $table->string('void_note')->nullable();
             $table->timestamp('void_date')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'company_id', 'currency_id']);
+            $table->index(['user_id','company_id','void_id'],'depreciation_index');
         });
     }
 
@@ -41,6 +39,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('retirements');
+        Schema::dropIfExists('depreciations');
     }
 };

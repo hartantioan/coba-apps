@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2-materialize.css?v=13') }}" type="text/css">
     <!-- END: VENDOR CSS-->
     <!-- BEGIN: Page Level CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=3') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=4') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=0') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/dashboard-modern.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/intro.css?v=7') }}">

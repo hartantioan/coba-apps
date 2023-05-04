@@ -216,24 +216,24 @@
                         </div>
                         <div class="col s12">
                             <div class="col s12" style="overflow:auto;width:100% !important;">
-                                <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="https://www.google.com" target="_blank">disini</a> untuk mengunduh.</h6>
+                                <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_copas_journal.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
                                 <p class="mt-2 mb-2">
-                                    <table class="bordered" style="min-width:2000px;">
+                                    <table class="bordered" style="min-width:2700px;zoom:0.7;">
                                         <thead>
                                             <tr>
                                                 <th class="center">Kode Jurnal</th>
-                                                <th class="center">Perusahaan</th>
+                                                <th class="center" style="width:75px;">Perusahaan</th>
                                                 <th class="center">Keterangan</th>
                                                 <th class="center">Tgl.Post</th>
                                                 <th class="center">Tgl.Tenggat</th>
                                                 <th class="center">Mata Uang</th>
-                                                <th class="center">Konversi</th>
-                                                <th class="center">Coa</th>
-                                                <th class="center">Site</th>
-                                                <th class="center">BP</th>
-                                                <th class="center">Item</th>
-                                                <th class="center">Departemen</th>
-                                                <th class="center">Gudang</th>
+                                                <th class="center" style="width:75px;">Konversi</th>
+                                                <th class="center" style="width:75px;">Coa</th>
+                                                <th class="center" style="width:75px;">Site</th>
+                                                <th class="center" style="width:75px;">BP</th>
+                                                <th class="center" style="width:75px;">Item</th>
+                                                <th class="center" style="width:75px;">Departemen</th>
+                                                <th class="center" style="width:75px;">Gudang</th>
                                                 <th class="center">Debit</th>
                                                 <th class="center">Kredit</th>
                                                 <th class="center">Hapus</th>
@@ -243,10 +243,10 @@
                                             <tr id="last-row-coa-multi">
                                                 <td colspan="16" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Baris
+                                                        <i class="material-icons left">add</i> Tambah 1 Baris
                                                     </a>
                                                     <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Multi
+                                                        <i class="material-icons left">add</i> Tambah Multi Baris
                                                     </a>
                                                 </td>
                                             </tr>
@@ -365,6 +365,7 @@
 
         $('#body-coa-multi').on('click', '.delete-data-coa-multi', function() {
             $(this).closest('tr').remove();
+            countAllMulti();
         });
     });
 
@@ -390,7 +391,7 @@
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
                         @foreach ($place as $row)
-                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->company->name }}</option>
+                            <option value="{{ $row->id }}">{{ $row->code }}</option>
                         @endforeach
                     </select>
                 </td>
@@ -476,10 +477,10 @@
                     <input type="text" name="arr_multi_warehouse" placeholder="ID Gudang">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit" value="0">
+                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit" value="0">
+                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
@@ -516,6 +517,10 @@
                     });
                     e.preventDefault();
                 }
+                countAllMulti();
+                M.toast({
+                    html: 'Sukses ditempel.'
+                });
             }
         });
     }
@@ -589,10 +594,10 @@
                                     <input type="text" name="arr_multi_warehouse" placeholder="ID Gudang">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit" value="0">
+                                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit" value="0">
+                                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
@@ -631,6 +636,10 @@
                                 });
                                 e.preventDefault();
                             }
+                            countAllMulti();
+                            M.toast({
+                                html: 'Sukses ditempel.'
+                            });
                         }
                     });
                 }
@@ -652,6 +661,20 @@
 
         $('#totalDebit').text(formatRupiahIni(totalDebit.toFixed(2).toString().replace('.',',')));
         $('#totalCredit').text(formatRupiahIni(totalCredit.toFixed(2).toString().replace('.',',')));
+    }
+
+    function countAllMulti(){
+        let totalDebit = 0, totalCredit = 0;
+
+        $('input[name^="arr_multi_debit"]').each(function(index){
+            totalDebit += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('input[name^="arr_multi_kredit"]').each(function(index){
+            totalCredit += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+
+        $('#totalDebitMulti').text(formatRupiahIni(totalDebit.toFixed(2).toString().replace('.',',')));
+        $('#totalCreditMulti').text(formatRupiahIni(totalCredit.toFixed(2).toString().replace('.',',')));
     }
 
     function getRowUnit(val){
@@ -840,6 +863,123 @@
         });
     }
 
+    function saveMulti(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data')[0]);
+
+                formData.delete("arr_multi_code[]");
+                formData.delete("arr_multi_company[]");
+                formData.delete("arr_multi_note[]");
+                formData.delete("arr_multi_post_date[]");
+                formData.delete("arr_multi_due_date[]");
+                formData.delete("arr_multi_currency[]");
+                formData.delete("arr_multi_conversion[]");
+                formData.delete("arr_multi_coa[]");
+                formData.delete("arr_multi_place[]");
+                formData.delete("arr_multi_bp[]");
+                formData.delete("arr_multi_item[]");
+                formData.delete("arr_multi_department[]");
+                formData.delete("arr_multi_warehouse[]");
+                formData.delete("arr_multi_debit[]");
+                formData.delete("arr_multi_kredit[]");
+
+                $('input[name^="arr_multi_code"]').each(function(index){
+                    if($(this).val()){
+                        formData.append('arr_multi_code[]',$(this).val());
+                        formData.append('arr_multi_company[]',($('input[name^="arr_multi_company"]').eq(index).val() ? $('input[name^="arr_multi_company"]').eq(index).val() : ''));
+                        formData.append('arr_multi_note[]',($('input[name^="arr_multi_note"]').eq(index).val() ? $('input[name^="arr_multi_note"]').eq(index).val() : ''));
+                        formData.append('arr_multi_post_date[]',($('input[name^="arr_multi_post_date"]').eq(index).val() ? $('input[name^="arr_multi_post_date"]').eq(index).val() : ''));
+                        formData.append('arr_multi_due_date[]',($('input[name^="arr_multi_due_date"]').eq(index).val() ? $('input[name^="arr_multi_due_date"]').eq(index).val() : ''));
+                        formData.append('arr_multi_currency[]',($('input[name^="arr_multi_currency"]').eq(index).val() ? $('input[name^="arr_multi_currency"]').eq(index).val() : ''));
+                        formData.append('arr_multi_conversion[]',($('input[name^="arr_multi_conversion"]').eq(index).val() ? $('input[name^="arr_multi_conversion"]').eq(index).val() : ''));
+                        formData.append('arr_multi_coa[]',($('input[name^="arr_multi_coa"]').eq(index).val() ? $('input[name^="arr_multi_coa"]').eq(index).val() : ''));
+                        formData.append('arr_multi_place[]',($('input[name^="arr_multi_place"]').eq(index).val() ? $('input[name^="arr_multi_place"]').eq(index).val() : ''));
+                        formData.append('arr_multi_bp[]',($('input[name^="arr_multi_bp"]').eq(index).val() ? $('input[name^="arr_multi_bp"]').eq(index).val() : ''));
+                        formData.append('arr_multi_item[]',($('input[name^="arr_multi_item"]').eq(index).val() ? $('input[name^="arr_multi_item"]').eq(index).val() : ''));
+                        formData.append('arr_multi_department[]',($('input[name^="arr_multi_department"]').eq(index).val() ? $('input[name^="arr_multi_department"]').eq(index).val() : ''));
+                        formData.append('arr_multi_warehouse[]',($('input[name^="arr_multi_warehouse"]').eq(index).val() ? $('input[name^="arr_multi_warehouse"]').eq(index).val() : ''));
+                        formData.append('arr_multi_debit[]',($('input[name^="arr_multi_debit"]').eq(index).val() ? $('input[name^="arr_multi_debit"]').eq(index).val() : '0'));
+                        formData.append('arr_multi_kredit[]',($('input[name^="arr_multi_kredit"]').eq(index).val() ? $('input[name^="arr_multi_kredit"]').eq(index).val() : '0'));
+                    }
+                });
+
+                $.ajax({
+                    url: '{{ Request::url() }}/create_multi',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert_multi').hide();
+                        $('#validation_alert_multi').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert_multi').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert_multi').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
@@ -884,7 +1024,7 @@
                             <td>
                                 <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
                                     @foreach ($place as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name.' - '.$row->company->name }}</option>
+                                        <option value="{{ $row->id }}">{{ $row->code }}</option>
                                     @endforeach
                                 </select>
                             </td>

@@ -181,7 +181,7 @@
                                                     <th class="center">Stok Skrg</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
-                                                    <th class="center">Harga HPP</th>
+                                                    <th class="center">Harga</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Coa Kredit</th>
@@ -194,9 +194,9 @@
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
                                                     <td colspan="12" class="center">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                        <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
-                                                        </a>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -288,6 +288,7 @@
                 };
             },
             onCloseEnd: function(modal, trigger){
+                $("#form_data :input").prop("disabled", false);
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('.row_item').each(function(){
@@ -455,7 +456,7 @@
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                         @foreach ($place as $rowplace)
-                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                         @endforeach
                     </select>    
                 </td>
@@ -576,8 +577,9 @@
     }
 
     function success(){
-        loadDataTable();
-        $('#modal1').modal('close');
+        /* loadDataTable();
+        $('#modal1').modal('close'); */
+        $("#form_data :input").prop("disabled", true);
     }
 
     function show(id){
@@ -644,7 +646,7 @@
                                 <td>
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                         @foreach ($place as $rowplace)
-                                            <option value="{{ $rowplace->id }}">{{ $rowplace->name.' - '.$rowplace->company->name }}</option>
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                         @endforeach
                                     </select>    
                                 </td>

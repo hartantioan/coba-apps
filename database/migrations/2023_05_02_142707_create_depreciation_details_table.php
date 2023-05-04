@@ -13,16 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('request_sparepart_details', function (Blueprint $table) {
+        Schema::create('depreciation_details', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('request_sparepart_id')->nullable();
-            $table->bigInteger('equipment_sparepart_id')->nullable();
-            $table->double('qty_request')->nullable();
-            $table->double('qty_usage')->nullable();
-            $table->double('qty_return')->nullable();
-            $table->double('qty_repair')->nullable();
+            $table->bigInteger('depreciation_id')->nullable();
+            $table->bigInteger('asset_id')->nullable();
+            $table->double('nominal')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['depreciation_id','asset_id'],'depreciation_details_index');
         });
     }
 
@@ -33,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('request_sparepart_details');
+        Schema::dropIfExists('depreciation_details');
     }
 };

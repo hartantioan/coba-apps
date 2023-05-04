@@ -127,12 +127,14 @@ class GoodReceipt extends Model
 
     public function landedCost()
     {
-        return $this->hasMany('App\Models\LandedCost');
+        return $this->hasMany('App\Models\LandedCost')->whereIn('status',['2','3']);;
     }
 
     public function purchaseInvoiceDetail()
     {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail','good_receipt_id','id');
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','good_receipt_id','id')->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function balanceInvoice(){

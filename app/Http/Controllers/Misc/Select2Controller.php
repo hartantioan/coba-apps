@@ -417,6 +417,9 @@ class Select2Controller extends Controller {
                             });
                     });
                 })
+                ->whereHas('purchaseOrderDetail',function($query){
+                    $query->whereIn('place_id',$this->dataplaces);
+                })
                 ->whereDoesntHave('used')
                 ->where('status','2')
                 ->where('inventory_type','1')->get();

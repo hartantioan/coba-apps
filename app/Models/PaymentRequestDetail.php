@@ -39,17 +39,29 @@ class PaymentRequestDetail extends Model
 
     public function purchaseDownPayment()
     {
-        return $this->belongsTo('App\Models\PurchaseDownPayment', 'lookable_id', 'id')->where('lookable_type','purchase_down_payments')->withTrashed();
+        if($this->lookable_type == 'purchase_down_payments'){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function purchaseInvoice()
     {
-        return $this->belongsTo('App\Models\PurchaseInvoice', 'lookable_id', 'id')->where('lookable_type','purchase_invoices')->withTrashed();
+        if($this->lookable_type == 'purchase_invoices'){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function fundRequest()
     {
-        return $this->belongsTo('App\Models\FundRequest', 'lookable_id', 'id')->where('lookable_type','fund_requests')->withTrashed();
+        if($this->lookable_type == 'fund_requests'){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function type(){

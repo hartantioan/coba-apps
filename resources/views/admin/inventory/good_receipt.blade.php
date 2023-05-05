@@ -281,8 +281,6 @@
             width: '100%',
         });
 
-
-
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
             var badge = tr.find('button.btn-floating');
@@ -362,6 +360,7 @@
                 $('#show_print').html('');
             }
         });
+        
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
                 

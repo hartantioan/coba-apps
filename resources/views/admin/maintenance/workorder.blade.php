@@ -549,6 +549,8 @@
         
         loadDataTable();
 
+        window.table.search('{{ $code }}').draw();
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {

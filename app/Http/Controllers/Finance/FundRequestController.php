@@ -37,11 +37,12 @@ class FundRequestController extends Controller
         $this->dataplaces = $user->userPlaceArray();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             'title'     => 'Permohonan Dana',
             'content'   => 'admin.finance.fund_request',
+            'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -88,6 +89,14 @@ class FundRequestController extends Controller
                             ->orWhere('note', 'like', "%$search%");
                     });
                 }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
+                }
 
                 if($request->status){
                     $query->where('status', $request->status);
@@ -107,6 +116,14 @@ class FundRequestController extends Controller
                             ->orWhere('required_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%");
                     });
+                }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
                 if($request->status){
@@ -821,7 +838,7 @@ class FundRequestController extends Controller
                 'properties'=> [
                      ['name'=> "Tanggal: ".date('d/m/y',strtotime($query->post_date))],
                   ],
-                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$fr;
@@ -1171,7 +1188,7 @@ class FundRequestController extends Controller
                                 $po =[
                                     "name"=>$row_po->code,
                                     "key" => $row_po->code,
-                                    "color"=>"lightblue",
+                                    
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_po->post_date],
                                         ['name'=> "Nominal : Rp.:".number_format($row_po->grandtotal,2,',','.')]
@@ -1358,7 +1375,7 @@ class FundRequestController extends Controller
                                 ],
                                 "key" => $row_pi->purchaseDownPayment->code,
                                 "name" => $row_pi->purchaseDownPayment->code,
-                                'url'=>request()->root()."/admin/inventory/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
+                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                             ];
                             $found = false;
                             foreach($data_purchase_downpayment as $data_dp){
@@ -1753,7 +1770,7 @@ class FundRequestController extends Controller
                             ],
                             "key" => $query_pyr->outgoingPayment->code,
                             "name" => $query_pyr->outgoingPayment->code,
-                            'url'=>request()->root()."/admin/finace/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
+                            'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
                         ];
                         if(count($data_outgoingpayments) < 1){
                             $data_outgoingpayments[]=$outgoing_payment;

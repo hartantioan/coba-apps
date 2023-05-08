@@ -100,6 +100,18 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="start_date" style="font-size:1rem;">Start Date (Tanggal Mulai) :</label>
+                                                <div class="input-field col s12">
+                                                <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="finish_date" style="font-size:1rem;">End Date (Tanggal Berhenti) :</label>
+                                                <div class="input-field col s12">
+                                                    <input type="date" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                </div>
+                                            </div>
                                         </div>  
                                     </div>
                                 </li>
@@ -314,6 +326,8 @@
 
         loadDataTable();
 
+        window.table.search('{{ $code }}').draw();
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -484,6 +498,8 @@
                     'account_id[]' : $('#filter_account').val(),
                     company_id : $('#filter_company').val(),
                     'currency_id[]' : $('#filter_currency').val(),
+                    start_date : $('#start_date').val(),
+                    finish_date : $('#finish_date').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

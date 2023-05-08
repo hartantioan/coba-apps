@@ -113,6 +113,14 @@ class PaymentRequestController extends Controller
                             });
                     });
                 }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
+                }
 
                 if($request->status){
                     $query->where('status', $request->status);
@@ -161,6 +169,14 @@ class PaymentRequestController extends Controller
                                     });
                             });
                     });
+                }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
                 if($request->status){
@@ -976,7 +992,7 @@ class PaymentRequestController extends Controller
                 'properties'=> [
                      ['name'=> "Tanggal: ".date('d/m/y',strtotime($query->post_date))],
                   ],
-                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$fr;
@@ -1478,7 +1494,7 @@ class PaymentRequestController extends Controller
                                 ],
                                 "key" => $row_pi->purchaseDownPayment->code,
                                 "name" => $row_pi->purchaseDownPayment->code,
-                                'url'=>request()->root()."/admin/inventory/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
+                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                             ];
                             $found = false;
                             foreach($data_purchase_downpayment as $data_dp){
@@ -1873,7 +1889,7 @@ class PaymentRequestController extends Controller
                             ],
                             "key" => $query_pyr->outgoingPayment->code,
                             "name" => $query_pyr->outgoingPayment->code,
-                            'url'=>request()->root()."/admin/finace/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
+                            'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
                         ];
                         if(count($data_outgoingpayments) < 1){
                             $data_outgoingpayments[]=$outgoing_payment;

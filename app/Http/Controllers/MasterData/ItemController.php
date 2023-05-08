@@ -310,6 +310,10 @@ class ItemController extends Controller
                                 <th>Gudang</th>
                                 <th>'.$data->warehouses().'</th>
                             </tr>
+                            <tr>
+                                <th>Keterangan</th>
+                                <th>'.$data->note.'</th>
+                            </tr>
                         </thead>
                     </table>';
 		

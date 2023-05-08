@@ -27,7 +27,12 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="printData();">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
+                            <i class="material-icons hide-on-med-and-up">refresh</i>
+                            <span class="hide-on-small-onl">Refresh</span>
+                            <i class="material-icons right">refresh</i>
+                        </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">Print</span>
                             <i class="material-icons right">local_printshop</i>
@@ -146,10 +151,6 @@
                                 <div class="card-content">
                                     <h4 class="card-title">
                                         List Data
-                                        <button class="btn waves-effect waves-light mr-1 float-right btn-small" onclick="loadDataTable()">
-                                            Refresh
-                                            <i class="material-icons left">refresh</i>
-                                        </button>
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
@@ -320,24 +321,40 @@
                                 <label class="active" for="receiver_phone">Kontak Penerima</label>
                             </div>
                             <div class="col m12 s12">
-                                <div class="col m6 s6">
+                                <div class="col m4 s4">
                                     <p class="mt-2 mb-2">
-                                        <h4>Purchase Request</h4>
+                                        <h5>Purchase Request</h5>
                                         <div class="row">
-                                            <div class="input-field col m6 s6">
+                                            <div class="input-field col m12 s12">
                                                 <select class="browser-default" id="purchase_request_id" name="purchase_request_id"></select>
                                                 <label class="active" for="purchase_request_id">Purchase Request (Jika ada)</label>
                                             </div>
-                                            <div class="col m6 s6 mt-4">
-                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getPurchaseRequest();" href="javascript:void(0);">
-                                                    <i class="material-icons left">add</i> Tambah PR
+                                            <div class="col m12 12">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getDetails('po');" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Purchase Request
                                                 </a>
                                             </div>
                                         </div>
                                     </p>
                                 </div>
-                                <div class="col m6 s6">
-                                    <h6><b>PR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                                <div class="col m4 s4">
+                                    <p class="mt-2 mb-2">
+                                        <h5>Good Issue / Barang Keluar</h5>
+                                        <div class="row">
+                                            <div class="input-field col m12 s12">
+                                                <select class="browser-default" id="good_issue_id" name="good_issue_id"></select>
+                                                <label class="active" for="good_issue_id">Good Issue / Barang Keluar (Jika ada)</label>
+                                            </div>
+                                            <div class="col m12 12">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getDetails('gi');" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Good Issue
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </p>
+                                </div>
+                                <div class="col m4 s4">
+                                    <h6><b>PR/GI Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
                             <div class="col m12 s12" style="overflow:auto;width:100% !important;">
@@ -535,7 +552,9 @@
                 M.updateTextFields();
                 $('#subtotal,#total,#tax,#grandtotal,#wtax').text('0,00');
                 $('#purchase_request_id').empty();
-                $('#list-used-data').empty();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -576,6 +595,7 @@
 
         select2ServerSide('#supplier_id,#filter_supplier', '{{ url("admin/select2/supplier") }}');
         select2ServerSide('#purchase_request_id', '{{ url("admin/select2/purchase_request") }}');
+        select2ServerSide('#good_issue_id', '{{ url("admin/select2/good_issue") }}');
     });
     
 
@@ -811,16 +831,24 @@
         resetTerm();
     }
 
-    function getPurchaseRequest(){
-        let nil = $('#purchase_request_id').val();
+    function getDetails(type){
+
+        let nil;
+
+        if(type == 'po'){
+            nil = $('#purchase_request_id').val();
+        }else if(type == 'gi'){
+            nil = $('#good_issue_id').val();
+        }
 
         if(nil){
             $.ajax({
-                url: '{{ Request::url() }}/get_purchase_request',
+                url: '{{ Request::url() }}/get_details',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: nil
+                    id: nil,
+                    type : type,
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -837,13 +865,12 @@
                             text: response.message,
                             icon: 'warning'
                         });
-                        $('#purchase_request_id').empty();
                     }else{
                         if(response.details.length > 0){
                             $('#list-used-data').append(`
                                 <div class="chip purple darken-4 gradient-shadow white-text">
                                     ` + response.code + `
-                                    <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `','` + type + `')">close</i>
                                 </div>
                             `);
                             $.each(response.details, function(i, val) {
@@ -851,7 +878,8 @@
                                 
                                 $('#last-row-item').before(`
                                     <tr class="row_item" data-id="` + response.id + `">
-                                        <input type="hidden" name="arr_purchase[]" value="` + val.purchase_request_detail_id + `">
+                                        <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
+                                        <input type="hidden" name="arr_type[]" value="` + type + `">
                                         <td>
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                         </td>
@@ -953,10 +981,9 @@
                                 }
                             });
                         }
-
-                        $('#purchase_request_id').empty();
                     }
                     M.updateTextFields();
+                    $('#purchase_request_id,#good_issue_id').empty();
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
@@ -980,7 +1007,8 @@
         if($('#inventory_type').val() == '1'){
             $('#last-row-item').before(`
                 <tr class="row_item">
-                    <input type="hidden" name="arr_purchase[]" value="0">
+                    <input type="hidden" name="arr_data[]" value="0">
+                    <input type="hidden" name="arr_type[]" value="">
                     <td>
                         <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                     </td>
@@ -1063,7 +1091,8 @@
 
             $('#last-row-item').before(`
                 <tr class="row_item">
-                    <input type="hidden" name="arr_purchase[]" value="0">
+                    <input type="hidden" name="arr_data[]" value="0">
+                    <input type="hidden" name="arr_type[]" value="">
                     <td>
                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                     </td>
@@ -1151,13 +1180,14 @@
         }
     }
 
-    function removeUsedData(id){
+    function removeUsedData(id,type){
         $.ajax({
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
             data: { 
-                id : id
+                id : id,
+                type : type,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1447,7 +1477,8 @@
                         if(response.inventory_type == '1'){
                             $('#last-row-item').before(`
                                 <tr class="row_item">
-                                    <input type="hidden" name="arr_purchase[]" value="` + val.purchase_request_detail_id + `">
+                                    <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
+                                    <input type="hidden" name="arr_type[]" value="` + val.type + `">
                                     <td>
                                         <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                     </td>
@@ -1542,7 +1573,8 @@
 
                             $('#last-row-item').before(`
                                 <tr class="row_item">
-                                    <input type="hidden" name="arr_purchase[]" value="` + val.purchase_request_detail_id + `">
+                                    <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
+                                    <input type="hidden" name="arr_type[]" value="` + val.type + `">
                                     <td>
                                         <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                     </td>

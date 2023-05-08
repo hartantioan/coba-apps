@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Misc;
 
 use App\Models\ApprovalStage;
+use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\Menu;
 use App\Models\PaymentRequest;
@@ -387,7 +388,7 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->where('status','2')->get();
+                ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
             if($d->hasBalance()){
@@ -396,6 +397,41 @@ class Select2Controller extends Controller {
                     'text' 			=> $d->code.' - '.$d->note,
                 ];
             }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function goodIssue(Request $request)
+    {
+
+        $response = [];
+        $search   = $request->search;
+        $data = GoodIssue::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('goodIssueDetail',function($query) use($search){
+                                $query->whereHas('item',function($query) use($search){
+                                    $query->where('code', 'like', "%$search%")
+                                        ->orWhere('name','like',"%$search%");
+                                });
+                            })
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                })
+                ->whereDoesntHave('used')
+                ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->note,
+            ];
         }
 
         return response()->json(['items' => $response]);

@@ -89,10 +89,10 @@ class Item extends Model
         $arrPrice = [];
         $po = PurchaseOrder::whereHas('purchaseOrderDetail', function($query) use ($dataplaces){
                 $query->where('item_id',$this->id)->whereIn('place_id',$dataplaces);
-            })->orderByDesc('post_date')->get();
+            })->whereIn('status',['2','3'])->orderByDesc('post_date')->get();
         
         foreach($po as $row){
-            foreach($row->purchaseOrderDetail()->where('item_id',$this->id)->get() as $rowdetail){
+            foreach($row->purchaseOrderDetail as $rowdetail){
                 $arrPrice[] = [
                     'purchase_code' => $row->code,
                     'supplier_id'   => $row->account_id,

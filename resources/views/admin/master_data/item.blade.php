@@ -169,8 +169,8 @@
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="keterangan" name="keterangan" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
-                            <label class="active" for="keterangan">Keterangan</label>
+                            <input id="note" name="note" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
+                            <label class="active" for="note">Keterangan</label>
                         </div>
                         <div class="input-field col s6">
                             <select class="select2 browser-default" id="item_group_id" name="item_group_id">
@@ -687,6 +687,7 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#note').val(response.note);
                 $('#item_group_id').val(response.item_group_id).trigger('change');
                 $('#uom_unit').val(response.uom_unit).formSelect();
                 $('#buy_unit').val(response.buy_unit).formSelect();

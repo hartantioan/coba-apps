@@ -140,6 +140,7 @@
                         <th>Item Pembelian</th>
                         <th>Item Aset</th>
 						<th>Gudang</th>
+						<th>Keterangan</th>
                         <th>Status</th>
 					</tr>
 				</thead>
@@ -160,6 +161,7 @@
                             <td>{!! $row->is_purchase_item ? '&#10003;' : '&#10005;' !!}</td>
                             <td>{!! $row->is_asset ? '&#10003;' : '&#10005;' !!}</td>
 							<td>{!! $row->warehouses() !!}</td>
+							<td>{!! $row->note !!}</td>
                             <td>{!! $row->status() !!}</td>
                         </tr>
 					@endforeach

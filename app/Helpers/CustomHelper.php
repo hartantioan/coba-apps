@@ -16,6 +16,8 @@ use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
 use App\Models\InventoryTransfer;
+use App\Models\Item;
+use App\Models\ItemWarehouse;
 use App\Models\OutgoingPayment;
 use App\Models\Place;
 use App\Models\PurchaseInvoice;
@@ -1137,6 +1139,28 @@ class CustomHelper {
 			return true;
 		}else{
 			return false;
+		}
+	}
+
+	public static function addNewItemService($item_id = null){
+		$item = Item::find($item_id);
+
+		$arrString = explode('-',$item->code);
+
+		if(count($arrString) > 0){
+			$lastIndex = count($arrString) - 1;
+			if($arrString[$lastIndex] !== 'SVC'){
+				$newItem = $item->replicate();
+				$newItem->code = $item->code.'-SVC';
+				$newItem->save();
+
+				foreach($item->itemWarehouse as $row){
+					ItemWarehouse::create([
+						'item_id'		=> $newItem->id,
+						'warehouse_id'	=> $row->warehouse_id,
+					]);
+				}
+			}
 		}
 	}
 }

@@ -56,4 +56,11 @@ class GoodIssueDetail extends Model
     {
         return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
+
+    public function qtyConvertToBuy()
+    {
+        $qty = round($this->qty / $this->item->buy_convert,3);
+
+        return $qty;
+    }
 }

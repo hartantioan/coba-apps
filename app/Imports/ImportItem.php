@@ -35,6 +35,7 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
             'is_sales_item' => $row['is_sales_item'],
             'is_purchase_item' => $row['is_purchase_item'],
             'is_service' => $row['is_service'],
+            'note' => $row['note'],
             'status' => $row['status']
         ]);
 
@@ -64,6 +65,7 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
             '*.is_sales_item' => 'nullable',
             '*.is_purchase_item' => 'nullable',
             '*.is_service' => 'nullable',
+            '*.note' => 'nullable',
             '*.status' => 'required',
         ];
     }

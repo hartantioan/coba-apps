@@ -114,6 +114,7 @@ Route::prefix('admin')->group(function () {
             Route::get('warehouse', [Select2Controller::class, 'warehouse']);
             Route::get('asset_item', [Select2Controller::class, 'assetItem']);
             Route::get('purchase_request', [Select2Controller::class, 'purchaseRequest']);
+            Route::get('good_issue', [Select2Controller::class, 'goodIssue']);
             Route::get('purchase_order', [Select2Controller::class, 'purchaseOrder']);
             Route::get('vendor', [Select2Controller::class, 'vendor']);
             Route::get('good_receipt', [Select2Controller::class, 'goodReceipt']);
@@ -581,7 +582,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('print',[PurchaseOrderController::class, 'print']);
                 Route::get('export',[PurchaseOrderController::class, 'export']);
                 Route::get('viewstructuretree',[PurchaseOrderController::class, 'viewStructureTree']);
-                Route::post('get_purchase_request', [PurchaseOrderController::class, 'getPurchaseRequest']);
+                Route::post('get_details', [PurchaseOrderController::class, 'getDetails']);
                 Route::post('remove_used_data', [PurchaseOrderController::class, 'removeUsedData']);
                 Route::post('create',[PurchaseOrderController::class, 'create'])->middleware('operation.access:purchase_order,update');
                 Route::get('approval/{id}',[PurchaseOrderController::class, 'approval'])->withoutMiddleware('direct.access');

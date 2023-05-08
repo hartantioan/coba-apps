@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Department;
+use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\PaymentRequest;
 use App\Models\Place;
@@ -281,30 +282,66 @@ class PurchaseOrderController extends Controller
         return response()->json($response);
     }
 
-    public function getPurchaseRequest(Request $request){
-        $data = PurchaseRequest::where('id',$request->id)->where('status','2')->first();
+    public function getDetails(Request $request){
+
+        if($request->type == 'po'){
+            $data = PurchaseRequest::where('id',$request->id)->where('status','2')->first();
+        }elseif($request->type == 'gi'){
+            $data = GoodIssue::where('id',$request->id)->where('status','2')->first();
+        }
 
         if($data->used()->exists()){
-            $data['status'] = '500';
-            $data['message'] = 'Purchase Request '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+            if($request->type == 'po'){
+                $data['status'] = '500';
+                $data['message'] = 'Purchase Request '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+            }elseif($request->type == 'gi'){
+                $data['status'] = '500';
+                $data['message'] = 'Good Issue / Barang Keluar '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+            }
         }else{
-            if($data->hasBalance()){
+            $passed = true;
+            if($request->type == 'po'){
+                if(!$data->hasBalance()){
+                    $passed = false;
+                }
+            }
+            
+            if($passed){
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
                 $details = [];
-                foreach($data->purchaseRequestDetail as $row){
-                    $details[] = [
-                        'purchase_request_detail_id'    => $row->id,
-                        'item_id'                       => $row->item_id,
-                        'item_name'                     => $row->item->code.' - '.$row->item->name,
-                        'old_prices'                    => $row->item->oldPrices($this->dataplaces),
-                        'unit'                          => $row->item->buyUnit->code,
-                        'qty'                           => number_format($row->qtyBalance(),3,',','.'),
-                        'note'                          => $row->note,
-                        'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
-                        'warehouse_id'                  => $row->warehouse_id,
-                        'place_id'                      => $row->place_id,
-                        'department_id'                 => $row->department_id,
-                    ];
+
+                if($request->type == 'po'){
+                    foreach($data->purchaseRequestDetail as $row){
+                        $details[] = [
+                            'reference_id'                  => $row->id,
+                            'item_id'                       => $row->item_id,
+                            'item_name'                     => $row->item->code.' - '.$row->item->name,
+                            'old_prices'                    => $row->item->oldPrices($this->dataplaces),
+                            'unit'                          => $row->item->buyUnit->code,
+                            'qty'                           => number_format($row->qtyBalance(),3,',','.'),
+                            'note'                          => $row->note,
+                            'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
+                            'warehouse_id'                  => $row->warehouse_id,
+                            'place_id'                      => $row->place_id,
+                            'department_id'                 => $row->department_id,
+                        ];
+                    }
+                }elseif($request->type == 'gi'){
+                    foreach($data->goodIssueDetail as $row){
+                        $details[] = [
+                            'reference_id'                  => $row->id,
+                            'item_id'                       => $row->item_id,
+                            'item_name'                     => $row->item->code.' - '.$row->item->name,
+                            'old_prices'                    => $row->item->oldPrices($this->dataplaces),
+                            'unit'                          => $row->item->buyUnit->code,
+                            'qty'                           => number_format($row->qtyConvertToBuy(),3,',','.'),
+                            'note'                          => $row->note,
+                            'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
+                            'warehouse_id'                  => $row->warehouse_id,
+                            'place_id'                      => $row->place_id,
+                            'department_id'                 => $row->department_id,
+                        ];
+                    }
                 }
 
                 $data['details'] = $details;
@@ -555,7 +592,8 @@ class PurchaseOrderController extends Controller
         
                                 $querydetail = PurchaseOrderDetail::create([
                                     'purchase_order_id'             => $query->id,
-                                    'purchase_request_detail_id'    => $request->arr_purchase ? $request->arr_purchase[$key] : NULL,
+                                    'purchase_request_detail_id'    => $request->arr_data ? ($request->arr_type[$key] == 'po' ? $request->arr_data[$key] : NULL) : NULL,
+                                    'good_issue_detail_id'          => $request->arr_data ? ($request->arr_type[$key] == 'gi' ? $request->arr_data[$key] : NULL) : NULL,
                                     'item_id'                       => $row,
                                     'qty'                           => $qty,
                                     'price'                         => $price,
@@ -578,6 +616,10 @@ class PurchaseOrderController extends Controller
                                 
                                 if($querydetail->purchaseRequestDetail()->exists()){
                                     CustomHelper::removeUsedData('purchase_requests',$querydetail->purchaseRequestDetail->purchase_request_id);
+                                }
+
+                                if($querydetail->goodReceiptDetail()->exists()){
+                                    CustomHelper::removeUsedData('good_issues',$querydetail->goodReceiptDetail->good_issue_id);
                                 }
                             }
                         }
@@ -742,11 +784,11 @@ class PurchaseOrderController extends Controller
         $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
 
         $arr = [];
-
+        
         foreach($po->purchaseOrderDetail as $row){
             $arr[] = [
-                'id'                                => $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchase_request_id : '0',
-                'purchase_request_detail_id'        => $row->purchase_request_detail_id ? $row->purchase_request_detail_id : '0',
+                'id'                                => $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchase_request_id : ($row->goodIssueDetail()->exists() ? $row->goodIssueDetail->good_issue_id : '0'),
+                'reference_id'                      => $row->purchase_request_detail_id ? $row->purchase_request_detail_id : ($row->good_issue_detail_id ? $row->good_issue_detail_id : '0' ),
                 'item_id'                           => $row->item_id,
                 'coa_id'                            => $row->coa_id,
                 'item_name'                         => $row->item_id ? $row->item->name : '',
@@ -769,7 +811,8 @@ class PurchaseOrderController extends Controller
                 'place_id'                          => $row->place_id,
                 'department_id'                     => $row->department_id,
                 'tax_id'                            => $row->tax_id,
-                'wtax_id'                           => $row->wtax_id
+                'wtax_id'                           => $row->wtax_id,
+                'type'                              => $row->purchase_request_detail_id ? 'po' : ($row->good_issue_detail_id ? 'gi' : ''),
             ];
         }
 
@@ -2310,7 +2353,12 @@ class PurchaseOrderController extends Controller
     }
 
     public function removeUsedData(Request $request){
-        CustomHelper::removeUsedData('purchase_requests',$request->id);
+        if($request->type == 'po'){
+            CustomHelper::removeUsedData('purchase_requests',$request->id);
+        }elseif($request->type == 'gi'){
+            CustomHelper::removeUsedData('good_issues',$request->id);
+        }
+        
         return response()->json([
             'status'    => 200,
             'message'   => ''

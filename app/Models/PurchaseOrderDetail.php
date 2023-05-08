@@ -17,6 +17,7 @@ class PurchaseOrderDetail extends Model
     protected $fillable = [
         'purchase_order_id',
         'purchase_request_detail_id',
+        'good_issue_detail_id',
         'item_id',
         'coa_id',
         'qty',
@@ -122,5 +123,10 @@ class PurchaseOrderDetail extends Model
     public function purchaseRequestDetail()
     {
         return $this->belongsTo('App\Models\PurchaseRequestDetail','purchase_request_detail_id','id');
+    }
+
+    public function goodIssueDetail()
+    {
+        return $this->belongsTo('App\Models\GoodIssueDetail','good_issue_detail_id','id');
     }
 }

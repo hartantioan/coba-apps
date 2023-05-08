@@ -36,6 +36,7 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
         'ITEM PEMBELIAN',
         'ITEM SERVICE',
         'GUDANG',
+        'KETERANGAN',
         'STATUS',
     ];
 
@@ -90,6 +91,7 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'is_purchase'   => $row->is_purchase_item ? 'Ya' : 'Tidak',
                 'is_service'    => $row->is_service ? 'Ya' : 'Tidak',
                 'warehouses'    => $row->warehouses(),
+                'note'          => $row->note,
                 'status'        => $row->status == '1' ? 'Aktif' : 'Non-Aktif',
             ];
         }

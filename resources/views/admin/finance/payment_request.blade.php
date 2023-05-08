@@ -423,7 +423,7 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
-
+        
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
             var badge = tr.find('button.btn-floating');
@@ -446,6 +446,8 @@
         });
 
         loadDataTable();
+
+        window.table.search('{{ $code }}').draw();
 
         $('#modal1').modal({
             dismissible: false,

@@ -42,13 +42,14 @@ class PaymentRequestController extends Controller
 
         $this->dataplaces = $user->userPlaceArray();
     }
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             'title'         => 'Permintaan Pembayaran',
             'content'       => 'admin.finance.payment_request',
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

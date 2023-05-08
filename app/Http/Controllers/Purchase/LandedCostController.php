@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodReceipt;
+use App\Models\PaymentRequest;
+use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\Tax;
 use Illuminate\Support\Facades\Storage;
@@ -809,14 +811,19 @@ class LandedCostController extends Controller
         
         $data_good_receipts=[];
         $data_purchase_requests=[];
+        $data_pos = [];
 
+        $data_id_dp=[];
         $data_id_po = [];
         $data_id_gr = [];
-        $data_pos = [];
         $data_id_invoice=[];
+        $data_purchase_downpayment=[];
+        $data_id_pyrs=[];
+        $data_id_frs=[];
+        $data_frs=[];
+        $data_pyrs = [];
+        $data_outgoingpayments = [];
         
-
-        $data_purchase_downpayment = [];
         $data_invoices=[];
         $data_link = [];
         $data_go_chart = [];
@@ -826,6 +833,7 @@ class LandedCostController extends Controller
                 "name" => $query->code,
                 'properties'=> [
                     ['name'=> "Tanggal :".$query->post_date],
+                    ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')],
                  ],
                 'color'=>"lightblue",
                 'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($query->code),
@@ -841,6 +849,7 @@ class LandedCostController extends Controller
                         "name"=>$row->code,
                         'properties'=> [
                             ['name'=> "Tanggal :".$row->code],
+                            ['name'=> "Nominal : Rp.:".number_format($row->grandtotal,2,',','.')],
                          ],
                         'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row->code),
                     ];
@@ -858,6 +867,7 @@ class LandedCostController extends Controller
                     'name'=>$query->goodReceipt->code,
                     'properties'=> [
                         ['name'=> "Tanggal :".$query->goodReceipt->post_date],
+                        ['name'=> "Nominal : Rp.:".number_format($query->goodReceipt->grandtotal,2,',','.')],
                      ],
                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($query->goodReceipt->code),
                 ];
@@ -873,14 +883,16 @@ class LandedCostController extends Controller
             
             $added = true;
             while($added){
+               
                 $added=false;
-                //Pengambilan foreign branch gr
+                // Pengambilan foreign branch gr
                 foreach($data_id_gr as $gr_id){
                     $query_gr = GoodReceipt::where('id',$gr_id)->first();
                     foreach($query_gr->goodReceiptDetail as $good_receipt_detail){
                         $po = [
                             'properties'=> [
                                 ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
+                                ['name'=> "Nominal : Rp.:".number_format($good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')]
                             ],
                             'key'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
                             'name'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
@@ -922,6 +934,7 @@ class LandedCostController extends Controller
                             $data_lc=[
                                 'properties'=> [
                                     ['name'=> "Tanggal : ".$landed_cost->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($landed_cost->grandtotal,2,',','.')]
                                 ],
                                 'key'=>$landed_cost->code,
                                 'name'=>$landed_cost->code,
@@ -962,6 +975,8 @@ class LandedCostController extends Controller
                             $invoice_tempura=[
                                 'properties'=> [
                                     ['name'=> "Tanggal : ".$invoice_detail->purchaseInvoice->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
+                                    
                                 ],
                                 'key'=>$invoice_detail->purchaseInvoice->code,
                                 'name'=>$invoice_detail->purchaseInvoice->code,
@@ -974,7 +989,7 @@ class LandedCostController extends Controller
                                     'from'=>$query_gr->code,
                                     'to'=>$invoice_detail->purchaseInvoice->code,
                                 ];
-                                $data_id_invoice[]=$invoice_detail->purchaseInvoice->id;
+                                
                             }else{
                                 $found = false;
                                 foreach ($data_invoices as $key => $row_invoice) {
@@ -990,13 +1005,20 @@ class LandedCostController extends Controller
                                         'from'=>$query_gr->code,
                                         'to'=>$invoice_detail->purchaseInvoice->code,
                                     ];
-                                    $data_id_invoice[]=$invoice_detail->purchaseInvoice->id;
+                                    
                                 }
+                                
+                            }
+                            if(!in_array($invoice_detail->purchaseInvoice->id, $data_id_invoice)){
+                                $data_id_invoice[] = $invoice_detail->purchaseInvoice->id;
+                                $added = true; 
                             }
                         }
                     }
 
                 }
+
+                // invoice insert foreign
 
                 foreach($data_id_invoice as $invoice_id){
                     $query_invoice = PurchaseInvoice::where('id',$invoice_id)->first();
@@ -1009,6 +1031,7 @@ class LandedCostController extends Controller
                                     "color"=>"lightblue",
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_po->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($row_po->grandtotal,2,',','.')]
                                      ],
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->post_date),           
                                 ];
@@ -1017,8 +1040,8 @@ class LandedCostController extends Controller
                                     $data_pos[]=$po;
                                     $data_go_chart[]=$po;
                                     $data_link[]=[
-                                        'from'=>$query_invoice->code,
-                                        'to'=>$row_po->code,
+                                        'from'=>$row_po->code,
+                                        'to'=>$query_invoice->code,
                                     ]; 
                                     $data_id_po[]= $purchase_order_detail->purchaseOrder->id;  
                                     
@@ -1033,8 +1056,8 @@ class LandedCostController extends Controller
                                     //po yang memiliki request yang sama
                                     if($found){
                                         $data_links=[
-                                            'from'=>$query_invoice->code,
-                                            'to'=>$row_po->code,
+                                            'from'=>$row_po->code,
+                                            'to'=>$query_invoice->code,
                                         ]; 
                                         $found_inlink = false;
                                         foreach($data_link as $key=>$row_link){
@@ -1051,8 +1074,8 @@ class LandedCostController extends Controller
                                     if (!$found) {
                                         $data_pos[] = $po;
                                         $data_link[]=[
-                                            'from'=>$query_invoice->code,
-                                            'to'=>$row_po->code,
+                                            'from'=>$row_po->code,
+                                            'to'=>$query_invoice->code,
                                         ];  
                                         $data_go_chart[]=$po;
                                         $data_id_po[]= $purchase_order_detail->purchaseOrder->id; 
@@ -1066,7 +1089,7 @@ class LandedCostController extends Controller
                                             $data_good_receipt=[
                                                 'properties'=> [
                                                     ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                                    ['name'=> "url", 'type'=> request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code)],
+                                                    ['name'=> "Nominal : Rp.".number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')],
                                                  ],
                                                 "key" => $good_receipt_detail->goodReceipt->code,
                                                 "name" => $good_receipt_detail->goodReceipt->code,
@@ -1109,6 +1132,7 @@ class LandedCostController extends Controller
                             $data_good_receipt=[
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->goodReceipt->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->goodReceipt->grandtotal,2,',','.')]
                                 ],
                                 "key" => $row->goodReceipt->code,
                                 "name" => $row->goodReceipt->code,
@@ -1119,8 +1143,8 @@ class LandedCostController extends Controller
                                 $data_good_receipts[]=$data_good_receipt;
                                 $data_go_chart[]=$data_good_receipt;
                                 $data_link[]=[
-                                    'from'=>$query_invoice->code,
-                                    'to'=>$data_good_receipt["key"],
+                                    'from'=>$data_good_receipt["key"],
+                                    'to'=>$query_invoice->code,
                                 ];
                                 $data_id_gr[]=$row->goodReceipt->id;   
                             }else{
@@ -1135,8 +1159,8 @@ class LandedCostController extends Controller
                                     $data_good_receipts[]=$data_good_receipt;
                                     $data_go_chart[]=$data_good_receipt;
                                     $data_link[]=[
-                                        'from'=>$query_invoice->code,
-                                        'to'=>$data_good_receipt["key"],
+                                        'from'=>$data_good_receipt["key"],
+                                        'to'=>$query_invoice->code,
                                     ]; 
                                     $data_id_gr[]=$row->goodReceipt->id; 
                                 }
@@ -1147,6 +1171,7 @@ class LandedCostController extends Controller
                             $data_lc=[
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->landedCost->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->landedCost->grandtotal,2,',','.')]
                                 ],
                                 "key" => $row->landedCost->code,
                                 "name" => $row->landedCost->code,
@@ -1186,6 +1211,7 @@ class LandedCostController extends Controller
                             $data_down_payment=[
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row_pi->purchaseDownPayment->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row_pi->purchaseDownPayment->grandtotal,2,',','.')]
                                 ],
                                 "key" => $row_pi->purchaseDownPayment->code,
                                 "name" => $row_pi->purchaseDownPayment->code,
@@ -1224,10 +1250,736 @@ class LandedCostController extends Controller
                                 ];
                                 $data_purchase_downpayment[]=$data_down_payment;
                             }
+                            if($row_pi->purchaseDownPayment->hasPaymentRequestDetail()->exists()){
+                                foreach($row_pi->purchaseDownPayment->hasPaymentRequestDetail as $row_pyr_detail){
+                                    $data_pyr_tempura=[
+                                        'properties'=> [
+                                            ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                            ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                        ],
+                                        "key" => $row_pyr_detail->paymentRequest->code,
+                                        "name" => $row_pyr_detail->paymentRequest->code,
+                                        'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                                    ];
+
+                                    if(count($data_pyrs)<1){
+                                        $data_pyrs[]=$data_pyr_tempura;
+                                        $data_go_chart[]=$data_pyr_tempura;
+                                        $data_link[]=[
+                                            'from'=>$row_pi->purchaseDownPayment->code,
+                                            'to'=>$row_pyr_detail->paymentRequest->code,
+                                        ]; 
+                                        $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
+                                        
+                                    }else{
+                                        $found = false;
+                                        foreach ($data_pyrs as $key => $row_pyr) {
+                                            if ($row_pyr["key"] == $data_pyr_tempura["key"]) {
+                                                $found = true;
+                                                break;
+                                            }
+                                        }
+                                     
+                                        if($found){
+                                            $data_links=[
+                                                'from'=>$row_pi->purchaseDownPayment->code,
+                                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                            ]; 
+                                            $found_inlink = false;
+                                            foreach($data_link as $key=>$row_link){
+                                                if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                                    $found_inlink = true;
+                                                    break;
+                                                }
+                                            }
+                                            if(!$found_inlink){
+                                                $data_link[] = $data_links;
+                                            }
+                                            
+                                        }
+                                        if (!$found) {
+                                            $data_pyrs[]=$data_pyr_tempura;
+                                            $data_go_chart[]=$data_pyr_tempura;
+                                            $data_link[]=[
+                                                'from'=>$row_pi->purchaseDownPayment->code,
+                                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                            ]; 
+                                            $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;   
+                                        }
+                                    }
+
+                                    if($row_pyr_detail->fundRequest()){
+                                        $data_fund_tempura=[
+                                            'properties'=> [
+                                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                                ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ],
+                                            "key" => $row_pyr_detail->lookable->code,
+                                            "name" => $row_pyr_detail->lookable->code,
+                                            'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                        ];
+                                        if(count($data_frs)<1){
+                                            $data_frs[]=$data_fund_tempura;
+                                            $data_go_chart[]=$data_fund_tempura;
+                                            $data_link[]=[
+                                                'from'=>$row_pyr_detail->lookable->code,
+                                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                            ]; 
+                                            $data_id_frs[]= $row_pyr_detail->lookable->id;  
+                                            
+                                        }else{
+                                            $found = false;
+                                            foreach ($data_frs as $key => $row_fundreq) {
+                                                if ($row_fundreq["key"] == $data_fund_tempura["key"]) {
+                                                    $found = true;
+                                                    break;
+                                                }
+                                            }
+                                            
+                                            if($found){
+                                                $data_links=[
+                                                    'from'=>$row_pyr_detail->lookable->code,
+                                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                                ]; 
+                                                $found_inlink = false;
+                                                foreach($data_link as $key=>$row_link){
+                                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                                        $found_inlink = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if(!$found_inlink){
+                                                    $data_link[] = $data_links;
+                                                }
+                                                
+                                            }
+                                            if (!$found) {
+                                                $data_frs[]=$data_fund_tempura;
+                                                $data_go_chart[]=$data_fund_tempura;
+                                                $data_link[]=[
+                                                    'from'=>$row_pyr_detail->lookable->code,
+                                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                                ]; 
+                                                $data_id_frs[]= $row_pyr_detail->lookable->id;   
+                                            }
+                                        }
+                                        
+                                    }
+                                    if($row_pyr_detail->purchaseDownPayment()){
+                                        $data_downp_tempura = [
+                                            'properties'=> [
+                                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                                ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ],
+                                            "key" => $row_pyr_detail->lookable->code,
+                                            "name" => $row_pyr_detail->lookable->code,
+                                            'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                        ];
+                                        if(count($data_purchase_downpayment)<1){
+                                            $data_purchase_downpayment[]=$data_downp_tempura;
+                                            $data_go_chart[]=$data_downp_tempura;
+                                            $data_link[]=[
+                                                'from'=>$row_pyr_detail->lookable->code,
+                                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                            ]; 
+                                            $data_id_dp[]= $row_pyr_detail->lookable->id;  
+                                            
+                                        }else{
+                                            $found = false;
+                                            foreach ($data_purchase_downpayment as $key => $row_dp) {
+                                                if ($row_dp["key"] == $data_downp_tempura["key"]) {
+                                                    $found = true;
+                                                    break;
+                                                }
+                                            }
+                                            
+                                            if($found){
+                                                $data_links=[
+                                                    'from'=>$row_pyr_detail->lookable->code,
+                                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                                ]; 
+                                                $found_inlink = false;
+                                                foreach($data_link as $key=>$row_link){
+                                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                                        $found_inlink = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if(!$found_inlink){
+                                                    $data_link[] = $data_links;
+                                                }
+                                                
+                                            }
+                                            if (!$found) {
+                                                $data_purchase_downpayment[]=$data_downp_tempura;
+                                                $data_go_chart[]=$data_downp_tempura;
+                                                $data_link[]=[
+                                                    'from'=>$row_pyr_detail->lookable->code,
+                                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                                ]; 
+                                                $data_id_dp[]= $row_pyr_detail->lookable->id;    
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                    if($query_invoice->hasPaymentRequestDetail()->exists()){
+                        foreach($query_invoice->hasPaymentRequestDetail as $row_pyr_detail){
+                            $data_pyr_tempura=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row_pyr_detail->paymentRequest->code,
+                                "name" => $row_pyr_detail->paymentRequest->code,
+                                'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                            ];
+                            if(count($data_pyrs)<1){
+                                $data_pyrs[]=$data_pyr_tempura;
+                                $data_go_chart[]=$data_pyr_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_invoice->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                ]; 
+                                $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
+                                
+                            }else{
+                                $found = false;
+                                foreach ($data_pyrs as $key => $row_pyr) {
+                                    if ($row_pyr["key"] == $data_pyr_tempura["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                             
+                                if($found){
+                                    $data_links=[
+                                        'from'=>$query_invoice->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ]; 
+                                    $found_inlink = false;
+                                    foreach($data_link as $key=>$row_link){
+                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                            $found_inlink = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!$found_inlink){
+                                        $data_link[] = $data_links;
+                                    }
+                                    
+                                }
+                                if (!$found) {
+                                    $data_pyrs[]=$data_pyr_tempura;
+                                    $data_go_chart[]=$data_pyr_tempura;
+                                    $data_link[]=[
+                                        'from'=>$query_invoice->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ]; 
+                                    $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;   
+                                }
+                            }
+                            if($row_pyr_detail->fundRequest()){
+                                $data_fund_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pyr_detail->lookable->code,
+                                    "name" => $row_pyr_detail->lookable->code,
+                                    'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                ];
+                                if(count($data_frs)<1){
+                                    $data_frs[]=$data_fund_tempura;
+                                    $data_go_chart[]=$data_fund_tempura;
+                                    $data_link[]=[
+                                        'from'=>$row_pyr_detail->lookable->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ]; 
+                                    $data_id_frs[]= $row_pyr_detail->lookable->id;  
+                                    
+                                }else{
+                                    $found = false;
+                                    foreach ($data_frs as $key => $row_fundreq) {
+                                        if ($row_fundreq["key"] == $data_fund_tempura["key"]) {
+                                            $found = true;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    if($found){
+                                        $data_links=[
+                                            'from'=>$row_pyr_detail->lookable->code,
+                                            'to'=>$row_pyr_detail->paymentRequest->code,
+                                        ]; 
+                                        $found_inlink = false;
+                                        foreach($data_link as $key=>$row_link){
+                                            if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                                $found_inlink = true;
+                                                break;
+                                            }
+                                        }
+                                        if(!$found_inlink){
+                                            $data_link[] = $data_links;
+                                        }
+                                        
+                                    }
+                                    if (!$found) {
+                                        $data_frs[]=$data_fund_tempura;
+                                        $data_go_chart[]=$data_fund_tempura;
+                                        $data_link[]=[
+                                            'from'=>$row_pyr_detail->lookable->code,
+                                            'to'=>$row_pyr_detail->paymentRequest->code,
+                                        ]; 
+                                        $data_id_frs[]= $row_pyr_detail->lookable->id;   
+                                    }
+                                }
+                                
+                            }
+                            if($row_pyr_detail->purchaseDownPayment()){
+                                $data_downp_tempura = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pyr_detail->lookable->code,
+                                    "name" => $row_pyr_detail->lookable->code,
+                                    'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                ];
+                                if(count($data_purchase_downpayment)<1){
+                                    $data_purchase_downpayment[]=$data_downp_tempura;
+                                    $data_go_chart[]=$data_downp_tempura;
+                                    $data_link[]=[
+                                        'from'=>$row_pyr_detail->lookable->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ]; 
+                                    $data_id_dp[]= $row_pyr_detail->lookable->id;  
+                                    
+                                }else{
+                                    $found = false;
+                                    foreach ($data_purchase_downpayment as $key => $row_dp) {
+                                        if ($row_dp["key"] == $data_downp_tempura["key"]) {
+                                            $found = true;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    if($found){
+                                        $data_links=[
+                                            'from'=>$row_pyr_detail->lookable->code,
+                                            'to'=>$row_pyr_detail->paymentRequest->code,
+                                        ]; 
+                                        $found_inlink = false;
+                                        foreach($data_link as $key=>$row_link){
+                                            if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                                $found_inlink = true;
+                                                break;
+                                            }
+                                        }
+                                        if(!$found_inlink){
+                                            $data_link[] = $data_links;
+                                        }
+                                        
+                                    }
+                                    if (!$found) {
+                                        $data_purchase_downpayment[]=$data_downp_tempura;
+                                        $data_go_chart[]=$data_downp_tempura;
+                                        $data_link[]=[
+                                            'from'=>$row_pyr_detail->lookable->code,
+                                            'to'=>$row_pyr_detail->paymentRequest->code,
+                                        ]; 
+                                        $data_id_dp[]= $row_pyr_detail->lookable->id;    
+                                    }
+                                }
+                            }
                         }
                     }
                 }
 
+                foreach($data_id_pyrs as $payment_request_id){
+                    $query_pyr = PaymentRequest::find($payment_request_id);
+
+                    if($query_pyr->outgoingPayment()->exists()){
+                        $outgoing_payment = [
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_pyr->outgoingPayment->post_date],
+                                ['name'=> "Nominal : Rp.".number_format($query_pyr->outgoingPayment->grandtotal,2,',','.')]
+                            ],
+                            "key" => $query_pyr->outgoingPayment->code,
+                            "name" => $query_pyr->outgoingPayment->code,
+                            'url'=>request()->root()."/admin/finace/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
+                        ];
+                        if(count($data_outgoingpayments) < 1){
+                            $data_outgoingpayments[]=$outgoing_payment;
+                            $data_go_chart[]=$outgoing_payment;
+                            $data_link[]=[
+                                'from'=>$query_pyr->code,
+                                'to'=>$query_pyr->outgoingPayment->code,
+                            ]; 
+                        }else{
+                            $found = false;
+                            foreach($data_outgoingpayments as $row_op){
+                                if($outgoing_payment["key"]== $row_op["key"]){
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if($found){
+                                $data_links=[
+                                    'from'=>$query_pyr->code,
+                                    'to'=>$query_pyr->outgoingPayment->code, 
+                                ];
+                                foreach($data_link as $key=>$row_link){
+                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                        $found_inlink = true;
+                                        break;
+                                    }
+                                }
+                                if(!$found_inlink){
+                                    $data_link[] = $data_links;
+                                }
+                            }
+                            if(!$found){
+                                $data_outgoingpayments[]=$outgoing_payment;
+                                $data_go_chart[]=$outgoing_payment;
+                                $data_link[]=[
+                                    'from'=>$query_pyr->code,
+                                    'to'=>$query_pyr->outgoingPayment->code,
+                                ]; 
+                            }
+                        }
+                    }
+                    
+                    foreach($query_pyr->paymentRequestDetail as $row_pyr_detail){
+                        
+                        $data_pyr_tempura=[
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                                ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                            ],
+                            "key" => $row_pyr_detail->paymentRequest->code,
+                            "name" => $row_pyr_detail->paymentRequest->code,
+                            'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                        ];
+                        if($row_pyr_detail->fundRequest()){
+                            
+                            $data_fund_tempura=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row_pyr_detail->lookable->code,
+                                "name" => $row_pyr_detail->lookable->code,
+                                'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                            ];
+                            if(count($data_frs)<1){
+                                $data_frs[]=$data_fund_tempura;
+                                $data_go_chart[]=$data_fund_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                ]; 
+                                $data_id_frs[]= $row_pyr_detail->lookable->id;  
+                                
+                            }else{
+                                $found = false;
+                                foreach ($data_frs as $key => $row_fundreq) {
+                                    if ($row_fundreq["key"] == $data_fund_tempura["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if($found){
+                                    $data_links=[
+                                        'from'=>$row_pyr_detail->lookable->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ]; 
+                                    $found_inlink = false;
+                                    foreach($data_link as $key=>$row_link){
+                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                            $found_inlink = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!$found_inlink){
+                                        $data_link[] = $data_links;
+                                    }
+                                    
+                                }
+                                if (!$found) {
+                                    $data_frs[]=$data_fund_tempura;
+                                    $data_go_chart[]=$data_fund_tempura;
+                                    $data_link[]=[
+                                        'from'=>$row_pyr_detail->lookable->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ]; 
+                                    $data_id_frs[]= $row_pyr_detail->lookable->id;   
+                                }
+                            }
+                            
+                        }
+                        if($row_pyr_detail->purchaseDownPayment()){
+                            $data_downp_tempura = [
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row_pyr_detail->lookable->code,
+                                "name" => $row_pyr_detail->lookable->code,
+                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                            ];
+                            if(count($data_purchase_downpayment)<1){
+                                
+                                $data_purchase_downpayment[]=$data_downp_tempura;
+                                $data_go_chart[]=$data_downp_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                ]; 
+                                
+                                
+                            }else{
+                                $found = false;
+                                foreach ($data_purchase_downpayment as $key => $row_dp) {
+                                    if ($row_dp["key"] == $data_downp_tempura["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if($found){
+                                    
+                                    $data_links=[
+                                        'from'=>$row_pyr_detail->lookable->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ]; 
+                                    $found_inlink = false;
+                                    foreach($data_link as $key=>$row_link){
+                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                            $found_inlink = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!$found_inlink){
+                                        $data_link[] = $data_links;
+                                    }
+                                    
+                                }
+                                if (!$found) {
+                                    $data_purchase_downpayment[]=$data_downp_tempura;
+                                    $data_go_chart[]=$data_downp_tempura;
+                                    $data_link[]=[
+                                        'from'=>$row_pyr_detail->lookable->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ]; 
+                                    
+                                }
+                                if(count($data_id_dp)<1){
+                                    $data_id_dp[] = $row_pyr_detail->lookable->id;
+                                    $added = true;
+                                    
+                                }
+                                
+                                
+                            }
+                            if(!in_array($row_pyr_detail->lookable->id, $data_id_dp)){
+                                $data_id_dp[] = $row_pyr_detail->lookable->id;
+                                $added = true; 
+                               
+                            }else{
+                            }
+                        }
+                    }
+                    
+                }
+                foreach($data_id_dp as $downpayment_id){
+                    $query_dp = PurchaseDownPayment::find($downpayment_id);
+                    foreach($query_dp->purchaseDownPaymentDetail as $row){
+                        if($row->purchaseOrder->exists()){
+                            $po=[
+                                "name"=>$row->purchaseOrder->code,
+                                "key" => $row->purchaseOrder->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row->purchaseOrder->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row->purchaseOrder->grandtotal,2,',','.')],
+                                ],
+                                'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),
+                            ];
+                            if(count($data_pos)<1){
+                                $data_go_chart[]=$po;
+                                $data_link[]=[
+                                    'from'=>$row->purchaseOrder->code,
+                                    'to'=>$query_dp->code,
+                                ];
+                                $data_pos[]=$po;
+                            
+                                $data_id_po []=$row->purchaseOrder->id; 
+                                
+                            }else{
+                                $found = false;
+                                foreach ($data_pos as $key => $row_pos) {
+                                    if ($row_pos["key"] == $po["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data_go_chart[]=$po;
+                                    $data_link[]=[
+                                        'from'=>$row->purchaseOrder->code,
+                                        'to'=>$query_dp->code,
+                                    ];
+                                    $data_pos[]=$po;
+                                
+                                    $data_id_po []=$row->purchaseOrder->id;
+                                }
+                            }
+                           
+                            
+                            
+                            /* mendapatkan request po */
+                            foreach($row->purchaseOrder->purchaseOrderDetail as $po_detail){
+                                if($po_detail->purchaseRequestDetail()->exists()){
+                                    $pr = [
+                                        "key" => $po_detail->purchaseRequestDetail->purchaseRequest->code,
+                                        'name'=> $po_detail->purchaseRequestDetail->purchaseRequest->code,
+                                        'properties'=> [
+                                            ['name'=> "Tanggal: ".$po_detail->purchaseRequestDetail->purchaseRequest->post_date],
+                                           
+                                         ],
+                                        'url'=>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($po_detail->purchaseRequestDetail->purchaseRequest->code),
+                                    ];
+                                    if(count($data_purchase_requests)<1){
+                                        $data_purchase_requests[]=$pr;
+                                        $data_go_chart[]=$pr;
+                                        $data_link[]=[
+                                            'from'=>$po_detail->purchaseRequestDetail->purchaseRequest->code,
+                                            'to'=>$row->purchaseOrder->code,
+                                        ]; 
+                                        
+                                    }else{
+                                        $found = false;
+                                        foreach ($data_purchase_requests as $key => $row_pos) {
+                                            if ($row_pos["key"] == $pr["key"]) {
+                                                $found = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!$found) {
+                                            $data_purchase_requests[]=$pr;
+                                            $data_go_chart[]=$pr;
+                                            $data_link[]=[
+                                                'from'=>$po_detail->purchaseRequestDetail->purchaseRequest->code,
+                                                'to'=>$row->purchaseOrder->code,
+                                            ]; 
+                                        }
+                                    }
+                                }
+                                /* mendapatkan gr po */
+                                if($po_detail->goodReceiptDetail()->exists()){
+                                    foreach($po_detail->goodReceiptDetail as $good_receipt_detail){
+                            
+                                        $data_good_receipt = [
+                                            'properties'=> [
+                                                ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
+                                                ['name'=> "Nominal : Rp.:".number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')],
+                                             ],
+                                            "key" => $good_receipt_detail->goodReceipt->code,
+                                            "name" => $good_receipt_detail->goodReceipt->code,
+                                            'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code),  
+                                        ];
+                    
+                                        if(count($data_good_receipts)<1){
+                                            
+                                            $data_good_receipts[]=$data_good_receipt;
+                                            $data_go_chart[]=$data_good_receipt;
+                                            $data_link[]=[
+                                                'from'=>$row->purchaseOrder->code,
+                                                'to'=>$data_good_receipt["key"],
+                                            ];
+                                            $data_id_gr[]=$good_receipt_detail->goodReceipt->id;
+                                            
+                                        }else{
+                                            $found = false;
+                                            foreach ($data_good_receipts as $key => $row_pos) {
+                                                if ($row_pos["key"] == $data_good_receipt["key"]) {
+                                                    $found = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!$found) {
+                                                $data_good_receipts[]=$data_good_receipt;
+                                                $data_go_chart[]=$data_good_receipt;
+                                                $data_link[]=[
+                                                    'from'=>$row->purchaseOrder->code,
+                                                    'to'=>$data_good_receipt["key"],
+                                                ];
+                                                $data_id_gr[]=$good_receipt_detail->goodReceipt->id;
+                                               
+                                            }
+                                        }
+                    
+                                    }
+                                }
+                            }
+                             
+        
+                        }
+                        
+                    }
+
+                    foreach($query_dp->purchaseInvoiceDp as $purchase_invoicedp){
+                        
+                        $invoice_tempura = [
+                            "name"=>$purchase_invoicedp->purchaseInvoice->code,
+                            "key" => $purchase_invoicedp->purchaseInvoice->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$purchase_invoicedp->purchaseInvoice->post_date],
+                                ['name'=> "Nominal : Rp.:".number_format($purchase_invoicedp->purchaseInvoice->grandtotal,2,',','.')],
+                                ],
+                            'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoicedp->purchaseInvoice->code),           
+                        ];
+                        if(count($data_invoices)<1){
+                           
+                            $data_go_chart[]=$invoice_tempura;
+                            $data_link[]=[
+                                'from'=>$query_dp->code,
+                                'to'=>$purchase_invoicedp->purchaseInvoice->code,
+                            ];
+                            
+                            $data_invoices[]=$invoice_tempura;
+                        }else{
+                            $found = false;
+                            foreach ($data_invoices as $key => $row_invoice) {
+                                if ($row_invoice["key"] == $invoice_tempura["key"]) {
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                               
+                                $data_go_chart[]=$invoice_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_dp->code,
+                                    'to'=>$purchase_invoicedp->purchaseInvoice->code,
+                                ];
+                                
+                                $data_invoices[]=$invoice_tempura;
+                            }
+                        }
+                        if(!in_array($purchase_invoicedp->purchaseInvoice->id, $data_id_invoice)){
+                            
+                            $data_id_invoice[] = $purchase_invoicedp->purchaseInvoice->id;
+                            $added = true; 
+                        }
+                    }
+
+                }
+                
                 //Pengambilan foreign branch po
                 foreach($data_id_po as $po_id){
                     $query_po = PurchaseOrder::find($po_id);
@@ -1242,6 +1994,7 @@ class LandedCostController extends Controller
                             
                                 'properties'=> [
                                     ['name'=> "Tanggal: ".$purchase_order_detail->purchaseRequestDetail->purchaseRequest->post_date],
+                                   
                                 ],
                                 'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($purchase_order_detail->purchaseRequestDetail->purchaseRequest->code),
                             ];
@@ -1293,8 +2046,8 @@ class LandedCostController extends Controller
                                 $data_good_receipt = [
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                        ['name'=> "url", 'type'=> request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code)],
-                                     ],
+                                        ['name'=> "Nominal : Rp.".number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')]
+                                    ],
                                     "key" => $good_receipt_detail->goodReceipt->code,
                                     "name" => $good_receipt_detail->goodReceipt->code,
                                     

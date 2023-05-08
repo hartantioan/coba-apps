@@ -59,9 +59,8 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
                         ->orWhere('grandtotal', 'like', "%$this->search%")
                         ->orWhere('note', 'like', "%$this->search%")
                         ->orWhereHas('purchaseDownPaymentDetail',function($query){
-                            $query->whereHas('item',function($query){
-                                $query->where('code', 'like', "%$this->search%")
-                                    ->orWhere('name','like',"%$this->search%");
+                            $query->whereHas('purchaseOrder',function($query){
+                                $query->where('code', 'like', "%$this->search%");
                             });
                         })
                         ->orWhereHas('user',function($query){

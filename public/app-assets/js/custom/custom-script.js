@@ -219,7 +219,7 @@ function checkPageMaintenance(root){
 				swal({
 					title: response.title,
 					text: response.message,
-					icon: 'error'
+					icon: 'warning'
 				});
 			}
 		}

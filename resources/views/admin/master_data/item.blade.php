@@ -169,6 +169,10 @@
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
+                            <input id="keterangan" name="keterangan" type="text" placeholder="Keterangan : sparepart, aktiva, tools, etc">
+                            <label class="active" for="keterangan">Keterangan</label>
+                        </div>
+                        <div class="input-field col s6">
                             <select class="select2 browser-default" id="item_group_id" name="item_group_id">
                                 @foreach($group->whereNull('parent_id') as $c)
                                         @if(!$c->childSub()->exists())

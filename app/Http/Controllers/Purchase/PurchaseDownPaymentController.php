@@ -111,9 +111,8 @@ class PurchaseDownPaymentController extends Controller
                             ->orWhere('grandtotal', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseDownPaymentDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
+                                $query->whereHas('purchaseOrder',function($query) use($search, $request){
+                                    $query->where('code', 'like', "%$search%");
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -173,9 +172,8 @@ class PurchaseDownPaymentController extends Controller
                             ->orWhere('grandtotal', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('purchaseDownPaymentDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
+                                $query->whereHas('purchaseOrder',function($query) use($search, $request){
+                                    $query->where('code', 'like', "%$search%");
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -689,9 +687,8 @@ class PurchaseDownPaymentController extends Controller
                             ->orWhere('grandtotal', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
                             ->orWhereHas('purchaseDownPaymentDetail',function($query) use($request){
-                                $query->whereHas('item',function($query) use($request){
-                                    $query->where('code', 'like', "%$request->search%")
-                                        ->orWhere('name','like',"%$request->search%");
+                                $query->whereHas('purchaseOrder',function($query) use($request){
+                                    $query->where('code', 'like', "%$request->search%");
                                 });
                             })
                             ->orWhereHas('user',function($query) use($request){

@@ -28,6 +28,7 @@ return new class extends Migration
             $table->char('is_sales_item', 1)->nullable();
             $table->char('is_purchase_item', 1)->nullable();
             $table->char('is_service', 1)->nullable();
+            $table->string('note')->nullable();
             $table->char('status', 1)->nullable();   
             $table->timestamps();
             $table->softDeletes('deleted_at');

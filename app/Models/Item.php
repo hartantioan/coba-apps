@@ -27,6 +27,7 @@ class Item extends Model
         'is_sales_item',
         'is_purchase_item',
         'is_service',
+        'note',
         'status'
     ];
 

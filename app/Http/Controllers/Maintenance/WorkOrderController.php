@@ -35,7 +35,7 @@ class WorkOrderController extends Controller
         $this->dataplaces = $user->userPlaceArray();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             'title'         => 'Maintenance',
@@ -43,6 +43,7 @@ class WorkOrderController extends Controller
             'place'         => Place::where('status','1')->get(),
             'area'          => Area::where('status','1')->get(),
             'activity'      => Activity::where('status','1')->get(),
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -855,7 +856,7 @@ class WorkOrderController extends Controller
                      ['name'=> "Tanggal : ".date('d/m/y',strtotime($query->request_date))],
                      ['name'=> "Requested By :".$query->user->name]
                   ],
-                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/maintenance/work_order?code=".CustomHelper::encrypt($query->code),
             ];
         $data_go_chart[]=$work_order_main;
         if($query) {
@@ -871,7 +872,7 @@ class WorkOrderController extends Controller
                         ['name'=> "Tanggal : ".date('d/m/y',strtotime($row_requestsp->request_date))],
                         ['name'=> "Requested By :".$row_requestsp->user->name]
                     ],
-                    'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($row_requestsp->code),
+                    'url'   =>request()->root()."/admin/maintenance/request_sparepart?code=".CustomHelper::encrypt($row_requestsp->code),
                 ];
                 $data_go_chart[]=$data_request_spare_tempura;
                 $data_link[]=[

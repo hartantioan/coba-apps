@@ -70,6 +70,14 @@ class JournalController extends Controller
                             });
                     });
                 }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
+                }
 
                 if($request->status){
                     $query->where('status', $request->status);
@@ -94,6 +102,14 @@ class JournalController extends Controller
                                 $query->where('name', 'like', "%$search%");
                             });
                     });
+                }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
                 if($request->status){

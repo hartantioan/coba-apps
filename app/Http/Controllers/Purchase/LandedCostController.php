@@ -34,7 +34,7 @@ class LandedCostController extends Controller
 
         $this->dataplaces = $user->userPlaceArray();
     }
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             'title'         => 'Landed Cost',
@@ -43,6 +43,7 @@ class LandedCostController extends Controller
             'company'       => Company::where('status','1')->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -144,6 +145,14 @@ class LandedCostController extends Controller
                             });
                     });
                 }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
+                }
 
                 if($request->status){
                     $query->where('status', $request->status);
@@ -199,6 +208,14 @@ class LandedCostController extends Controller
                                 $query->where('code','like',"%$search%");
                             });
                     });
+                }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
                 if($request->status){
@@ -1215,7 +1232,7 @@ class LandedCostController extends Controller
                                 ],
                                 "key" => $row_pi->purchaseDownPayment->code,
                                 "name" => $row_pi->purchaseDownPayment->code,
-                                'url'=>request()->root()."/admin/inventory/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
+                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                             ];
                             $found = false;
                             foreach($data_purchase_downpayment as $data_dp){
@@ -1610,7 +1627,7 @@ class LandedCostController extends Controller
                             ],
                             "key" => $query_pyr->outgoingPayment->code,
                             "name" => $query_pyr->outgoingPayment->code,
-                            'url'=>request()->root()."/admin/finace/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
+                            'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
                         ];
                         if(count($data_outgoingpayments) < 1){
                             $data_outgoingpayments[]=$outgoing_payment;

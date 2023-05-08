@@ -36,13 +36,14 @@ class OutgoingPaymentController extends Controller
 
         $this->dataplaces = $user->userPlaceArray();
     }
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             'title'         => 'Kas / Bank Keluar',
             'content'       => 'admin.finance.outgoing_payment',
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
+            'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -95,6 +96,14 @@ class OutgoingPaymentController extends Controller
                             });
                     });
                 }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
+                }
 
                 if($request->status){
                     $query->where('status', $request->status);
@@ -136,6 +145,14 @@ class OutgoingPaymentController extends Controller
                                 $query->where('code','like',"%$search%");
                             });
                     });
+                }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
                 if($request->status){
@@ -581,7 +598,7 @@ class OutgoingPaymentController extends Controller
                      ['name'=> "Tanggal: ".date('d/m/y',strtotime($query->post_date))],
                      ['name'=> "Nominal: Rp".number_format($query->grandtotal,2,',','.')]
                   ],
-                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$outgoing_payment;
@@ -1118,7 +1135,7 @@ class OutgoingPaymentController extends Controller
                                 ],
                                 "key" => $row_pi->purchaseDownPayment->code,
                                 "name" => $row_pi->purchaseDownPayment->code,
-                                'url'=>request()->root()."/admin/inventory/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
+                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                             ];
                             $found = false;
                             foreach($data_purchase_downpayment as $data_dp){
@@ -1513,7 +1530,7 @@ class OutgoingPaymentController extends Controller
                             ],
                             "key" => $query_pyr->outgoingPayment->code,
                             "name" => $query_pyr->outgoingPayment->code,
-                            'url'=>request()->root()."/admin/finace/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
+                            'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
                         ];
                         if(count($data_outgoingpayments) < 1){
                             $data_outgoingpayments[]=$outgoing_payment;

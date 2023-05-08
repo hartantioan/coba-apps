@@ -32,7 +32,7 @@ class RequestSparepartController extends Controller
         $this->dataplaces = $user->userPlaceArray();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             'title'         => 'Sparepart',
@@ -40,6 +40,7 @@ class RequestSparepartController extends Controller
             'place'         => Place::where('status','1')->get(),
             'area'          => Area::where('status','1')->get(),
             'activity'      => Activity::where('status','1')->get(),
+            'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -578,7 +579,7 @@ class RequestSparepartController extends Controller
                      ['name'=> "Tanggal : ".date('d/m/y',strtotime($query->request_date))],
                      ['name'=> "Requested By :".$query->user->name]
                   ],
-                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/maintenance/request_sparepart?code=".CustomHelper::encrypt($query->code),
             ];
         $data_go_chart[]=$request_sparepart;
         $data_request_spareparts[]=$request_sparepart;
@@ -596,7 +597,7 @@ class RequestSparepartController extends Controller
                     ['name'=> "Tanggal : ".date('d/m/y',strtotime($wo_main->request_date))],
                     ['name'=> "Requested By :".$wo_main->user->name]
                 ],
-                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($wo_main->code),
+                'url'   =>request()->root()."/admin/maintenance/work_order?code=".CustomHelper::encrypt($wo_main->code),
             ];
            $data_go_chart[]=$data_wo_main;
             $data_link[]=[

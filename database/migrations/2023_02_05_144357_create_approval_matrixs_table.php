@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('approval_matrixs', function (Blueprint $table) {
             $table->id();
             $table->string('code',155)->unique();
-            $table->bigInteger('approval_table_id')->nullable();
+            $table->bigInteger('approval_template_stage_id')->nullable();
             $table->bigInteger('approval_source_id')->nullable();
             $table->string('note')->nullable();
             $table->bigInteger('user_id')->nullable();
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['approval_table_id', 'approval_source_id', 'user_id', 'status']);
+            $table->index(['approval_template_stage_id', 'approval_source_id', 'user_id', 'status'],'approval_matrix_indexes');
         });
     }
 

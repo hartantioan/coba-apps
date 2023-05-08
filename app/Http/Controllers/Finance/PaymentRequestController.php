@@ -247,7 +247,7 @@ class PaymentRequestController extends Controller
             }
 
             foreach($data->fundRequest as $row){
-                if(!$row->used()->exists()){
+                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0){
                     CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
                     $coa = Coa::where('code','100.01.03.04.02')->where('company_id',$row->place->company_id)->first();
                     $details[] = [
@@ -269,7 +269,7 @@ class PaymentRequestController extends Controller
             }
 
             foreach($data->purchaseDownPayment as $row){
-                if(!$row->used()->exists()){
+                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0){
                     CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
                     $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->company_id)->first();
                     $details[] = [
@@ -291,7 +291,7 @@ class PaymentRequestController extends Controller
             }
 
             foreach($data->purchaseInvoice as $row){
-                if(!$row->used()->exists()){
+                if(!$row->used()->exists() && $row->balance > 0){
                     CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
                     $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->company_id)->first();
                     $details[] = [
@@ -566,7 +566,7 @@ class PaymentRequestController extends Controller
         if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
             foreach($data->approval()->approvalMatrix as $key => $row){
                 $string .= '<tr>
-                    <td class="center-align">'.$row->approvalTable->level.'</td>
+                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                     <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
                     <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
                     <td class="center-align">'.$row->note.'</td>
@@ -849,7 +849,7 @@ class PaymentRequestController extends Controller
                 if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
                     foreach($data->approval()->approvalMatrix as $key => $row){
                         $html .= '<tr>
-                            <td class="center-align">'.$row->approvalTable->level.'</td>
+                            <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                             <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
                             <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
                             <td class="center-align">'.$row->note.'</td>

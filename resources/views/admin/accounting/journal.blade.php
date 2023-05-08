@@ -149,7 +149,7 @@
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -426,7 +426,7 @@
             </tr>
         `);
         
-        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
         select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
         select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
@@ -763,104 +763,112 @@
 	}
 
     function save(){
-		swal({
-            title: "Apakah anda yakin ingin simpan?",
-            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                var formData = new FormData($('#form_data')[0]);
+        if(checkMustBp()){
+            swal({
+                title: "Apakah anda yakin ingin simpan?",
+                text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+                icon: 'warning',
+                dangerMode: true,
+                buttons: {
+                cancel: 'Tidak, jangan!',
+                delete: 'Ya, lanjutkan!'
+                }
+            }).then(function (willDelete) {
+                if (willDelete) {
+                    var formData = new FormData($('#form_data')[0]);
 
-                formData.delete("arr_type[]");
-                formData.delete("arr_coa[]");
-                formData.delete("arr_place[]");
-                formData.delete("arr_account[]");
-                formData.delete("arr_item[]");
-                formData.delete("arr_department[]");
-                formData.delete("arr_warehouse[]");
-                formData.delete("arr_nominal[]");
+                    formData.delete("arr_type[]");
+                    formData.delete("arr_coa[]");
+                    formData.delete("arr_place[]");
+                    formData.delete("arr_account[]");
+                    formData.delete("arr_item[]");
+                    formData.delete("arr_department[]");
+                    formData.delete("arr_warehouse[]");
+                    formData.delete("arr_nominal[]");
 
-                $('input[name^="arr_type"]').each(function(index){
-                    formData.append('arr_type[]',$(this).val());
-                    formData.append('arr_coa[]',($('select[name^="arr_coa"]').eq(index).val() ? $('select[name^="arr_coa"]').eq(index).val() : 'NULL'));
-                    formData.append('arr_place[]',$('select[name^="arr_place"]').eq(index).val());
-                    formData.append('arr_account[]',($('select[name^="arr_account"]').eq(index).val() ? $('select[name^="arr_account"]').eq(index).val() : 'NULL'));
-                    formData.append('arr_item[]',($('select[name^="arr_item"]').eq(index).val() ? $('select[name^="arr_item"]').eq(index).val() : 'NULL'));
-                    formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
-                    formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : 'NULL'));
-                    formData.append('arr_nominal[]',($('input[name^="arr_nominal"]').eq(index).val() ? $('input[name^="arr_nominal"]').eq(index).val() : 'NULL'));
-                });
-                
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
-
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
+                    $('input[name^="arr_type"]').each(function(index){
+                        formData.append('arr_type[]',$(this).val());
+                        formData.append('arr_coa[]',($('select[name^="arr_coa"]').eq(index).val() ? $('select[name^="arr_coa"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_place[]',$('select[name^="arr_place"]').eq(index).val());
+                        formData.append('arr_account[]',($('select[name^="arr_account"]').eq(index).val() ? $('select[name^="arr_account"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_item[]',($('select[name^="arr_item"]').eq(index).val() ? $('select[name^="arr_item"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
+                        formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_nominal[]',($('input[name^="arr_nominal"]').eq(index).val() ? $('input[name^="arr_nominal"]').eq(index).val() : 'NULL'));
+                    });
+                    
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
                                 });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
                             });
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        }else{
+            swal({
+                title: 'Ups! Error di detail.',
+                text: 'Salah satu coa harus memiliki bisnis partner.',
+                icon: 'error'
+            });
+        }
     }
 
     function saveMulti(){
@@ -985,6 +993,21 @@
         $('#modal1').modal('close');
     }
 
+    function checkMustBp(){
+        let passed = true;
+        $('select[name^="arr_coa"]').each(function(index){
+            if($(this).val()){
+                if($(this).select2('data')[0].must_bp == '1'){
+                    if(!$('select[name^="arr_account"]').eq(index).val()){
+                        passed = false;
+                    }
+                }
+            }
+        });
+
+        return passed;
+    }
+
     function show(id){
         $.ajax({
             url: '{{ Request::url() }}/show',
@@ -1059,7 +1082,7 @@
                         </tr>
                     `);
                     
-                    select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                    select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
                     select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                     select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
                     select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');

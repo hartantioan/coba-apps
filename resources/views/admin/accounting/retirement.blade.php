@@ -144,7 +144,7 @@
                             <label class="active" for="currency_rate">Konversi</label>
                         </div>
                         <div class="input-field col s4">
-                            <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                            <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
                         <div class="input-field col m4">

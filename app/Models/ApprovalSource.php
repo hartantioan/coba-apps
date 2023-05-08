@@ -27,6 +27,26 @@ class ApprovalSource extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
+    public function fullUrl(){
+        $menu = Menu::where('table_name',$this->lookable_type)->where('status','1')->first();
+
+        if($menu){
+            return $menu->fullUrl();
+        }else{
+            return '';
+        }
+    }
+
+    public function fullName(){
+        $menu = Menu::where('table_name',$this->lookable_type)->where('status','1')->first();
+
+        if($menu){
+            return $menu->fullName();
+        }else{
+            return '';
+        }
+    }
+
     public function lookable(){
         return $this->morphTo();
     }

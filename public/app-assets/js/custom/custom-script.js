@@ -5,15 +5,19 @@ $(function() {
 });
 
 function initializeMasking(){
-	$('.npwp').formatter({
-		'pattern': '{{99}}.{{999}}.{{999}}.{{9}}-{{999}}.{{999}}',
-		'persistent': true
-	});
+	if($('.npwp').length > 0){
+		$('.npwp').formatter({
+			'pattern': '{{99}}.{{999}}.{{999}}.{{9}}-{{999}}.{{999}}',
+			'persistent': true
+		});
+	}
 	
-	$('.ktp').formatter({
-		'pattern': '{{9999999999999999}}',
-		'persistent': true
-	});
+	if($('.ktp').length > 0){
+		$('.ktp').formatter({
+			'pattern': '{{9999999999999999}}',
+			'persistent': true
+		});
+	}
 }
 
 function openLoader(){

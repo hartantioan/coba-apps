@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('approval_table_details'))
-        Schema::create('approval_table_details', function (Blueprint $table) {
+        Schema::create('approval_template_menus', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('approval_table_id')->nullable();
-            $table->bigInteger('user_id')->nullable();
+            $table->bigInteger('approval_template_id')->nullable();
+            $table->bigInteger('menu_id')->nullable();
+            $table->string('table_name',155)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['approval_table_id', 'user_id']);
+            $table->index(['approval_template_id','menu_id']);
         });
     }
 
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('approval_table_details');
+        Schema::dropIfExists('approval_template_menus');
     }
 };

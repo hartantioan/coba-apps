@@ -187,4 +187,16 @@ class Menu extends Model
             return null;
         }
     }
+
+    public function hasGrandtotal(){
+        $there = false;
+
+        if($this->table_name){
+            if(Schema::hasColumn($this->table_name, 'grandtotal')){
+                $there = true;
+            }
+        }
+
+        return $there;
+    }
 }

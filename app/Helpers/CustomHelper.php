@@ -2,8 +2,10 @@
 
 namespace App\Helpers;
 use App\Models\ApprovalMatrix;
-use App\Models\ApprovalTable;
+use App\Models\ApprovalStage;
 use App\Models\ApprovalSource;
+use App\Models\ApprovalTemplate;
+use App\Models\ApprovalTemplateMenu;
 use App\Models\Asset;
 use App\Models\Capitalization;
 use App\Models\Coa;
@@ -160,11 +162,18 @@ class CustomHelper {
 			'note'			=> $note,
 		]);
 
-		$approvaltable = ApprovalTable::where('table_name',$table_name)->where('status','1')->orderBy('level')->get();
-
+		$approvalTemplate = ApprovalTemplate::where('status','1')
+		->whereHas('approvalTemplateMenu',function($query) use($table_name){
+			$query->where('table_name',$table_name);
+		})
+		->whereHas('approvalTemplateOriginator',function($query){
+			$query->where('user_id',session('bo_id'));
+		})->get();
+		info($approvalTemplate);
+		
 		$count = 0;
 
-		foreach($approvaltable as $row){
+		foreach($approvalTemplate as $row){
 			$passed = true;
 
 			if($row->is_check_nominal){
@@ -174,20 +183,21 @@ class CustomHelper {
 			}
 
 			if($passed == true){
-				$status = $count == 0 ? '1': '0';
 
-				foreach($row->approvalTableDetail as $rowdetail){
-					ApprovalMatrix::create([
-						'code'						=> strtoupper(Str::random(30)),
-						'approval_table_id'			=> $row->id,
-						'approval_source_id'		=> $source->id,
-						'user_id'					=> $rowdetail->user_id,
-						'date_request'				=> date('Y-m-d H:i:s'),
-						'status'					=> $status
-					]);
+				foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
+					$status = $count == 0 ? '1': '0';
+					foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
+						ApprovalMatrix::create([
+							'code'							=> strtoupper(Str::random(30)),
+							'approval_template_stage_id'	=> $rowTemplateStage->id,
+							'approval_source_id'			=> $source->id,
+							'user_id'						=> $rowStageDetail->user_id,
+							'date_request'					=> date('Y-m-d H:i:s'),
+							'status'						=> $status
+						]);
+					}
+					$count++;
 				}
-
-				$count++;
 			}
 		}
 

@@ -144,7 +144,7 @@
                         <tr align="center" style="background-color:#d6d5d5;">
                             <td>{{ $key+1 }}</td>
                             <td>{{ $row->user->name }}</td>
-                            <td>{{ $row->company->name }}</td>
+                            <td>{{ $row->company_id ? $row->company->name : '-' }}</td>
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->lookable_type ? $row->lookable->code : '-' }}</td>
                             <td>{{ $row->currency_id ? $row->currency->code : '-' }}</td>

@@ -262,7 +262,7 @@
                     @if($data->approval())
                     @foreach ($data->approval()->approvalMatrix()->where('status','2')->get() as $row)
                         <td class="center-align">
-                            {{ $row->approvalTable->approval->document_text }}
+                            {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
                             @if($row->user->signature)
                                 <div>{!! $row->user->signature() !!}</div>
                             @endif

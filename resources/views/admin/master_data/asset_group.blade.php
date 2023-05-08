@@ -144,7 +144,7 @@
                         </div>
                         <div class="input-field col s6">
                             <input id="depreciation_period" name="depreciation_period" type="number" step="1" value="0">
-                            <label class="active" for="depreciation_period">Periode Akumulasi Penyusutan (Bulan)</label>
+                            <label class="active" for="depreciation_period">Periode Penyusutan (Bulan)</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">

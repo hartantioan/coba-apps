@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Misc;
 
+use App\Models\ApprovalStage;
 use App\Models\GoodReceipt;
+use App\Models\Menu;
 use App\Models\PaymentRequest;
 use App\Models\Region;
 use App\Models\Place;
@@ -695,6 +697,71 @@ class Select2Controller extends Controller {
                 'equipment'     => $d->equipment->id
             ];
         }
+        return response()->json(['items' => $response]);
+    }
+
+    public function approvalStage(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ApprovalStage::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->approval->name,
+            ];
+        }
+        return response()->json(['items' => $response]);
+    }
+
+    public function menu(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Menu::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('url','like',"%$search%")
+                    ->orWhere('table_name','like',"$search");
+                })
+                ->where('status','1')
+                ->whereDoesntHave('sub')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->fullName(),
+                'hasGrandtotal' => $d->hasGrandtotal() ? '1' : '0',
+            ];
+        }
+        return response()->json(['items' => $response]);
+    }
+
+    public function coaJournal(Request $request)
+    {   
+        $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
+        $response = [];
+        $search   = $request->search;
+        $data = Coa::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                 })->where('level',5)
+                ->where('status','1')
+                ->whereIn('company_id',$arrCompany)
+                ->whereNotNull('show_journal')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name.' - '.$d->company->name,
+                'must_bp'       => $d->bp_journal ? '1' : '',
+            ];
+        }
+
         return response()->json(['items' => $response]);
     }
 }

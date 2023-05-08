@@ -30,7 +30,7 @@ class DepreciationDetail extends Model
 
     public function depreciationNumber(){
         $data = Depreciation::whereHas('depreciationDetail', function($query){
-            $query->where('asset_id',$this->asset_id);
+            $query->where('asset_id',$this->asset_id)->where('id','<=',$this->id);
         })->whereIn('status',['2','3'])->orderByDesc('period')->count();
 
         return $data;

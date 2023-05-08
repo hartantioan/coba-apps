@@ -7,38 +7,29 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class ApprovalTable extends Model
+class ApprovalStage extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'approval_tables';
+    protected $table = 'approval_stages';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'approval_id',
-        'menu_id',
-        'table_name',
         'level',
-        'is_check_nominal',
-        'sign',
-        'nominal',
-        'status',
         'min_approve',
-        'min_reject'
+        'min_reject',
+        'status',
     ];
 
     public function approval(){
         return $this->belongsTo('App\Models\Approval', 'approval_id', 'id')->withTrashed();
     }
 
-    public function menu(){
-        return $this->belongsTo('App\Models\Menu', 'menu_id', 'id')->withTrashed();
-    }
-
-    public function approvalTableDetail()
+    public function approvalStageDetail()
     {
-        return $this->hasMany('App\Models\ApprovalTableDetail');
+        return $this->hasMany('App\Models\ApprovalStageDetail');
     }
 
     public function status(){
@@ -51,8 +42,15 @@ class ApprovalTable extends Model
         return $status;
     }
 
-    public function approvalMatrix()
-    {
-        return $this->hasMany('App\Models\ApprovalMatrix');
+    public function listApprover(){
+        $list = '<ol>';
+        
+        foreach($this->approvalStageDetail as $row){
+            $list .= '<li class="left-align">'.$row->user->name.'</li>';
+        }
+
+        $list .= '<ol>';
+
+        return $list;
     }
 }

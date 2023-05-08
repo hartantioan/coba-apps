@@ -143,7 +143,7 @@
                             </div>
                             
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
                             <div class="file-field input-field col m3 s12">

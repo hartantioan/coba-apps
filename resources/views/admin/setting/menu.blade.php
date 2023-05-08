@@ -60,7 +60,6 @@
                                                         <th>Status</th>
                                                         <th>Maintenance</th>
                                                         <th>Hak Akses</th>
-                                                        <th>Peta Approval</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -241,7 +240,6 @@
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'maintenance', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'crud', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'approval', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

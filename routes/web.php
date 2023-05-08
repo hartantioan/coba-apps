@@ -57,6 +57,8 @@ use App\Http\Controllers\Accounting\DepreciationController;
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
 use App\Http\Controllers\Setting\ApprovalController;
+use App\Http\Controllers\Setting\ApprovalStageController;
+use App\Http\Controllers\Setting\ApprovalTemplateController;
 use App\Http\Controllers\Setting\DataAccessController;
 
 use App\Http\Controllers\Misc\Select2Controller;
@@ -105,6 +107,7 @@ Route::prefix('admin')->group(function () {
             Route::get('item', [Select2Controller::class, 'item']);
             Route::get('purchase_item', [Select2Controller::class, 'purchaseItem']);
             Route::get('coa', [Select2Controller::class, 'coa']);
+            Route::get('coa_journal', [Select2Controller::class, 'coaJournal']);
             Route::get('raw_coa', [Select2Controller::class, 'rawCoa']);
             Route::get('employee', [Select2Controller::class, 'employee']);
             Route::get('supplier', [Select2Controller::class, 'supplier']);
@@ -125,6 +128,8 @@ Route::prefix('admin')->group(function () {
             Route::get('payment_request', [Select2Controller::class, 'paymentRequest']);
             Route::get('equipment', [Select2Controller::class, 'equipment']);
             Route::get('workorder', [Select2Controller::class, 'workOrder']);
+            Route::get('approval_stage', [Select2Controller::class, 'approvalStage']);
+            Route::get('menu', [Select2Controller::class, 'menu']);
         });
 
         Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -470,6 +475,24 @@ Route::prefix('admin')->group(function () {
                 Route::post('destroy', [ApprovalController::class, 'destroy'])->middleware('operation.access:approval,delete');
             });
 
+            Route::prefix('approval_stage')->middleware('operation.access:approval_stage,view')->group(function () {
+                Route::get('/',[ApprovalStageController::class, 'index']);
+                Route::get('datatable',[ApprovalStageController::class, 'datatable']);
+                Route::post('create',[ApprovalStageController::class, 'create'])->middleware('operation.access:approval_stage,update');
+                Route::post('show', [ApprovalStageController::class, 'show']);
+                Route::get('row_detail',[ApprovalStageController::class, 'rowDetail']);
+                Route::post('destroy', [ApprovalStageController::class, 'destroy'])->middleware('operation.access:approval_stage,delete');
+            });
+
+            Route::prefix('approval_template')->middleware('operation.access:approval_template,view')->group(function () {
+                Route::get('/',[ApprovalTemplateController::class, 'index']);
+                Route::get('datatable',[ApprovalTemplateController::class, 'datatable']);
+                Route::post('create',[ApprovalTemplateController::class, 'create'])->middleware('operation.access:approval_template,update');
+                Route::post('show', [ApprovalTemplateController::class, 'show']);
+                Route::get('row_detail',[ApprovalTemplateController::class, 'rowDetail']);
+                Route::post('destroy', [ApprovalTemplateController::class, 'destroy'])->middleware('operation.access:approval_template,delete');
+            });
+
             Route::prefix('menu')->middleware('operation.access:menu,view')->group(function () {
                 Route::get('/',[MenuController::class, 'index']);
                 Route::get('datatable',[MenuController::class, 'datatable']);
@@ -480,14 +503,6 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('operation_access')->group(function () {
                     Route::get('{id}',[MenuController::class, 'operationAccessIndex']);
                     Route::post('create',[MenuController::class, 'operationAccessCreate'])->middleware('operation.access:menu,update');
-                });
-                Route::prefix('approval_map')->group(function () {
-                    Route::get('{id}',[MenuController::class, 'approvalAccessIndex']);
-                    Route::post('{id}/create',[MenuController::class, 'approvalAccessCreate'])->middleware('operation.access:menu,update');
-                    Route::get('{id}/datatable',[MenuController::class, 'approvalAccessDatatable']);
-                    Route::post('{id}/show', [MenuController::class, 'approvalAccessShow']);
-                    Route::get('{id}/row_detail',[MenuController::class, 'approvalAccessRowDetail']);
-                    Route::post('{id}/destroy', [MenuController::class, 'approvalAccessDestroy'])->middleware('operation.access:menu,delete');
                 });
             });
 

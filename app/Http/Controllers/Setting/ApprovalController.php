@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Setting;
 use App\Http\Controllers\Controller;
+use App\Models\FundRequest;
 use App\Models\GoodReceipt;
 use App\Models\LandedCost;
+use App\Models\OutgoingPayment;
+use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
@@ -250,7 +253,7 @@ class ApprovalController extends Controller
                             ->orWhere('date_request', 'like', "%$search%")
                             ->orWhere('note','like',"%$search%")
                             ->orWhereHas('approvalSource',function($query) use($search,$request){
-                                $query->whereHasMorph('lookable',[PurchaseRequest::class,PurchaseOrder::class,PurchaseInvoice::class,PurchaseDownPayment::class,LandedCost::class,GoodReceipt::class],function (Builder $query) use ($search) {
+                                $query->whereHasMorph('lookable',[PurchaseRequest::class,PurchaseOrder::class,PurchaseInvoice::class,PurchaseDownPayment::class,LandedCost::class,GoodReceipt::class,PurchaseInvoice::class,FundRequest::class,PaymentRequest::class,OutgoingPayment::class],function (Builder $query) use ($search) {
                                     $query->where('code','like',"%$search%");
                                 })
                                 ->orWhereHas('user',function($query) use($search,$request){
@@ -307,13 +310,13 @@ class ApprovalController extends Controller
 				
                 $response['data'][] = [
                     $val->status == '1' ? '<span class="pick" data-id="'.CustomHelper::encrypt($val->code).'">'.$nomor.'</span>' : $nomor,
-                    $val->code,
+                    $val->code.' - '.$val->updateNextLevelApproval(),
                     date('d M Y H:i:s',strtotime($val->date_request)),
                     $val->approvalSource->user->name,
                     $val->approvalSource->lookable->code,
                     $val->approvalSource->note,
                     $val->status == '1' ? '
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small btn-approve" data-popup="tooltip" title="show" onclick="show(`' . url('admin/'.$val->approvalTable->menu->fullUrl() . '/approval/' . CustomHelper::encrypt($val->approvalSource->lookable->code)) . '`,`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons dp48">pageview</i></button>
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small btn-approve" data-popup="tooltip" title="show" onclick="show(`' . url('admin/'.$val->approvalSource->fullUrl() . '/approval/' . CustomHelper::encrypt($val->approvalSource->lookable->code)) . '`,`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons dp48">pageview</i></button>
 					' : ($val->approved ? 'Disetujui' : ($val->rejected ? 'Ditolak' : 'Invalid')),
                     $val->status(),
                     $val->note,
@@ -379,7 +382,7 @@ class ApprovalController extends Controller
                     if($request->approve_reject){
                         if($query->passedApprove()){
                             if($query->updateNextLevelApproval() !== ''){
-                                $am = ApprovalMatrix::where('approval_table_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
+                                $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
     
                                 if($am){
                                     foreach($am as $row){
@@ -412,7 +415,7 @@ class ApprovalController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalTable->menu->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTable->level.'.',$query->note,$query->approvalSource->lookable->user_id);
+                CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
 
                 activity()
                     ->performedOn(new ApprovalMatrix())
@@ -482,7 +485,7 @@ class ApprovalController extends Controller
                         if($request->approve_reject_multi){
                             if($query->passedApprove()){
                                 if($query->updateNextLevelApproval() !== ''){
-                                    $am = ApprovalMatrix::where('approval_table_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
+                                    $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
         
                                     if($am){
                                         foreach($am as $rowdetail){
@@ -509,7 +512,7 @@ class ApprovalController extends Controller
                             }
                         }
     
-                        CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalTable->menu->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTable->level.'.',$query->note);
+                        CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
     
                         activity()
                             ->performedOn(new ApprovalMatrix())

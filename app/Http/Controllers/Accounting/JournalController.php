@@ -196,7 +196,7 @@ class JournalController extends Controller
         if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
             foreach($data->approval()->approvalMatrix as $key => $row){
                 $string .= '<tr>
-                    <td class="center-align">'.$row->approvalTable->level.'</td>
+                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                     <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
                     <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
                     <td class="center-align">'.$row->note.'</td>

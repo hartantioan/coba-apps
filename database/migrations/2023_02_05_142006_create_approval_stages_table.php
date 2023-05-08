@@ -13,23 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('approval_tables'))
-        Schema::create('approval_tables', function (Blueprint $table) {
+        if(!Schema::hasTable('approval_stages'))
+        Schema::create('approval_stages', function (Blueprint $table) {
             $table->id();
             $table->string('code', 50)->unique();
             $table->bigInteger('approval_id')->nullable();
-            $table->bigInteger('menu_id')->nullable();
             $table->integer('level')->nullable();
-            $table->char('is_check_nominal',1)->nullable();
-            $table->char('sign',2)->nullable();
-            $table->double('nominal')->nullable();
-            $table->char('status',1)->nullable();
             $table->integer('min_approve')->nullable();
             $table->integer('min_reject')->nullable();
+            $table->char('status',1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['approval_id', 'user_id', 'position_id', 'menu_id']);
+            $table->index(['approval_id', 'user_id']);
         });
     }
 
@@ -40,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('approval_tables');
+        Schema::dropIfExists('approval_stages');
     }
 };

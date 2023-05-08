@@ -516,6 +516,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [WorkOrderController::class, 'show']);
                 Route::get('row_detail',[WorkOrderController::class, 'rowDetail']);
                 Route::get('export',[WorkOrderController::class, 'export']);
+                Route::get('viewstructuretree',[WorkOrderController::class, 'viewStructureTree']);
                 Route::post('get_decode',[WorkOrderController::class, 'getDecode']);
                 Route::post('delete_attachment',[WorkOrderController::class, 'deleteAttachment']);
                 Route::post('print',[WorkOrderController::class, 'print']);
@@ -533,6 +534,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('create',[RequestSparepartController::class, 'create'])->middleware('operation.access:request_sparepart,update');
                 Route::post('show', [RequestSparepartController::class, 'show']);
                 Route::get('row_detail',[RequestSparepartController::class, 'rowDetail']);
+                Route::get('viewstructuretree',[RequestSparepartController::class, 'viewStructureTree']);
                 Route::get('export',[RequestSparepartController::class, 'export']);
                 Route::post('print',[RequestSparepartController::class, 'print']);
                 Route::get('approval/{id}',[RequestSparepartController::class, 'approval'])->withoutMiddleware('direct.access');
@@ -698,6 +700,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('row_detail',[FundRequestController::class, 'rowDetail']);
                 Route::post('show', [FundRequestController::class, 'show']);
                 Route::post('print',[FundRequestController::class, 'print']);
+                Route::get('viewstructuretree',[FundRequestController::class, 'viewStructureTree']);
                 Route::get('export',[FundRequestController::class, 'export']);
                 Route::post('create',[FundRequestController::class, 'create'])->middleware('operation.access:fund_request,update');
                 Route::post('void_status', [FundRequestController::class, 'voidStatus'])->middleware('operation.access:fund_request,void');
@@ -713,6 +716,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [PaymentRequestController::class, 'show']);
                 Route::post('print',[PaymentRequestController::class, 'print']);
                 Route::get('export',[PaymentRequestController::class, 'export']);
+                Route::get('viewstructuretree',[PaymentRequestController::class, 'viewStructureTree']);
                 Route::post('remove_used_data', [PaymentRequestController::class, 'removeUsedData']);
                 Route::post('create',[PaymentRequestController::class, 'create'])->middleware('operation.access:payment_request,update');
                 Route::post('create_pay',[PaymentRequestController::class, 'createPay'])->middleware('operation.access:payment_request,update');
@@ -728,6 +732,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('show', [OutgoingPaymentController::class, 'show']);
                 Route::post('print',[OutgoingPaymentController::class, 'print']);
                 Route::get('export',[OutgoingPaymentController::class, 'export']);
+                Route::get('viewstructuretree',[OutgoingPaymentController::class, 'viewStructureTree']);
                 Route::post('send_used_data',[OutgoingPaymentController::class, 'sendUsedData']);
                 Route::post('remove_used_data', [OutgoingPaymentController::class, 'removeUsedData']);
                 Route::post('create',[OutgoingPaymentController::class, 'create'])->middleware('operation.access:outgoing_payment,update');

@@ -153,6 +153,7 @@ class WorkOrderController extends Controller
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light teal lighten-1 white-tex btn-small" data-popup="tooltip" title="Add PIC" onclick="addPIC(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">group_add</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
@@ -837,5 +838,63 @@ class WorkOrderController extends Controller
 
     public function export(Request $request){
 		return Excel::download(new ExportWorkOrder($request->search,$request->status), 'work_order'.uniqid().'.xlsx');
+    }
+
+    public function viewStructureTree(Request $request){
+        $query = WorkOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $data_go_chart = [];
+        $data_link = [];
+
+        $data_id_wo = [];
+
+        $work_order_main = [
+                'key'   => $query->code,
+                "name"  => $query->code,
+                "color" => "lightblue",
+                'properties'=> [
+                     ['name'=> "Tanggal : ".date('d/m/y',strtotime($query->request_date))],
+                     ['name'=> "Requested By :".$query->user->name]
+                  ],
+                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+            ];
+        $data_go_chart[]=$work_order_main;
+        if($query) {
+
+            //Pengambilan Main Branch beserta id terkait
+           if($query->requestSparepart()->exists()){
+            foreach($query->requestSparepart as $row_requestsp){
+                $data_request_spare_tempura = [
+                    'key'   => $row_requestsp->code,
+                    "name"  => $row_requestsp->code,
+                  
+                    'properties'=> [
+                        ['name'=> "Tanggal : ".date('d/m/y',strtotime($row_requestsp->request_date))],
+                        ['name'=> "Requested By :".$row_requestsp->user->name]
+                    ],
+                    'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($row_requestsp->code),
+                ];
+                $data_go_chart[]=$data_request_spare_tempura;
+                $data_link[]=[
+                    'from'=>$row_requestsp->code,
+                    'to'=>$query->code,
+                ];
+            }
+           }
+            
+
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link,
+            ];
+            
+        } else {
+            $data_good_receipt = [];
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+        return response()->json($response);
     }
 }

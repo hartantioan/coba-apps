@@ -125,6 +125,7 @@ class RequestSparepartController extends Controller
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -269,8 +270,6 @@ class RequestSparepartController extends Controller
                                 }catch(\Exception $e){
                                     DB::rollback();
                                 }
-                            }elseif($row == 'purchase_down_payments'){
-                                $idDetail = PurchaseDownPayment::where('code',$code)->first()->id;
                             }
                             
                             try {
@@ -563,5 +562,90 @@ class RequestSparepartController extends Controller
     public function export(Request $request){
 		return Excel::download(new ExportRequestSparepart($request->search,$request->status), 'request_sparepart_'.uniqid().'.xlsx');
     }
+    
+    public function viewStructureTree(Request $request){
+        $query = RequestSparepart::where('code',CustomHelper::decrypt($request->id))->first();
+        $data_go_chart = [];
+        $data_link = [];
 
+        $data_id_wo = [];
+        $data_request_spareparts=[];
+        $request_sparepart = [
+                'key'   => $query->code,
+                "name"  => $query->code,
+                "color" => "lightblue",
+                'properties'=> [
+                     ['name'=> "Tanggal : ".date('d/m/y',strtotime($query->request_date))],
+                     ['name'=> "Requested By :".$query->user->name]
+                  ],
+                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+            ];
+        $data_go_chart[]=$request_sparepart;
+        $data_request_spareparts[]=$request_sparepart;
+
+        if($query) {
+            
+
+            //Pengambilan Main Branch beserta id terkait
+           $wo_main = $query->workOrder;
+           $data_wo_main = [
+                'key'   => $wo_main->code,
+                "name"  => $wo_main->code,
+            
+                'properties'=> [
+                    ['name'=> "Tanggal : ".date('d/m/y',strtotime($wo_main->request_date))],
+                    ['name'=> "Requested By :".$wo_main->user->name]
+                ],
+                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($wo_main->code),
+            ];
+           $data_go_chart[]=$data_wo_main;
+            $data_link[]=[
+                'from'=>$query->code,
+                'to'=>$wo_main->code,
+            ];
+           foreach($wo_main->requestSparepart as $row_requestsp){
+                $data_request_spare_tempura = [
+                    'key'   => $row_requestsp->code,
+                    "name"  => $row_requestsp->code,
+                
+                    'properties'=> [
+                        ['name'=> "Tanggal : ".date('d/m/y',strtotime($row_requestsp->request_date))],
+                        ['name'=> "Requested By :".$row_requestsp->user->name]
+                    ],
+                    'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($row_requestsp->code),
+                ];
+                $found = false;
+                foreach ($data_request_spareparts as $row_sp) {
+                    if ($row_sp["key"] == $data_request_spare_tempura["key"]) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $data_go_chart[]=$data_request_spare_tempura;
+                    $data_link[]=[
+                        'from'=>$row_requestsp->code,
+                        'to'=>$wo_main->code,
+                    ];
+                    $data_request_spareparts[]=$data_request_spare_tempura;
+                }
+                
+           }
+            
+
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link,
+            ];
+            
+        } else {
+            $data_good_receipt = [];
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+        return response()->json($response);
+    }
 }

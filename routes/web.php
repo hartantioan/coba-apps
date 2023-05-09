@@ -773,6 +773,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('void_status', [CloseBillController::class, 'voidStatus'])->middleware('operation.access:close_temp_bill,void');
                 Route::get('approval/{id}',[CloseBillController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('destroy', [CloseBillController::class, 'destroy'])->middleware('operation.access:close_temp_bill,delete');
+                Route::post('get_fund_request', [CloseBillController::class, 'getFundRequest']);
             });
         });
 

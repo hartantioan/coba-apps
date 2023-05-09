@@ -171,13 +171,13 @@
                             <div class="col m12 s12">
                                 <div class="col m6 s6">
                                     <p class="mt-2 mb-2">
-                                        <h4>Fund Request / Permohonan Dana (Tipe BS)</h4>
+                                        <h6>Fund Request / Permohonan Dana (Tipe BS)</h6>
                                         <div class="row">
                                             <div class="input-field col m6 s7">
                                                 <select class="browser-default" id="fund_request_id" name="fund_request_id">&nbsp;</select>
                                             </div>
                                             <div class="col m6 s6 mt-4">
-                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getFnudRequest();" href="javascript:void(0);">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getFundRequest();" href="javascript:void(0);">
                                                     <i class="material-icons left">add</i> Tambah
                                                 </a>
                                             </div>
@@ -531,7 +531,94 @@
 	}
 
     function getFundRequest(){
-        
+        if($('#fund_request_id').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_fund_request',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#fund_request_id').val()
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                        $('#fund_request_id').empty();
+                    }else{
+                        $('#empty-detail').remove();
+
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + response.rawcode + `
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
+                            </div>
+                        `);
+
+                        var count = makeid(10);
+
+                        $('#body-detail').append(`
+                            <tr class="row_detail" data-fr="` + response.id + `">
+                                <input type="hidden" name="arr_fund_request[]" value="` + response.code + `">
+                                <td>
+                                    ` + response.rawcode + `
+                                </td>
+                                <td class="center">
+                                    ` + response.bp_name + `
+                                </td>
+                                <td class="center">
+                                    ` + response.post_date + `
+                                </td>
+                                <td class="center">
+                                    ` + response.required_date + `
+                                </td>
+                                <td class="center">
+                                    ` + response.grandtotal + `
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>
+                                </td>
+                                <td class="center">
+                                        <input id="arr_nominal` + count + `" name="arr_nominal[]" class="browser-default" type="text" value="` + response.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;">
+                                    </td>
+                                <td>
+                                    <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value=" - " style="width:100%;">
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        $('#fund_request_id').empty();
+                        $('.modal-content').scrollTop(0);
+                        M.updateTextFields();
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+
+        }
     }
 
     function removeUsedData(id){
@@ -549,7 +636,16 @@
                 
             },
             success: function(response) {
-                
+                $('.row_detail[data-fr="' + id + '"]').remove();
+                if($('.row_detail').length == 0 && $('#empty-detail').length == 0){
+                    $('#body-detail').append(`
+                        <tr id="empty-detail">
+                            <td colspan="9" class="center">
+                                Pilih Fund Request / Permohonan Dana untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
             },
             error: function() {
                 swal({

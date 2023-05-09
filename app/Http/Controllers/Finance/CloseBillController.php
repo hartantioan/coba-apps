@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\CloseBill;
 use App\Models\CloseBillDetail;
+use App\Models\FundRequest;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
@@ -168,6 +169,31 @@ class CloseBillController extends Controller
         return response()->json($response);
     }
 
+    public function getFundRequest(Request $request){
+        $data = FundRequest::where('id',$request->id)->whereIn('status',['2','3'])->first();
+
+        if($data->used()->exists()){
+            $data['status'] = '500';
+            $data['message'] = 'Permohonan dana no. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+        }else{
+            if($data->balanceCloseBill() > 0){
+                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Penutupan BS / Close Bill');
+                $data['rawcode'] = $data->code;
+                $data['code'] = CustomHelper::encrypt($data->code);
+                $data['grandtotal'] = number_format($data->grandtotal,'2',',','.');
+                $data['balance'] = $data->balanceCloseBill();
+                $data['post_date'] = date('d/m/y',strtotime($data->post_date));
+                $data['required_date'] = date('d/m/y',strtotime($data->required_date));
+                $data['bp_name'] = $data->account->employee_no.' - '.$data->account->name;
+            }else{
+                $data['status'] = '500';
+                $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
+            }
+        }
+
+        return response()->json($data);
+    }
+
     public function rowDetail(Request $request){
         $data   = OutgoingPayment::find($request->id);
         
@@ -222,7 +248,7 @@ class CloseBillController extends Controller
     }
 
     public function removeUsedData(Request $request){
-        CustomHelper::removeUsedData('outgoing_payments',$request->id);
+        CustomHelper::removeUsedData('fund_requests',$request->id);
         return response()->json([
             'status'    => 200,
             'message'   => ''
@@ -268,25 +294,20 @@ class CloseBillController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'account_id' 			=> 'required',
             'company_id'            => 'required',
-            'coa_source_id'         => 'required',
             'post_date'             => 'required',
-            'pay_date'              => 'required',
-            'currency_id'           => 'required',
-            'currency_rate'         => 'required',
-            'admin'                 => 'required',
-            'grandtotal'            => 'required',
+            'arr_fund_request'      => 'request|array',
+            'arr_coa'               => 'request|array',
+            'arr_nominal'           => 'request|array',
 		], [
-			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
-            'coa_source_id.required'            => 'Kas/Bank tidak boleh kosong.',
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
-            'pay_date.required'                 => 'Tanggal bayar tidak boleh kosong.',
-            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
-            'admin.required'                    => 'Biaya admin tidak boleh kosong, minimal 0.',
-            'grandtotal.required'               => 'Total bayar tidak boleh kosong.',
+            'arr_fund_request.required'         => 'Fund request tidak boleh kosong.',
+            'arr_fund_request.array'            => 'Fund request harus array.',
+            'arr_coa.required'                  => 'Coa tidak boleh kosong.',
+            'arr_coa.array'                     => 'Coa harus array.',
+            'arr_nominal.required'              => 'Nominal tidak boleh kosong.',
+            'arr_nominal.array'                 => 'Nominal harus array.',
 		]);
 
         if($validation->fails()) {
@@ -299,7 +320,7 @@ class CloseBillController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = CloseBill::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
@@ -314,31 +335,16 @@ class CloseBillController extends Controller
 
                     if($query->status == '1'){
 
-                        if($request->has('document')) {
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
-                            }
-                            $document = $request->file('document')->store('public/outgoing_payments');
-                        } else {
-                            $document = $query->document;
-                        }
-
                         $query->user_id = session('bo_id');
-                        $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
-                        $query->coa_source_id = $request->coa_source_id;
-                        $query->payment_request_id = $request->payment_request_id ? $request->payment_request_id : NULL;
                         $query->post_date = $request->post_date;
-                        $query->due_date = $request->due_date;
-                        $query->pay_date = $request->pay_date;
-                        $query->currency_id = $request->currency_id;
-                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->admin = str_replace(',','.',str_replace('.','',$request->admin));
-                        $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
-                        $query->document = $document;
                         $query->note = $request->note;
 
                         $query->save();
+
+                        foreach($query->closeBillDetail as $row){
+                            $row->delete();
+                        }
 
                         DB::commit();
                     }else{
@@ -353,20 +359,11 @@ class CloseBillController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = OutgoingPayment::create([
-                        'code'			            => OutgoingPayment::generateCode(),
+                    $query = CloseBill::create([
+                        'code'			            => CloseBill::generateCode(),
                         'user_id'		            => session('bo_id'),
-                        'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
-                        'coa_source_id'             => $request->coa_source_id,
-                        'payment_request_id'        => $request->payment_request_id ? $request->payment_request_id : NULL,
                         'post_date'                 => $request->post_date,
-                        'pay_date'                  => $request->pay_date,
-                        'currency_id'               => $request->currency_id,
-                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'admin'                     => str_replace(',','.',str_replace('.','',$request->admin)),
-                        'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
-                        'document'                  => $request->file('document') ? $request->file('document')->store('public/outgoing_payments') : NULL,
                         'note'                      => $request->note,
                         'status'                    => '1',
                     ]);
@@ -379,14 +376,14 @@ class CloseBillController extends Controller
 			
 			if($query) {
 
-                CustomHelper::sendApproval('outgoing_payments',$query->id,$query->note);
-                CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas / Bank Keluar No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval('close_bills',$query->id,$query->note);
+                CustomHelper::sendNotification('close_bills',$query->id,'Penutupan BS / Close Bill No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
-                    ->performedOn(new OutgoingPayment())
+                    ->performedOn(new CloseBill())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit cash bank out.');
+                    ->log('Add / edit close bill.');
 
 				$response = [
 					'status'    => 200,
@@ -404,7 +401,7 @@ class CloseBillController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = CloseBill::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(in_array($query->status,['4','5'])){
@@ -421,13 +418,13 @@ class CloseBillController extends Controller
                 ]);
     
                 activity()
-                    ->performedOn(new OutgoingPayment())
+                    ->performedOn(new CloseBill())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the outgoing payment data');
+                    ->log('Void the close bill data');
     
-                CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas / Bank Keluar No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('outgoing_payments',$query->id);
+                CustomHelper::sendNotification('close_bills',$query->id,'Penutupan BS / Closing Bill No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('close_bills',$query->id);
 
                 $response = [
                     'status'  => 200,
@@ -445,14 +442,14 @@ class CloseBillController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = CloseBill::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Kas / Bank Keluar telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                        'message' => 'Penutupan BS / Close Bill telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
                     ]);
                 }
             }
@@ -467,13 +464,13 @@ class CloseBillController extends Controller
         
         if($query->delete()) {
 
-            CustomHelper::removeApproval('outgoing_payments',$query->id);
+            CustomHelper::removeApproval('close_bills',$query->id);
 
             activity()
-                ->performedOn(new OutgoingPayment())
+                ->performedOn(new CloseBill())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the outgoing payment data');
+                ->log('Delete the close bill data');
 
             $response = [
                 'status'  => 200,

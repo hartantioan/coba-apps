@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Misc;
 
 use App\Models\ApprovalStage;
+use App\Models\FundRequest;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\Menu;
@@ -795,6 +796,44 @@ class Select2Controller extends Controller {
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name.' - '.$d->company->name,
                 'must_bp'       => $d->bp_journal ? '1' : '',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function fundRequestBs(Request $request)
+    {
+
+        $response = [];
+        $search   = $request->search;
+        $data = FundRequest::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('required_date', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('total', 'like', "%$search%")
+                            ->orWhere('tax', 'like', "%$search%")
+                            ->orWhere('wtax', 'like', "%$search%")
+                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhereHas('fundRequestDetail',function($query) use($search){
+                                $query->where('note', 'like', "%$search%");
+                            })
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                })
+                ->where('type','1')
+                ->whereDoesntHave('used')
+                ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->note.' - '.number_format($d->grandtotal,2,',','.'),
             ];
         }
 

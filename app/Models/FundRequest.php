@@ -86,12 +86,28 @@ class FundRequest extends Model
         });
     }
 
+    public function closeBillDetail(){
+        return $this->hasMany('App\Models\CloseBillDetail','fund_request_id','id')->whereHas('closeBill',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function balancePaymentRequest(){
         $total = $this->grandtotal;
 
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
             $query->whereIn('status',['2','3']);
         })->get() as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
+    public function balanceCloseBill(){
+        $total = $this->grandtotal;
+
+        foreach($this->closeBillDetail as $row){
             $total -= $row->nominal;
         }
 

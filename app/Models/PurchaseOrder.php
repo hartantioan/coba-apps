@@ -151,7 +151,7 @@ class PurchaseOrder extends Model
     }
 
     public function balanceInvoice(){
-        $total = $this->grandtotal;
+        $total = round($this->grandtotal,2);
 
         foreach($this->purchaseInvoiceDetail()->whereHas('purchaseInvoice', function($query){
             $query->whereIn('status',['2','3']);

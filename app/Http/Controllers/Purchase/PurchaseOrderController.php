@@ -331,19 +331,21 @@ class PurchaseOrderController extends Controller
 
                 if($request->type == 'po'){
                     foreach($data->purchaseRequestDetail as $row){
-                        $details[] = [
-                            'reference_id'                  => $row->id,
-                            'item_id'                       => $row->item_id,
-                            'item_name'                     => $row->item->code.' - '.$row->item->name,
-                            'old_prices'                    => $row->item->oldPrices($this->dataplaces),
-                            'unit'                          => $row->item->buyUnit->code,
-                            'qty'                           => number_format($row->qtyBalance(),3,',','.'),
-                            'note'                          => $row->note,
-                            'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
-                            'warehouse_id'                  => $row->warehouse_id,
-                            'place_id'                      => $row->place_id,
-                            'department_id'                 => $row->department_id,
-                        ];
+                        if($row->qtyBalance() > 0){
+                            $details[] = [
+                                'reference_id'                  => $row->id,
+                                'item_id'                       => $row->item_id,
+                                'item_name'                     => $row->item->code.' - '.$row->item->name,
+                                'old_prices'                    => $row->item->oldPrices($this->dataplaces),
+                                'unit'                          => $row->item->buyUnit->code,
+                                'qty'                           => number_format($row->qtyBalance(),3,',','.'),
+                                'note'                          => $row->note,
+                                'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
+                                'warehouse_id'                  => $row->warehouse_id,
+                                'place_id'                      => $row->place_id,
+                                'department_id'                 => $row->department_id,
+                            ];
+                        }
                     }
                 }elseif($request->type == 'gi'){
                     foreach($data->goodIssueDetail as $row){

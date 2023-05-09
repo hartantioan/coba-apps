@@ -36,6 +36,7 @@ use App\Http\Controllers\MasterData\TaxController;
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
 use App\Http\Controllers\Finance\OutgoingPaymentController;
+use App\Http\Controllers\Finance\CloseFundRequestController;
 
 use App\Http\Controllers\Purchase\PurchaseRequestController;
 use App\Http\Controllers\Purchase\PurchaseOrderController;
@@ -755,6 +756,23 @@ Route::prefix('admin')->group(function () {
                 Route::post('void_status', [OutgoingPaymentController::class, 'voidStatus'])->middleware('operation.access:outgoing_payment,void');
                 Route::get('approval/{id}',[OutgoingPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
                 Route::post('destroy', [OutgoingPaymentController::class, 'destroy'])->middleware('operation.access:outgoing_payment,delete');
+            });
+
+            Route::prefix('close_fund_request')->middleware('operation.access:
+            ,view')->group(function () {
+                Route::get('/',[CloseFundRequestController::class, 'index']);
+                Route::get('datatable',[CloseFundRequestController::class, 'datatable']);
+                Route::get('row_detail',[CloseFundRequestController::class, 'rowDetail']);
+                Route::post('show', [CloseFundRequestController::class, 'show']);
+                Route::post('print',[CloseFundRequestController::class, 'print']);
+                Route::get('export',[CloseFundRequestController::class, 'export']);
+                Route::get('viewstructuretree',[CloseFundRequestController::class, 'viewStructureTree']);
+                Route::post('send_used_data',[CloseFundRequestController::class, 'sendUsedData']);
+                Route::post('remove_used_data', [CloseFundRequestController::class, 'removeUsedData']);
+                Route::post('create',[CloseFundRequestController::class, 'create'])->middleware('operation.access:close_fund_request,update');
+                Route::post('void_status', [CloseFundRequestController::class, 'voidStatus'])->middleware('operation.access:close_fund_request,void');
+                Route::get('approval/{id}',[CloseFundRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                Route::post('destroy', [CloseFundRequestController::class, 'destroy'])->middleware('operation.access:close_fund_request,delete');
             });
         });
 

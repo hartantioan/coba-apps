@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\FundRequest;
 use App\Models\GoodReceipt;
 use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
@@ -12,19 +11,13 @@ use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrder;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Currency;
-use App\Models\ItemCogs;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportOutgoingPayment;
-use App\Models\Place;
-use Illuminate\Database\Eloquent\Builder;
 
 class OutgoingPaymentController extends Controller
 {

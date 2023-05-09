@@ -390,8 +390,6 @@
         select2ServerSide('#arr_warehouse0', '{{ url("admin/select2/warehouse") }}');
     });
 
-    
-
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
 

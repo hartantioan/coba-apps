@@ -89,7 +89,7 @@ class GoodReceipt extends Model
         $source = $this->approval();
         if($source){
             $html = '';
-            foreach($source->approvalMatrix()->whereHas('approvalTable',function($query){ $query->orderBy('level'); })->get() as $row){
+            foreach($source->approvalMatrix()->whereHas('approvalTemplateStage',function($query){ $query->whereHas('approvalStage', function($query) { $query->orderBy('level'); }); })->get() as $row){
                 $html .= '<span style="top:-10px;">'.$row->user->name.'</span> '.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br>';
             }
 

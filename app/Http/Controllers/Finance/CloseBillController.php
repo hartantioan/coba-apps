@@ -1,34 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Purchase;
+namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
-use App\Models\ApprovalMatrix;
-use App\Models\ApprovalSource;
 use App\Models\Company;
-use App\Models\GoodReceipt;
+use App\Models\CloseBill;
+use App\Models\CloseBillDetail;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
+use App\Models\PurchaseOrder;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\PurchaseRequest;
-use App\Models\PurchaseOrder;
-use App\Models\PurchaseRequestDetail;
-use App\Models\User;
-use App\Models\Warehouse;
-use App\Models\Place;
-use App\Models\Department;
+use App\Models\Currency;
 use App\Helpers\CustomHelper;
-use App\Exports\ExportPurchaseRequest;
+use App\Exports\ExportOutgoingPayment;
 
-class PurchaseRequestController extends Controller
+class CloseBillController extends Controller
 {
+
     protected $dataplaces;
 
     public function __construct(){
@@ -39,12 +32,10 @@ class PurchaseRequestController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'     => 'Purchase Request',
-            'content'   => 'admin.purchase.request',
-            'company'   => Company::where('status','1')->get(),
-            'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'department'=> Department::where('status','1')->get(),
-            'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'title'         => 'Penutupan BS Karyawan',
+            'content'       => 'admin.finance.close_bill',
+            'company'       => Company::where('status','1')->get(),
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -53,12 +44,19 @@ class PurchaseRequestController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
-            'user_id',
             'code',
+            'user_id',
+            'account_id',
             'company_id',
+            'payment_request_id',
+            'coa_source_id',
             'post_date',
-            'due_date',
-            'required_date',
+            'pay_date',
+            'currency_id',
+            'currency_rate',
+            'admin',
+            'grandtotal',
+            'document',
             'note',
         ];
 
@@ -68,33 +66,28 @@ class PurchaseRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
-
-        $total_data = PurchaseRequest::count();
+        $total_data = OutgoingPayment::count();
         
-        $query_data = PurchaseRequest::where(function($query) use ($search, $request, $dataplaces) {
+        $query_data = OutgoingPayment::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
+                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('admin', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('paymentRequest',function($query) use($search, $request){
+                                $query->where('code','like',"%$search%");
                             });
                     });
                 }
-
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('post_date', '>=', $request->start_date)
                         ->whereDate('post_date', '<=', $request->finish_date);
@@ -106,6 +99,18 @@ class PurchaseRequestController extends Controller
 
                 if($request->status){
                     $query->where('status', $request->status);
+                }
+
+                if($request->account_id){
+                    $query->whereIn('account_id',$request->account_id);
+                }
+
+                if($request->currency_id){
+                    $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
             })
             ->offset($start)
@@ -113,27 +118,26 @@ class PurchaseRequestController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = PurchaseRequest::where(function($query) use ($search, $request, $dataplaces) {
+        $total_filtered = OutgoingPayment::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('required_date', 'like', "%$search%")
+                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('admin', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('purchaseRequestDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('paymentRequest',function($query) use($search, $request){
+                                $query->where('code','like',"%$search%");
                             });
                     });
                 }
-
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('post_date', '>=', $request->start_date)
                         ->whereDate('post_date', '<=', $request->finish_date);
@@ -145,6 +149,18 @@ class PurchaseRequestController extends Controller
 
                 if($request->status){
                     $query->where('status', $request->status);
+                }
+
+                if($request->account_id){
+                    $query->whereIn('account_id',$request->account_id);
+                }
+
+                if($request->currency_id){
+                    $query->whereIn('currency_id',$request->currency_id);
+                }
+
+                if($request->company_id){
+                    $query->where('company_id',$request->company_id);
                 }
             })
             ->count();
@@ -154,22 +170,25 @@ class PurchaseRequestController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->user->name,
+                    '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
+                    $val->user->name,
+                    $val->account->name,
                     $val->company->name,
+                    $val->paymentRequest()->exists() ? $val->paymentRequest->code : '-',
+                    $val->coaSource->name,
                     date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->due_date)),
-                    date('d/m/y',strtotime($val->required_date)),
-                    $val->note,
+                    date('d/m/y',strtotime($val->pay_date)),
+                    $val->currency->code,
+                    number_format($val->currency_rate,2,',','.'),
+                    number_format($val->admin,3,',','.'),
+                    number_format($val->grandtotal,3,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    $val->note,
                     $val->status(),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat red accent-2 white-text btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 					'
                 ];
 
@@ -190,45 +209,10 @@ class PurchaseRequestController extends Controller
         return response()->json($response);
     }
 
-    public function rowDetail(Request $request)
-    {
-        $data   = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+    public function rowDetail(Request $request){
+        $data   = OutgoingPayment::find($request->id);
         
-        $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
-                        <thead>
-                            <tr>
-                                <th class="center-align" colspan="9">Daftar Item</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Tgl.Dipakai</th>
-                                <th class="center-align">Site</th>
-                                <th class="center-align">Gudang</th>
-                                <th class="center-align">Departemen</th>
-                            </tr>
-                        </thead><tbody>';
-        
-        foreach($data->purchaseRequestDetail as $key => $row){
-            $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->item->buyUnit->code.'</td>
-                <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
-                <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
-                <td class="center-align">'.$row->warehouse->name.'</td>
-                <td class="center-align">'.$row->department->name.'</td>
-            </tr>';
-        }
-        
-        $string .= '</tbody></table></div>';
-
-        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12 mt-1"><table style="max-width:500px;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>
@@ -261,121 +245,89 @@ class PurchaseRequestController extends Controller
         return response()->json($string);
     }
 
-    public function voidStatus(Request $request){
-        $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        
-        if($query) {
-            if(in_array($query->status,['4','5'])){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
-                ];
-            }elseif($query->purchaseOrderDetailComposition()->exists()){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data telah digunakan pada Purchase Order.'
-                ];
-            }else{
-                $query->update([
-                    'status'    => '5',
-                    'void_id'   => session('bo_id'),
-                    'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
-                ]);
-    
-                activity()
-                    ->performedOn(new PurchaseRequest())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Void the purchase request data');
-    
-                CustomHelper::sendNotification('purchase_requests',$query->id,'Purchase Request No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('purchase_requests',$query->id);
-
-                $response = [
-                    'status'  => 200,
-                    'message' => 'Data closed successfully.'
-                ];
-            }
-        } else {
-            $response = [
-                'status'  => 500,
-                'message' => 'Data failed to delete.'
-            ];
+    public function sendUsedData(Request $request){
+        $op = OutgoingPayment::find($request->id);
+        if(!$op->used()->exists()){
+            CustomHelper::sendUsedData('outgoing_payments',$request->id,'Form Kas / Bank Keluar');
+            return response()->json([
+                'status'    => 200,
+                'code'      => $op->code,
+                'id'        => $op->id
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Kas / Bank Keluar '.$op->used->lookable->code.' telah dipakai di '.$op->used->ref.', oleh '.$op->used->user->name.'.'
+            ]);
         }
-
-        return response()->json($response);
     }
 
-    public function print(Request $request){
-
-        $data = [
-            'title' => 'PURCHASE REQUEST REPORT',
-            'data' => PurchaseRequest::where(function ($query) use ($request) {
-                if ($request->search) {
-                    $query->where(function ($query) use ($request) {
-                        $query->where('code', 'like', "%$request->search%")
-                            ->orWhere('post_date', 'like', "%$request->search%")
-                            ->orWhere('due_date', 'like', "%$request->search%")
-                            ->orWhere('required_date', 'like', "%$request->search%")
-                            ->orWhere('note', 'like', "%$request->search%")
-                            ->orWhereHas('purchaseRequestDetail',function($query) use($request){
-                                $query->whereHas('item',function($query) use($request){
-                                    $query->where('code', 'like', "%$request->search%")
-                                        ->orWhere('name','like',"%$request->search%");
-                                });
-                            })
-                            ->orWhereHas('user',function($query) use($request){
-                                $query->where('name','like',"%$request->search%")
-                                    ->orWhere('employee_no','like',"%$request->search%");
-                            });
-                    });
-                    
-                }
-
-                if ($request->status) {
-                    $query->where('status',$request->status);
-                }
-            })
-            ->get()
-		];
-		
-		return view('admin.print.purchase.request', $data);
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData('outgoing_payments',$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 
-    public function export(Request $request){
-        $search = $request->search ? $request->search : '';
-        $status = $request->status ? $request->status : '';
+    public function approval(Request $request,$id){
+        
+        $pr = OutgoingPayment::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($pr){
+            $data = [
+                'title'     => 'Print Kas Bank Keluar',
+                'data'      => $pr
+            ];
 
-		
-		return Excel::download(new ExportPurchaseRequest($search,$status,$this->dataplaces), 'purchase_request_'.uniqid().'.xlsx');
+            return view('admin.approval.outgoing_payment', $data);
+        }else{
+            abort(404);
+        }
+    }
+
+    public function show(Request $request){
+        $pr = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($pr->used()->exists()){
+            $pr['status'] = 500;
+            $pr['message'] = 'Kas / Bank Keluar '.$pr->used->lookable->code.' telah dipakai di '.$pr->used->ref.', oleh '.$pr->used->user->name.'.';
+        }else{
+            CustomHelper::sendUsedData('outgoing_payments',$pr->id,'Form Kas / Bank Keluar');
+            $pr['status'] = 200;
+            $pr['account_name'] = $pr->account->name;
+            $pr['coa_source_name'] = $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name;
+            $pr['currency_rate'] = number_format($pr->currency_rate,3,',','.');
+            $pr['admin'] = number_format($pr->admin,3,',','.');
+            $pr['grandtotal'] = number_format($pr->grandtotal,3,',','.');
+            $pr['payment_request_id'] = $pr->payment_request_id ? $pr->payment_request_id : '';
+            $pr['payment_request_code'] = $pr->paymentRequest->code;
+        }
+        				
+		return response()->json($pr);
     }
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'post_date' 				=> 'required',
-			'due_date'			        => 'required',
-			'required_date'		        => 'required',
-            'note'		                => 'required',
-            'arr_item'                  => 'required|array',
-            'company_id'                => 'required',
-            'arr_warehouse'             => 'required|array',
-            'arr_place'                 => 'required|array',
-            'arr_department'            => 'required|array'
+			'account_id' 			=> 'required',
+            'company_id'            => 'required',
+            'coa_source_id'         => 'required',
+            'post_date'             => 'required',
+            'pay_date'              => 'required',
+            'currency_id'           => 'required',
+            'currency_rate'         => 'required',
+            'admin'                 => 'required',
+            'grandtotal'            => 'required',
 		], [
-			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
-			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
-			'required_date.required' 			=> 'Tanggal dipakai tidak boleh kosong.',
-			'note.required'				        => 'Keterangan tidak boleh kosong',
-            'arr_item.required'                 => 'Item tidak boleh kosong',
-            'arr_item.array'                    => 'Item harus dalam bentuk array.',
+			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
-            'arr_warehouse.required'            => 'Gudang tujuan tidak boleh kosong.',
-            'arr_warehouse.array'               => 'Gudang harus dalam bentuk array.',
-            'arr_place.required'                => 'Penempatan tujuan tidak boleh kosong.',
-            'arr_place.array'                   => 'Penempatan harus dalam bentuk array.',
-            'arr_department.required'           => 'Departemen tujuan tidak boleh kosong.',
-            'arr_department.array'              => 'Departemen harus dalam bentuk array.'
+            'coa_source_id.required'            => 'Kas/Bank tidak boleh kosong.',
+            'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
+            'pay_date.required'                 => 'Tanggal bayar tidak boleh kosong.',
+            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+            'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
+            'admin.required'                    => 'Biaya admin tidak boleh kosong, minimal 0.',
+            'grandtotal.required'               => 'Total bayar tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {
@@ -384,51 +336,56 @@ class PurchaseRequestController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
+            
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
                             if($row->status == '2'){
                                 return response()->json([
                                     'status'  => 500,
-                                    'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                                    'message' => 'Kas / Bank Keluar telah diapprove, anda tidak bisa melakukan perubahan.'
                                 ]);
                             }
                         }
                     }
 
                     if($query->status == '1'){
-                        if($request->has('file')) {
+
+                        if($request->has('document')) {
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
                             }
-                            $document = $request->file('file')->store('public/purchase_requests');
+                            $document = $request->file('document')->store('public/outgoing_payments');
                         } else {
                             $document = $query->document;
                         }
-                        
+
+                        $query->user_id = session('bo_id');
+                        $query->account_id = $request->account_id;
+                        $query->company_id = $request->company_id;
+                        $query->coa_source_id = $request->coa_source_id;
+                        $query->payment_request_id = $request->payment_request_id ? $request->payment_request_id : NULL;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
-                        $query->required_date = $request->required_date;
-                        $query->note = $request->note;
+                        $query->pay_date = $request->pay_date;
+                        $query->currency_id = $request->currency_id;
+                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
+                        $query->admin = str_replace(',','.',str_replace('.','',$request->admin));
+                        $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
-                        $query->project_id = $request->project_id ? $request->project_id : NULL;
-                        $query->company_id = $request->company_id;
-                        $query->save();
+                        $query->note = $request->note;
 
-                        foreach($query->purchaseRequestDetail as $row){
-                            $row->delete();
-                        }
+                        $query->save();
 
                         DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -437,17 +394,22 @@ class PurchaseRequestController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = PurchaseRequest::create([
-                        'code'			=> PurchaseRequest::generateCode(),
-                        'user_id'		=> session('bo_id'),
-                        'company_id'    => $request->company_id,
-                        'status'        => '1',
-                        'post_date'     => $request->post_date,
-                        'due_date'      => $request->due_date,
-                        'required_date' => $request->required_date,
-                        'note'          => $request->note,
-                        'project_id'    => $request->project_id ? $request->project_id : NULL,
-                        'document'      => $request->file('file') ? $request->file('file')->store('public/purchase_requests') : NULL,
+                    $query = OutgoingPayment::create([
+                        'code'			            => OutgoingPayment::generateCode(),
+                        'user_id'		            => session('bo_id'),
+                        'account_id'                => $request->account_id,
+                        'company_id'                => $request->company_id,
+                        'coa_source_id'             => $request->coa_source_id,
+                        'payment_request_id'        => $request->payment_request_id ? $request->payment_request_id : NULL,
+                        'post_date'                 => $request->post_date,
+                        'pay_date'                  => $request->pay_date,
+                        'currency_id'               => $request->currency_id,
+                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
+                        'admin'                     => str_replace(',','.',str_replace('.','',$request->admin)),
+                        'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
+                        'document'                  => $request->file('document') ? $request->file('document')->store('public/outgoing_payments') : NULL,
+                        'note'                      => $request->note,
+                        'status'                    => '1',
                     ]);
 
                     DB::commit();
@@ -458,33 +420,14 @@ class PurchaseRequestController extends Controller
 			
 			if($query) {
 
-                DB::beginTransaction();
-                try {
-                    foreach($request->arr_item as $key => $row){
-                        PurchaseRequestDetail::create([
-                            'purchase_request_id'   => $query->id,
-                            'item_id'               => $row,
-                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'note'                  => $request->arr_note[$key],
-                            'required_date'         => $request->arr_required_date[$key],
-                            'place_id'              => $request->arr_place[$key],
-                            'department_id'         => $request->arr_department[$key],
-                            'warehouse_id'          => $request->arr_warehouse[$key]
-                        ]);
-                    }
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-
-                CustomHelper::sendApproval('purchase_requests',$query->id,$query->note);
-                CustomHelper::sendNotification('purchase_requests',$query->id,'Pengajuan Purchase Request No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval('outgoing_payments',$query->id,$query->note);
+                CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas / Bank Keluar No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
-                    ->performedOn(new PurchaseRequest())
+                    ->performedOn(new OutgoingPayment())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit purchase request.');
+                    ->log('Add / edit cash bank out.');
 
 				$response = [
 					'status'    => 200,
@@ -501,42 +444,56 @@ class PurchaseRequestController extends Controller
 		return response()->json($response);
     }
 
-    public function show(Request $request){
-        $pr = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
-        $pr['project_id'] = $pr->project_id ? $pr->project_id : '';
-        $pr['project_name'] = $pr->project()->exists() ? $pr->project->code.' - '.$pr->project->name : '';
+    public function voidStatus(Request $request){
+        $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+            if(in_array($query->status,['4','5'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+    
+                activity()
+                    ->performedOn(new OutgoingPayment())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the outgoing payment data');
+    
+                CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas / Bank Keluar No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('outgoing_payments',$query->id);
 
-        $arr = [];
-
-        foreach($pr->purchaseRequestDetail as $row){
-            $arr[] = [
-                'item_id'           => $row->item_id,
-                'item_name'         => $row->item->name,
-                'qty'               => $row->qty,
-                'unit'              => $row->item->buyUnit->code,
-                'note'              => $row->note,
-                'date'              => $row->required_date,
-                'warehouse_name'    => $row->warehouse->name,
-                'warehouse_id'      => $row->warehouse_id,
-                'place_id'          => $row->place_id,
-                'department_id'     => $row->department_id
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
             ];
         }
 
-        $pr['details'] = $arr;
-        				
-		return response()->json($pr);
+        return response()->json($response);
     }
 
     public function destroy(Request $request){
-        $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                        'message' => 'Kas / Bank Keluar telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
                     ]);
                 }
             }
@@ -545,27 +502,19 @@ class PurchaseRequestController extends Controller
         if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
-                'message' => 'Purchase Request sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                'message' => 'Jurnal / dokumen sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
         
-        if($query->purchaseOrderDetailComposition()->exists()){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Data telah digunakan pada Purchase Order.'
-            ]);
-        }
-
         if($query->delete()) {
-            
-            $query->purchaseRequestDetail()->delete();
-            CustomHelper::removeApproval('purchase_requests',$query->id);
+
+            CustomHelper::removeApproval('outgoing_payments',$query->id);
 
             activity()
-                ->performedOn(new PurchaseRequest())
+                ->performedOn(new OutgoingPayment())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the purchase request data');
+                ->log('Delete the outgoing payment data');
 
             $response = [
                 'status'  => 200,
@@ -580,25 +529,74 @@ class PurchaseRequestController extends Controller
 
         return response()->json($response);
     }
+
+    public function print(Request $request){
+
+        $data = [
+            'title' => 'OUTGOING PAYMENT REPORT',
+            'data' => OutgoingPayment::where(function($query) use ($request) {
+                if($request->search) {
+                    $query->where(function($query) use ($request) {
+                        $query->where('code', 'like', "%$request->search%")
+                            ->orWhere('grandtotal', 'like', "%$request->search%")
+                            ->orWhere('admin', 'like', "%$request->search%")
+                            ->orWhere('note', 'like', "%$request->search%")
+                            ->orWhereHas('user',function($query) use($request){
+                                $query->where('name','like',"%$request->search%")
+                                    ->orWhere('employee_no','like',"%$request->search%");
+                            })
+                            ->orWhereHas('account',function($query) use($request){
+                                $query->where('name','like',"%$request->search%")
+                                    ->orWhere('employee_no','like',"%$request->search%");
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
+                if($request->account){
+                    $query->whereIn('account_id',$request->account);
+                }
+
+                if($request->currency){
+                    $query->whereIn('currency_id',$request->currency);
+                }
+
+                if($request->company){
+                    $query->where('company_id',$request->company);
+                }
+            })
+            ->get()
+		];
+		
+		return view('admin.print.finance.outgoing_payment', $data);
+    }
+
+    public function export(Request $request){
+		return Excel::download(new ExportOutgoingPayment($request->search,$request->status,$request->company,$request->account,$request->currency,$this->dataplaces), 'outgoing_payment'.uniqid().'.xlsx');
+    }
+
     public function viewStructureTree(Request $request){
-        $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
         $data_go_chart = [];
         $data_link = [];
-        $pr = [
+        $outgoing_payment = [
                 'key'   => $query->code,
                 "name"  => $query->code,
                 "color" => "lightblue",
                 'properties'=> [
                      ['name'=> "Tanggal: ".date('d/m/y',strtotime($query->post_date))],
+                     ['name'=> "Nominal: Rp".number_format($query->grandtotal,2,',','.')]
                   ],
-                'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($query->code),
+                'url'   =>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query->code),
                 "title" =>$query->code,
             ];
-        $data_go_chart[]=$pr;
+        $data_go_chart[]=$outgoing_payment;
         $data_good_receipts = [];
         $data_purchase_requests = [];
-        $data_purchase_requests[]=$pr;
-
+        
         $data_id_dp=[];
         $data_id_po = [];
         $data_id_gr = [];
@@ -609,48 +607,103 @@ class PurchaseRequestController extends Controller
         $data_frs=[];
         $data_pyrs = [];
         $data_outgoingpayments = [];
+        $data_outgoingpayments[]=$outgoing_payment;
 
         $data_pos=[];
         if($query) {
 
             //Pengambilan Main Branch beserta id terkait
-            foreach($query->purchaseRequestDetail as $purchase_request_detail){
-                if($purchase_request_detail->purchaseOrderDetail()->exists()){
-                   foreach($purchase_request_detail->purchaseOrderDetail as $purchase_order_detail){
-                        $po=[
+            if($query->paymentRequest()->exists()){
+                foreach($query->paymentRequest->paymentRequestDetail as $row_pyr_detail){
+                    $data_pyr_tempura=[
+                        'properties'=> [
+                            ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
+                            ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                        ],
+                        "key" => $row_pyr_detail->paymentRequest->code,
+                        "name" => $row_pyr_detail->paymentRequest->code,
+                        'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
+                    ];
+                    if(count($data_pyrs)<1){
+                        $data_pyrs[]=$data_pyr_tempura;
+                        $data_go_chart[]=$data_pyr_tempura;
+                        $data_link[]=[
+                            'from'=>$row_pyr_detail->paymentRequest->code,
+                            'to'=>$query->code,
+                        ]; 
+                        $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
+                        
+                    }else{
+                        $found = false;
+                        foreach ($data_pyrs as $key => $row_pyr) {
+                            if ($row_pyr["key"] == $data_pyr_tempura["key"]) {
+                                $found = true;
+                                break;
+                            }
+                        }
+                     
+                        if($found){
+                            $data_links=[
+                                'from'=>$row_pyr_detail->paymentRequest->code,
+                                'to'=>$query->code,
+                            ]; 
+                            $found_inlink = false;
+                            foreach($data_link as $key=>$row_link){
+                                if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                    $found_inlink = true;
+                                    break;
+                                }
+                            }
+                            if(!$found_inlink){
+                                $data_link[] = $data_links;
+                            }
+                            
+                        }
+                        if (!$found) {
+                            $data_pyrs[]=$data_pyr_tempura;
+                            $data_go_chart[]=$data_pyr_tempura;
+                            $data_link[]=[
+                                'from'=>$row_pyr_detail->paymentRequest->code,
+                                'to'=>$query->code,
+                            ]; 
+                            $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;   
+                        }
+                    }
+                    if($row_pyr_detail->fundRequest()){
+                       
+                        $data_fund_tempura=[
                             'properties'=> [
-                                ['name'=> "Tanggal: ".$purchase_order_detail->purchaseOrder->post_date],
-                                ['name'=> "url", 'type'=> request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($purchase_order_detail->purchaseOrder->code)],
-                             ],
-                            'key'=>$purchase_order_detail->purchaseOrder->code,
-                            'name'=>$purchase_order_detail->purchaseOrder->code,
-                            'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($purchase_order_detail->purchaseOrder->code),
+                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                            ],
+                            "key" => $row_pyr_detail->lookable->code,
+                            "name" => $row_pyr_detail->lookable->code,
+                            'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                         ];
                         
-                        
-                        if(count($data_pos)<1){
-                            $data_pos[]=$po;
-                            $data_go_chart[]=$po;
+                        if(count($data_frs)<1){
+                            $data_frs[]=$data_fund_tempura;
+                            $data_go_chart[]=$data_fund_tempura;
                             $data_link[]=[
-                                'from'=>$query->code,
-                                'to'=>$po["key"],
-                            ];
-                            $data_id_po[]= $purchase_order_detail->purchaseOrder->id;  
+                                'from'=>$row_pyr_detail->lookable->code,
+                                'to'=>$row_pyr_detail->paymentRequest->code,
+                            ]; 
+                            $data_id_frs[]= $row_pyr_detail->lookable->id;  
                             
                         }else{
                             $found = false;
-                            foreach ($data_pos as $key => $row_pos) {
-                                if ($row_pos["key"] == $po["key"]) {
+                            foreach ($data_frs as $key => $row_fundreq) {
+                                if ($row_fundreq["key"] == $data_fund_tempura["key"]) {
                                     $found = true;
                                     break;
                                 }
                             }
-                            //po yang memiliki request yang sama
+                            
                             if($found){
                                 $data_links=[
-                                    'from'=>$query->code,
-                                    'to'=>$po["key"],
-                                ];  
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                ]; 
                                 $found_inlink = false;
                                 foreach($data_link as $key=>$row_link){
                                     if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
@@ -664,86 +717,83 @@ class PurchaseRequestController extends Controller
                                 
                             }
                             if (!$found) {
-                                $data_pos[] = $po;
+                                $data_frs[]=$data_fund_tempura;
+                                $data_go_chart[]=$data_fund_tempura;
                                 $data_link[]=[
-                                    'from'=>$query->code,
-                                    'to'=>$po["key"],
-                                ];  
-                                $data_go_chart[]=$po;
-                                $data_id_po[]= $purchase_order_detail->purchaseOrder->id; 
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                ]; 
+                                $data_id_frs[]= $row_pyr_detail->lookable->id;   
                             }
                         }
                         
-                        if($purchase_order_detail->goodReceiptDetail()->exists()){
-                            foreach($purchase_order_detail->goodReceiptDetail as $good_receipt_detail){
-                                $data_good_receipt = [
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                        ['name'=> "url", 'type'=> request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code)],
-                                     ],
-                                    "key" => $good_receipt_detail->goodReceipt->code,
-                                    "name" => $good_receipt_detail->goodReceipt->code,
-                                    
-                                    'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code),
-                                    
-                                ];
-                                if(count($data_good_receipts)<1){
-                                    $data_good_receipts[]=$data_good_receipt;
-                                    $data_link[]=[
-                                        'from'=>$purchase_order_detail->purchaseOrder->code,
-                                        'to'=>$data_good_receipt["key"],
-                                    ];
-                                    $data_id_gr[]= $good_receipt_detail->goodReceipt->id;
-                                    $data_go_chart[]=$data_good_receipt;  
-                                }else{
-                                    $found = false;
-                                    foreach($data_good_receipts as $tempdg){
-                                        if ($tempdg["key"] == $data_good_receipt["key"]) {
-                                            $found = true;
+                    }
+                    foreach($row_pyr_detail->paymentRequest->paymentRequestDetail as $row_pyrd){
+                        if($row_pyrd->purchaseDownPayment()){
+                        
+                            $data_downp_tempura = [
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_pyrd->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row_pyrd->lookable->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row_pyrd->lookable->code,
+                                "name" => $row_pyrd->lookable->code,
+                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyrd->lookable->code),  
+                            ];
+                            if(count($data_purchase_downpayment)<1){
+                                $data_purchase_downpayment[]=$data_downp_tempura;
+                                $data_go_chart[]=$data_downp_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyrd->lookable->code,
+                                    'to'=>$row_pyrd->paymentRequest->code,
+                                ]; 
+                                $data_id_dp[]= $row_pyrd->lookable->id;  
+                                
+                            }else{
+                                $found = false;
+                                foreach ($data_purchase_downpayment as $key => $row_dp) {
+                                    if ($row_dp["key"] == $data_downp_tempura["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if($found){
+                                    $data_links=[
+                                        'from'=>$row_pyrd->lookable->code,
+                                        'to'=>$row_pyrd->paymentRequest->code,
+                                    ]; 
+                                    $found_inlink = false;
+                                    foreach($data_link as $key=>$row_link){
+                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                            $found_inlink = true;
                                             break;
                                         }
                                     }
-                                    if($found){
-                                        $data_links=[
-                                            'from'=>$purchase_order_detail->purchaseOrder->code,
-                                            'to'=>$data_good_receipt["key"],
-                                        ];  
-                                        $found_inlink = false;
-                                        foreach($data_link as $key=>$row_link){
-                                            if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                $found_inlink = true;
-                                                break;
-                                            }
-                                        }
-                                        if(!$found_inlink){
-                                            $data_link[] = $data_links;
-                                        }
-                                        
+                                    if(!$found_inlink){
+                                        $data_link[] = $data_links;
                                     }
-                                    if (!$found) {
-                                        $data_good_receipts[]=$data_good_receipt;
-                                        $data_link[]=[
-                                            'from'=>$purchase_order_detail->purchaseOrder->code,
-                                            'to'=>$data_good_receipt["key"],
-                                        ];  
-                                        $data_id_gr[]= $good_receipt_detail->goodReceipt->id;
-                                        $data_go_chart[]=$data_good_receipt; 
-                                    }
+                                    
+                                }
+                                if (!$found) {
+                                    $data_purchase_downpayment[]=$data_downp_tempura;
+                                    $data_go_chart[]=$data_downp_tempura;
+                                    $data_link[]=[
+                                        'from'=>$row_pyrd->lookable->code,
+                                        'to'=>$row_pyrd->paymentRequest->code,
+                                    ]; 
+                                    $data_id_dp[]= $row_pyrd->lookable->id;    
                                 }
                             }
-                        }
-                
-                        
-                        
-                    }//selesaiforeachdetailpo
-                }//selesai if
-                else{
-                    $data_good_receipts[]=$pr;
+                        }  
+                    }
                 }
             }
+
             $data_lcs=[];
             $data_invoices=[];
             $added = true;
+           
             while($added){
                
                 $added=false;
@@ -1984,21 +2034,5 @@ class PurchaseRequestController extends Controller
             ];
         }
         return response()->json($response);
-    }
-
-    public function approval(Request $request,$id){
-        
-        $pr = PurchaseRequest::where('code',CustomHelper::decrypt($id))->first();
-                
-        if($pr){
-            $data = [
-                'title'     => 'Print Purchase Request',
-                'data'      => $pr
-            ];
-
-            return view('admin.approval.purchase_request', $data);
-        }else{
-            abort(404);
-        }
     }
 }

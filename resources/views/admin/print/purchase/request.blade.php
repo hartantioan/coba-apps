@@ -103,7 +103,7 @@
 			body { margin: 1cm; }
 		</style>
 	</head>
-	<body onload="window.print();">
+	<body onload="window.print();window.close();">
 		<div class="invoice-box">
 			<table cellpadding="0" cellspacing="0" width="100%">
 				<tr>

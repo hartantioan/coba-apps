@@ -8,23 +8,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class Capitalization extends Model
+class CloseBill extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'capitalizations';
+    protected $table = 'close_bills';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
         'company_id',
-        'currency_id',
-        'currency_rate',
         'post_date',
         'note',
         'status',
-        'grandtotal',
         'void_id',
         'void_note',
         'void_date'
@@ -39,11 +36,6 @@ class Capitalization extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public function currency()
-    {
-        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
-    }
-
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
@@ -54,9 +46,9 @@ class Capitalization extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function capitalizationDetail()
+    public function closeBillDetail()
     {
-        return $this->hasMany('App\Models\CapitalizationDetail');
+        return $this->hasMany('App\Models\CloseBillDetail');
     }
 
     public function status(){
@@ -87,7 +79,7 @@ class Capitalization extends Model
 
     public static function generateCode()
     {
-        $query = Capitalization::selectRaw('RIGHT(code, 9) as code')
+        $query = CloseBill::selectRaw('RIGHT(code, 9) as code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();
@@ -100,13 +92,13 @@ class Capitalization extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'CAP-'.date('y').date('m').date('d').'-';
+        $pre = 'CB-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type','capitalizations')->where('lookable_id',$this->id)->first();
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
         if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{

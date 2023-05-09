@@ -613,7 +613,7 @@ class PurchaseOrderController extends Controller
                                     'purchase_order_id'             => $query->id,
                                     'purchase_request_detail_id'    => $request->arr_data ? ($request->arr_type[$key] == 'po' ? $request->arr_data[$key] : NULL) : NULL,
                                     'good_issue_detail_id'          => $request->arr_data ? ($request->arr_type[$key] == 'gi' ? $request->arr_data[$key] : NULL) : NULL,
-                                    'item_id'                       => $row,
+                                    'item_id'                       => $request->arr_type[$key] == 'gi' ? CustomHelper::addNewItemService(intval($row)) : $row,
                                     'qty'                           => $qty,
                                     'price'                         => $price,
                                     'percent_discount_1'            => $disc1,
@@ -741,7 +741,7 @@ class PurchaseOrderController extends Controller
         foreach($data->purchaseOrderDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.($row->item_id ? $row->item->name : $row->coa->name).'</td>
+                <td class="center-align">'.($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->buyUnit->code : '-').'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
@@ -753,7 +753,7 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.$row->place->name.'</td>
                 <td class="center-align">'.$row->department->name.'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
-                <td class="center-align">'.($row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : ' - ').'</td>
+                <td class="center-align">'.($row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : ($row->goodIssueDetail()->exists() ? $row->goodIssueDetail->goodIssue->code : ' - ')).'</td>
             </tr>';
         }
         

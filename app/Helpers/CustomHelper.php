@@ -1145,6 +1145,8 @@ class CustomHelper {
 	public static function addNewItemService($item_id = null){
 		$item = Item::find($item_id);
 
+		$newItem = $item;
+
 		$arrString = explode('-',$item->code);
 
 		if(count($arrString) > 0){
@@ -1162,5 +1164,7 @@ class CustomHelper {
 				}
 			}
 		}
+
+		return $newItem->id;
 	}
 }

@@ -817,6 +817,8 @@ class CustomHelper {
 				self::updateBalanceAsset($row->asset_id,$row->nominal,'OUT');
 			}
 
+		}elseif($table_name == 'work_orders'){
+
 		}else{
 
 			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){

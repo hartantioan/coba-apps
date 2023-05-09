@@ -42,7 +42,16 @@ class Region extends Model
         $arr = explode('.',$this->code);
 
         if(count($arr) == 1){
-            /* $region = Region::where()     */
+            $latestRegion = Region::selectRaw('RIGHT(code, 2) as code')->where('code','like',"$code%")->whereRaw("CHAR_LENGTH(code) = 5")->orderByDesc('code')->get();
+            if($latestRegion->count() > 0) {
+                $code = (int)$latestRegion[0]->code + 1;
+            } else {
+                $code = '01';
+            }
+    
+            $no = str_pad($code, 2, 0, STR_PAD_LEFT);
+
+            $code .= '.'.$no;
         }elseif(count($arr) == 2){
 
         }elseif(count($arr) == 3){

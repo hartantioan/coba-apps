@@ -805,6 +805,8 @@ class GoodReceiptPOController extends Controller
         $data_frs=[];
         $data_pyrs = [];
         $data_outgoingpayments = [];
+        $data_lcs=[];
+        $data_invoices=[];
        
         $data_pos = [];
         if($query) {
@@ -828,6 +830,7 @@ class GoodReceiptPOController extends Controller
                     'grandtotal'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,
                     'properties'=> [
                         ['name'=> "Tanggal :".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
+                        ['name'=> "Vendor  : ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name],
                     ],
                     'arrowDirection'=>"left",
                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($good_receipt_detail->purchaseOrderDetail->purchaseOrder->code),
@@ -919,8 +922,7 @@ class GoodReceiptPOController extends Controller
             }
 
             //pengambilan foreign branch
-            $data_lcs=[];
-            $data_invoices=[];
+            
             $added = true;
             while($added){
                
@@ -932,6 +934,7 @@ class GoodReceiptPOController extends Controller
                         $po = [
                             'properties'=> [
                                 ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
+                                ['name'=> "Vendor  : ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name],
                                 ['name'=> "Nominal : Rp.:".number_format($good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')]
                             ],
                             'key'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
@@ -1071,6 +1074,7 @@ class GoodReceiptPOController extends Controller
                                     "color"=>"lightblue",
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_po->post_date],
+                                        ['name'=> "Vendor  : ".$row_po->supplier->name],
                                         ['name'=> "Nominal : Rp.:".number_format($row_po->grandtotal,2,',','.')]
                                      ],
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->post_date),           
@@ -1186,7 +1190,7 @@ class GoodReceiptPOController extends Controller
                                     'from'=>$data_good_receipt["key"],
                                     'to'=>$query_invoice->code,
                                 ];
-                                $data_id_gr[]=$row->goodReceipt->id;   
+                               
                             }else{
                                 $found = false;
                                 foreach ($data_good_receipts as $key => $row_pos) {
@@ -1202,8 +1206,12 @@ class GoodReceiptPOController extends Controller
                                         'from'=>$data_good_receipt["key"],
                                         'to'=>$query_invoice->code,
                                     ]; 
-                                    $data_id_gr[]=$row->goodReceipt->id; 
+                                   
                                 }
+                            }
+                            if(!in_array($row->goodReceipt->id, $data_id_gr)){
+                                $data_id_gr[] = $row->goodReceipt->id; 
+                                $added = true;
                             } 
                         }
                         /* melihat apakah ada hubungan lc */
@@ -1461,6 +1469,49 @@ class GoodReceiptPOController extends Controller
                                             }
                                         }
                                     }
+                                    if($row_pyr_detail->purchaseInvoice()){
+                                        $data_invoices_tempura = [
+                                            'properties'=> [
+                                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                                ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ],
+                                            "key" => $row_pyr_detail->lookable->code,
+                                            "name" => $row_pyr_detail->lookable->code,
+                                            'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                        ];
+                                        if(count($data_invoices)<1){
+                                               
+                                            $data_go_chart[]=$data_invoices_tempura;
+                                            $data_link[]=[
+                                                'from'=>$row_pyr_detail->lookable->code,
+                                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                            ];
+                                            
+                                            $data_invoices[]=$data_invoices_tempura;
+                                        }else{
+                                            $found = false;
+                                            foreach ($data_invoices as $key => $row_invoice) {
+                                                if ($row_invoice["key"] == $data_invoices_tempura["key"]) {
+                                                    $found = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!$found) {
+                                               
+                                                $data_go_chart[]=$data_invoices_tempura;
+                                                $data_link[]=[
+                                                   'from'=>$row_pyr_detail->lookable->code,
+                                                   'to'=>$row_pyr_detail->paymentRequest->code,
+                                                ];
+                                            
+                                                $data_invoices[]=$data_invoices_tempura;
+                                            }
+                                        }
+                                        if(!in_array($row_pyr_detail->lookable->id, $data_id_invoice)){
+                                            $data_id_invoice[] = $row_pyr_detail->lookable->id;
+                                            $added=true;
+                                        }
+                                    }
 
                                 }
                             }
@@ -1633,6 +1684,49 @@ class GoodReceiptPOController extends Controller
                                         ]; 
                                         $data_id_dp[]= $row_pyr_detail->lookable->id;    
                                     }
+                                }
+                            }
+                            if($row_pyr_detail->purchaseInvoice()){
+                                $data_invoices_tempura = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pyr_detail->lookable->code,
+                                    "name" => $row_pyr_detail->lookable->code,
+                                    'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                                ];
+                                if(count($data_invoices)<1){
+                                       
+                                    $data_go_chart[]=$data_invoices_tempura;
+                                    $data_link[]=[
+                                        'from'=>$row_pyr_detail->lookable->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ];
+                                    
+                                    $data_invoices[]=$data_invoices_tempura;
+                                }else{
+                                    $found = false;
+                                    foreach ($data_invoices as $key => $row_invoice) {
+                                        if ($row_invoice["key"] == $data_invoices_tempura["key"]) {
+                                            $found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!$found) {
+                                       
+                                        $data_go_chart[]=$data_invoices_tempura;
+                                        $data_link[]=[
+                                           'from'=>$row_pyr_detail->lookable->code,
+                                           'to'=>$row_pyr_detail->paymentRequest->code,
+                                        ];
+                                    
+                                        $data_invoices[]=$data_invoices_tempura;
+                                    }
+                                }
+                                if(!in_array($row_pyr_detail->lookable->id, $data_id_invoice)){
+                                    $data_id_invoice[] = $row_pyr_detail->lookable->id;
+                                    $added=true;
                                 }
                             }
                         }
@@ -1833,6 +1927,49 @@ class GoodReceiptPOController extends Controller
                             }else{
                             }
                         }
+                        if($row_pyr_detail->purchaseInvoice()){
+                            $data_invoices_tempura = [
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row_pyr_detail->lookable->code,
+                                "name" => $row_pyr_detail->lookable->code,
+                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                            ];
+                            if(count($data_invoices)<1){
+                                   
+                                $data_go_chart[]=$data_invoices_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                ];
+                                
+                                $data_invoices[]=$data_invoices_tempura;
+                            }else{
+                                $found = false;
+                                foreach ($data_invoices as $key => $row_invoice) {
+                                    if ($row_invoice["key"] == $data_invoices_tempura["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                   
+                                    $data_go_chart[]=$data_invoices_tempura;
+                                    $data_link[]=[
+                                       'from'=>$row_pyr_detail->lookable->code,
+                                       'to'=>$row_pyr_detail->paymentRequest->code,
+                                    ];
+                                
+                                    $data_invoices[]=$data_invoices_tempura;
+                                }
+                            }
+                            if(!in_array($row_pyr_detail->lookable->id, $data_id_invoice)){
+                                $data_id_invoice[] = $row_pyr_detail->lookable->id;
+                                $added=true;
+                            }
+                        }
                     }
                     
                 }
@@ -1845,6 +1982,7 @@ class GoodReceiptPOController extends Controller
                                 "key" => $row->purchaseOrder->code,
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->purchaseOrder->post_date],
+                                    ['name'=> "Vendor  : ".$row->purchaseOrder->supplier->name],
                                     ['name'=> "Nominal : Rp.:".number_format($row->purchaseOrder->grandtotal,2,',','.')],
                                 ],
                                 'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),
@@ -1856,7 +1994,7 @@ class GoodReceiptPOController extends Controller
                                     'to'=>$query_dp->code,
                                 ];
                                 $data_pos[]=$po;
-                            
+                                
                                 $data_id_po []=$row->purchaseOrder->id; 
                                 
                             }else{
@@ -1883,7 +2021,9 @@ class GoodReceiptPOController extends Controller
                             
                             /* mendapatkan request po */
                             foreach($row->purchaseOrder->purchaseOrderDetail as $po_detail){
+
                                 if($po_detail->purchaseRequestDetail()->exists()){
+                                   
                                     $pr = [
                                         "key" => $po_detail->purchaseRequestDetail->purchaseRequest->code,
                                         'name'=> $po_detail->purchaseRequestDetail->purchaseRequest->code,
@@ -1941,8 +2081,7 @@ class GoodReceiptPOController extends Controller
                                                 'from'=>$row->purchaseOrder->code,
                                                 'to'=>$data_good_receipt["key"],
                                             ];
-                                            $data_id_gr[]=$good_receipt_detail->goodReceipt->id;
-                                            
+                                           
                                         }else{
                                             $found = false;
                                             foreach ($data_good_receipts as $key => $row_pos) {
@@ -1958,9 +2097,13 @@ class GoodReceiptPOController extends Controller
                                                     'from'=>$row->purchaseOrder->code,
                                                     'to'=>$data_good_receipt["key"],
                                                 ];
-                                                $data_id_gr[]=$good_receipt_detail->goodReceipt->id;
+                                                
                                                
                                             }
+                                        }
+                                        if(!in_array($good_receipt_detail->goodReceipt->id, $data_id_gr)){
+                                            $data_id_gr[] = $good_receipt_detail->goodReceipt->id;
+                                            $added = true;
                                         }
                     
                                     }
@@ -2146,7 +2289,7 @@ class GoodReceiptPOController extends Controller
                     }
 
                 }
-            }        
+            }     
             $response = [
                 'status'  => 200,
                 'message' => $data_go_chart,

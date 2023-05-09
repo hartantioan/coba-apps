@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class Login
+class Lock
 {
     /**
      * Handle an incoming request.
@@ -18,12 +18,10 @@ class Login
      */
     public function handle(Request $request, Closure $next)
     {
-        
-        if(session('bo_id')) {
+        if(session('bo_is_lock') !== 1) {
             return $next($request);
         } else {
-            session()->flush();
-            return redirect('/admin/login');
+            return redirect('/admin/lock');
         }
     }
 }

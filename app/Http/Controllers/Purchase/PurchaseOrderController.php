@@ -482,6 +482,22 @@ class PurchaseOrderController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+
+            $passedZero = true;
+            if($request->arr_price){
+                foreach($request->arr_price as $row){
+                    if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
+                        $passedZero = false;
+                    }
+                }
+
+                if(!$passedZero){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Harga item tidak boleh 0.'
+                    ]);
+                }
+            }
             
 			if($request->temp){
                 DB::beginTransaction();

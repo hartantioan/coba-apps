@@ -153,10 +153,6 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id"></select>
-                                <label class="active" for="account_id">Partner Bisnis</label>
-                            </div>
-                            <div class="input-field col m3 s12">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
                                         <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -165,56 +161,61 @@
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="browser-default" id="coa_source_id" name="coa_source_id"></select>
-                                <label class="active" for="account_id">Kas / Bank</label>
-                            </div>
-                            <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="pay_date" name="pay_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar">
-                                <label class="active" for="pay_date">Tgl. Bayar</label>
-                            </div>
-                            <div class="file-field input-field col m3 s12">
-                                <div class="btn">
-                                    <span>Lampiran</span>
-                                    <input type="file" name="document" id="document">
-                                </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
-                                </div>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="currency_id" name="currency_id">
-                                    @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="currency_id">Mata Uang</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                <label class="active" for="currency_rate">Konversi</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="browser-default" id="payment_request_id" name="payment_request_id" onchange="getPaymentRequest();"></select>
-                                <label class="active" for="user_bank_id">Permintaan Pembayaran (Jika Ada)</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="admin" name="admin" type="text" value="0,000" onkeyup="formatRupiah(this)">
-                                <label class="active" for="admin">Biaya Admin</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this)">
-                                <label class="active" for="grandtotal">Total Bayar (Keluar)</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="input-field col m3 s12">
-                                <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
+                            <div class="col m12 s12">
+                                <div class="col m6 s6">
+                                    <p class="mt-2 mb-2">
+                                        <h4>Fund Request / Permohonan Dana (Tipe BS)</h4>
+                                        <div class="row">
+                                            <div class="input-field col m6 s7">
+                                                <select class="browser-default" id="fund_request_id" name="fund_request_id">&nbsp;</select>
+                                            </div>
+                                            <div class="col m6 s6 mt-4">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getFnudRequest();" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Tambah
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </p>
+                                </div>
+                                <div class="col m6 s6">
+                                    <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                                </div>
+                            </div>
+                            <div class="col m12 s12">
+                                <p class="mt-2 mb-2">
+                                    <h6>Detail Fund Request / Permohonan Dana (Tipe BS)</h6>
+                                    <div style="overflow:auto;">
+                                        <table class="bordered" style="max-width:1650px !important;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">Referensi</th>
+                                                    <th class="center">Partner Bisnis</th>
+                                                    <th class="center">Tgl.Post</th>
+                                                    <th class="center">Tgl.Req.Bayar</th>
+                                                    <th class="center">Total</th>
+                                                    <th class="center">Coa</th>
+                                                    <th class="center">Nominal</th>
+                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-detail">
+                                                <tr id="empty-detail">
+                                                    <td colspan="9" class="center">
+                                                        Pilih Fund Request / Permohonan Dana untuk memulai...
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </p>
                             </div>
                             <div class="col s12 mt-3">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -260,11 +261,11 @@
     </div>
 </div>
 
-{{-- <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
     </a>
-</div> --}}
+</div>
 
 <!-- END: Page Main-->
 <script>
@@ -362,9 +363,7 @@
             }
         });
 
-        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
-        select2ServerSide('#coa_source_id', '{{ url("admin/select2/coa_cash_bank") }}');
-        select2ServerSide('#payment_request_id', '{{ url("admin/select2/payment_request") }}');
+        select2ServerSide('#fund_request_id', '{{ url("admin/select2/fund_request_bs") }}');
     });
 
     function voidStatus(id){
@@ -491,24 +490,15 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
-                { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
-                { name: 'payment_request_id', className: 'center-align' },
-                { name: 'coa_source_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'pay_date', className: 'center-align' },
-                { name: 'currency_id', className: 'center-align' },
-                { name: 'currency_rate', className: 'center-align' },
-                { name: 'admin', className: 'right-align' },
-                { name: 'grandtotal', className: 'right-align' },
-                { name: 'document', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' /* or colvis */
+                'columnsToggle'
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -540,60 +530,8 @@
         return content;
 	}
 
-    function getPaymentRequest(){
-        if($('#payment_request_id').val()){
-            $('#admin').val($('#payment_request_id').select2('data')[0].admin);
-            $('#grandtotal').val($('#payment_request_id').select2('data')[0].grandtotal);
-            $('#note').val($('#payment_request_id').select2('data')[0].code);
-            $.ajax({
-                url: '{{ Request::url() }}/send_used_data',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    id: $('#payment_request_id').val()
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    
-                    if(response.status == 500){
-                        swal({
-                            title: 'Ups!',
-                            text: response.message,
-                            icon: 'warning'
-                        });
-                        $('#payment_request_id').empty();
-                    }else{
-                        $('#list-used-data').append(`
-                            <div class="chip purple darken-4 gradient-shadow white-text">
-                                ` + response.code + `
-                                <i class="material-icons close data-used" onclick="removeUsedData(` + response.id + `)">close</i>
-                            </div>
-                        `);
-                    }
-                    
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-        }else{
-            $('#admin,#grandtotal').val('0,000');
-            $('#note').val('');
-        }
+    function getFundRequest(){
+        
     }
 
     function removeUsedData(id){
@@ -668,33 +606,9 @@
                 }else{
                     $('#modal1').modal('open');
                     $('#temp').val(id);
-                    $('#account_id').empty().append(`
-                        <option value="` + response.account_id + `">` + response.account_name + `</option>
-                    `);
-                    $('#coa_source_id').empty().append(`
-                        <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
-                    `);
                     $('#company_id').val(response.company_id).formSelect();
-                    $('#currency_id').val(response.currency_id).formSelect();
-                    $('#currency_rate').val(response.currency_rate);
                     $('#post_date').val(response.post_date);
-                    $('#pay_date').val(response.pay_date);                
                     $('#note').val(response.note);
-                    $('#admin').val(response.admin);
-                    $('#grandtotal').val(response.grandtotal);
-                    
-                    if(response.payment_request_id){
-                        $('#list-used-data').append(`
-                            <div class="chip purple darken-4 gradient-shadow white-text">
-                                ` + response.payment_request_code + `
-                                <i class="material-icons close data-used" onclick="removeUsedData(` + response.payment_request_id + `)">close</i>
-                            </div>
-                        `);
-                        $('#payment_request_id').append(`
-                            <option value="` + response.payment_request_id + `">` + response.payment_request_code + `</option>
-                        `);
-                    }
-
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
                     M.updateTextFields();

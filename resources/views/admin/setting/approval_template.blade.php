@@ -590,6 +590,14 @@
                         $(this).remove();
                     });
 
+                    $('.row_stage').each(function(){
+                        $(this).remove();
+                    });
+
+                    $('.row_menu').each(function(){
+                        $(this).remove();
+                    });
+
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#last-row-user').before(`

@@ -111,7 +111,7 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name,
-                'newcode'       => ''
+                'newcode'       => $d->getNewCode(),
             ];
         }
 

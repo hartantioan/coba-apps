@@ -131,7 +131,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>Add/Edit {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>

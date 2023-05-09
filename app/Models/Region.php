@@ -44,20 +44,41 @@ class Region extends Model
         if(count($arr) == 1){
             $latestRegion = Region::selectRaw('RIGHT(code, 2) as code')->where('code','like',"$code%")->whereRaw("CHAR_LENGTH(code) = 5")->orderByDesc('code')->get();
             if($latestRegion->count() > 0) {
-                $code = (int)$latestRegion[0]->code + 1;
+                $no = (int)$latestRegion[0]->code + 1;
             } else {
-                $code = '01';
+                $no = '01';
             }
     
-            $no = str_pad($code, 2, 0, STR_PAD_LEFT);
-
             $code .= '.'.$no;
         }elseif(count($arr) == 2){
-
+            $latestRegion = Region::selectRaw('RIGHT(code, 2) as code')->where('code','like',"$code%")->whereRaw("CHAR_LENGTH(code) = 8")->orderByDesc('code')->get();
+            if($latestRegion->count() > 0) {
+                $no = (int)$latestRegion[0]->code + 1;
+            } else {
+                $no = '01';
+            }
+    
+            $code .= '.'.$no;
         }elseif(count($arr) == 3){
+            $latestRegion = Region::selectRaw('RIGHT(code, 4) as code')->where('code','like',"$code%")->whereRaw("CHAR_LENGTH(code) = 13")->orderByDesc('code')->get();
+            if($latestRegion->count() > 0) {
+                $no = (int)$latestRegion[0]->code + 1;
+            } else {
+                $no = '2001';
+            }
 
+            $code .= '.'.$no;
         }elseif(count($arr) == 4){
+            $latestRegion = Region::selectRaw('RIGHT(code, 6) as code')->where('code','like',"$code%")->whereRaw("CHAR_LENGTH(code) = 20")->orderByDesc('code')->get();
+            if($latestRegion->count() > 0) {
+                $no = (int)$latestRegion[0]->code + 1;
+            } else {
+                $no = '200001';
+            }
 
+            $code .= '.'.$no;
         }
+
+        return $code;
     }
 }

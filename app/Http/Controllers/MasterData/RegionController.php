@@ -81,7 +81,7 @@ class RegionController extends Controller
 				
                 $response['data'][] = [
                     $val->id,
-                    $val->code,
+                    $val->code.' - '.$val->getNewCode(),
                     $val->name,
                     $val->parentRegion(),
                     '

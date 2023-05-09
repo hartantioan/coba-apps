@@ -97,7 +97,7 @@
                     <div class="col s12">
                         <div class="input-field col s6">
                             <input type="hidden" id="temp" name="temp">
-                            <select class="browser-default" id="parent_id" name="parent_id"></select>
+                            <select class="browser-default" id="parent_id" name="parent_id" onchange="getNewCode(this);"></select>
                             <label class="active" for="parent_id">Parent</label>
                         </div>
                         <div class="input-field col s6">
@@ -198,6 +198,14 @@
         $('.dt-buttons').appendTo('#datatable_buttons');
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
+
+    function getNewCode(element){
+        if($(element).val()){
+
+        }else{
+            $('#code').val('');
+        }
+    }
 
     function save(){
 			

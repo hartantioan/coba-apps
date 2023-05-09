@@ -46,17 +46,8 @@ class CloseBillController extends Controller
             'id',
             'code',
             'user_id',
-            'account_id',
             'company_id',
-            'payment_request_id',
-            'coa_source_id',
             'post_date',
-            'pay_date',
-            'currency_id',
-            'currency_rate',
-            'admin',
-            'grandtotal',
-            'document',
             'note',
         ];
 
@@ -66,28 +57,20 @@ class CloseBillController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = OutgoingPayment::count();
+        $total_data = CloseBill::count();
         
-        $query_data = OutgoingPayment::where(function($query) use ($search, $request) {
+        $query_data = CloseBill::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhere('admin', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('account',function($query) use($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('paymentRequest',function($query) use($search, $request){
-                                $query->where('code','like',"%$search%");
                             });
                     });
                 }
+
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('post_date', '>=', $request->start_date)
                         ->whereDate('post_date', '<=', $request->finish_date);
@@ -99,14 +82,6 @@ class CloseBillController extends Controller
 
                 if($request->status){
                     $query->where('status', $request->status);
-                }
-
-                if($request->account_id){
-                    $query->whereIn('account_id',$request->account_id);
-                }
-
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
                 }
 
                 if($request->company_id){
@@ -118,26 +93,18 @@ class CloseBillController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = OutgoingPayment::where(function($query) use ($search, $request) {
+        $total_filtered = CloseBill::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhere('admin', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('account',function($query) use($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('paymentRequest',function($query) use($search, $request){
-                                $query->where('code','like',"%$search%");
                             });
                     });
                 }
+
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('post_date', '>=', $request->start_date)
                         ->whereDate('post_date', '<=', $request->finish_date);
@@ -149,14 +116,6 @@ class CloseBillController extends Controller
 
                 if($request->status){
                     $query->where('status', $request->status);
-                }
-
-                if($request->account_id){
-                    $query->whereIn('account_id',$request->account_id);
-                }
-
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
                 }
 
                 if($request->company_id){

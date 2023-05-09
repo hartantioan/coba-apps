@@ -346,7 +346,7 @@
                                                     <i class="material-icons left">add</i> Purchase Request
                                                 </a>
                                             </div>
-                                        </div>
+                                        </div> 
                                     </p>
                                 </div>
                                 <div class="col m4 s4">

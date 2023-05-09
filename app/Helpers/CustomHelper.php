@@ -819,6 +819,8 @@ class CustomHelper {
 
 		}elseif($table_name == 'work_orders'){
 
+		}elseif($table_name == 'request_spareparts'){
+
 		}else{
 
 			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){

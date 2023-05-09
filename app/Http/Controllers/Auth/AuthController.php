@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Redirect;
 
 class AuthController extends Controller
 {
@@ -37,7 +38,8 @@ class AuthController extends Controller
                     'bo_company_id'     => $user->company_id,
                     'bo_place_id'       => $user->place_id,
                     'bo_department_id'  => $user->department_id,
-                    'bo_position_id'    => $user->position_id
+                    'bo_position_id'    => $user->position_id,
+                    'bo_is_lock'        => 0,
                 ]);
                 
                 $response = [
@@ -64,6 +66,35 @@ class AuthController extends Controller
     public function logout(){
         session()->flush();
         return redirect('admin/login');
+    }
+    public function enable(){
+        session([
+            'bo_is_lock' => 1,
+            'bo_last_url' => url()->previous(),
+        ]);
+        
+        return redirect('admin/lock');
+    }
+
+    public function disable(){
+        session([
+            'bo_is_lock' => 0,
+        ]);
+        $response = [
+            'status' => 200,
+            'url'  => session('bo_last_url')
+        ];
+        return $response;
+    }
+    
+    public function lock(){
+        $data = [
+            'title'     => 'Profil Pengguna',
+            'content'   => 'admin.personal.profile',
+            'data'      => User::find(session('bo_id')),
+            
+        ];
+        return view('admin.personal.lock', ['data' => $data]);
     }
 
     public function index()

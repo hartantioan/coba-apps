@@ -356,10 +356,6 @@ class UserController extends Controller
                                 <th>'.$data->top_internal.' hari</th>
                             </tr>
                             <tr>
-                                <th>Toleransi Qty Barang Diterima (%)</th>
-                                <th>'.$data->tolerance_gr.' %</th>
-                            </tr>
-                            <tr>
                                 <th>Daftar Rekening</th>
                                 <th>'.implode('<br>',$banks).'</th>
                             </tr>
@@ -486,7 +482,6 @@ class UserController extends Controller
                     $query->limit_credit    = $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : NULL;
                     $query->top             = $request->top;
                     $query->top_internal    = $request->top_internal;
-                    $query->tolerance_gr    = $request->tolerance_gr;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->gender          = $request->gender;
                     $query->married_status  = $request->type == '1' ? $request->married_status :NULL;
@@ -532,7 +527,6 @@ class UserController extends Controller
                         'limit_credit'  => $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : NULL,
                         'top'           => $request->top,
                         'top_internal'  => $request->top_internal,
-                        'tolerance_gr'  => $request->tolerance_gr,
                         'status'        => $request->status ? $request->status : '2',
                         'gender'        => $request->gender,
                         'married_status'=> $request->type == '1' ? $request->married_status :NULL,

@@ -195,7 +195,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit {{ $title }}</h4>
+                <h4>Tambah/Edit {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -205,7 +205,7 @@
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="good_receipt_id" name="good_receipt_id" onchange="getGoodReceipt(this.value)"></select>
-                                <label class="active" for="good_receipt_id">Penerimaan PO / Good Receipt</label>
+                                <label class="active" for="good_receipt_id">Penerimaan PO / Goods Receipt</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="browser-default" id="vendor_id" name="vendor_id"></select>

@@ -17,7 +17,7 @@ use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
 use App\Models\InventoryTransfer;
 use App\Models\Item;
-use App\Models\ItemWarehouse;
+use App\Models\ItemGroupWarehouse;
 use App\Models\OutgoingPayment;
 use App\Models\Place;
 use App\Models\PurchaseInvoice;
@@ -1155,13 +1155,6 @@ class CustomHelper {
 				$newItem = $item->replicate();
 				$newItem->code = $item->code.'-SVC';
 				$newItem->save();
-
-				foreach($item->itemWarehouse as $row){
-					ItemWarehouse::create([
-						'item_id'		=> $newItem->id,
-						'warehouse_id'	=> $row->warehouse_id,
-					]);
-				}
 			}
 		}
 

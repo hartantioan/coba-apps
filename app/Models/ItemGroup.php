@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Psy\CodeCleaner\ImplicitReturnPass;
 
 class ItemGroup extends Model
 {
@@ -22,6 +23,19 @@ class ItemGroup extends Model
         'warehouse_id',
         'status'
     ];
+
+    public function itemGroupWarehouse(){
+        return $this->hasMany('App\Models\ItemGroupWarehouse');
+    }
+
+    public function listWarehouse(){
+        $arr = [];
+        foreach($this->itemGroupWarehouse as $row){
+            $arr[] = $row->warehouse->name;
+        }
+
+        return implode(',',$arr);
+    }
 
     public function parentSub(){
         return $this->belongsTo('App\Models\ItemGroup', 'parent_id', 'id')->withTrashed();

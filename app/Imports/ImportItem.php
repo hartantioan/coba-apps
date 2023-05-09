@@ -6,7 +6,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\Item;
-use App\Models\ItemWarehouse;
 
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -31,6 +30,7 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
             'buy_convert' => $row['buy_convert'],
             'sell_unit' => $row['sell_unit'],
             'sell_convert' => $row['sell_convert'],
+            'tolerance_gr' => $row['tolerance_gr'],
             'is_inventory_item' => $row['is_inventory_item'],
             'is_sales_item' => $row['is_sales_item'],
             'is_purchase_item' => $row['is_purchase_item'],
@@ -38,16 +38,6 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
             'note' => $row['note'],
             'status' => $row['status']
         ]);
-
-        if($row['warehouse'] && $query){
-            $arrWarehouse = explode(',',$row['warehouse']);
-            foreach($arrWarehouse as $rowwr){
-                ItemWarehouse::create([
-                    'item_id'       => $query->id,
-                    'warehouse_id'  => intval($rowwr),
-                ]);
-            }
-        }
     }
 
     public function rules(): array
@@ -61,6 +51,7 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithValidation, WithBatch
             '*.buy_convert' => 'required|numeric',
             '*.sell_unit' => 'required',
             '*.sell_convert' => 'required|numeric',
+            '*.tolerance_gr' => 'required|numeric',
             '*.is_inventory_item' => 'nullable',
             '*.is_sales_item' => 'nullable',
             '*.is_purchase_item' => 'nullable',

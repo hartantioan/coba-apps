@@ -49,7 +49,6 @@ class User extends Authenticatable
         'limit_credit',
         'top',
         'top_internal',
-        'tolerance_gr',
         'gender',
         'married_status',
         'married_date',

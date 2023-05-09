@@ -24,6 +24,7 @@ return new class extends Migration
             $table->double('buy_convert')->nullable();
             $table->string('sell_unit', 50)->nullable();
             $table->double('sell_convert')->nullable();
+            $table->double('tolerance_gr')->nullable();
             $table->char('is_inventory_item', 1)->nullable();
             $table->char('is_sales_item', 1)->nullable();
             $table->char('is_purchase_item', 1)->nullable();

@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('item_warehouses', function (Blueprint $table) {
+        Schema::create('item_group_warehouses', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('item_id')->nullable();
+            $table->bigInteger('item_group_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('item_warehouses');
+        Schema::dropIfExists('item_group_warehouses');
     }
 };

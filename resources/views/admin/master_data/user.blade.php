@@ -121,7 +121,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit {{ $title }}</h4>
+                <h4>Tambah/Edit {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -261,10 +261,6 @@
                             <input id="top_internal" name="top_internal" type="number" min="0" step="1" value="0">
                             <label class="active" for="top_internal">TOP Internal</label>
                         </div>
-                        <div class="input-field col s3 other_inputs" style="display:none;">
-                            <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
-                            <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
-                        </div>
                         <div class="input-field col s3">
                             <select class="browser-default" id="province_id" name="province_id"></select>
                             <label class="active" for="province_id">Provinsi</label>
@@ -364,7 +360,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit Lampiran Pengguna</h4>
+                <h4>Tambah/Edit Lampiran Pengguna</h4>
                 <div class="card-alert card green">
                     <div class="card-content white-text">
                         <p>Maksimal ukuran adalah 1 Mb, dengan jumlah 5.</p>
@@ -423,7 +419,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit Hak Akses - <span id="tempname"></span></h4>
+                <h4>Tambah/Edit Hak Akses - <span id="tempname"></span></h4>
                 <form class="row" id="form_data_access" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert_access" style="display:none;"></div>
@@ -1505,7 +1501,6 @@
                     $('#limit_credit').val(response.limit_credit);
                     $('#top').val(response.top);
                     $('#top_internal').val(response.top_internal);
-                    $('#tolerance_gr').val(response.tolerance_gr);
                 }
 
                 $('.row_bank').remove();

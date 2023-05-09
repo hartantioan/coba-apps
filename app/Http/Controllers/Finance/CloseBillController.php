@@ -133,22 +133,16 @@ class CloseBillController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->account->name,
                     $val->company->name,
-                    $val->paymentRequest()->exists() ? $val->paymentRequest->code : '-',
-                    $val->coaSource->name,
                     date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->pay_date)),
-                    $val->currency->code,
-                    number_format($val->currency_rate,2,',','.'),
-                    number_format($val->admin,3,',','.'),
-                    number_format($val->grandtotal,3,',','.'),
-                    '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->note,
                     $val->status(),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
 
@@ -296,9 +290,9 @@ class CloseBillController extends Controller
         $validation = Validator::make($request->all(), [
             'company_id'            => 'required',
             'post_date'             => 'required',
-            'arr_fund_request'      => 'request|array',
-            'arr_coa'               => 'request|array',
-            'arr_nominal'           => 'request|array',
+            'arr_fund_request'      => 'required|array',
+            'arr_coa'               => 'required|array',
+            'arr_nominal'           => 'required|array',
 		], [
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
@@ -375,6 +369,20 @@ class CloseBillController extends Controller
 			}
 			
 			if($query) {
+
+                if($request->arr_fund_request){
+                    foreach($request->arr_fund_request as $key => $row){
+                        $fr = FundRequest::where('code',CustomHelper::decrypt($row))->first();
+                        CloseBillDetail::create([
+                            'close_bill_id'         => $query->id,
+                            'fund_request_id'       => $fr->id,
+                            'coa_id'                => $request->arr_coa[$key],
+                            'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                            'note'                  => $request->arr_note[$key],
+                        ]);
+                        CustomHelper::removeUsedData('fund_requests',$fr->id);
+                    }
+                }
 
                 CustomHelper::sendApproval('close_bills',$query->id,$query->note);
                 CustomHelper::sendNotification('close_bills',$query->id,'Penutupan BS / Close Bill No. '.$query->code,$query->note,session('bo_id'));

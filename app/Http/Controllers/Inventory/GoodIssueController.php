@@ -539,7 +539,7 @@ class GoodIssueController extends Controller
                 
         if($gr){
             $data = [
-                'title'     => 'Print Good Receive (Barang Keluar)',
+                'title'     => 'Print Goods Receive (Barang Keluar)',
                 'data'      => $gr
             ];
 

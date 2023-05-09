@@ -7,20 +7,20 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class ItemWarehouse extends Model
+class ItemGroupWarehouse extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'item_warehouses';
+    protected $table = 'item_group_warehouses';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
-        'item_id',
+        'item_group_id',
         'warehouse_id',
     ];
 
     public function item(){
-        return $this->belongsTo('App\Models\Item')->withTrashed();
+        return $this->belongsTo('App\Models\ItemGroup')->withTrashed();
     }
 
     public function warehouse(){

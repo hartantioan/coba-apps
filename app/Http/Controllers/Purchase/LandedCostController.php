@@ -54,7 +54,7 @@ class LandedCostController extends Controller
         
         if($data->used()->exists()){
             $data['status'] = '500';
-            $data['message'] = 'Good Receipt '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+            $data['message'] = 'Goods Receipt '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
             CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
 
@@ -308,7 +308,7 @@ class LandedCostController extends Controller
             'arr_price'                 => 'required|array',
             'arr_qty'                   => 'required|array'
 		], [
-			'good_receipt_id.required' 			=> 'Good receipt tidak boleh kosong.',
+			'good_receipt_id.required' 			=> 'Goods receipt tidak boleh kosong.',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
 			'vendor_id.required'                => 'Vendor/ekspedisi tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',

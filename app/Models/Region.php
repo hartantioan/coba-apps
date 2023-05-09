@@ -35,4 +35,20 @@ class Region extends Model
 
         return $text;
     }
+
+    public function getNewCode(){
+        $code = $this->code;
+
+        $arr = explode('.',$this->code);
+
+        if(count($arr) == 1){
+            /* $region = Region::where()     */
+        }elseif(count($arr) == 2){
+
+        }elseif(count($arr) == 3){
+
+        }elseif(count($arr) == 4){
+
+        }
+    }
 }

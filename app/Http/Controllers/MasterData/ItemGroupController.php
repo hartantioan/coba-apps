@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Exports\ExportItemGroup;
+use App\Models\ItemGroupWarehouse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -92,7 +93,7 @@ class ItemGroupController extends Controller
                     $val->name,
                     $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
                     $val->coa->name,
-                    $val->warehouse_id ? $val->warehouse->code.' - '.$val->warehouse->name : '-',
+                    $val->listWarehouse(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -144,9 +145,11 @@ class ItemGroupController extends Controller
                     $query->name        = $request->name;
                     $query->parent_id   = $request->parent_id ? $request->parent_id : NULL;
                     $query->coa_id      = $request->coa_id;
-                    $query->warehouse_id= $request->warehouse_id;
                     $query->status      = $request->status ? $request->status : '2';
                     $query->save();
+
+                    $query->itemGroupWarehouse()->delete();
+
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
@@ -159,7 +162,6 @@ class ItemGroupController extends Controller
                         'name'			=> $request->name,
                         'parent_id'     => $request->parent_id ? $request->parent_id : NULL,
                         'coa_id'        => $request->coa_id,
-                        'warehouse_id'  => $request->warehouse_id,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
@@ -187,6 +189,13 @@ class ItemGroupController extends Controller
                     }
                 }
 
+                foreach($request->warehouse_id as $row){
+                    ItemGroupWarehouse::create([
+                        'item_group_id' => $query->id,
+                        'warehouse_id'  => intval($row)
+                    ]);
+                }
+
                 activity()
                     ->performedOn(new ItemGroup())
                     ->causedBy(session('bo_id'))
@@ -211,6 +220,13 @@ class ItemGroupController extends Controller
 
     public function show(Request $request){
         $itemgroup = ItemGroup::find($request->id);
+        $arrWarehouse = [];
+
+        foreach($itemgroup->itemGroupWarehouse as $row){
+            $arrWarehouse[] = $row->warehouse_id;
+        }
+
+        $itemgroup['warehouses'] = $arrWarehouse;
         				
 		return response()->json($itemgroup);
     }

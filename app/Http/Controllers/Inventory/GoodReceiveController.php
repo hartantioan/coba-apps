@@ -541,7 +541,7 @@ class GoodReceiveController extends Controller
                 
         if($gr){
             $data = [
-                'title'     => 'Print Good Receive (Barang Masuk)',
+                'title'     => 'Print Goods Receive (Barang Masuk)',
                 'data'      => $gr
             ];
 

@@ -315,7 +315,7 @@ class PurchaseOrderController extends Controller
                 $data['message'] = 'Purchase Request '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
             }elseif($request->type == 'gi'){
                 $data['status'] = '500';
-                $data['message'] = 'Good Issue / Barang Keluar '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+                $data['message'] = 'Goods Issue / Barang Keluar '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
             }
         }else{
             $passed = true;
@@ -886,7 +886,7 @@ class PurchaseOrderController extends Controller
             }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data telah digunakan pada Good Receipt PO.'
+                    'message' => 'Data telah digunakan pada Goods Receipt PO.'
                 ];
             }else{
                 $query->update([

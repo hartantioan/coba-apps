@@ -12,7 +12,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Item;
-use App\Models\ItemWarehouse;
 use App\Models\Unit;
 use App\Models\ItemGroup;
 use App\Models\Warehouse;
@@ -170,6 +169,7 @@ class ItemController extends Controller
             'sell_unit'         => 'required',
             'sell_convert'      => 'required',
             'warehouse_id'      => 'required',
+            'tolerance_gr'      => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah dipakai',
@@ -181,6 +181,7 @@ class ItemController extends Controller
             'sell_unit.required'        => 'Satuan jual tidak boleh kosong.',
             'sell_convert.required'     => 'Satuan konversi jual ke stok tidak boleh kosong.',
             'warehouse_id.required'     => 'Gudang tidak boleh kosong.',
+            'tolerance_gr.required'     => 'Toleransi penerimaan barang tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -201,14 +202,13 @@ class ItemController extends Controller
                     $query->buy_convert         = str_replace(',','.',str_replace('.','',$request->buy_convert));
                     $query->sell_unit           = $request->sell_unit;
                     $query->sell_convert        = str_replace(',','.',str_replace('.','',$request->sell_convert));
+                    $query->tolerance_gr        = str_replace(',','.',str_replace('.','',$request->tolerance_gr));
                     $query->is_inventory_item   = $request->is_inventory_item ? $request->is_inventory_item : NULL;
                     $query->is_sales_item       = $request->is_sales_item ? $request->is_sales_item : NULL;
                     $query->is_purchase_item    = $request->is_purchase_item ? $request->is_purchase_item : NULL;
                     $query->is_service          = $request->is_service ? $request->is_service : NULL;
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
-
-                    $query->itemWarehouse()->delete();
 
                     DB::commit();
                 }catch(\Exception $e){
@@ -226,6 +226,7 @@ class ItemController extends Controller
                         'buy_convert'       => str_replace(',','.',str_replace('.','',$request->buy_convert)),
                         'sell_unit'         => $request->sell_unit,
                         'sell_convert'      => str_replace(',','.',str_replace('.','',$request->sell_convert)),
+                        'tolerance_gr'      => str_replace(',','.',str_replace('.','',$request->tolerance_gr)),
                         'is_inventory_item' => $request->is_inventory_item ? $request->is_inventory_item : NULL,
                         'is_sales_item'     => $request->is_sales_item ? $request->is_sales_item : NULL,
                         'is_purchase_item'  => $request->is_purchase_item ? $request->is_purchase_item : NULL,
@@ -239,13 +240,6 @@ class ItemController extends Controller
 			}
 			
 			if($query) {
-
-                foreach($request->warehouse_id as $row){
-                    ItemWarehouse::create([
-                        'item_id'       => $query->id,
-                        'warehouse_id'  => intval($row)
-                    ]);
-                }
 
                 activity()
                     ->performedOn(new Item())
@@ -314,6 +308,10 @@ class ItemController extends Controller
                                 <th>Keterangan</th>
                                 <th>'.$data->note.'</th>
                             </tr>
+                            <tr>
+                                <th>Toleransi Penerimaan Barang Lebih (%)</th>
+                                <th>'.number_format($data->tolerance_gr,2,',','.').'</th>
+                            </tr>
                         </thead>
                     </table>';
 		
@@ -324,14 +322,7 @@ class ItemController extends Controller
         $item = Item::find($request->id);
         $item['buy_convert'] = number_format($item->buy_convert,3,',','.');
         $item['sell_convert'] = number_format($item->sell_convert,3,',','.');
-
-        $arrWarehouse = [];
-
-        foreach($item->itemWarehouse as $row){
-            $arrWarehouse[] = $row->warehouse_id;
-        }
-
-        $item['warehouses'] = $arrWarehouse;
+        $item['tolerance_gr'] = number_format($item->tolerance_gr,2,',','.');
         				
 		return response()->json($item);
     }

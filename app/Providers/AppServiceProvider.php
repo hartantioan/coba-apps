@@ -46,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
             'work_orders'               => 'App\Models\WorkOrder',
             'request_spareparts'        => 'App\Models\RequestSparepart',
             'depreciations'             => 'App\Models\Depreciation',
+            'close_bills'               => 'App\Models\CloseBill',
         ]);
     }
 }

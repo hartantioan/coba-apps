@@ -61,7 +61,7 @@ table.bordered th {
                                         </div>
                                         <div class="card-alert card purple lighten-5">
                                             <div class="card-content purple-text">
-                                                <p>INFO 2 : Khusus untuk pembelian item barang (Good Receipt) dan Landed Cost untuk stok, maka jurnal nominal sebelum ppn pada debit akan diisi dengan masing-masing coa pada kelompok item barang tersebut.</p>
+                                                <p>INFO 2 : Khusus untuk pembelian item barang (Goods Receipt) dan Landed Cost untuk stok, maka jurnal nominal sebelum ppn pada debit akan diisi dengan masing-masing coa pada kelompok item barang tersebut.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -106,7 +106,7 @@ table.bordered th {
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit Coa Menu - <b><i><span id="title_coa_menu"></span></i></b></h4>
+                <h4>Tambah/Edit Coa Menu - <b><i><span id="title_coa_menu"></span></i></b></h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>

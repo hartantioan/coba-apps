@@ -226,7 +226,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit {{ $title }}</h4>
+                <h4>Tambah/Edit {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -351,15 +351,15 @@
                                 </div>
                                 <div class="col m4 s4">
                                     <p class="mt-2 mb-2">
-                                        <h5>Good Issue / Barang Keluar</h5>
+                                        <h5>Goods Issue / Barang Keluar</h5>
                                         <div class="row">
                                             <div class="input-field col m12 s12">
                                                 <select class="browser-default" id="good_issue_id" name="good_issue_id"></select>
-                                                <label class="active" for="good_issue_id">Good Issue / Barang Keluar (Jika ada)</label>
+                                                <label class="active" for="good_issue_id">Goods Issue / Barang Keluar (Jika ada)</label>
                                             </div>
                                             <div class="col m12 12">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getDetails('gi');" href="javascript:void(0);">
-                                                    <i class="material-icons left">add</i> Good Issue
+                                                    <i class="material-icons left">add</i> Goods Issue
                                                 </a>
                                             </div>
                                         </div>

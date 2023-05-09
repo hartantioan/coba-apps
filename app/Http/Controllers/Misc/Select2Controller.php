@@ -105,7 +105,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = Region::where('name', 'like', "%$search%")->get();
+        $data = Region::where('name', 'like', "%$search%")->orWhere('code','like',"%$search%")->get();
 
         foreach($data as $d) {
             $response[] = [

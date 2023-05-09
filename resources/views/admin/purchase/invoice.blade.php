@@ -184,7 +184,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit {{ $title }}</h4>
+                <h4>Tambah/Edit {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -262,7 +262,7 @@
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h6>Detail Good Receipt PO / Landed Cost / Purchase Order Jasa</h6>
+                                    <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered" style="width:1600px !important;">
                                             <thead>

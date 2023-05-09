@@ -23,6 +23,7 @@ class Item extends Model
         'buy_convert',
         'sell_unit',
         'sell_convert',
+        'tolerance_gr',
         'is_inventory_item',
         'is_sales_item',
         'is_purchase_item',
@@ -33,10 +34,6 @@ class Item extends Model
 
     public function itemGroup(){
         return $this->belongsTo('App\Models\ItemGroup', 'item_group_id', 'id')->withTrashed();
-    }
-
-    public function itemWarehouse(){
-        return $this->hasMany('App\Models\ItemWarehouse');
     }
 
     public function warehouses(){

@@ -90,7 +90,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit Group Item</h4>
+                <h4>Tambah/Edit Group Item</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -133,13 +133,12 @@
                             <label class="active" for="coa_id">Coa</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="select2 browser-default" id="warehouse_id" name="warehouse_id">
-                                <option value="">-- Tidak ada --</option>
-                                @foreach($warehouse as $w)
-                                    <option value="{{ $w->id }}">{{ $w->code.' - '.$w->name }}</option>
+                            <select class="select2 browser-default" multiple="multiple" id="warehouse_id" name="warehouse_id[]">
+                                @foreach ($warehouse as $row)
+                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="active" for="warehouse_id">Gudang Penempatan</label>
+                            <label class="active" for="warehouse_id">Gudang</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -360,7 +359,7 @@
                 $('#name').val(response.name);
                 $('#parent_id').val(response.parent_id).trigger('change');
                 $('#coa_id').val(response.coa_id).trigger('change');
-                $('#warehouse_id').val(response.warehouse_id).trigger('change');
+                $('#warehouse_id').val(response.warehouses).trigger('change');
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

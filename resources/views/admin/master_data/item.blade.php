@@ -153,7 +153,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Add/Edit Item</h4>
+                <h4>Tambah/Edit Item</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -224,6 +224,10 @@
                                     Active
                                 </label>
                             </div>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
+                            <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
                         </div>
                         <div class="col s12">
                             <div class="col s4">
@@ -302,14 +306,6 @@
                                     Ya
                                 </label>
                             </div>
-                        </div>
-                        <div class="input-field col s6">
-                            <select class="select2 browser-default" multiple="multiple" id="warehouse_id" name="warehouse_id[]">
-                                @foreach ($warehouse as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="active" for="warehouse_id">Gudang</label>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -495,7 +491,7 @@
             }
         });
 
-        $("#item_group_id,#warehouse_id").select2({
+        $("#item_group_id").select2({
             dropdownAutoWidth: true,
             width: '100%',
         });
@@ -695,6 +691,7 @@
                 $('#sell_unit').val(response.sell_unit).formSelect();
                 $('#sell_convert').val(response.sell_convert);
                 $('#warehouse_id').val(response.warehouses).trigger('change');
+                $('#tolerance_gr').val(response.tolerance_gr);
 
                 if(response.is_inventory_item == '1'){
                     $('#is_inventory_item').prop( "checked", true);

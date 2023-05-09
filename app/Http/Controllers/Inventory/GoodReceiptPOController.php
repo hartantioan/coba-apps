@@ -202,7 +202,7 @@ class GoodReceiptPOController extends Controller
             $data['message'] = 'Purchase Order '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
             if($data->hasBalance()){
-                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Receipt');
+                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Goods Receipt');
                 $details = [];
                 foreach($data->purchaseOrderDetail as $row){
                     $details[] = [
@@ -238,7 +238,7 @@ class GoodReceiptPOController extends Controller
         foreach($rows as $data){
             if(!$data->used()->exists()){
                 if($data->hasBalance()){
-                    CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Receipt');
+                    CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Goods Receipt');
                     $details = [];
 
                     foreach($data->purchaseOrderDetail as $row){
@@ -314,7 +314,7 @@ class GoodReceiptPOController extends Controller
 
                 if($pod){
 
-                    $tolerance_gr = User::find($request->account_id)->tolerance_gr;
+                    $tolerance_gr = $pod->item->tolerance_gr;
 
                     if($tolerance_gr){
                         $balance = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) - $pod->qty;
@@ -608,7 +608,7 @@ class GoodReceiptPOController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Print Good Receipt (Penerimaan Barang)',
+                'title'     => 'Print Goods Receipt (Penerimaan Barang)',
                 'data'      => $pr
             ];
 
@@ -670,7 +670,7 @@ class GoodReceiptPOController extends Controller
 
                 CustomHelper::removeJournal('good_receipts',$query->id);
                 CustomHelper::removeCogs('good_receipts',$query->id);
-                CustomHelper::sendNotification('good_receipts',$query->id,'Good Receipt No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification('good_receipts',$query->id,'Goods Receipt No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('good_receipts',$query->id);
     
                 activity()

@@ -145,7 +145,7 @@
                     <li class="tab col m6"><a href="#inputMulti">Input Multi Data</a></li>
                 </ul>
                 <div id="inputOne" class="col s12 active">
-                    <h4 class="mt-2">Add/Edit Satu {{ $title }}</h4>
+                    <h4 class="mt-2">Tambah/Edit Satu {{ $title }}</h4>
                     <form class="row" id="form_data" onsubmit="return false;">
                         <div class="col s12">
                             <div id="validation_alert" style="display:none;"></div>
@@ -226,7 +226,7 @@
                     </form>
                 </div>
                 <div id="inputMulti" class="col s12">
-                    <h4 class="mt-2">Add/Edit Multi {{ $title }}</h4>
+                    <h4 class="mt-2">Tambah/Edit Multi {{ $title }}</h4>
                     <form class="row" id="form_data_multi" onsubmit="return false;">
                         <div class="col s12">
                             <div id="validation_alert_multi" style="display:none;"></div>

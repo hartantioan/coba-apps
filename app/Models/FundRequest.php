@@ -105,13 +105,31 @@ class FundRequest extends Model
     }
 
     public function balanceCloseBill(){
-        $total = $this->grandtotal;
+        $total = floatval($this->grandtotal);
 
         foreach($this->closeBillDetail as $row){
             $total -= $row->nominal;
         }
 
         return $total;
+    }
+
+    public function getCoaPaymentRequestAll(){
+        $arr_coa = [];
+
+        foreach($this->hasPaymentRequestDetail as $row){
+            $arr_coa[] = $row->coa->code.' - '.$row->coa->name;
+        }
+
+        return implode(',',$arr_coa);
+    }
+
+    public function getCoaPaymentRequestOne(){
+        $coa_id = 0;
+        foreach($this->hasPaymentRequestDetail as $row){
+            $coa_id = $row->coa_id;
+        }
+        return $coa_id;
     }
 
     public function type(){

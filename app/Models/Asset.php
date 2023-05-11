@@ -23,7 +23,6 @@ class Asset extends Model
         'date',
         'nominal',
         'method',
-        'cost_coa_id',
         'note',
         'status',
         'book_balance',
@@ -61,11 +60,6 @@ class Asset extends Model
     public function assetGroup()
     {
         return $this->belongsTo('App\Models\AssetGroup', 'asset_group_id', 'id')->withTrashed();
-    }
-
-    public function costCoa()
-    {
-        return $this->belongsTo('App\Models\Coa', 'cost_coa_id', 'id')->withTrashed();
     }
 
     public function depreciationDetail(){

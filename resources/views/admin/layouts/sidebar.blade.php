@@ -27,7 +27,7 @@
                             <i class="material-icons">{{ $m->icon }}</i>
                             <span class="menu-title" data-i18n="{{ $m->name }}">{{ $m->name }}</span>
                             @if($m->is_maintenance)
-                                <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Under construction" style="height:30px !important;margin-top: 7px;">
+                                <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height:30px !important;margin-top: 7px;">
                                     <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
                                 </span>
                             @endif
@@ -41,7 +41,7 @@
                                                 <i class="material-icons">{{ $msub->icon }}</i>
                                                 <span class="menu-title" data-i18n="{{ $msub->name }}">{{ $msub->name }}</span>
                                                 @if($msub->is_maintenance)
-                                                    <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Under construction" style="height:30px !important;margin-top: 7px;">
+                                                    <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height:30px !important;margin-top: 7px;">
                                                         <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
                                                     </span>
                                                 @endif
@@ -57,7 +57,7 @@
                                                                     <i class="material-icons">{{ $msub2->icon }}</i>
                                                                     <span data-i18n="{{ $msub2->name }}">{{ $msub2->name }}</span>
                                                                     @if($msub2->is_maintenance)
-                                                                        <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Under construction" style="height:30px !important;margin-top: 7px;">
+                                                                        <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height:30px !important;margin-top: 7px;">
                                                                             <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
                                                                         </span>
                                                                     @endif
@@ -74,7 +74,7 @@
                                                 <i class="material-icons">{{ $msub->icon }}</i>
                                                 <span data-i18n="{{ $msub->name }}">{{ $msub->name }}</span>
                                                 @if($msub->is_maintenance)
-                                                    <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Under construction" style="height:30px !important;margin-top: 7px;">
+                                                    <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height:30px !important;margin-top: 7px;">
                                                         <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
                                                     </span>
                                                 @endif
@@ -91,7 +91,7 @@
                             <i class="material-icons">{{ $m->icon }}</i>
                             <span data-i18n="{{ $m->name }}">{{ $m->name }}</span>
                             @if($m->is_maintenance)
-                                <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Under construction" style="height:30px !important;margin-top: 7px;">
+                                <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height:30px !important;margin-top: 7px;">
                                     <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
                                 </span>
                             @endif

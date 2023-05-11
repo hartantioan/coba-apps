@@ -21,10 +21,13 @@ return new class extends Migration
             $table->bigInteger('parent_id')->nullable();
             $table->bigInteger('coa_id')->nullable();
             $table->bigInteger('depreciation_coa_id')->nullable();
+            $table->bigInteger('cost_coa_id')->nullable();
             $table->integer('depreciation_period')->nullable();
             $table->char('status', 1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['parent_id', 'coa_id', 'depreciation_coa_id', 'cost_coa_id']);
         });
     }
 

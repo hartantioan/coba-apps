@@ -72,6 +72,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
+                                                        <th>Pegawai</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
                                                         <th>Keterangan</th>
@@ -103,11 +104,18 @@
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
+                    <div class="col s12 center-align">
+                        <i>Info : Untuk satu karyawan tidak bisa memiliki kota sama di keresidenan yang berbeda milik karyawan tersebut.</i>
+                    </div>
                     <div class="col s12">
                         <div class="input-field col s6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="browser-default" id="employee_id" name="employee_id"></select>
+                            <label class="active" for="employee_id">Karyawan</label>
                         </div>
                         <div class="input-field col s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
@@ -216,6 +224,8 @@
         $('#body-region').on('click', '.delete-data-region', function() {
             $(this).closest('tr').remove();
         });
+
+        select2ServerSide('#employee_id', '{{ url("admin/select2/employee") }}');
     });
 
     function rowDetail(data) {
@@ -292,6 +302,7 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'employee', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
@@ -300,7 +311,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' /* or colvis */
+                'columnsToggle' 
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -411,6 +422,9 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#employee_id').empty().append(`
+                    <option value="` + response.employee_id + `">` + response.employee_name + `</option>
+                `);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
                 $('#note').val(response.note);

@@ -72,7 +72,6 @@
                                                         <th>Nominal</th>
                                                         <th>Saldo Buku</th>
                                                         <th>Metode</th>
-                                                        <th>Coa Biaya</th>
                                                         <th>Keterangan</th>
                                                         <th>Status</th>
                                                         <th>Site</th>
@@ -171,10 +170,6 @@
                                 <option value="2">Declining Balance</option>
                             </select>
                             <label class="" for="method">Metode Hitung</label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <select class="browser-default" id="cost_coa_id" name="cost_coa_id"></select>
-                            <label class="active" for="cost_coa_id">Coa Biaya</label>
                         </div>
                         <div class="input-field col m4 s6">
                             <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. kapitalisasi" readonly>
@@ -395,7 +390,7 @@
         });
 
         $('#place_id').val("{{ session('bo_place_id') }}").formSelect();
-        select2ServerSide('#cost_coa_id', '{{ url("admin/select2/coa") }}');
+        
         $("#asset_group_id").select2({
             dropdownAutoWidth: true,
             width: '100%',
@@ -442,7 +437,6 @@
                 { name: 'nominal', className: 'center-align' },
                 { name: 'book_balance', className: 'center-align' },
                 { name: 'method', className: 'center-align' },
-                { name: 'coa_cost', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place', searchable: false, orderable: false, className: 'center-align' },
@@ -450,7 +444,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' /* or colvis */
+                'columnsToggle' 
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -562,10 +556,6 @@
                 $('#date').val(response.date);
                 $('#nominal').val(response.nominal);
                 $('#method').val(response.method).formSelect();
-                $('#cost_coa_id').empty();
-                $('#cost_coa_id').append(`
-                    <option value="` + response.cost_coa_id + `">` + response.cost_coa_name + `</option>
-                `);
                 $('#note').val(response.note);
 
                 if(response.status == '1'){
@@ -658,7 +648,7 @@
     }
 
     
-        function destroy(id){
+    function destroy(id){
         swal({
             title: "Apakah anda yakin?",
             text: "Anda tidak bisa mengembalikan data yang terhapus!",

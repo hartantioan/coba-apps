@@ -229,7 +229,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' /* or colvis */
+                'columnsToggle' 
             ]
         });
         $('select[name="datatable_serverside_length"]').addClass('browser-default');

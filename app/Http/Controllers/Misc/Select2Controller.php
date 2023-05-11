@@ -25,6 +25,7 @@ use App\Models\Equipment;
 use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class Select2Controller extends Controller {
     
@@ -105,13 +106,13 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = Region::where('name', 'like', "%$search%")->orWhere('code','like',"%$search%")->get();
+        $data = Region::where('name', 'like', "%$search%")->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name,
-                'newcode'       => $d->getNewCode(),
+                'code'          => $d->code,
             ];
         }
 
@@ -145,13 +146,14 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
-                'code'          => $d->code,
-                'name'          => $d->name,
-                'uom'           => $d->uomUnit->code,
-                'price_list'    => $d->currentCogs($this->dataplaces),
-                'stock_list'    => $d->currentStock($this->dataplaces),
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'price_list'        => $d->currentCogs($this->dataplaces),
+                'stock_list'        => $d->currentStock($this->dataplaces),
+                'list_warehouse'    => $d->warehouseList(),
             ];
         }
 
@@ -265,13 +267,14 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
-                'code'          => $d->code,
-                'name'          => $d->name,
-                'uom'           => $d->uomUnit->code,
-                'buy_unit'      => $d->buyUnit->code,
-                'old_prices'    => $d->oldPrices($this->dataplaces),
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'buy_unit'          => $d->buyUnit->code,
+                'old_prices'        => $d->oldPrices($this->dataplaces),
+                'list_warehouse'    => $d->warehouseList(),
             ];
         }
 
@@ -827,15 +830,23 @@ class Select2Controller extends Controller {
                             });
                     });
                 })
+                ->whereHas('hasPaymentRequestDetail',function($query){
+                    $query->whereHas('paymentRequest',function($query){
+                        $query->whereHas('outgoingPayment');
+                    });
+                })
                 ->where('type','1')
-                ->whereDoesntHave('used')
+                /* ->whereDoesntHave('used') */
                 ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
-            $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->note.' - '.number_format($d->grandtotal,2,',','.'),
-            ];
+            $balance = $d->balanceCloseBill();
+            if($balance > 0){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note.' - Saldo '.number_format($balance,2,',','.'),
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);

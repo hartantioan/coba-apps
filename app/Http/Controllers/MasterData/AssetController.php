@@ -49,7 +49,6 @@ class AssetController extends Controller
             'nominal',
             'book_balance',
             'method',
-            'cost_coa_id',
             'note',
             'status',
             'place_id',
@@ -112,7 +111,6 @@ class AssetController extends Controller
                     $val->nominal > 0 ? number_format($val->nominal,2,',','.') : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
                     number_format($val->book_balance,2,',','.'),
                     $val->method(),
-                    $val->costCoa->name,
                     $val->note,
                     $val->status(),
                     $val->place_id ? $val->place->name.' - '.$val->place->company->name : '-',
@@ -145,7 +143,6 @@ class AssetController extends Controller
             'name'                  => 'required',
             'nominal'               => 'required',
             'method'                => 'required',
-            'cost_coa_id'           => 'required',
             'asset_group_id'        => 'required',
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
@@ -153,7 +150,6 @@ class AssetController extends Controller
             'name.required'                 => 'Nama tidak boleh kosong.',
             'nominal.required'              => 'Nominal tidak boleh kosong.',
             'method.required'               => 'Metode hitung tidak boleh kosong.',
-            'cost_coa_id.required'          => 'Coa pengakuan aset tidak boleh kosong.',
             'asset_group_id.required'       => 'Grup aset tidak boleh kosong.'
         ]);
 
@@ -175,7 +171,6 @@ class AssetController extends Controller
                     $query->date	        = $request->date;
                     $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
                     $query->method          = $request->method;
-                    $query->cost_coa_id     = $request->cost_coa_id;
                     $query->note            = $request->note;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
@@ -195,7 +190,6 @@ class AssetController extends Controller
                         'date'              => $request->date,
                         'nominal'           => str_replace(',','.',str_replace('.','',$request->nominal)),
                         'method'            => $request->method,
-                        'cost_coa_id'       => $request->cost_coa_id,
                         'note'              => $request->note,
                         'status'            => $request->status ? $request->status : '2'
                     ]);
@@ -230,7 +224,6 @@ class AssetController extends Controller
 
     public function show(Request $request){
         $asset = Asset::find($request->id);
-        $asset['cost_coa_name'] = $asset->costCoa->name;
         $asset['nominal'] = number_format($asset->nominal,3,',','.');
         				
 		return response()->json($asset);

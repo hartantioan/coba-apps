@@ -152,7 +152,7 @@
                                         <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                     @endforeach
                                 </select>    
-                                <label for="place_id">Pabrik/Kantor</label>
+                                <label for="place_id">Site</label>
                             </div>
                             
                             <div class="input-field col m4 s12">
@@ -782,7 +782,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' /* or colvis */
+                'columnsToggle' 
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');

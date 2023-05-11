@@ -39,11 +39,24 @@ class Item extends Model
     public function warehouses(){
         $arr = [];
 
-        foreach($this->itemWarehouse as $row){
+        foreach($this->itemGroup->itemGroupWarehouse as $row){
             $arr[] = $row->warehouse->name;
         }
 
         return implode(', ',$arr);
+    }
+
+    public function warehouseList(){
+        $arr = [];
+
+        foreach($this->itemGroup->itemGroupWarehouse as $row){
+            $arr[] = [
+                'id'    => $row->warehouse_id,
+                'name'  => $row->warehouse->name,
+            ];
+        }
+
+        return $arr;
     }
 
     public function uomUnit(){
@@ -117,6 +130,22 @@ class Item extends Model
         $arrData = [];
 
         $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->get();
+        foreach($data as $detail){
+            $arrData[] = [
+                'id'            => $detail->id,
+                'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
+                'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
+                'qty_raw'       => number_format($detail->qty,3,',','.'),
+            ];
+        }
+        
+        return $arrData;
+    }
+
+    public function currentStockPerPlace($place_id){
+        $arrData = [];
+
+        $data = ItemStock::where('item_id',$this->id)->where('place_id',$place_id)->get();
         foreach($data as $detail){
             $arrData[] = [
                 'id'            => $detail->id,

@@ -213,7 +213,7 @@ class WorkOrderController extends Controller
             'request_date'              => 'required',
             
 		], [
-			'place_id.required' 			    => 'Penempatan pabrik/kantor tidak boleh kosong.',
+			'place_id.required' 			    => 'Penempatan Site tidak boleh kosong.',
             'equipment_id.required'                 => 'Peralatan tidak boleh kosong.',
             'activity_id.required'            => 'Aktivitas tidak boleh kosong.',
             'area_id.required'                => 'Area tidak boleh kosong.',

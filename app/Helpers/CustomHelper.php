@@ -8,6 +8,7 @@ use App\Models\ApprovalTemplate;
 use App\Models\ApprovalTemplateMenu;
 use App\Models\Asset;
 use App\Models\Capitalization;
+use App\Models\CloseBill;
 use App\Models\Coa;
 use App\Models\Depreciation;
 use App\Models\GoodIssue;
@@ -800,7 +801,7 @@ class CustomHelper {
 
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->asset->cost_coa_id,
+					'coa_id'		=> $row->asset->assetGroup->cost_coa_id,
 					'place_id'		=> $row->asset->place_id,
 					'type'			=> '1',
 					'nominal'		=> $row->nominal,
@@ -820,6 +821,43 @@ class CustomHelper {
 		}elseif($table_name == 'work_orders'){
 
 		}elseif($table_name == 'request_spareparts'){
+
+		}elseif($table_name == 'close_bills'){
+			
+			$cb = CloseBill::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+
+			foreach($cb->closeBillDetail as $row){
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->coa_id,
+					'place_id'		=> $row->fundRequest->place_id,
+					'account_id'	=> $row->fundRequest->account_id,
+					'department_id'	=> $row->fundRequest->department_id,
+					'type'			=> '1',
+					'nominal'		=> $row->nominal,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->fundRequest->getCoaPaymentRequestOne(),
+					'place_id'		=> $row->fundRequest->place_id,
+					'account_id'	=> $row->fundRequest->account_id,
+					'department_id'	=> $row->fundRequest->department_id,
+					'type'			=> '2',
+					'nominal'		=> $row->nominal,
+				]);
+			}
 
 		}else{
 

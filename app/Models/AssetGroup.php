@@ -20,9 +20,15 @@ class AssetGroup extends Model
         'parent_id',
         'coa_id',
         'depreciation_coa_id',
+        'cost_coa_id',
         'depreciation_period',
         'status'
     ];
+
+    public function costCoa()
+    {
+        return $this->belongsTo('App\Models\Coa', 'cost_coa_id', 'id')->withTrashed();
+    }
 
     public function parentSub(){
         return $this->belongsTo('App\Models\AssetGroup', 'parent_id', 'id');

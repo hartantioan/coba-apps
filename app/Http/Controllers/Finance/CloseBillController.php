@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Currency;
 use App\Helpers\CustomHelper;
-use App\Exports\ExportOutgoingPayment;
+use App\Exports\ExportCloseBill;
 
 class CloseBillController extends Controller
 {
@@ -164,34 +164,65 @@ class CloseBillController extends Controller
     }
 
     public function getFundRequest(Request $request){
-        $data = FundRequest::where('id',$request->id)->whereIn('status',['2','3'])->first();
+        $data = FundRequest::find($request->id);
 
-        if($data->used()->exists()){
+        /* if($data->used()->exists()){
             $data['status'] = '500';
             $data['message'] = 'Permohonan dana no. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
-        }else{
-            if($data->balanceCloseBill() > 0){
-                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Penutupan BS / Close Bill');
+        }else{ */
+            $balance = $data->balanceCloseBill();
+            if($balance > 0){
+                if(!$data->used()->exists()) CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Penutupan BS / Close Bill');
                 $data['rawcode'] = $data->code;
                 $data['code'] = CustomHelper::encrypt($data->code);
                 $data['grandtotal'] = number_format($data->grandtotal,'2',',','.');
-                $data['balance'] = $data->balanceCloseBill();
+                $data['balance'] = number_format($balance,'2',',','.');
                 $data['post_date'] = date('d/m/y',strtotime($data->post_date));
                 $data['required_date'] = date('d/m/y',strtotime($data->required_date));
                 $data['bp_name'] = $data->account->employee_no.' - '.$data->account->name;
+                $data['coa_list'] = $data->getCoaPaymentRequestAll();
             }else{
                 $data['status'] = '500';
-                $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
+                $data['message'] = 'Seluruh nominal pada penutupan bs '.$data->code.' telah dimasukkan ke form ini.';
             }
-        }
+        /* } */
 
         return response()->json($data);
     }
 
     public function rowDetail(Request $request){
-        $data   = OutgoingPayment::find($request->id);
+        $data   = CloseBill::find($request->id);
         
-        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12 mt-1"><table style="max-width:500px;">
+        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12">
+                    <table style="max-width:800px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="6">Daftar Permohonan Dana (BS)</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">FR No.</th>
+                                <th class="center-align">Partner Bisnis</th>
+                                <th class="center-align">Coa</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Nominal</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        foreach($data->closeBillDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->fundRequest->code.'</td>
+                <td class="center-align">'.$row->fundRequest->account->name.'</td>
+                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+            </tr>';
+        }
+        
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="max-width:500px;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>
@@ -224,23 +255,6 @@ class CloseBillController extends Controller
         return response()->json($string);
     }
 
-    public function sendUsedData(Request $request){
-        $op = OutgoingPayment::find($request->id);
-        if(!$op->used()->exists()){
-            CustomHelper::sendUsedData('outgoing_payments',$request->id,'Form Kas / Bank Keluar');
-            return response()->json([
-                'status'    => 200,
-                'code'      => $op->code,
-                'id'        => $op->id
-            ]);
-        }else{
-            return response()->json([
-                'status'    => 500,
-                'message'   => 'Kas / Bank Keluar '.$op->used->lookable->code.' telah dipakai di '.$op->used->ref.', oleh '.$op->used->user->name.'.'
-            ]);
-        }
-    }
-
     public function removeUsedData(Request $request){
         CustomHelper::removeUsedData('fund_requests',$request->id);
         return response()->json([
@@ -251,39 +265,44 @@ class CloseBillController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = OutgoingPayment::where('code',CustomHelper::decrypt($id))->first();
+        $pr = CloseBill::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Print Kas Bank Keluar',
+                'title'     => 'Print Penutupan BS Karyawan',
                 'data'      => $pr
             ];
 
-            return view('admin.approval.outgoing_payment', $data);
+            return view('admin.approval.close_bill', $data);
         }else{
             abort(404);
         }
     }
 
     public function show(Request $request){
-        $pr = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        $cb = CloseBill::where('code',CustomHelper::decrypt($request->id))->first();
 
-        if($pr->used()->exists()){
-            $pr['status'] = 500;
-            $pr['message'] = 'Kas / Bank Keluar '.$pr->used->lookable->code.' telah dipakai di '.$pr->used->ref.', oleh '.$pr->used->user->name.'.';
-        }else{
-            CustomHelper::sendUsedData('outgoing_payments',$pr->id,'Form Kas / Bank Keluar');
-            $pr['status'] = 200;
-            $pr['account_name'] = $pr->account->name;
-            $pr['coa_source_name'] = $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name;
-            $pr['currency_rate'] = number_format($pr->currency_rate,3,',','.');
-            $pr['admin'] = number_format($pr->admin,3,',','.');
-            $pr['grandtotal'] = number_format($pr->grandtotal,3,',','.');
-            $pr['payment_request_id'] = $pr->payment_request_id ? $pr->payment_request_id : '';
-            $pr['payment_request_code'] = $pr->paymentRequest->code;
+        $arr = [];
+
+        foreach($cb->closeBillDetail as $row){
+            $arr[] = [
+                'id'                => $row->fund_request_id,
+                'rawcode'           => $row->fundRequest->code,
+                'code'              => CustomHelper::encrypt($row->fundRequest->code),
+                'grandtotal'        => number_format($row->fundRequest->grandtotal,'2',',','.'),
+                'balance'           => number_format($row->nominal,'2',',','.'),
+                'post_date'         => date('d/m/y',strtotime($row->fundRequest->post_date)),
+                'required_date'     => date('d/m/y',strtotime($row->fundRequest->required_date)),
+                'bp_name'           => $row->fundRequest->account->employee_no.' - '.$row->fundRequest->account->name,
+                'coa_list'          => $row->fundRequest->getCoaPaymentRequestAll(),
+                'coa_name'          => $row->coa->code.' - '.$row->coa->name,
+                'coa_id'            => $row->coa_id,
+            ];
         }
+
+        $cb['details'] = $arr;
         				
-		return response()->json($pr);
+		return response()->json($cb);
     }
 
     public function create(Request $request){
@@ -321,7 +340,7 @@ class CloseBillController extends Controller
                             if($row->status == '2'){
                                 return response()->json([
                                     'status'  => 500,
-                                    'message' => 'Kas / Bank Keluar telah diapprove, anda tidak bisa melakukan perubahan.'
+                                    'message' => 'Penutupan BS Karyawan telah diapprove, anda tidak bisa melakukan perubahan.'
                                 ]);
                             }
                         }
@@ -336,15 +355,13 @@ class CloseBillController extends Controller
 
                         $query->save();
 
-                        foreach($query->closeBillDetail as $row){
-                            $row->delete();
-                        }
+                        $query->closeBillDetail()->delete();
 
                         DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Penutupan BS Karyawan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -370,7 +387,8 @@ class CloseBillController extends Controller
 			
 			if($query) {
 
-                if($request->arr_fund_request){
+                DB::beginTransaction();
+                try {
                     foreach($request->arr_fund_request as $key => $row){
                         $fr = FundRequest::where('code',CustomHelper::decrypt($row))->first();
                         CloseBillDetail::create([
@@ -382,16 +400,19 @@ class CloseBillController extends Controller
                         ]);
                         CustomHelper::removeUsedData('fund_requests',$fr->id);
                     }
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
                 }
 
                 CustomHelper::sendApproval('close_bills',$query->id,$query->note);
-                CustomHelper::sendNotification('close_bills',$query->id,'Penutupan BS / Close Bill No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendNotification('close_bills',$query->id,'Penutupan BS Karyawan No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new CloseBill())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit close bill.');
+                    ->log('Add / edit close bill out.');
 
 				$response = [
 					'status'    => 200,
@@ -403,6 +424,7 @@ class CloseBillController extends Controller
 					'message' => 'Data failed to save.'
 				];
 			}
+            
 		}
 		
 		return response()->json($response);
@@ -433,6 +455,7 @@ class CloseBillController extends Controller
     
                 CustomHelper::sendNotification('close_bills',$query->id,'Penutupan BS / Closing Bill No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('close_bills',$query->id);
+                CustomHelper::removeJournal('close_bills',$query->id);
 
                 $response = [
                     'status'  => 200,
@@ -472,6 +495,8 @@ class CloseBillController extends Controller
         
         if($query->delete()) {
 
+            $query->closeBillDetail()->delete();
+
             CustomHelper::removeApproval('close_bills',$query->id);
 
             activity()
@@ -498,34 +523,29 @@ class CloseBillController extends Controller
 
         $data = [
             'title' => 'OUTGOING PAYMENT REPORT',
-            'data' => OutgoingPayment::where(function($query) use ($request) {
+            'data' => CloseBill::where(function($query) use ($request) {
                 if($request->search) {
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
-                            ->orWhere('grandtotal', 'like', "%$request->search%")
-                            ->orWhere('admin', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
                             ->orWhereHas('user',function($query) use($request){
-                                $query->where('name','like',"%$request->search%")
-                                    ->orWhere('employee_no','like',"%$request->search%");
-                            })
-                            ->orWhereHas('account',function($query) use($request){
                                 $query->where('name','like',"%$request->search%")
                                     ->orWhere('employee_no','like',"%$request->search%");
                             });
                     });
                 }
 
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
+                }
+
                 if($request->status){
                     $query->where('status', $request->status);
-                }
-
-                if($request->account){
-                    $query->whereIn('account_id',$request->account);
-                }
-
-                if($request->currency){
-                    $query->whereIn('currency_id',$request->currency);
                 }
 
                 if($request->company){
@@ -535,11 +555,11 @@ class CloseBillController extends Controller
             ->get()
 		];
 		
-		return view('admin.print.finance.outgoing_payment', $data);
+		return view('admin.print.finance.close_bill', $data);
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportOutgoingPayment($request->search,$request->status,$request->company,$request->account,$request->currency,$this->dataplaces), 'outgoing_payment'.uniqid().'.xlsx');
+		return Excel::download(new ExportCloseBill($request->search,$request->status,$request->company,$request->start_date,$request->finish_date,$this->dataplaces), 'close_bill_'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

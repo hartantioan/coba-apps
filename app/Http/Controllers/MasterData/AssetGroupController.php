@@ -90,6 +90,7 @@ class AssetGroupController extends Controller
                     $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
                     $val->coa->name,
                     $val->depreciationCoa->name,
+                    $val->costCoa->name,
                     $val->depreciation_period,
                     $val->status(),
                     '
@@ -122,13 +123,15 @@ class AssetGroupController extends Controller
             'name'                  => 'required',
             'coa_id'                => 'required',
             'depreciation_coa_id'   => 'required',
+            'cost_coa_id'           => 'required',
             'depreciation_period'   => 'required',
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah dipakai',
             'name.required'                 => 'Nama tidak boleh kosong.',
-            'coa_id.required'               => 'Coa tidak boleh kosong.',
+            'coa_id.required'               => 'Coa pengakuan aset tidak boleh kosong.',
             'depreciation_coa_id.required'  => 'Coa akumulasi penyusutan tidak boleh kosong.',
+            'cost_coa_id.required'          => 'Coa biaya tidak boleh kosong.',
             'depreciation_period.required'  => 'Periode penyusutan tidak boleh kosong.',
         ]);
 
@@ -147,6 +150,7 @@ class AssetGroupController extends Controller
                     $query->parent_id           = $request->parent_id ? $request->parent_id : NULL;
                     $query->coa_id              = $request->coa_id;
                     $query->depreciation_coa_id = $request->depreciation_coa_id;
+                    $query->cost_coa_id         = $request->cost_coa_id;
                     $query->depreciation_period = $request->depreciation_period;
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
@@ -162,6 +166,7 @@ class AssetGroupController extends Controller
                         'name'			        => $request->name,
                         'parent_id'             => $request->parent_id ? $request->parent_id : NULL,
                         'coa_id'                => $request->coa_id,
+                        'cost_coa_id'           => $request->cost_coa_id,
                         'depreciation_coa_id'   => $request->depreciation_coa_id,
                         'depreciation_period'   => $request->depreciation_period,
                         'status'                => $request->status ? $request->status : '2'
@@ -215,6 +220,7 @@ class AssetGroupController extends Controller
 
     public function show(Request $request){
         $itemgroup = AssetGroup::find($request->id);
+        $itemgroup['cost_coa_name'] = $itemgroup->costCoa->name;
         				
 		return response()->json($itemgroup);
     }

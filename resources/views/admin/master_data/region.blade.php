@@ -101,7 +101,7 @@
                             <label class="active" for="parent_id">Parent</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="code" name="code" type="text" placeholder="Kode Daerah" readonly>
+                            <input id="code" name="code" type="text" placeholder="Kode Daerah (Auto dari Parent)" readonly>
                             <label class="active" for="code">Kode</label>
                         </div>
                         <div class="input-field col s6">
@@ -192,7 +192,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' /* or colvis */
+                'columnsToggle' 
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -201,7 +201,34 @@
 
     function getNewCode(element){
         if($(element).val()){
-
+            $.ajax({
+                url: '{{ Request::url() }}/get_new_code',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    code: $(element).select2('data')[0].code,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#code').val(response.newcode);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
         }else{
             $('#code').val('');
         }

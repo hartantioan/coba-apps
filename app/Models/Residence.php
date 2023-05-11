@@ -15,11 +15,17 @@ class Residence extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
+        'employee_id',
         'code',
         'name',
         'note',
         'status',
     ];
+
+    public function employee()
+    {
+        return $this->belongsTo('App\Models\User', 'employee_id', 'id')->withTrashed();
+    }
 
     public function residenceDetail()
     {

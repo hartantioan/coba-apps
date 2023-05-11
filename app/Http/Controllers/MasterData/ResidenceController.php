@@ -85,6 +85,7 @@ class ResidenceController extends Controller
 				
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
+                    $val->employee->name,
                     $val->code,
                     $val->name,
                     $val->note,
@@ -116,11 +117,13 @@ class ResidenceController extends Controller
         
         $validation = Validator::make($request->all(), [
             'code'			=> $request->temp ? ['required', Rule::unique('residences', 'code')->ignore($request->temp)] : 'required|unique:residences,code',
+            'employee_id'   => 'required',
             'name'          => 'required',
             'arr_region'    => 'required|array'
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah dipakai',
+            'employee_id.required'  => 'Pegawai tidak boleh kosong',
             'name.required'         => 'Nama tidak boleh kosong.',
             'arr_region.required'   => 'Wilayah tidak boleh kosong.',
             'arr_region.array'      => 'Wilayah harus dalam bentuk array.'
@@ -136,9 +139,12 @@ class ResidenceController extends Controller
             if($request->arr_region){
                 $arr = [];
                 foreach($request->arr_region as $row){
-                    $cek = ResidenceDetail::where('region_id',$row)->first();
+                    $cek = ResidenceDetail::where('region_id',$row)->whereHas('residence',function($query) use($request){
+                        $query->where('employee_id',$request->employee_id)->where('status','1');
+                    })->first();
+
                     if($cek){
-                        $arr[] = $cek->region->name.' pada no keresidenan '.$cek->residence->code;
+                        $arr[] = $cek->region->name.' pada no keresidenan '.$cek->residence->code.' oleh pegawai '.$cek->residence->employee->name;
                     }
                 }
 
@@ -155,6 +161,7 @@ class ResidenceController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Residence::find($request->temp);
+                    $query->employee_id = $request->employee_id;
                     $query->code        = $request->code;
                     $query->name        = $request->name;
                     $query->note        = $request->note;
@@ -171,6 +178,7 @@ class ResidenceController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Residence::create([
+                        'employee_id'   => $request->employee_id,
                         'code'          => $request->code,
                         'name'			=> $request->name,
                         'note'          => $request->note,
@@ -216,6 +224,7 @@ class ResidenceController extends Controller
 
     public function show(Request $request){
         $residence = Residence::find($request->id);
+        $residence['employee_name'] = $residence->employee->name;
 
         $details = [];
 

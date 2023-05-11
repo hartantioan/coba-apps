@@ -20,11 +20,57 @@ class RegionController extends Controller
     public function index()
     {
         $data = [
-            'title' => 'Area',
-            'content' => 'admin.master_data.region'
+            'title'     => 'Area',
+            'content'   => 'admin.master_data.region',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getNewCode(Request $request){
+        $code = $request->code;
+
+        $arr = explode('.',$code);
+
+        if(count($arr) == 1){
+            $latestRegion = Region::selectRaw('RIGHT(code, 2) as code')->where('code','like',"$code%")->whereRaw("CHAR_LENGTH(code) = 5")->orderByDesc('code')->first();
+            if($latestRegion) {
+                $no = (int)$latestRegion->code + 1;
+            } else {
+                $no = '01';
+            }
+    
+            $code .= '.'.$no;
+        }elseif(count($arr) == 2){
+            $latestRegion = Region::selectRaw('RIGHT(code, 2) as code')->where('code','like',"$code%")->whereRaw("CHAR_LENGTH(code) = 8")->orderByDesc('code')->first();
+            if($latestRegion) {
+                $no = (int)$latestRegion->code + 1;
+            } else {
+                $no = '01';
+            }
+    
+            $code .= '.'.$no;
+        }elseif(count($arr) == 3){
+            $latestRegion = Region::selectRaw('RIGHT(code, 4) as code')->where('code','like',"$code%")->whereRaw("CHAR_LENGTH(code) = 13")->orderByDesc('code')->first();
+            if($latestRegion) {
+                $no = (int)$latestRegion->code + 1;
+            } else {
+                $no = '2001';
+            }
+
+            $code .= '.'.$no;
+        }elseif(count($arr) == 4){
+            $latestRegion = Region::selectRaw('RIGHT(code, 6) as code')->where('code','like',"$code%")->whereRaw("CHAR_LENGTH(code) = 20")->orderByDesc('code')->first();
+            if($latestRegion) {
+                $no = (int)$latestRegion->code + 1;
+            } else {
+                $no = '200001';
+            }
+
+            $code .= '.'.$no;
+        }
+
+        return response()->json(['newcode' => $code]);
     }
 
     public function datatable(Request $request){
@@ -81,7 +127,7 @@ class RegionController extends Controller
 				
                 $response['data'][] = [
                     $val->id,
-                    $val->code.' - '.$val->getNewCode(),
+                    $val->code,
                     $val->name,
                     $val->parentRegion(),
                     '

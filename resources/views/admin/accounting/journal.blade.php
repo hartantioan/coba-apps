@@ -774,7 +774,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' /* or colvis */
+                'columnsToggle' 
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');

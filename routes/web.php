@@ -124,24 +124,24 @@ Route::prefix('admin')->group(function () {
                 Route::get('asset_item', [Select2Controller::class, 'assetItem']);
                 Route::get('purchase_request', [Select2Controller::class, 'purchaseRequest']);
                 Route::get('good_issue', [Select2Controller::class, 'goodIssue']);
-            Route::get('purchase_order', [Select2Controller::class, 'purchaseOrder']);
-            Route::get('vendor', [Select2Controller::class, 'vendor']);
-            Route::get('good_receipt', [Select2Controller::class, 'goodReceipt']);
-            Route::get('supplier_vendor', [Select2Controller::class, 'supplierVendor']);
-            Route::get('bank', [Select2Controller::class, 'bank']);
-            Route::get('region', [Select2Controller::class, 'region']);
-            Route::get('project', [Select2Controller::class, 'project']);
-            Route::get('business_partner', [Select2Controller::class, 'businessPartner']);
-            Route::get('asset', [Select2Controller::class, 'asset']);
-            Route::get('unit', [Select2Controller::class, 'unit']);
-            Route::get('coa_cash_bank', [Select2Controller::class, 'coaCashBank']);
-            Route::get('payment_request', [Select2Controller::class, 'paymentRequest']);
-            Route::get('equipment', [Select2Controller::class, 'equipment']);
-            Route::get('workorder', [Select2Controller::class, 'workOrder']);
-            Route::get('approval_stage', [Select2Controller::class, 'approvalStage']);
-            Route::get('menu', [Select2Controller::class, 'menu']);
-            Route::get('fund_request_bs', [Select2Controller::class, 'fundRequestBs']);
-        });
+                Route::get('purchase_order', [Select2Controller::class, 'purchaseOrder']);
+                Route::get('vendor', [Select2Controller::class, 'vendor']);
+                Route::get('good_receipt', [Select2Controller::class, 'goodReceipt']);
+                Route::get('supplier_vendor', [Select2Controller::class, 'supplierVendor']);
+                Route::get('bank', [Select2Controller::class, 'bank']);
+                Route::get('region', [Select2Controller::class, 'region']);
+                Route::get('project', [Select2Controller::class, 'project']);
+                Route::get('business_partner', [Select2Controller::class, 'businessPartner']);
+                Route::get('asset', [Select2Controller::class, 'asset']);
+                Route::get('unit', [Select2Controller::class, 'unit']);
+                Route::get('coa_cash_bank', [Select2Controller::class, 'coaCashBank']);
+                Route::get('payment_request', [Select2Controller::class, 'paymentRequest']);
+                Route::get('equipment', [Select2Controller::class, 'equipment']);
+                Route::get('workorder', [Select2Controller::class, 'workOrder']);
+                Route::get('approval_stage', [Select2Controller::class, 'approvalStage']);
+                Route::get('menu', [Select2Controller::class, 'menu']);
+                Route::get('fund_request_bs', [Select2Controller::class, 'fundRequestBs']);
+            });
 
             Route::prefix('personal')->middleware('direct.access')->group(function () {
 
@@ -263,6 +263,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [RegionController::class, 'index']);
                         Route::get('datatable', [RegionController::class, 'datatable']);
                         Route::post('show', [RegionController::class, 'show']);
+                        Route::post('get_new_code', [RegionController::class, 'getNewCode']);
                         Route::post('print', [RegionController::class, 'print']);
                         Route::get('export', [RegionController::class, 'export']);
                         Route::post('create', [RegionController::class, 'create'])->middleware('operation.access:region,update');
@@ -751,37 +752,38 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [PaymentRequestController::class, 'destroy'])->middleware('operation.access:payment_request,delete');
                 });
 
-            Route::prefix('outgoing_payment')->middleware('operation.access:outgoing_payment,view')->group(function () {
-                Route::get('/',[OutgoingPaymentController::class, 'index']);
-                Route::get('datatable',[OutgoingPaymentController::class, 'datatable']);
-                Route::get('row_detail',[OutgoingPaymentController::class, 'rowDetail']);
-                Route::post('show', [OutgoingPaymentController::class, 'show']);
-                Route::post('print',[OutgoingPaymentController::class, 'print']);
-                Route::get('export',[OutgoingPaymentController::class, 'export']);
-                Route::get('viewstructuretree',[OutgoingPaymentController::class, 'viewStructureTree']);
-                Route::post('send_used_data',[OutgoingPaymentController::class, 'sendUsedData']);
-                Route::post('remove_used_data', [OutgoingPaymentController::class, 'removeUsedData']);
-                Route::post('create',[OutgoingPaymentController::class, 'create'])->middleware('operation.access:outgoing_payment,update');
-                Route::post('void_status', [OutgoingPaymentController::class, 'voidStatus'])->middleware('operation.access:outgoing_payment,void');
-                Route::get('approval/{id}',[OutgoingPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
-                Route::post('destroy', [OutgoingPaymentController::class, 'destroy'])->middleware('operation.access:outgoing_payment,delete');
-            });
+                Route::prefix('outgoing_payment')->middleware('operation.access:outgoing_payment,view')->group(function () {
+                    Route::get('/',[OutgoingPaymentController::class, 'index']);
+                    Route::get('datatable',[OutgoingPaymentController::class, 'datatable']);
+                    Route::get('row_detail',[OutgoingPaymentController::class, 'rowDetail']);
+                    Route::post('show', [OutgoingPaymentController::class, 'show']);
+                    Route::post('print',[OutgoingPaymentController::class, 'print']);
+                    Route::get('export',[OutgoingPaymentController::class, 'export']);
+                    Route::get('viewstructuretree',[OutgoingPaymentController::class, 'viewStructureTree']);
+                    Route::post('send_used_data',[OutgoingPaymentController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [OutgoingPaymentController::class, 'removeUsedData']);
+                    Route::post('create',[OutgoingPaymentController::class, 'create'])->middleware('operation.access:outgoing_payment,update');
+                    Route::post('void_status', [OutgoingPaymentController::class, 'voidStatus'])->middleware('operation.access:outgoing_payment,void');
+                    Route::get('approval/{id}',[OutgoingPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('destroy', [OutgoingPaymentController::class, 'destroy'])->middleware('operation.access:outgoing_payment,delete');
+                });
 
-            Route::prefix('close_temp_bill')->middleware('operation.access:close_temp_bill,view')->group(function () {
-                Route::get('/',[CloseBillController::class, 'index']);
-                Route::get('datatable',[CloseBillController::class, 'datatable']);
-                Route::get('row_detail',[CloseBillController::class, 'rowDetail']);
-                Route::post('show', [CloseBillController::class, 'show']);
-                Route::post('print',[CloseBillController::class, 'print']);
-                Route::get('export',[CloseBillController::class, 'export']);
-                Route::get('viewstructuretree',[CloseBillController::class, 'viewStructureTree']);
-                Route::post('send_used_data',[CloseBillController::class, 'sendUsedData']);
-                Route::post('remove_used_data', [CloseBillController::class, 'removeUsedData']);
-                Route::post('create',[CloseBillController::class, 'create'])->middleware('operation.access:close_temp_bill,update');
-                Route::post('void_status', [CloseBillController::class, 'voidStatus'])->middleware('operation.access:close_temp_bill,void');
-                Route::get('approval/{id}',[CloseBillController::class, 'approval'])->withoutMiddleware('direct.access');
-                Route::post('destroy', [CloseBillController::class, 'destroy'])->middleware('operation.access:close_temp_bill,delete');
-                Route::post('get_fund_request', [CloseBillController::class, 'getFundRequest']);
+                Route::prefix('close_bill')->middleware('operation.access:close_bill,view')->group(function () {
+                    Route::get('/',[CloseBillController::class, 'index']);
+                    Route::get('datatable',[CloseBillController::class, 'datatable']);
+                    Route::get('row_detail',[CloseBillController::class, 'rowDetail']);
+                    Route::post('show', [CloseBillController::class, 'show']);
+                    Route::post('print',[CloseBillController::class, 'print']);
+                    Route::get('export',[CloseBillController::class, 'export']);
+                    Route::get('viewstructuretree',[CloseBillController::class, 'viewStructureTree']);
+                    Route::post('remove_used_data', [CloseBillController::class, 'removeUsedData']);
+                    Route::post('create',[CloseBillController::class, 'create'])->middleware('operation.access:close_bill,update');
+                    Route::post('void_status', [CloseBillController::class, 'voidStatus'])->middleware('operation.access:close_bill,void');
+                    Route::get('approval/{id}',[CloseBillController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('destroy', [CloseBillController::class, 'destroy'])->middleware('operation.access:close_bill,delete');
+                    Route::post('get_fund_request', [CloseBillController::class, 'getFundRequest']);
+                });
+
             });
 
             Route::prefix('accounting')->middleware('direct.access')->group(function () {
@@ -854,7 +856,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [JournalController::class, 'destroy'])->middleware('operation.access:journal,delete');
                 });
             });
-        }); 
-    });
+        });
     });
 });

@@ -68,6 +68,7 @@
                                                         <th>Parent</th>
                                                         <th>Coa Pengakuan Aset</th>
                                                         <th>Coa Akumulasi Penyusutan</th>
+                                                        <th>Coa Biaya</th>
                                                         <th>Periode Penyusutan (Bln)</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -147,6 +148,10 @@
                             <label class="active" for="depreciation_period">Periode Penyusutan (Bulan)</label>
                         </div>
                         <div class="input-field col s6">
+                            <select class="browser-default" id="cost_coa_id" name="cost_coa_id"></select>
+                            <label class="active" for="cost_coa_id">Coa Biaya</label>
+                        </div>
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -204,6 +209,8 @@
             /* dropdownAutoWidth: true, */
             width: '100%',
         });
+
+        select2ServerSide('#cost_coa_id', '{{ url("admin/select2/coa") }}');
     });
 
     function loadDataTable() {
@@ -244,13 +251,14 @@
                 { name: 'parent', className: 'center-align' },
                 { name: 'coa', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'dep_coa_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'coa_cost', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'dep_acc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' /* or colvis */
+                'columnsToggle' 
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -362,6 +370,9 @@
                 $('#coa_id').val(response.coa_id).trigger('change');
                 $('#depreciation_coa_id').val(response.depreciation_coa_id).trigger('change');
                 $('#depreciation_period').val(response.depreciation_period);
+                $('#cost_coa_id').empty().append(`
+                    <option value="` + response.cost_coa_id + `">` + response.cost_coa_name + `</option>
+                `);
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

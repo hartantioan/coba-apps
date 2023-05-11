@@ -185,7 +185,7 @@
                                     </p>
                                 </div>
                                 <div class="col m6 s6">
-                                    <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                                    <h6><b>FR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
                             <div class="col m12 s12">
@@ -200,7 +200,8 @@
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Req.Bayar</th>
                                                     <th class="center">Total</th>
-                                                    <th class="center">Coa</th>
+                                                    <th class="center">Coa Debit</th>
+                                                    <th class="center">Coa Kredit</th>
                                                     <th class="center">Nominal</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Hapus</th>
@@ -208,7 +209,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="empty-detail">
-                                                    <td colspan="9" class="center">
+                                                    <td colspan="10" class="center">
                                                         Pilih Fund Request / Permohonan Dana untuk memulai...
                                                     </td>
                                                 </tr>
@@ -328,8 +329,13 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
-                $('#account_id,#coa_source_id,#payment_request_id').empty();
-                $('#grandtotal,#admin').val('0,000');
+                $('#body-detail').empty().append(`
+                    <tr id="empty-detail">
+                        <td colspan="10" class="center">
+                            Pilih Fund Request / Permohonan Dana untuk memulai...
+                        </td>
+                    </tr>
+                `);
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -361,6 +367,10 @@
                     `
                 );
             }
+        });
+
+        $('#body-detail').on('click', '.delete-data-detail', function() {
+            $(this).closest('tr').remove();
         });
 
         select2ServerSide('#fund_request_id', '{{ url("admin/select2/fund_request_bs") }}');
@@ -557,12 +567,14 @@
                     }else{
                         $('#empty-detail').remove();
 
-                        $('#list-used-data').append(`
-                            <div class="chip purple darken-4 gradient-shadow white-text">
-                                ` + response.rawcode + `
-                                <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
-                            </div>
-                        `);
+                        if(!$('.data-used[data-code="' + response.rawcode + '"]').length > 0){
+                            $('#list-used-data').append(`
+                                <div class="chip purple darken-4 gradient-shadow white-text">
+                                    ` + response.rawcode + `
+                                    <i class="material-icons close data-used" data-code="` + response.rawcode + `"" onclick="removeUsedData('` + response.id + `')">close</i>
+                                </div>
+                            `);
+                        }
 
                         var count = makeid(10);
 
@@ -586,6 +598,9 @@
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>
+                                </td>
+                                <td class="center">
+                                    ` + response.coa_list + `
                                 </td>
                                 <td class="center">
                                         <input id="arr_nominal` + count + `" name="arr_nominal[]" class="browser-default" type="text" value="` + response.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;">
@@ -640,7 +655,7 @@
                 if($('.row_detail').length == 0 && $('#empty-detail').length == 0){
                     $('#body-detail').append(`
                         <tr id="empty-detail">
-                            <td colspan="9" class="center">
+                            <td colspan="10" class="center">
                                 Pilih Fund Request / Permohonan Dana untuk memulai...
                             </td>
                         </tr>
@@ -705,6 +720,59 @@
                     $('#company_id').val(response.company_id).formSelect();
                     $('#post_date').val(response.post_date);
                     $('#note').val(response.note);
+
+                    if(response.details.length > 0){
+                        $('.row_detail').each(function(){
+                            $(this).remove();
+                        });
+
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+
+                            $('#body-detail').append(`
+                                <tr class="row_detail" data-fr="` + val.id + `">
+                                    <input type="hidden" name="arr_fund_request[]" value="` + val.code + `">
+                                    <td>
+                                        ` + val.rawcode + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.bp_name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.required_date + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>
+                                    </td>
+                                    <td class="center">
+                                        ` + val.coa_list + `
+                                    </td>
+                                    <td class="center">
+                                            <input id="arr_nominal` + count + `" name="arr_nominal[]" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;">
+                                        </td>
+                                    <td>
+                                        <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value=" - " style="width:100%;">
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                            $('#arr_coa' + count).append(`
+                                <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                            `);
+                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        });
+                    }
+
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
                     M.updateTextFields();
@@ -810,7 +878,7 @@
     }
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), start_date = $('#start_date').val(), finish_date = $('#finish_date').val();
         
         $.ajax({
             type : "POST",
@@ -819,8 +887,8 @@
                 search : search,
                 status : status,
                 company : company,
-                'account[]' : account,
-                'currency[]' : currency
+                start_date : start_date,
+                finish_date : finish_date,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -836,9 +904,9 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), start_date = $('#start_date').val(), finish_date = $('#finish_date').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&company=" + company + "&account=" + account + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&company=" + company + "&start_date=" + start_date + "&finish_date=" + finish_date;
     }
 
     function makeTreeOrg(data,link){

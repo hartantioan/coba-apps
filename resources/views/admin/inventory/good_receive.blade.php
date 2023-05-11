@@ -334,6 +334,7 @@
 
     function getRowUnit(val){
         $('#tempPrice' + val).empty();
+        $("#arr_warehouse" + val).empty();
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
             if($("#arr_item" + val).select2('data')[0].price_list.length){
@@ -351,9 +352,23 @@
                     `);
                 });
             }
+            if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
+                $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
+                    $('#arr_warehouse' + val).append(`
+                        <option value="` + value.id + `">` + value.name + `</option>
+                    `);
+                });
+            }else{
+                $("#arr_warehouse" + val).append(`
+                    <option value="">--Gudang tidak diatur di master data Grup Item--</option>
+                `);
+            }
         }else{
             $('#tempPrice' + val).empty();
             $('#arr_stock' + val).text('-');
+            $("#arr_warehouse" + val).append(`
+                <option value="">--Silahkan pilih item--</option>
+            `);
         }
     }
 
@@ -406,7 +421,7 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' /* or colvis */
+                'columnsToggle' 
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
@@ -483,7 +498,9 @@
                     </select>    
                 </td>
                 <td class="center">
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                        <option value="">--Silahkan pilih item--</option>    
+                    </select>
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -494,7 +511,6 @@
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
         $('#arr_place' + count).formSelect();
         $('#arr_department' + count).formSelect();
         M.updateTextFields();
@@ -693,7 +709,6 @@
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-                        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                         $('#arr_place' + count).val(val.place_id).formSelect();
                         $('#arr_department' + count).val(val.department_id).formSelect();
                     });

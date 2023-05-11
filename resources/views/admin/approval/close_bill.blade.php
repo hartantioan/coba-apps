@@ -35,11 +35,11 @@
 
     @media print {
         .invoice-print-area {
-            font-size:13px !important;
+            font-size:11px !important;
         }
 
         table > thead > tr > th {
-            font-size:15px !important;
+            font-size:12px !important;
             font-weight: 800 !important;
         }
 
@@ -120,13 +120,13 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Work Order # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Permohonan Dana # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
                         <small>Diajukan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->request_date)) }}</span>
+                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -134,22 +134,24 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Work Order</h5>
+                <h5 class="indigo-text">Penutupan BS Karyawan</h5>
             </div>
-            <div class="col m6 s12 right-align">
-                <img src="{{ url('website/logo_web_fix.png') }}" width="40%">
+            <div class="col m6 s12">
+                <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
             </div>
         </div>
-        <table border="0" width="100%" class="mt-3">
+        <div class="divider mb-3 mt-3"></div>
+        <!-- invoice address and contact -->
+        <table border="0" width="100%">
             <tr>
-                <td width="50%" class="left-align" style="vertical-align: top !important;">
+                <td width="50%" class="left-align">
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Dari
+                                Nama
                             </td>
                             <td width="60%">
-                                {{ $data->user->name }}
+                                {{ $data->user->name.' - '.$data->user->phone }}
                             </td>
                         </tr>
                         <tr>
@@ -167,86 +169,66 @@
                             <td width="60%">
                                 {{ $data->user->department->name }}
                             </td>
-                            
                         </tr>
+                    </table>
+                </td>
+                <td width="50%" class="left-align">
+                    <table border="0" width="100%">
                         <tr>
-                            <td width="50%" class="left-align" style="vertical-align: top !important;">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="40%">
-                                            Site
-                                        </td>
-                                        <td width="60%">
-                                            {{ $data->place->name.' - '.$data->place->company->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="40%">
-                                            Catatan
-                                        </td>
-                                        <td width="60%">
-                                            {{ $data->detail_issue }}
-                                        </td>
-                                    </tr>
-                                </table>
+                            <td width="40%">
+                                Perusahaan
+                            </td>
+                            <td width="60%">
+                                {{ $data->company->name }}
                             </td>
                         </tr>
                         <tr>
-                            <td width="50%" class="left-align" style="vertical-align: top !important;">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="40%">
-                                            Equipment
-                                        </td>
-                                        <td width="60%">
-                                            {{ $data->equipment->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="40%">
-                                            Aktivitas
-                                        </td>
-                                        <td width="60%">
-                                            {{ $data->activity->title }}
-                                        </td>
-                                    </tr>
-                                </table>
+                            <td width="40%">
+                                Status
+                            </td>
+                            <td width="60%">
+                                {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
                             </td>
                         </tr>
-                        
                     </table>
                 </td>
             </tr>
         </table>
-        <div class="invoice-product-details mt-3">
-            <table class="bordered">
-                <thead>
-                    <tr>
-                        <th class="center">No.</th>
-                        <th class="center">Code</th>
-                        <th class="center">Nama</th>
-                        <th class="center">Spesifikasi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($data->workOrderPartDetail as $key => $row)
-                        <tr>
-                            <td class="center-align">{{ $key + 1 }}</td>
-                            <td>{{ $row->equipmentPart->code }}</td>
-                            <td class="center-align">{{$row->equipmentPart->name}}</td>
-                            <td class="center-align">{{$row->equipmentPart->specification }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="invoice-subtotal mt-3">
+        <div class="divider mb-3 mt-3"></div>
+        <!-- product details table-->
+        <div class="invoice-product-details">
+        <table class="bordered">
+            <thead>
+                <tr>
+                    <th class="center">No. FR</th>
+                    <th class="center">Partner Bisnis</th>
+                    <th class="center">Coa</th>
+                    <th class="center">Keterangan</th>
+                    <th class="center">Nominal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data->closeBillDetail as $row)
+                <tr>
+                    <td class="center-align">{{ $row->fundRequest->code }}</td>
+                    <td class="center-align">{{ $row->fundRequest->account->name }}</td>
+                    <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                    <td>{{ $row->note }}</td>
+                    <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    <!-- invoice subtotal -->
+    <div class="divider mt-3 mb-3"></div>
+        <div class="invoice-subtotal">
             <div class="row">
                 <div class="col m6 s6 l6">
-                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->request_date) !!}
+                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
-                    Catatan : {{ $data->detail_issue }}
+                    Catatan : {{ $data->note }}
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">

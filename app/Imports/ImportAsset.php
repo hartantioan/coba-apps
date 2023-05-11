@@ -26,7 +26,6 @@ class ImportAsset implements ToModel, WithHeadingRow, WithValidation,WithBatchIn
             'name' => $row['name'],
             'asset_group_id' => $row['asset_group_id'],
             'method' => $row['method'],
-            'cost_coa_id' => $row['cost_coa_id'],
             'note' => $row['note'],
             'status' => $row['status']
         ]);
@@ -56,7 +55,6 @@ class ImportAsset implements ToModel, WithHeadingRow, WithValidation,WithBatchIn
             '*.name'            => 'required',
             '*.asset_group_id'  => 'required',
             '*.method'          => 'required',
-            '*.cost_coa_id'     => 'required',
             '*.status'          => 'required',
         ];
     }

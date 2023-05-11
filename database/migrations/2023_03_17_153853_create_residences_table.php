@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('residences', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('employee_id')->nullable();
             $table->string('code',155)->unique();
             $table->string('name')->nullable();
             $table->string('note')->nullable();

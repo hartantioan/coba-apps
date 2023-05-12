@@ -18,6 +18,7 @@ return new class extends Migration
                 $table->id();
                 $table->bigInteger('request_sparepart_id')->nullable();
                 $table->bigInteger('equipment_sparepart_id')->nullable();
+                $table->bigInteger('item_stock_id')->nullable();
                 $table->double('qty_request')->nullable();
                 $table->double('qty_usage')->nullable();
                 $table->double('qty_return')->nullable();

@@ -17,6 +17,9 @@
     .chart-container{
         margin: 10%
     }
+    .select2 {
+    height: 3.6rem !important;
+    }
 </style>
 <div id="main">
     <div class="row">
@@ -104,8 +107,8 @@
                                                         <th >Prioritas</th>
                                                         <th >Tipe WO</th>
                                                         <th >Tanggal selesai yang diharapkan</th>
-                                                        <th >Waktu Perbaikan</th>
                                                         <th >Tanggal Permintaan</th>
+                                                        <th >Waktu Perbaikan</th>
                                                         <th >Detail Keterangan</th>
                                                         <th >Hasil yang Diharapkan</th>
                                                         <th >Status</th>
@@ -171,18 +174,23 @@
                                 <input type="text" placeholder="Nama Peng-request" id="user_name" value="{{session('bo_name')}}" disabled>
                                 <label class="active" for="request_by">Requester</label>
                             </div>
-                            
-                            <div class="input-field col m4 s12">
-                                <input id="suggested_completion_date" name="suggested_completion_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tanggal selesai yang diharapkan" value="{{ date('Y-m-d') }}">
-                                <label class="active" for="suggested_completion_date">Tgl Selesai yang diharapkan</label>
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="estimated_fix_time" name="estimated_fix_time" type="number" placeholder="Estimasi waktu yang diperlukan">
-                                <label class="active" for="estimated_fix_time">Estimasi Waktu Selesai</label>
-                            </div>
                             <div class="input-field col m4 s12">
                                 <input id="request_date" name="request_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="request_date">Tgl. Request</label>
+                            </div>
+
+                            <div class="input-field col m3 s12">
+                                <input id="estimated_fix_time" name="estimated_fix_time" type="number" placeholder="Estimasi waktu yang diperlukan">
+                                <label class="active" for="estimated_fix_time">Estimasi Waktu Selesai</label>
+                            </div>
+                            <div class="input-field col m1 s12">
+                               
+                                <p>Min</p>
+                              
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <input id="suggested_completion_date" name="suggested_completion_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tanggal selesai yang diharapkan" value="{{ date('Y-m-d') }}">
+                                <label class="active" for="suggested_completion_date">Tgl Selesai yang diharapkan</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="priority" name="priority">    
@@ -221,8 +229,21 @@
                                 <select class="browser-default" id="equipment_id" name="equipment_id" onchange="getEquipmentPart()">&nbsp;</select>
                                 <label class="active" for="equipment_id">Equipment</label>
                             </div>
+                            <div class="input-field col m2 s12">
+                            </div>
+                            <div class="col m6 s12">
+                                <label for="actual_start_time">Actual Start Time (date and time):</label>
+                                 <input type="datetime-local" id="actual_start_time" name="actual_start_time">
+                            </div>
+                            <div class="input-field col m2 s12">
+                            </div>
+                            <div class="col m6 s12">
+                                <label for="actual_finish_time">Actual Finish Time (date and time):</label>
+                                 <input type="datetime-local" id="actual_finish_time" name="actual_finish_time">
+                            </div>
                             <div class="col m12 s12">
-                                
+                                <label for="solution">Solusi </label>
+                                 <input type="text" id="solution" name="solution">
                             </div>
                             <div class="col m12 s12">
                                 <div class="card-panel">
@@ -306,7 +327,7 @@
                                                             <tr>
                                                                 <th class="center">No</th>
                                                                 <th class="center">Deskripsi</th>
-                                                                <th class="center">File Path</th>
+                                                                <th class="center">Created At</th>
                                                                 <th class="center">Display</th>
                                                                 <th class="center">Action</th>
                                                                 
@@ -476,6 +497,13 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+                        const currentDate = new Date();
+                        const year = currentDate.getFullYear();
+                        const month = currentDate.getMonth() + 1;
+                        const day = currentDate.getDate();
+                        const hours = currentDate.getHours();
+                        const minutes = currentDate.getMinutes();
+                        const seconds = currentDate.getSeconds();
                         href = response.result;
                         base64image = e.target.result;
                         var fileInput = document.getElementById('document');
@@ -501,7 +529,7 @@
                                     </td>
                                     <input type="hidden" name="arr_file_path[]" value="`+base64image+`">
                                     <td>
-                                        ` +  fileInput.value + `
+                                        ` + day +`-`+month+`-`+year+`
                                     </td>
                                     <td>
                                         <a href="`+  href +`" target="_blank"><i class="material-icons">attachment</i></a>',
@@ -567,16 +595,16 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
-                $('#area_id').attr("disabled", false);
-                $('#place_id').attr("disabled", false);
-                $('#activity_id').attr("disabled", false);
+                $('#area_id').attr("disabled", false).formSelect();
+                $('#place_id').attr("disabled", false).formSelect();
+                $('#activity_id').attr("disabled", false).formSelect();
                 $('#user_id').attr("disabled", false);
                 $('#suggested_completion_date').attr("disabled", false);
                 $('#estimated_fix_time').attr("disabled", false);
                 $('#request_date').attr("disabled", false);
-                $('#priority').attr("disabled", false);
-                $('#maintenance_type').attr("disabled", false);
-                $('#work_order_type').attr("disabled", false);
+                $('#priority').attr("disabled", false).formSelect();
+                $('#maintenance_type').attr("disabled", false).formSelect();
+                $('#work_order_type').attr("disabled", false).formSelect();
                 $('#note').attr("disabled", false);
                 $('#expected_result').attr("disabled", false);
                 $('#equipment_id').attr("disabled", false);
@@ -1157,7 +1185,10 @@
                 $('#work_order_type').val(response.work_order_type).formSelect();
                 $('#maintenance_type').val(response.maintenance_type).formSelect();
                 $('#note').val(response.note);
+                $('#actual_start_time').val(response.actual_finish);
+                $('#actual_finish_time').val(response.actual_start);
                 $('#expected_result').val(response.expected_result);
+                $('#solution').val(response.solution);
                 if(response.equipment_part.length > 0){
                     
                     $.each(response.equipment_part, function(i, val) {
@@ -1233,7 +1264,7 @@
                                 </td>
                                 <input type="hidden" name="arr_file_path[]" value="`+val_file.path+`">
                                 <td>
-                                    ` +  val_file.path + `
+                                    ` +  val_file.created_at + `
                                 </td>
                                 <td>
                                 <a href="`+  val_file.attachment +`" target="_blank"><i class="material-icons">attachment</i></a>',
@@ -1492,21 +1523,19 @@
                     $('#empty-pic-detail').remove();
                     if(response.length > 0){
                         $.each(response, function(i, val) {
-                            console.log(val.id);
+                            
                             var count = makeid(10);
                             var picExist = false;
                             $.each(pic,function(i,vals){
                                 
-                                if(val.name === vals.name){
+                                if(val.name == vals.name){
                                     picExist = true;
                                     
-                                    return false;
-                                }else{
-                                    pic.push(val);
+                                    return true;
                                 }
                             });
-                            if(picExist===false){
-                                
+                            if(picExist == false){
+                                pic.push(val);
                                 $('#body-pic').append(`
                                 <tr class="row_pic_detail">
                                     <input type="hidden" name="arr_types[]" value="pic" data-id="` + count + `">

@@ -17,6 +17,7 @@ class RequestSparepartDetail extends Model
     protected $fillable = [    
         'request_sparepart_id',
         'equipment_sparepart_id',
+        'item_stock_id',
         'qty_request',
         'qty_usage',
         'qty_return',
@@ -32,4 +33,10 @@ class RequestSparepartDetail extends Model
     {
         return $this->belongsTo('App\Models\EquipmentSparepart', 'equipment_sparepart_id', 'id')->withTrashed();
     }
+
+    public function itemStock()
+    {
+        return $this->belongsTo('App\Models\ItemStock', 'item_stock_id', 'id');
+    }
+    
 }

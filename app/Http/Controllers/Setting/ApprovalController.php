@@ -307,7 +307,6 @@ class ApprovalController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
                 $response['data'][] = [
                     $val->status == '1' ? '<span class="pick" data-id="'.CustomHelper::encrypt($val->code).'">'.$nomor.'</span>' : $nomor,
                     $val->code.' - '.$val->updateNextLevelApproval(),
@@ -316,14 +315,15 @@ class ApprovalController extends Controller
                     $val->approvalSource->lookable->code,
                     $val->approvalSource->note,
                     $val->status == '1' ? '
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small btn-approve" data-popup="tooltip" title="show" onclick="show(`' . url('admin/'.$val->approvalSource->fullUrl() . '/approval/' . CustomHelper::encrypt($val->approvalSource->lookable->code)) . '`,`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons dp48">pageview</i></button>
-					' : ($val->approved ? 'Disetujui' : ($val->rejected ? 'Ditolak' : 'Invalid')),
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small btn-approve" data-popup="tooltip" title="show" onclick="show(`' . url('admin/'.$val->approvalSource->fullUrl() . '/approval/' . CustomHelper::encrypt($val->approvalSource->lookable->code)) . '`,`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons dp48">pageview</i></button>
+                    ' : ($val->approved ? 'Disetujui' : ($val->rejected ? 'Ditolak' : 'Invalid')),
                     $val->status(),
                     $val->note,
                     $val->status == '1' ? 'pending' : ''
                 ];
-
                 $nomor++;
+
+                
             }
         }
 
@@ -355,84 +355,119 @@ class ApprovalController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
+            $work_orders_rp = 0;
             $query = ApprovalMatrix::where('code',CustomHelper::decrypt($request->temp))->where('status','1')->first();
 			
-			if($query) {
-
-                /* DB::beginTransaction();
-                try { */
-
-                    $query->note = $request->note;
-
-                    if($request->approve_reject){
-                        $query->approved = '1';
-                        $query->rejected = NULL;
-                        $text = 'disetujui';
-                    }else{
-                        $query->approved = NULL;
-                        $query->rejected = '1';
-                        $text = 'ditolak';
-                    }
-
-                    $query->date_process = date('Y-m-d H:i:s');
-                    $query->status = '2';
-                    $query->save();
-                    
-                    if($request->approve_reject){
-                        if($query->passedApprove()){
-                            if($query->updateNextLevelApproval() !== ''){
-                                $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
-    
-                                if($am){
-                                    foreach($am as $row){
-                                        $row->update([
-                                            'status'    => '1'
-                                        ]);
-                                    }
-                                }
-                            }else{
-
-                                $pr = $query->approvalSource->lookable;
-                                $pr->update([
-                                    'status'    => '2'
-                                ]);
-                                
-                                CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+            if($query->approvalSource->lookable_type == 'work_orders'){
+                if($query->approvalSource->lookable->requestSparepartALL()->exists()){
+                    foreach($query->approvalSource->lookable->requestSparepartALL as $row){
+                        if($row->status == '1' ){
+                            $work_orders_rp = 1;
+                            $message = 'Data merupakan tipe Work Order yang masih memiliki request sparepart dengan kode '.$row->code.' yang belum di approve';
+                            break;
+                           
+                        }
+                        foreach($row->requestSparepartDetail as $row_detail){
+                            if($row_detail->qty_usage == null){
+                                $work_orders_rp = 1;
+                                $message="Qty usage pada Request sparepart ".$row->code." masih belum terisi / minimal 0";
+                                break;
+                            }elseif($row_detail->qty_repair == null){
+                                $work_orders_rp = 1;
+                                $message="Qty repair pada Request sparepart ".$row->code." masih belum terisi / minimal 0";
+                                break;
+                            }elseif($row_detail->qty_return == null){
+                                $work_orders_rp = 1;
+                                $message="Qty return pada Request sparepart ".$row->code." masih belum terisi / minimal 0";
+                                break;
                             }
                         }
-                    }else{
-                        if($query->passedReject()){
-                            $updaterealtable = $query->approvalSource->lookable;
-                            $updaterealtable->update([
-                                'status'    => '4'
-                            ]);
-                        }
                     }
+                }
+            }
+            if($work_orders_rp == 0){
+                if($query) {
 
-                    /* DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                } */
-
-                CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
-
-                activity()
-                    ->performedOn(new ApprovalMatrix())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit approval data.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
+                    /* DB::beginTransaction();
+                    try { */
+    
+                        $query->note = $request->note;
+    
+                        if($request->approve_reject){
+                            $query->approved = '1';
+                            $query->rejected = NULL;
+                            $text = 'disetujui';
+                        }else{
+                            $query->approved = NULL;
+                            $query->rejected = '1';
+                            $text = 'ditolak';
+                        }
+    
+                        $query->date_process = date('Y-m-d H:i:s');
+                        $query->status = '2';
+                        $query->save();
+                        
+                        if($request->approve_reject){
+                            if($query->passedApprove()){
+                                if($query->updateNextLevelApproval() !== ''){
+                                    $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
+        
+                                    if($am){
+                                        foreach($am as $row){
+                                            $row->update([
+                                                'status'    => '1'
+                                            ]);
+                                        }
+                                    }
+                                }else{
+    
+                                    $pr = $query->approvalSource->lookable;
+                                    $pr->update([
+                                        'status'    => '2'
+                                    ]);
+                                    
+                                    CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+                                }
+                            }
+                        }else{
+                            if($query->passedReject()){
+                                $updaterealtable = $query->approvalSource->lookable;
+                                $updaterealtable->update([
+                                    'status'    => '4'
+                                ]);
+                            }
+                        }
+    
+                        /* DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
+                    } */
+    
+                    CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
+    
+                    activity()
+                        ->performedOn(new ApprovalMatrix())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit approval data.');
+    
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => $message,
+                ];
+            }
+			
 		}
 		
 		return response()->json($response);
@@ -460,74 +495,110 @@ class ApprovalController extends Controller
 
             foreach($arrMulti as $row){
                 $query = ApprovalMatrix::where('code',CustomHelper::decrypt($row))->where('status','1')->first();
-			
-                if($query) {
-    
-                    DB::beginTransaction();
-                    try {
-    
-                        $query->note = $request->note_multi;
-
-                        if($request->approve_reject_multi){
-                            $query->approved = '1';
-                            $query->rejected = NULL;
-                            $text = 'disetujui';
-                        }else{
-                            $query->approved = NULL;
-                            $query->rejected = '1';
-                            $text = 'ditolak';
-                        }
-
-                        $query->date_process = date('Y-m-d H:i:s');
-                        $query->status = '2';
-                        $query->save();
-                        
-                        if($request->approve_reject_multi){
-                            if($query->passedApprove()){
-                                if($query->updateNextLevelApproval() !== ''){
-                                    $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
-        
-                                    if($am){
-                                        foreach($am as $rowdetail){
-                                            $rowdetail->update([
-                                                'status'    => '1'
-                                            ]);
-                                        }
-                                    }
-                                }else{
-                                    $pr = $query->approvalSource->lookable;
-                                    $pr->update([
-                                        'status'    => '2'
-                                    ]);
-
-                                    CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+                $work_orders_rp = 0;
+                if($query->approvalSource->lookable_type == 'work_orders'){
+                    if($query->approvalSource->lookable->requestSparepartALL()->exists()){
+                        foreach($query->approvalSource->lookable->requestSparepartALL as $row){
+                            if($row->status == '1' ){
+                                $work_orders_rp = 1;
+                                $message = 'Data merupakan tipe Work Order yang masih memiliki request sparepart dengan kode '.$row->code.' yang belum di approve';
+                                break;
+                               
+                            }
+                            foreach($row->requestSparepartDetail as $row_detail){
+                                if($row_detail->qty_usage == null){
+                                    $work_orders_rp = 1;
+                                    $message="Qty usage pada Request sparepart ".$row->code." masih belum terisi / minimal 0";
+                                    break;
+                                }elseif($row_detail->qty_repair == null){
+                                    $work_orders_rp = 1;
+                                    $message="Qty repair pada Request sparepart ".$row->code." masih belum terisi / minimal 0";
+                                    break;
+                                }elseif($row_detail->qty_return == null){
+                                    $work_orders_rp = 1;
+                                    $message="Qty return pada Request sparepart ".$row->code." masih belum terisi / minimal 0";
+                                    break;
                                 }
                             }
-                        }else{
-                            if($query->passedReject()){
-                                $updaterealtable = $query->approvalSource->lookable;
-                                $updaterealtable->update([
-                                    'status'    => '4'
-                                ]);
+                        }
+                    }
+                }
+                if($work_orders_rp == 0){
+                    if($query) {
+    
+                        DB::beginTransaction();
+                        try {
+        
+                            $query->note = $request->note_multi;
+    
+                            if($request->approve_reject_multi){
+                                $query->approved = '1';
+                                $query->rejected = NULL;
+                                $text = 'disetujui';
+                            }else{
+                                $query->approved = NULL;
+                                $query->rejected = '1';
+                                $text = 'ditolak';
                             }
+    
+                            $query->date_process = date('Y-m-d H:i:s');
+                            $query->status = '2';
+                            $query->save();
+                            
+                            if($request->approve_reject_multi){
+                                if($query->passedApprove()){
+                                    if($query->updateNextLevelApproval() !== ''){
+                                        $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
+            
+                                        if($am){
+                                            foreach($am as $rowdetail){
+                                                $rowdetail->update([
+                                                    'status'    => '1'
+                                                ]);
+                                            }
+                                        }
+                                    }else{
+                                        $pr = $query->approvalSource->lookable;
+                                        $pr->update([
+                                            'status'    => '2'
+                                        ]);
+    
+                                        CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+                                    }
+                                }
+                            }else{
+                                if($query->passedReject()){
+                                    $updaterealtable = $query->approvalSource->lookable;
+                                    $updaterealtable->update([
+                                        'status'    => '4'
+                                    ]);
+                                }
+                            }
+        
+                            CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
+        
+                            activity()
+                                ->performedOn(new ApprovalMatrix())
+                                ->causedBy(session('bo_id'))
+                                ->withProperties($query)
+                                ->log('Add / edit approval data.');
+        
+                            DB::commit();
+                        }catch(\Exception $e){
+                            DB::rollback();
                         }
     
-                        CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
-    
-                        activity()
-                            ->performedOn(new ApprovalMatrix())
-                            ->causedBy(session('bo_id'))
-                            ->withProperties($query)
-                            ->log('Add / edit approval data.');
-    
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
+                    } else {
+                        $success = false;
                     }
-
-                } else {
-                    $success = false;
+                }else{
+                    $response = [
+                        'status'  => 500,
+                        'message' => $message,
+                    ];
+                    return response()->json($response);
                 }
+                
             }
 
             if($success){

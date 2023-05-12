@@ -28,11 +28,14 @@ class WorkOrder extends Model
         'request_date',
         'estimated_fix_time',
         'detail_issue',
-        'expected_result', 
+        'expected_result',
+        'solution', 
         'status',  
         'void_id', //void user
         'void_note',    
-        'void_date'
+        'void_date',
+        'actual_start',
+        'actual_finish',
     ];
 
     public static function generateCode()
@@ -89,6 +92,35 @@ class WorkOrder extends Model
         return $status;
     }
 
+    public function maintenanceType(){
+        $maintenance = match ($this->maintenance_type) {
+            '1' => 'Preventive',
+            '2' => 'Corrective',
+            '3' => 'Utility',
+            default => 'Invalid',
+        };
+        return $maintenance;
+    }
+    public function priorityType(){
+        $priortys = match ($this->priority) {
+            '1' => 'Low',
+            '2' => 'Medium',
+            '3' => 'High',
+            default => 'Invalid',
+        };
+        return $priortys;
+    }
+
+    public function workorderType(){
+        $worktype = match ($this->work_order_type) {
+            '1' => 'MWR',
+            '2' => 'Abnormal',
+            '3' => 'DT',
+            default => 'Invalid',
+        };
+        return $worktype;
+    }
+
     public function user(){
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
@@ -114,6 +146,9 @@ class WorkOrder extends Model
     }
     public function requestSparepart(){
         return $this->hasMany('App\Models\RequestSparepart')->whereIn('status',['2','3']);
+    }
+    public function requestSparepartALL(){
+        return $this->hasMany('App\Models\RequestSparepart');
     }
     public function workOrderPersonInChargeDetail(){
         return $this->hasMany('App\Models\WorkOrderPersonInChargeDetail');

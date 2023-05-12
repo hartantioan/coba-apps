@@ -34,6 +34,8 @@ return new class extends Migration
                 $table->bigInteger('void_id')->nullable();
                 $table->string('void_note',155)->nullable();
                 $table->date('void_date')->nullable();
+                $table->date('actual_start')->nullable();
+                $table->date('actual_finish')->nullable();
                 $table->timestamps();
                 $table->softDeletes('deleted_at');
             });

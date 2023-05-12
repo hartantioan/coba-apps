@@ -9,6 +9,8 @@
     table.bordered th {
         padding: 5px !important;
     }
+    .select2-selection { overflow: hidden; }
+
 </style>
 <div id="main">
     <div class="row">
@@ -122,30 +124,36 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m5 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="work_order_id" name="work_order_id" onchange="getWO_info()">&nbsp;</select>
+                                <select class="browser-default" id="work_order_id" name="work_order_id" onchange="getWO_info();removeBodydetail()">&nbsp;</select>
                                 <label class="active" for="work_order_id">Work Order</label>
                             </div>
-                            <div class="input-field col m5 s12">
+                            <div class="input-field col m2 s12">
                                 
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m5 s12">
                                 <input type="hidden" id="user_id" name="user_id" value="">
                                 <input type="text" placeholder="Nama Peng-request" id="user_name" value="" readonly>
                                 <label class="active" for="request_by">Requester WO</label>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m5 s12">
                                 <input id="equipment_id" name="equipment_id"  type="text" placeholder="Equipment Name" readonly>
                                 <label class="active" for="suggested_completion_date">Equipment</label>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m2 s12">
+                                
+                            </div>
+                            <div class="input-field col m5 s12">
                                 <input id="request_date" name="request_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="request_date">Tgl. Request</label>
                             </div>
-                            <div class="input-field col m6 s12">
+                            <div class="input-field col m5 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Detail Issue</label>
+                            </div>
+                            <div class="input-field col m2 s12">
+                                
                             </div>
                             <div class="col m12 s12">
                                 <div style="overflow:auto;">
@@ -154,6 +162,32 @@
                                             <tr>
                                                 <th class="center" colspan="1">Nama Part</th>
                                                 <th class="center" colspan="7">Informasi Part</th>
+                                            </tr>
+                                            <tr class="row_header_part">
+                                                <td>
+                                                    Kode Equipment Part
+                                                </td>
+                                                <td>
+                                                    Nama Sparepart
+                                                </td>
+                                                <td>
+                                                    Stock
+                                                </td>
+                                                <td>
+                                                    Qty Request
+                                                </td>
+                                                <td>
+                                                    Qty Return
+                                                </td>
+                                                <td>
+                                                    Qty Usage
+                                                </td>
+                                                <td>
+                                                    Qty Repair
+                                                </td>
+                                                <td>
+                                                    Action
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody id="body-detail">
@@ -262,11 +296,12 @@
             
             },
             onCloseEnd: function(modal, trigger){
+                $('#btn_add_sparepart').prop('disabled', false);
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
                 $('#body-detail').empty();
-                $("#work_order_id").val("");
+                $("#work_order_id").empty();
                 $('.row_detail').each(function(){
                     $(this).remove();
                 });
@@ -318,8 +353,133 @@
         });
     });
 
-    function getWO_info(){
+    list_sparepart=[];
+    temp_spareparts=[];
+    function removeBodydetail(){
+        $('#body-detail').empty();
+    }
+
+    function takeSparepart(count){
+        console.log("kambing");
+        $('#arr_item'+count).empty();
+        $('#arr_item' + count).append(`
+            <option>Silahkan pilih sparepart</option>
+        `);
+        var temp_val = $('#equipmentpart'+count).val();
+        var temp_sparepart = list_sparepart[temp_val].sparepart;
+        $.each(temp_sparepart, function(index, value) {
+            $('#arr_item' + count).append(`
+                <option value="` + index + `">` + value.name + `</option>
+            `);
+        });
+        $('#arr_item'+count).select2(
+        {
+            placeholder: "Kosong untuk semua tipe.",
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+    }
+
+    function add_sparepart(){
         if($('#work_order_id').val()){
+            console.log(list_sparepart);
+            $('#empty-detail').remove();
+            var count = makeid(10);
+            
+            
+            $('#body-detail').append(`
+                <tr class="row_detail">
+                    <td>
+                        <select class="browser-default select2" id="equipmentpart` + count + `" name="equipmentpart" onchange="takeSparepart('` + count + `')">
+                                    
+                        </select>
+                    </td>
+                    <td id="select_item` + count + `">
+        
+                    </td>
+                    <td>
+                        
+                        <select class="browser-default select2" id="arr_stock` + count + `" name="arr_stock[]">
+                            <option>Silahkan pilih stock</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input name="arr_qty_req[]" id="arr_qty_req`+ count +`" type="text" value="0">
+                    </td>
+                    <td>
+                        <input name="arr_qty_return[]" id="arr_qty_return`+ count +`"  type="text" readonly>
+                    </td>  
+                    <td>
+                        <input name="arr_qty_usage[]" id="arr_qty_usage`+ count +`" type="text" readonly>
+                    </td>  
+                    <td>
+                        <input name="arr_qty_repair[]" id="arr_qty_repair`+ count +`" type="text" readonly>
+                    </td>
+                    <input type="hidden" name="arr_code[]" id="arr_code` + count + `" >
+                    <input type="hidden" name="arr_type[]">
+                    <td class="center-align">
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="deleteRow(this)"><i class="material-icons dp48">delete</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="add_sparepart(this)"><i class="material-icons dp48">add</i></button>
+                    </td>     
+                </tr>
+            `);
+
+            $.each(list_sparepart, function(i, value) {
+                $('#equipmentpart'+count).append(`
+                    <option value="`+i+`"> `+value.code+` - `+value.name+`</option>
+                `);
+                
+            });
+
+            var temp_val = $('#equipmentpart'+count).val();
+           
+            
+            $('#select_item'+count).append(`
+                <select class="browser-default select2" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')">
+                    <option>Silahkan pilih sparepart</option>
+                </select>
+            `);
+            var temp_sparepart = list_sparepart[temp_val].sparepart;
+
+            $.each(temp_sparepart, function(index, value) {
+                $('#arr_item' + count).append(`
+                    <option value="` + index + `">` + value.name + `</option>
+                `);
+            });
+            $('#arr_item'+count).select2(
+            {
+                placeholder: "Kosong untuk semua tipe.",
+                dropdownAutoWidth: true,
+                width: '100%',
+            });
+        }else{
+            alert("Harap pilih work order terlebih dahulu")
+        }
+        
+    }
+
+    function getRowUnit(val){
+        var temp_val = $('#equipmentpart'+val).val();
+        var temp_sparepart = list_sparepart[temp_val].sparepart;
+        console.log(temp_sparepart);
+        if($("#arr_item" + val).val()){
+            $("#arr_code" + val).val(temp_sparepart[$("#arr_item" + val).val()].code);
+            var temp_stock=temp_sparepart[$("#arr_item" + val).val()].stock;
+            $('#arr_stock' + val).empty();
+            console.log(temp_stock);
+            $.each(temp_stock, function(index, value) {
+                $('#arr_stock' + val).append(`
+                    <option value="` + value.id + `">` + value.qty + ` - ` + value.warehouse + `</option>
+                `);
+            });
+        }else{
+            
+        }
+    }
+
+    function getWO_info_edit(){
+        if($('#work_order_id').val()){
+            
             $.ajax({
                 url: '{{ Request::url() }}/get_work_order_info',
                 type: 'POST',
@@ -337,77 +497,18 @@
                     loadingClose('.modal-content');
                     $('#user_id').empty();
                     $('#user_name').empty();
-
+                    
                     if(response.user_name){
                         $('#user_name').val(response.user_name);
                         $('#equipment_id').val(response.equipment_name);
                     }
-                    $('#body-detail').empty();
-                    if(response.spare_part.length > 0){
-                        $.each(response.spare_part, function(i, val) {
-                            $('#body-detail').append(`
-                                <tr class="row_header_part">
-                                    <td rowspan="`+(val.sparepart.length+1)+`">
-                                        `+val.name+`
-                                    </td>
-                                    <td>
-                                        Kode
-                                    </td>
-                                    <td>
-                                        Nama
-                                    </td>
-                                    <td>
-                                        Qty Request
-                                    </td>
-                                    <td>
-                                        Qty Usage
-                                    </td>
-                                    <td>
-                                        Qty Return
-                                    </td>
-                                    <td>
-                                        Qty Repair
-                                    </td>
-                                    <td>
-                                        Pilih
-                                    </td>
-                                </tr>
-                            `);
-                            
-                            $.each(val.sparepart, function(i, val_spare) {
-                                var count = makeid(10);
-                                $('#body-detail').append(`
-                                    <tr class="row_detail">
-                                        <td>
-                                        `+val_spare.rawcode+`
-                                        </td>
-                                        <td>
-                                        `+val_spare.name+`
-                                        </td>
-                                        <td>
-                                            <input name="arr_qty_req[]" data-sparepart="` + val_spare.id + `" type="text" value="0">
-                                        </td>
-                                        <td>
-                                            <input name="arr_qty_usage[]" data-sparepart="` + val_spare.id + `" type="text" value="0">
-                                        </td>  
-                                        <td>
-                                            <input name="arr_qty_return[]" data-sparepart="` + val_spare.id + `" type="text" value="0">
-                                        </td>  
-                                        <td>
-                                            <input name="arr_qty_repair[]" data-sparepart="` + val_spare.id + `" type="text" value="0">
-                                        </td>
-                                        <input type="hidden" name="arr_type[]" value="`+val_spare.type+`" data-id="`+count+`">
-                                        <td class="center-align">
-                                            <label>
-                                                <input type="checkbox" id="check`+count+`" name="arr_code[]" value="`+val_spare.code+`" data-id="`+count+`">
-                                                <span>Pilih</span>
-                                            </label>
-                                        </td>     
-                                    </tr>
-                                `);
-                            });
-                        }); 
-                 
+                   
+                    
+                    if(response.equipment_part.length > 0){
+                       
+                        list_sparepart=response.equipment_part;
+                       
+
                     }else{
                         $('#body-detail').empty().append(`
                             <tr id="empty-detail">
@@ -432,7 +533,7 @@
                 }
             });
         }else{
-            $('#body-detail').empty();
+            
             $('#body-detail').empty().append(`
                 <tr id="empty-detail">
                     <td colspan="10" class="center">
@@ -443,6 +544,151 @@
         }
     }
 
+    function getWO_info(){
+       
+        if($('#work_order_id').val()){
+            
+            $.ajax({
+                url: '{{ Request::url() }}/get_work_order_info',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#work_order_id').val()
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#user_id').empty();
+                    $('#user_name').empty();
+                    
+                    if(response.user_name){
+                        $('#user_name').val(response.user_name);
+                        $('#equipment_id').val(response.equipment_name);
+                    }
+                   
+                    
+                    if(response.equipment_part.length > 0){
+                       
+                        list_sparepart=response.equipment_part;
+                       
+                        $('#empty-detail').remove();
+                        var count = makeid(10);
+                        
+                        
+                        $('#body-detail').append(`
+                            <tr class="row_detail">
+                                <td>
+                                    <select class="browser-default select2" id="equipmentpart` + count + `" name="equipmentpart"  onchange="takeSparepart('` + count + `')">
+                                                
+                                    </select>
+                                </td>
+                                <td id="select_item` + count + `">
+                                    
+                                </td>
+                                <td>
+                                    
+                                    <select class="browser-default select2" id="arr_stock` + count + `" name="arr_stock[]">
+                                        <option>Silahkan pilih stock</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input name="arr_qty_req[]" id="arr_qty_req`+ count +`" type="text" value="0">
+                                </td>
+                                <td>
+                                    <input name="arr_qty_return[]" id="arr_qty_return`+ count +`"  type="text" readonly>
+                                </td>  
+                                <td>
+                                    <input name="arr_qty_usage[]" id="arr_qty_usage`+ count +`" type="text" readonly>
+                                </td>  
+                                <td>
+                                    <input name="arr_qty_repair[]" id="arr_qty_repair`+ count +`" type="text" readonly>
+                                </td>
+                                <input type="hidden" name="arr_code[]" id="arr_code` + count + `" >
+                                <input type="hidden" name="arr_type[]">
+                                <td class="center-align">
+                                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="deleteRow(this)"><i class="material-icons dp48">delete</i></button>
+                                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="add_sparepart(this)"><i class="material-icons dp48">add</i></button>
+                                </td>     
+                            </tr>
+                        `);
+                        
+                        $('#equipmentpart').empty();
+                        $.each(response.equipment_part, function(i, value) {
+                            $('#equipmentpart'+count).append(`
+                                <option value="`+i+`"> `+value.code+` - `+value.name+`</option>
+                            `);
+                            
+                        });
+                            
+                        $('#equipmentpart').select2(
+                            {
+                                placeholder: "Kosong untuk semua tipe.",
+                                dropdownAutoWidth: true,
+                                width: '100%',
+                            }
+                        );
+
+                        var temp_val = $('#equipmentpart'+count).val();
+
+                        $('#select_item'+count).append(`
+                            <select class="browser-default select2" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')">
+                                <option>Silahkan pilih sparepart</option>
+                            </select>
+                        `);
+                        var temp_sparepart = list_sparepart[temp_val].sparepart;
+                        
+                        $.each(temp_sparepart, function(index, value) {
+                            $('#arr_item' + count).append(`
+                                <option value="` + index + `">` + value.name + `</option>
+                            `);
+                        });
+                        $('#arr_item'+count).select2(
+                        {
+                            placeholder: "Kosong untuk semua tipe.",
+                            dropdownAutoWidth: true,
+                            width: '100%',
+                        });
+
+                    }else{
+                        $('#body-detail').empty().append(`
+                            <tr id="empty-detail">
+                                <td colspan="10" class="center">
+                                   Work Order tidak mencantumkan Equipment part
+                                </td>
+                            </tr>
+                        `);
+                    }
+                    
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            
+            $('#body-detail').empty().append(`
+                <tr id="empty-detail">
+                    <td colspan="10" class="center">
+                        Silahkan memilih WO terlebih dahulu
+                    </td>
+                </tr>
+            `);
+        }
+        
+    }
     function removeAttachment(button) {
         const row = button.parentNode.parentNode;
         row.parentNode.removeChild(row);
@@ -674,7 +920,25 @@
         }
     }
 
+    function deleteRow(button) {
+        $(button).closest('tr').remove();
+    }
+    function returnUsage(val){
+        var qtyReturn = parseInt($("#arr_qty_return" + val).val());
+        var qtyReq = parseInt($('#arr_qty_req' + val).val());
+
+        if(qtyReturn > qtyReq) {
+            qtyReturn = qtyReq;
+            $("#arr_qty_return" + val).val(qtyReq);
+        }
+
+        var qtyUsage = qtyReq - qtyReturn;
+        $('#arr_qty_usage' + val).val(qtyUsage);
+    }
+
     function show(id){
+        
+        console.log(list_sparepart);
         $.ajax({
             url: '{{ Request::url() }}/show',
             type: 'POST',
@@ -698,89 +962,187 @@
                     <option value="` + response.work_order_id + `">` + response.work_order_code + `</option>
                 `);
                 $('#request_date').val(response.request_date);
+                getWO_info_edit();
                 
+                
+
                 if(response.equipment_part.length > 0){
-                   
-                    $.each(response.equipment_part, function(i, val) {
-                        var count = makeid(10);
-                        
-                        $('#body-detail').append(`
-                            <tr class="row_header_part">
-                                <td rowspan="`+(val.sparepart.length+1)+`">
-                                    `+val.name+`
-                                </td>
-                                <td>
-                                    Kode
-                                </td>
-                                <td>
-                                    Nama
-                                </td>
-                                <td>
-                                    Qty Request
-                                </td>
-                                <td>
-                                    Qty Usage
-                                </td>
-                                <td>
-                                    Qty Return
-                                </td>
-                                <td>
-                                    Qty Repair
-                                </td>
-                                <td>
-                                    Pilih
-                                </td>
-                            </tr>
-                        `);
+                    
+                    if(response.status == '1'){
+                        $.each(response.equipment_part, function(index_ep, val) {
+                           
+                            $.each(val.sparepart, function(i, val_spare) {
+                                var count = makeid(10);
+                                var temp_sparepart = response.equipment_part[index_ep].sparepart;
+                                      
+                                $.each(response.request_sp_detail, function(idex, val_request_sp_detail) {
+                                    
+                                    if(val_spare.id==val_request_sp_detail.equipment_sparepart_id){
+                                        
+                                        
+                                        $('#body-detail').append(`
+                                            <tr class="row_detail">
+                                                <td>
+                                                `+val.code+`
+                                                </td>
+                                                <td>
+                                                    <select class="browser-default select2" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `',` + index_ep + `)" readonly>
+                                                        <option value="` + i + `">` + val_spare.name + `</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="browser-default select2" id="arr_stock` + count + `" name="arr_stock[]" readonly>
+                                                        <option value="` + val_request_sp_detail.stock.id + `">` + val_request_sp_detail.stock.qty + ` - ` + val_request_sp_detail.stock.warehouse + `</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input name="arr_qty_req[]" id="arr_qty_req`+ count +`" type="text" value="0" >
+                                                </td>
+                                                <td>
+                                                    <input name="arr_qty_return[]" id="arr_qty_return`+ count +`"  type="text" readonly>
+                                                </td>  
+                                                <td>
+                                                    <input name="arr_qty_usage[]" id="arr_qty_usage`+ count +`" type="text" readonly >
+                                                </td>  
+                                                <td>
+                                                    <input name="arr_qty_repair[]" id="arr_qty_repair`+ count +`" type="text" readonly>
+                                                </td>
+                                                <input type="hidden" name="arr_code[]" id="arr_code` + count + `" >
+                                                <input type="hidden" name="arr_type[]">
+                                                <td class="center-align">
+                                                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete"  onclick="deleteRow(this)"><i class="material-icons dp48">delete</i></button>
+                                                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="add_sparepart(this)"><i class="material-icons dp48">add</i></button>
+                                                </td>     
+                                            </tr>
+                                        `);
+                                        
+                                        var temp_stock=temp_sparepart[$('#arr_item' + count).val()].stock;
+                                        
+                                       
+                                        $("#arr_code" + count).val(temp_sparepart[$('#arr_item' + count).val()].code);
+                                        $.each(temp_stock, function(index, value) {
+                                            if(value.id != val_request_sp_detail.stock.id){
+                                                $('#arr_stock' + count).append(`
+                                                    <option value="` + value.id + `">` + value.qty + ` - ` + value.warehouse + `</option>
+                                                `);
+                                            }
+                                        });
+                                        $.each(temp_sparepart, function(index, value) {
+                                            if(value.name != val_spare.name){
+                                                $('#arr_item' + count).append(`
+                                                    <option value="` + index + `">` + value.name + `</option>
+                                                `);
+                                            }
+                                            
+                                        });
+                                        $('#arr_item'+count).select2(
+                                        {
+                                            placeholder: "Kosong untuk semua tipe.",
+                                            dropdownAutoWidth: true,
+                                            width: '100%',
+                                        });
 
-                        $.each(val.sparepart, function(i, val_spare) {
-                            var count = makeid(10);
-                            $('#body-detail').append(`
-                                <tr class="row_detail">
-                                    <td>
-                                    `+val_spare.rawcode+`
-                                    </td>
-                                    <td>
-                                    `+val_spare.name+`
-                                    </td>
-                                    <td>
-                                        <input name="arr_qty_req[]" data-sparepart="` + val_spare.id + `"  type="text" value="0">
-                                    </td>
-                                    <td>
-                                        <input name="arr_qty_usage[]" data-sparepart="` + val_spare.id + `" type="text" value="0">
-                                    </td>  
-                                    <td>
-                                        <input name="arr_qty_return[]" data-sparepart="` + val_spare.id + `"  type="text" value="0">
-                                    </td>  
-                                    <td>
-                                        <input name="arr_qty_repair[]" data-sparepart="` + val_spare.id + `"  type="text" value="0">
-                                    </td>
-                                    <input type="hidden" name="arr_type[]" value="`+val_spare.type+`" data-id="`+count+`">
-                                    <td class="center-align">
-                                        <label>
-                                            <input type="checkbox" id="check`+count+`" name="arr_code[]" value="`+val_spare.code+`" data-id="`+count+`">
-                                            <span>Pilih</span>
-                                        </label>
-                                    </td>     
-                                </tr>
-                            `);
+                                        
+                                        $('input[name^="arr_qty_req"][id="arr_qty_req'+ count +'"]').val(val_request_sp_detail.qty_request);
+                                        $('input[name^="arr_qty_usage"][id="arr_qty_usage'+ count +'"]').val(val_request_sp_detail.qty_usage);
+                                        $('input[name^="arr_qty_return"][id="arr_qty_return'+ count +'"]').val(val_request_sp_detail.qty_return);
+                                        $('input[name^="arr_qty_repair"][id="arr_qty_repair'+ count +'"]').val(val_request_sp_detail.qty_repair);
+                                            
+                                    }
+                                });
+                            });                  
+                        });
+                    }
+                    if(response.status == '2'){
+                        $('#btn_add_sparepart').prop('disabled', true);
+                        
+                        $.each(response.equipment_part, function(index_ep, val) {
                             
-                            $.each(response.request_sp_detail, function(i, val_request_sp_detail) {
-                            if(val_spare.id==val_request_sp_detail.equipment_sparepart_id){
-                                $('#check' + count).prop( "checked", true);
-                                $('input[name^="arr_qty_req"][data-sparepart="' + val_spare.id + '"]').val(val_request_sp_detail.qty_request);
-                                $('input[name^="arr_qty_usage"][data-sparepart="' + val_spare.id + '"]').val(val_request_sp_detail.qty_usage);
-                                $('input[name^="arr_qty_return"][data-sparepart="' + val_spare.id + '"]').val(val_request_sp_detail.qty_return);
-                                $('input[name^="arr_qty_repair"][data-sparepart="' + val_spare.id + '"]').val(val_request_sp_detail.qty_repair);
-                            }
-                        });
+                            $.each(val.sparepart, function(i, val_spare) {
+                                var count = makeid(10);
+                                var temp_sparepart = response.equipment_part[index_ep].sparepart;
+                                   
+                                $.each(response.request_sp_detail, function(idex, val_request_sp_detail) {
+                                    if(val_spare.id==val_request_sp_detail.equipment_sparepart_id){
+                                        
+                                        $('#body-detail').append(`
+                                            <tr class="row_detail">
+                                                <td>
+                                                `+val.code+`
+                                                </td>
+                                                <td>
+                                                    <select class="browser-default select2" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `',` + index_ep + `)" readonly>
+                                                        <option value="` + i + `">` + val_spare.name + `</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="browser-default select2" id="arr_stock` + count + `" name="arr_stock[]" readonly>
+                                                        <option value="` + val_request_sp_detail.stock.id + `">` + val_request_sp_detail.stock.qty + ` - ` + val_request_sp_detail.stock.warehouse + `</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input name="arr_qty_req[]" id="arr_qty_req`+ count +`" type="number" value="0" readonly>
+                                                </td>
+                                                <td>
+                                                    <input name="arr_qty_return[]" id="arr_qty_return`+ count +`"  type="number" onkeyup="returnUsage('` + count + `')" onchange="returnUsage('` + count + `')">
+                                                    
+                                                </td>  
+                                                <td>
+                                                    <input name="arr_qty_usage[]" id="arr_qty_usage`+ count +`" type="number" min="0" readonly>
+                                                </td>  
+                                                <td>
+                                                    <input name="arr_qty_repair[]" id="arr_qty_repair`+ count +`" type="text" >
+                                                </td>
+                                                <input type="hidden" name="arr_code[]" id="arr_code` + count + `" >
+                                                <input type="hidden" name="arr_type[]">
+                                                <td class="center-align">
+                                                    <button disabled type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete"  onclick="deleteRow(this)"><i class="material-icons dp48">delete</i></button>
+                                                </td>     
+                                            </tr>
+                                        `);
+                                        
+                                      
+                                        var temp_stock=temp_sparepart[$('#arr_item' + count).val()].stock;
+                                        
+                                        $("#arr_code" + count).val(temp_sparepart[$('#arr_item' + count).val()].code);
+                                        $.each(temp_stock, function(index, value) {
+                                            if(value.id != val_request_sp_detail.stock.id){
+                                                $('#arr_stock' + count).append(`
+                                                    <option value="` + value.id + `" disabled>` + value.qty + ` - ` + value.warehouse + `</option>
+                                                `);
+                                            }
+                                        });
+                                        $.each(temp_sparepart, function(index, value) {
+                                            if(value.name != val_spare.name){
+                                                $('#arr_item' + count).append(`
+                                                    <option value="` + index + `" disabled>` + value.name + `</option>
+                                                `);
+                                            }
+                                            
+                                        });
+                                        $('#arr_item'+count).select2(
+                                        {
+                                            placeholder: "Kosong untuk semua tipe.",
+                                            dropdownAutoWidth: true,
+                                            width: '100%',
+                                        });
 
+                                        
+                                        $('input[name^="arr_qty_req"][id="arr_qty_req'+ count +'"]').val(val_request_sp_detail.qty_request);
+                                        $('input[name^="arr_qty_usage"][id="arr_qty_usage'+ count +'"]').val(val_request_sp_detail.qty_usage);
+                                        $('input[name^="arr_qty_return"][id="arr_qty_return'+ count +'"]').val(val_request_sp_detail.qty_return);
+                                        $('input[name^="arr_qty_repair"][id="arr_qty_repair'+ count +'"]').val(val_request_sp_detail.qty_repair);
+                                            
+                                    }
+                                });
+                            });                  
                         });
-                            //untuk checklist
+                        
                       
-                        
-                        
-                    });
+                    }
+                    
+                   
+                    
                 }
 
                 $('#empty-detail').remove();
@@ -978,7 +1340,7 @@
                 } else {
                     part.expandTree();
                 }
-                console.log("Node clicked: " + part.data.key);
+                
             }
         });
         myDiagram.nodeTemplate =
@@ -1027,7 +1389,7 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        console.log(data[0].key);
+        
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {

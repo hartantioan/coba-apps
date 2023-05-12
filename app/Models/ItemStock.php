@@ -40,4 +40,7 @@ class ItemStock extends Model
 
         return $totalNow;
     }
+    public function requestSparepartDetail(){
+        return $this->hasMany('App\Models\RequestSparepartDetail');
+    }
 }

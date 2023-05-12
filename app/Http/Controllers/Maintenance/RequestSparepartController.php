@@ -152,6 +152,7 @@ class RequestSparepartController extends Controller
         $data = WorkOrder::find($request->id);
         
         $part_details = [];
+        $spare_part = [];
         $equipment_name = $data->equipment->name;
         $user_name = $data->user->name;
         if($data->workOrderPartDetail()->exists()){
@@ -170,17 +171,19 @@ class RequestSparepartController extends Controller
                         'rawcode'       => $sparepart_temp->code,
                         "name" => $sparepart_temp->item->name,
                         "type" => "sparepart",
+                        "stock" =>$sparepart_temp->item->currentStock($this->dataplaces),
                     ];
                     $spareparts[]=$sparepart;
                 }
+                
                 $part_detail["sparepart"]=$spareparts;
-
                 $part_details[]=$part_detail;
+                
             }
         }
         $data["equipment_name"]=$equipment_name;
         $data["user_name"]=$user_name;
-        $data["spare_part"]=$part_details;
+        $data["equipment_part"]=$part_details;
         
         return response()->json($data);
     }
@@ -209,29 +212,52 @@ class RequestSparepartController extends Controller
                 try {
                     $query = RequestSparepart::where('code',CustomHelper::decrypt($request->temp))->first();
                     
-                    
-
-                    if($query->status == '1'){
+                    if($query->workOrder->status == 1){
+                        if($query->status == '1'){
                        
-                        $query->work_order_id = $request->work_order_id;
-                       
-                        $query->request_date = $request->request_date;
-                        
-                        $query->summary_issue = $request->note;
-                       
-                        $query->save();
-                      
-                        foreach($query->requestSparePartDetail as $row){
-                            $row->delete();
+                            $query->work_order_id = $request->work_order_id;
+                           
+                            $query->request_date = $request->request_date;
+                            
+                            $query->summary_issue = $request->note;
+                           
+                            $query->save();
+                          
+                            foreach($query->requestSparePartDetail as $row){
+                                $row->delete();
+                            }
+    
+                            DB::commit();
                         }
-
-                        DB::commit();
+                        elseif($query->status =='2'){
+                            $query->work_order_id = $request->work_order_id;
+                           
+                            $query->request_date = $request->request_date;
+                            
+                            $query->summary_issue = $request->note;
+                           
+                            $query->save();
+                          
+                            foreach($query->requestSparePartDetail as $row){
+                                $row->delete();
+                            }
+    
+                            DB::commit();
+                        }
+                        else{
+                            return response()->json([
+                                'status'  => 500,
+                                'message' => 'Status request sparepart sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            ]);
+                        }
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status request sparepart sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Work Order milik request sparepart ini sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan .'
                         ]);
                     }
+
+                    
                 }catch(\Exception $e){
                     DB::rollback();
                 }
@@ -257,39 +283,34 @@ class RequestSparepartController extends Controller
 			
 			if($query) {
                 
-                if($request->arr_type){
+                if($request->arr_code){
                     DB::beginTransaction();
                     
                     try {
-                        foreach($request->arr_type as $key => $row){
+                        foreach($request->arr_code as $key => $row){
                             $code = CustomHelper::decrypt($request->arr_code[$key]);
                             
-                            if($row == 'sparepart'){
+                           
                                 
-                                try {
-                                    $idDetail = EquipmentSparepart::where('code',$code)->first()->id;
-                                }catch(\Exception $e){
-                                    DB::rollback();
-                                }
-                            }
+                                
+                                $idDetail = EquipmentSparepart::where('code',$code)->first()->id;
+                                info($request->arr_stock[$key]);
                             
-                            try {
+                                
+                            
                                 
                                 RequestSparepartDetail::create([
                                     'request_sparepart_id'          => $query->id,
                                     'equipment_sparepart_id'        => $idDetail,
+                                    'item_stock_id'                 => $request->arr_stock[$key],
                                     'qty_request'                   => $request->arr_qty_req[$key],
                                     'qty_usage'                     => $request->arr_qty_usage[$key],
                                     'qty_return'                    => $request->arr_qty_return[$key],
                                     'qty_repair'                    => $request->arr_qty_repair[$key],
                                 ]);
                                 
-                               
-                                DB::commit();
-                            } catch(\Exception $e){
-                                info($e);
-                                DB::rollback();
-                            }
+                                DB::commit(); 
+                            
                         }
                     }catch(\Exception $e){
                         DB::rollback();
@@ -337,6 +358,7 @@ class RequestSparepartController extends Controller
                     'code'          => CustomHelper::encrypt($sparepart_temp->code),
                     'rawcode'       => $sparepart_temp->code,
                     "name"          => $sparepart_temp->item->name,
+                    "stock"         => $sparepart_temp->item->currentStock($this->dataplaces),
                     "type"          => "sparepart",
                 ];
                 $spareparts[]=$sparepart;
@@ -346,10 +368,15 @@ class RequestSparepartController extends Controller
         }
         
         foreach($request_sp->requestSparePartDetail as $row){
-            
+            // info($row->itemStock->qty);
             $request_sp_detail=[
                 'request_sparepart_id' =>$row->request_sparepart_id,
                 'equipment_sparepart_id'=>$row->equipment_sparepart_id,
+                'stock' =>[
+                    "id"            => $row->itemStock->id,
+                    'qty'           => number_format($row->itemStock->qty,3,',','.').' '.$row->itemStock->item->uomUnit->code,
+                    'warehouse'     => $row->itemStock->warehouse->name,
+                ],
                 'qty_request'=>$row->qty_request,
                 'qty_usage'=>$row->qty_usage,
                 'qty_return'=>$row->qty_return,
@@ -429,7 +456,7 @@ class RequestSparepartController extends Controller
         
         if($query->delete()) {
 
-            CustomHelper::removeApproval('good_receipts',$query->id);
+            CustomHelper::removeApproval('request_spareparts',$query->id);
 
             $query->requestSparePartDetail()->delete();
 
@@ -437,7 +464,7 @@ class RequestSparepartController extends Controller
                 ->performedOn(new RequestSparepart())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the Work Order Data');
+                ->log('Delete the request_spareparts Data');
 
             $response = [
                 'status'  => 200,

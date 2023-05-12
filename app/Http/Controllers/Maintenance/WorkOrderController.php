@@ -142,12 +142,12 @@ class WorkOrderController extends Controller
                     $val->activity->title,
                     $val->area->name,
                     $val->user->name,
-                    $val->maintenance_type,
-                    $val->priority,
-                    $val->work_order_type,
+                    $val->maintenanceType(),
+                    $val->priorityType(),
+                    $val->workorderType(),
                     $val->suggested_completion_date,
                     $val->request_date,
-                    $val->estimated_fix_time,
+                    $val->estimated_fix_time ? $val->estimated_fix_time." Min" : '',
                     $val->detail_issue,
                     $val->expected_result,
                     $val->status(),
@@ -156,7 +156,6 @@ class WorkOrderController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light teal lighten-1 white-tex btn-small" data-popup="tooltip" title="Add PIC" onclick="addPIC(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">group_add</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
 
@@ -241,15 +240,6 @@ class WorkOrderController extends Controller
                     
 
                     if($query->status == '1'){
-                        
-                        /* if($request->has('document')) {
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
-                            }
-                            $document = $request->file('document')->store('public/payment_requests');
-                        } else {
-                            $document = $query->document;
-                        } */
 
                         $query->user_id = $request->user_id;
                        
@@ -274,7 +264,9 @@ class WorkOrderController extends Controller
                         $query->maintenance_type = $request->maintenance_type;
                         $query->detail_issue = $request->note;
                         $query->expected_result = $request->expected_result;
-                       
+                        $query->actual_start = $request->actual_start_time;
+                        $query->actual_finish = $request->actual_finish_time;
+                        $query->solution = $request->solution;
                         $query->save();
                       
                         foreach($query->WorkOrderPartDetail as $row){
@@ -314,6 +306,9 @@ class WorkOrderController extends Controller
                         'estimated_fix_time'        => $request->estimated_fix_time,
                         'detail_issue'              => $request->note,
                         'expected_result'           => $request->expected_result,
+                        'actual_start'              => $request->actual_start_time,
+                        'actual_finish'             => $request->actual_finish_time,
+                        'solution'                  => $request->solution,
                         'status'                    => '1',
                     ]);
 
@@ -389,8 +384,7 @@ class WorkOrderController extends Controller
                                     'work_order_id'                 => $query->id,
                                     'part_id'                       => $idDetail,
                                 ]);
-                                CustomHelper::sendApproval('work_orders',$query->id,$query->note);
-                                CustomHelper::sendNotification('work_orders',$query->id,'Pengajuan Request Work Order No. '.$query->code,$query->note,session('bo_id'));
+                               
                                
                                 DB::commit();
                             } catch(\Exception $e){
@@ -402,6 +396,8 @@ class WorkOrderController extends Controller
                         DB::rollback();
                     }
                 }
+                CustomHelper::sendApproval('work_orders',$query->id,$query->note);
+                CustomHelper::sendNotification('work_orders',$query->id,'Pengajuan Request Work Order No. '.$query->code,$query->note,session('bo_id'));
                 activity()
                     ->performedOn(new WorkOrder())
                     ->causedBy(session('bo_id'))
@@ -475,7 +471,7 @@ class WorkOrderController extends Controller
         foreach($wo->workOrderAttachmentDetail as $row){
             $file = [
                 'id'=>$row->id,
-                'path'=>$row->path,
+                'created_at'=> date('d/m/y',strtotime($row->created_at)),
                 'file_name'=>$row->file_name,
                 'attachment'=>$row->attachment()
             ];
@@ -519,26 +515,83 @@ class WorkOrderController extends Controller
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
-                $query->update([
-                    'status'    => '5',
-                    'void_id'   => session('bo_id'),
-                    'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
-                ]);
-    
-                activity()
-                    ->performedOn(new WorkOrder())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Void the purchase request data');
-    
-                CustomHelper::sendNotification('work_orders',$query->id,'Work Order No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('work_orders',$query->id);
+                $message = "";
+                if($query->requestSparepartALL()->exists()){
+                    $work_orders_rp=0;
+                    
+                    foreach($query->requestSparepartALL as $row){
+                        if($row->status == '1' ){
+                            $work_orders_rp = 1;
+                            $message="Request sparepart ".$row->code." masih belum di approve";
+                            break;
+                        }
+                        foreach($row->requestSparepartDetail as $row_detail){
+                            if($row_detail->qty_usage == null){
+                                $work_orders_rp = 1;
+                                $message="Qty usage pada Request sparepart ".$row->code." masih belum terisi / minimal 0";
+                                break;
+                            }elseif($row_detail->qty_repair == null){
+                                $work_orders_rp = 1;
+                                $message="Qty repair pada Request sparepart ".$row->code." masih belum terisi / minimal 0";
+                                break;
+                            }elseif($row_detail->qty_return == null){
+                                $work_orders_rp = 1;
+                                $message="Qty return pada Request sparepart ".$row->code." masih belum terisi / minimal 0";
+                                break;
+                            }
+                        }
+                    }
 
-                $response = [
-                    'status'  => 200,
-                    'message' => 'Data closed successfully.'
-                ];
+                    if($work_orders_rp==0){
+                        $query->update([
+                            'status'    => '5',
+                            'void_id'   => session('bo_id'),
+                            'void_note' => $request->msg,
+                            'void_date' => date('Y-m-d H:i:s')
+                        ]);
+            
+                        activity()
+                            ->performedOn(new WorkOrder())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query)
+                            ->log('Void the purchase request data');
+            
+                        CustomHelper::sendNotification('work_orders',$query->id,'Work Order No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                        CustomHelper::removeApproval('work_orders',$query->id);
+        
+                        $response = [
+                            'status'  => 200,
+                            'message' => 'Data closed successfully.'
+                        ];
+                    }else{
+                        $response = [
+                            'status'  => 500,
+                            'message' => $message
+                        ];
+                    }
+
+                }else{
+                    $query->update([
+                        'status'    => '5',
+                        'void_id'   => session('bo_id'),
+                        'void_note' => $request->msg,
+                        'void_date' => date('Y-m-d H:i:s')
+                    ]);
+        
+                    activity()
+                        ->performedOn(new WorkOrder())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Void the purchase request data');
+        
+                    CustomHelper::sendNotification('work_orders',$query->id,'Work Order No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                    CustomHelper::removeApproval('work_orders',$query->id);
+    
+                    $response = [
+                        'status'  => 200,
+                        'message' => 'Data closed successfully.'
+                    ];
+                }
             }
         } else {
             $response = [
@@ -597,7 +650,7 @@ class WorkOrderController extends Controller
         if($query->delete()) {
 
 
-            CustomHelper::removeApproval('work_order',$query->id);
+            CustomHelper::removeApproval('work_orders',$query->id);
 
             $query->WorkOrderPartDetail()->delete();
 

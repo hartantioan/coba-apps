@@ -63,4 +63,21 @@ class GoodIssueDetail extends Model
 
         return $qty;
     }
+
+    public function purchaseOrderDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseOrderDetail', 'good_issue_detail_id', 'id')->whereHas('purchaseOrder',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function qtyBalance(){
+        $qty = $this->qtyConvertToBuy();
+
+        foreach($this->purchaseOrderDetail as $row){
+            $qty -= $row->qty;
+        }
+
+        return $qty;
+    }
 }

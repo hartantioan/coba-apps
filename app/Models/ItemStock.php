@@ -30,4 +30,14 @@ class ItemStock extends Model
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
     }
+
+    public function valueNow(){
+        $totalNow = 0;
+        $cek = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderByDesc('id')->first();
+        if($cek){
+            $totalNow = $cek->total_final;
+        }
+
+        return $totalNow;
+    }
 }

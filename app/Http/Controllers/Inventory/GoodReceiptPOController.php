@@ -56,8 +56,8 @@ class GoodReceiptPOController extends Controller
             'id',
             'user_id',
             'account_id',
+            'company_id',
             'code',
-            'account_id',
             'receiver_name',
             'post_date',
             'due_date',
@@ -194,7 +194,7 @@ class GoodReceiptPOController extends Controller
     }
 
     public function getPurchaseOrder(Request $request){
-        $data = PurchaseOrder::where('id',$request->id)->where('status','2')->first();
+        $data = PurchaseOrder::where('id',$request->id)->whereIn('status',['2','3'])->first();
         $data['account_name'] = $data->supplier->employee_no.' - '.$data->supplier->name;
 
         if($data->used()->exists()){
@@ -231,7 +231,7 @@ class GoodReceiptPOController extends Controller
     }
 
     public function getPurchaseOrderAll(Request $request){
-        $rows = PurchaseOrder::where('account_id',$request->id)->where('status','2')->get();
+        $rows = PurchaseOrder::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
         
         $arrdata = [];
         

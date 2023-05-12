@@ -136,7 +136,7 @@ class PurchaseInvoiceController extends Controller
             }
         }
     
-        $datalc = LandedCost::where('account_id',$request->id)->where('status','2')->get();
+        $datalc = LandedCost::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datalc as $row){
             if($row->balanceInvoice() > 0){

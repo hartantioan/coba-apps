@@ -45,6 +45,7 @@ use App\Http\Controllers\Purchase\LandedCostController;
 use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
+use App\Http\Controllers\Inventory\GoodReturnPOController;
 use App\Http\Controllers\Inventory\InventoryTransferController;
 use App\Http\Controllers\Inventory\GoodReceiveController;
 use App\Http\Controllers\Inventory\GoodIssueController;
@@ -127,6 +128,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('purchase_order', [Select2Controller::class, 'purchaseOrder']);
                 Route::get('vendor', [Select2Controller::class, 'vendor']);
                 Route::get('good_receipt', [Select2Controller::class, 'goodReceipt']);
+                Route::get('good_receipt_return', [Select2Controller::class, 'goodReceiptReturn']);
                 Route::get('supplier_vendor', [Select2Controller::class, 'supplierVendor']);
                 Route::get('bank', [Select2Controller::class, 'bank']);
                 Route::get('region', [Select2Controller::class, 'region']);
@@ -678,6 +680,22 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodReceiptPOController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                     Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
+                });
+
+                Route::prefix('good_return_po')->middleware('operation.access:good_return_po,view')->group(function () {
+                    Route::get('/',[GoodReturnPOController::class, 'index']);
+                    Route::get('datatable',[GoodReturnPOController::class, 'datatable']);
+                    Route::get('row_detail',[GoodReturnPOController::class, 'rowDetail']);
+                    Route::post('show', [GoodReturnPOController::class, 'show']);
+                    Route::post('print',[GoodReturnPOController::class, 'print']);
+                    Route::get('export',[GoodReturnPOController::class, 'export']);
+                    Route::get('viewstructuretree',[GoodReturnPOController::class, 'viewStructureTree']);
+                    Route::post('get_good_receipt', [GoodReturnPOController::class, 'getGoodReceipt']);
+                    Route::post('remove_used_data', [GoodReturnPOController::class, 'removeUsedData']);
+                    Route::post('create',[GoodReturnPOController::class, 'create'])->middleware('operation.access:good_return_po,update');
+                    Route::get('approval/{id}',[GoodReturnPOController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [GoodReturnPOController::class, 'voidStatus'])->middleware('operation.access:good_return_po,void');
+                    Route::post('destroy', [GoodReturnPOController::class, 'destroy'])->middleware('operation.access:good_return_po,delete');
                 });
 
                 Route::prefix('transfer')->middleware('operation.access:transfer,view')->group(function () {

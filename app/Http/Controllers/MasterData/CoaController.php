@@ -149,6 +149,7 @@ class CoaController extends Controller
                     $val->is_confidential ? '&#10003;' : '&#10005;',
                     $val->is_control_account ? '&#10003;' : '&#10005;',
                     $val->is_cash_account ? '&#10003;' : '&#10005;',
+                    $val->is_hidden ? '&#10003;' : '&#10005;',
                     $val->show_journal ? '&#10003;' : '&#10005;',
                     $val->bp_journal ? '&#10003;' : '&#10005;',
                     $val->status(),
@@ -216,6 +217,7 @@ class CoaController extends Controller
                     $query->is_confidential = $request->is_confidential ? $request->is_confidential : NULL;
                     $query->is_control_account = $request->is_control_account ? $request->is_control_account : NULL;
                     $query->is_cash_account = $request->is_cash_account ? $request->is_cash_account : NULL;
+                    $query->is_hidden = $request->is_hidden ? $request->is_hidden : NULL;
                     $query->show_journal = $request->show_journal ? $request->show_journal : NULL;
                     $query->bp_journal = $request->bp_journal ? $request->bp_journal : NULL;
                     $query->save();
@@ -236,6 +238,7 @@ class CoaController extends Controller
                         'is_confidential'       => $request->is_confidential ? $request->is_confidential : NULL,
                         'is_control_account'    => $request->is_control_account ? $request->is_control_account : NULL,
                         'is_cash_account'       => $request->is_cash_account ? $request->is_cash_account : NULL,
+                        'is_hidden'             => $request->is_hidden ? $request->is_hidden : NULL,
                         'show_journal'          => $request->show_journal ? $request->show_journal : NULL,
                         'bp_journal'            => $request->bp_journal ? $request->bp_journal : NULL,
                         'status'                => $request->status ? $request->status : '2'

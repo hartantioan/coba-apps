@@ -697,6 +697,9 @@
                         $('#purchase_request_id').empty();
                     }else{
                         if(response.details.length > 0){
+                            if($('.data-used').length > 0){
+                                $('.data-used').trigger('click');
+                            }
 
                             $('#list-used-data').append(`
                                 <div class="chip purple darken-4 gradient-shadow white-text">
@@ -782,7 +785,7 @@
     }
 
     function countRow(){
-        var tax = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, total = 0;
+        var tax = 0, wtax = 0, percent_wtax = parseFloat($('#wtax_id').val().replaceAll(".", "").replaceAll(",",".")), percent_tax = parseFloat($('#tax_id').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, total = 0;
 
         if($('.nominalitem').length > 0){
             $('input[name^="arr_price"]').each(function(){
@@ -797,16 +800,21 @@
             tax = total * (percent_tax / 100);
         }
 
-        grandtotal = total + tax;
+        wtax = total * (percent_wtax / 100);
+
+        grandtotal = total + tax - wtax;
         
-        $('#total').val(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(total.tofixed(2).toString().replace('.',','))
+        $('#total,#pretotal').val(
+            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
         );
         $('#tax').val(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.tofixed(2).toString().replace('.',','))
+            (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
+        );
+        $('#wtax').val(
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',','))
         );
         $('#grandtotal').val(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
     }
 
@@ -1343,7 +1351,17 @@
                 
             },
             success: function(response) {
-                
+                $('#good_receipt_id').empty();
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+                $('#body-item').append(`
+                    <tr id="last-row-item">
+                        <td colspan="7" class="center">
+                            Silahkan pilih penerimaan barang / good receipt po...
+                        </td>
+                    </tr>
+                `);
             },
             error: function() {
                 swal({

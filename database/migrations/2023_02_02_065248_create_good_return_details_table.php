@@ -20,6 +20,7 @@ return new class extends Migration
             $table->bigInteger('good_receipt_detail_id')->nullable();
             $table->bigInteger('item_id')->nullable();
             $table->double('qty')->nullable();
+            $table->string('note')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 

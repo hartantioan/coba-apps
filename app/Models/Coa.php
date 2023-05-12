@@ -24,6 +24,7 @@ class Coa extends Model
         'is_confidential',
         'is_control_account',
         'is_cash_account',
+        'is_hidden',
         'show_journal',
         'bp_journal',
     ];

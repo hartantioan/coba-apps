@@ -50,7 +50,7 @@ class PurchaseDownPaymentController extends Controller
     }
 
     public function getPurchaseOrder(Request $request){
-        $data = PurchaseOrder::where('account_id',$request->supplier)->where('status','2')->get();
+        $data = PurchaseOrder::where('account_id',$request->supplier)->whereIn('status',['2','3'])->get();
 
         $details = [];
 

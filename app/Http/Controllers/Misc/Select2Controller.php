@@ -172,6 +172,7 @@ class Select2Controller extends Controller {
                  })->where('level',5)
                 ->where('status','1')
                 ->whereIn('company_id',$arrCompany)
+                ->whereNull('is_hidden')
                 ->get();
 
         foreach($data as $d) {
@@ -433,10 +434,12 @@ class Select2Controller extends Controller {
                 ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
-            $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->note,
-            ];
+            if($d->hasBalance()){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note,
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);
@@ -464,14 +467,16 @@ class Select2Controller extends Controller {
                     $query->whereIn('place_id',$this->dataplaces);
                 })
                 ->whereDoesntHave('used')
-                ->where('status','2')
+                ->whereIn('status',['2','3'])
                 ->where('inventory_type','1')->get();
 
         foreach($data as $d) {
-            $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->note,
-            ];
+            if($d->hasBalance()){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note,
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);
@@ -573,7 +578,41 @@ class Select2Controller extends Controller {
                     });
                 })
                 ->whereDoesntHave('used')
-                ->where('status','2')->get();
+                ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->note,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function goodReceiptReturn(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = GoodReceipt::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('goodReceiptDetail',function($query) use($search){
+                                $query->whereHas('item',function($query) use($search){
+                                    $query->where('code', 'like', "%$search%")
+                                        ->orWhere('name','like',"%$search%");
+                                });
+                            })
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                })
+                ->whereDoesntHave('purchaseInvoiceDetail')
+                ->whereDoesntHave('used')
+                ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
             $response[] = [
@@ -682,7 +721,7 @@ class Select2Controller extends Controller {
                     ->orWhere('note', 'like', "%$search%");
                 })
                 ->whereDoesntHave('outgoingPayment')
-                ->where('status','2')->get();
+                ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
             $response[] = [

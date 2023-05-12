@@ -25,6 +25,7 @@ return new class extends Migration
             $table->char('is_confidential', 1)->nullable();
             $table->char('is_control_account', 1)->nullable();
             $table->char('is_cash_account', 1)->nullable();
+            $table->char('is_hidden', 1)->nullable();
             $table->char('show_journal',1)->nullable();
             $table->char('bp_journal',1)->nullable();
             $table->timestamps();

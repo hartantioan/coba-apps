@@ -97,6 +97,7 @@
                                                         <th>Akun Rahasia</th>
                                                         <th>Akun Kontrol</th>
                                                         <th>Akun Kas</th>
+                                                        <th>Block</th>
                                                         <th>Tampil di Jurnal</th>
                                                         <th>Wajib BP di Jurnal</th>
                                                         <th>Status</th>
@@ -199,6 +200,17 @@
                                 <label class="right">
                                     Tidak
                                     <input type="checkbox" id="bp_journal" name="bp_journal" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
+                                <label for="is_hidden">Sembunyikan dari Transaksi</label>
+                                <label class="right">
+                                    Tidak
+                                    <input type="checkbox" id="is_hidden" name="is_hidden" value="1">
                                     <span class="lever"></span>
                                     Ya
                                 </label>
@@ -505,6 +517,7 @@
                 { name: 'confidential', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'control', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'cash', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'hidden', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'show_journal', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'bp_journal', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -651,6 +664,12 @@
                     $('#is_cash_account').prop( "checked", true);
                 }else{
                     $('#is_cash_account').prop( "checked", false);
+                }
+
+                if(response.is_hidden == '1'){
+                    $('#is_hidden').prop( "checked", true);
+                }else{
+                    $('#is_hidden').prop( "checked", false);
                 }
 
                 if(response.show_journal == '1'){

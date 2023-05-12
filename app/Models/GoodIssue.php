@@ -157,4 +157,16 @@ class GoodIssue extends Model
             return false;
         }
     }
+
+    public function updateGrandtotal(){
+        $total = 0;
+
+        foreach($this->goodIssueDetail as $row){
+            $total += $row->total;
+        }
+
+        $gi = GoodIssue::find($this->id)->update([
+            'grandtotal'    => $total
+        ]);
+    }
 }

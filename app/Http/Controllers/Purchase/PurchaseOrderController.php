@@ -106,6 +106,12 @@ class PurchaseOrderController extends Controller
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('purchaseOrderDetail',function($query) use ($search, $request){
+                                $query->whereHas('item',function($query) use ($search, $request){
+                                    $query->where('code','like',"%$search%")
+                                        ->orWhere('name','like',"%$search%");
+                                });
                             });
                     });
                 }
@@ -183,6 +189,11 @@ class PurchaseOrderController extends Controller
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })->orWhereHas('purchaseOrderDetail',function($query) use ($search, $request){
+                                $query->whereHas('item',function($query) use ($search, $request){
+                                    $query->where('code','like',"%$search%")
+                                        ->orWhere('name','like',"%$search%");
+                                });
                             });
                     });
                 }
@@ -304,9 +315,9 @@ class PurchaseOrderController extends Controller
     public function getDetails(Request $request){
 
         if($request->type == 'po'){
-            $data = PurchaseRequest::where('id',$request->id)->where('status','2')->first();
+            $data = PurchaseRequest::where('id',$request->id)->whereIn('status',['2','3'])->first();
         }elseif($request->type == 'gi'){
-            $data = GoodIssue::where('id',$request->id)->where('status','2')->first();
+            $data = GoodIssue::where('id',$request->id)->whereIn('status',['2','3'])->first();
         }
 
         if($data->used()->exists()){
@@ -319,10 +330,8 @@ class PurchaseOrderController extends Controller
             }
         }else{
             $passed = true;
-            if($request->type == 'po'){
-                if(!$data->hasBalance()){
-                    $passed = false;
-                }
+            if(!$data->hasBalance()){
+                $passed = false;
             }
             
             if($passed){
@@ -368,7 +377,7 @@ class PurchaseOrderController extends Controller
                 $data['details'] = $details;
             }else{
                 $data['status'] = '500';
-                $data['message'] = 'Seluruh item pada purchase request '.$data->code.' telah digunakan pada purchase order.';
+                $data['message'] = 'Seluruh item pada purchase request / good issue '.$data->code.' telah digunakan pada purchase order.';
             }
         }
 

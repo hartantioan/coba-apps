@@ -936,7 +936,7 @@
             });
         }else{
             
-            $('.row_item').each(function(){
+            /* $('.row_item').each(function(){
                 $(this).remove();
             });
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
@@ -947,7 +947,7 @@
                         </td>
                     </tr>
                 `);
-            }
+            } */
         }
     }
 

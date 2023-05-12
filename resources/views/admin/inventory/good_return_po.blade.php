@@ -2,6 +2,13 @@
     .modal {
         top:0px !important;
     }
+    table > thead > tr > th {
+        font-size: 13px !important;
+    }
+
+    table.bordered th {
+        padding: 5px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -53,8 +60,8 @@
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
-                                                <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
-                                                <div class="input-field col s12">
+                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
+                                                <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
                                                         <option value="1">Menunggu</option>
@@ -68,7 +75,7 @@
                                             <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Start Date (Tanggal Mulai) :</label>
                                                 <div class="input-field col s12">
-                                                    <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
+                                                <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
@@ -86,26 +93,28 @@
                                     <h4 class="card-title">
                                         List Data
                                     </h4>
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p>Form pengembalian barang PO ini hanya untuk GRPO yang belum menjadi Invoice.</p>
+                                        </div>
+                                    </div>
                                     <div class="row mt-2">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
-                                                        <th rowspan="2">#</th>
-                                                        <th rowspan="2">Pengguna</th>
-                                                        <th rowspan="2">Code</th>
-                                                        <th rowspan="2">Perusahaan</th>
-                                                        <th colspan="3" class="center-align">Tanggal</th>
-                                                        <th rowspan="2">Keterangan</th>
-                                                        <th rowspan="2">Dokumen</th>
-                                                        <th rowspan="2">Status</th>
-                                                        <th rowspan="2">Operasi</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Pengajuan</th>
-                                                        <th>Kadaluwarsa</th>
-                                                        <th>Pemakaian</th>
+                                                        <th>#</th>
+                                                        <th>Pengguna</th>
+                                                        <th>Supplier/Vendor</th>
+                                                        <th>Perusahaan</th>
+                                                        <th>Code</th>
+                                                        <th>Penerima</th>
+                                                        <th>Tgl.Post</th>
+                                                        <th>Keterangan</th>
+                                                        <th>Dokumen</th>
+                                                        <th>Status</th>
+                                                        <th>Operasi</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -123,7 +132,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="min-width:100%;max-height: 100% !important;height: 100% !important;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -134,113 +143,83 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            
-                            <div class="input-field col m4 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Posting</label>
+                            <div class="input-field col m3 s12">
+                                <input type="hidden" id="temp" name="temp">
+                                <select class="browser-default" id="account_id" name="account_id"></select>
+                                <label class="active" for="account_id">Supplier</label>
                             </div>
-                            <div class="input-field col m4 s12">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                <label class="active" for="due_date">Tgl. Kadaluwarsa</label>
+                            <div class="input-field col m3 s12">
+                                <select class="form-control" id="company_id" name="company_id">
+                                    @foreach ($company as $rowcompany)
+                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label class="" for="company_id">Perusahaan</label>
                             </div>
-                            <div class="input-field col m4 s12">
-                                <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                <label class="active" for="required_date">Tgl. Dipakai</label>
+                            <div class="input-field col m3 s12">
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}">
+                                <label class="active" for="post_date">Tgl.Post</label>
                             </div>
-                            <div class="file-field input-field col m4 s12">
+                            <div class="file-field input-field col m3 s12">
                                 <div class="btn">
-                                    <span>File</span>
-                                    <input type="file" name="file" id="file">
+                                    <span>Lampiran Bukti</span>
+                                    <input type="file" name="document" id="document">
                                 </div>
                                 <div class="file-path-wrapper">
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="input-field col m4 s12">
-                                <select class="form-control" id="company_id" name="company_id">
-                                    @foreach ($company as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="company_id">Perusahaan</label>
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <select class="browser-default" id="project_id" name="project_id"></select>
-                                <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
+                            <div class="col m12 s12">
+                                <div class="col m6 s6">
+                                    <p class="mt-2 mb-2">
+                                        <h6>Good Receipt (Belum jadi PO Invoice)</h6>
+                                        <div class="row">
+                                            <div class="input-field col m6 s7">
+                                                <select class="browser-default" id="good_receipt_id" name="good_receipt_id">&nbsp;</select>
+                                            </div>
+                                            <div class="col m6 s6 mt-4">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getGoodReceipt();" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Tambah GRPO
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </p>
+                                </div>
+                                <div class="col m6 s6">
+                                    <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                                </div>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <table class="bordered">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">Item</th>
-                                                <th class="center">Qty</th>
-                                                <th class="center">Satuan</th>
-                                                <th class="center">Keterangan</th>
-                                                <th class="center">Tgl.Dipakai</th>
-                                                <th class="center">Gudang Tujuan</th>
-                                                <th class="center">Site</th>
-                                                <th class="center">Departemen</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-item">
-                                            <tr class="row_item">
-                                                <td>
-                                                    <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this)">
-                                                </td>
-                                                <td class="center">
-                                                    <span id="arr_satuan0">-</span>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
-                                                </td>
-                                                <td>
-                                                    <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]">\
-                                                        <option value="">--Silahkan pilih item--</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_place0" name="arr_place[]">
-                                                        @foreach ($place as $rowplace)
-                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                                        @endforeach
-                                                    </select>    
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_department0" name="arr_department[]">
-                                                        @foreach ($department as $rowdept)
-                                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                                                        @endforeach
-                                                    </select>    
-                                                </td>
-                                                <td class="center">
-                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                        <i class="material-icons">delete</i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr id="last-row-item">
-                                                <td colspan="9" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> New Item
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <div style="overflow:auto;">
+                                        <table class="bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">Item</th>
+                                                    <th class="center">Qty Diterima</th>
+                                                    <th class="center">Qty Kembali</th>
+                                                    <th class="center">Satuan</th>
+                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Site</th>
+                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Dari Gudang</th>
+                                                    <th class="center">Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-item">
+                                                <tr id="empty-item">
+                                                    <td colspan="9" class="center">
+                                                        Pilih good receipt po / penerimaan barang po untuk memulai...
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </p>
                             </div>
                             <div class="input-field col m4 s12">
-                                <input type="hidden" id="temp" name="temp">
-                                <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
+                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
@@ -269,27 +248,11 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
+
 <div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12" id="show_structure">
-                <div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
-
-                </div>
-                <div id="visualisation">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
-    </div>
-</div>
-
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12" id="show_detail">
+    <div class="modal-content row">
+        <div class="col s12" id="show_structure">
+            <div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
 
             </div>
         </div>
@@ -308,6 +271,10 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
 
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
@@ -315,23 +282,82 @@
             var icon  = tr.find('i');
             var row   = table.row(tr);
 
+            if(row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                badge.first().removeClass('red');
+                badge.first().addClass('green');
+                icon.first().html('add');
+            } else {
+                row.child(rowDetail(row.data())).show();
+                tr.addClass('shown');
+                badge.first().removeClass('green');
+                badge.first().addClass('red');
+                icon.first().html('remove');
+            }
         });
-
+        
         loadDataTable();
 
         window.table.search('{{ $code }}').draw();
+
+        $('#modal1').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                $('#post_date').attr('min','{{ date("Y-m-d") }}');
+                $('#due_date').attr('min','{{ date("Y-m-d") }}');
+                $('#document_date').attr('min','{{ date("Y-m-d") }}');
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#temp').val('');
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+                if($('#empty-item').length == 0){
+                    $('#body-item').append(`
+                        <tr id="empty-item">
+                            <td colspan="9" class="center">
+                                Pilih good receipt po / penerimaan barang po untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+                $('#good_receipt_id').empty();
+                $('#account_id').empty();
+                M.updateTextFields();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+                window.onbeforeunload = function() {
+                    return null;
+                };
+            }
+        });
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
                 
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 window.print();
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_print').html('');
             }
         });
+        
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
                 
@@ -347,47 +373,31 @@
             }
         });
 
-        $('#modal4').modal({
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) { 
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#show_detail').empty();
-            }
-        });
-
-        $('#modal1').modal({
-            dismissible: false,
-            onOpenStart: function(modal,trigger) {
-                $('#post_date').attr('min','{{ date("Y-m-d") }}');
-                $('#due_date').attr('min','{{ date("Y-m-d") }}');
-                $('#required_date').attr('min','{{ date("Y-m-d") }}');
-            },
-            onOpenEnd: function(modal, trigger) {
-                $('#name').focus();
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                M.updateTextFields();
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#form_data')[0].reset();
-                $('#temp').val('');
-                M.updateTextFields();
-                $('#project_id,#warehouse_id').empty();
-                $('.row_item').remove();
-            }
-        });
+        select2ServerSide('#good_receipt_id', '{{ url("admin/select2/good_receipt_return") }}');
+        select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
+            
+            if($('.row_item').length == 0){
+                $('#body-item').append(`
+                    <tr id="empty-item">
+                        <td colspan="9" class="center">
+                            Pilih good receipt po / penerimaan barang po untuk memulai...
+                        </td>
+                    </tr>
+                `);
+                $('#good_receipt_id').empty();
+            }
         });
-
-        $('#arr_place0,#arr_department0').formSelect();
-        select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
-        select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
     });
+
+    var nodeTemplate = function(data) {
+        return `
+            <div class="title">${data.name}</div>
+            <div class="content">${data.title}<br>Tanggal ${data.date}<br> Nominal : ${data.grandtotal}<br></div>
+        `;
+    };
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -507,8 +517,7 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });
-            
+        });    
             
     }
 
@@ -523,14 +532,8 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
             success: function(response) {
-                loadingClose('.modal-content');
-            
                 makeTreeOrg(response.message,response.link);
-                
                 $('#modal3').modal('open');
             },
             error: function() {
@@ -543,7 +546,7 @@
         });
     }
 
-     function loadDataTable() {
+    function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "responsive": false,
             "scrollX": true,
@@ -579,11 +582,11 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'name', className: 'center-align' },
-                { name: 'code', className: 'center-align' },
+                { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
+                { name: 'code', className: 'center-align' },
+                { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
-                { name: 'date_due', className: 'center-align' },
-                { name: 'date_use', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -600,19 +603,16 @@
 	}
 
     function rowDetail(data) {
+        var content = '';
         $.ajax({
             url: '{{ Request::url() }}/row_detail',
             type: 'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
+            async: false,
             data: {
-                id: data
+                id: $(data[0]).data('id')
             },
             success: function(response) {
-                $('#modal4').modal('open');
-                $('#show_detail').html(response);
-                loadingClose('.modal-content');
+                content += response;
             },
             error: function() {
                 swal({
@@ -622,10 +622,12 @@
                 });
             }
         });
+
+        return content;
 	}
 
     function save(){
-		swal({
+        swal({
             title: "Apakah anda yakin ingin simpan?",
             text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
             icon: 'warning',
@@ -636,8 +638,8 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
                 var formData = new FormData($('#form_data')[0]);
+        
                 $.ajax({
                     url: '{{ Request::url() }}/create',
                     type: 'POST',
@@ -710,6 +712,142 @@
         $('#modal1').modal('close');
     }
 
+    function getGoodReceipt(){
+        let val = $('#good_receipt_id').val();
+
+        if(val){
+            $.ajax({
+                url: '{{ Request::url() }}/get_good_receipt',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: val
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                        $('#good_receipt_id').empty();
+                    }else{
+                        if(response.details.length > 0){
+                            $('#account_id').empty().append(`
+                                <option value="` + response.account_id + `">` + response.account_name + `</option>
+                            `);
+
+                            $('#empty-item').remove();
+
+                            $('#list-used-data').append(`
+                                <div class="chip purple darken-4 gradient-shadow white-text">
+                                    ` + response.code + `
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
+                                </div>
+                            `);
+
+                            $.each(response.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-item').append(`
+                                    <tr class="row_item" data-gr="` + response.id + `">
+                                        <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_good_receipt_detail[]" value="` + val.good_receipt_detail_id + `">
+                                        <td>
+                                            ` + val.item_name + `
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.qty + `</span>
+                                        </td>
+                                        <td>
+                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.unit + `</span>
+                                        </td>
+                                        <td>
+                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="-" style="width:100%;">
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.place_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.department_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.warehouse_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }
+                        $('#good_receipt_id').empty();
+                        $('.modal-content').scrollTop(0);
+                        M.updateTextFields();
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            
+        }
+    }
+
+    function removeUsedData(id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_item[data-gr="' + id + '"]').remove();
+                if($('.row_item').length == 0 && $('#empty-item').length == 0){
+                    $('#body-item').append(`
+                        <tr id="empty-item">
+                            <td colspan="9" class="center">
+                                Pilih good receipt po / penerimaan barang po untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function show(id){
         $.ajax({
             url: '{{ Request::url() }}/show',
@@ -723,67 +861,58 @@
             },
             beforeSend: function() {
                 loadingOpen('#main');
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
             },
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#account_id').empty().append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
+                `);
+                $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
+                $('#receiver_name').val(response.receiver_name);
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
-                $('#required_date').val(response.required_date);
+                $('#document_date').val(response.document_date);
+                $('#delivery_no').val(response.delivery_no);
                 $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
-                $('#required_date').removeAttr('min');
-                $('#company_id').val(response.company_id).formSelect();
-
-                if(response.project_id){
-                    $('#project_id').empty();
-                    $('#project_id').append(`
-                        <option value="` + response.project_id + `">` + response.project_name + `</option>
-                    `);
-                }
-
+                $('#document_date').removeAttr('min');
+                
                 if(response.details.length > 0){
-                    $('.row_item').each(function(){
-                        $(this).remove();
-                    });
-
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        $('#last-row-item').before(`
+                        $('#body-item').append(`
                             <tr class="row_item">
+                                <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                <input type="hidden" name="arr_good_receipt_detail[]" value="` + val.good_receipt_detail_id + `">
                                 <td>
-                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                    ` + val.item_name + `
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this)">
+                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
-                                    <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                    <span>` + val.unit + `</span>
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `">
+                                    <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;">
                                 </td>
                                 <td>
-                                    <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
+                                    <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.remark + `"  style="width:100%;">
                                 </td>
-                                <td>
-                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                <td class="center">
+                                    <span>` + val.place_name + `</span>
                                 </td>
-                                <td>
-                                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
-                                        @foreach ($place as $rowplace)
-                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                        @endforeach
-                                    </select>    
+                                <td class="center">
+                                    <span>` + val.department_name + `</span>
                                 </td>
-                                <td>
-                                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
-                                        @foreach ($department as $rowdept)
-                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                                        @endforeach
-                                    </select>    
+                                <td class="center">
+                                    <span>` + val.warehouse_name + `</span>
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -792,17 +921,10 @@
                                 </td>
                             </tr>
                         `);
-                        $('#arr_item' + count).append(`
-                            <option value="` + val.item_id + `">` + val.item_name + `</option>
-                        `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-                        $('#arr_warehouse' + count).append(`
-                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
-                        `);
-                        $('#arr_place' + count).val(val.place_id).formSelect();
-                        $('#arr_department' + count).val(val.department_id).formSelect();
                     });
                 }
+
+                $('#empty-item').remove();
                 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
@@ -820,45 +942,21 @@
         });
     }
 
-    function getRowUnit(val){
-        $("#arr_warehouse" + val).empty();
-        if($("#arr_item" + val).val()){
-            $('#arr_satuan' + val).text($("#arr_item" + val).select2('data')[0].buy_unit);
-            if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
-                $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
-                    $('#arr_warehouse' + val).append(`
-                        <option value="` + value.id + `">` + value.name + `</option>
-                    `);
-                });
-            }else{
-                $("#arr_warehouse" + val).append(`
-                    <option value="">--Gudang tidak diatur di master data Grup Item--</option>
-                `);
-            }
-        }else{
-            $("#arr_warehouse" + val).append(`
-                <option value="">--Silahkan pilih item--</option>
-            `);
-        }
-    }
-
-    function destroy(id){
+    function voidStatus(id){
+        var msg = '';
         swal({
-            title: "Apakah anda yakin?",
-            text: "Anda tidak bisa mengembalikan data yang terhapus!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
+            title: "Alasan mengapa anda menutup!",
+            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
                 $.ajax({
-                    url: '{{ Request::url() }}/destroy',
+                    url: '{{ Request::url() }}/void_status',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id },
+                    data: { id : id, msg : message },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -885,80 +983,23 @@
         });
     }
 
-    function addItem(){
-        var count = makeid(10);
-        $('#last-row-item').before(`
-            <tr class="row_item">
-                <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                </td>
-                <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this)">
-                </td>
-                <td class="center">
-                    <span id="arr_satuan` + count + `">-</span>
-                </td>
-                <td>
-                    <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
-                </td>
-                <td>
-                    <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                        <option value="">--Silahkan pilih item--</option>    
-                    </select>
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                        @foreach ($place as $rowplace)
-                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                        @endforeach
-                    </select>    
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
-                        @foreach ($department as $rowdept)
-                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                        @endforeach
-                    </select>    
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        $('#arr_place' + count).formSelect();
-        $('#arr_department' + count).formSelect();
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-    }
-
-    function changeDateMinimum(val){
-        if(val){
-            $('#due_date,#required_date').attr("min",val);
-            $('input[name^="arr_required_date"]').each(function(){
-                $(this).attr("min",val);
-            });
-        }
-    }
-
-    function voidStatus(id){
-        var msg = '';
+    function destroy(id){
         swal({
-            title: "Alasan mengapa anda menutup!",
-            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
-            buttons: true,
-            content: "input",
-        })
-        .then(message => {
-            if (message != "" && message != null) {
+            title: "Apakah anda yakin?",
+            text: "Anda tidak bisa mengembalikan data yang terhapus!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
                 $.ajax({
-                    url: '{{ Request::url() }}/void_status',
+                    url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
-                    data: { id : id, msg : message },
+                    data: { id : id },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },

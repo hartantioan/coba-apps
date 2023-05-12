@@ -65,6 +65,7 @@
                                                     <th class="center-align">Site</th>
                                                     <th class="center-align">Gudang</th>
                                                     <th class="center-align">Qty</th>
+                                                    <th class="center-align">Rp</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -75,6 +76,7 @@
                                                         <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
                                                         <td class="center-align">{{ $row->warehouse->name }}</td>
                                                         <td class="center-align">{{ number_format($row->qty,3,',','.').' '.$row->item->uomUnit->code }}</td>
+                                                        <td class="right-align">{{ number_format($row->valueNow(),3,',','.') }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

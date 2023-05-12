@@ -1,6 +1,8 @@
 <?php 
 
 namespace App\Helpers;
+use App\Jobs\ResetCogs;
+use App\Jobs\ResetStock;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalStage;
 use App\Models\ApprovalSource;
@@ -16,6 +18,7 @@ use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
+use App\Models\GoodReturnPO;
 use App\Models\InventoryTransfer;
 use App\Models\Item;
 use App\Models\ItemGroupWarehouse;
@@ -289,6 +292,8 @@ class CustomHelper {
 
 			$arrCoa = [];
 
+			$coa_credit = Coa::where('code','200.01.03.01.02')->where('company_id',$gr->company_id)->first();
+
 			foreach($gr->goodReceiptDetail as $rowdetail){
 				$rowtotal = $rowdetail->getRowTotal();
 
@@ -302,6 +307,19 @@ class CustomHelper {
 					'type'			=> '1',
 					'nominal'		=> $rowtotal
 				]);
+
+				if($coa_credit){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coa_credit->id,
+						'place_id'		=> $rowdetail->place_id,
+						'account_id'	=> $gr->account_id,
+						'department_id'	=> $rowdetail->department_id,
+						'warehouse_id'	=> $rowdetail->warehouse_id,
+						'type'			=> '2',
+						'nominal'		=> $rowtotal
+					]);
+				}
 
 				self::sendCogs('good_receipts',
 					$gr->id,
@@ -322,28 +340,6 @@ class CustomHelper {
 					$rowdetail->qtyConvert(),
 					'IN'
 				);
-
-				$journalMap = MenuCoa::whereHas('menu', function($query){
-					$query->where('table_name','good_receipts');
-				})
-				->whereHas('coa', function($query) use($data){
-					$query->where('company_id',$data->company_id);
-				})->get();
-
-				foreach($journalMap as $row){
-					$nominal = $rowtotal * ($row->percentage / 100);
-
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->coa_id,
-						'place_id'		=> $rowdetail->place_id,
-						'account_id'	=> $gr->account_id,
-						'department_id'	=> $rowdetail->department_id,
-						'warehouse_id'	=> $rowdetail->warehouse_id,
-						'type'			=> '2',
-						'nominal'		=> $rowtotal
-					]);
-				}
 			}
 
 		}elseif($table_name == 'retirements'){
@@ -546,6 +542,70 @@ class CustomHelper {
 					'IN'
 				);
 			}
+		
+		}elseif($table_name == 'good_returns'){
+
+			$gr = GoodReturnPO::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> 'good_returns',
+				'lookable_id'	=> $gr->id,
+				'post_date'		=> $gr->post_date,
+				'note'			=> $gr->code,
+				'status'		=> '3'
+			]);
+
+			$coa_credit = Coa::where('code','200.01.03.01.02')->where('company_id',$gr->company_id)->first();
+
+			foreach($gr->goodReturnPODetail as $row){
+				$rowtotal = $row->getRowTotal();
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->item->itemGroup->coa_id,
+					'place_id'		=> $row->goodReceiptDetail->place_id,
+					'account_id'	=> $row->goodReturnPO->account_id,
+					'department_id'	=> $row->goodReceiptDetail->department_id,
+					'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> -1 * $rowtotal,
+				]);
+
+				if($coa_credit){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coa_credit->id,
+						'place_id'		=> $row->goodReceiptDetail->place_id,
+						'account_id'	=> $row->goodReturnPO->account_id,
+						'department_id'	=> $row->goodReceiptDetail->department_id,
+						'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
+						'type'			=> '2',
+						'nominal'		=> -1 * $rowtotal,
+					]);
+				}
+
+				self::sendCogs('good_returns',
+					$gr->id,
+					$row->goodReceiptDetail->place->company_id,
+					$row->goodReceiptDetail->place_id,
+					$row->goodReceiptDetail->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					$rowtotal,
+					'OUT',
+					$gr->post_date
+				);
+
+				self::sendStock(
+					$row->goodReceiptDetail->place_id,
+					$row->goodReceiptDetail->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					'OUT'
+				);
+			}
 
 		}elseif($table_name == 'good_issues'){
 
@@ -634,7 +694,7 @@ class CustomHelper {
 						]);
 					}
 
-					self::resetCogsItem($rowdetail->place_id,$rowdetail->item_id);
+					ResetCogs::dispatch($lc->post_date,$rowdetail->place_id,$rowdetail->item_id);
 
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -991,65 +1051,9 @@ class CustomHelper {
 				
 				$row->delete();
 
-				self::resetCogsItem($place_id,$item_id);
-
-				self::resetStock($place_id,$warehouse_id,$item_id,$qty,$type);
+				ResetCogs::dispatch($row->date,$place_id,$item_id);
+				ResetStock::dispatch($place_id,$warehouse_id,$item_id,$qty,$type);
 			}
-		}
-	}
-
-	public static function resetCogsItem($place_id = null, $item_id = null){
-		$data = ItemCogs::where('place_id',$place_id)->where('item_id',$item_id)->orderBy('date')->orderBy('id')->get();
-
-		foreach($data as $key => $row){
-			if($key == 0){
-				if($row->type == 'IN'){
-					$finalprice = $row->total_in / $row->qty_in;
-					$totalprice = $finalprice * $row->qty_in;
-					$row->update([
-						'qty_final' 	=> $row->qty_in,
-						'price_final'	=> $finalprice,
-						'total_final'	=> $totalprice
-					]);
-				}
-			}else{
-				$prevqty = $data[$key-1]->qty_final;
-				$prevtotal = $data[$key-1]->total_final;
-				if($row->type == 'IN'){
-					$finalprice = ($prevtotal + $row->total_in) / ($prevqty + $row->qty_in);
-					$totalprice = $finalprice * ($prevqty + $row->qty_in);
-					$row->update([
-						'qty_final' 	=> $prevqty + $row->qty_in,
-						'price_final'	=> $finalprice,
-						'total_final'	=> $totalprice
-					]);
-				}elseif($row->type == 'OUT'){
-					$finalprice = ($prevtotal - $row->total_out) / ($prevqty - $row->qty_out);
-					$totalprice = $finalprice * ($prevqty - $row->qty_out);
-					$row->update([
-						'qty_final' 	=> $prevqty - $row->qty_out,
-						'price_final'	=> $finalprice,
-						'total_final'	=> $totalprice
-					]);
-				}
-			}
-		}
-	}
-
-	public static function resetStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null){
-		$data = ItemStock::where('place_id',$place_id)->where('warehouse_id',$warehouse_id)->where('item_id',$item_id)->first();
-
-		if($data){
-			$data->update([
-				'qty' => $type == 'IN' ? $data->qty - $qty : $data->qty + $qty,
-			]);
-		}else{
-			ItemStock::create([
-				'place_id'		=> $place_id,
-				'warehouse_id'	=> $warehouse_id,
-				'item_id'		=> $item_id,
-				'qty'			=> $type == 'IN' ? 0 - $qty : $qty,
-			]);
 		}
 	}
 
@@ -1187,15 +1191,16 @@ class CustomHelper {
 	public static function addNewItemService($item_id = null){
 		$item = Item::find($item_id);
 
-		$newItem = $item;
-
-		$arrString = explode('-',$item->code);
-
-		if(count($arrString) > 0){
-			$lastIndex = count($arrString) - 1;
-			if($arrString[$lastIndex] !== 'SVC'){
+		if(str_contains($item,'-SVC')){
+			$newItem = $item;
+		}else{
+			$cek = Item::where('code',$item->code.'-SVC')->where('status','1')->first();
+			if($cek){
+				$newItem = $cek;
+			}else{
 				$newItem = $item->replicate();
 				$newItem->code = $item->code.'-SVC';
+				$newItem->name = $item->name.' SERVICE';
 				$newItem->save();
 			}
 		}

@@ -1154,7 +1154,6 @@ class PaymentRequestController extends Controller
                     if(!in_array($row_pyr_detail->lookable->id, $data_id_dp)){
                         $data_id_dp[] = $row_pyr_detail->lookable->id;
                         $added = true; 
-                       info("masuk pertama");
                     }
                 }
                 if($row_pyr_detail->purchaseInvoice()){

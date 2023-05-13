@@ -84,7 +84,7 @@ class Item extends Model
     public function currentCogs($dataplaces){
         $arrPrice = [];
             
-        $price = ItemCogs::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->orderByDesc('id')->first();
+        $price = ItemCogs::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->orderByDesc('date')->orderByDesc('id')->first();
         if($price){
             $arrPrice[] = [
                 'description'   => $price->company->name.' - '.date('d/m/y',strtotime($price->date)),

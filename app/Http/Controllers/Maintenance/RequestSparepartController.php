@@ -276,7 +276,6 @@ class RequestSparepartController extends Controller
                     
                  DB::commit();
                 }catch(\Exception $e){
-                    info($e);
                     DB::rollback();
                 }
 			}
@@ -368,7 +367,6 @@ class RequestSparepartController extends Controller
         }
         
         foreach($request_sp->requestSparePartDetail as $row){
-            // info($row->itemStock->qty);
             $request_sp_detail=[
                 'request_sparepart_id' =>$row->request_sparepart_id,
                 'equipment_sparepart_id'=>$row->equipment_sparepart_id,

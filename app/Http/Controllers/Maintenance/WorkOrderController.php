@@ -350,7 +350,6 @@ class WorkOrderController extends Controller
                                 'path'                            => $image
                             ]);
                         }catch(\Exception $e){
-                            info($e);
                             DB::rollback();
                         }
 
@@ -362,20 +361,14 @@ class WorkOrderController extends Controller
                     
                     try {
                         foreach($request->arr_type as $key => $row){
-                            info($key);
-                            info($row);
                             $code = CustomHelper::decrypt($request->arr_code[$key]);
                            
                             if($row == 'equipmentpart'){
-                                info($code);
                                 try{
                                     $idDetail = EquipmentPart::where('code',$code)->first()->id;
                                 } catch(\Exception $e){
-                                    info($e);
                                     DB::rollback();
                                 }
-                                
-                                
                             }
                             
                             try {
@@ -388,7 +381,6 @@ class WorkOrderController extends Controller
                                
                                 DB::commit();
                             } catch(\Exception $e){
-                                info($e);
                                 DB::rollback();
                             }
                         }
@@ -712,7 +704,6 @@ class WorkOrderController extends Controller
                         </thead><tbody>';
         foreach($data->requestSparepart as $key => $row){
             foreach($row->requestSparePartDetail as $row_sparepart){
-                info($row_sparepart->equipmentSparepart);
                 $string .= '<tr>
                 <td class="center-align">'.$row_sparepart->equipmentSparepart->equipmentPart->name.'-'.$row_sparepart->equipmentSparepart->item->name.'</td>
                 <td class="center-align">'.$row_sparepart->qty_request.'</td>
@@ -797,7 +788,6 @@ class WorkOrderController extends Controller
                             ]);
                             DB::commit();
                         } catch(\Exception $e){
-                            info($e);
                             DB::rollback();
                         }
                     }

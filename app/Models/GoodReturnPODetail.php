@@ -19,6 +19,7 @@ class GoodReturnPODetail extends Model
         'good_receipt_detail_id',
         'item_id',
         'qty',
+        'note',
     ];
 
     public function goodReturnPO()

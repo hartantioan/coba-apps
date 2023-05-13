@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\ItemCogs;
+use App\Models\Journal;
 use App\Models\Place;
 use App\Models\PurchaseOrder;
 use App\Models\ApprovalMatrix;
@@ -138,9 +139,10 @@ class GoodIssueController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                $journal = Journal::where('lookable_type','good_issues')->where('lookable_id',$val->id)->first();
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
-                    $val->code,
+                    $val->code.' - '.$journal->code,
                     $val->user->name,
                     $val->company->name,
                     date('d M Y',strtotime($val->post_date)),
@@ -205,7 +207,7 @@ class GoodIssueController extends Controller
 
             foreach($request->arr_item as $key => $row){
                 $price = NULL;
-                $price = ItemCogs::where('item_id',intval($row))->where('place_id',intval($request->arr_place[$key]))->orderByDesc('id')->first();
+                $price = ItemCogs::where('item_id',intval($row))->where('place_id',intval($request->arr_place[$key]))->orderByDesc('date')->orderByDesc('id')->first();
                 $rowprice = 0;
                 if($price){
                     $rowprice = $price->price_final;
@@ -286,7 +288,7 @@ class GoodIssueController extends Controller
                 try {
                     foreach($request->arr_item as $key => $row){
                         $price = NULL;
-                        $price = ItemCogs::where('item_id',intval($row))->where('place_id',intval($request->arr_place[$key]))->orderByDesc('id')->first();
+                        $price = ItemCogs::where('item_id',intval($row))->where('place_id',intval($request->arr_place[$key]))->orderByDesc('date')->orderByDesc('id')->first();
                         $rowprice = 0;
                         if($price){
                             $rowprice = $price->price_final;

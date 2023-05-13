@@ -2269,7 +2269,6 @@ class LandedCostController extends Controller
 
 
         } else {
-            info("rusak sini");
             $data_good_receipt = [];
             $response = [
                 'status'  => 500,

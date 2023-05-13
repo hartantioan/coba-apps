@@ -368,7 +368,7 @@ class GoodReturnPOController extends Controller
                 DB::beginTransaction();
                 try {
                     foreach($request->arr_good_receipt_detail as $key => $row){
-                        GoodReturnPODetail::create([
+                        $querydetail = GoodReturnPODetail::create([
                             'good_return_id'            => $query->id,
                             'good_receipt_detail_id'    => $row,
                             'item_id'                   => $request->arr_item[$key],

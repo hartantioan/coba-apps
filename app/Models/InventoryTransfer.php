@@ -135,4 +135,23 @@ class InventoryTransfer extends Model
             return '';
         }
     }
+
+    public function updateJournal(){
+        $journal = Journal::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
+        
+        if($journal){
+            foreach($this->inventoryTransferDetail as $row){
+                $priceout = $row->item->priceNow($row->itemStock->place_id);
+				$nominal = $row->qty * $priceout;
+
+                if($journal){
+                    foreach($journal->journalDetail()->where('item_id',$row->item_id)->get() as $rowupdate){
+                        $rowupdate->update([
+                            'nominal'   => $nominal
+                        ]);
+                    }
+                }
+            }
+        }
+    }
 }

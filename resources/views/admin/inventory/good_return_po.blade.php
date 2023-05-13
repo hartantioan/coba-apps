@@ -109,7 +109,6 @@
                                                         <th>Supplier/Vendor</th>
                                                         <th>Perusahaan</th>
                                                         <th>Code</th>
-                                                        <th>Penerima</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Keterangan</th>
                                                         <th>Dokumen</th>
@@ -585,7 +584,6 @@
                 { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
-                { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },

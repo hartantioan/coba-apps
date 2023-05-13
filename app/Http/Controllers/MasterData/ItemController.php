@@ -168,7 +168,6 @@ class ItemController extends Controller
             'buy_convert'       => 'required',
             'sell_unit'         => 'required',
             'sell_convert'      => 'required',
-            'warehouse_id'      => 'required',
             'tolerance_gr'      => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
@@ -180,7 +179,6 @@ class ItemController extends Controller
             'buy_convert.required'      => 'Satuan konversi beli ke stok tidak boleh kosong.',
             'sell_unit.required'        => 'Satuan jual tidak boleh kosong.',
             'sell_convert.required'     => 'Satuan konversi jual ke stok tidak boleh kosong.',
-            'warehouse_id.required'     => 'Gudang tidak boleh kosong.',
             'tolerance_gr.required'     => 'Toleransi penerimaan barang tidak boleh kosong.',
         ]);
 

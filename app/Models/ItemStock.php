@@ -33,7 +33,7 @@ class ItemStock extends Model
 
     public function valueNow(){
         $totalNow = 0;
-        $cek = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderByDesc('id')->first();
+        $cek = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderByDesc('date')->orderByDesc('id')->first();
         if($cek){
             $totalNow = $cek->total_final;
         }

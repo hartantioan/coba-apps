@@ -59,7 +59,7 @@ class CustomHelper {
 	}
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null){
-		$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderByDesc('date')->orderByDesc('id')->first();
+		$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
 		if($type == 'IN'){
 			ItemCogs::create([
 				'lookable_type'	=> $lookable_type,
@@ -79,28 +79,53 @@ class CustomHelper {
 			]);
 		}elseif($type == 'OUT'){
 			if($old_data){
-				$priceeach = $old_data->price_final;
-				$totalout = round($priceeach * $qty,3);
-				$qtybalance = $old_data->qty_final - $qty;
-				$totalfinal = round($qtybalance * $priceeach,3);
-				ItemCogs::create([
-					'lookable_type'	=> $lookable_type,
-					'lookable_id'	=> $lookable_id,
-					'company_id'	=> $company_id,
-					'place_id'		=> $place_id,
-					'warehouse_id'	=> $warehouse_id,
-					'item_id'		=> $item_id,
-					'qty_out'		=> $qty,
-					'price_out'		=> $priceeach,
-					'total_out'		=> $totalout,
-					'qty_final'		=> $qtybalance,
-					'price_final'	=> $priceeach,
-					'total_final'	=> $totalfinal,
-					'date'			=> $date,
-					'type'			=> $type
-				]);
+				if($lookable_type == 'good_returns'){
+					$priceout = round($total / $qty,3);
+					$qtybalance = $old_data->qty_final - $qty;
+					$totalfinal = $old_data->total_final - $total;
+					$pricefinal = $qtybalance > 0 ? round($totalfinal / $qtybalance,3) : 0;
+					ItemCogs::create([
+						'lookable_type'	=> $lookable_type,
+						'lookable_id'	=> $lookable_id,
+						'company_id'	=> $company_id,
+						'place_id'		=> $place_id,
+						'warehouse_id'	=> $warehouse_id,
+						'item_id'		=> $item_id,
+						'qty_out'		=> $qty,
+						'price_out'		=> $priceout,
+						'total_out'		=> $total,
+						'qty_final'		=> $qtybalance,
+						'price_final'	=> $pricefinal,
+						'total_final'	=> $totalfinal,
+						'date'			=> $date,
+						'type'			=> $type
+					]);
+				}else{
+					$priceeach = $old_data->price_final;
+					$totalout = round($priceeach * $qty,3);
+					$qtybalance = $old_data->qty_final - $qty;
+					$totalfinal = round($qtybalance * $priceeach,3);
+					ItemCogs::create([
+						'lookable_type'	=> $lookable_type,
+						'lookable_id'	=> $lookable_id,
+						'company_id'	=> $company_id,
+						'place_id'		=> $place_id,
+						'warehouse_id'	=> $warehouse_id,
+						'item_id'		=> $item_id,
+						'qty_out'		=> $qty,
+						'price_out'		=> $priceeach,
+						'total_out'		=> $totalout,
+						'qty_final'		=> $qtybalance,
+						'price_final'	=> $priceeach,
+						'total_final'	=> $totalfinal,
+						'date'			=> $date,
+						'type'			=> $type
+					]);
+				}
 			}
 		}
+
+		ResetCogs::dispatch($date,$place_id,$item_id);
 	}
 
 	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null){
@@ -175,7 +200,6 @@ class CustomHelper {
 		->whereHas('approvalTemplateOriginator',function($query){
 			$query->where('user_id',session('bo_id'));
 		})->get();
-		info($approvalTemplate);
 		
 		$count = 0;
 
@@ -566,6 +590,7 @@ class CustomHelper {
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->item->itemGroup->coa_id,
 					'place_id'		=> $row->goodReceiptDetail->place_id,
+					'item_id'		=> $row->item_id,
 					'account_id'	=> $row->goodReturnPO->account_id,
 					'department_id'	=> $row->goodReceiptDetail->department_id,
 					'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
@@ -578,6 +603,7 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coa_credit->id,
 						'place_id'		=> $row->goodReceiptDetail->place_id,
+						'item_id'		=> $row->item_id,
 						'account_id'	=> $row->goodReturnPO->account_id,
 						'department_id'	=> $row->goodReceiptDetail->department_id,
 						'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
@@ -592,7 +618,7 @@ class CustomHelper {
 					$row->goodReceiptDetail->place_id,
 					$row->goodReceiptDetail->warehouse_id,
 					$row->item_id,
-					$row->qty,
+					$row->qtyConvert(),
 					$rowtotal,
 					'OUT',
 					$gr->post_date
@@ -602,7 +628,7 @@ class CustomHelper {
 					$row->goodReceiptDetail->place_id,
 					$row->goodReceiptDetail->warehouse_id,
 					$row->item_id,
-					$row->qty,
+					$row->qtyConvert(),
 					'OUT'
 				);
 			}
@@ -627,6 +653,7 @@ class CustomHelper {
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->coa_id,
 					'place_id'		=> $row->place_id,
+					'item_id'		=> $row->item_id,
 					'department_id'	=> $row->department_id,
 					'warehouse_id'	=> $row->warehouse_id,
 					'type'			=> '1',
@@ -637,6 +664,7 @@ class CustomHelper {
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->item->itemGroup->coa_id,
 					'place_id'		=> $row->place_id,
+					'item_id'		=> $row->item_id,
 					'department_id'	=> $row->department_id,
 					'warehouse_id'	=> $row->warehouse_id,
 					'type'			=> '2',
@@ -789,6 +817,7 @@ class CustomHelper {
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
 					'place_id'		=> $rowdetail->to_place_id,
+					'item_id'		=> $rowdetail->item_id,
 					'warehouse_id'	=> $rowdetail->to_warehouse_id,
 					'type'			=> '1',
 					'nominal'		=> $nominal,
@@ -798,6 +827,7 @@ class CustomHelper {
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
 					'place_id'		=> $rowdetail->itemStock->place_id,
+					'item_id'		=> $rowdetail->item_id,
 					'warehouse_id'	=> $rowdetail->itemStock->warehouse_id,
 					'type'			=> '2',
 					'nominal'		=> $nominal,

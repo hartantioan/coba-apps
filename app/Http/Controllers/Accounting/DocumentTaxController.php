@@ -272,7 +272,6 @@ class DocumentTaxController extends Controller
 		$start_date = $request->start_date ? $request->start_date : ''   ;
         $finish_date = $request->finish_date ? $request->finish_date : ''   ;
         if($start_date!=''){
-            info("masukkkk".$start_date);
             $filename = 'faktur_masukan_from'.$start_date;
         }if($finish_date !=''){
             $filename = 'faktur_masukan_end'.$finish_date;

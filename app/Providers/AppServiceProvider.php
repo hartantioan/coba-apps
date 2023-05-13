@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
             'request_spareparts'        => 'App\Models\RequestSparepart',
             'depreciations'             => 'App\Models\Depreciation',
             'close_bills'               => 'App\Models\CloseBill',
-            'good_returns'              => 'App\Models\GoodReturn',
+            'good_returns'              => 'App\Models\GoodReturnPO',
         ]);
     }
 }

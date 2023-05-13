@@ -869,7 +869,6 @@ class PurchaseDownPaymentController extends Controller
                                 ];
             
                                 if(count($data_good_receipts)<1){
-                                    info("masukkadfadfs");
                                     $data_good_receipts[]=$data_good_receipt;
                                     $data_go_chart[]=$data_good_receipt;
                                     $data_link[]=[
@@ -894,7 +893,6 @@ class PurchaseDownPaymentController extends Controller
                                             'to'=>$data_good_receipt["key"],
                                         ];
                                         $data_id_gr[]=$good_receipt_detail->goodReceipt->id;
-                                        info($data_id_gr);
                                     }
                                 }
             

@@ -123,7 +123,7 @@ class ItemGroupController extends Controller
         $validation = Validator::make($request->all(), [
             'code'			=> $request->temp ? ['required', Rule::unique('item_groups', 'code')->ignore($request->temp)] : 'required|unique:item_groups,code',
             'name'          => 'required',
-            'coa_id'        => 'required',  
+            'coa_id'        => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah dipakai',

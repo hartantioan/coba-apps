@@ -33,7 +33,6 @@ class ImportAsset implements ToModel, WithHeadingRow, WithValidation,WithBatchIn
     /* public function transformDate($value, $format = 'Y-m-d')
     {
         if(!is_numeric($value)){
-            info($value);
             return $value;
         }else{
             return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value)->format('Y-m-d');

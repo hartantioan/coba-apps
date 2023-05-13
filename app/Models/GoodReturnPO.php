@@ -49,7 +49,7 @@ class GoodReturnPO extends Model
 
     public function goodReturnPODetail()
     {
-        return $this->hasMany('App\Models\GoodReturnPODetail');
+        return $this->hasMany('App\Models\GoodReturnPODetail','good_return_id','id');
     }
 
     public static function generateCode()

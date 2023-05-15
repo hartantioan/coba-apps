@@ -273,6 +273,11 @@ class EquipmentController extends Controller
         $query = Equipment::find($request->id);
 		
         if($query->delete()) {
+            foreach($query->equipmentPart as $row){
+                $row->sparepart()->delete();
+                $row->delete();
+            }
+
             activity()
                 ->performedOn(new Equipment())
                 ->causedBy(session('bo_id'))
@@ -521,6 +526,8 @@ class EquipmentController extends Controller
         $query = EquipmentPart::find($request->id);
 		
         if($query->delete()) {
+            $query->sparepart()->delete();
+
             activity()
                 ->performedOn(new EquipmentPart())
                 ->causedBy(session('bo_id'))

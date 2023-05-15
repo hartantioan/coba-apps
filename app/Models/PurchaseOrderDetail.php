@@ -110,8 +110,6 @@ class PurchaseOrderDetail extends Model
 
     public function getBalanceReceipt()
     {
-        $item = $this->item_id;
-        $po = $this->purchase_order_id;
 
         $received = $this->goodReceiptDetail()->sum('qty');
 

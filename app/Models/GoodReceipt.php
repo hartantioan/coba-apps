@@ -212,4 +212,18 @@ class GoodReceipt extends Model
 
         return $hasRelation;
     }
+
+    public function hasBalanceReturn(){
+        $qty = 0;
+
+        foreach($this->goodReceiptDetail as $row){
+            $qty += $row->getBalanceReturn();
+        }
+
+        if($qty > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

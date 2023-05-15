@@ -213,6 +213,25 @@ class GoodReceiveController extends Controller
             ];
         } else {
 
+            $passed = true;
+
+            foreach($request->arr_item as $key => $row){
+                if(isset($request->arr_price[$key]) && isset($request->arr_qty[$key])){
+                    if(str_replace(',','.',str_replace('.','',$request->arr_price[$key])) == 0 || str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) == 0){
+                        $passed = false;
+                    }
+                }else{
+                    $passed = false;
+                }
+            }
+
+            if(!$passed){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Silahkan cek detail form anda, tidak boleh ada data 0 atau kosong.'
+                ]);
+            }
+
             $grandtotal = 0;
 
             foreach($request->arr_item as $key => $row){

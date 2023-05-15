@@ -143,7 +143,7 @@ class ResidenceController extends Controller
                         $query->where('employee_id',$request->employee_id)->where('status','1');
                     })->first();
 
-                    if($cek){
+                    if($cek && !$request->temp){
                         $arr[] = $cek->region->name.' pada no keresidenan '.$cek->residence->code.' oleh pegawai '.$cek->residence->employee->name;
                     }
                 }

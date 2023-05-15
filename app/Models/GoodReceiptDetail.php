@@ -55,6 +55,12 @@ class GoodReceiptDetail extends Model
         return $this->belongsTo('App\Models\PurchaseOrderDetail', 'purchase_order_detail_id', 'id')->withTrashed();
     }
 
+    public function goodReturnPODetail(){
+        return $this->hasMany('App\Models\GoodReturnPODetail','good_receipt_detail_id','id')->whereHas('goodReturnPO',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function getRowTotal(){
         $total = 0;
         $rowprice = 0;
@@ -83,5 +89,13 @@ class GoodReceiptDetail extends Model
         $qty = round($this->qty * $this->item->buy_convert,3);
 
         return $qty;
+    }
+
+    public function getBalanceReturn(){
+        $returned = $this->goodReturnPODetail()->sum('qty');
+
+        $balance = $this->qty - $returned;
+
+        return $balance;
     }
 }

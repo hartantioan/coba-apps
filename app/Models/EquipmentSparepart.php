@@ -28,15 +28,15 @@ class EquipmentSparePart extends Model
     ];
 
     public function user(){
-        return $this->belongsTo('App\Models\User', 'user_id', 'id');
+        return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
     public function item(){
-        return $this->belongsTo('App\Models\Item', 'item_id', 'id');
+        return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
     }
 
     public function equipmentPart(){
-        return $this->belongsTo('App\Models\EquipmentPart', 'equipment_part_id', 'id');
+        return $this->belongsTo('App\Models\EquipmentPart', 'equipment_part_id', 'id')->withTrashed();
     }
 
     public function status(){
@@ -58,6 +58,7 @@ class EquipmentSparePart extends Model
     public static function generateCode()
     {
         $query = EquipmentSparePart::selectRaw('RIGHT(code, 6) as code')
+            ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
             ->get();

@@ -24,11 +24,11 @@ class EquipmentPart extends Model
     ];
 
     public function user(){
-        return $this->belongsTo('App\Models\User', 'user_id', 'id');
+        return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
     public function equipment(){
-        return $this->belongsTo('App\Models\Equipment', 'equipment_id', 'id');
+        return $this->belongsTo('App\Models\Equipment', 'equipment_id', 'id')->withTrashed();
     }
 
     public function sparepart(){
@@ -59,6 +59,7 @@ class EquipmentPart extends Model
     public static function generateCode()
     {
         $query = EquipmentPart::selectRaw('RIGHT(code, 6) as code')
+            ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
             ->get();

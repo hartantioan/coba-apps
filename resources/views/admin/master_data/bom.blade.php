@@ -217,7 +217,7 @@
                                         <thead>
                                             <tr>
                                                 <th width="30%" class="center">Deskripsi</th>
-                                                <th width="30%" class="center">Coa (Jika ada)</th>
+                                                <th width="30%" class="center">Coa</th>
                                                 <th width="10%" class="center">Nominal</th>
                                                 <th width="10%" class="center">Hapus</th>
                                             </tr>

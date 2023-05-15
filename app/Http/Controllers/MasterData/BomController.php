@@ -213,7 +213,7 @@ class BomController extends Controller
                     foreach($request->arr_description_cost as $key => $row){
                         BomCost::create([
                             'bom_id'        => $query->id,
-                            'coa_id'        => $request->arr_coa[$key],
+                            'coa_id'        => isset($request->arr_coa[$key]) ? $request->arr_coa[$key] : NULL,
                             'description'   => $request->arr_description_cost[$key],
                             'nominal'       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]))
                         ]);

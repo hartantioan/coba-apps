@@ -615,10 +615,12 @@ class Select2Controller extends Controller {
                 ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
-            $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->note,
-            ];
+            if($d->hasBalanceReturn()){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note,
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);

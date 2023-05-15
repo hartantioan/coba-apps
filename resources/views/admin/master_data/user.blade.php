@@ -623,7 +623,7 @@
                             </div>
                             <div id="accessdata" class="col s12">
                                 <div class="row mt-1 center-align">
-                                    <div class="col s6">
+                                    <div class="col s12">
                                         <h5 class="card-title center">Penempatan (Site)</h5>
                                         <table class="bordered centered">
                                             <thead>
@@ -661,7 +661,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="col s6">
+                                    <div class="col s12">
                                         <h5 class="card-title center">Gudang</h5>
                                         <table class="bordered centered">
                                             <thead>

@@ -453,6 +453,28 @@ class UserController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+
+            $passed = true;
+
+            if($request->arr_bank){
+                foreach($request->arr_bank as $key => $row){
+                    if(isset($request->arr_name[$key]) && isset($request->arr_no[$key]) && isset($request->arr_branch[$key])){
+                        if($request->arr_name[$key] == '' || $request->arr_no[$key] == '' || $request->arr_branch[$key] == ''){
+                            $passed = false;
+                        }
+                    }else{
+                        $passed = false;
+                    }
+                }
+            }
+
+            if(!$passed){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Silahkan cek detail informasi bank rekening anda, tidak boleh ada kosong.'
+                ]);
+            }
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {

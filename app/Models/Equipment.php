@@ -87,6 +87,7 @@ class Equipment extends Model
     public static function generateCode()
     {
         $query = Equipment::selectRaw('RIGHT(code, 6) as code')
+            ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
             ->get();

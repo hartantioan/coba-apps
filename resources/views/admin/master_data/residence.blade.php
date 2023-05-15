@@ -117,6 +117,8 @@
                             <select class="browser-default" id="employee_id" name="employee_id"></select>
                             <label class="active" for="employee_id">Karyawan</label>
                         </div>
+                    </div>
+                    <div class="col s12">
                         <div class="input-field col s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
@@ -218,6 +220,7 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
+                $('.row_region').remove();
             }
         });
 

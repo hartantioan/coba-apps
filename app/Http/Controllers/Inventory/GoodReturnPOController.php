@@ -20,7 +20,7 @@ use App\Models\GoodReturnPO;
 use App\Models\User;
 use App\Models\GoodReturnPODetail;
 use App\Helpers\CustomHelper;
-use App\Exports\ExportGoodReceipt;
+use App\Exports\ExportGoodReturnPO;
 
 class GoodReturnPOController extends Controller
 {
@@ -180,7 +180,7 @@ class GoodReturnPOController extends Controller
             $data['status'] = '500';
             $data['message'] = 'Good Receipt / Penerimaan Barang PO '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
-            /* if($data->hasBalance()){ */
+            if($data->hasBalanceReturn()){
                 if(!$data->purchaseInvoiceDetail()->exists()){
                     CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Return PO / Pengembalian Barang PO');
                     $details = [];
@@ -205,10 +205,10 @@ class GoodReturnPOController extends Controller
                     $data['status'] = '500';
                     $data['message'] = 'Good Receipt / Penerimaan Barang No '.$data->code.' telah menjadi Purchase Invoice, anda tidak bisa menambahkannya.';
                 }
-            /* }else{
+            }else{
                 $data['status'] = '500';
-                $data['message'] = 'Seluruh item pada good receipt '.$data->code.' telah dikembalikan ke supplier.';
-            } */
+                $data['message'] = 'Seluruh item pada good receipt po '.$data->code.' telah dikembalikan ke supplier.';
+            }
         }
 
         return response()->json($data);
@@ -408,40 +408,44 @@ class GoodReturnPOController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = GoodReceipt::find($request->id);
+        $data   = GoodReturnPO::find($request->id);
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4">
                         <div class="col s12">
                             <table class="bordered" style="width:auto;">
                                 <thead>
                                     <tr>
-                                        <th class="center-align" colspan="9">Daftar Item</th>
+                                        <th class="center-align" colspan="11">Daftar Item</th>
                                     </tr>
                                     <tr>
                                         <th class="center-align">No.</th>
                                         <th class="center-align">Item</th>
-                                        <th class="center-align">Qty</th>
+                                        <th class="center-align">BP</th>
+                                        <th class="center-align">Qty Diterima</th>
+                                        <th class="center-align">Qty Dikembalikan</th>
                                         <th class="center-align">Satuan</th>
                                         <th class="center-align">Keterangan</th>
-                                        <th class="center-align">Remark</th>
                                         <th class="center-align">Site</th>
                                         <th class="center-align">Departemen</th>
                                         <th class="center-align">Gudang</th>
+                                        <th class="center-align">Referensi</th>
                                     </tr>
                                 </thead>
                                 <tbody>';
         
-        foreach($data->goodReceiptDetail as $key => $rowdetail){
+        foreach($data->goodReturnPODetail as $key => $rowdetail){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$rowdetail->item->name.'</td>
+                <td class="center-align">'.$rowdetail->goodReceiptDetail->goodReceipt->account->name.'</td>
+                <td class="center-align">'.number_format($rowdetail->goodReceiptDetail->qty,3,',','.').'</td>
                 <td class="center-align">'.number_format($rowdetail->qty,3,',','.').'</td>
                 <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
-                <td class="center-align">'.$rowdetail->remark.'</td>
-                <td class="center-align">'.$rowdetail->place->name.' - '.$rowdetail->place->company->name.'</td>
-                <td class="center-align">'.$rowdetail->department->name.'</td>
-                <td class="center-align">'.$rowdetail->warehouse->name.'</td>
+                <td class="center-align">'.$rowdetail->goodReceiptDetail->place->name.' - '.$rowdetail->goodReceiptDetail->place->company->name.'</td>
+                <td class="center-align">'.$rowdetail->goodReceiptDetail->department->name.'</td>
+                <td class="center-align">'.$rowdetail->goodReceiptDetail->warehouse->name.'</td>
+                <td class="center-align">'.$rowdetail->goodReceiptDetail->goodReceipt->code.'</td>
             </tr>';
         }
         
@@ -477,40 +481,6 @@ class GoodReturnPOController extends Controller
             </tr>';
         }
 
-        $string .= '</tbody></table></div>';
-
-        $string .= '<div class="col s12 mt-1"><table style="max-width:500px;">
-                <thead>
-                    <tr>
-                        <th class="center-align" colspan="6">Landed Cost</th>
-                    </tr>
-                    <tr>
-                        <th class="center-align">Nomor/Kode</th>
-                        <th class="center-align">Vendor</th>
-                        <th class="center-align">Keterangan</th>
-                        <th class="center-align">Total</th>
-                        <th class="center-align">Pajak</th>
-                        <th class="center-align">Grandtotal</th>
-                    </tr>
-                </thead><tbody>';
-
-        if($data->landedCost()->exists()){
-            foreach($data->landedCost as $key => $row){
-            $string .= '<tr>
-                <td class="center-align">'.$row->code.'</td>
-                <td class="center-align">'.$row->vendor->name.'</td>
-                <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.number_format($row->total,2,',','.').'</td>
-                <td class="center-align">'.number_format($row->tax,2,',','.').'</td>
-                <td class="center-align">'.number_format($row->grandtotal,2,',','.').'</td>
-            </tr>';
-            }
-        }else{
-            $string .= '<tr>
-            <td class="center-align" colspan="6">Landed cost tidak ditemukan.</td>
-            </tr>';
-        }
-
         $string .= '</tbody></table></div></div>';
 		
         return response()->json($string);
@@ -518,40 +488,39 @@ class GoodReturnPOController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = GoodReceipt::where('code',CustomHelper::decrypt($id))->first();
+        $pr = GoodReturnPO::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Print Goods Receipt (Penerimaan Barang)',
+                'title'     => 'Print Goods Return PO (Pengembalian Barang PO)',
                 'data'      => $pr
             ];
 
-            return view('admin.approval.good_receipt', $data);
+            return view('admin.approval.good_return_po', $data);
         }else{
             abort(404);
         }
     }
 
     public function show(Request $request){
-        $grm = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+        $grm = GoodReturnPO::where('code',CustomHelper::decrypt($request->id))->first();
         $grm['account_name'] = $grm->account->name;
 
         $arr = [];
         
-        foreach($grm->goodReceiptDetail as $row){
+        foreach($grm->GoodReturnPODetail as $row){
             $arr[] = [
-                'purchase_order_detail_id'  => $row->purchase_order_detail_id,
-                'item_id'       => $row->item_id,
-                'item_name'     => $row->item->name,
-                'qty'           => $row->qty,
-                'unit'          => $row->item->buyUnit->code,
-                'note'          => $row->note,
-                'place_id'      => $row->place_id,
-                'place_name'    => $row->place->name.' - '.$row->place->company->name,
-                'department_id' => $row->department_id,
-                'department_name'   => $row->department->name,
-                'warehouse_id'  => $row->warehouse_id,
-                'warehouse_name'=> $row->warehouse->name
+                'id'                        => $row->goodReceiptDetail->good_receipt_id,
+                'good_receipt_detail_id'    => $row->good_receipt_detail_id,
+                'item_id'                   => $row->item_id,
+                'item_name'                 => $row->item->name,
+                'qty_returned'              => number_format($row->qty,3,',','.'),
+                'qty_received'              => number_format($row->goodReceiptDetail->qty,3,',','.'),
+                'unit'                      => $row->item->buyUnit->code,
+                'note'                      => $row->note,
+                'place_name'                => $row->goodReceiptDetail->place->name.' - '.$row->goodReceiptDetail->place->company->name,
+                'department_name'           => $row->goodReceiptDetail->department->name,
+                'warehouse_name'            => $row->goodReceiptDetail->warehouse->name
             ];
         }
 
@@ -561,18 +530,13 @@ class GoodReturnPOController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = GoodReturnPO::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
-                ];
-            }elseif($query->hasChildDocument()){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data telah digunakan pada Landed Cost / Purchase Invoice.'
                 ];
             }else{
                 $query->update([
@@ -582,16 +546,16 @@ class GoodReturnPOController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                CustomHelper::removeJournal('good_receipts',$query->id);
-                CustomHelper::removeCogs('good_receipts',$query->id);
-                CustomHelper::sendNotification('good_receipts',$query->id,'Goods Receipt No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('good_receipts',$query->id);
+                CustomHelper::removeJournal('good_returns',$query->id);
+                CustomHelper::removeCogs('good_returns',$query->id);
+                CustomHelper::sendNotification('good_returns',$query->id,'Goods Return PO No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('good_returns',$query->id);
     
                 activity()
-                    ->performedOn(new GoodReceipt())
+                    ->performedOn(new GoodReturnPO())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the good receipt data');
+                    ->log('Void the good return po data');
                 
                 $response = [
                     'status'  => 200,
@@ -609,14 +573,14 @@ class GoodReturnPOController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = GoodReturnPO::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query->approval()){
             foreach($query->approval()->approvalMatrix as $row){
                 if($row->status == '2'){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Purchase Order telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                        'message' => 'Good Return PO / Pengembalian Barang PO telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
                     ]);
                 }
             }
@@ -631,9 +595,7 @@ class GoodReturnPOController extends Controller
         
         if($query->delete()) {
 
-            CustomHelper::removeJournal('good_receipts',$query->id);
-            CustomHelper::removeCogs('good_receipts',$query->id);
-            CustomHelper::removeApproval('good_receipts',$query->id);
+            CustomHelper::removeApproval('good_returns',$query->id);
 
             $query->goodReceiptDetail()->delete();
 
@@ -641,7 +603,7 @@ class GoodReturnPOController extends Controller
                 ->performedOn(new GoodReceipt())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the good receipt data');
+                ->log('Delete the good return po data');
 
             $response = [
                 'status'  => 200,
@@ -660,17 +622,14 @@ class GoodReturnPOController extends Controller
     public function print(Request $request){
 
         $data = [
-            'title' => 'GOOD RECEIPT PO REPORT',
-            'data' => GoodReceipt::where(function ($query) use ($request) {
+            'title' => 'GOOD RETURN PO REPORT',
+            'data' => GoodReturnPO::where(function ($query) use ($request) {
                 if($request->search) {
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('post_date', 'like', "%$request->search%")
-                            ->orWhere('due_date', 'like', "%$request->search%")
-                            ->orWhere('document_date', 'like', "%$request->search%")
-                            ->orWhere('receiver_name', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
-                            ->orWhereHas('goodReceiptDetail',function($query) use($request){
+                            ->orWhereHas('goodReturnPODetail',function($query) use($request){
                                 $query->whereHas('item',function($query) use($request){
                                     $query->where('code', 'like', "%$request->search%")
                                         ->orWhere('name','like',"%$request->search%");
@@ -682,23 +641,27 @@ class GoodReturnPOController extends Controller
                             });
                     });
                 }
+                if($request->start_date && $request->finish_date) {
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
+                } else if($request->start_date) {
+                    $query->whereDate('post_date','>=', $request->start_date);
+                } else if($request->finish_date) {
+                    $query->whereDate('post_date','<=', $request->finish_date);
+                }
 
                 if($request->status){
                     $query->where('status', $request->status);
-                }
-
-                if($request->warehouse){
-                    $query->whereIn('warehouse_id', $request->warehouse);
                 }
             })
             ->get()
 		];
 		
-		return view('admin.print.inventory.good_receipt', $data);
+		return view('admin.print.inventory.good_return_po', $data);
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportGoodReceipt($request->search,$request->status,$this->dataplaces), 'good_receipt_'.uniqid().'.xlsx');
+		return Excel::download(new ExportGoodReturnPO($request->search,$request->status,$this->dataplaces), 'good_return_po_'.uniqid().'.xlsx');
     }
     
     public function viewStructureTree(Request $request){

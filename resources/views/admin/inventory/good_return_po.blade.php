@@ -872,36 +872,30 @@
                 `);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
-                $('#receiver_name').val(response.receiver_name);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
-                $('#document_date').val(response.document_date);
-                $('#delivery_no').val(response.delivery_no);
                 $('#post_date').removeAttr('min');
-                $('#due_date').removeAttr('min');
-                $('#document_date').removeAttr('min');
                 
                 if(response.details.length > 0){
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#body-item').append(`
-                            <tr class="row_item">
+                            <tr class="row_item" data-gr="` + val.id + `">
                                 <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_good_receipt_detail[]" value="` + val.good_receipt_detail_id + `">
                                 <td>
                                     ` + val.item_name + `
                                 </td>
+                                <td class="center">
+                                    <span>` + val.qty_received + `</span>
+                                </td>
                                 <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty_returned + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;">
-                                </td>
-                                <td>
-                                    <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.remark + `"  style="width:100%;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.place_name + `</span>

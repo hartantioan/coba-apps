@@ -806,7 +806,7 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('accounting')->middleware('direct.access')->group(function () {
 
-                Route::prefix('acAsset')->group(function () {
+                Route::prefix('accounting_asset')->group(function () {
                     Route::prefix('capitalization')->middleware('operation.access:capitalization,view')->group(function () {
                         Route::get('/',[CapitalizationController::class, 'index']);
                         Route::get('datatable',[CapitalizationController::class, 'datatable']);

@@ -314,8 +314,8 @@
     });
 
     function getRowUnit(val){
+        $("#arr_warehouse" + val).empty();
         if($("#arr_item" + val).val()){
-
             if($("#arr_item" + val).select2('data')[0].stock_list.length){
                 $('#arr_item_stock' + val).empty();
                 $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
@@ -328,8 +328,23 @@
             }
 
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
+
+            if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
+                $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
+                    $('#arr_warehouse' + val).append(`
+                        <option value="` + value.id + `">` + value.name + `</option>
+                    `);
+                });
+            }else{
+                $("#arr_warehouse" + val).append(`
+                    <option value="">--Gudang tidak diatur di master data Grup Item--</option>
+                `);
+            }
         }else{
             $('#arr_item_stock' + val).empty().formSelect();
+            $("#arr_warehouse" + val).append(`
+                <option value="">--Silahkan pilih item--</option>
+            `);
         }
     }
 
@@ -373,7 +388,9 @@
                     </select>    
                 </td>
                 <td class="center">
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                        <option value="">--Silahkan pilih item--</option>    
+                    </select>
                 </td>
                 <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
@@ -386,7 +403,6 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
-        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
         $('#arr_place' + count).formSelect();
         M.updateTextFields();
     }

@@ -198,6 +198,7 @@ class InventoryTransferController extends Controller
         } else {
 
             $passed = true;
+            $passedQty = true;
 
             foreach($request->arr_item as $key => $row){
                 $qtyout = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
@@ -217,6 +218,24 @@ class InventoryTransferController extends Controller
                     'message' => 'Maaf, beberapa stok keluar yang anda masukkan melebihi stok tersedia.'
                 ]);
             }
+
+            foreach($request->arr_item as $key => $row){
+                if(isset($request->arr_qty[$key])){
+                    if(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) == 0){
+                        $passedQty = false;
+                    }
+                }else{
+                    $passedQty = false;
+                }
+            }
+
+            if(!$passedQty){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Silahkan cek detail form anda, tidak boleh ada data 0 atau kosong.'
+                ]);
+            }
+
 
 			if($request->temp){
                 DB::beginTransaction();

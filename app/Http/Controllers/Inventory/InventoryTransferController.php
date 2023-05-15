@@ -236,7 +236,6 @@ class InventoryTransferController extends Controller
                 ]);
             }
 
-
 			if($request->temp){
                 DB::beginTransaction();
                 try {

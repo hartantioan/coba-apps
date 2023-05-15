@@ -548,8 +548,8 @@
     }
 
     function success(){
-        /* loadDataTable();
-        $('#modal1').modal('close'); */
+        loadDataTable();
+        /* $('#modal1').modal('close'); */
         $("#form_data :input").prop("disabled", true);
     }
 

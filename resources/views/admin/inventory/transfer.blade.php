@@ -625,7 +625,9 @@
                                 </select>    
                             </td>
                             <td class="center">
-                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                    
+                                </select>
                             </td>
                             <td>
                                 <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
@@ -644,7 +646,6 @@
                             <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
-                        select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                         $('#arr_place' + count).val(val.place_id).formSelect();
                         
                         if(val.stock_list.length){

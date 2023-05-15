@@ -170,6 +170,7 @@ class LandedCost extends Model
     public static function generateCode()
     {
         $query = LandedCost::selectRaw('RIGHT(code, 9) as code')
+            ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
             ->get();

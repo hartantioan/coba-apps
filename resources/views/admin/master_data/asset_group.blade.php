@@ -200,7 +200,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#coa_id,#depreciation_coa_id').val('').trigger('change');
+                $('#coa_id,#depreciation_coa_id,#cost_coa_id').val('').trigger('change');
                 M.updateTextFields();
             }
         });

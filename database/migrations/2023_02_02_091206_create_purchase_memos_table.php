@@ -18,23 +18,22 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50)->unique();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('purchase_invoice_id')->nullable();
-            $table->bigInteger('vendor_id')->nullable();
-            $table->bigInteger('branch_id')->nullable();
-            $table->date('posting_date')->nullable();
-            $table->date('due_date')->nullable();
-            $table->date('document_date')->nullable();
+            $table->bigInteger('account_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
+            $table->date('post_date')->nullable();
             $table->text('note')->nullable();
             $table->char('status', 1)->nullable();
-            $table->string('document')->nullable();
-            $table->double('subtotal')->nullable();
-            $table->double('percent_discount')->nullable();
-            $table->double('nominal_discount')->nullable();
-            $table->double('down_payment')->nullable();
+            $table->double('total')->nullable();
             $table->double('tax')->nullable();
+            $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
+            $table->bigInteger('void_id')->nullable();
+            $table->string('void_note')->nullable();
+            $table->timestamp('void_date')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+            
+            $table->index(['user_id', 'account_id', 'company_id']);
         });
     }
 

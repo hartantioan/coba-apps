@@ -20,7 +20,7 @@ class ImportCoa implements ToModel,WithHeadingRow, WithValidation,WithBatchInser
     public function model(array $row)
     {
         return new Coa([
-            'id' => $row['id'],
+            'id' => intval($row['id']),
             'code' => $row['code'],
             'name'=> $row['name'],
             'company_id'=> $row['company_id'],
@@ -38,7 +38,7 @@ class ImportCoa implements ToModel,WithHeadingRow, WithValidation,WithBatchInser
     public function rules(): array
     {
         return [
-            '*.id'  => 'required|numeric|unique:coas,id',
+            '*.id'  => 'required|unique:coas,id',
             '*.code' => 'required',
             '*.name' => 'required|string',
             '*.company_id' => 'required|numeric',

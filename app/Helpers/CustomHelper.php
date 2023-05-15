@@ -788,7 +788,7 @@ class CustomHelper {
 
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> Coa::where('code','100.01.01.99.03')->where('company_id',$row->asset->place->company_id)->first()->id,
+						'coa_id'		=> Coa::where('code','100.01.01.99.04')->where('company_id',$row->asset->place->company_id)->first()->id,
 						'place_id'		=> $row->asset->place_id,
 						'type'			=> '2',
 						'nominal'		=> $row->total

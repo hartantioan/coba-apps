@@ -27,6 +27,32 @@ class CoaController extends Controller
             'company'   => Company::where('status','1')->get(),
         ];
 
+        /* foreach(Coa::where('status','1')->get() as $row){
+            $arrCode = explode('.',$row->code);
+            $level = 0;
+            $parent = '';
+            if($arrCode[1] == '00'){
+                $level = 1;
+            }elseif($arrCode[2] == '00'){
+                $level = 2;
+                $parent = $arrCode[0].'.00.00.00.00';
+            }elseif($arrCode[3] == '00'){
+                $level = 3;
+                $parent = $arrCode[0].'.'.$arrCode[1].'.00.00.00';
+            }elseif($arrCode[4] == '00'){
+                $level = 4;
+                $parent = $arrCode[0].'.'.$arrCode[1].'.'.$arrCode[2].'.00.00';
+            }else{
+                $level = 5;
+                $parent = $arrCode[0].'.'.$arrCode[1].'.'.$arrCode[2].'.'.$arrCode[3].'.00';
+            }
+
+            $row->update([
+                'level'     => $level,
+                'parent_id' => $parent ? Coa::where('code',$parent)->first()->id : NULL,
+            ]);
+        } */
+
         return view('admin.layouts.index', ['data' => $data]);
     }
 

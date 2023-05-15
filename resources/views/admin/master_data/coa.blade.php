@@ -45,40 +45,47 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <div class="card-panel">
-                                <div class="row">
-                                    <div class="col s12 ">
-                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
-                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
-                                            <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Non-Aktif</option>
-                                            </select>
-                                        </div>
-
-                                        <label for="filter_company" style="font-size:1.2rem;">Filter Cabang :</label>
-                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
-                                            <select class="form-control" id="filter_company" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                @foreach($company as $m)
-                                                <option value="{{ $m->id }}">{{ $m->code.' '.$m->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <label for="filter_type" style="font-size:1.2rem;">Filter Tipe :</label>
-                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;min-width:35% !important;max-width:100%;">
-                                            <select class="select2 browser-default" multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
-                                                <option value="" disabled>Semua</option>
-                                                <option value="1">Akun Rahasia</option>
-                                                <option value="2">Akun Kontrol</option>
-                                                <option value="3">Akun Kas</option>
-                                            </select>
-                                        </div>
+                            <ul class="collapsible collapsible-accordion">
+                                <li>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-body">
+                                        <div class="row">
+                                            <div class="col m3 s6 ">
+                                                <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Aktif</option>
+                                                        <option value="2">Non-Aktif</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m3 s6 ">
+                                                <label for="filter_company" style="font-size:1.2rem;">Filter Cabang :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_company" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        @foreach($company as $m)
+                                                        <option value="{{ $m->id }}">{{ $m->code.' '.$m->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m6 s6 ">
+                                                <label for="filter_type" style="font-size:1.2rem;">Filter Tipe :</label>
+                                                <div class="input-field">
+                                                    <select class="select2 browser-default" multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
+                                                        <option value="" disabled>Semua</option>
+                                                        <option value="1">Akun Rahasia</option>
+                                                        <option value="2">Akun Kontrol</option>
+                                                        <option value="3">Akun Kas</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>  
                                     </div>
-                                </div>
-                            </div>
+                                </li>
+                            </ul>
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">List Data</h4>
@@ -251,7 +258,7 @@
                     @csrf
                     <div class="file-field input-field col m6 s12">
                         <div class="btn">
-                            <span>Dokumen PO</span>
+                            <span>Dokumen</span>
                             <input type="file" class="form-control-file" id="fileExcel" name="file">
                         </div>
                         <div class="file-path-wrapper">

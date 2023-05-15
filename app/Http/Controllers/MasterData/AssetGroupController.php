@@ -89,8 +89,8 @@ class AssetGroupController extends Controller
                     $val->name,
                     $val->parentSub()->exists() ? $val->parentSub->name : 'is Parent',
                     $val->coa->name,
-                    $val->depreciationCoa->name,
-                    $val->costCoa->name,
+                    $val->depreciationCoa()->exists() ? $val->depreciationCoa->name : '-',
+                    $val->costCoa()->exists() ? $val->costCoa->name : '-',
                     $val->depreciation_period,
                     $val->status(),
                     '
@@ -122,16 +122,16 @@ class AssetGroupController extends Controller
             'code'			        => $request->temp ? ['required', Rule::unique('asset_groups', 'code')->ignore($request->temp)] : 'required|unique:asset_groups,code',
             'name'                  => 'required',
             'coa_id'                => 'required',
-            'depreciation_coa_id'   => 'required',
-            'cost_coa_id'           => 'required',
+            /* 'depreciation_coa_id'   => 'required',
+            'cost_coa_id'           => 'required', */
             'depreciation_period'   => 'required',
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah dipakai',
             'name.required'                 => 'Nama tidak boleh kosong.',
             'coa_id.required'               => 'Coa pengakuan aset tidak boleh kosong.',
-            'depreciation_coa_id.required'  => 'Coa akumulasi penyusutan tidak boleh kosong.',
-            'cost_coa_id.required'          => 'Coa biaya tidak boleh kosong.',
+            /* 'depreciation_coa_id.required'  => 'Coa akumulasi penyusutan tidak boleh kosong.',
+            'cost_coa_id.required'          => 'Coa biaya tidak boleh kosong.', */
             'depreciation_period.required'  => 'Periode penyusutan tidak boleh kosong.',
         ]);
 

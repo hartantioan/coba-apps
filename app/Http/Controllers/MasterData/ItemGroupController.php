@@ -189,11 +189,13 @@ class ItemGroupController extends Controller
                     }
                 }
 
-                foreach($request->warehouse_id as $row){
-                    ItemGroupWarehouse::create([
-                        'item_group_id' => $query->id,
-                        'warehouse_id'  => intval($row)
-                    ]);
+                if($request->warehouse_id){
+                    foreach($request->warehouse_id as $row){
+                        ItemGroupWarehouse::create([
+                            'item_group_id' => $query->id,
+                            'warehouse_id'  => intval($row)
+                        ]);
+                    }
                 }
 
                 activity()

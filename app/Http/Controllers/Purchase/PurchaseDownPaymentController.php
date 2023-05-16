@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodReceipt;
+use App\Models\GoodReturnPO;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseInvoice;
 use Illuminate\Support\Facades\Session;
@@ -771,9 +772,13 @@ class PurchaseDownPaymentController extends Controller
         $data_purchase_downpayment=[];
         $data_id_pyrs=[];
         $data_id_frs=[];
+        $data_id_greturns=[];
         $data_frs=[];
         $data_pyrs = [];
+        $data_good_returns = [];
         $data_outgoingpayments = [];
+        $data_lcs=[];
+        $data_invoices=[];
 
         $data_go_chart=[];
         $data_link=[];
@@ -973,6 +978,45 @@ class PurchaseDownPaymentController extends Controller
                             }
                         }
 
+                        if($good_receipt_detail->goodReturnPODetail()->exists()){
+                            $good_return_tempura =[
+                                "name"=> $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
+                                "key" =>  $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
+                                
+                                'properties'=> [
+                                    ['name'=> "Tanggal :". $good_receipt_detail->goodReturnPODetail->goodReturnPO->post_date],
+                                ],
+                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt( $good_receipt_detail->goodReturnPODetail->goodReturnPO->code),
+                            ];
+                            if(count($data_good_returns)<1){
+                                $data_good_returns[]=$good_return_tempura;
+                                $data_go_chart[] = $good_return_tempura;;
+                                $data_link[]=[
+                                    'from'=> $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
+                                    'to'=>$query_gr->code,
+                                ];
+                                $data_id_greturns[]=  $good_receipt_detail->goodReturnPODetail->goodReturnPO->id; 
+                                
+                            }else{
+                                $found = false;
+                                foreach ($data_good_returns as $key => $row_return) {
+                                    if ($row_return["key"] == $good_return_tempura["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data_good_returns[]=$good_return_tempura;
+                                    $data_go_chart[] = $good_return_tempura;;
+                                    $data_link[]=[
+                                        'from'=> $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
+                                        'to'=>$query_gr->code,
+                                    ];
+                                    $data_id_greturns[]=  $good_receipt_detail->goodReturnPODetail->goodReturnPO->id; 
+                                }
+                            }
+                        }
+
                     }
 
                     //landed cost searching
@@ -1065,13 +1109,75 @@ class PurchaseDownPaymentController extends Controller
 
                 }
 
+                //mencari goodreturn foreign
+                foreach($data_id_greturns as $good_return_id){
+                    $query_return = GoodReturnPO::where('id',$good_return_id)->first();
+                    foreach($query_return->goodReturnPODetail as $good_return_detail){
+                        $data_good_receipt = [
+                            "name"=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
+                            "key" => $good_return_detail->goodReceiptDetail->goodReceipt->code,
+                            "color"=>"lightblue",
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$good_return_detail->goodReceiptDetail->goodReceipt->post_date],
+                            ],
+                            'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_return_detail->goodReceiptDetail->goodReceipt->code),
+                        ];
+                        if(count($data_good_receipts)<1){
+                            $data_good_receipt[]=$data_good_receipt;
+                            $data_go_chart[]=$data_good_receipt;
+                            $data_link[]=[
+                                'from'=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
+                                'to'=>$data_good_receipt["key"],
+                            ];
+                        }else{
+                            $found = false;
+                            foreach ($data_good_receipts as $key => $row_gr) {
+                                if ($row_gr["key"] == $data_good_receipt["key"]) {
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if($found){
+                                $data_links=[
+                                    'from'=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
+                                    'to'=>$data_good_receipt["key"],
+                                ];  
+                                $found_inlink = false;
+                                foreach($data_link as $key=>$row_link){
+                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                        $found_inlink = true;
+                                        break;
+                                    }
+                                }
+                                if(!$found_inlink){
+                                    $data_link[] = $data_links;
+                                }
+                                
+                            }
+                            if (!$found) {
+                                $data_good_receipt[]=$data_good_receipt;
+                                $data_go_chart[]=$data_good_receipt;
+                                $data_link[]=[
+                                    'from'=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
+                                    'to'=>$data_good_receipt["key"],
+                                ];
+                                  
+                            }
+                        }
+                        if(!in_array($good_return_detail->goodReceiptDetail->goodReceipt->id, $data_id_gr)){
+                            $data_id_gr[] = $good_return_detail->goodReceiptDetail->goodReceipt->id;
+                            $added = true;
+                        }
+                    }
+                }
+
                 // invoice insert foreign
 
                 foreach($data_id_invoice as $invoice_id){
                     $query_invoice = PurchaseInvoice::where('id',$invoice_id)->first();
                     foreach($query_invoice->purchaseInvoiceDetail as $row){
-                        if($row->purchaseOrder()->exists()){
-                            foreach($row->purchaseOrder as $row_po){
+                        if($row->purchaseOrder()){
+                            $row_po=$row->lookable;
                                 $po =[
                                     "name"=>$row_po->code,
                                     "key" => $row_po->code,
@@ -1172,19 +1278,19 @@ class PurchaseDownPaymentController extends Controller
                                         }
                                     }
                                 }
-                            }
+                            
                         }
                         /*  melihat apakah ada hubungan grpo tanpa po */
-                        if($row->goodReceipt()->exists()){
+                        if($row->goodReceipt()){
         
                             $data_good_receipt=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row->goodReceipt->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->goodReceipt->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row->goodReceipt->code,
-                                "name" => $row->goodReceipt->code,
-                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($row->goodReceipt->code),
+                                "key" => $row->lookable->code,
+                                "name" => $row->lookable->code,
+                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($row->lookable->code),
                             ];
         
                             if(count($data_good_receipts)<1){
@@ -1219,24 +1325,24 @@ class PurchaseDownPaymentController extends Controller
                             } 
                         }
                         /* melihat apakah ada hubungan lc */
-                        if($row->landedCost()->exists()){
+                        if($row->landedCost()){
                             $data_lc=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row->landedCost->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->landedCost->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row->landedCost->code,
-                                "name" => $row->landedCost->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->landedCost->code),
+                                "key" => $row->lookable->code,
+                                "name" => $row->lookable->code,
+                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->code),
                             ];
                             if(count($data_lcs)<1){
                                 $data_lcs[]=$data_lc;
                                 $data_go_chart[]=$data_lc;
                                 $data_link[]=[
                                     'from'=>$query_invoice->code,
-                                    'to'=>$row->landedCost->code,
+                                    'to'=>$row->lookable->code,
                                 ];
-                                $data_id_lc = $row->landedCost->id;
+                                $data_id_lc = $row->lookable->id;
                             }else{
                                 $found = false;
                                 foreach ($data_lcs as $key => $row_lc) {
@@ -1250,9 +1356,9 @@ class PurchaseDownPaymentController extends Controller
                                     $data_go_chart[]=$data_lc;
                                     $data_link[]=[
                                         'from'=>$query_invoice->code,
-                                        'to'=>$row->landedCost->code,
+                                        'to'=>$row->lookable->code,
                                     ];
-                                    $data_id_lc = $row->landedCost->id;
+                                    $data_id_lc = $row->lookable->id;
                                 }
                             }
                         }
@@ -2293,7 +2399,7 @@ class PurchaseDownPaymentController extends Controller
                     }
 
                 }
-            }
+            }  
 
             $response = [
                 'status'  => 200,

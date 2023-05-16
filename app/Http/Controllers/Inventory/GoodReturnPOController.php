@@ -665,7 +665,8 @@ class GoodReturnPOController extends Controller
     }
     
     public function viewStructureTree(Request $request){
-        $query = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = GoodReturnPO::where('code',CustomHelper::decrypt($request->id))->first();
+        
         $data_link=[];
 
         $data_good_receipts=[];
@@ -679,15 +680,18 @@ class GoodReturnPOController extends Controller
         $data_purchase_downpayment=[];
         $data_id_pyrs=[];
         $data_id_frs=[];
+        $data_id_greturns=[];
         $data_frs=[];
         $data_pyrs = [];
+        $data_good_returns = [];
         $data_outgoingpayments = [];
         $data_lcs=[];
         $data_invoices=[];
        
         $data_pos = [];
+
         if($query) {
-            $data_good_receipt = [
+            $data_good_return = [
                 "name"=>$query->code,
                 "key" => $query->code,
                 "color"=>"lightblue",
@@ -696,106 +700,64 @@ class GoodReturnPOController extends Controller
                 ],
                 'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($query->code),
             ];
-            $data_go_chart[]=$data_good_receipt;
-            $data_good_receipts[]=$data_good_receipt;
-            $data_id_gr[]=$query->id;
-            
-            foreach($query->goodReceiptDetail as $good_receipt_detail){
-                $data_po = [
-                    "key" => $good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
-                    "name" => $good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
-                    'grandtotal'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,
+            $data_good_returns[]=$data_good_return;
+            $data_go_chart[]=$data_good_return;
+            $data_id_greturns[]=$query->id;
+            foreach($query->goodReturnPODetail as $good_return_detail){
+                $data_good_receipt = [
+                    "name"=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
+                    "key" => $good_return_detail->goodReceiptDetail->goodReceipt->code,
+                    "color"=>"lightblue",
                     'properties'=> [
-                        ['name'=> "Tanggal :".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
-                        ['name'=> "Vendor  : ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name],
+                        ['name'=> "Tanggal :".$good_return_detail->goodReceiptDetail->goodReceipt->post_date],
                     ],
-                    'arrowDirection'=>"left",
-                    'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($good_receipt_detail->purchaseOrderDetail->purchaseOrder->code),
+                    'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_return_detail->goodReceiptDetail->goodReceipt->code),
                 ];
-                
-                $purchase_order_detail = $good_receipt_detail->purchaseOrderDetail;
-                
-                if($purchase_order_detail->purchaseRequestDetail()->exists()){
-                    
-                    $purchase_request_detail=$purchase_order_detail->purchaseRequestDetail;
-                    $pr = [
-                        "key" => $purchase_request_detail->purchaseRequest->code,
-                        "name" => $purchase_request_detail->purchaseRequest->code,
-                        'properties'=> [
-                            ['name'=> "Tanggal :".$purchase_request_detail->purchaseRequest->post_date],
-                        ],
-                        'arrowDirection'=>"left",
-                        'url'=>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($purchase_request_detail->purchaseRequest->code),
-                    ];
-                    if(count($data_purchase_requests)<1){
-                        $data_purchase_requests[]=$pr;
-                        $data_go_chart[]=$pr;
-                        $data_link[]=[
-                            'from'=>$pr["key"],
-                            'to'=>$data_po["key"],
-                        ];  
-                        
-                    }else{
-                        $found = false;
-                        foreach ($data_purchase_requests as $key => $row_pos) {
-                            if ($row_pos["key"] == $pr["key"]) {
-                                $found = true;
-                                break;
-                            }
-                        }
-                        if($found){
-                            $data_links=[
-                                'from'=>$pr["key"],
-                                'to'=>$data_po["key"],
-                            ];  
-                            $found_inlink = false;
-                            foreach($data_link as $key=>$row_link){
-                                if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                    $found_inlink = true;
-                                    break;
-                                }
-                            }
-                            if(!$found_inlink){
-                                $data_link[] = $data_links;
-                            }
-                            
-                        }
-                        if (!$found) {
-                            $data_purchase_requests[]=$pr;
-                            $data_go_chart[]=$pr;
-                            $data_link[]=[
-                                'from'=>$pr["key"],
-                                'to'=>$data_po["key"],
-                            ];  
-                        }
-                    }
-                }
-                if(count($data_pos)<1){
-                    $data_pos[]=$data_po;
-                    $data_go_chart[]=$data_po;
+                if(count($data_good_receipts)<1){
+                    $data_good_receipt[]=$data_good_receipt;
+                    $data_go_chart[]=$data_good_receipt;
                     $data_link[]=[
-                        'from'=>$data_po["key"],
-                        'to'=>$query->code,
-                    ];  
-                    $data_id_po[]=$good_receipt_detail->purchaseOrderDetail->purchaseOrder->id;
+                        'from'=>$data_good_return["key"],
+                        'to'=>$data_good_receipt["key"],
+                    ];
+                    $data_id_gr[]=$good_return_detail->goodReceiptDetail->goodReceipt->id;
+                    
                 }else{
                     $found = false;
-                    foreach ($data_pos as $key => $row_pos) {
-                        if ($row_pos["key"] == $data_po["key"]) {
+                    foreach ($data_good_receipts as $key => $row_gr) {
+                        if ($row_gr["key"] == $data_good_receipt["key"]) {
                             $found = true;
                             break;
                         }
                     }
+                    if($found){
+                        $data_links=[
+                            'from'=>$data_good_return["key"],
+                            'to'=>$data_good_receipt["key"],
+                        ];  
+                        $found_inlink = false;
+                        foreach($data_link as $key=>$row_link){
+                            if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                $found_inlink = true;
+                                break;
+                            }
+                        }
+                        if(!$found_inlink){
+                            $data_link[] = $data_links;
+                        }
+                        
+                    }
                     if (!$found) {
-                        $data_pos[] = $data_po;
-                        $data_go_chart[]=$data_po;
+                        $data_good_receipt[]=$data_good_receipt;
+                        $data_go_chart[]=$data_good_receipt;
                         $data_link[]=[
-                            'from'=>$data_po["key"],
-                            'to'=>$query->code,
+                            'from'=>$data_good_return["key"],
+                            'to'=>$data_good_receipt["key"],
                         ];
-                    $data_id_po[]=$good_receipt_detail->purchaseOrderDetail->purchaseOrder->id;  
+                        $data_id_gr[]=$good_return_detail->goodReceiptDetail->goodReceipt->id;   
                     }
                 }
+                
             }
 
             //pengambilan foreign branch
@@ -843,6 +805,45 @@ class GoodReturnPOController extends Controller
                                 ];  
                                 $data_go_chart[]=$po;
                                 $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id;
+                            }
+                        }
+
+                        if($good_receipt_detail->goodReturnPODetail()->exists()){
+                            $good_return_tempura =[
+                                "name"=> $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
+                                "key" =>  $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
+                                
+                                'properties'=> [
+                                    ['name'=> "Tanggal :". $good_receipt_detail->goodReturnPODetail->goodReturnPO->post_date],
+                                ],
+                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt( $good_receipt_detail->goodReturnPODetail->goodReturnPO->code),
+                            ];
+                            if(count($data_good_returns)<1){
+                                $data_good_returns[]=$good_return_tempura;
+                                $data_go_chart[] = $good_return_tempura;;
+                                $data_link[]=[
+                                    'from'=> $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
+                                    'to'=>$query_gr->code,
+                                ];
+                                $data_id_greturns[]=  $good_receipt_detail->goodReturnPODetail->goodReturnPO->id; 
+                                
+                            }else{
+                                $found = false;
+                                foreach ($data_good_returns as $key => $row_return) {
+                                    if ($row_return["key"] == $good_return_tempura["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data_good_returns[]=$good_return_tempura;
+                                    $data_go_chart[] = $good_return_tempura;;
+                                    $data_link[]=[
+                                        'from'=> $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
+                                        'to'=>$query_gr->code,
+                                    ];
+                                    $data_id_greturns[]=  $good_receipt_detail->goodReturnPODetail->goodReturnPO->id; 
+                                }
                             }
                         }
 
@@ -938,13 +939,75 @@ class GoodReturnPOController extends Controller
 
                 }
 
+                //mencari goodreturn foreign
+                foreach($data_id_greturns as $good_return_id){
+                    $query_return = GoodReturnPO::where('id',$good_return_id)->first();
+                    foreach($query_return->goodReturnPODetail as $good_return_detail){
+                        $data_good_receipt = [
+                            "name"=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
+                            "key" => $good_return_detail->goodReceiptDetail->goodReceipt->code,
+                            "color"=>"lightblue",
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$good_return_detail->goodReceiptDetail->goodReceipt->post_date],
+                            ],
+                            'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_return_detail->goodReceiptDetail->goodReceipt->code),
+                        ];
+                        if(count($data_good_receipts)<1){
+                            $data_good_receipt[]=$data_good_receipt;
+                            $data_go_chart[]=$data_good_receipt;
+                            $data_link[]=[
+                                'from'=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
+                                'to'=>$data_good_receipt["key"],
+                            ];
+                        }else{
+                            $found = false;
+                            foreach ($data_good_receipts as $key => $row_gr) {
+                                if ($row_gr["key"] == $data_good_receipt["key"]) {
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if($found){
+                                $data_links=[
+                                    'from'=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
+                                    'to'=>$data_good_receipt["key"],
+                                ];  
+                                $found_inlink = false;
+                                foreach($data_link as $key=>$row_link){
+                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                        $found_inlink = true;
+                                        break;
+                                    }
+                                }
+                                if(!$found_inlink){
+                                    $data_link[] = $data_links;
+                                }
+                                
+                            }
+                            if (!$found) {
+                                $data_good_receipt[]=$data_good_receipt;
+                                $data_go_chart[]=$data_good_receipt;
+                                $data_link[]=[
+                                    'from'=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
+                                    'to'=>$data_good_receipt["key"],
+                                ];
+                                  
+                            }
+                        }
+                        if(!in_array($good_return_detail->goodReceiptDetail->goodReceipt->id, $data_id_gr)){
+                            $data_id_gr[] = $good_return_detail->goodReceiptDetail->goodReceipt->id;
+                            $added = true;
+                        }
+                    }
+                }
+
                 // invoice insert foreign
 
                 foreach($data_id_invoice as $invoice_id){
                     $query_invoice = PurchaseInvoice::where('id',$invoice_id)->first();
                     foreach($query_invoice->purchaseInvoiceDetail as $row){
-                        if($row->purchaseOrder()->exists()){
-                            foreach($row->purchaseOrder as $row_po){
+                        if($row->purchaseOrder()){
+                            $row_po=$row->lookable;
                                 $po =[
                                     "name"=>$row_po->code,
                                     "key" => $row_po->code,
@@ -1045,19 +1108,19 @@ class GoodReturnPOController extends Controller
                                         }
                                     }
                                 }
-                            }
+                            
                         }
                         /*  melihat apakah ada hubungan grpo tanpa po */
-                        if($row->goodReceipt()->exists()){
+                        if($row->goodReceipt()){
         
                             $data_good_receipt=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row->goodReceipt->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->goodReceipt->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row->goodReceipt->code,
-                                "name" => $row->goodReceipt->code,
-                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($row->goodReceipt->code),
+                                "key" => $row->lookable->code,
+                                "name" => $row->lookable->code,
+                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($row->lookable->code),
                             ];
         
                             if(count($data_good_receipts)<1){
@@ -1092,24 +1155,24 @@ class GoodReturnPOController extends Controller
                             } 
                         }
                         /* melihat apakah ada hubungan lc */
-                        if($row->landedCost()->exists()){
+                        if($row->landedCost()){
                             $data_lc=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row->landedCost->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->landedCost->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row->landedCost->code,
-                                "name" => $row->landedCost->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->landedCost->code),
+                                "key" => $row->lookable->code,
+                                "name" => $row->lookable->code,
+                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->code),
                             ];
                             if(count($data_lcs)<1){
                                 $data_lcs[]=$data_lc;
                                 $data_go_chart[]=$data_lc;
                                 $data_link[]=[
                                     'from'=>$query_invoice->code,
-                                    'to'=>$row->landedCost->code,
+                                    'to'=>$row->lookable->code,
                                 ];
-                                $data_id_lc = $row->landedCost->id;
+                                $data_id_lc = $row->lookable->id;
                             }else{
                                 $found = false;
                                 foreach ($data_lcs as $key => $row_lc) {
@@ -1123,9 +1186,9 @@ class GoodReturnPOController extends Controller
                                     $data_go_chart[]=$data_lc;
                                     $data_link[]=[
                                         'from'=>$query_invoice->code,
-                                        'to'=>$row->landedCost->code,
+                                        'to'=>$row->lookable->code,
                                     ];
-                                    $data_id_lc = $row->landedCost->id;
+                                    $data_id_lc = $row->lookable->id;
                                 }
                             }
                         }

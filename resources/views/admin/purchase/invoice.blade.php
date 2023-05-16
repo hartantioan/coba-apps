@@ -262,7 +262,7 @@
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa</h6>
+                                    <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered" style="width:1600px !important;">
                                             <thead>
@@ -287,9 +287,11 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
-                                                <tr id="empty-detail">
+                                                <tr id="last-row-detail">
                                                     <td colspan="12" class="center">
-                                                        Pilih supplier/vendor untuk memulai...
+                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                            <i class="material-icons left">add</i> New Item
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -471,13 +473,7 @@
                     $(this).remove();
                 });
                 M.updateTextFields();
-                $('#body-detail').empty().append(`
-                    <tr id="empty-detail">
-                        <td colspan="12" class="center">
-                            Pilih supplier/vendor untuk memulai...
-                        </td>
-                    </tr>
-                `);
+                $('.row_detail').remove();
                 $('#account_id').empty();
                 $('#total,#tax,#wtax,#balance').text('0,00');
                 $('#subtotal,#discount,#downpayment').val('0,00');
@@ -686,12 +682,12 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-
-                    $('#body-detail,#body-detail-dp').empty();
+                    $('.row_detail').remove();
+                    $('#body-detail-dp').empty();
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
-                            $('#body-detail').append(`
+                            $('#last-row-detail').before(`
                                 <tr class="row_detail">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
@@ -821,6 +817,54 @@
             $('#due_date').val('');
             $('#total,#tax,#wtax,#balance').text('0,00');
         }
+    }
+
+    function addItem(){
+        var count = makeid(10);
+        $('#last-row-detail').before(`
+            <tr class="row_detail">
+                <input type="hidden" name="arr_type[]" value="coas" data-id="` + count + `">
+                <td class="center-align">
+                    <label>
+                        <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
+                        <span>Pilih</span>
+                    </label>
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="">
+                    -
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="right-align">
+                    <input type="text" name="arr_total[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="right-align" id="row_tax` + count + `">
+                    <input type="text" name="arr_tax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="right-align" id="row_wtax` + count + `">
+                    <input type="text" name="arr_wtax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="right-align">
+                    <input type="text" name="arr_grandtotal[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td>
+                    ` + val.info + `
+                </td>
+            </tr>
+        `);
     }
 
     function countAll(){
@@ -1165,10 +1209,10 @@
                 $('#downpayment').val(response.downpayment);
                 
                 if(response.details.length > 0){
-                    $('#body-detail').empty();
+                    $('.row_detail').remove();
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        $('#body-detail').append(`
+                        $('#last-row-detail').before(`
                             <tr class="row_detail">
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                 <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">

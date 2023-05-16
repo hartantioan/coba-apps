@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
+use App\Models\Coa;
 use App\Models\Company;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
@@ -20,6 +21,7 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseInvoice;
 use App\Models\User;
 use App\Models\Tax;
+use Illuminate\Database\Eloquent\Builder;
 
 class PurchaseInvoiceController extends Controller
 {
@@ -72,7 +74,7 @@ class PurchaseInvoiceController extends Controller
         foreach($datapo as $row){
             if($row->balanceInvoice() > 0){
                 $details[] = [
-                    'type'          => 'purchase_order',
+                    'type'          => 'purchase_orders',
                     'code'          => CustomHelper::encrypt($row->code),
                     'rawcode'       => $row->code,
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
@@ -118,7 +120,7 @@ class PurchaseInvoiceController extends Controller
                 }
 
                 $details[] = [
-                    'type'          => 'good_receipt',
+                    'type'          => 'good_receipts',
                     'code'          => CustomHelper::encrypt($row->code),
                     'rawcode'       => $row->code,
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
@@ -141,7 +143,7 @@ class PurchaseInvoiceController extends Controller
         foreach($datalc as $row){
             if($row->balanceInvoice() > 0){
                 $details[] = [
-                    'type'          => 'landed_cost',
+                    'type'          => 'landed_costs',
                     'code'          => CustomHelper::encrypt($row->code),
                     'rawcode'       => $row->code,
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
@@ -225,9 +227,7 @@ class PurchaseInvoiceController extends Controller
                                     ->orWhere('employee_no','like',"%$search%");
                             })
                             ->orWhereHas('purchaseInvoiceDetail',function($query) use($search, $request){
-                                $query->whereHas('landedCost',function($query) use($search, $request){
-                                    $query->where('code','like',"%$search%");
-                                })->orWhereHas('goodReceipt',function($query) use($search, $request){
+                                $query->whereHasMorph('lookable',[PurchaseOrder::class,PurchaseInvoice::class,LandedCost::class,GoodReceipt::class,Coa::class],function (Builder $query) use ($search) {
                                     $query->where('code','like',"%$search%");
                                 });
                             });
@@ -287,9 +287,7 @@ class PurchaseInvoiceController extends Controller
                                     ->orWhere('employee_no','like',"%$search%");
                             })
                             ->orWhereHas('purchaseInvoiceDetail',function($query) use($search, $request){
-                                $query->whereHas('landedCost',function($query) use($search, $request){
-                                    $query->where('code','like',"%$search%");
-                                })->orWhereHas('goodReceipt',function($query) use($search, $request){
+                                $query->whereHasMorph('lookable',[PurchaseOrder::class,PurchaseInvoice::class,LandedCost::class,GoodReceipt::class,Coa::class],function (Builder $query) use ($search) {
                                     $query->where('code','like',"%$search%");
                                 });
                             });
@@ -548,11 +546,18 @@ class PurchaseInvoiceController extends Controller
                     DB::beginTransaction();
                     try {
                         foreach($request->arr_type as $key => $row){
+                            $id = match ($row) {
+                                'good_receipts'     => GoodReceipt::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
+                                'landed_costs'      => LandedCost::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
+                                'purchase_orders'   => PurchaseOrder::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
+                                'coas'              => Coa::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
+                                default             => 0,
+                            };
+
                             PurchaseInvoiceDetail::create([
                                 'purchase_invoice_id'   => $query->id,
-                                'good_receipt_id'       => $row == 'good_receipt' ? GoodReceipt::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
-                                'landed_cost_id'        => $row == 'landed_cost' ? LandedCost::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
-                                'purchase_order_id'     => $row == 'purchase_order' ? PurchaseOrder::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id : NULL,
+                                'lookable_type'         => $row,
+                                'lookable_id'           => $id,
                                 'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                                 'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
                                 'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
@@ -617,7 +622,7 @@ class PurchaseInvoiceController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">GR. PO / Landed Cost / Purchase Order</th>
+                                <th class="center-align">GR. PO / Landed Cost / Purchase Order / Coa</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
                                 <th class="center-align">PPH</th>
@@ -629,7 +634,7 @@ class PurchaseInvoiceController extends Controller
             foreach($data->purchaseInvoiceDetail as $key => $row){
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
-                    <td class="center-align">'.($row->getCode()).'</td>
+                    <td class="center-align">'.$row->getCode().'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
@@ -748,19 +753,19 @@ class PurchaseInvoiceController extends Controller
 
         foreach($pi->purchaseInvoiceDetail as $row){
             $arr[] = [
-                'code'                      => $row->good_receipt_id ? CustomHelper::encrypt($row->goodReceipt->code) : CustomHelper::encrypt($row->landedCost->code),
-                'rawcode'                   => $row->good_receipt_id ? $row->goodReceipt->code : $row->landedCost->code,
-                'post_date'                 => $row->good_receipt_id ? date('d/m/y',strtotime($row->goodReceipt->post_date)) : date('d/m/y',strtotime($row->landedCost->post_date)),
-                'due_date'                  => $row->good_receipt_id ? date('d/m/y',strtotime($row->goodReceipt->due_date)) : date('d/m/y',strtotime($row->landedCost->due_date)),
-                'type'                      => $row->good_receipt_id ? 'good_receipt' : 'landed_cost',
+                'code'                      => CustomHelper::encrypt($row->lookable->code),
+                'rawcode'                   => $row->lookable->code,
+                'post_date'                 => date('d/m/y',strtotime($row->lookable->post_date)),
+                'due_date'                  => date('d/m/y',strtotime($row->lookable->due_date)),
+                'type'                      => $row->lookable_type,
                 'total'                     => number_format($row->total,2,',','.'),
                 'tax'                       => number_format($row->tax,2,',','.'),
                 'wtax'                      => number_format($row->wtax,2,',','.'),
                 'grandtotal'                => number_format($row->grandtotal,2,',','.'),
                 'info'                      => '-',
-                'delivery_no'               => 'No SJ GRPO - '.($row->good_receipt_id ? $row->goodReceipt->delivery_no : $row->landedCost->goodReceipt->delivery_no),
-                'purchase_no'               => 'NO PO - '.($row->good_receipt_id ? $row->goodReceipt->getPurchaseCode() : $row->landedCost->goodReceipt->getPurchase()),
-                'list_item'                 => $row->good_receipt_id ? $row->goodReceipt->getListItem() : $row->landedCost->getListItem(),
+                'delivery_no'               => 'No SJ GRPO - '.$row->getDeliveryCode(),
+                'purchase_no'               => 'NO PO - '.$row->getPurchaseCode(),
+                'list_item'                 => $row->getListItem(),
             ];
         }
 
@@ -894,9 +899,7 @@ class PurchaseInvoiceController extends Controller
                                     ->orWhere('employee_no','like',"%$request->search%");
                             })
                             ->orWhereHas('purchaseInvoiceDetail',function($query) use($request){
-                                $query->whereHas('landedCost',function($query) use($request){
-                                    $query->where('code','like',"%$request->search%");
-                                })->orWhereHas('goodReceipt',function($query) use($request){
+                                $query->whereHasMorph('lookable',[PurchaseOrder::class,PurchaseInvoice::class,LandedCost::class,GoodReceipt::class,Coa::class],function (Builder $query) use ($request) {
                                     $query->where('code','like',"%$request->search%");
                                 });
                             });

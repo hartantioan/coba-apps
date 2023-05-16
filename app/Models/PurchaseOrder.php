@@ -145,7 +145,7 @@ class PurchaseOrder extends Model
 
     public function purchaseInvoiceDetail()
     {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail','purchase_order_id','id')->whereHas('purchaseInvoice',function($query){
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
             $query->whereIn('status',['2','3']);
         });
     }
@@ -153,9 +153,7 @@ class PurchaseOrder extends Model
     public function balanceInvoice(){
         $total = round($this->grandtotal,2);
 
-        foreach($this->purchaseInvoiceDetail()->whereHas('purchaseInvoice', function($query){
-            $query->whereIn('status',['2','3']);
-        })->get() as $row){
+        foreach($this->purchaseInvoiceDetail as $row){
             $total -= $row->grandtotal;
         }
 

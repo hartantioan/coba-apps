@@ -19,6 +19,8 @@ class PurchaseInvoiceDetail extends Model
         'good_receipt_id',
         'landed_cost_id',
         'purchase_order_id',
+        'lookable_type',
+        'lookable_id',
         'total',
         'tax_id',
         'wtax_id',
@@ -29,6 +31,10 @@ class PurchaseInvoiceDetail extends Model
         'wtax',
         'grandtotal',
     ];
+
+    public function lookable(){
+        return $this->morphTo();
+    }
 
     public function purchaseInvoice()
     {
@@ -49,18 +55,45 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function getCode(){
-        $code = '';
-
-        if($this->goodReceipt()->exists()){
-            $code = $this->goodReceipt->code;
-        }
-        if($this->landedCost()->exists()){
-            $code = $this->landedCost->code;
-        }
-        if($this->purchaseOrder()->exists()){
-            $code = $this->purchaseOrder->code;
-        }
+        $code = match ($this->lookable_type) {
+            'good_receipts'     => $this->lookable->getPurchaseCode(),
+            'landed_costs'      => $this->lookable->goodReceipt->getPurchaseCode(),
+            'purchase_orders'   => $this->lookable->code,
+            'coas'              => $this->lookable->code.' - '.$this->lookable->name,
+            default             => '-',
+        };
 
         return $code;
+    }
+
+    public function getPurchaseCode(){
+        $code = match ($this->lookable_type) {
+            'good_receipts'     => $this->lookable->getPurchaseCode(),
+            'landed_costs'      => $this->lookable->goodReceipt->getPurchaseCode(),
+            'purchase_orders'   => $this->lookable->code,
+            default => '-',
+        };
+
+        return $code;
+    }
+
+    public function getDeliveryCode(){
+        $code = match ($this->lookable_type) {
+            'good_receipts'     => $this->lookable->code,
+            'landed_costs'      => $this->lookable->goodReceipt->code,
+            default => '-',
+        };
+
+        return $code;
+    }
+
+    public function getListItem(){
+        $list = match ($this->lookable_type) {
+            'good_receipts'     => $this->lookable->getListItem(),
+            'landed_costs'      => $this->lookable->goodReceipt->getListItem(),
+            default => '-',
+        };
+
+
     }
 }

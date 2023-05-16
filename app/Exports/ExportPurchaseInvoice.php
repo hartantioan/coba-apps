@@ -48,9 +48,7 @@ class ExportPurchaseInvoice implements FromView
                                     ->orWhere('employee_no','like',"%$this->search%");
                             })
                             ->orWhereHas('purchaseInvoiceDetail',function($query){
-                                $query->whereHas('landedCost',function($query){
-                                    $query->where('code','like',"%$this->search%");
-                                })->orWhereHas('goodReceiptMain',function($query){
+                                $query->whereHasMorph('lookable',[PurchaseOrder::class,PurchaseInvoice::class,LandedCost::class,GoodReceipt::class,Coa::class],function (Builder $query){
                                     $query->where('code','like',"%$this->search%");
                                 });
                             });

@@ -980,8 +980,8 @@ class CustomHelper {
 				if($table_name == 'purchase_invoices'){
 					$pi = PurchaseInvoice::find($table_id);
 
-					foreach($pi->purchaseInvoiceDetail()->whereNotNull('purchase_order_id')->get() as $row){
-						$po = PurchaseOrder::find($row->purchase_order_id);
+					foreach($pi->purchaseInvoiceDetail()->where('lookable_type','purchase_orders')->get() as $row){
+						$po = PurchaseOrder::find($row->lookable_id);
 
 						foreach($po->purchaseOrderDetail as $rowpo){
 							JournalDetail::create([

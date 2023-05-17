@@ -48,6 +48,8 @@ class AppServiceProvider extends ServiceProvider
             'depreciations'             => 'App\Models\Depreciation',
             'close_bills'               => 'App\Models\CloseBill',
             'good_returns'              => 'App\Models\GoodReturnPO',
+            'coas'                      => 'App\Models\Coa',
+            'purchase_memos'            => 'App\Models\PurchaseMemo',
         ]);
     }
 }

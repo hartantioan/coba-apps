@@ -695,7 +695,7 @@ class PurchaseOrderController extends Controller
                                     'percent_discount_2'            => $disc2,
                                     'discount_3'                    => $disc3,
                                     'subtotal'                      => $rowsubtotal,
-                                    'note'                          => $request->arr_note[$key],
+                                    'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                                     'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
                                     'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
                                     'percent_tax'                   => $request->arr_tax[$key],

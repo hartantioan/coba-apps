@@ -214,20 +214,22 @@
                             </select>
                             <label class="active" for="item_group_id">Grup Item</label>
                         </div>
-                        <div class="input-field col s6">
-                            <div class="switch mb-1">
-                                <label for="status">Status</label>
-                                <label class="right">
-                                    Non-Active
-                                    <input checked type="checkbox" id="status" name="status" value="1">
-                                    <span class="lever"></span>
-                                    Active
-                                </label>
+                        <div class="col s12">
+                            <div class="input-field col s6">
+                                <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
+                                <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
                             </div>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
-                            <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
+                            <div class="input-field col s6">
+                                <div class="switch mb-1">
+                                    <label for="status">Status</label>
+                                    <label class="right">
+                                        Non-Active
+                                        <input checked type="checkbox" id="status" name="status" value="1">
+                                        <span class="lever"></span>
+                                        Active
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <div class="col s12">
                             <div class="col s4">

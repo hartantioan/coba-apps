@@ -724,6 +724,7 @@
                 }
             });
         }else{
+            $('#empty-purchase').remove();
             $('#body-purchase').append(`
                 <tr id="empty-purchase">
                     <td colspan="7" class="center">

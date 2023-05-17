@@ -240,14 +240,15 @@
                                                     <th class="center">PPN</th>
                                                     <th class="center">PPH</th>
                                                     <th class="center">Grandtotal</th>
+                                                    <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="7" class="center">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail()" href="javascript:void(0);">
+                                                    <td colspan="8" class="center">
+                                                        {{-- <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Coa
-                                                        </a>
+                                                        </a> --}}
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -374,6 +375,12 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -382,16 +389,15 @@
                     $(this).remove();
                 });
                 M.updateTextFields();
-                $('#body-purchase').empty().append(`
-                    <tr id="empty-purchase">
-                        <td colspan="7" class="center">
-                            Pilih partner bisnis untuk memulai...
-                        </td>
-                    </tr>
-                `);
                 $('#account_id').empty();
                 $('#total,#tax,#grandtotal').text('0,000');
                 $('#subtotal').val('0,000');
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -423,7 +429,173 @@
         });
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier") }}');
+        select2ServerSide('#purchase_invoice_id', '{{ url("admin/select2/purchase_invoice") }}');
+        select2ServerSide('#purchase_down_payment_id', '{{ url("admin/select2/purchase_down_payment") }}');
+
+        $('#body-detail').on('click', '.delete-data-detail', function() {
+            $(this).closest('tr').remove();
+            countAll();
+        });
     });
+
+    function getDetails(type){
+
+        let nil;
+
+        if(type == 'pi'){
+            nil = $('#purchase_invoice_id').val();
+        }else if(type == 'podp'){
+            nil = $('#purchase_down_payment_id').val();
+        }
+
+        if(nil){
+            $.ajax({
+                url: '{{ Request::url() }}/get_details',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: nil,
+                    type : type,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                    }else{
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + response.rawcode + `
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `','` + response.type + `')">close</i>
+                            </div>
+                        `);
+                        
+                        var count = makeid(10);
+                        
+                        $('#last-row-detail').before(`
+                            <tr class="row_detail" data-id="` + response.id + `">
+                                <input type="hidden" name="arr_type[]" value="` + response.type + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_code[]" value="` + response.code + `" data-id="` + count + `">
+                                <td>
+                                    ` + response.rawcode + `
+                                </td>
+                                <td>
+                                    ` + response.post_date + `
+                                </td>
+                                <td>
+                                    <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + response.note + ` - ` + response.account_name + `">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_total[]" value="` + response.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_tax[]" value="` + response.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_wtax[]" value="` + response.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_grandtotal[]" value="` + response.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                    }
+                    M.updateTextFields();
+                    $('#purchase_invoice_id,#purchase_down_payment_id').empty();
+                    countAll();
+                    $('#account_id').empty().append(`
+                        <option value="` + response.account_id + `">` + response.account_name + `</option>
+                    `);
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            
+        }
+    }
+
+    function countAll(){
+        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0;
+        
+        if($('input[name^="arr_code"]').length > 0){
+            $('input[name^="arr_code"]').each(function(){
+                var rowgrandtotal = 0;
+                let element = $(this);
+                total += parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                tax += parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                wtax += parseFloat($('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                rowgrandtotal = parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")) + parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")) - parseFloat($('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                grandtotal += rowgrandtotal;
+                $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
+                    (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
+                );
+            });
+        }
+
+        $('#total').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
+        );
+        $('#tax').text(
+            (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
+        );
+        $('#wtax').text(
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',','))
+        );
+        $('#grandtotal').text(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
+        );
+    }
+
+    function removeUsedData(id,type){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id,
+                type : type,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_detail[data-id="' + id + '"]').remove();
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -676,85 +848,84 @@
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]);
 
-                formData.delete('tax_id');
-                formData.delete("arr_code[]");
-                formData.delete("arr_nominal[]");
-                formData.delete("arr_note[]");
-                formData.append('tax_id',$('#tax_id').find(':selected').data('id'));
-                formData.append('percent_tax',$('#tax_id').val());
+                var passed = true;
 
-                $('input[name^="arr_code"]').each(function(){
-                    if($(this).is(':checked')){
-                        formData.append('arr_code[]',$(this).val());
-                        formData.append('arr_nominal[]',$('#rowNominal' + $(this).data('id')).val());
-                        formData.append('arr_note[]',$('#rowNote' + $(this).data('id')).val());
-                    }
+                $('input[name^="arr_code"]').each(function(i){
+                    if($('input[name^="arr_description"]').eq(i).val() == '' || $('input[name^="arr_total"]').eq(i).val() == '' || $('input[name^="arr_tax"]').eq(i).val() == '' || $('input[name^="arr_wtax"]').eq(i).val() == '' || $('input[name^="arr_grandtotal"]').eq(i).val() == ''){
+                        passed = false;
+                    }                    
                 });
 
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
+                if(passed == true){
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
 
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
-
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
                                 });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
                             });
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+                    });
+                }else{
+                    M.toast({
+                        html: 'Silahkan cek detail form anda. Pastikan tidak ada data yang kosong.'
+                    });
+                }
             }
         });
     }

@@ -5,7 +5,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\GoodReturnPO;
+use App\Models\Department;
 use App\Models\PaymentRequest;
+use App\Models\Place;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoiceDp;
 use App\Models\PurchaseOrder;
@@ -43,6 +45,8 @@ class PurchaseInvoiceController extends Controller
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'place'         => Place::where('status','1')->get(),
+            'department'    => Department::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -563,6 +567,9 @@ class PurchaseInvoiceController extends Controller
                                 'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
                                 'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
                                 'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                                'note'                  => $request->arr_note[$key],
+                                'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                                'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             ]);
                         }
                         DB::commit();
@@ -763,10 +770,12 @@ class PurchaseInvoiceController extends Controller
                 'tax'                       => number_format($row->tax,2,',','.'),
                 'wtax'                      => number_format($row->wtax,2,',','.'),
                 'grandtotal'                => number_format($row->grandtotal,2,',','.'),
-                'info'                      => '-',
+                'info'                      => $row->note,
                 'delivery_no'               => 'No SJ GRPO - '.$row->getDeliveryCode(),
                 'purchase_no'               => 'NO PO - '.$row->getPurchaseCode(),
-                'list_item'                 => $row->getListItem(),
+                'list_item'                 => $row->lookable_type == 'coas' ? '-' : $row->lookable->getListItem(),
+                'place_id'                  => $row->place_id ? $row->place_id : '',
+                'department_id'             => $row->department_id ? $row->department_id : '',
             ];
         }
 

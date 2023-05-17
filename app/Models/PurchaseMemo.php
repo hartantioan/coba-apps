@@ -12,7 +12,7 @@ class PurchaseMemo extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'purchase_orders';
+    protected $table = 'purchase_memos';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [

@@ -23,9 +23,6 @@ class PurchaseMemoDetail extends Model
         'tax',
         'wtax',
         'grandtotal',
-        'place_id',
-        'department_id',
-        'warehouse_id',
     ];
 
     public function purchaseMemo()
@@ -35,20 +32,5 @@ class PurchaseMemoDetail extends Model
     
     public function lookable(){
         return $this->morphTo();
-    }
-
-    public function place()
-    {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function department()
-    {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
-    }
-
-    public function warehouse()
-    {
-        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 }

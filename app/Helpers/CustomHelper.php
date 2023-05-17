@@ -25,6 +25,7 @@ use App\Models\ItemGroupWarehouse;
 use App\Models\OutgoingPayment;
 use App\Models\Place;
 use App\Models\PurchaseInvoice;
+use App\Models\PurchaseMemo;
 use App\Models\PurchaseOrder;
 use App\Models\Retirement;
 use App\Models\User;
@@ -912,6 +913,72 @@ class CustomHelper {
 
 		}elseif($table_name == 'request_spareparts'){
 
+		}elseif($table_name == 'purchase_memos'){
+
+			$pm = PurchaseMemo::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+
+			foreach($pm->purchaseMemoDetail as $row){
+				$coacode = '';
+
+				if($row->lookable_type == 'purchase_invoices'){
+					$coacode = '700.01.01.01.99';
+				}
+
+				if($row->lookable_type == 'purchase_down_payments'){
+					$coacode = '100.01.07.01.01';
+				}
+
+				if($row->total > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> Coa::where('code',$coacode)->where('company_id',$pm->company_id)->first()->id,
+						'account_id'	=> $row->lookable->account_id,
+						'type'			=> '1',
+						'nominal'		=> -1 * $row->total,
+					]);
+				}
+
+				if($row->tax > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> Coa::where('code','100.01.08.01.05')->where('company_id',$pm->company_id)->first()->id,
+						'account_id'	=> $row->lookable->account_id,
+						'type'			=> '1',
+						'nominal'		=> -1 * $row->tax,
+					]);
+				}
+
+				if($row->wtax > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> Coa::where('code','100.01.03.03.06')->where('company_id',$pm->company_id)->first()->id,
+						'account_id'	=> $row->lookable->account_id,
+						'type'			=> '2',
+						'nominal'		=> -1 * $row->wtax,
+					]);
+				}
+				
+				if($row->grandtotal > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> Coa::where('code','200.01.03.01.01')->where('company_id',$pm->company_id)->first()->id,
+						'account_id'	=> $row->lookable->account_id,
+						'type'			=> '2',
+						'nominal'		=> -1 * $row->grandtotal,
+					]);
+				}
+			}
+
 		}elseif($table_name == 'close_bills'){
 			
 			$cb = CloseBill::find($table_id);
@@ -981,7 +1048,7 @@ class CustomHelper {
 					$pi = PurchaseInvoice::find($table_id);
 
 					foreach($pi->purchaseInvoiceDetail()->where('lookable_type','purchase_orders')->get() as $row){
-						$po = PurchaseOrder::find($row->lookable_id);
+						$po = $row->lookable;
 
 						foreach($po->purchaseOrderDetail as $rowpo){
 							JournalDetail::create([
@@ -996,6 +1063,22 @@ class CustomHelper {
 							
 							$totalOutSide += $rowpo->subtotal;
 						}
+					}
+
+					foreach($pi->purchaseInvoiceDetail()->where('lookable_type','coas')->get() as $row){
+						$coa = $row->lookable;
+
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->lookable_id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'type'			=> $row->grandtotal >= 0 ? '1' : '2',
+							'nominal'		=> -1 * $row->grandtotal
+						]);
+						
+						$totalOutSide += $row->grandtotal;
 					}
 
 					#start journal rounding

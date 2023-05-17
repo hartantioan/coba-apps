@@ -32,6 +32,7 @@ use App\Http\Controllers\MasterData\UnitController;
 use App\Http\Controllers\MasterData\BankController;
 use App\Http\Controllers\MasterData\ProjectController;
 use App\Http\Controllers\MasterData\TaxController;
+use App\Http\Controllers\MasterData\BenchmarkPriceController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -144,6 +145,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('approval_stage', [Select2Controller::class, 'approvalStage']);
                 Route::get('menu', [Select2Controller::class, 'menu']);
                 Route::get('fund_request_bs', [Select2Controller::class, 'fundRequestBs']);
+                Route::get('purchase_invoice', [Select2Controller::class, 'purchaseInvoice']);
+                Route::get('purchase_down_payment', [Select2Controller::class, 'purchaseDownPayment']);
             });
 
             Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -466,6 +469,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('create',[TaxController::class, 'create'])->middleware('operation.access:tax,update');
                         Route::post('destroy', [TaxController::class, 'destroy'])->middleware('operation.access:tax,delete');
                     });
+
+                    Route::prefix('benchmark_price')->middleware('operation.access:benchmark_price,view')->group(function () {
+                        Route::get('/',[BenchmarkPriceController::class, 'index']);
+                        Route::get('datatable',[BenchmarkPriceController::class, 'datatable']);
+                        Route::post('show', [BenchmarkPriceController::class, 'show']);
+                        Route::post('create',[BenchmarkPriceController::class, 'create'])->middleware('operation.access:benchmark_price,update');
+                        Route::post('destroy', [BenchmarkPriceController::class, 'destroy'])->middleware('operation.access:benchmark_price,delete');
+                    });
                 });
 
                 Route::prefix('master_administration')->group(function () {
@@ -658,6 +669,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [PurchaseMemoController::class, 'show']);
                     Route::post('print',[PurchaseMemoController::class, 'print']);
                     Route::get('export',[PurchaseMemoController::class, 'export']);
+                    Route::post('get_details', [PurchaseMemoController::class, 'getDetails']);
+                    Route::post('remove_used_data', [PurchaseMemoController::class, 'removeUsedData']);
                     Route::post('create',[PurchaseMemoController::class, 'create'])->middleware('operation.access:purchase_memo,update');
                     Route::post('void_status', [PurchaseMemoController::class, 'voidStatus'])->middleware('operation.access:purchase_memo,void');
                     Route::get('approval/{id}',[PurchaseMemoController::class, 'approval'])->withoutMiddleware('direct.access');

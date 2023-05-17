@@ -19,18 +19,16 @@ return new class extends Migration
             $table->bigInteger('purchase_memo_id')->nullable();
             $table->string('lookable_type',155)->nullable();
             $table->bigInteger('lookable_id')->nullable();
+            $table->bigInteger('coa_debit_id')->nullable();
             $table->string('description')->nullable();
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
             $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
-            $table->bigInteger('place_id')->nullable();
-            $table->bigInteger('department_id')->nullable();
-            $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['purchase_memo_id', 'lookable_id', 'place_id', 'department_id', 'warehouse_id']);
+            $table->index(['purchase_memo_id', 'lookable_id', 'coa_debit_id']);
         });
     }
 

@@ -30,6 +30,9 @@ class PurchaseInvoiceDetail extends Model
         'percent_wtax',
         'wtax',
         'grandtotal',
+        'note',
+        'place_id',
+        'department_id',
     ];
 
     public function lookable(){
@@ -39,6 +42,16 @@ class PurchaseInvoiceDetail extends Model
     public function purchaseInvoice()
     {
         return $this->belongsTo('App\Models\PurchaseInvoice', 'purchase_invoice_id', 'id')->withTrashed();
+    }
+
+    public function place()
+    {
+        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function department()
+    {
+        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
     
     public function landedCost()

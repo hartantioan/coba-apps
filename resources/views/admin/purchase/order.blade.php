@@ -559,6 +559,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#supplier_id').empty();
                 $('#savesubtotal,#savetotal,#savetax,#savewtax,#savegrandtotal').val('0,00');
                 $('.row_item').each(function(){
                     $(this).remove();
@@ -1373,7 +1374,7 @@
                     formData.append('arr_wtax_id[]',$('select[name^="arr_wtax"]').eq(index).find(':selected').data('id'));
                     formData.append('arr_is_include_tax[]',($('input[name^="arr_is_include_tax"]').eq(index).is(':checked') ? '1' : '0'));
                     formData.append('arr_wtax[]',$('select[name^="arr_wtax"]').eq(index).val());
-                    formData.append('arr_note[]',($('select[name^="arr_note"]').eq(index).val() ? $('select[name^="arr_note"]').eq(index).val() : ''));
+                    formData.append('arr_note[]',($('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''));
                     formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : ''));
                 });
 

@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\Place;
+use App\Models\PurchaseDownPayment;
+use App\Models\PurchaseInvoice;
 use App\Models\UsedData;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -40,6 +42,64 @@ class PurchaseMemoController extends Controller
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getDetails(Request $request){
+
+        if($request->type == 'pi'){
+            $data = PurchaseInvoice::where('id',$request->id)->whereIn('status',['2','3'])->first();
+        }elseif($request->type == 'podp'){
+            $data = PurchaseDownPayment::where('id',$request->id)->whereIn('status',['2','3'])->first();
+        }
+
+        if($data->used()->exists()){
+            if($request->type == 'pi'){
+                $data['status'] = '500';
+                $data['message'] = 'Purchase Invoice '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+            }elseif($request->type == 'podp'){
+                $data['status'] = '500';
+                $data['message'] = 'Purchase Down Payment '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+            }
+        }else{
+           /*  $passed = true;
+            if(!$data->hasBalance()){
+                $passed = false;
+            }
+            
+            if($passed){ */
+                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Memo');
+
+                if($request->type == 'pi'){
+                    $data['rawcode'] = $data->code;
+                    $data['code'] = CustomHelper::encrypt($data->code);
+                    $data['type'] = $data->getTable();
+                    $data['post_date'] = date('d/m/y',strtotime($data->post_date));
+                    $data['total'] = number_format($data->total,2,',','.');
+                    $data['tax'] = number_format($data->tax,2,',','.');
+                    $data['wtax'] = number_format($data->wtax,2,',','.');
+                    $data['grandtotal'] = number_format($data->balance,2,',','.');
+                    $data['account_id'] = $data->account_id;
+                    $data['account_name'] = $data->account->name;
+                }elseif($request->type == 'podp'){
+                    $data['rawcode'] = $data->code;
+                    $data['code'] = CustomHelper::encrypt($data->code);
+                    $data['type'] = $data->getTable();
+                    $data['post_date'] = date('d/m/y',strtotime($data->post_date));
+                    $data['total'] = number_format($data->total,2,',','.');
+                    $data['tax'] = number_format($data->tax,2,',','.');
+                    $data['wtax'] = number_format($data->wtax,2,',','.');
+                    $data['grandtotal'] = number_format($data->grandtotal,2,',','.');
+                    $data['account_id'] = $data->account_id;
+                    $data['account_name'] = $data->supplier->name;
+                }
+
+            /* }else{
+                $data['status'] = '500';
+                $data['message'] = 'Seluruh item pada purchase request / good issue '.$data->code.' telah digunakan pada purchase order.';
+            } */
+        }
+
+        return response()->json($data);
     }
 
     public function datatable(Request $request){
@@ -191,5 +251,198 @@ class PurchaseMemoController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function create(Request $request){
+        $validation = Validator::make($request->all(), [
+			'account_id' 			=> 'required',
+            'company_id'            => 'required',
+            'post_date'             => 'required',
+            'arr_type'                  => 'required|array',
+            'arr_code'                  => 'required|array',
+            'arr_description'           => 'required|array',
+            'arr_total'                 => 'required|array',
+            'arr_tax'                   => 'required|array',
+            'arr_wtax'                  => 'required|array',
+            'arr_grandtotal'            => 'required|array',
+		], [
+			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+            'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
+            'arr_type.required'                 => 'Tipe dokumen tidak boleh kosong.',
+            'arr_type.array'                    => 'Tipe dokumen harus dalam bentuk array.',
+            'arr_code.required'                 => 'Kode dokumen tidak boleh kosong.',
+            'arr_code.array'                    => 'Kode dokumen harus dalam bentuk array.',
+            'arr_description.required'          => 'Keterangan tidak boleh kosong.',
+            'arr_description.array'             => 'Keterangan harus dalam bentuk array.',
+            'arr_total.required'                => 'Nominal total tidak boleh kosong.',
+            'arr_total.array'                   => 'Nominal harus dalam bentuk array.',
+            'arr_tax.required'                  => 'Nominal ppn tidak boleh kosong.',
+            'arr_tax.array'                     => 'Nominal ppn harus dalam bentuk array.',
+            'arr_wtax.required'                 => 'Nominal pph tidak boleh kosong.',
+            'arr_wtax.array'                    => 'Nominal pph harus dalam bentuk array.',
+            'arr_grandtotal.required'           => 'Grandtotal tidak boleh kosong.',
+            'arr_grandtotal.array'              => 'Grandtotal harus dalam bentuk array.'
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            
+            $total = 0;
+            $tax = 0;
+            $wtax = 0;
+            $grandtotal = 0;
+
+            $passed = true;
+
+            foreach($request->arr_total as $key => $row){
+                $total += str_replace(',','.',str_replace('.','',$row));
+                $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
+                $wtax += str_replace(',','.',str_replace('.','',$request->arr_wtax[$key]));
+                $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+            }
+
+			if($request->temp){
+                DB::beginTransaction();
+                try {
+                    $query = PurchaseMemo::where('code',CustomHelper::decrypt($request->temp))->first();
+
+                    if($query->approval()){
+                        foreach($query->approval()->approvalMatrix as $row){
+                            if($row->status == '2'){
+                                return response()->json([
+                                    'status'  => 500,
+                                    'message' => 'Purchase Memo telah diapprove, anda tidak bisa melakukan perubahan.'
+                                ]);
+                            }
+                        }
+                    }
+
+                    if($query->status == '1'){
+
+                        if($request->has('document')) {
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
+                            }
+                            $document = $request->file('document')->store('public/purchase_memos');
+                        } else {
+                            $document = $query->document;
+                        }
+
+                        $query->user_id = session('bo_id');
+                        $query->account_id = $request->account_id;
+                        $query->company_id = $request->company_id;
+                        $query->post_date = $request->post_date;
+                        $query->total = round($total,3);
+                        $query->tax = round($tax,3);
+                        $query->wtax = round($wtax,3);
+                        $query->grandtotal = round($grandtotal,3);
+                        $query->document = $document;
+                        $query->note = $request->note;
+
+                        $query->save();
+
+                        foreach($query->purchaseMemoDetail as $row){
+                            $row->delete();
+                        }
+
+                        DB::commit();
+                    }else{
+                        return response()->json([
+                            'status'  => 500,
+					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}else{
+                DB::beginTransaction();
+                try {
+                    $query = PurchaseMemo::create([
+                        'code'			            => PurchaseMemo::generateCode(),
+                        'user_id'		            => session('bo_id'),
+                        'account_id'                => $request->account_id,
+                        'company_id'                => $request->company_id,
+                        'post_date'                 => $request->post_date,
+                        'total'                     => round($total,3),
+                        'tax'                       => round($tax,3),
+                        'wtax'                      => round($wtax,3),
+                        'grandtotal'                => round($grandtotal,3),
+                        'note'                      => $request->note,
+                        'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_memos') : NULL,
+                        'status'                    => '1',
+                    ]);
+
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}
+			
+			if($query) {
+                
+                if($request->arr_type){
+                    DB::beginTransaction();
+                    try {
+                        foreach($request->arr_type as $key => $row){
+                            $id = match ($row) {
+                                'purchase_invoices'         => PurchaseInvoice::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
+                                'purchase_down_payments'    => PurchaseDownPayment::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
+                                default                     => NULL,
+                            };
+
+                            PurchaseMemoDetail::create([
+                                'purchase_memo_id'      => $query->id,
+                                'lookable_type'         => $row,
+                                'lookable_id'           => $id,
+                                'description'           => $request->arr_description[$key],
+                                'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
+                                'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                            ]);
+                        }
+                        DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
+                    }
+                }
+
+                CustomHelper::sendApproval('purchase_memos',$query->id,$query->note);
+                CustomHelper::sendNotification('purchase_memos',$query->id,'Pengajuan Purchase Memo No. '.$query->code,$query->note,session('bo_id'));
+
+                activity()
+                    ->performedOn(new PurchaseMemo())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit purchase memo.');
+
+				$response = [
+					'status'    => 200,
+					'message'   => 'Data successfully saved.',
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+		
+		return response()->json($response);
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->type,$request->id);
+        
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 }

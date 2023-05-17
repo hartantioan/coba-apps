@@ -205,6 +205,7 @@ class ItemController extends Controller
                     $query->is_sales_item       = $request->is_sales_item ? $request->is_sales_item : NULL;
                     $query->is_purchase_item    = $request->is_purchase_item ? $request->is_purchase_item : NULL;
                     $query->is_service          = $request->is_service ? $request->is_service : NULL;
+                    $query->note                = $request->note;
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
 
@@ -229,6 +230,7 @@ class ItemController extends Controller
                         'is_sales_item'     => $request->is_sales_item ? $request->is_sales_item : NULL,
                         'is_purchase_item'  => $request->is_purchase_item ? $request->is_purchase_item : NULL,
                         'is_service'        => $request->is_service ? $request->is_service : NULL,
+                        'note'              => $request->note,
                         'status'            => $request->status ? $request->status : '2',
                     ]);
                     DB::commit();

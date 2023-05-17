@@ -28,6 +28,9 @@ return new class extends Migration
             $table->double('percent_wtax')->nullable();
             $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
+            $table->string('note')->nullable();
+            $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('department_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 

@@ -45,7 +45,7 @@ class PaymentRequestDetail extends Model
             return false;
         }
     }
-
+ 
     public function purchaseInvoice()
     {
         if($this->lookable_type == 'purchase_invoices'){

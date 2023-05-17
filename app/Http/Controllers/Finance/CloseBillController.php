@@ -956,7 +956,7 @@ class CloseBillController extends Controller
                                 //memasukkan dengan yang sama atau tidak
                                 
                                 foreach($row_po->purchaseOrderDetail as $po_detail){
-                                    if($po_detail->goodReceiptDetail->exists()){
+                                    if($po_detail->goodReceiptDetail()->exists()){
                                         foreach($po_detail->goodReceiptDetail as $good_receipt_detail){
                                             $data_good_receipt=[
                                                 'properties'=> [
@@ -1037,8 +1037,8 @@ class CloseBillController extends Controller
                                    
                                 }
                             }
-                            if(!in_array($row->goodReceipt->id, $data_id_gr)){
-                                $data_id_gr[] = $row->goodReceipt->id; 
+                            if(!in_array($row->lookable->id, $data_id_gr)){
+                                $data_id_gr[] = $row->lookable->id; 
                                 $added = true;
                             } 
                         }
@@ -1989,190 +1989,6 @@ class CloseBillController extends Controller
                         }
                     }
 
-                }
-
-                foreach($data_id_frs as $fund_r_id){
-                    $query_fund = FundRequest::find($fund_r_id);
-                    if($query_fund->hasPaymentRequestDetail()->exists()){
-                        foreach($query->hasPaymentRequestDetail as $row_pyr_detail){
-                            $data_pyr_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                                ],
-                                "key" => $row_pyr_detail->paymentRequest->code,
-                                "name" => $row_pyr_detail->paymentRequest->code,
-                                'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
-                            ];
-                            if(count($data_pyrs)<1){
-                                $data_pyrs[]=$data_pyr_tempura;
-                                $data_go_chart[]=$data_pyr_tempura;
-                                $data_link[]=[
-                                    'from'=>$query_fund->code,
-                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                ]; 
-                                $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
-                                
-                            }else{
-                                $found = false;
-                                foreach ($data_pyrs as $key => $row_pyr) {
-                                    if ($row_pyr["key"] == $data_pyr_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                             
-                                if($found){
-                                    $data_links=[
-                                        'from'=>$query_fund->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $found_inlink = false;
-                                    foreach($data_link as $key=>$row_link){
-                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                            $found_inlink = true;
-                                            break;
-                                        }
-                                    }
-                                    if(!$found_inlink){
-                                        $data_link[] = $data_links;
-                                    }
-                                    
-                                }
-                                if (!$found) {
-                                    $data_pyrs[]=$data_pyr_tempura;
-                                    $data_go_chart[]=$data_pyr_tempura;
-                                    $data_link[]=[
-                                        'from'=>$query_fund->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;    
-                                }
-                            }
-                            if($row_pyr_detail->fundRequest()){
-                               
-                                $data_fund_tempura=[
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
-                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                    ],
-                                    "key" => $row_pyr_detail->lookable->code,
-                                    "name" => $row_pyr_detail->lookable->code,
-                                    'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
-                                ];
-                                
-                                if(count($data_frs)<1){
-                                    $data_frs[]=$data_fund_tempura;
-                                    $data_go_chart[]=$data_fund_tempura;
-                                    $data_link[]=[
-                                        'from'=>$row_pyr_detail->lookable->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $data_id_frs[]= $row_pyr_detail->lookable->id;  
-                                    
-                                }else{
-                                    $found = false;
-                                    foreach ($data_frs as $key => $row_fundreq) {
-                                        if ($row_fundreq["key"] == $data_fund_tempura["key"]) {
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if($found){
-                                        $data_links=[
-                                            'from'=>$row_pyr_detail->lookable->code,
-                                            'to'=>$row_pyr_detail->paymentRequest->code,
-                                        ]; 
-                                        $found_inlink = false;
-                                        foreach($data_link as $key=>$row_link){
-                                            if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                $found_inlink = true;
-                                                break;
-                                            }
-                                        }
-                                        if(!$found_inlink){
-                                            $data_link[] = $data_links;
-                                        }
-                                        
-                                    }
-                                    if (!$found) {
-                                        $data_frs[]=$data_fund_tempura;
-                                        $data_go_chart[]=$data_fund_tempura;
-                                        $data_link[]=[
-                                            'from'=>$row_pyr_detail->lookable->code,
-                                            'to'=>$row_pyr_detail->paymentRequest->code,
-                                        ]; 
-                                        $data_id_frs[]= $row_pyr_detail->lookable->id;   
-                                    }
-                                }
-                                
-                            }
-                            foreach($row_pyr_detail->paymentRequest->paymentRequestDetail as $row_pyrd){
-                                if($row_pyrd->purchaseDownPayment()){
-                                
-                                    $data_downp_tempura = [
-                                        'properties'=> [
-                                            ['name'=> "Tanggal :".$row_pyrd->lookable->post_date],
-                                            ['name'=> "Nominal : Rp.".number_format($row_pyrd->lookable->grandtotal,2,',','.')]
-                                        ],
-                                        "key" => $row_pyrd->lookable->code,
-                                        "name" => $row_pyrd->lookable->code,
-                                        'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyrd->lookable->code),  
-                                    ];
-                                    if(count($data_purchase_downpayment)<1){
-                                        $data_purchase_downpayment[]=$data_downp_tempura;
-                                        $data_go_chart[]=$data_downp_tempura;
-                                        $data_link[]=[
-                                            'from'=>$row_pyrd->lookable->code,
-                                            'to'=>$row_pyrd->paymentRequest->code,
-                                        ]; 
-                                        $data_id_dp[]= $row_pyrd->lookable->id;  
-                                        
-                                    }else{
-                                        $found = false;
-                                        foreach ($data_purchase_downpayment as $key => $row_dp) {
-                                            if ($row_dp["key"] == $data_downp_tempura["key"]) {
-                                                $found = true;
-                                                break;
-                                            }
-                                        }
-                                        
-                                        if($found){
-                                            $data_links=[
-                                                'from'=>$row_pyrd->lookable->code,
-                                                'to'=>$row_pyrd->paymentRequest->code,
-                                            ]; 
-                                            $found_inlink = false;
-                                            foreach($data_link as $key=>$row_link){
-                                                if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                    $found_inlink = true;
-                                                    break;
-                                                }
-                                            }
-                                            if(!$found_inlink){
-                                                $data_link[] = $data_links;
-                                            }
-                                            
-                                        }
-                                        if (!$found) {
-                                            $data_purchase_downpayment[]=$data_downp_tempura;
-                                            $data_go_chart[]=$data_downp_tempura;
-                                            $data_link[]=[
-                                                'from'=>$row_pyrd->lookable->code,
-                                                'to'=>$row_pyrd->paymentRequest->code,
-                                            ]; 
-                                            $data_id_dp[]= $row_pyrd->lookable->id;    
-                                        }
-                                    }
-                                }  
-                            }
-                            if(!in_array($row_pyr_detail->lookable->id, $data_id_pyrs)){
-                                $data_id_pyrs[] = $row_pyr_detail->lookable->id;
-                                $added = true;
-                            }
-                        }
-                    }
                 }
                 
                 //Pengambilan foreign branch po

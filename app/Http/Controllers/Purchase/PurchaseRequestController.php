@@ -1053,7 +1053,7 @@ class PurchaseRequestController extends Controller
                                 //memasukkan dengan yang sama atau tidak
                                 
                                 foreach($row_po->purchaseOrderDetail as $po_detail){
-                                    if($po_detail->goodReceiptDetail->exists()){
+                                    if($po_detail->goodReceiptDetail()->exists()){
                                         foreach($po_detail->goodReceiptDetail as $good_receipt_detail){
                                             $data_good_receipt=[
                                                 'properties'=> [
@@ -1134,8 +1134,8 @@ class PurchaseRequestController extends Controller
                                    
                                 }
                             }
-                            if(!in_array($row->goodReceipt->id, $data_id_gr)){
-                                $data_id_gr[] = $row->goodReceipt->id; 
+                            if(!in_array($row->lookable->id, $data_id_gr)){
+                                $data_id_gr[] = $row->lookable->id; 
                                 $added = true;
                             } 
                         }

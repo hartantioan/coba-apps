@@ -25,7 +25,7 @@ class EquipmentController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Peralatan Pabrik',
+            'title'     => 'Peralatan Plant',
             'content'   => 'admin.master_data.equipment',
             'place'     => Place::where('status','1')->get(),
             'area'      => Area::where('status','1')->get(),
@@ -152,7 +152,7 @@ class EquipmentController extends Controller
             'area_id'       => 'required',
         ], [
             'name.required'         => 'Nama area tidak boleh kosong.',
-            'place_id.required'     => 'Pabrik tidak boleh kosong.',
+            'place_id.required'     => 'Plant tidak boleh kosong.',
             'area_id.required'      => 'Area servis tidak boleh kosong.',
         ]);
 

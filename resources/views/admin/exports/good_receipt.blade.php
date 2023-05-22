@@ -41,7 +41,7 @@
                 <th>Jum.</th>
                 <th>Sat.</th>
                 <th>Catatan</th>
-                <th>Site</th>
+                <th>Plant</th>
                 <th>Departemen</th>
                 <th>Gudang</th>
             </tr>

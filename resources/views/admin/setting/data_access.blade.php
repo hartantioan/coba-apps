@@ -69,7 +69,7 @@
                                         </div>
                                         <div class="row mt-1 center-align">
                                             <div class="col s6">
-                                                <h5 class="card-title center">Penempatan (Site)</h5>
+                                                <h5 class="card-title center">Penempatan (Plant)</h5>
                                                 <table class="bordered centered">
                                                     <thead>
                                                         <tr>

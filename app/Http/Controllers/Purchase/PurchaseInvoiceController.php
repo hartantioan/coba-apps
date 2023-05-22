@@ -11,6 +11,7 @@ use App\Models\Place;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoiceDp;
 use App\Models\PurchaseOrder;
+use App\Models\Warehouse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -34,7 +35,7 @@ class PurchaseInvoiceController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
     public function index(Request $request)
     {
@@ -47,11 +48,76 @@ class PurchaseInvoiceController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'place'         => Place::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
+            'warehouse'     => Warehouse::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
     }
 
+    public function getAccountData(Request $request){
+        $account = User::find($request->id);
+
+        $details = [];
+        $downpayments = [];
+        
+        $datadp = PurchaseDownPayment::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
+
+        foreach($datadp as $row){
+            if($row->balanceInvoice() > 0){
+                $downpayments[] = [
+                    'rawcode'       => $row->code,
+                    'code'          => CustomHelper::encrypt($row->code),
+                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                    'total'         => number_format($row->total,2,',','.'),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'balance'       => number_format($row->balanceInvoice(),2,',','.'),
+                ];
+            }
+        }
+        
+        $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','2')->where('account_id',$request->id)->get();
+
+        foreach($datapo as $row){
+            $invoice = $row->totalInvoice();
+            $details[] = [
+                'type'          => 'purchase_orders',
+                'id'            => $row->id,
+                'code'          => $row->code,
+                'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                'invoice'       => number_format($invoice,2,',','.'),
+                'balance'       => number_format($row->grandtotal - $invoice,2,',','.'),
+                'info'          => $row->note,
+            ];
+        }
+
+        $datagr = GoodReceipt::where('status','2')->where('account_id',$request->id)->get();
+        
+        foreach($datagr as $row){
+            $invoice = $row->totalInvoice();
+            $details[] = [
+                'type'          => 'good_receipts',
+                'id'            => $row->id,
+                'code'          => $row->code,
+                'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                'invoice'       => number_format($invoice,2,',','.'),
+                'balance'       => number_format($row->grandtotal - $invoice,2,',','.'),
+                'info'          => $row->note,
+            ];
+        }
+    
+        $datalc = LandedCost::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
+
+        foreach($datalc as $row){
+
+        }
+
+        $account['details'] = $details;
+        $account['downpayments'] = $downpayments;
+
+        return response()->json($account);
+    }
     public function getGoodReceiptLandedCost(Request $request){
         $account = User::find($request->id);
         $account['deposit'] = number_format($account->deposit,2,',','.');
@@ -77,23 +143,37 @@ class PurchaseInvoiceController extends Controller
         $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','2')->where('account_id',$request->id)->get();
 
         foreach($datapo as $row){
-            if($row->balanceInvoice() > 0){
-                $details[] = [
-                    'type'          => 'purchase_orders',
-                    'code'          => CustomHelper::encrypt($row->code),
-                    'rawcode'       => $row->code,
-                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
-                    'due_date'      => date('d/m/y',strtotime($row->post_date)),
-                    'total'         => number_format($row->total,2,',','.'),
-                    'tax'           => number_format($row->tax,2,',','.'),
-                    'wtax'          => number_format($row->wtax,2,',','.'),
-                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'info'          => '',
-                    'top'           => $row->payment_term,
-                    'delivery_no'   => '-',
-                    'purchase_no'   => 'NO PO - '.$row->code,
-                    'list_item'     => $row->getListItem(),
-                ];
+            foreach($row->purchaseOrderDetail as $rowdetail){
+                if($rowdetail->balanceInvoice() > 0){
+                    $arrTotal = $rowdetail->getArrayTotal();
+                    $details[] = [
+                        'type'          => 'purchase_order_details',
+                        'id'            => $rowdetail->id,
+                        'name'          => $rowdetail->item_id ? $rowdetail->item->code.' - '.$rowdetail->item->name : $rowdetail->coa->code.' - '.$rowdetail->coa->name,
+                        'qty_received'  => number_format($rowdetail->qty,3,',','.'),
+                        'qty_returned'  => 0,
+                        'qty_balance'   => number_format($rowdetail->qty,3,',','.'),
+                        'price'         => number_format($arrTotal['total'] / $rowdetail->qty,2,',','.'),
+                        'buy_unit'      => $rowdetail->item_id ? $rowdetail->item->buyUnit->code : '-',
+                        'rawcode'       => $row->code,
+                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'due_date'      => date('d/m/y',strtotime($row->post_date)),
+                        'total'         => number_format($arrTotal['total'],2,',','.'),
+                        'tax'           => number_format($arrTotal['tax'],2,',','.'),
+                        'wtax'          => number_format($arrTotal['wtax'],2,',','.'),
+                        'grandtotal'    => number_format($arrTotal['grandtotal'],2,',','.'),
+                        'info'          => '',
+                        'top'           => $row->payment_term,
+                        'delivery_no'   => '-',
+                        'purchase_no'   => 'NO PO - '.$row->code,
+                        'percent_tax'   => $rowdetail->percent_tax,
+                        'percent_wtax'  => $rowdetail->percent_wtax,
+                        'include_tax'   => $rowdetail->is_include_tax,
+                        'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                        'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
+                        'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                    ];
+                }
             }
         }
 
@@ -102,67 +182,82 @@ class PurchaseInvoiceController extends Controller
         $top = 0;
         
         foreach($datagr as $row){
-            if($row->balanceInvoice() > 0){
-                $info = '';
+           
+            $info = '';
 
-                $tax_id = 0;
-                $wtax_id = 0;
-                $is_include_tax = '0';
-                $percent_tax = 0;
-                $percent_wtax = 0;
-                
-
-                foreach($row->goodReceiptDetail as $rowdetail){
-                    $tax_id = $rowdetail->purchaseOrderDetail->tax_id;
-                    $wtax_id = $rowdetail->purchaseOrderDetail->wtax_id;
-                    $is_include_tax = $rowdetail->purchaseOrderDetail->is_include_tax;
-                    $percent_tax = $rowdetail->purchaseOrderDetail->percent_tax;
-                    $percent_wtax = $rowdetail->purchaseOrderDetail->percent_wtax;
-                    if($top < $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term){
-                        $top = $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term;
-                    }
-                    $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->item->buyUnit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->item->buyUnit->code.'<br>';
+            foreach($row->goodReceiptDetail as $rowdetail){
+                if($top < $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term){
+                    $top = $rowdetail->purchaseOrderDetail->purchaseOrder->payment_term;
                 }
+                $info .= 'Diterima '.$rowdetail->qty.' '.$rowdetail->item->buyUnit->code.' dari '.$rowdetail->purchaseOrderDetail->qty.' '.$rowdetail->item->buyUnit->code;
+            }
 
-                $details[] = [
-                    'type'          => 'good_receipts',
-                    'code'          => CustomHelper::encrypt($row->code),
-                    'rawcode'       => $row->code,
-                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
-                    'due_date'      => date('d/m/y',strtotime($row->due_date)),
-                    'total'         => number_format($row->total,2,',','.'),
-                    'tax'           => number_format($row->tax,2,',','.'),
-                    'wtax'          => number_format($row->wtax,2,',','.'),
-                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'info'          => $info,
-                    'top'           => $top,
-                    'delivery_no'   => 'NO SJ - '.$row->delivery_no,
-                    'purchase_no'   => 'NO PO - '.$row->getPurchaseCode(),
-                    'list_item'     => $row->getListItem(),
-                ];
+            foreach($row->goodReceiptDetail as $rowdetail){
+                if($rowdetail->balanceInvoice() > 0){
+                    $details[] = [
+                        'type'          => 'good_receipt_details',
+                        'id'            => $rowdetail->id,
+                        'name'          => $rowdetail->item->code.' - '.$rowdetail->item->name,
+                        'qty_received'  => number_format($rowdetail->qty,3,',','.'),
+                        'qty_returned'  => number_format($rowdetail->qtyReturn(),3,',','.'),
+                        'qty_balance'   => number_format(($rowdetail->qty - $rowdetail->qtyReturn()),3,',','.'),
+                        'price'         => number_format($rowdetail->total / ($rowdetail->qty - $rowdetail->qtyReturn()),2,',','.'),
+                        'buy_unit'      => $rowdetail->item->buyUnit->code,
+                        'rawcode'       => $row->code,
+                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'due_date'      => date('d/m/y',strtotime($row->due_date)),
+                        'total'         => number_format($rowdetail->total,2,',','.'),
+                        'tax'           => number_format($rowdetail->tax,2,',','.'),
+                        'wtax'          => number_format($rowdetail->wtax,2,',','.'),
+                        'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
+                        'info'          => $info,
+                        'top'           => $top,
+                        'delivery_no'   => 'NO SJ - '.$row->delivery_no,
+                        'purchase_no'   => 'NO PO - '.$rowdetail->purchaseOrderDetail->purchaseOrder->code,
+                        'percent_tax'   => $rowdetail->purchaseOrderDetail->percent_tax,
+                        'percent_wtax'  => $rowdetail->purchaseOrderDetail->percent_wtax,
+                        'include_tax'   => $rowdetail->purchaseOrderDetail->is_include_tax,
+                        'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                        'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
+                        'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                    ];
+                }
             }
         }
     
         $datalc = LandedCost::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datalc as $row){
-            if($row->balanceInvoice() > 0){
-                $details[] = [
-                    'type'          => 'landed_costs',
-                    'code'          => CustomHelper::encrypt($row->code),
-                    'rawcode'       => $row->code,
-                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
-                    'due_date'      => date('d/m/y',strtotime($row->due_date)),
-                    'total'         => number_format($row->total,2,',','.'),
-                    'tax'           => number_format($row->tax,2,',','.'),
-                    'wtax'          => number_format($row->wtax,2,',','.'),
-                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'info'          => '',
-                    'top'           => $top,
-                    'delivery_no'   => 'No SJ GRPO - '.$row->goodReceipt->delivery_no,
-                    'purchase_no'   => 'NO PO - '.$row->goodReceipt->getPurchaseCode(),
-                    'list_item'     => $row->getListItem(),
-                ];
+            foreach($row->landedCostDetail as $rowdetail){
+                if($row->balanceInvoice() > 0){
+                    $details[] = [
+                        'type'          => 'good_receipt_details',
+                        'id'            => $rowdetail->id,
+                        'name'          => $rowdetail->item->code.' - '.$rowdetail->item->name,
+                        'qty_received'  => number_format($rowdetail->qty,3,',','.'),
+                        'qty_returned'  => number_format($rowdetail->qtyReturn(),3,',','.'),
+                        'qty_balance'   => number_format(($rowdetail->qty - $rowdetail->qtyReturn()),3,',','.'),
+                        'price'         => number_format($rowdetail->total / ($rowdetail->qty - $rowdetail->qtyReturn()),2,',','.'),
+                        'buy_unit'      => $rowdetail->item->buyUnit->code,
+                        'rawcode'       => $row->code,
+                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'due_date'      => date('d/m/y',strtotime($row->due_date)),
+                        'total'         => number_format($rowdetail->total,2,',','.'),
+                        'tax'           => number_format($rowdetail->tax,2,',','.'),
+                        'wtax'          => number_format($rowdetail->wtax,2,',','.'),
+                        'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
+                        'info'          => $info,
+                        'top'           => $top,
+                        'delivery_no'   => 'NO SJ - '.$row->delivery_no,
+                        'purchase_no'   => 'NO PO - '.$rowdetail->purchaseOrderDetail->purchaseOrder->code,
+                        'percent_tax'   => $rowdetail->purchaseOrderDetail->percent_tax,
+                        'percent_wtax'  => $rowdetail->purchaseOrderDetail->percent_wtax,
+                        'include_tax'   => $rowdetail->purchaseOrderDetail->is_include_tax,
+                        'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                        'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
+                        'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                    ];
+                }
             }
         }
 
@@ -551,25 +646,23 @@ class PurchaseInvoiceController extends Controller
                     DB::beginTransaction();
                     try {
                         foreach($request->arr_type as $key => $row){
-                            $id = match ($row) {
-                                'good_receipts'     => GoodReceipt::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
-                                'landed_costs'      => LandedCost::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
-                                'purchase_orders'   => PurchaseOrder::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
-                                'coas'              => Coa::where('code',CustomHelper::decrypt($request->arr_code[$key]))->first()->id,
-                                default             => 0,
-                            };
-
                             PurchaseInvoiceDetail::create([
                                 'purchase_invoice_id'   => $query->id,
                                 'lookable_type'         => $row,
-                                'lookable_id'           => $id,
+                                'lookable_id'           => $request->arr_code[$key],
+                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                                 'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                'is_include_tax'        => $request->arr_include_tax[$key],
+                                'percent_tax'           => $request->arr_percent_tax[$key],
                                 'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                'percent_wtax'          => $request->arr_percent_wtax[$key],
                                 'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
                                 'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
                                 'note'                  => $request->arr_note[$key],
                                 'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
                                 'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                             ]);
                         }
                         DB::commit();
@@ -630,7 +723,7 @@ class PurchaseInvoiceController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">GR. PO / Landed Cost / Purchase Order / Coa</th>
+                                <th class="center-align">Item / Biaya</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
                                 <th class="center-align">PPH</th>
@@ -761,21 +854,31 @@ class PurchaseInvoiceController extends Controller
 
         foreach($pi->purchaseInvoiceDetail as $row){
             $arr[] = [
-                'code'                      => CustomHelper::encrypt($row->lookable->code),
-                'rawcode'                   => $row->lookable->code,
-                'post_date'                 => date('d/m/y',strtotime($row->lookable->post_date)),
-                'due_date'                  => date('d/m/y',strtotime($row->lookable->due_date)),
-                'type'                      => $row->lookable_type,
-                'total'                     => number_format($row->total,2,',','.'),
-                'tax'                       => number_format($row->tax,2,',','.'),
-                'wtax'                      => number_format($row->wtax,2,',','.'),
-                'grandtotal'                => number_format($row->grandtotal,2,',','.'),
-                'info'                      => $row->note,
-                'delivery_no'               => 'No SJ GRPO - '.$row->getDeliveryCode(),
-                'purchase_no'               => 'NO PO - '.$row->getPurchaseCode(),
-                'list_item'                 => $row->lookable_type == 'coas' ? '-' : $row->lookable->getListItem(),
-                'place_id'                  => $row->place_id ? $row->place_id : '',
-                'department_id'             => $row->department_id ? $row->department_id : '',
+                'type'          => $row->lookable_type,
+                'id'            => $row->lookable_id,
+                'name'          => $row->getCode(),
+                'qty_received'  => 0,
+                'qty_returned'  => 0,
+                'qty_balance'   => number_format($row->qty,3,',','.'),
+                'price'         => number_format($row->price,2,',','.'),
+                'buy_unit'      => $row->getUnitCode(),
+                'rawcode'       => $row->getHeaderCode(),
+                'post_date'     => $row->getPostDate(),
+                'due_date'      => $row->getDueDate(),
+                'total'         => number_format($row->total,2,',','.'),
+                'tax'           => number_format($row->tax,2,',','.'),
+                'wtax'          => number_format($row->wtax,2,',','.'),
+                'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                'info'          => $row->note,
+                'top'           => $row->getTop(),
+                'delivery_no'   => 'NO SJ - '.$row->getDeliveryCode(),
+                'purchase_no'   => 'NO PO - '.$row->getPurchaseCode(),
+                'percent_tax'   => $row->percent_tax,
+                'percent_wtax'  => $row->percent_wtax,
+                'include_tax'   => $row->is_include_tax,
+                'place_id'      => $row->place_id ? $row->place_id : '',
+                'department_id' => $row->department_id ? $row->department_id : '',
+                'warehouse_id'  => $row->warehouse_id ? $row->warehouse_id : '',
             ];
         }
 

@@ -192,7 +192,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="center">Coa</th>
-                                                <th class="center">Site</th>
+                                                <th class="center">Plant</th>
                                                 <th class="center">BP</th>
                                                 <th class="center">Item</th>
                                                 <th class="center">Departemen</th>
@@ -246,7 +246,7 @@
                                                 <th class="center">Mata Uang</th>
                                                 <th class="center" style="width:75px;">Konversi</th>
                                                 <th class="center" style="width:75px;">Coa</th>
-                                                <th class="center" style="width:75px;">Site</th>
+                                                <th class="center" style="width:75px;">Plant</th>
                                                 <th class="center" style="width:75px;">BP</th>
                                                 <th class="center" style="width:75px;">Item</th>
                                                 <th class="center" style="width:75px;">Departemen</th>
@@ -479,7 +479,7 @@
                     <input type="text" name="arr_multi_coa" placeholder="ID Coa">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_place" placeholder="ID Site">
+                    <input type="text" name="arr_multi_place" placeholder="ID Plant">
                 </td>
                 <td>
                     <input type="text" name="arr_multi_bp" placeholder="ID Partner Bisnis">    
@@ -596,7 +596,7 @@
                                     <input type="text" name="arr_multi_coa" placeholder="ID Coa">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_place" placeholder="ID Site">
+                                    <input type="text" name="arr_multi_place" placeholder="ID Plant">
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_bp" placeholder="ID Partner Bisnis">    

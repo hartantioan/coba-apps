@@ -131,23 +131,6 @@ class GoodReceipt extends Model
         return $this->hasMany('App\Models\LandedCost')->whereIn('status',['2','3']);;
     }
 
-    public function purchaseInvoiceDetail()
-    {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
-            $query->whereIn('status',['2','3']);
-        });
-    }
-
-    public function balanceInvoice(){
-        $total = round($this->grandtotal,2);
-
-        foreach($this->purchaseInvoiceDetail as $row){
-            $total -= $row->grandtotal;
-        }
-
-        return $total;
-    }
-
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-1">Menunggu</span>',
@@ -224,5 +207,15 @@ class GoodReceipt extends Model
         }else{
             return false;
         }
+    }
+
+    public function totalInvoice(){
+        $total = round($this->grandtotal,2);
+
+        foreach($this->goodReceiptDetail() as $row){
+            $total += $row->totalInvoice();
+        }
+
+        return $total;
     }
 }

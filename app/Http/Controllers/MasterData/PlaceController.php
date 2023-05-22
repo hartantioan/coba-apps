@@ -21,7 +21,7 @@ class PlaceController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Site',
+            'title'     => 'Plant',
             'content'   => 'admin.master_data.place',
             'company'   => Company::all()
         ];

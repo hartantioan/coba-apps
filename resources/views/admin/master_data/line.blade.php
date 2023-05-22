@@ -29,6 +29,11 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="loadDataTable();">
+                            <i class="material-icons hide-on-med-and-up">refresh</i>
+                            <span class="hide-on-small-onl">Refresh</span>
+                            <i class="material-icons right">refresh</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -63,14 +68,10 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Kode</th>
-                                                        <th>Nama</th>
+                                                        <th>Code</th>
                                                         <th>Plant</th>
-                                                        <th>Area</th>
-                                                        <th>Item</th>
+                                                        <th>Nama</th>
                                                         <th>Keterangan</th>
-                                                        <th>Document</th>
-                                                        <th>Part</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -102,8 +103,8 @@
                     <div class="col s12">
                         <div class="input-field col s6">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="name" name="name" type="text" placeholder="Nama Alat">
-                            <label class="active" for="name">Nama Alat</label>
+                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <label class="active" for="code">Kode</label>
                         </div>
                         <div class="input-field col s6">
                             <select id="place_id" name="place_id">
@@ -114,29 +115,12 @@
                             <label for="plant_id">Plant</label>
                         </div>
                         <div class="input-field col s6">
-                            <select id="area_id" name="area_id">
-                                @foreach($area as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="area_id">Area</label>
+                            <input id="name" name="name" type="text" placeholder="Nama">
+                            <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="browser-default" id="item_id" name="item_id"></select>
-                            <label class="active" for="item_id">Item (Jika ada)</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="note" name="note" type="text" placeholder="Catatan tambahan">
-                            <label class="active" for="note">Catatan</label>
-                        </div>
-                        <div class="file-field input-field col s6">
-                            <div class="btn">
-                                <span>File</span>
-                                <input type="file" name="file" id="file">
-                            </div>
-                            <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text">
-                            </div>
+                            <input id="note" name="note" type="text" placeholder="Keterangan / catatan">
+                            <label class="active" for="note">Keterangan</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -171,27 +155,6 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
-        $('#datatable_serverside').on('click', 'td.details-control', function() {
-            var tr    = $(this).closest('tr');
-            var badge = tr.find('button.btn-floating');
-            var icon  = tr.find('i');
-            var row   = table.row(tr);
-
-            if(row.child.isShown()) {
-                row.child.hide();
-                tr.removeClass('shown');
-                badge.first().removeClass('red');
-                badge.first().addClass('green');
-                icon.first().html('add');
-            } else {
-                row.child(rowDetail(row.data())).show();
-                tr.addClass('shown');
-                badge.first().removeClass('green');
-                badge.first().addClass('red');
-                icon.first().html('remove');
-            }
-        });
-
         loadDataTable();
         
         $('#modal1').modal({
@@ -200,7 +163,7 @@
                 
             },
             onOpenEnd: function(modal, trigger) { 
-                $('#title').focus();
+                $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -212,37 +175,11 @@
             }
         });
 
-        select2ServerSide('#item_id', '{{ url("admin/select2/item") }}');
     });
-
-    function rowDetail(data) {
-        var content = '';
-        $.ajax({
-            url: '{{ Request::url() }}/row_detail',
-            type: 'GET',
-            async: false,
-            data: {
-                id: $(data[0]).data('id')
-            },
-            success: function(response) {
-                content += response;
-            },
-            error: function() {
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-
-        return content;
-	}
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
-            "responsive": false,
-            "scrollX": true,
+            "responsive": true,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -253,8 +190,7 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val(),
-                    url : '{{ Request::url() }}'
+                    status : $('#filter_status').val()
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -274,13 +210,9 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
+                { name: 'place_id', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'place', className: 'center-align' },
-                { name: 'area', className: 'center-align' },
-                { name: 'item', className: 'center-align' },
-                { name: 'note', className: '' },
-                { name: 'document', className: 'center-align' },
-                { name: 'part', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -290,6 +222,7 @@
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
+
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -384,28 +317,18 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
                 $('#temp').val(id);
+                $('#code').val(response.code);
+                $('#place_id').val(response.place_id).formSelect();
                 $('#name').val(response.name);
                 $('#note').val(response.note);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#area_id').val(response.area_id).formSelect();
-                $('#item_id').empty();
-                
-                if(response.item_name){
-                    $('#item_id').append(`
-                        <option value="` + response.item_id + `">` + response.item_name + `</option>
-                    `);
-                }
-
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
                 }
-
                 $('.modal-content').scrollTop(0);
-                $('#name').focus();
+                $('#code').focus();
                 M.updateTextFields();
             },
             error: function() {

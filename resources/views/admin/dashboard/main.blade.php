@@ -62,7 +62,7 @@
                                                 <tr>
                                                     <th class="center-align">No.</th>
                                                     <th class="center-align">Item</th>
-                                                    <th class="center-align">Site</th>
+                                                    <th class="center-align">Plant</th>
                                                     <th class="center-align">Gudang</th>
                                                     <th class="center-align">Qty</th>
                                                     <th class="center-align">Rp</th>

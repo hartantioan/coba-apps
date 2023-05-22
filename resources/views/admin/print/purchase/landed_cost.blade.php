@@ -192,7 +192,7 @@
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
-											<th>Site</th>
+											<th>Plant</th>
 											<th>Departemen</th>
 											<th>Gudang</th>
                                             <th>Item</th>

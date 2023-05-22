@@ -39,7 +39,7 @@
                 <th>Harga Total</th>
                 <th>Keterangan</th>
                 <th>Coa</th>
-                <th>Site</th>
+                <th>Plant</th>
                 <th>Departemen</th>
                 <th>Gudang</th>
             </tr>

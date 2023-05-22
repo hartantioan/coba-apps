@@ -129,7 +129,7 @@
 						<th>No</th>
 						<th>Kode</th>
 						<th>Nama</th>
-                        <th>Site</th>
+                        <th>Plant</th>
                         <th>Area</th>
                         <th>Item</th>
                         <th>Status</th>

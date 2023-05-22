@@ -28,7 +28,7 @@ class PurchaseMemoController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
     public function index(Request $request)
     {
@@ -435,6 +435,78 @@ class PurchaseMemoController extends Controller
 		}
 		
 		return response()->json($response);
+    }
+
+    public function rowDetail(Request $request){
+        $data   = PurchaseMemo::find($request->id);
+        
+        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="7">Daftar Order Pembelian</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">PO Inv./PO DP</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">PPN</th>
+                                <th class="center-align">PPH</th>
+                                <th class="center-align">Grandtotal</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        if(count($data->purchaseMemoDetail) > 0){
+            foreach($data->purchaseMemoDetail as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td class="center-align">'.$row->lookable->code.'</td>
+                    <td class="center-align">'.$row->description.'</td>
+                    <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                    <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                    <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
+                    <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="7">Data detail tidak ditemukan.</td>
+            </tr>';
+        }
+        
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="max-width:500px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="4">Approval</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Level</th>
+                                <th class="center-align">Kepada</th>
+                                <th class="center-align">Status</th>
+                                <th class="center-align">Catatan</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        if($data->approval() && $data->approval()->approvalMatrix()->exists()){    
+            foreach($data->approval()->approvalMatrix as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
+                    <td class="center-align">'.$row->note.'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="4">Approval tidak ditemukan.</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div></div>';
+		
+        return response()->json($string);
     }
 
     public function removeUsedData(Request $request){

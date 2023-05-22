@@ -78,7 +78,7 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_company" style="font-size:1rem;">Pabrik :</label>
+                                                <label for="filter_company" style="font-size:1rem;">Plant :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_company" onchange="loadDataTable()">
                                                         <option value="">Semua</option>

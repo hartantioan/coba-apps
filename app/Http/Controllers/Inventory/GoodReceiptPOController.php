@@ -35,7 +35,7 @@ class GoodReceiptPOController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
 
     public function index(Request $request)
@@ -304,12 +304,13 @@ class GoodReceiptPOController extends Controller
             $wtaxall = 0;
             $grandtotalall = 0;
             $overtolerance = false;
-            $wtax = 0;
-            $total = 0;
-            $grandtotal = 0;
-            $tax = 0;
+            $arrDetail = [];
 
             foreach($request->arr_purchase as $key => $row){
+                $wtax = 0;
+                $total = 0;
+                $grandtotal = 0;
+                $tax = 0;
 
                 $pod = PurchaseOrderDetail::find(intval($row));
 
@@ -331,7 +332,7 @@ class GoodReceiptPOController extends Controller
                     $rowprice = 0;
 
                     $bobot = $pod->subtotal / $subtotal;
-                    $rowprice = round($pod->subtotal / $pod->qty,3);
+                    $rowprice = round($pod->subtotal / $pod->qty,2);
 
                     $total = ($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount);
 
@@ -340,14 +341,21 @@ class GoodReceiptPOController extends Controller
                     }
 
                     if($pod->is_tax == '1'){
-                        $tax = round($total * ($pod->percent_tax / 100),3);
+                        $tax = round($total * ($pod->percent_tax / 100),2);
                     }
 
                     if($pod->is_wtax == '1'){
-                        $wtax = round($total * ($pod->percent_wtax / 100),3);
+                        $wtax = round($total * ($pod->percent_wtax / 100),2);
                     }
 
                     $grandtotal = $total + $tax - $wtax;
+
+                    $arrDetail[] = [
+                        'total'         => $total,
+                        'tax'           => $tax,
+                        'wtax'          => $wtax,
+                        'grandtotal'    => $grandtotal,
+                    ];
 
                     $totalall += $total;
                     $taxall += $tax;
@@ -456,6 +464,10 @@ class GoodReceiptPOController extends Controller
                             'purchase_order_detail_id'  => $row,
                             'item_id'                   => $request->arr_item[$key],
                             'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'total'                     => $arrDetail[$key]['total'],
+                            'tax'                       => $arrDetail[$key]['tax'],
+                            'wtax'                      => $arrDetail[$key]['wtax'],
+                            'grandtotal'                => $arrDetail[$key]['grandtotal'],
                             'note'                      => $request->arr_note[$key],
                             'remark'                    => $request->arr_remark[$key],
                             'place_id'                  => $request->arr_place[$key],
@@ -511,7 +523,7 @@ class GoodReceiptPOController extends Controller
                                         <th class="center-align">Satuan</th>
                                         <th class="center-align">Keterangan</th>
                                         <th class="center-align">Remark</th>
-                                        <th class="center-align">Site</th>
+                                        <th class="center-align">Plant</th>
                                         <th class="center-align">Departemen</th>
                                         <th class="center-align">Gudang</th>
                                     </tr>

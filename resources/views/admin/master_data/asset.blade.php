@@ -74,7 +74,7 @@
                                                         <th>Metode</th>
                                                         <th>Keterangan</th>
                                                         <th>Status</th>
-                                                        <th>Site</th>
+                                                        <th>Plant</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -116,7 +116,7 @@
                                     <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->code }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="plant_id">Site</label>
+                            <label class="" for="plant_id">Plant</label>
                         </div>
                         <div class="input-field col m4 s6">
                             <input id="name" name="name" type="text" placeholder="Nama">

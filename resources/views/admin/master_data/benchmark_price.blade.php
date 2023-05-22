@@ -55,7 +55,7 @@
                                                         <th>#</th>
                                                         <th>Pengguna</th>
                                                         <th>Item</th>
-                                                        <th>Site</th>
+                                                        <th>Plant</th>
                                                         <th>Harga</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -97,7 +97,7 @@
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
                                 @endforeach
                             </select>
-                            <label for="plant_id" class="">Site</label>
+                            <label for="plant_id" class="">Plant</label>
                         </div>
                         <div class="input-field col s6">
                             <input id="price" name="price" type="text" onkeyup="formatRupiah(this)" value="0">

@@ -37,7 +37,7 @@ class Select2Controller extends Controller {
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->datawarehouses = $user->userWarehouseArray();
     }
     
@@ -181,7 +181,8 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name.' - '.$d->company->name,
+                'text' 			=> $d->code.' - '.$d->name,
+                'uom'           => '-',
                 'code'          => CustomHelper::encrypt($d->code),
             ];
         }
@@ -206,7 +207,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name.' - '.$d->company->name,
+                'text' 			=> $d->code.' - '.$d->name,
             ];
         }
 

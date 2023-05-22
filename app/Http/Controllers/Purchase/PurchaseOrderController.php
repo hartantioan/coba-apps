@@ -36,7 +36,7 @@ class PurchaseOrderController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
     public function index(Request $request)
     {
@@ -45,7 +45,7 @@ class PurchaseOrderController extends Controller
             'content'       => 'admin.purchase.order',
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
-            'place'         => Place::where('status','1')->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'    => Department::where('status','1')->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
@@ -433,8 +433,8 @@ class PurchaseOrderController extends Controller
                 'arr_disc2.array'                   => 'Diskon 2 harus array.',
                 'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
                 'arr_disc3.array'                   => 'Diskon 3 harus array.',
-                'arr_place.required'                => 'Site tidak boleh kosong.',
-                'arr_place.array'                   => 'Site harus array.',
+                'arr_place.required'                => 'Plant tidak boleh kosong.',
+                'arr_place.array'                   => 'Plant harus array.',
                 'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
                 'arr_warehouse.array'               => 'Gudang harus array.',
                 'discount.required'                 => 'Diskon akhir tidak boleh kosong.'
@@ -759,7 +759,7 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Discount 3 (Rp)</th>
                                 <th class="center-align">Subtotal</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Site</th>
+                                <th class="center-align">Plant</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Referensi</th>

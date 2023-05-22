@@ -32,7 +32,7 @@
             <tr align="center">
                 <th></th>
                 <th>Coa</th>
-                <th>Site</th>
+                <th>Plant</th>
                 <th>Bisnis Partner</th>
                 <th>Item</th>
                 <th>Departemen</th>

@@ -129,7 +129,7 @@
 						<th rowspan="2">No</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Code</th>
-                        <th rowspan="2">Site</th>
+                        <th rowspan="2">Plant</th>
                         <th rowspan="2">Tanggal</th>
                         <th colspan="2">Mata Uang</th>
                         <th rowspan="2">Keterangan</th>
@@ -167,7 +167,7 @@
                                             <th>Harga Total</th>
                                             <th>Keterangan</th>
                                             <th>Coa</th>
-											<th>Site</th>
+											<th>Plant</th>
 											<th>Depertemen</th>
                                             <th>Gudang</th>
                                         </tr>

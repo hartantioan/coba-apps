@@ -129,7 +129,7 @@
 						<th>No</th>
                         <th>Pengguna</th>
 						<th>Code</th>
-                        <th>Site</th>
+                        <th>Plant</th>
                         <th>Tanggal</th>
                         <th>Keterangan</th>
                         <th>Dokumen</th>

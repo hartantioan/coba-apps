@@ -130,7 +130,7 @@
 						<th>Kode</th>
 						<th>Nama</th>
                         <th>Item</th>
-                        <th>Site</th>
+                        <th>Plant</th>
                         <th>Qty Output</th>
                         <th>Qty Rencana</th>
                         <th>Tipe</th>
@@ -151,52 +151,30 @@
                             <th>{!! $row->status() !!}</th>
                         </tr>
                         <tr align="center">
-                            <td colspan="4" width="50%">
+                            <td colspan="9" width="50%">
                                 <table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:11px;">
                                     <thead>
                                         <tr align="center">
-                                            <th colspan="3">Material</th>
-                                        </tr>
-                                        <tr align="center">
-                                            <th>Item</th>
+                                            <th>Bahan/Biaya</th>
+											<th>Description</th>
                                             <th>Qty</th>
-                                            <th>Description</th>
+											<th>Nominal</th>
+											<th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($row->bomMaterial as $key => $m)
+                                        @foreach ($row->bomDetail as $key => $m)
                                             <tr>
-                                                <td>{{ $m->item->name }}</td>
-                                                <td align="right">{{ number_format($m->qty,3,',','.').' '.$m->item->uomUnit->code }}</td>
-                                                <td>{{ $m->description }}</td>
+                                                <td>{{ $m->lookable->code.' - '.$m->lookable->name }}</td>
+												<td>{{ $m->description }}</td>
+                                                <td align="right">{{ $m->lookable_type == 'items' ? number_format($m->qty,3,',','.').' '.$m->lookable->uomUnit->code : number_format($m->qty,3,',','.') }}</td>
+												<td align="right">{{ number_format($m->nominal,3,',','.') }}</td>
+												<td align="right">{{ number_format($m->total,3,',','.') }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </td>
-							<td colspan="5" width="50%">
-								<table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:11px;">
-                                    <thead>
-                                        <tr align="center">
-                                            <th colspan="3">Biaya</th>
-                                        </tr>
-                                        <tr align="center">
-                                            <th>Description</th>
-                                            <th>Coa</th>
-                                            <th>Nominal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($row->bomCost as $key => $c)
-                                            <tr>
-                                                <td>{{ $c->description }}</td>
-                                                <td>{{ $c->coa()->exists() ? $c->coa->name : '-' }}</td>
-                                                <td class="right">{{ number_format($c->nominal,3,',','.') }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-							</td>
                         </tr>
 					@endforeach
 				</tbody>

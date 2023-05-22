@@ -18,12 +18,14 @@ class JournalDetail extends Model
         'journal_id',
         'coa_id',
         'place_id',
+        'line_id',
         'account_id',
         'item_id',
         'department_id',
         'warehouse_id',
         'type',
-        'nominal'
+        'nominal',
+        'note',
     ];
 
     public function journal(){
@@ -32,6 +34,10 @@ class JournalDetail extends Model
 
     public function coa(){
         return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
+    }
+
+    public function line(){
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 
     public function warehouse(){

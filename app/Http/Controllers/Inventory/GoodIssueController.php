@@ -32,7 +32,7 @@ class GoodIssueController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
 
     public function index()
@@ -356,7 +356,7 @@ class GoodIssueController extends Controller
                                 <th class="right-align">Harga Total</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Coa</th>
-                                <th class="center-align">Site</th>
+                                <th class="center-align">Plant</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                             </tr>

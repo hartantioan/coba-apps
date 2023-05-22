@@ -35,7 +35,7 @@ class PurchaseRequestController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
     public function index(Request $request)
     {
@@ -207,7 +207,7 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Tgl.Dipakai</th>
-                                <th class="center-align">Site</th>
+                                <th class="center-align">Plant</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Departemen</th>
                             </tr>
@@ -223,7 +223,7 @@ class PurchaseRequestController extends Controller
                 <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
                 <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
-                <td class="center-align">'.$row->department->name.'</td>
+                <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
             </tr>';
         }
         

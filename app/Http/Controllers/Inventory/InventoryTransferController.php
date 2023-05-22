@@ -28,7 +28,7 @@ class InventoryTransferController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
 
     public function index()
@@ -184,8 +184,8 @@ class InventoryTransferController extends Controller
             'arr_item.array'                    => 'Item harus dalam bentuk array',
             'arr_qty.required'                  => 'Qty item tidak boleh kosong',
             'arr_qty.array'                     => 'Qty item harus dalam bentuk array',
-            'arr_place.required'                => 'Site tidak boleh kosong',
-            'arr_place.array'                   => 'Site harus dalam bentuk array',
+            'arr_place.required'                => 'Plant tidak boleh kosong',
+            'arr_place.array'                   => 'Plant harus dalam bentuk array',
             'arr_warehouse.required'            => 'Gudang tidak boleh kosong',
             'arr_warehouse.array'               => 'Gudang harus dalam bentuk array',
 		]);

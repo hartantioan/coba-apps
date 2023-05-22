@@ -18,6 +18,7 @@ use App\Http\Controllers\MasterData\CountryController;
 use App\Http\Controllers\MasterData\RegionController;
 use App\Http\Controllers\MasterData\ResidenceController;
 use App\Http\Controllers\MasterData\WarehouseController;
+use App\Http\Controllers\MasterData\LineController;
 use App\Http\Controllers\MasterData\BomController;
 use App\Http\Controllers\MasterData\ShiftController;
 use App\Http\Controllers\MasterData\ActivityController;
@@ -331,6 +332,17 @@ Route::prefix('admin')->group(function () {
                 });
 
                 Route::prefix('master_production')->group(function () {
+
+                    Route::prefix('machine')->middleware('operation.access:machine,view')->group(function () {
+                        Route::get('/',[LineController::class, 'index']);
+                        Route::get('datatable',[LineController::class, 'datatable']);
+                        Route::post('show', [LineController::class, 'show']);
+                        Route::post('print',[LineController::class, 'print']);
+                        Route::get('export',[LineController::class, 'export']);
+                        Route::post('create',[LineController::class, 'create'])->middleware('operation.access:machine,update');
+                        Route::post('destroy', [LineController::class, 'destroy'])->middleware('operation.access:machine,delete');
+                    });
+
                     Route::prefix('bom')->middleware('operation.access:bom,view')->group(function () {
                         Route::get('/',[BomController::class, 'index']);
                         Route::get('datatable',[BomController::class, 'datatable']);
@@ -650,6 +662,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('purchase_invoice')->middleware('operation.access:purchase_invoice,view')->group(function () {
                     Route::get('/',[PurchaseInvoiceController::class, 'index']);
                     Route::post('get_gr_lc', [PurchaseInvoiceController::class, 'getGoodReceiptLandedCost']);
+                    Route::post('get_account_data', [PurchaseInvoiceController::class, 'getAccountData']);
                     Route::get('datatable',[PurchaseInvoiceController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseInvoiceController::class, 'rowDetail']);
                     Route::post('show', [PurchaseInvoiceController::class, 'show']);

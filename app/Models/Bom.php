@@ -38,12 +38,8 @@ class Bom extends Model
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
-    public function bomCost(){
-        return $this->hasMany('App\Models\BomCost');
-    }
-
-    public function bomMaterial(){
-        return $this->hasMany('App\Models\BomMaterial');
+    public function bomDetail(){
+        return $this->hasMany('App\Models\BomDetail');
     }
 
     public function status(){

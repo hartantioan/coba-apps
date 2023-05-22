@@ -29,7 +29,7 @@ class GoodReturnPOController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
 
     public function index(Request $request)
@@ -425,7 +425,7 @@ class GoodReturnPOController extends Controller
                                         <th class="center-align">Qty Dikembalikan</th>
                                         <th class="center-align">Satuan</th>
                                         <th class="center-align">Keterangan</th>
-                                        <th class="center-align">Site</th>
+                                        <th class="center-align">Plant</th>
                                         <th class="center-align">Departemen</th>
                                         <th class="center-align">Gudang</th>
                                         <th class="center-align">Referensi</th>

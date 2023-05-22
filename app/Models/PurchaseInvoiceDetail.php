@@ -16,11 +16,10 @@ class PurchaseInvoiceDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'purchase_invoice_id',
-        'good_receipt_id',
-        'landed_cost_id',
-        'purchase_order_id',
         'lookable_type',
         'lookable_id',
+        'qty',
+        'price',
         'total',
         'tax_id',
         'wtax_id',
@@ -33,10 +32,21 @@ class PurchaseInvoiceDetail extends Model
         'note',
         'place_id',
         'department_id',
+        'warehouse_id',
     ];
 
     public function lookable(){
         return $this->morphTo();
+    }
+
+    public function taxMaster()
+    {
+        return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
+    }
+
+    public function wTaxMaster()
+    {
+        return $this->belongsTo('App\Models\Tax', 'wtax_id', 'id')->withTrashed();
     }
 
     public function purchaseInvoice()
@@ -52,6 +62,11 @@ class PurchaseInvoiceDetail extends Model
     public function department()
     {
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
     
     public function landedCost()
@@ -81,22 +96,79 @@ class PurchaseInvoiceDetail extends Model
 
     public function getCode(){
         $code = match ($this->lookable_type) {
-            'good_receipts'     => $this->lookable->getPurchaseCode(),
-            'landed_costs'      => $this->lookable->goodReceipt->getPurchaseCode(),
-            'purchase_orders'   => $this->lookable->code,
-            'coas'              => $this->lookable->code.' - '.$this->lookable->name,
-            default             => '-',
+            'good_receipt_details'      => $this->lookable->item->code.' - '.$this->lookable->item->name,
+            'landed_cost_details'       => $this->lookable->item->code.' - '.$this->lookable->item->name,
+            'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->code.' - '.$this->lookable->item->name : $this->lookable->coa->code.' - '.$this->lookable->coa->name,
+            'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
+            default                     => '-',
         };
 
         return $code;
     }
 
+    public function getHeaderCode(){
+        $code = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->goodReceipt->code,
+            'landed_cost_details'       => $this->lookable->landedCost->code,
+            'purchase_order_details'    => $this->lookable->purchaseOrder->code,
+            'coas'                      => '-',
+            default                     => '-',
+        };
+
+        return $code;
+    }
+
+    public function getTop(){
+        $code = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->payment_term,
+            'landed_cost_details'       => $this->lookable->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->payment_term,
+            'purchase_order_details'    => $this->lookable->purchaseOrder->payment_term,
+            default                     => '-',
+        };
+
+        return $code;
+    }
+
+    public function getUnitCode(){
+        $code = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->item->buyUnit->code,
+            'landed_cost_details'       => $this->lookable->item->buyUnit->code,
+            'purchase_order_details'    => $this->lookable->item_id ? $this->lookable->item->buyUnit->code : '-',
+            default                     => '-',
+        };
+
+        return $code;
+    }
+
+    public function getPostDate(){
+        $date = match ($this->lookable_type) {
+            'good_receipt_details'      => date('d/m/y',strtotime($this->lookable->goodReceipt->post_date)),
+            'landed_cost_details'       => date('d/m/y',strtotime($this->lookable->landedCost->post_date)),
+            'purchase_order_details'    => date('d/m/y',strtotime($this->lookable->purchaseOrder->post_date)),
+            default                     => '-',
+        };
+
+        return $date;
+    }
+
+    public function getDueDate(){
+        $date = match ($this->lookable_type) {
+            'good_receipt_details'      => $this->lookable->goodReceipt->due_date ? date('d/m/y',strtotime($this->lookable->goodReceipt->due_date)) : '-',
+            'landed_cost_details'       => $this->lookable->landedCost->due_date ? date('d/m/y',strtotime($this->lookable->landedCost->due_date)) : '-',
+            'purchase_order_details'    => $this->lookable->purchaseOrder->due_date ? date('d/m/y',strtotime($this->lookable->purchaseOrder->due_date)) : '-',
+            default                     => '-',
+        };
+
+        return $date;
+    }
+
     public function getPurchaseCode(){
         $code = match ($this->lookable_type) {
-            'good_receipts'     => $this->lookable->getPurchaseCode(),
-            'landed_costs'      => $this->lookable->goodReceipt->getPurchaseCode(),
-            'purchase_orders'   => $this->lookable->code,
-            default => '-',
+            'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->code,
+            'landed_cost_details'       => $this->lookable->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->code,
+            'purchase_order_details'    => $this->lookable->purchaseOrder->code.' - '.$this->lookable->purchaseOrder->code,
+            'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
+            default                     => '-',
         };
 
         return $code;
@@ -104,8 +176,8 @@ class PurchaseInvoiceDetail extends Model
 
     public function getDeliveryCode(){
         $code = match ($this->lookable_type) {
-            'good_receipts'     => $this->lookable->code,
-            'landed_costs'      => $this->lookable->goodReceipt->code,
+            'good_receipt_details'     => $this->lookable->goodReceipt->delivery_no,
+            'landed_cost_details'      => $this->lookable->landedCost->goodReceipt->delivery_no,
             default => '-',
         };
 

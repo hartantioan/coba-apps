@@ -180,7 +180,7 @@
                                                     <th class="center">Ambil Dari</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
-                                                    <th class="center">Site Tujuan</th>
+                                                    <th class="center">Plant Tujuan</th>
                                                     <th class="center">Gudang Tujuan</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Hapus</th>

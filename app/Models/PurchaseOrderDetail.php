@@ -108,6 +108,42 @@ class PurchaseOrderDetail extends Model
         });
     }
 
+    public function getArrayTotal(){
+        $wtax = 0;
+        $total = 0;
+        $grandtotal = 0;
+        $tax = 0;
+        $discount = $this->purchaseOrder->discount;
+        $subtotal = $this->purchaseOrder->subtotal;
+        $rowprice = 0;
+        $bobot = $this->subtotal / $subtotal;
+        $rowprice = round($this->subtotal / $this->qty,2);
+        $total = ($rowprice * $this->qty) - ($bobot * $discount);
+
+        if($this->is_tax == '1' && $this->is_include_tax == '1'){
+            $total = $total / (1 + ($this->percent_tax / 100));
+        }
+        
+        if($this->is_tax == '1'){
+            $tax = round($total * ($this->percent_tax / 100),2);
+        }
+
+        if($this->is_wtax == '1'){
+            $wtax = round($total * ($this->percent_wtax / 100),2);
+        }
+
+        $grandtotal = $total + $tax - $wtax;
+
+        $arrDetail = [
+            'total'         => $total,
+            'tax'           => $tax,
+            'wtax'          => $wtax,
+            'grandtotal'    => $grandtotal,
+        ];
+
+        return $arrDetail;
+    }
+
     public function getBalanceReceipt()
     {
 
@@ -126,5 +162,32 @@ class PurchaseOrderDetail extends Model
     public function goodIssueDetail()
     {
         return $this->belongsTo('App\Models\GoodIssueDetail','good_issue_detail_id','id');
+    }
+
+    public function purchaseInvoiceDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balanceInvoice(){
+        $total = round($this->getArrayTotal()['grandtotal'],2);
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $total -= $row->grandtotal;
+        }
+
+        return $total;
+    }
+
+    public function totalInvoice(){
+        $total = 0;
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $total += $row->grandtotal;
+        }
+
+        return $total;
     }
 }

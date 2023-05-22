@@ -20,6 +20,10 @@ return new class extends Migration
             $table->bigInteger('purchase_order_detail_id')->nullable();
             $table->bigInteger('item_id')->nullable();
             $table->double('qty')->nullable();
+            $table->double('total')->nullable();
+            $table->double('tax')->nullable();
+            $table->double('wtax')->nullable();
+            $table->double('grandtotal')->nullable();
             $table->string('note')->nullable();
             $table->string('remark')->nullable();
             $table->bigInteger('place_id')->nullable();

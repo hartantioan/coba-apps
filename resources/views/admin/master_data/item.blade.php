@@ -176,27 +176,27 @@
                             <select class="select2 browser-default" id="item_group_id" name="item_group_id">
                                 @foreach($group->whereNull('parent_id') as $c)
                                         @if(!$c->childSub()->exists())
-                                            <option value="{{ $c->id }}"> - {{ $c->name.' COA '.$c->coa->code.' - '.$c->coa->name }}</option>
+                                            <option value="{{ $c->id }}"> - {{ $c->name }}</option>
                                         @else
                                             <optgroup label=" - {{ $c->code.' - '.$c->name }}">
                                             @foreach($c->childSub as $bc)
                                                 @if(!$bc->childSub()->exists())
-                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name.' COA '.$bc->coa->code.' - '.$bc->coa->name }}</option>
+                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
                                                 @else
                                                     <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
                                                         @foreach($bc->childSub as $bcc)
                                                             @if(!$bcc->childSub()->exists())
-                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name.' COA '.$bcc->coa->code.' - '.$bcc->coa->name }}</option>
+                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
                                                             @else
                                                                 <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
                                                                     @foreach($bcc->childSub as $bccc)
                                                                         @if(!$bccc->childSub()->exists())
-                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name.' COA '.$bccc->coa->code.' - '.$bccc->coa->name }}</option>
+                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
                                                                         @else
                                                                             <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
                                                                                 @foreach($bccc->childSub as $bcccc)
                                                                                     @if(!$bcccc->childSub()->exists())
-                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name.' COA '.$bcccc->coa->code.' - '.$bcccc->coa->name }}</option>
+                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
                                                                                     @endif
                                                                                 @endforeach
                                                                             </optgroup>
@@ -234,20 +234,20 @@
                         <div class="col s12">
                             <div class="col s4">
                                 <div class="input-field col s12">
-                                    <select class="form-control" id="buy_unit" name="buy_unit">
+                                    <select class="select2 browser-default" id="buy_unit" name="buy_unit">
                                         @foreach ($unit as $row)
                                             <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
                                         @endforeach
                                     </select>
-                                    <label class="" for="buy_unit">Satuan Beli</label>
+                                    <label class="active" for="buy_unit">Satuan Beli</label>
                                 </div>
                                 <div class="input-field col s12">
-                                    <select class="form-control" id="sell_unit" name="sell_unit">
+                                    <select class="select2 browser-default" id="sell_unit" name="sell_unit">
                                         @foreach ($unit as $row)
                                             <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
                                         @endforeach
                                     </select>
-                                    <label class="" for="sell_unit">Satuan Jual</label>
+                                    <label class="active" for="sell_unit">Satuan Jual</label>
                                 </div>
                             </div>
                             <div class="col s4">
@@ -262,12 +262,12 @@
                             </div>
                             <div class="col s4">
                                 <div class="input-field col s12" style="top: 30px;">
-                                    <select class="form-control" id="uom_unit" name="uom_unit">
+                                    <select class="select2 browser-default" id="uom_unit" name="uom_unit">
                                         @foreach ($unit as $row)
                                             <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
                                         @endforeach
                                     </select>
-                                    <label class="" for="uom_unit">Satuan Stok & Produksi</label>
+                                    <label class="active" for="uom_unit">Satuan Stok & Produksi</label>
                                 </div>
                             </div>
                         </div>
@@ -331,6 +331,11 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
             var badge = tr.find('button.btn-floating');
@@ -687,10 +692,10 @@
                 $('#name').val(response.name);
                 $('#note').val(response.note);
                 $('#item_group_id').val(response.item_group_id).trigger('change');
-                $('#uom_unit').val(response.uom_unit).formSelect();
-                $('#buy_unit').val(response.buy_unit).formSelect();
+                $('#uom_unit').val(response.uom_unit).trigger('change');
+                $('#buy_unit').val(response.buy_unit).trigger('change');
                 $('#buy_convert').val(response.buy_convert);
-                $('#sell_unit').val(response.sell_unit).formSelect();
+                $('#sell_unit').val(response.sell_unit).trigger('change');
                 $('#sell_convert').val(response.sell_convert);
                 $('#warehouse_id').val(response.warehouses).trigger('change');
                 $('#tolerance_gr').val(response.tolerance_gr);

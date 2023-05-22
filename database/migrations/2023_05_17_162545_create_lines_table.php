@@ -13,15 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('bom_materials'))
-        Schema::create('bom_materials', function (Blueprint $table) {
+        if(!Schema::hasTable('lines'))
+        Schema::create('lines', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('bom_id')->nullable();
-            $table->bigInteger('item_id')->nullable();
-            $table->double('qty')->nullable();
-            $table->string('description')->nullable();
+            $table->string('code',155)->unique();
+            $table->bigInteger('place_id')->nullable();
+            $table->string('name', 155)->nullable();
+            $table->string('note', 155)->nullable();
+            $table->char('status', 1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['place_id']);
         });
     }
 
@@ -32,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bom_materials');
+        Schema::dropIfExists('lines');
     }
 };

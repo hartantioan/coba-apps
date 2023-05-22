@@ -142,7 +142,7 @@ class ShiftController extends Controller
             'max_time_out'              => 'required',
         ], [
             'name.required'                 => 'Nama Shift tidak boleh kosong.',
-            'place_id.required'             => 'Site tidak boleh kosong.',
+            'place_id.required'             => 'Plant tidak boleh kosong.',
             'department_id.required'        => 'Departemen tidak boleh kosong',
             'minimum_time_in.required'      => 'Minimum jam masuk tidak boleh kosong',
             'time_in.required'              => 'Jam masuk tidak boleh kosong',

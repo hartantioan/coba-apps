@@ -5,7 +5,7 @@
             <th rowspan="2">Code</th>
             <th rowspan="2">Pengguna</th>
             <th rowspan="2">Partner Bisnis</th>
-            <th rowspan="2">Site</th>
+            <th rowspan="2">Plant</th>
             <th rowspan="2">Kas/Bank</th>
             <th rowspan="2">Tipe Pembayaran</th>
             <th rowspan="2">No.Cek/BG</th>

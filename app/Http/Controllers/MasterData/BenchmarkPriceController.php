@@ -124,7 +124,7 @@ class BenchmarkPriceController extends Controller
             'price'                 => 'required',
         ], [
             'item_id.required'      => 'Item tidak boleh kosong.',
-            'place_id.required'     => 'Site tidak boleh kosong.',
+            'place_id.required'     => 'Plant tidak boleh kosong.',
             'price.required'        => 'Harga tidak boleh kosong.',
         ]);
 

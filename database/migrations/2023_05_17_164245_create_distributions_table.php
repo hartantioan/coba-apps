@@ -13,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('bom_costs'))
-        Schema::create('bom_costs', function (Blueprint $table) {
+        Schema::create('distributions', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('bom_id')->nullable();
-            $table->bigInteger('coa_id')->nullable();
-            $table->string('description')->nullable();
-            $table->double('nominal')->nullable();
+            $table->string('code',155)->unique();
+            $table->string('name', 155)->nullable();
+            $table->char('status', 1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
         });
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bom_costs');
+        Schema::dropIfExists('distributions');
     }
 };

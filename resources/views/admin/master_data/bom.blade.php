@@ -1,3 +1,12 @@
+<style>
+    .modal {
+        top:0px !important;
+    }
+
+    table > thead > tr > th {
+        font-size: 13px !important;
+    }
+</style>
 <!-- BEGIN: Page Main-->
 <div id="main">
     <div class="row">
@@ -77,7 +86,7 @@
                                                         <th>Kode</th>
                                                         <th>Nama</th>
                                                         <th>Item</th>
-                                                        <th>Site</th>
+                                                        <th>Plant</th>
                                                         <th>Qty Output</th>
                                                         <th>Qty Rencana</th>
                                                         <th>Type</th>
@@ -99,7 +108,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;min-width:80%;max-width:100%;">
+<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -148,7 +157,7 @@
                                     <option value="{{ $b->id }}">{{ $b->code }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="place_id">Site</label>
+                            <label class="" for="place_id">Plant</label>
                         </div>
                         <div class="input-field col s4">
                             <div class="switch mb-1">
@@ -161,95 +170,41 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="col s12 mt-3">
-                            <ul class="tabs tabs-fixed-width tab-demo z-depth-1">
-                                <li class="tab col m3"><a class="active" href="#tabmaterial">Material</a></li>
-                                <li class="tab col m3"><a href="#tabcost">Biaya</a></li>
-                             </ul>
-                        </div>
                         <div class="col s12">
-                            <div id="tabmaterial" class="col s12">
-                                <p class="mt-2 mb-2">
-                                    <table class="bordered">
-                                        <thead>
-                                            <tr>
-                                                <th width="50%" class="center">Item</th>
-                                                <th width="10%" class="center">Qty</th>
-                                                <th width="10%" class="center">Satuan</th>
-                                                <th width="20%" class="center">Deskripsi</th>
-                                                <th width="10%" class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-material">
-                                            <tr class="row_material">
-                                                <td>
-                                                    <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this)">
-                                                </td>
-                                                <td class="center">
-                                                    <span id="arr_satuan0">-</span>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_description_material[]" type="text" placeholder="Deskripsi item material">
-                                                </td>
-                                                <td class="center">
-                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-material" href="javascript:void(0);">
-                                                        <i class="material-icons">delete</i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr id="last-row-material">
-                                                <td colspan="5" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addMaterial()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> New Material
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
+                            <h6>Bahan & Biaya</h6>
+                            <div class="col s12 center">
+                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items')" href="javascript:void(0);">
+                                    <i class="material-icons left">add</i> Bahan
+                                </a>
+                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addDetail('coas')" href="javascript:void(0);">
+                                    <i class="material-icons left">add</i> Biaya
+                                </a>
+                                <div>
+                                    <i>
+                                        Untuk detail tipe bahan, harga 0, karena perhitungan diambil dari rata-rata stok berjalan.
+                                    </i>
+                                </div>
                             </div>
-                            <div id="tabcost" class="col s12">
-                                <p class="mt-2 mb-2">
-                                    <table class="bordered">
-                                        <thead>
-                                            <tr>
-                                                <th width="30%" class="center">Deskripsi</th>
-                                                <th width="30%" class="center">Coa</th>
-                                                <th width="10%" class="center">Nominal</th>
-                                                <th width="10%" class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-cost">
-                                            <tr class="row_cost">
-                                                <td>
-                                                    <input name="arr_description_cost[]" type="text" placeholder="Deskripsi cost material">
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default cost-array" id="arr_coa0" name="arr_coa[]"></select>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_nominal[]" type="text" value="0" onkeyup="formatRupiah(this)">
-                                                </td>
-                                                <td class="center">
-                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-cost" href="javascript:void(0);">
-                                                        <i class="material-icons">delete</i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr id="last-row-cost">
-                                                <td colspan="4" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addCost()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> New Cost
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                            </div>
+                            <table class="bordered mt-2">
+                                <thead>
+                                    <tr>
+                                        <th class="center">Bahan/Biaya</th>
+                                        <th class="center">Qty</th>
+                                        <th class="center">Satuan</th>
+                                        <th class="center">Nominal</th>
+                                        <th class="center">Total</th>
+                                        <th class="center">Deskripsi</th>
+                                        <th class="center">Hapus</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-detail">
+                                    <tr id="empty-row-detail">
+                                        <td colspan="7" class="center">
+                                            <i>Silahkan tambahkan bahan / biaya...</i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -314,85 +269,88 @@
                 resetDetailForm();
             }
         });
-
-        select2ServerSide('#item_id,#arr_item0', '{{ url("admin/select2/item") }}');
-        select2ServerSide('#arr_coa0', '{{ url("admin/select2/coa") }}');
         
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
             $('#name').val('');
         });
 
-        $('#body-material').on('click', '.delete-data-material', function() {
-            $(this).closest('tr').remove();
-        });
-
-        $('#body-cost').on('click', '.delete-data-cost', function() {
+        $('#body-detail').on('click', '.delete-data-detail', function() {
             $(this).closest('tr').remove();
         });
     });
 
     function resetDetailForm(){
-        $('.row_material').each(function(){
+        $('.row_detail').each(function(){
             $(this).remove();
         });
+        $('#body-detail').append(`
+            <tr id="empty-row-detail">
+                <td colspan="7" class="center">
+                    <i>Silahkan tambahkan bahan / biaya...</i>
+                </td>
+            </tr>
+        `);
+    }
 
-        $('.row_cost').each(function(){
-            $(this).remove();
+    function countAll(){
+        $('input[name^="arr_qty"]').each(function(index){
+            let total = 0, qty = 0, nominal = 0;
+            qty = parseFloat($('input[name^="arr_qty"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            nominal = parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            total = qty * nominal;
+            $('input[name^="arr_total"]').eq(index).val(
+                (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
+            );
         });
     }
 
-    function addMaterial(){
-        var count = $('select[name^="arr_item"]').length;
-        $('#last-row-material').before(`
-            <tr class="row_material">
+    function addDetail(param){
+        if($('#empty-row-detail').length > 0){
+            $('#empty-row-detail').remove();
+        }
+        var count = makeid(10);
+        $('#body-detail').append(`
+            <tr class="row_detail">
+                <input name="arr_type[]" value="` + param + `" type="hidden">
                 <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit(` + count + `)"></select>
+                    <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `')"></select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this)">
+                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
                 </td>
                 <td class="center">
                     <span id="arr_satuan` + count + `">-</span>
                 </td>
                 <td>
-                    <input name="arr_description_material[]" type="text" placeholder="Deskripsi item material">
+                    <input name="arr_nominal[]" type="text" value="0" onkeyup="formatRupiah(this);countAll();" ` + (param == 'items' ? 'readonly' : '') + `>
+                </td>
+                <td>
+                    <input name="arr_total[]" type="text" value="0" onkeyup="formatRupiah(this);" readonly>
+                </td>
+                <td>
+                    <input name="arr_description[]" type="text" placeholder="Deskripsi item material">
                 </td>
                 <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-material" href="javascript:void(0);">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
-    }
-
-    function addCost(){
-        var count = $('select[name^="arr_coa"]').length;
-        $('#last-row-cost').before(`
-            <tr class="row_cost">
-                <td>
-                    <input name="arr_description_cost[]" type="text" placeholder="Deskripsi cost material">
-                </td>
-                <td>
-                    <select class="browser-default cost-array" id="arr_coa` + count + `" name="arr_coa[]"></select>
-                </td>
-                <td>
-                    <input name="arr_nominal[]" type="text" value="0" onkeyup="formatRupiah(this)">
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-cost" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        if(param == 'items'){
+            select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/item") }}');
+        }else if(param == 'coas'){
+            select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/coa") }}');
+        }
     }
 
     function getRowUnit(val){
-        $('#arr_satuan' + val).text($("#arr_item" + val).select2('data')[0].uom);
+        if($("#arr_detail" + val).val()){
+            $('#arr_satuan' + val).text($("#arr_detail" + val).select2('data')[0].uom);
+        }else{
+            $('#arr_satuan' + val).text('-');
+        }
     }
 
     function getCodeAndName(){
@@ -479,69 +437,82 @@
 	}
 
     function save(){
-			
-        var formData = new FormData($('#form_data')[0]);
-        
-        $.ajax({
-            url: '{{ Request::url() }}/create',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    success();
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
-                    
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
 
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
+        swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data')[0]);
+        
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
                         });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+                    }
                 });
             }
         });
@@ -591,57 +562,47 @@
 
                 resetDetailForm();
 
-                $.each(response.material, function(i, val) {
-                    $('#last-row-material').before(`
-                        <tr class="row_material">
+                $.each(response.details, function(i, val) {
+                    if($('#empty-row-detail').length > 0){
+                        $('#empty-row-detail').remove();
+                    }
+                    var count = makeid(10);
+                    $('#body-detail').append(`
+                        <tr class="row_detail">
+                            <input name="arr_type[]" value="` + val.lookable_type + `" type="hidden">
                             <td>
-                                <select class="browser-default item-array" id="arr_item` + i + `" name="arr_item[]" onchange="getRowUnit(` + i + `)">
-                                    <option value="` + val.item_id + `">` + val.item_name + `</option>
-                                    </select>
+                                <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `')"></select>
                             </td>
                             <td>
-                                <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this)">
+                                <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countAll();">
                             </td>
                             <td class="center">
-                                <span id="arr_satuan` + i + `">` + val.uom_unit + `</span>
+                                <span id="arr_satuan` + count + `">` + val.uom_unit + `</span>
                             </td>
                             <td>
-                                <input name="arr_description_material[]" type="text" placeholder="Deskripsi item material" value="` + val.description + `">
+                                <input name="arr_nominal[]" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" ` + (val.lookable_type == 'items' ? 'readonly' : '') + `>
+                            </td>
+                            <td>
+                                <input name="arr_total[]" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly>
+                            </td>
+                            <td>
+                                <input name="arr_description[]" type="text" placeholder="Deskripsi item material" value="` + val.description + `">
                             </td>
                             <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-material" href="javascript:void(0);">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </td>
                         </tr>
                     `);
-
-                    select2ServerSide('#arr_item' + i, '{{ url("admin/select2/item") }}');
-                });
-
-                $.each(response.cost, function(i, val) {
-                    $('#last-row-cost').before(`
-                        <tr class="row_cost">
-                            <td>
-                                <input name="arr_description_cost[]" type="text" placeholder="Deskripsi cost material" value="` + val.description + `">
-                            </td>
-                            <td>
-                                <select class="browser-default cost-array" id="arr_coa` + i + `" name="arr_coa[]">
-                                    <option value="` + val.coa_id + `">` + val.coa_name + `</option>
-                                    </select>
-                            </td>
-                            <td>
-                                <input name="arr_nominal[]" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this)">
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-cost" href="javascript:void(0);">
-                                    <i class="material-icons">delete</i>
-                                </a>
-                            </td>
-                        </tr>
+                    $('#arr_detail' + count).append(`
+                        <option value="` + val.lookable_id + `">` + val.detail_text + `</option>
                     `);
-
-                    select2ServerSide('#arr_coa' + i, '{{ url("admin/select2/coa") }}');
+                    if(val.lookable_type == 'items'){
+                        select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/item") }}');
+                    }else if(val.lookable_type == 'coas'){
+                        select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/coa") }}');
+                    }
                 });
 
                 $('.modal-content').scrollTop(0);

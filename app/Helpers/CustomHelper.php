@@ -723,7 +723,7 @@ class CustomHelper {
 						]);
 					}
 
-					ResetCogs::dispatch($lc->post_date,$rowdetail->place_id,$rowdetail->item_id);
+					ResetCogs::dispatch($lc->goodReceipt->post_date,$rowdetail->place_id,$rowdetail->item_id);
 
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -1047,26 +1047,27 @@ class CustomHelper {
 				if($table_name == 'purchase_invoices'){
 					$pi = PurchaseInvoice::find($table_id);
 
-					foreach($pi->purchaseInvoiceDetail()->where('lookable_type','purchase_orders')->get() as $row){
-						$po = $row->lookable;
+					foreach($pi->purchaseInvoiceDetail()->where('lookable_type','purchase_order_details')->get() as $row){
+						$pod = $row->lookable;
 
-						foreach($po->purchaseOrderDetail as $rowpo){
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $rowpo->coa_id,
-								'place_id'		=> $rowpo->place_id,
-								'account_id'	=> $account_id,
-								'department_id'	=> $rowpo->department_id,
-								'type'			=> '1',
-								'nominal'		=> $rowpo->subtotal
-							]);
-							
-							$totalOutSide += $rowpo->subtotal;
-						}
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $pod->coa_id,
+							'place_id'		=> $pod->place_id,
+							'account_id'	=> $account_id,
+							'department_id'	=> $pod->department_id,
+							'type'			=> '1',
+							'nominal'		=> $pod->getArrayTotal()['total'],
+						]);
+						
+						$totalOutSide += $pod->getArrayTotal()['total'];
 					}
 
 					foreach($pi->purchaseInvoiceDetail()->where('lookable_type','coas')->get() as $row){
 						$coa = $row->lookable;
+
+						$typeround = $row->grandtotal >= 0 ? '1' : '2';
+						/* $typeenemy = $typeround == '1' ? '2' : '1'; */
 
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -1074,9 +1075,19 @@ class CustomHelper {
 							'place_id'		=> $row->place_id ? $row->place_id : NULL,
 							'account_id'	=> $account_id,
 							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'type'			=> $row->grandtotal >= 0 ? '1' : '2',
+							'type'			=> $typeround,
 							'nominal'		=> -1 * $row->grandtotal
 						]);
+
+						/* JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> Coa::where('code','200.01.03.01.01')->where('company_id',$pi->company_id)->first()->id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'type'			=> $typeenemy,
+							'nominal'		=> -1 * $row->grandtotal
+						]); */
 						
 						$totalOutSide += $row->grandtotal;
 					}
@@ -1109,7 +1120,7 @@ class CustomHelper {
 					
 					$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
 
-					if($totalOutSide > 0){
+					if($totalOutSide > 0 || $totalOutSide < 0){
 						if($row->field_name == 'total'){
 							$nominal -= $totalOutSide;
 						}

@@ -19,6 +19,10 @@ class GoodReceiptDetail extends Model
         'purchase_order_detail_id',
         'item_id',
         'qty',
+        'total',
+        'tax',
+        'wtax',
+        'grandtotal',
         'note',
         'remark',
         'place_id',
@@ -97,5 +101,38 @@ class GoodReceiptDetail extends Model
         $balance = $this->qty - $returned;
 
         return $balance;
+    }
+
+    public function qtyReturn(){
+        $returned = $this->goodReturnPODetail()->sum('qty');
+
+        return $returned;
+    }
+
+    public function purchaseInvoiceDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balanceInvoice(){
+        $total = round($this->grandtotal,2);
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $total -= $row->grandtotal;
+        }
+
+        return $total;
+    }
+
+    public function totalInvoice(){
+        $total = 0;
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $total += $row->grandtotal;
+        }
+
+        return $total;
     }
 }

@@ -80,7 +80,7 @@
                                                     <tr>
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
-                                                        <th rowspan="2">Site</th>
+                                                        <th rowspan="2">Plant</th>
                                                         <th rowspan="2">Departemen</th>
                                                         <th rowspan="2">Partner Bisnis</th>
                                                         <th rowspan="2">Tipe</th>
@@ -167,7 +167,7 @@
                                         <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="place_id">Site</label>
+                                <label class="" for="place_id">Plant</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="department_id" name="department_id">

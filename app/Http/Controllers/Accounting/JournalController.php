@@ -27,7 +27,7 @@ class JournalController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
     public function index()
     {
@@ -174,7 +174,7 @@ class JournalController extends Controller
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Perusahaan</th>
-                                <th class="center-align">Site</th>
+                                <th class="center-align">Plant</th>
                                 <th class="center-align">Bisnis Partner</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Departemen</th>

@@ -4,7 +4,7 @@
             <th>No</th>
             <th>Kode</th>
             <th>Nama</th>
-            <th>Pabrik</th>
+            <th>Plant</th>
             <th>Area</th>
             <th>Item</th>
             <th>Status</th>

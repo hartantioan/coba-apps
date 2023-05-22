@@ -1,22 +1,13 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Str;
+use App\Models\BomDetail;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Bom;
-use App\Models\BomMaterial;
-use App\Models\BomCost;
-use App\Models\Company;
-use App\Models\Item;
 use App\Models\Place;
-use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportBom;
@@ -154,10 +145,12 @@ class BomController extends Controller
             'qty_planned'               => 'required',
             'type'                      => 'required',
             'place_id'                  => 'required',
-            'arr_item'                  => 'required|array',
+            'arr_type'                  => 'required|array',
+            'arr_detail'                => 'required|array',
             'arr_qty'                   => 'required|array',
-            'arr_description_cost'      => 'required|array',
-            'arr_nominal'               => 'required|array'
+            'arr_description'           => 'required|array',
+            'arr_nominal'               => 'required|array',
+            'arr_total'                 => 'required|array'
         ], [
             'code.required'                 => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah terpakai',
@@ -166,15 +159,19 @@ class BomController extends Controller
             'qty_output.required'           => 'Jumlah output produksi tidak boleh kosong',
             'qty_planned.required'          => 'Jumlah rata-rata produksi tidak boleh kosong',
             'type.required'                 => 'Tipe bill of material tidak boleh kosong',
-            'place_id.required'             => 'Site tidak boleh kosong',
-            'arr_item.required'             => 'Material tidak boleh kosong',
-            'arr_item.array'                => 'Material haruslah dalam bentuk array',
+            'place_id.required'             => 'Plant tidak boleh kosong',
+            'arr_type.required'             => 'Tipe tidak boleh kosong',
+            'arr_type.array'                => 'Tipe haruslah dalam bentuk array',
+            'arr_detail.required'           => 'Detail item/biaya tidak boleh kosong',
+            'arr_detail.array'              => 'Detail item/biaya haruslah dalam bentuk array',
             'arr_qty.required'              => 'Jumlah material tidak boleh kosong',
             'arr_qty.array'                 => 'Jumlah material haruslah dalam bentuk array',
-            'arr_description_cost.required' => 'Deskripsi biaya tidak boleh kosong',
-            'arr_description_cost.array'    => 'Deskripsi biaya haruslah dalam bentuk array',
+            'arr_description.required'      => 'Deskripsi biaya tidak boleh kosong',
+            'arr_description.array'         => 'Deskripsi biaya haruslah dalam bentuk array',
             'arr_nominal.required'          => 'Nominal biaya tidak boleh kosong',
             'arr_nominal.array'             => 'Nominal biaya haruslah dalam bentuk array',
+            'arr_total.required'            => 'Total tidak boleh kosong',
+            'arr_total.array'               => 'Total haruslah dalam bentuk array',
         ]);
 
         if($validation->fails()) {
@@ -198,26 +195,7 @@ class BomController extends Controller
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
 
-                    $query->bomCost()->delete();
-                    $query->bomMaterial()->delete();
-
-                    foreach($request->arr_item as $key => $row){
-                        BomMaterial::create([
-                            'bom_id'        => $query->id,
-                            'item_id'       => $row,
-                            'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'description'   => $request->arr_description_material[$key]
-                        ]);
-                    }
-    
-                    foreach($request->arr_description_cost as $key => $row){
-                        BomCost::create([
-                            'bom_id'        => $query->id,
-                            'coa_id'        => isset($request->arr_coa[$key]) ? $request->arr_coa[$key] : NULL,
-                            'description'   => $request->arr_description_cost[$key],
-                            'nominal'       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]))
-                        ]);
-                    }
+                    $query->bomDetail()->delete();
 
                     DB::commit();
                 }catch(\Exception $e){
@@ -238,24 +216,6 @@ class BomController extends Controller
                         'status'            => $request->status ? $request->status : '2',
                     ]);
 
-                    foreach($request->arr_item as $key => $row){
-                        BomMaterial::create([
-                            'bom_id'        => $query->id,
-                            'item_id'       => $row,
-                            'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'description'   => $request->arr_description_material[$key]
-                        ]);
-                    }
-    
-                    foreach($request->arr_description_cost as $key => $row){
-                        BomCost::create([
-                            'bom_id'        => $query->id,
-                            'coa_id'        => $request->arr_coa[$key],
-                            'description'   => $request->arr_description_cost[$key],
-                            'nominal'       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]))
-                        ]);
-                    }
-
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
@@ -263,6 +223,18 @@ class BomController extends Controller
 			}
 			
 			if($query) {               
+
+                foreach($request->arr_type as $key => $row){
+                    BomDetail::create([
+                        'bom_id'        => $query->id,
+                        'lookable_type' => $row,
+                        'lookable_id'   => $request->arr_detail[$key],
+                        'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                        'nominal'       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                        'total'         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                        'description'   => $request->arr_description[$key]
+                    ]);
+                }
 
                 activity()
                     ->performedOn(new Bom())
@@ -291,66 +263,38 @@ class BomController extends Controller
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4">';
 
-        $string .= '<div class="col s6">
+        $string .= '<div class="col s12">
                         <table class="bordered">
                             <thead>
                                 <tr>
-                                    <th colspan="5" class="center">MATERIAL</th>
+                                    <th colspan="7" class="center">MATERIAL</th>
                                 </tr>
                                 <tr>
                                     <th class="center">No</th>
-                                    <th class="center">Item</th>
+                                    <th class="center">Bahan/Biaya</th>
+                                    <th class="center">Deskripsi</th>
                                     <th class="center">Qty</th>
                                     <th class="center">Satuan</th>
-                                    <th class="center">Deskripsi</th>
+                                    <th class="center">Nominal</th>
+                                    <th class="center">Total</th>
                                 </tr>
                             </thead>
                             <tbody>';
 
-        foreach($data->bomMaterial as $key => $m){
+        foreach($data->bomDetail as $key => $m){
             $string .= '<tr>
-                <td class="center">'.($key + 1).'</td>
-                <td>'.$m->item->name.'</td>
-                <td class="right">'.number_format($m->qty,3,',','.').'</td>
-                <td class="center">'.$m->item->uomUnit->code.'</td>
+                <td class="center-align">'.($key + 1).'</td>
+                <td>'.$m->lookable->code.' - '.$m->lookable->name.'</td>
                 <td>'.$m->description.'</td>
+                <td class="right-align">'.number_format($m->qty,3,',','.').'</td>
+                <td class="center-align">'.($m->lookable_type == 'items' ? $m->lookable->uomUnit->code : '-').'</td>
+                <td class="right-align">'.number_format($m->nominal,2,',','.').'</td>
+                <td class="right-align">'.number_format($m->total,2,',','.').'</td>
             </tr>';
         }
 
-        $string .= '</tbody>
-                        </table>
-                    </div>';
+        $string .= '</tbody></table></div></div>';
 
-        $string .= '<div class="col s6">
-                    <table class="bordered">
-                        <thead>
-                            <tr>
-                                <th colspan="4" class="center">BIAYA</th>
-                            </tr>
-                            <tr>
-                                <th class="center">No</th>
-                                <th class="center">Description</th>
-                                <th class="center">Coa</th>
-                                <th class="center">Nominal</th>
-                            </tr>
-                        </thead>
-                        <tbody>';
-
-    foreach($data->bomCost as $key => $c){
-        $string .= '<tr>
-            <td class="center">'.($key + 1).'</td>
-            <td>'.$c->description.'</td>
-            <td>'.($c->coa()->exists() ? $c->coa->name : '-').'</td>
-            <td class="right">'.number_format($c->nominal,3,',','.').'</td>
-        </tr>';
-    }
-
-    $string .= '</tbody>
-                    </table>
-                </div>';
-
-        $string .= '</div>';
-		
         return response()->json($string);
     }
 
@@ -360,30 +304,22 @@ class BomController extends Controller
         $bom['qty_output'] = number_format($bom->qty_output,3,',','.');
         $bom['qty_planned'] = number_format($bom->qty_planned,3,',','.');
 
-        $arrMaterial = [];
-        $arrCost = [];
+        $arr = [];
 
-        foreach($bom->bomMaterial as $m){
-            $arrMaterial[] = [
-                'item_id'       => $m->item_id,
-                'item_name'     => $m->item->name,
+        foreach($bom->bomDetail as $m){
+            $arr[] = [
+                'lookable_type' => $m->lookable_type,
+                'lookable_id'   => $m->lookable_id,
+                'detail_text'   => $m->lookable->code.' - '.$m->lookable->name,    
                 'qty'           => number_format($m->qty,3,',','.'),
-                'uom_unit'      => $m->item->uomUnit->code,
-                'description'   => $m->description
+                'uom_unit'      => $m->lookable_type == 'items' ? $m->lookable->uomUnit->code : '-',
+                'nominal'       => number_format($m->nominal,2,',','.'),
+                'total'         => number_format($m->total,2,',','.'),
+                'description'   => $m->description,
             ];
         }
 
-        foreach($bom->bomCost as $c){
-            $arrCost[] = [
-                'coa_id'        => $c->coa_id ? $c->coa_id : '',
-                'coa_name'      => $c->coa()->exists() ? $c->coa->name : '',
-                'description'   => $c->description,
-                'nominal'       => number_format($c->nominal,3,',','.'),
-            ];
-        }
-
-        $bom['material'] = $arrMaterial;
-        $bom['cost'] = $arrCost;
+        $bom['details'] = $arr;
         				
 		return response()->json($bom);
     }
@@ -392,8 +328,7 @@ class BomController extends Controller
         $query = Bom::find($request->id);
 		
         if($query->delete()) {
-            $query->bomCost()->delete();
-            $query->bomMaterial()->delete();
+            $query->bomDetail()->delete();
 
             activity()
                 ->performedOn(new Bom())

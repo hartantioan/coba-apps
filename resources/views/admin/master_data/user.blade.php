@@ -624,7 +624,7 @@
                             <div id="accessdata" class="col s12">
                                 <div class="row mt-1 center-align">
                                     <div class="col s12">
-                                        <h5 class="card-title center">Penempatan (Site)</h5>
+                                        <h5 class="card-title center">Penempatan (Plant)</h5>
                                         <table class="bordered centered">
                                             <thead>
                                                 <tr>
@@ -1336,12 +1336,12 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'name', className: 'center-align' },
+                { name: 'name', className: '' },
                 { name: 'username', className: 'center-align' },
                 { name: 'id_card', className: 'center-align' },
                 { name: 'type', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'action', searchable: false, orderable: false, className: 'right-align' },
             ],
             dom: 'Blfrtip',
             buttons: [

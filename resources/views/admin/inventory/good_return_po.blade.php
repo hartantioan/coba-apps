@@ -200,7 +200,7 @@
                                                     <th class="center">Qty Kembali</th>
                                                     <th class="center">Satuan</th>
                                                     <th class="center">Keterangan</th>
-                                                    <th class="center">Site</th>
+                                                    <th class="center">Plant</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Dari Gudang</th>
                                                     <th class="center">Hapus</th>

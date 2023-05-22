@@ -129,7 +129,7 @@
 						<th rowspan="2">No</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Code</th>
-                        <th rowspan="2">Site</th>
+                        <th rowspan="2">Plant</th>
                         <th rowspan="2">Departemen</th>
                         <th rowspan="2">Partner Bisnis</th>
 						<th rowspan="2">Tipe</th>

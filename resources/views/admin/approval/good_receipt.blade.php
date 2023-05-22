@@ -214,7 +214,7 @@
                         <th class="center">Sat.</th>
                         <th class="center">Keterangan</th>
                         <th class="center">Remark</th>
-                        <th class="center">Site</th>
+                        <th class="center">Plant</th>
                         <th class="center">Departemen</th>
                         <th class="center">Gudang</th>
                     </tr>

@@ -50,6 +50,10 @@ class AppServiceProvider extends ServiceProvider
             'good_returns'              => 'App\Models\GoodReturnPO',
             'coas'                      => 'App\Models\Coa',
             'purchase_memos'            => 'App\Models\PurchaseMemo',
+            'items'                     => 'App\Models\Item',
+            'good_receipt_details'      => 'App\Models\GoodReceiptDetail',
+            'purchase_order_details'    => 'App\Models\PurchaseOrderDetail',
+            'landed_cost_details'       => 'App\Models\LandedCostDetail',
         ]);
     }
 }

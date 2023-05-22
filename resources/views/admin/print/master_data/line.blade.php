@@ -128,14 +128,9 @@
 					<tr align="center">
 						<th>No</th>
 						<th>Kode</th>
-						<th>Nama</th>
                         <th>Plant</th>
-                        <th>Departemen</th>
-                        <th>Min Time In</th>
-                        <th>Time In</th>
-                        <th>Time Out</th>
-                        <th>Max Time Out</th>
-                        <th>Status</th>
+						<th>Nama</th>
+                        <th>Keterangan</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -143,14 +138,9 @@
                         <tr align="center">
                             <td>{{ $key+1 }}</td>
                             <td>{{ $row->code }}</td>
+                            <td>{{ $row->place->code.' - '.$row->place->name }}</td>
                             <td>{{ $row->name }}</td>
-                            <td>{{ $row->place->name }}</td>
-                            <td>{{ $row->department->name }}</td>
-                            <td>{{ date('H:i',strtotime($row->min_time_in)) }}</td>
-                            <td>{{ date('H:i',strtotime($row->time_in)) }}</td>
-                            <td>{{ date('H:i',strtotime($row->time_out)) }}</td>
-                            <td>{{ date('H:i',strtotime($row->max_time_out)) }}</td>
-                            <td>{!! $row->status() !!}</td>
+                            <td>{{ $row->note }}</td>
                         </tr>
 					@endforeach
 				</tbody>

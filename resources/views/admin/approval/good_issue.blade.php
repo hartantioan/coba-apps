@@ -202,7 +202,7 @@
                     <th class="center">Harga @</th>
                     <th class="center">Harga Total.</th>
                     <th class="center">Coa</th>
-                    <th class="center">Site</th>
+                    <th class="center">Plant</th>
                     <th class="center">Departemen</th>
                     <th class="center">Dari Gudang</th>
                     <th class="center">Keterangan</th>

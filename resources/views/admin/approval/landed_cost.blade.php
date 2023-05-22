@@ -229,7 +229,7 @@
                 <thead>
                     <tr>
                         <th class="center">No</th>
-                        <th class="center">Site</th>
+                        <th class="center">Plant</th>
                         <th class="center">Departemen</th>
                         <th class="center">Gudang</th>
                         <th class="center">Item</th>

@@ -332,7 +332,7 @@
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan (UOM)</th>
                                                     <th class="center">Harga Total</th>
-                                                    <th class="center">Site</th>
+                                                    <th class="center">Plant</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                 </tr>
@@ -855,7 +855,7 @@
 
             $('input[name^="arr_total"]').each(function(index){
                 let totalrow = (parseFloat($(this).val()) / totalall) * total;
-                $('input[name^="arr_price"]:eq(' + index + ')').val(formatRupiahIni(totalrow.toFixed(5).toString().replace('.',',')));
+                $('input[name^="arr_price"]:eq(' + index + ')').val(formatRupiahIni(totalrow.toFixed(2).toString().replace('.',',')));
             })
         }
     }

@@ -128,7 +128,7 @@
                         <div class="input-field col s6">
                             <select class="form-control" id="type" name="type">
                                 <option value="1">Kantor/Office</option>
-                                <option value="2">Site</option>
+                                <option value="2">Pabrik/Plant</option>
                             </select>
                             <label class="" for="type">Tipe</label>
                         </div>

@@ -155,7 +155,7 @@
                                         <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                     @endforeach
                                 </select>    
-                                <label for="place_id">Site</label>
+                                <label for="place_id">Plant</label>
                             </div>
                             
                             <div class="input-field col m4 s12">

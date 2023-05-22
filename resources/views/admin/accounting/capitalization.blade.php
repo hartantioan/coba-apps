@@ -194,7 +194,7 @@
                                         <th class="center">No.</th>
                                         <th class="center">Kode Aset</th>
                                         <th class="center">Nama Aset</th>
-                                        <th class="center">Site</th>
+                                        <th class="center">Plant</th>
                                         <th class="center">Harga@</th>
                                         <th class="center">Qty</th>
                                         <th class="center">Unit</th>

@@ -32,7 +32,7 @@ class WorkOrderController extends Controller
     public function __construct(){
         $user = User::find(session('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
 
     public function index(Request $request)
@@ -212,7 +212,7 @@ class WorkOrderController extends Controller
             'request_date'              => 'required',
             
 		], [
-			'place_id.required' 			    => 'Penempatan Site tidak boleh kosong.',
+			'place_id.required' 			    => 'Penempatan Plant tidak boleh kosong.',
             'equipment_id.required'                 => 'Peralatan tidak boleh kosong.',
             'activity_id.required'            => 'Aktivitas tidak boleh kosong.',
             'area_id.required'                => 'Area tidak boleh kosong.',

@@ -33,7 +33,7 @@ class PurchaseDownPaymentController extends Controller
     public function __construct(){
         $user = User::find(Session::get('bo_id'));
 
-        $this->dataplaces = $user->userPlaceArray();
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
 
     public function index(Request $request)

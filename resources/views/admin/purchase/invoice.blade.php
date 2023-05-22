@@ -264,7 +264,7 @@
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="width:2200px !important;">
+                                        <table class="bordered" style="width:2800px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">
@@ -277,22 +277,31 @@
                                                     <th class="center">NO.PO</th>
                                                     <th class="center">No.SJ</th>
                                                     <th class="center">Item / Coa Jasa</th>
+                                                    <th class="center">Satuan</th>
+                                                    <th class="center">Qty Diterima</th>
+                                                    <th class="center">Qty Kembali</th>
+                                                    <th class="center">Qty Sisa</th>
+                                                    <th class="center">Harga@</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Tenggat</th>
                                                     <th class="center">Total</th>
-                                                    <th class="center">PPN</th>
-                                                    <th class="center">PPH</th>
+                                                    <th class="center">PPN (%)</th>
+                                                    <th class="center">Termasuk PPN</th>
+                                                    <th class="center">PPN (Rp)</th>
+                                                    <th class="center">PPH (%)</th>
+                                                    <th class="center">PPH (Rp)</th>
                                                     <th class="center">Grandtotal</th>
                                                     <th class="center">Keterangan</th>
-                                                    <th class="center">Site</th>
+                                                    <th class="center">Plant</th>
                                                     <th class="center">Departemen</th>
+                                                    <th class="center">Gudang</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="14" class="center">
+                                                    <td colspan="23">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> New Item
+                                                            <i class="material-icons left">add</i> Pembulatan Manual
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -413,6 +422,75 @@
     </div>
 </div>
 
+<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h5>Lampiran Dokumen <b id="account_name"></b></h5>
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <ul class="collapsible">
+                            <li class="active">
+                                <div class="collapsible-header purple lightrn-1 white-text">
+                                    <i class="material-icons">layers</i> Goods Receipt / Landed Cost / Purchase Order (Jasa)
+                                </div>
+                                <div class="collapsible-body">
+                                    <table id="table_multi" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="center-align">
+                                                    <label>
+                                                        <input type="checkbox" onclick="chooseAll(this)">
+                                                        <span>Semua</span>
+                                                    </label>
+                                                </th>
+                                                <th class="center-align">GR/LC/PO No.</th>
+                                                <th class="center-align">Tgl.Post</th>
+                                                <th class="center-align">Grandtotal</th>
+                                                <th class="center-align">Ter-Invoice</th>
+                                                <th class="center-align">Sisa</th>
+                                                <th class="center-align">Keterangan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-multi"></tbody>
+                                    </table>
+                                </div>
+                            </li>
+                            <li class="active">
+                                <div class="collapsible-header cyan white-text">
+                                    <i class="material-icons">more</i> Purchase Down Payment
+                                </div>
+                                <div class="collapsible-body">
+                                    <table id="table_multi_dp" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">
+                                                    <label>
+                                                        <input type="checkbox" onclick="chooseAllDp(this)">
+                                                        <span>Semua</span>
+                                                    </label>
+                                                </th>
+                                                <th class="center">Purchase DP No.</th>
+                                                <th class="center">Tgl.Post</th>
+                                                <th class="center">Nominal</th>
+                                                <th class="center">Sisa</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-dp-multi"></tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -421,6 +499,7 @@
 
 <!-- END: Page Main-->
 <script>
+    var table_multi, table_multi_dp;
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
@@ -509,6 +588,44 @@
                     `<div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;"></div>
                     `
                 );
+            }
+        });
+
+        $('#modal4').modal({
+            onOpenStart: function(modal,trigger) {
+                $('.collapsible').collapsible({
+                    accordion:false
+                });
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_multi = $('#table_multi').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[1, 'asc']],
+                    "columnDefs": [
+                        { "orderable": false, "targets": 0 }
+                    ]
+                });
+                table_multi_dp = $('#table_multi_dp').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[1, 'asc']],
+                    "columnDefs": [
+                        { "orderable": false, "targets": 0 }
+                    ]
+                });
+                $('select[name="table_multi_length"]').addClass('browser-default');
+                $('select[name="table_multi_dp_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-multi,#body-detail-dp-multi').empty();
+                $('#account_name').text('');
+                $('#preview_data').html('');
+                $('#table_multi,#table_multi_dp').DataTable().clear().destroy();
             }
         });
 
@@ -668,7 +785,7 @@
     }
 
     function getGrLcPo(val){
-        if(val){
+        /* if(val){
             $.ajax({
                 url: '{{ Request::url() }}/get_gr_lc',
                 type: 'POST',
@@ -692,11 +809,20 @@
                             $('#last-row-detail').before(`
                                 <tr class="row_detail">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_price[]" value="` + val.price + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_include_tax` + count + `" name="arr_include_tax[]" value="` + val.include_tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
                                     <td class="center-align">
                                         <label>
-                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
+                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `">
                                             <span>Pilih</span>
                                         </label>
                                     </td>
@@ -710,7 +836,22 @@
                                         ` + val.delivery_no + `
                                     </td>
                                     <td class="">
-                                        ` + val.list_item + `
+                                        ` + val.name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.buy_unit + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.qty_received + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.qty_returned + `
+                                    </td>
+                                    <td class="center">
+                                        <input class="browser-default" type="text" name="arr_qty[]" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.price + `
                                     </td>
                                     <td class="center">
                                         ` + val.post_date + `
@@ -718,21 +859,32 @@
                                     <td class="center">
                                         ` + val.due_date + `
                                     </td>
-                                    <td class="right-align">
+                                    <td class="right-align row_total" id="row_total` + count + `">
                                         ` + val.total + `
                                     </td>
+                                    <td class="center">
+                                        ` + val.percent_tax + `
+                                    </td>
+                                    <td class="center">
+                                        ` + (val.include_tax == '1' ? 'Ya' : 'Tidak') + `
+                                    </td>
                                     <td class="right-align" id="row_tax` + count + `">
-                                        <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
-                                    
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.percent_wtax + `
                                     </td>
                                     <td class="right-align" id="row_wtax` + count + `">
-                                        <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        ` + val.wtax + `    
                                     </td>
-                                    <td class="right-align" id="row_grandtotal` + count + `">
+                                    <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                         ` + val.grandtotal + `
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                        <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                    </td>
+                                    <td class="center">
+                                        -
                                     </td>
                                     <td class="center">
                                         -
@@ -811,7 +963,105 @@
             $('#top').val('0');
             $('#due_date').val('');
             $('#total,#tax,#wtax,#balance').text('0,00');
-        }
+        } */
+
+        if(val){
+            $.ajax({
+                url: '{{ Request::url() }}/get_account_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: val
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#modal4').modal('open');
+                    $('#account_name').text($('#account_id').select2('data')[0].text);
+
+                    if(response.details.length > 0){
+                        for(var i=0;i<25;i++){
+                            $.each(response.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-detail-multi').append(`
+                                    <tr>
+                                        <td class="center-align">
+                                            <label>
+                                                <input type="checkbox" id="check` + count + `" name="arr_id[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `">
+                                                <span>Pilih</span>
+                                            </label>
+                                        </td>
+                                        <td class="center">
+                                            ` + val.code + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.invoice + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.balance + `
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.info + `
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }               
+                    }
+
+                    if(response.downpayments.length > 0){
+                        $.each(response.downpayments, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-detail-dp').append(`
+                                <tr class="row_detail_dp">
+                                    <td class="center-align">
+                                        <label>
+                                            <input type="checkbox" id="check` + count + `" name="arr_dp_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
+                                            <span>Pilih</span>
+                                        </label>
+                                    </td>
+                                    <td class="center">
+                                        ` + val.rawcode + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.balance + `
+                                    </td>
+                                </tr>
+                            `);
+                        });                        
+                    }
+                    
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }      
     }
 
     function addItem(){
@@ -819,6 +1069,10 @@
         $('#last-row-detail').before(`
             <tr class="row_detail">
                 <input type="hidden" name="arr_type[]" value="coas" data-id="` + count + `">
+                <input type="hidden" name="arr_total[]" value="0" data-id="` + count + `">
+                <input type="hidden" name="arr_tax[]" value="0" data-id="` + count + `">
+                <input type="hidden" name="arr_wtax[]" value="0" data-id="` + count + `">
+                <input type="hidden" name="arr_grandtotal[]" value="0" data-id="` + count + `">
                 <td class="center-align">
                     <label>
                         <input type="checkbox" id="check` + count + `" name="arr_code[]" value="" onclick="countAll();" data-id="` + count + `">
@@ -834,7 +1088,10 @@
                 <td class="center">
                     -
                 </td>
-                <td class="">
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
                     -
                 </td>
                 <td class="center">
@@ -843,20 +1100,44 @@
                 <td class="center">
                     -
                 </td>
-                <td class="right-align">
-                    <input type="text" name="arr_total[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                <td class="center">
+                    <input class="browser-default" type="text" name="arr_qty[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
+                </td>
+                <td class="center">
+                    <input class="browser-default" type="text" name="arr_price[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="right-align row_total" id="row_total` + count + `">
+                    0
+                </td>
+                <td class="center">
+                    <input class="browser-default" type="text" name="arr_percent_tax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
+                        <option value="0">Tidak</option>
+                        <option value="1">Ya</option>
+                    </select>
                 </td>
                 <td class="right-align" id="row_tax` + count + `">
-                    <input type="text" name="arr_tax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                    <input class="browser-default" type="text" name="arr_tax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                </td>
+                <td class="center">
+                    <input class="browser-default" type="text" name="arr_percent_wtax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
                 </td>
                 <td class="right-align" id="row_wtax` + count + `">
-                    <input type="text" name="arr_wtax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                    <input class="browser-default" type="text" name="arr_wtax[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
                 </td>
-                <td class="right-align">
-                    <input type="text" name="arr_grandtotal[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                    0
                 </td>
                 <td>
-                    <input type="text" name="arr_note[]" value="-" data-id="` + count + `">
+                    <input type="text" name="arr_note[]" value="Pembulatan ..." data-id="` + count + `">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -872,6 +1153,14 @@
                         @endforeach
                     </select>
                 </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                        <option value="">--Kosong--</option>
+                        @foreach ($warehouse as $row)
+                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
             </tr>
         `);
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
@@ -882,13 +1171,37 @@
         
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
-                var rowgrandtotal = 0;
                 let element = $(this);
                 if($(element).is(':checked')){
-                    total += parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                    tax += parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                    wtax += parseFloat($('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                    rowgrandtotal = parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")) + parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")) - parseFloat($('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('input[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('input[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                    rowtotal = rowprice * rowqty;
+                    if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
+                        rowtotal = rowtotal / (1 + (percent_tax / 100));
+                    }
+                    rowtax = rowtotal * (percent_tax / 100);
+                    rowwtax = rowtotal * (percent_wtax / 100);
+                    $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
+                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                    );
+                    $('#row_total' + element.data('id')).text(
+                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                    );
+                    $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
+                        (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
+                    );
+                    $('#row_tax' + element.data('id')).text(
+                        (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
+                    );
+                    $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
+                        (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
+                    );
+                    $('#row_wtax' + element.data('id')).text(
+                        (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
+                    );
+                    total += rowtotal;
+                    tax += rowtax;
+                    wtax += rowwtax;
+                    rowgrandtotal = rowtotal + rowtax - rowwtax;
                     grandtotal += rowgrandtotal;
                     $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
                         (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
@@ -928,31 +1241,35 @@
     }
 
     function chooseAll(element){
-        if($(element).is(':checked')){
-            $('input[name^="arr_code"]').each(function(){
+        /* if($(element).is(':checked')){
+            $('input[name^="arr_id"]').each(function(){
                 if(!$(this).is(':checked')){
                     $(this).prop( "checked", true);
                 }
             });
         }else{
-            $('input[name^="arr_code"]').each(function(){
+            $('input[name^="arr_id"]').each(function(){
                 if($(this).is(':checked')){
                     $(this).prop( "checked", false);
                 }
             });
         }
-        countAll();
+        countAll(); */
+        rowcollection = table_multi.$('input[name^="arr_id"]:checked', {"page": "all"});
+        rowcollection.each(function(index,elem){
+            alert($(elem).val());
+        });
     }
 
     function chooseAllDp(element){
         if($(element).is(':checked')){
-            $('input[name^="arr_dp_code"]').each(function(){
+            $('input[name^="arr_dp_id"]').each(function(){
                 if(!$(this).is(':checked')){
                     $(this).prop( "checked", true);
                 }
             });
         }else{
-            $('input[name^="arr_dp_code"]').each(function(){
+            $('input[name^="arr_dp_id"]').each(function(){
                 if($(this).is(':checked')){
                     $(this).prop( "checked", false);
                 }
@@ -1086,13 +1403,14 @@
                 formData.delete("arr_note[]");
                 formData.delete("arr_place[]");
                 formData.delete("arr_department[]");
+                formData.delete("arr_warehouse[]");
 
                 $('input[name^="arr_code"]').each(function(){
                     passed = true;
                     if($(this).is(':checked')){
                         if($('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val() == 'coas'){
                             if($('#arr_coa' + $(this).data('id')).val()){
-                                formData.append('arr_code[]',$('#arr_coa' + $(this).data('id')).select2('data')[0].code);
+                                formData.append('arr_code[]',$('#arr_coa' + $(this).data('id')).val());
                             }else{
                                 passed = false;
                             }
@@ -1106,12 +1424,9 @@
                             formData.append('arr_wtax[]',$('input[name^="arr_wtax"][data-id="' + $(this).data('id') + '"]').val());
                             formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
                             formData.append('arr_note[]',$('input[name^="arr_note"][data-id="' + $(this).data('id') + '"]').val());
-                            formData.append('arr_place[]',(
-                                $('#arr_place' + $(this).data('id')).length > 0 ? $('#arr_place' + $(this).data('id')).val() : ''
-                            ));
-                            formData.append('arr_department[]',(
-                                $('#arr_department' + $(this).data('id')).length > 0 ? $('#arr_department' + $(this).data('id')).val() : ''
-                            ));
+                            formData.append('arr_place[]',$('#arr_place' + $(this).data('id')).val());
+                            formData.append('arr_department[]',$('#arr_department' + $(this).data('id')).val());
+                            formData.append('arr_warehouse[]',$('#arr_warehouse' + $(this).data('id')).val());
                         }
                     }
                 });
@@ -1260,85 +1575,201 @@
                     $('.row_detail').remove();
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        var optionPlace = `-`;
-                        var optionDepartment = `-`;
-                        if(val.place_id){
-                            optionPlace = `
-                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            `;
-                        }
-                        if(val.department_id){
-                            optionDepartment = `
-                                <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
-                                    @foreach ($department as $rowdept)
-                                        <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                                    @endforeach
-                                </select>
-                            `;
-                        }
-                        $('#last-row-detail').before(`
-                            <tr class="row_detail">
-                                <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
-                                <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
-                                <td class="center-align">
-                                    <label>
-                                        <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
-                                        <span>Pilih</span>
-                                    </label>
-                                </td>
-                                <td class="center">
-                                    ` + val.rawcode + `
-                                </td>
-                                <td class="center">
-                                    ` + val.purchase_no + `
-                                </td>
-                                <td class="center">
-                                    ` + val.delivery_no + `
-                                </td>
-                                <td class="">
-                                    ` + val.list_item + `
-                                </td>
-                                <td class="center">
-                                    ` + val.post_date + `
-                                </td>
-                                <td class="center">
-                                    ` + val.due_date + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.total + `
-                                </td>
-                                <td class="right-align" id="row_tax` + count + `">
-                                    <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
-                                </td>
-                                <td class="right-align" id="row_wtax` + count + `">
-                                    <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
-                                </td>
-                                <td class="right-align" id="row_grandtotal` + count + `">
-                                    ` + val.grandtotal + `
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
-                                </td>
-                                <td class="center">
-                                    ` + optionPlace + `
-                                </td>
-                                <td class="center">
-                                    ` + optionDepartment + `
-                                </td>
-                            </tr>
-                        `);
-
-                        if(val.place_id){
+                        if(val.type == 'coas'){
+                            $('#last-row-detail').before(`
+                                <tr class="row_detail">
+                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                    <td class="center-align">
+                                        <label>
+                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="" onclick="countAll();" data-id="` + count + `" checked>
+                                            <span>Pilih</span>
+                                        </label>
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        <input class="browser-default" type="text" name="arr_qty[]" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
+                                    </td>
+                                    <td class="center">
+                                        <input class="browser-default" type="text" name="arr_price[]" value="` + val.price + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="right-align row_total" id="row_total` + count + `">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="center">
+                                        <input class="browser-default" type="text" name="arr_percent_tax[]" value="` + val.percent_tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
+                                            <option value="0">Tidak</option>
+                                            <option value="1">Ya</option>
+                                        </select>
+                                    </td>
+                                    <td class="right-align" id="row_tax` + count + `">
+                                        <input class="browser-default" type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                                    </td>
+                                    <td class="center">
+                                        <input class="browser-default" type="text" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
+                                    </td>
+                                    <td class="right-align" id="row_wtax` + count + `">
+                                        <input class="browser-default" type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                                    </td>
+                                    <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                            @foreach ($department as $rowdept)
+                                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($warehouse as $row)
+                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                </tr>
+                            `);
+                            $('#arr_include_tax' + count).val(val.include_tax);
                             $('#arr_place' + count).val(val.place_id);
-                        }
-
-                        if(val.department_id){
                             $('#arr_department' + count).val(val.department_id);
+                            $('#arr_warehouse' + count).val(val.warehouse_id);
+                            $('#arr_coa' + count).append(`
+                                <option value="` + val.lookable_id + `">` + val.name + `</option>
+                            `);
+                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        }else{
+                            $('#last-row-detail').before(`
+                                <tr class="row_detail">
+                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_price[]" value="` + val.price + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_include_tax` + count + `" name="arr_include_tax[]" value="` + val.include_tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
+                                    <td class="center-align">
+                                        <label>
+                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `" checked>
+                                            <span>Pilih</span>
+                                        </label>
+                                    </td>
+                                    <td class="center">
+                                        ` + val.rawcode + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.purchase_no + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.delivery_no + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.buy_unit + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.qty_received + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.qty_returned + `
+                                    </td>
+                                    <td class="center">
+                                        <input class="browser-default" type="text" name="arr_qty[]" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.price + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.due_date + `
+                                    </td>
+                                    <td class="right-align row_total" id="row_total` + count + `">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.percent_tax + `
+                                    </td>
+                                    <td class="center">
+                                        ` + (val.include_tax == '1' ? 'Ya' : 'Tidak') + `
+                                    </td>
+                                    <td class="right-align" id="row_tax` + count + `">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.percent_wtax + `
+                                    </td>
+                                    <td class="right-align" id="row_wtax` + count + `">
+                                        ` + val.wtax + `    
+                                    </td>
+                                    <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td>
+                                        <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                    <td class="center">
+                                        -
+                                    </td>
+                                </tr>
+                            `);
                         }
                     });
                 }

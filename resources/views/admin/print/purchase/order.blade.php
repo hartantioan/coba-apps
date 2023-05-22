@@ -207,7 +207,7 @@
                                             <th>Discount 2 (%)</th>
                                             <th>Discount 3 (Rp)</th>
                                             <th>Subtotal</th>
-											<th>Site</th>
+											<th>Plant</th>
 											<th>Departemen</th>
 											<th>Gudang</th>
                                         </tr>

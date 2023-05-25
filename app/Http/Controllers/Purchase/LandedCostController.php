@@ -7,6 +7,7 @@ use App\Jobs\ResetStock;
 use App\Models\Company;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
+use App\Models\LandedCostFee;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\LandedCost;
 use App\Models\LandedCostDetail;
+use App\Models\LandedCostFeeDetail;
 use App\Models\PurchaseOrder;
 use App\Models\Currency;
 use App\Models\ItemCogs;
@@ -47,44 +49,99 @@ class LandedCostController extends Controller
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'landedcostfee' => LandedCostFee::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getGoodReceipt(Request $request){
-        $data = GoodReceipt::find($request->id);
-        
-        if($data->used()->exists()){
-            $data['status'] = '500';
-            $data['message'] = 'Goods Receipt '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
-        }else{
-            CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
+    public function getAccountData(Request $request){
+        $account = User::find($request->id);
 
-            $details = [];
-            
-            foreach($data->goodReceiptDetail as $row){
-                $details[] = [
-                    'item_id'                   => $row->item_id,
-                    'item_name'                 => $row->item->code.' - '.$row->item->name,
-                    'qty'                       => number_format($row->qtyConvert(),5,',','.'),
-                    'totalrow'                  => $row->getRowTotal(),
-                    'qtyRaw'                    => $row->qtyConvert(),
-                    'unit'                      => $row->item->uomUnit->code,
-                    'place_name'                => $row->place->name.' - '.$row->place->company->name,
-                    'department_name'           => $row->department->name,
-                    'warehouse_name'            => $row->warehouse->name,
-                    'place_id'                  => $row->place_id,
-                    'department_id'             => $row->department_id,
-                    'warehouse_id'              => $row->warehouse_id,
-                    'good_receipt_detail_id'    => $row->id
+        $goods_receipt = [];
+        $landed_cost = [];
+
+        $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->get();
+        
+        foreach($datagr as $row){
+            if(!$row->used()->exists()){
+                $goods_receipt[] = [
+                    'id'            => $row->id,
+                    'code'          => $row->code,
+                    'delivery_no'   => $row->delivery_no,
+                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                    'total'         => number_format($row->total,2,',','.'),
+                    'tax'           => number_format($row->tax,2,',','.'),
+                    'wtax'          => number_format($row->wtax,2,',','.'),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'note'          => $row->note,
                 ];
             }
+        }
+    
+        $datalc = LandedCost::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
-            $data['details'] = $details;
+        foreach($datalc as $row){
+            if(!$row->used()->exists()){
+                $landed_cost[] = [
+                    'id'            => $row->id,
+                    'code'          => $row->code,
+                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                    'total'         => number_format($row->total,2,',','.'),
+                    'tax'           => number_format($row->tax,2,',','.'),
+                    'wtax'          => number_format($row->wtax,2,',','.'),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'note'          => $row->note,
+                ];
+            }
         }
 
-        return response()->json($data);
+        $account['goods_receipt'] = $goods_receipt;
+        $account['landed_cost'] = $landed_cost;
+
+        return response()->json($account);
+    }
+
+    public function getGoodReceipt(Request $request){
+        $arr_main = [];
+
+        foreach($request->arr_gr_id as $row){
+            $data = GoodReceipt::find(intval($row));
+        
+            if($data->used()->exists()){
+                $data['status'] = '500';
+                $data['message'] = 'Goods Receipt '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+            }else{
+                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
+    
+                $details = [];
+                
+                foreach($data->goodReceiptDetail as $row){
+                    $details[] = [
+                        'item_id'                   => $row->item_id,
+                        'item_name'                 => $row->item->code.' - '.$row->item->name,
+                        'qty'                       => number_format($row->qtyConvert(),3,',','.'),
+                        'totalrow'                  => $row->getRowTotal(),
+                        'qtyRaw'                    => $row->qtyConvert(),
+                        'unit'                      => $row->item->uomUnit->code,
+                        'place_name'                => $row->place->name.' - '.$row->place->company->name,
+                        'department_name'           => $row->department->name,
+                        'warehouse_name'            => $row->warehouse->name,
+                        'place_id'                  => $row->place_id,
+                        'department_id'             => $row->department_id,
+                        'warehouse_id'              => $row->warehouse_id,
+                        'lookable_id'               => $row->id,
+                        'lookable_type'             => $row->getTable(),
+                    ];
+                }
+    
+                $data['details'] = $details;
+            }
+
+            $arr_main[] = $data;
+        }
+
+        return response()->json($arr_main);
     }
 
     public function datatable(Request $request){
@@ -94,10 +151,8 @@ class LandedCostController extends Controller
             'user_id',
             'account_id',
             'purchase_order_id',
-            'good_receipt_id',
             'company_id',
             'post_date',
-            'due_date',
             'reference',
             'currency_id',
             'currency_rate',
@@ -127,7 +182,6 @@ class LandedCostController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('reference', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
@@ -188,7 +242,6 @@ class LandedCostController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('reference', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
@@ -250,12 +303,10 @@ class LandedCostController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->vendor->name,
-                    $val->goodReceipt->code,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->due_date)),
                     $val->reference,
-                    $val->currency->code,
+                    $val->currency()->exists() ? $val->currency->code : '',
                     number_format($val->currency_rate,2,',','.'),
                     $val->isTax(),
                     $val->isIncludeTax(),
@@ -297,11 +348,9 @@ class LandedCostController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'good_receipt_id' 			=> 'required',
             'company_id' 			    => 'required',
 			'vendor_id'                 => 'required',
             'post_date'                 => 'required',
-            'due_date'                  => 'required',
             'currency_id'               => 'required',
             'currency_rate'             => 'required',
             'total'                     => 'required',
@@ -311,11 +360,9 @@ class LandedCostController extends Controller
             'arr_price'                 => 'required|array',
             'arr_qty'                   => 'required|array'
 		], [
-			'good_receipt_id.required' 			=> 'Goods receipt tidak boleh kosong.',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
 			'vendor_id.required'                => 'Vendor/ekspedisi tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
-            'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'total.required'                    => 'Total tagihan tidak boleh kosong.',
             'tax.required'                      => 'Total pajak tidak boleh kosong.',
@@ -334,8 +381,6 @@ class LandedCostController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
-            $gr = GoodReceipt::find($request->good_receipt_id);
             
             $total = str_replace(',','.',str_replace('.','',$request->total));
             $tax = str_replace(',','.',str_replace('.','',$request->tax));
@@ -371,10 +416,8 @@ class LandedCostController extends Controller
 
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->vendor_id;
-                        $query->good_receipt_id = $gr->id;
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
-                        $query->due_date = $request->due_date;
                         $query->reference = $request->reference;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
@@ -394,9 +437,9 @@ class LandedCostController extends Controller
 
                         $query->save();
 
-                        foreach($query->landedCostDetail as $row){
-                            $row->delete();
-                        }
+                        $query->landedCostDetail()->delete();
+
+                        $query->landedCostFeeDetail()->delete();
 
                         DB::commit();
                     }else{
@@ -416,10 +459,8 @@ class LandedCostController extends Controller
                         'code'			            => LandedCost::generateCode(),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->vendor_id,
-                        'good_receipt_id'	        => $gr->id,
                         'company_id'                => $request->company_id,
                         'post_date'                 => $request->post_date,
-                        'due_date'                  => $request->due_date,
                         'reference'                 => $request->reference,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
@@ -460,6 +501,20 @@ class LandedCostController extends Controller
                                 'department_id'         => $request->arr_department[$key],
                                 'warehouse_id'          => $request->arr_warehouse[$key],
                                 'good_receipt_detail_id'=> $request->arr_good_receipt[$key],
+                            ]);
+                        }
+
+                        foreach($request->arr_fee_id as $key => $row){
+                            LandedCostFeeDetail::create([
+                                'landed_cost_id'        => $query->id,
+                                'landed_cost_fee_id'    => $row,
+                                'total'                 => str_replace(',','.',str_replace('.','',$request->arr_fee_nominal[$key])),
+                                'is_include_tax'        => $request->arr_fee_include_tax[$key] ? $request->arr_fee_include_tax[$key] : '0', 
+                                'percent_tax'           => $request->arr_fee_tax[$key],
+                                'percent_wtax'          => $request->arr_fee_wtax[$key],
+                                'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_fee_tax_rp[$key])),
+                                'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_fee_wtax_rp[$key])),
+                                'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_fee_grandtotal[$key])),
                             ]);
                         }
                         DB::commit();
@@ -531,7 +586,7 @@ class LandedCostController extends Controller
             }
         }else{
             $string .= '<tr>
-                <td class="center-align" colspan="8">Data item tidak ditemukan.</td>
+                <td class="center-align" colspan="10">Data item tidak ditemukan.</td>
             </tr>';
         }
         
@@ -758,7 +813,6 @@ class LandedCostController extends Controller
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('post_date', 'like', "%$request->search%")
-                            ->orWhere('due_date', 'like', "%$request->search%")
                             ->orWhere('reference', 'like', "%$request->search%")
                             ->orWhere('total', 'like', "%$request->search%")
                             ->orWhere('tax', 'like', "%$request->search%")

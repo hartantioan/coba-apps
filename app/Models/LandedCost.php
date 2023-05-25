@@ -22,7 +22,6 @@ class LandedCost extends Model
         'good_receipt_id',
         'company_id',
         'post_date',
-        'due_date',
         'reference',
         'currency_id',
         'currency_rate',
@@ -68,11 +67,6 @@ class LandedCost extends Model
     {
         return $this->belongsTo('App\Models\Tax', 'wtax_id', 'id')->withTrashed();
     }
-    
-    public function goodReceipt()
-    {
-        return $this->belongsTo('App\Models\GoodReceipt', 'good_receipt_id', 'id')->withTrashed();
-    }
 
     public function currency()
     {
@@ -92,6 +86,11 @@ class LandedCost extends Model
     public function landedCostDetail()
     {
         return $this->hasMany('App\Models\LandedCostDetail');
+    }
+
+    public function landedCostFeeDetail()
+    {
+        return $this->hasMany('App\Models\LandedCostFeeDetail');
     }
 
     public function isIncludeTax(){

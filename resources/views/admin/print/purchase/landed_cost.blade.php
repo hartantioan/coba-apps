@@ -133,9 +133,8 @@
                         <th rowspan="2">LC NO.</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Vendor</th>
-                        <th rowspan="2">GR No.</th>
                         <th rowspan="2">Perusahaan</th>
-						<th colspan="2">Tanggal</th>
+						<th rowspan="2">Tanggal</th>
                         <th rowspan="2">Referensi</th>
                         <th colspan="2">Mata Uang</th>
                         <th colspan="3">PPN</th>
@@ -149,8 +148,6 @@
                         <th rowspan="2">Grandtotal</th>
 					</tr>
                     <tr align="center">
-						<th>Pengajuan</th>
-						<th>Tenggat</th>
                         <th>Kode</th>
                         <th>Konversi</th>
                         <th>Ya/Tidak</th>
@@ -167,10 +164,8 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->user->name }}</td>
 							<td>{{ $row->vendor->name }}</td>
-                            <td>{{ $row->goodReceipt->code }}</td>
                             <td>{{ $row->company->name }}</td>
                             <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
-                            <td>{{ date('d/m/y',strtotime($row->due_date)) }}</td>
                             <td>{{ $row->reference }}</td>
                             <td>{{ $row->currency->symbol }}</td>
                             <td>{{ $row->currency_rate }}</td>
@@ -188,7 +183,7 @@
                             <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan="23" style="border-right-style: none !important;">
+                            <td colspan="22" style="border-right-style: none !important;">
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
@@ -222,7 +217,7 @@
 					@endforeach
                     @if(count($data) == 0)
                         <tr>
-                            <td colspan="23" align="center">
+                            <td colspan="22" align="center">
                                 Data tidak ditemukan
                             </td>
                         </tr>

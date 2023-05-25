@@ -23,7 +23,8 @@ return new class extends Migration
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
-            $table->bigInteger('good_receipt_detail_id')->nullable();
+            $table->string('lookable_type',155)->nullable();
+            $table->bigInteger('lookable_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 

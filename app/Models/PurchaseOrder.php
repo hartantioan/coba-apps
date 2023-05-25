@@ -273,7 +273,7 @@ class PurchaseOrder extends Model
     }
 
     public function totalInvoice(){
-        $total = round($this->grandtotal,2);
+        $total = 0;
 
         foreach($this->purchaseOrderDetail as $row){
             $total += $row->totalInvoice();

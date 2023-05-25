@@ -32,6 +32,7 @@ class TaxController extends Controller
             'id',
             'code',
             'name',
+            'coa_id',
             'type',
             'percentage',
             'is_default_ppn',
@@ -86,6 +87,7 @@ class TaxController extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
+                    $val->coa()->exists() ? $val->coa->code.' - '.$val->coa->name : ' - ',
                     $val->type(),
                     number_format($val->percentage,2,',','.'),
                     $val->isDefaultPpn(),
@@ -118,12 +120,16 @@ class TaxController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('banks', 'code')->ignore($request->temp)] : 'required|unique:banks,code',
             'name'              => 'required',
+            'coa_id'            => 'required',
             'type'              => 'required',
+            'percentage'        => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
             'name.required'         => 'Nama tidak boleh kosong.',
-            'type.required'         => 'Tipe pajak tidak boleh kosong.'
+            'coa_id.required'       => 'Coa tidak boleh kosong.',
+            'type.required'         => 'Tipe pajak tidak boleh kosong.',
+            'percentage.required'   => 'Prosentase tidak boleh kosong.'
         ]);
 
         if($validation->fails()) {
@@ -138,6 +144,7 @@ class TaxController extends Controller
                     $query = Tax::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
+                    $query->coa_id          = $request->coa_id;
                     $query->type            = $request->type;
                     $query->percentage      = str_replace(',','.',str_replace('.','',$request->percentage));
                     $query->is_default_ppn  = $request->is_default_ppn ? $request->is_default_ppn : '0';
@@ -148,6 +155,7 @@ class TaxController extends Controller
                     $query = Tax::create([
                         'code'              => $request->code,
                         'name'			    => $request->name,
+                        'coa_id'            => $request->coa_id,
                         'type'              => $request->type,
                         'percentage'        => str_replace(',','.',str_replace('.','',$request->percentage)),
                         'is_default_ppn'    => $request->is_default_ppn ? $request->is_default_ppn : '0',
@@ -187,6 +195,7 @@ class TaxController extends Controller
     public function show(Request $request){
         $tax = Tax::find($request->id);
         $tax['percentage'] = number_format($tax->percentage,2,',','.');
+        $tax['coa_name'] = $tax->coa()->exists() ? $tax->coa->name.' - '.$tax->coa->name : '-';
         				
 		return response()->json($tax);
     }

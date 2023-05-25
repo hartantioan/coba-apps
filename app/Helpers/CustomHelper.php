@@ -695,7 +695,7 @@ class CustomHelper {
 			
 		}elseif($table_name == 'landed_costs'){
 
-			$arrCoa = [];
+			/* $arrCoa = [];
 
 			$lc = LandedCost::find($data->id);
 			
@@ -735,30 +735,19 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $rowdetail->nominal
 					]);
-
-					$journalMap = MenuCoa::whereHas('menu', function($query){
-						$query->where('table_name','landed_costs');
-					})
-					->whereHas('coa', function($query) use($data){
-						$query->where('company_id',$data->company_id);
-					})->get();
-	
-					foreach($journalMap as $row){
-						$nominal = $rowdetail->nominal * ($row->percentage / 100);
 						
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->coa_id,
-							'place_id'		=> $rowdetail->place_id,
-							'account_id'	=> $lc->account_id,
-							'department_id'	=> $rowdetail->department_id,
-							'warehouse_id'	=> $rowdetail->warehouse_id,
-							'type'			=> '2',
-							'nominal'		=> $nominal,
-						]);
-					}
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->coa_id,
+						'place_id'		=> $rowdetail->place_id,
+						'account_id'	=> $lc->account_id,
+						'department_id'	=> $rowdetail->department_id,
+						'warehouse_id'	=> $rowdetail->warehouse_id,
+						'type'			=> '2',
+						'nominal'		=> $nominal,
+					]);
 				}
-			}
+			} */
 		}elseif($table_name == 'fund_requests'){
 		
 		}elseif($table_name == 'capitalizations'){		

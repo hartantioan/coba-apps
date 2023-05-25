@@ -210,9 +210,9 @@ class GoodReceipt extends Model
     }
 
     public function totalInvoice(){
-        $total = round($this->grandtotal,2);
+        $total = 0;
 
-        foreach($this->goodReceiptDetail() as $row){
+        foreach($this->goodReceiptDetail as $row){
             $total += $row->totalInvoice();
         }
 

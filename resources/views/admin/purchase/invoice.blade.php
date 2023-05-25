@@ -14,6 +14,18 @@
     .browser-default {
         height: 2rem !important;
     }
+    
+    @media (min-width: 960px) {
+        #modal4 {
+            width:60%;
+        }
+    }
+
+    @media (max-width: 960px) {
+        #modal4 {
+            width:100%;
+        }
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -185,6 +197,7 @@
         <div class="row">
             <div class="col s12">
                 <h4>Tambah/Edit {{ $title }}</h4>
+                <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO, PO Jasa, LC, atau PO DP.</i>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -193,7 +206,7 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="getGrLcPo(this.value);"></select>
+                                <select class="browser-default" id="account_id" name="account_id" onchange="getAccountData(this.value);"></select>
                                 <label class="active" for="account_id">Supplier / Vendor</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -267,12 +280,6 @@
                                         <table class="bordered" style="width:2800px !important;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center">
-                                                        <label>
-                                                            <input type="checkbox" onclick="chooseAll(this)">
-                                                            <span>Semua</span>
-                                                        </label>
-                                                    </th>
                                                     <th class="center">GR/LC/PO/Coa No.</th>
                                                     <th class="center">NO.PO</th>
                                                     <th class="center">No.SJ</th>
@@ -299,7 +306,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="23">
+                                                    <td colspan="22">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Pembulatan Manual
                                                         </a>
@@ -317,12 +324,6 @@
                                         <table class="bordered">
                                             <thead>
                                                 <tr>
-                                                    <th class="center">
-                                                        <label>
-                                                            <input type="checkbox" onclick="chooseAllDp(this)">
-                                                            <span>Semua</span>
-                                                        </label>
-                                                    </th>
                                                     <th class="center">Purchase DP No.</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Nominal</th>
@@ -332,7 +333,7 @@
                                             </thead>
                                             <tbody id="body-detail-dp">
                                                 <tr id="empty-detail-dp">
-                                                    <td colspan="6" class="center">
+                                                    <td colspan="5" class="center">
                                                         Pilih supplier/vendor untuk memulai...
                                                     </td>
                                                 </tr>
@@ -422,11 +423,13 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-header ml-2">
+        <h5>Daftar Tunggakan Dokumen <b id="account_name"></b></h5>
+    </div>
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h5>Lampiran Dokumen <b id="account_name"></b></h5>
                 <div class="row">
                     <div class="col s12 mt-2">
                         <ul class="collapsible">
@@ -435,15 +438,11 @@
                                     <i class="material-icons">layers</i> Goods Receipt / Landed Cost / Purchase Order (Jasa)
                                 </div>
                                 <div class="collapsible-body">
+                                    <div id="datatable_buttons_multi"></div>
+                                    <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
                                     <table id="table_multi" class="display" width="100%">
                                         <thead>
                                             <tr>
-                                                <th class="center-align">
-                                                    <label>
-                                                        <input type="checkbox" onclick="chooseAll(this)">
-                                                        <span>Semua</span>
-                                                    </label>
-                                                </th>
                                                 <th class="center-align">GR/LC/PO No.</th>
                                                 <th class="center-align">Tgl.Post</th>
                                                 <th class="center-align">Grandtotal</th>
@@ -461,15 +460,10 @@
                                     <i class="material-icons">more</i> Purchase Down Payment
                                 </div>
                                 <div class="collapsible-body">
+                                    <div id="datatable_buttons_multi_dp"></div>
                                     <table id="table_multi_dp" class="display" width="100%">
                                         <thead>
                                             <tr>
-                                                <th class="center">
-                                                    <label>
-                                                        <input type="checkbox" onclick="chooseAllDp(this)">
-                                                        <span>Semua</span>
-                                                    </label>
-                                                </th>
                                                 <th class="center">Purchase DP No.</th>
                                                 <th class="center">Tgl.Post</th>
                                                 <th class="center">Nominal</th>
@@ -487,7 +481,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
     </div>
 </div>
 
@@ -603,21 +598,45 @@
                     scrollY: '50vh',
                     scrollCollapse: true,
                     "iDisplayInLength": 10,
-                    "order": [[1, 'asc']],
-                    "columnDefs": [
-                        { "orderable": false, "targets": 0 }
-                    ]
+                    "order": [[0, 'asc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        buttons: {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
                 });
                 table_multi_dp = $('#table_multi_dp').DataTable({
                     "responsive": true,
                     scrollY: '50vh',
                     scrollCollapse: true,
                     "iDisplayInLength": 10,
-                    "order": [[1, 'asc']],
-                    "columnDefs": [
-                        { "orderable": false, "targets": 0 }
-                    ]
+                    "order": [[0, 'asc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        buttons: {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
                 });
+                $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('#table_multi_dp_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi_dp');
                 $('select[name="table_multi_length"]').addClass('browser-default');
                 $('select[name="table_multi_dp_length"]').addClass('browser-default');
             },
@@ -754,6 +773,231 @@
             
     }
 
+    function applyDocuments(){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let passed = false, arr_id = [], arr_type = [], sametype = true;
+                $.map(table_multi.rows('.selected').nodes(), function (item) {
+                    passed = true;
+                    arr_id.push($(item).data('id'));
+                    arr_type.push($(item).data('type'));
+                });
+
+                $.map(table_multi_dp.rows('.selected').nodes(), function (item) {
+                    arr_id.push($(item).data('id'));
+                    arr_type.push($(item).data('type'));
+                });
+                
+                if(arr_type.length > 0){
+                    let arrResult = arr_type.filter((element, index) => {
+                        return arr_type.indexOf(element) === index;
+                    });
+
+                    let indexkuy = arrResult.indexOf('purchase_down_payments');
+                    arrResult.splice(indexkuy, 1);
+
+                    if(arrResult.length > 1){
+                        sametype = false;
+                    }
+                }
+
+                if(passed == true){
+                    if(sametype == true){
+                        $.ajax({
+                            url: '{{ Request::url() }}/get_gr_lc',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: {
+                                arr_id: arr_id,
+                                arr_type: arr_type, 
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                loadingOpen('.modal-content');
+                            },
+                            success: function(response) {
+                                loadingClose('.modal-content');
+                                $('.row_detail').remove();
+                                $('#body-detail-dp').empty();
+                                $('.row_detail').remove();
+                                if(response.details.length > 0){
+                                    $.each(response.details, function(i, val) {
+                                        var count = makeid(10);
+                                        $('#last-row-detail').before(`
+                                            <tr class="row_detail">
+                                                <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_price[]" value="` + val.price + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_include_tax` + count + `" name="arr_include_tax[]" value="` + val.include_tax + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
+                                                <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                                <td class="center">
+                                                    ` + val.rawcode + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.purchase_no + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.delivery_no + `
+                                                </td>
+                                                <td class="">
+                                                    ` + val.name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.buy_unit + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.qty_received + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.qty_returned + `
+                                                </td>
+                                                <td class="center">
+                                                    <input class="browser-default" type="text" name="arr_qty[]" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                                </td>
+                                                <td class="right-align">
+                                                    ` + val.price + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.post_date + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.due_date + `
+                                                </td>
+                                                <td class="right-align row_total" id="row_total` + count + `">
+                                                    ` + val.total + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.percent_tax + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + (val.include_tax == '1' ? 'Ya' : 'Tidak') + `
+                                                </td>
+                                                <td class="right-align" id="row_tax` + count + `">
+                                                    ` + val.tax + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.percent_wtax + `
+                                                </td>
+                                                <td class="right-align" id="row_wtax` + count + `">
+                                                    ` + val.wtax + `    
+                                                </td>
+                                                <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                                    ` + val.grandtotal + `
+                                                </td>
+                                                <td>
+                                                    <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                                </td>
+                                                <td class="center">
+                                                    -
+                                                </td>
+                                                <td class="center">
+                                                    -
+                                                </td>
+                                                <td class="center">
+                                                    -
+                                                </td>
+                                            </tr>
+                                        `);
+
+                                        $('#top').val(val.top);
+                                    });                        
+                                }else{
+                                    $('.row_detail').remove();
+                                    $('#total,#tax,#balance').text('0,00');
+                                }
+
+                                if(response.downpayments.length > 0){
+                                    $.each(response.downpayments, function(i, val) {
+                                        var count = makeid(10);
+                                        $('#body-detail-dp').append(`
+                                            <tr class="row_detail_dp">
+                                                <input type="hidden" name="arr_dp_code[]" value="` + val.code + `"onclick="countAll();" data-id="` + count + `">
+                                                <td class="center">
+                                                    ` + val.rawcode + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.post_date + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.grandtotal + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.balance + `
+                                                </td>
+                                                <td class="center">
+                                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
+                                                </td>
+                                            </tr>
+                                        `);
+                                    });                        
+                                }else{
+                                    $('#body-detail-dp').empty().append(`
+                                        <tr id="empty-detail-dp">
+                                            <td colspan="6" class="center">
+                                                Pilih supplier/vendor untuk memulai...
+                                            </td>
+                                        </tr>
+                                    `);
+
+                                    $('#downpayment').val('0,00');
+                                }
+
+                                addDays();
+                                
+                                $('.modal-content').scrollTop(0);
+                                M.updateTextFields();
+
+                                countAll();
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('.modal-content');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
+                                });
+                            }
+                        });
+                        $('#modal4').modal('close');
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Anda tidak boleh memilih tipe dokumen yang berbeda.',
+                            icon: 'warning'
+                        });
+                    }
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Silahkan, pilih GRPO, LC, atau PO Jasa yang ingin anda masukkan.',
+                        icon: 'warning'
+                    });
+                }
+            }
+        });
+    } 
+
     function viewStructureTree(id){
         $.ajax({
             url: '{{ Request::url() }}/viewstructuretree',
@@ -784,187 +1028,7 @@
         });
     }
 
-    function getGrLcPo(val){
-        /* if(val){
-            $.ajax({
-                url: '{{ Request::url() }}/get_gr_lc',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    id: val
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    $('.row_detail').remove();
-                    $('#body-detail-dp').empty();
-                    if(response.details.length > 0){
-                        $.each(response.details, function(i, val) {
-                            var count = makeid(10);
-                            $('#last-row-detail').before(`
-                                <tr class="row_detail">
-                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_price[]" value="` + val.price + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_include_tax` + count + `" name="arr_include_tax[]" value="` + val.include_tax + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
-                                    <td class="center-align">
-                                        <label>
-                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `">
-                                            <span>Pilih</span>
-                                        </label>
-                                    </td>
-                                    <td class="center">
-                                        ` + val.rawcode + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.purchase_no + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.delivery_no + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.name + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.buy_unit + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.qty_received + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.qty_returned + `
-                                    </td>
-                                    <td class="center">
-                                        <input class="browser-default" type="text" name="arr_qty[]" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.price + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.due_date + `
-                                    </td>
-                                    <td class="right-align row_total" id="row_total` + count + `">
-                                        ` + val.total + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.percent_tax + `
-                                    </td>
-                                    <td class="center">
-                                        ` + (val.include_tax == '1' ? 'Ya' : 'Tidak') + `
-                                    </td>
-                                    <td class="right-align" id="row_tax` + count + `">
-                                        ` + val.tax + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.percent_wtax + `
-                                    </td>
-                                    <td class="right-align" id="row_wtax` + count + `">
-                                        ` + val.wtax + `    
-                                    </td>
-                                    <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
-                                        ` + val.grandtotal + `
-                                    </td>
-                                    <td>
-                                        <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                </tr>
-                            `);
-
-                            $('#top').val(val.top);
-                        });                        
-                    }else{
-                        $('.row_detail').remove();
-                        $('#total,#tax,#balance').text('0,00');
-                    }
-
-                    if(response.downpayments.length > 0){
-                        $.each(response.downpayments, function(i, val) {
-                            var count = makeid(10);
-                            $('#body-detail-dp').append(`
-                                <tr class="row_detail_dp">
-                                    <td class="center-align">
-                                        <label>
-                                            <input type="checkbox" id="check` + count + `" name="arr_dp_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
-                                            <span>Pilih</span>
-                                        </label>
-                                    </td>
-                                    <td class="center">
-                                        ` + val.rawcode + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.grandtotal + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.balance + `
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
-                                    </td>
-                                </tr>
-                            `);
-                        });                        
-                    }else{
-                        $('#body-detail-dp').empty().append(`
-                            <tr id="empty-detail-dp">
-                                <td colspan="6" class="center">
-                                    Pilih supplier/vendor untuk memulai...
-                                </td>
-                            </tr>
-                        `);
-
-                        $('#downpayment').val('0,00');
-                    }
-
-                    addDays();
-                    
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-        }else{
-            $('.row_detail').remove();
-            $('#top').val('0');
-            $('#due_date').val('');
-            $('#total,#tax,#wtax,#balance').text('0,00');
-        } */
-
+    function getAccountData(val){
         if(val){
             $.ajax({
                 url: '{{ Request::url() }}/get_account_data',
@@ -985,52 +1049,37 @@
                     $('#account_name').text($('#account_id').select2('data')[0].text);
 
                     if(response.details.length > 0){
-                        for(var i=0;i<25;i++){
-                            $.each(response.details, function(i, val) {
-                                var count = makeid(10);
-                                $('#body-detail-multi').append(`
-                                    <tr>
-                                        <td class="center-align">
-                                            <label>
-                                                <input type="checkbox" id="check` + count + `" name="arr_id[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `">
-                                                <span>Pilih</span>
-                                            </label>
-                                        </td>
-                                        <td class="center">
-                                            ` + val.code + `
-                                        </td>
-                                        <td class="center">
-                                            ` + val.post_date + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.grandtotal + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.invoice + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.balance + `
-                                        </td>
-                                        <td class="center-align">
-                                            ` + val.info + `
-                                        </td>
-                                    </tr>
-                                `);
-                            });
-                        }               
+                        $.each(response.details, function(i, val) {
+                            $('#body-detail-multi').append(`
+                                <tr data-type="` + val.type + `" data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.invoice + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.balance + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.info + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
                     }
 
                     if(response.downpayments.length > 0){
                         $.each(response.downpayments, function(i, val) {
                             var count = makeid(10);
-                            $('#body-detail-dp').append(`
-                                <tr class="row_detail_dp">
-                                    <td class="center-align">
-                                        <label>
-                                            <input type="checkbox" id="check` + count + `" name="arr_dp_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
-                                            <span>Pilih</span>
-                                        </label>
-                                    </td>
+                            $('#body-detail-dp-multi').append(`
+                                <tr data-type="` + val.type + `" data-id="` + val.id + `">
                                     <td class="center">
                                         ` + val.rawcode + `
                                     </td>
@@ -1061,7 +1110,11 @@
                     });
                 }
             });
-        }      
+        }else{
+            $('#body-detail-dp').empty();
+            $('.row_detail').remove();
+            countAll();
+        }
     }
 
     function addItem(){
@@ -1073,12 +1126,6 @@
                 <input type="hidden" name="arr_tax[]" value="0" data-id="` + count + `">
                 <input type="hidden" name="arr_wtax[]" value="0" data-id="` + count + `">
                 <input type="hidden" name="arr_grandtotal[]" value="0" data-id="` + count + `">
-                <td class="center-align">
-                    <label>
-                        <input type="checkbox" id="check` + count + `" name="arr_code[]" value="" onclick="countAll();" data-id="` + count + `">
-                        <span>Pilih</span>
-                    </label>
-                </td>
                 <td class="center">
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
@@ -1169,57 +1216,49 @@
     function countAll(){
         var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, downpayment = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
         
-        if($('input[name^="arr_code"]').length > 0){
-            $('input[name^="arr_code"]').each(function(){
-                let element = $(this);
-                if($(element).is(':checked')){
-                    var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('input[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('input[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                    rowtotal = rowprice * rowqty;
-                    if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
-                        rowtotal = rowtotal / (1 + (percent_tax / 100));
-                    }
-                    rowtax = rowtotal * (percent_tax / 100);
-                    rowwtax = rowtotal * (percent_wtax / 100);
-                    $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
-                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
-                    );
-                    $('#row_total' + element.data('id')).text(
-                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
-                    );
-                    $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
-                        (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
-                    );
-                    $('#row_tax' + element.data('id')).text(
-                        (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
-                    );
-                    $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
-                        (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
-                    );
-                    $('#row_wtax' + element.data('id')).text(
-                        (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
-                    );
-                    total += rowtotal;
-                    tax += rowtax;
-                    wtax += rowwtax;
-                    rowgrandtotal = rowtotal + rowtax - rowwtax;
-                    grandtotal += rowgrandtotal;
-                    $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
-                        (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
-                    );
-                    $('#row_grandtotal' + element.data('id')).text(
-                        (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
-                    );
-                }
-            });
-        }
+        $('input[name^="arr_code"]').each(function(){
+            let element = $(this);
+            var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('input[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val()), percent_wtax = parseFloat($('input[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val()), rowprice = parseFloat($('input[name^="arr_price"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowqty = parseFloat($('input[name^="arr_qty"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+            rowtotal = rowprice * rowqty;
+            if(percent_tax > 0 && $('#arr_include_tax' + element.data('id')).val() == '1'){
+                rowtotal = rowtotal / (1 + (percent_tax / 100));
+            }
+            rowtax = rowtotal * (percent_tax / 100);
+            rowwtax = rowtotal * (percent_wtax / 100);
+            $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
+                (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+            );
+            $('#row_total' + element.data('id')).text(
+                (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+            );
+            $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
+                (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
+            );
+            $('#row_tax' + element.data('id')).text(
+                (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
+            );
+            $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
+                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
+            );
+            $('#row_wtax' + element.data('id')).text(
+                (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
+            );
+            total += rowtotal;
+            tax += rowtax;
+            wtax += rowwtax;
+            rowgrandtotal = rowtotal + rowtax - rowwtax;
+            grandtotal += rowgrandtotal;
+            $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
+                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
+            );
+            $('#row_grandtotal' + element.data('id')).text(
+                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
+            );
+        });
 
-        if($('input[name^="arr_dp_code"]').length > 0){
-            $('input[name^="arr_dp_code"]').each(function(index){
-                if($(this).is(':checked')){
-                    downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-                }
-            });
-        }
+        $('input[name^="arr_dp_code"]').each(function(index){
+            downpayment += parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+        });
 
         balance = grandtotal - downpayment + rounding;
 
@@ -1238,44 +1277,6 @@
         $('#balance').text(
             (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
         );
-    }
-
-    function chooseAll(element){
-        /* if($(element).is(':checked')){
-            $('input[name^="arr_id"]').each(function(){
-                if(!$(this).is(':checked')){
-                    $(this).prop( "checked", true);
-                }
-            });
-        }else{
-            $('input[name^="arr_id"]').each(function(){
-                if($(this).is(':checked')){
-                    $(this).prop( "checked", false);
-                }
-            });
-        }
-        countAll(); */
-        rowcollection = table_multi.$('input[name^="arr_id"]:checked', {"page": "all"});
-        rowcollection.each(function(index,elem){
-            alert($(elem).val());
-        });
-    }
-
-    function chooseAllDp(element){
-        if($(element).is(':checked')){
-            $('input[name^="arr_dp_id"]').each(function(){
-                if(!$(this).is(':checked')){
-                    $(this).prop( "checked", true);
-                }
-            });
-        }else{
-            $('input[name^="arr_dp_id"]').each(function(){
-                if($(this).is(':checked')){
-                    $(this).prop( "checked", false);
-                }
-            });
-        }
-        countAll();
     }
 
     function loadDataTable() {
@@ -1390,7 +1391,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]);
+                var formData = new FormData($('#form_data')[0]), passedQty = true, passed = true;
 
                 formData.delete("arr_code[]");
                 formData.delete("arr_type[]");
@@ -1406,106 +1407,113 @@
                 formData.delete("arr_warehouse[]");
 
                 $('input[name^="arr_code"]').each(function(){
-                    passed = true;
-                    if($(this).is(':checked')){
-                        if($('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val() == 'coas'){
-                            if($('#arr_coa' + $(this).data('id')).val()){
-                                formData.append('arr_code[]',$('#arr_coa' + $(this).data('id')).val());
-                            }else{
-                                passed = false;
-                            }
+                    passed = true;                    
+                    if($('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val() == 'coas'){
+                        if($('#arr_coa' + $(this).data('id')).val()){
+                            formData.append('arr_code[]',$('#arr_coa' + $(this).data('id')).val());
                         }else{
-                            formData.append('arr_code[]',$(this).val());
+                            passed = false;
                         }
-                        if(passed == true){
-                            formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
-                            formData.append('arr_total[]',$('input[name^="arr_total"][data-id="' + $(this).data('id') + '"]').val());
-                            formData.append('arr_tax[]',$('input[name^="arr_tax"][data-id="' + $(this).data('id') + '"]').val());
-                            formData.append('arr_wtax[]',$('input[name^="arr_wtax"][data-id="' + $(this).data('id') + '"]').val());
-                            formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
-                            formData.append('arr_note[]',$('input[name^="arr_note"][data-id="' + $(this).data('id') + '"]').val());
-                            formData.append('arr_place[]',$('#arr_place' + $(this).data('id')).val());
-                            formData.append('arr_department[]',$('#arr_department' + $(this).data('id')).val());
-                            formData.append('arr_warehouse[]',$('#arr_warehouse' + $(this).data('id')).val());
-                        }
+                    }else{
+                        formData.append('arr_code[]',$(this).val());
+                    }
+                    if(passed == true){
+                        formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_total[]',$('input[name^="arr_total"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_tax[]',$('input[name^="arr_tax"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_wtax[]',$('input[name^="arr_wtax"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_note[]',$('input[name^="arr_note"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_place[]',$('#arr_place' + $(this).data('id')).val());
+                        formData.append('arr_department[]',$('#arr_department' + $(this).data('id')).val());
+                        formData.append('arr_warehouse[]',$('#arr_warehouse' + $(this).data('id')).val());
+                    }
+                    let qtyreal = parseFloat($('input[name^="arr_temp_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), qtynow = parseFloat($('input[name^="arr_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+
+                    if(qtynow > qtyreal){
+                        passedQty = false;
                     }
                 });
 
                 $('input[name^="arr_dp_code"]').each(function(index){
-                    if($(this).is(':checked')){
-                        formData.append('arr_dp_code[]',$(this).val());
-                        formData.append('arr_nominal[]',$('input[name^="arr_nominal"]').eq(index).val());
-                    }
+                    formData.append('arr_dp_code[]',$(this).val());
+                    formData.append('arr_nominal[]',$('input[name^="arr_nominal"]').eq(index).val());
                 });
 
-                if(passed == true){
-                    $.ajax({
-                        url: '{{ Request::url() }}/create',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        cache: true,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            $('#validation_alert').hide();
-                            $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
-                        },
-                        success: function(response) {
-                            loadingClose('.modal-content');
+                if(passedQty == true){
+                    if(passed == true){
+                        $.ajax({
+                            url: '{{ Request::url() }}/create',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            cache: true,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                $('#validation_alert').hide();
+                                $('#validation_alert').html('');
+                                loadingOpen('.modal-content');
+                            },
+                            success: function(response) {
+                                loadingClose('.modal-content');
 
-                            if(response.status == 200) {
-                                success();
-                                M.toast({
-                                    html: response.message
-                                });
-                            } else if(response.status == 422) {
-                                $('#validation_alert').show();
-                                $('.modal-content').scrollTop(0);
-                                
-                                swal({
-                                    title: 'Ups! Validation',
-                                    text: 'Check your form.',
-                                    icon: 'warning'
-                                });
-
-                                $.each(response.error, function(i, val) {
-                                    $.each(val, function(i, val) {
-                                        $('#validation_alert').append(`
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>` + val + `</p>
-                                                </div>
-                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                        `);
+                                if(response.status == 200) {
+                                    success();
+                                    M.toast({
+                                        html: response.message
                                     });
-                                });
-                            } else {
-                                M.toast({
-                                    html: response.message
+                                } else if(response.status == 422) {
+                                    $('#validation_alert').show();
+                                    $('.modal-content').scrollTop(0);
+                                    
+                                    swal({
+                                        title: 'Ups! Validation',
+                                        text: 'Check your form.',
+                                        icon: 'warning'
+                                    });
+
+                                    $.each(response.error, function(i, val) {
+                                        $.each(val, function(i, val) {
+                                            $('#validation_alert').append(`
+                                                <div class="card-alert card red">
+                                                    <div class="card-content white-text">
+                                                        <p>` + val + `</p>
+                                                    </div>
+                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                            `);
+                                        });
+                                    });
+                                } else {
+                                    M.toast({
+                                        html: response.message
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('.modal-content');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
                                 });
                             }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
-                            });
-                        }
-                    });
+                        });
+                    }else{
+                        M.toast({
+                            html: 'Silahkan cek detail form anda. Pastikan tidak ada data yang kosong.'
+                        });
+                    }
                 }else{
                     M.toast({
-                        html: 'Silahkan cek detail form anda. Pastikan tidak ada data yang kosong.'
+                        html: 'Salah satu item melebihi jumlah qty dari yang seharusnya.'
                     });
                 }
             }

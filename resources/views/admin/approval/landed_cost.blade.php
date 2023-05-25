@@ -128,10 +128,6 @@
                         <small>Diajukan:</small>
                         <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
-                    <div class="mr-2">
-                        <small>Hingga:</small>
-                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
-                    </div>
                 </div>
             </div>
         </div>

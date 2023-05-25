@@ -31,7 +31,6 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
         'LC.NO',
         'PENGGUNA',
         'VENDOR',
-        'GR.NO',
         'PERUSAHAAN',
         'TGL.POST',
         'TGL.TENGGAT',
@@ -53,7 +52,6 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                 $query->where(function($query) {
                     $query->where('code', 'like', "%$this->search%")
                         ->orWhere('post_date', 'like', "%$this->search%")
-                        ->orWhere('due_date', 'like', "%$this->search%")
                         ->orWhere('reference', 'like', "%$this->search%")
                         ->orWhere('total', 'like', "%$this->search%")
                         ->orWhere('tax', 'like', "%$this->search%")
@@ -108,7 +106,6 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
                 'code'          => $row->code,
                 'name'          => $row->user->name,
                 'vendor'        => $row->vendor->name,
-                'gr'            => $row->goodReceipt->code,
                 'company'       => $row->company->name,
                 'tgl_post'      => $row->post_date,
                 'tgl_due'       => $row->due_date,

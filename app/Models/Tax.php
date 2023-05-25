@@ -17,12 +17,17 @@ class Tax extends Model
     protected $fillable = [
         'code',
         'name',
+        'coa_id',
         'type',
         'percentage',
         'is_default_ppn',
         'is_default_pph',
         'status'
     ];
+
+    public function coa(){
+        return $this->belongsTo('App\Models\Coa','coa_id','id')->withTrashed();
+    }
 
     public function status(){
         switch($this->status) {

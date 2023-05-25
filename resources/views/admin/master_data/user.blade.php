@@ -715,7 +715,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
         <button class="btn waves-effect waves-light right submit" onclick="saveAccess();">Simpan <i class="material-icons right">send</i></button>
     </div>
 </div>

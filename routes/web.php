@@ -645,6 +645,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('landed_cost')->middleware('operation.access:landed_cost,view')->group(function () {
                     Route::get('/',[LandedCostController::class, 'index']);
                     Route::post('get_good_receipt', [LandedCostController::class, 'getGoodReceipt']);
+                    Route::post('get_account_data', [LandedCostController::class, 'getAccountData']);
                     Route::get('datatable',[LandedCostController::class, 'datatable']);
                     Route::get('row_detail',[LandedCostController::class, 'rowDetail']);
                     Route::post('show', [LandedCostController::class, 'show']);

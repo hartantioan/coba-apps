@@ -128,9 +128,7 @@ class PurchaseDownPayment extends Model
     public function balanceInvoice(){
         $total = round($this->grandtotal,2);
 
-        foreach($this->purchaseInvoiceDp()->whereHas('purchaseInvoice', function($query){
-            $query->whereIn('status',['2','3']);
-        })->get() as $row){
+        foreach($this->purchaseInvoiceDp as $row){
             $total -= $row->nominal;
         }
 
@@ -140,9 +138,7 @@ class PurchaseDownPayment extends Model
     public function balancePaymentRequest(){
         $total = $this->grandtotal;
 
-        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest', function($query){
-            $query->whereIn('status',['2','3']);
-        })->get() as $row){
+        foreach($this->hasPaymentRequestDetail as $row){
             $total -= $row->nominal;
         }
 

@@ -201,7 +201,7 @@
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="browser-default" id="coa_source_id" name="coa_source_id"></select>
-                                <label class="active" for="account_id">Kas / Bank</label>
+                                <label class="active" for="coa_source_id">Kas / Bank</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="payment_type" name="payment_type">

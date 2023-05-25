@@ -22,17 +22,17 @@ class LandedCostDetail extends Model
         'place_id',
         'department_id',
         'warehouse_id',
-        'good_receipt_detail_id',
+        'lookable_type',
+        'lookable_id',
     ];
+
+    public function lookable(){
+        return $this->morphTo();
+    }
 
     public function landedCost()
     {
         return $this->belongsTo('App\Models\LandedCost', 'landed_cost_id', 'id')->withTrashed();
-    }
-
-    public function goodReceiptDetail()
-    {
-        return $this->belongsTo('App\Models\GoodReceiptDetail', 'good_receipt_detail_id', 'id')->withTrashed();
     }
 
     public function place()

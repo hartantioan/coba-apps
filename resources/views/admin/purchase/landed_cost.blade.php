@@ -17,6 +17,17 @@
         overflow: auto;
         text-align:-webkit-right;
     }
+    @media (min-width: 960px) {
+        #modal4 {
+            width:75%;
+        }
+    }
+
+    @media (max-width: 960px) {
+        #modal4 {
+            width:100%;
+        }
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -150,7 +161,7 @@
                                                         <th rowspan="2">Vendor</th>
                                                         <th rowspan="2">GR No.</th>
                                                         <th rowspan="2">Perusahaan</th>
-                                                        <th colspan="2" class="center">Tanggal</th>
+                                                        <th rowspan="2">Tanggal</th>
                                                         <th rowspan="2">No. Referensi</th>
                                                         <th colspan="2" class="center">Mata Uang</th>
                                                         <th colspan="3" class="center">PPN</th>
@@ -165,8 +176,6 @@
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>Post</th>
-                                                        <th>Tenggat</th>
                                                         <th>Kode</th>
                                                         <th>Konversi</th>
                                                         <th>Ya/Tidak</th>
@@ -201,15 +210,16 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
+                        <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO atau LC.</i>
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="good_receipt_id" name="good_receipt_id" onchange="getGoodReceipt(this.value)"></select>
-                                <label class="active" for="good_receipt_id">Penerimaan PO / Goods Receipt</label>
+                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getAccountData(this.value);"></select>
+                                <label class="active" for="supplier_id">Supplier/Vendor</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="browser-default" id="vendor_id" name="vendor_id"></select>
-                                <label class="active" for="vendor_id">Vendor/Ekspedisi</label>
+                                <label class="active" for="vendor_id">Broker</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="company_id" name="company_id">
@@ -220,8 +230,8 @@
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="reference" name="reference" type="text" placeholder="No. Referensi">
-                                <label class="active" for="reference">No. Referensi</label>
+                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -245,102 +255,186 @@
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                                <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. tenggat">
-                                <label class="active" for="due_date">Tgl. Tenggat</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="pretotal" name="pretotal" type="text" value="0,000" onkeyup="formatRupiah(this);countEach();">
-                                <label class="active" for="pretotal">Nominal Input (Sebelum pajak)</label>
-                                <small class="errorTxt1"><div class="error">Isi disini untuk memulai.</div></small>
-                            </div>
-                            <div class="col m12 s12">
-                                <h5>PPN</h5>
-                                <div class="row">
-                                    <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="tax_id" name="tax_id" onchange="countEach();">
-                                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                            @foreach ($tax as $row)
-                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="active" for="tax_id">Pajak PPN</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <div class="switch mb-1">
-                                            <label class="active" for="is_include_tax">Termasuk Pajak?</label>
-                                            <label>
-                                                Tidak
-                                                <input type="checkbox" id="is_include_tax" name="is_include_tax" value="1" onclick="countEach();">
-                                                <span class="lever"></span>
-                                                Ya
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col m12 s12">
-                                <h5>PPH</h5>
-                                <div class="row">
-                                    <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="wtax_id" name="wtax_id" onchange="countEach();">
-                                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                            @foreach ($wtax as $row)
-                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="active" for="wtax_id">Pajak PPH</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col m12 s12">
-                                <h5>Nominal (Auto fill)</h5>
-                                <div class="row">
-                                    <div class="input-field col m3 s12">
-                                        <input id="total" name="total" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
-                                        <label class="active" for="total">Total</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="tax" name="tax" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
-                                        <label class="active" for="tax">PPN</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="wtax" name="wtax" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
-                                        <label class="active" for="wtax">PPH</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this);" readonly>
-                                        <label class="active" for="grandtotal">Grandtotal</label>
-                                    </div>
-                                </div>
+                                <input id="reference" name="reference" type="text" placeholder="No. Referensi">
+                                <label class="active" for="reference">No. Referensi</label>
                             </div>
                             <div class="col m12 s12">
                                 <h6><b>GRPO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h4>Detail Harga per Produk</h4>
+                                    <h5>Rincian Biaya</h5>
+                                    <div style="overflow:auto;">
+                                        <table class="bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">No</th>
+                                                    <th class="center" width="15%">Deskripsi</th>
+                                                    <th class="center" width="15%">Total</th>
+                                                    <th class="center">Termasuk PPN</th>
+                                                    <th class="center">PPN(%)</th>
+                                                    <th class="center">PPN(Rp)</th>
+                                                    <th class="center">PPH(%)</th>
+                                                    <th class="center">PPH(Rp)</th>
+                                                    <th class="center" width="15%">Grandtotal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="9"><h6>A. Local</h6></td>
+                                                </tr>
+                                                @foreach ($landedcostfee->where('type','1') as $key => $row)
+                                                    <tr>
+                                                        <input type="hidden" name="arr_fee_id[]" value="{{ $row->id }}">
+                                                        <td class="center-align">
+                                                            {{ $loop->iteration }}.
+                                                        </td>
+                                                        <td>
+                                                            {{ $row->name }}
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <input id="arr_fee_nominal{{ $key }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $key }});" style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <div class="switch mb-1">
+                                                                <label>
+                                                                    <input type="checkbox" id="arr_fee_include_tax{{ $key }}" name="arr_fee_include_tax[]" value="1" onclick="countEach({{ $key }});">
+                                                                    <span class="lever"></span>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <select class="browser-default" id="arr_fee_tax{{ $key }}" name="arr_fee_tax[]" onchange="countEach({{ $key }});">
+                                                                <option value="0" data-id="0">-- Non-PPN --</option>
+                                                                @foreach ($tax as $row)
+                                                                    <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->code }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align">
+                                                            <input id="arr_fee_tax_rp{{ $key }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <select class="browser-default" id="arr_fee_wtax{{ $key }}" name="arr_fee_wtax[]" onchange="countEach({{ $key }});">
+                                                                <option value="0" data-id="0">-- Non-PPH --</option>
+                                                                @foreach ($wtax as $row)
+                                                                    <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->code }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align">
+                                                            <input id="arr_fee_wtax_rp{{ $key }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <input id="arr_fee_grandtotal{{ $key }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                                <tr>
+                                                    <td colspan="9"><h6>B. Impor</h6></td>
+                                                </tr>
+                                                @foreach ($landedcostfee->where('type','2') as $key => $row)
+                                                    <tr>
+                                                        <input type="hidden" name="arr_fee_id[]" value="{{ $row->id }}">
+                                                        <td class="center-align">
+                                                            {{ $loop->iteration }}.
+                                                        </td>
+                                                        <td>
+                                                            {{ $row->name }}
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <input id="arr_fee_nominal{{ $key }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $key }});" style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <div class="switch mb-1">
+                                                                <label>
+                                                                    <input type="checkbox" id="arr_fee_include_tax{{ $key }}" name="arr_fee_include_tax[]" value="1" onclick="countEach({{ $key }});">
+                                                                    <span class="lever"></span>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <select class="browser-default" id="arr_fee_tax{{ $key }}" name="arr_fee_tax[]" onchange="countEach({{ $key }});">
+                                                                <option value="0" data-id="0">-- Non-PPN --</option>
+                                                                @foreach ($tax as $row)
+                                                                    <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->code }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align">
+                                                            <input id="arr_fee_tax_rp{{ $key }}" name="arr_fee_tax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <select class="browser-default" id="arr_fee_wtax{{ $key }}" name="arr_fee_wtax[]" onchange="countEach({{ $key }});">
+                                                                <option value="0" data-id="0">-- Non-PPH --</option>
+                                                                @foreach ($wtax as $row)
+                                                                    <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->code }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td class="right-align">
+                                                            <input id="arr_fee_wtax_rp{{ $key }}" name="arr_fee_wtax_rp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                        <td class="center-align">
+                                                            <input id="arr_fee_grandtotal{{ $key }}" name="arr_fee_grandtotal[]" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td class="center" colspan="2">
+                                                        Total
+                                                    </td>
+                                                    <td class="center">
+                                                        <input id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                    </td>
+                                                    <td class="center">
+                                                        -
+                                                    </td>
+                                                    <td class="center">
+                                                        -
+                                                    </td>
+                                                    <td class="center">
+                                                        <input id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                    </td>
+                                                    <td class="center">
+                                                        -
+                                                    </td>
+                                                    <td class="center">
+                                                        <input id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                    </td>
+                                                    <td class="center">
+                                                        <input id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" readonly style="height:1.5rem !important;text-align:right;">
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </p>
+                                <p class="mt-2 mb-2">
+                                    <h5>Detail Harga per Produk</h5>
                                     <h6 class="center">Perhitungan otomatis akan didasarkan pada satuan stok/produksi (UOM) dan dihitung berdasarkan harga landed cost sebelum pajak serta proposional qty. Silahkan masukkan nilai *Nominal Input (Sebelum pajak)* untuk memulai. Anda juga bisa memasukkan data nominal per barang secara langsung.</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered">
                                             <thead>
                                                 <tr>
+                                                    <th class="center">Ref.No</th>
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan (UOM)</th>
-                                                    <th class="center">Harga Total</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
+                                                    <th class="center">Qty x Harga</th>
+                                                    <th class="center">Proporsional</th>
+                                                    <th class="center">Harga Total</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="7" class="center">
-                                                        Silahkan pilih penerimaan barang / good receipt po...
+                                                    <td colspan="10" class="center">
+                                                        Silahkan pilih supplier untuk memulai...
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -398,6 +492,71 @@
     </div>
 </div>
 
+<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-header ml-2">
+        <h5>Daftar Goods Receipt PO & Landed Cost <b id="account_name"></b></h5>
+    </div>
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <ul class="tabs">
+                            <li class="tab col m6"><a class="active" href="#goodsreceipt">Goods Receipt PO</a></li>
+                            <li class="tab col m6"><a href="#landedcost">Landed Cost</a></li>
+                        </ul>
+                        <div id="goodsreceipt" class="col s12 active">
+                            <p class="mt-2 mb-2">
+                                <div id="datatable_buttons_goods_receipt"></div>
+                                <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                                <table id="table_goods_receipt" class="display" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="center-align">No. GRPO</th>
+                                            <th class="center-align">No. SJ</th>
+                                            <th class="center-align">Tgl.Post</th>
+                                            <th class="center-align">Total</th>
+                                            <th class="center-align">PPN</th>
+                                            <th class="center-align">PPH</th>
+                                            <th class="center-align">Grandtotal</th>
+                                            <th class="center-align">Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-detail-goods-receipt"></tbody>
+                                </table>
+                            </p>
+                        </div>
+                        <div id="landedcost" class="col s12">
+                            <p class="mt-2 mb-2">
+                                <div id="datatable_buttons_landed_cost"></div>
+                                <i class="right">Khusus untuk Landed Cost, hanya bisa diperbolehkan memilih 1 data saja.</i>
+                                <table id="table_landed_cost" class="display" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="center-align">No. LC</th>
+                                            <th class="center-align">Tgl.Post</th>
+                                            <th class="center-align">Total</th>
+                                            <th class="center-align">PPN</th>
+                                            <th class="center-align">PPH</th>
+                                            <th class="center-align">Grandtotal</th>
+                                            <th class="center-align">Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-detail-landed-cost"></tbody>
+                                </table>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -442,7 +601,6 @@
             dismissible: false,
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ date("Y-m-d") }}');
-                $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#document_date').attr('min','{{ date("Y-m-d") }}');
                 $('#required_date').attr('min','{{ date("Y-m-d") }}');
             },
@@ -466,8 +624,8 @@
                 });
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="7" class="center">
-                            Silahkan pilih penerimaan barang / good receipt po...
+                        <td colspan="10" class="center">
+                            Silahkan pilih supplier untuk memulai...
                         </td>
                     </tr>
                 `);
@@ -510,13 +668,87 @@
             }
         });
 
+        $('#modal4').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_goods_receipt = $('#table_goods_receipt').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'asc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        buttons: {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                table_landed_cost = $('#table_landed_cost').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'asc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    language: {
+                        buttons: {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        }
+                    },
+                    select: {
+                        style: 'single'
+                    }
+                });
+                $('#table_goods_receipt_wrapper > .dt-buttons').appendTo('#datatable_buttons_goods_receipt');
+                $('#table_landed_cost_wrapper > .dt-buttons').appendTo('#datatable_buttons_landed_cost');
+                $('select[name="table_goods_receipt_length"]').addClass('browser-default');
+                $('select[name="table_landed_cost_length"]').addClass('browser-default');
+                $('.tabs').tabs({
+                    onShow: function () {
+                        table_goods_receipt.columns.adjust().draw();
+                        table_landed_cost.columns.adjust().draw();
+                    }
+                });
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-goods-receipt,#body-detail-landed-cost').empty();
+                $('#account_name').text('');
+                $('#preview_data').html('');
+                $('#table_goods_receipt,#table_landed_cost').DataTable().clear().destroy();
+            }
+        });
+
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             countAll();
         });
 
+        $('#table_goods_receipt tbody').on('click', 'tr', function () {
+            table_landed_cost.rows().deselect();
+        });
+
+        $('#table_landed_cost tbody').on('click', 'tr', function () {
+            table_goods_receipt.rows().deselect();
+        });
+
         select2ServerSide('#vendor_id,#filter_vendor', '{{ url("admin/select2/vendor") }}');
-        select2ServerSide('#good_receipt_id', '{{ url("admin/select2/good_receipt") }}');
+        select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}')
     });
 
     function makeTreeOrg(data,link){
@@ -670,10 +902,182 @@
         });
     }
 
-    function getGoodReceipt(val){
+    function applyDocuments(){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let arr_lc_id = [], arr_gr_id = [], passed = true;
+                $.map(table_goods_receipt.rows('.selected').nodes(), function (item) {
+                    arr_gr_id.push($(item).data('id'));
+                });
+
+                $.map(table_landed_cost.rows('.selected').nodes(), function (item) {
+                    arr_lc_id.push($(item).data('id'));
+                });
+                
+                if(arr_gr_id.length == 0 && arr_lc_id.length == 0){
+                    passed = false;
+                }
+
+                if(passed){
+                    $.ajax({
+                        url: '{{ Request::url() }}/get_good_receipt',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            arr_gr_id: arr_gr_id,
+                            arr_lc_id: arr_lc_id,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            
+                            if($('.data-used').length > 0){
+                                $('.data-used').trigger('click');
+                            }
+
+                            $('.row_item').each(function(){
+                                $(this).remove();
+                            });
+
+                            $('#last-row-item').remove();
+                            var totalall = 0, totalproporsional = 0, passed = true, errormessage = [];
+                            $.each(response, function(i, val) {
+                                if(val.status == 500){
+                                    passed = false;
+                                    errormessage.push(val.message);
+                                }
+                                $.each(val.details, function(i, valdetail) {
+                                    totalall += valdetail.totalrow;
+                                });
+                            });
+
+                            if(passed){
+                                $.each(response, function(i, val) {
+                                    if(val.details.length > 0){
+                                        $('#list-used-data').append(`
+                                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                                ` + val.code + `
+                                                <i class="material-icons close data-used" onclick="removeUsedData('` + val.id + `')">close</i>
+                                            </div>
+                                        `);
+
+                                        $.each(val.details, function(i, valdetail) {
+                                            var count = makeid(10), rowproporsional = (valdetail.totalrow / totalall) * 100;
+                                            totalproporsional += rowproporsional;
+                                            $('#body-item').append(`
+                                                <tr class="row_item">
+                                                    <input type="hidden" name="arr_item[]" value="` + valdetail.item_id + `">
+                                                    <input type="hidden" name="arr_total[]" value="` + valdetail.totalrow + `">
+                                                    <input type="hidden" name="arr_qty[]" value="` + valdetail.qtyRaw + `">
+                                                    <input type="hidden" name="arr_place[]" value="` + valdetail.place_id + `">
+                                                    <input type="hidden" name="arr_department[]" value="` + valdetail.department_id + `">
+                                                    <input type="hidden" name="arr_warehouse[]" value="` + valdetail.warehouse_id + `">
+                                                    <input type="hidden" name="arr_lookable_id[]" value="` + valdetail.lookable_id + `">
+                                                    <input type="hidden" name="arr_lookable_type[]" value="` + valdetail.lookable_type + `">
+                                                    <td>
+                                                    ` + val.code + ` 
+                                                    </td>
+                                                    <td>
+                                                    ` + valdetail.item_name + ` 
+                                                    </td>
+                                                    <td class="center">
+                                                        ` + valdetail.qty + `
+                                                    </td>
+                                                    <td class="center">
+                                                        ` + valdetail.unit + `
+                                                    </td>
+                                                    <td class="center">
+                                                        ` + valdetail.place_name + `
+                                                    </td>
+                                                    <td class="center">
+                                                        ` + valdetail.department_name + `
+                                                    </td>
+                                                    <td class="center">
+                                                        ` + valdetail.warehouse_name + `
+                                                    </td>
+                                                    <td class="right-align">
+                                                        ` + formatRupiahIni(roundTwoDecimal(valdetail.totalrow).toString().replace('.',',')) + `
+                                                    </td>
+                                                    <td class="right-align">
+                                                        ` + formatRupiahIni(roundTwoDecimal(rowproporsional).toString().replace('.',',')) + `
+                                                    </td>
+                                                    <td class="center">
+                                                        <input name="arr_price[]" class="browser-default nominalitem" type="text" value="0" onkeyup="formatRupiah(this);countRow();" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`">
+                                                    </td>
+                                                </tr>
+                                            `);
+                                        });
+                                    }
+                                });
+
+                                $('#body-item').append(`
+                                    <tr class="row_item">
+                                        <td class="right-align" colspan="7">
+                                            TOTAL
+                                        </td>
+                                        <td class="right-align">
+                                            ` + formatRupiahIni(roundTwoDecimal(totalall).toString().replace('.',',')) + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + formatRupiahIni(roundTwoDecimal(totalproporsional).toString().replace('.',',')) + `
+                                        </td>
+                                        <td class="center">
+                                            -
+                                        </td>
+                                    </tr>
+                                `);
+                                
+                                countAll();
+                                $('.modal-content').scrollTop(0);
+                                M.updateTextFields();
+                                $('#modal4').modal('close');
+                            }else{
+                                $.each(errormessage, function(i, val) {
+                                    M.toast({
+                                        html: val
+                                    });
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Silahkan pilih data terlebih dahulu.',
+                        icon: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+    function getAccountData(val){
         if(val){
             $.ajax({
-                url: '{{ Request::url() }}/get_good_receipt',
+                url: '{{ Request::url() }}/get_account_data',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
@@ -687,71 +1091,71 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    
-                    if(response.status == 500){
-                        swal({
-                            title: 'Ups!',
-                            text: response.message,
-                            icon: 'warning'
-                        });
-                        $('#purchase_request_id').empty();
-                    }else{
-                        if(response.details.length > 0){
-                            if($('.data-used').length > 0){
-                                $('.data-used').trigger('click');
-                            }
+                    $('#modal4').modal('open');
+                    $('#account_name').text($('#supplier_id').select2('data')[0].text);
 
-                            $('#list-used-data').append(`
-                                <div class="chip purple darken-4 gradient-shadow white-text">
-                                    ` + response.code + `
-                                    <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
-                                </div>
+                    if(response.goods_receipt.length > 0){
+                        $.each(response.goods_receipt, function(i, val) {
+                            $('#body-detail-goods-receipt').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.delivery_no + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.wtax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                </tr>
                             `);
+                        });
+                    }
 
-                            $('.row_item').each(function(){
-                                $(this).remove();
-                            });
-
-                            $('#last-row-item').remove();
-
-                            $.each(response.details, function(i, val) {
-                                var count = makeid(10);
-                                $('#body-item').append(`
-                                    <tr class="row_item">
-                                        <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                        <input type="hidden" name="arr_total[]" value="` + val.totalrow + `">
-                                        <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
-                                        <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
-                                        <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
-                                        <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
-                                        <input type="hidden" name="arr_good_receipt[]" value="` + val.good_receipt_detail_id + `">
-                                        <td>
-                                        ` + val.item_name + ` 
-                                        </td>
-                                        <td class="center">
-                                            ` + val.qty + `
-                                        </td>
-                                        <td class="center">
-                                            ` + val.unit + `
-                                        </td>
-                                        <td class="center">
-                                            <input name="arr_price[]" class="browser-default nominalitem" type="text" value="0" onkeyup="formatRupiah(this);countRow();" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`">
-                                        </td>
-                                        <td class="center">
-                                            ` + val.place_name + `
-                                        </td>
-                                        <td class="center">
-                                            ` + val.department_name + `
-                                        </td>
-                                        <td class="center">
-                                            ` + val.warehouse_name + `
-                                        </td>
-                                    </tr>
-                                `);
-                            });
-
-                            countEach();
-                        }
+                    if(response.landed_cost.length > 0){
+                        $.each(response.landed_cost, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-detail-landed-cost').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.wtax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                </tr>
+                            `);
+                        });                        
                     }
                     
                     $('.modal-content').scrollTop(0);
@@ -768,19 +1172,7 @@
                 }
             });
         }else{
-            $('.row_item').each(function(){
-                $(this).remove();
-            });
-            $('#body-item').append(`
-                <tr id="last-row-item">
-                    <td colspan="7" class="center">
-                        Silahkan pilih penerimaan barang / good receipt po...
-                    </td>
-                </tr>
-            `);
-            if($('.data-used').length > 0){
-                $('.data-used').trigger('click');
-            }
+            $('.row_item').remove();
         }
     }
 
@@ -817,24 +1209,53 @@
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
     }
+    
+    function countEach(val){
+        let rowtotal = parseFloat($('#arr_fee_nominal' + val).val().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowgrandtotal = 0, rowpercenttax = parseFloat($('#arr_fee_tax' + val).val()), rowpercentwtax = parseFloat($('#arr_fee_wtax' + val).val());
 
-    function countEach(){
-        
-        var tax = 0, percent_tax = parseFloat($('#tax_id').val()), grandtotal = 0, total = parseFloat($('#pretotal').val().replaceAll(".", "").replaceAll(",",".")), wtax = 0, percent_wtax = parseFloat($('#wtax_id').val());
-
-        if($('#tax_id').val() !== '0'){
-            if($('#is_include_tax').is(':checked')){
-                total = total / (1 + (percent_tax / 100));
+        if(rowpercenttax !== 0){
+            if($('#arr_fee_include_tax' + val).is(':checked')){
+                rowtotal = rowtotal / (1 + (rowpercenttax / 100));
+                if($(":focus").attr('name') !== 'arr_fee_nominal[]'){
+                    $('#arr_fee_nominal' + val).val(
+                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                    );
+                }
             }
-            tax = total * (percent_tax / 100);
+            rowtax = rowtotal * (rowpercenttax / 100);
         }
 
-        if($('#wtax_id').val() !== '0'){
-            wtax = total * (percent_wtax / 100);
+        if(rowpercentwtax !== 0){
+            rowwtax = rowtotal * (rowpercentwtax / 100);
         }
 
-        grandtotal = total + tax - wtax;
+        rowgrandtotal = rowtotal + rowtax - rowwtax;
+
+        $('#arr_fee_tax_rp' + val).val(
+            (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
+        );
+
+        $('#arr_fee_wtax_rp' + val).val(
+            (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
+        );
         
+        $('#arr_fee_grandtotal' + val).val(
+            (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
+        );
+
+        countAll();
+    }
+
+    function countAll(){
+        var total = 0, tax = 0, wtax = 0, grandtotal = 0;
+
+        $('input[name^="arr_fee_nominal"]').each(function(index){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            tax += parseFloat($('input[name^="arr_fee_tax_rp"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            wtax += parseFloat($('input[name^="arr_fee_wtax_rp"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            grandtotal += parseFloat($('input[name^="arr_fee_grandtotal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+        });
+
         $('#total').val(
             (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
         );
@@ -847,6 +1268,7 @@
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
+        
         if($('input[name^="arr_total"]').length > 0){
             let totalall = 0;
             $('input[name^="arr_total"]').each(function(){
@@ -862,7 +1284,6 @@
 
     function changeDateMinimum(val){
         if(val){
-            $('#due_date,#document_date,#required_date').attr("min",val);
             $('input[name^="arr_required_date"]').each(function(){
                 $(this).attr("min",val);
             });
@@ -914,7 +1335,6 @@
                 { name: 'good_receipt_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'due_date', className: 'center-align' },
                 { name: 'no_reference', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
@@ -1090,7 +1510,6 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
                 $('#percent_tax').val(response.percent_tax);
                 
                 $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
@@ -1271,38 +1690,6 @@
         });
     }
 
-    function countAll(){
-        var subtotal = 0, tax = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), discount = parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",",".")), total = 0, grandtotal = 0;
-
-        $('.arr_subtotal').each(function(){
-			subtotal += parseFloat($(this).text().replaceAll(".", "").replaceAll(",","."));
-		});
-
-        total = subtotal - discount;
-
-        if($('#is_tax').is(':checked')){
-            if($('#is_include_tax').is(':checked')){
-                total = total / (1 + (percent_tax / 100));
-            }
-            tax = total * (percent_tax / 100);
-        }
-
-        grandtotal = total + tax;
-        
-        $('#subtotal').text(
-            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.tofixed(2).toString().replace('.',','))
-        );
-        $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.tofixed(2).toString().replace('.',','))
-        );
-        $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.tofixed(2).toString().replace('.',','))
-        );
-        $('#grandtotal').text(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.tofixed(2).toString().replace('.',','))
-        );
-    }
-
     function printData(){
         var search = window.table.search(), status = $('#filter_status').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val(), vendor = $('#filter_vendor').val(), currency = $('#filter_currency').val();
         
@@ -1355,13 +1742,15 @@
                 $('.row_item').each(function(){
                     $(this).remove();
                 });
-                $('#body-item').append(`
-                    <tr id="last-row-item">
-                        <td colspan="7" class="center">
-                            Silahkan pilih penerimaan barang / good receipt po...
-                        </td>
-                    </tr>
-                `);
+                if($('#last-row-item').length == 0){
+                    $('#body-item').append(`
+                        <tr id="last-row-item">
+                            <td colspan="10" class="center">
+                                Silahkan pilih supplier untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
             },
             error: function() {
                 swal({

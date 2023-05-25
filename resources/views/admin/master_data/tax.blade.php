@@ -53,8 +53,9 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
+                                                        <th>Kode</th>
                                                         <th>Nama</th>
+                                                        <th>Coa</th>
                                                         <th>Type</th>
                                                         <th>Prosentase</th>
                                                         <th>Default PPN</th>
@@ -96,6 +97,10 @@
                         <div class="input-field col s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="browser-default" id="coa_id" name="coa_id"></select>
+                            <label class="active" for="coa_id">Coa</label>
                         </div>
                         <div class="input-field col s6">
                             <input id="percentage" name="percentage" type="text" onkeyup="formatRupiah(this)">
@@ -178,11 +183,13 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('#coa_id').empty();
                 $('#temp').val('');
                 M.updateTextFields();
             }
         });
 
+        select2ServerSide('#coa_id', '{{ url("admin/select2/coa") }}');
     });
 
     function loadDataTable() {
@@ -219,6 +226,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'coa_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'percentage', className: 'center-align' },
                 { name: 'is_default_ppn', className: 'center-align' },
@@ -330,6 +338,9 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#coa_id').empty().append(`
+                    <option value="` + response.coa_id + `">` + response.coa_name + `</option>
+                `);
                 $('#percentage').val(response.percentage);
                 $('#type').val(response.type).formSelect();
                 if(response.is_default_ppn == '1'){

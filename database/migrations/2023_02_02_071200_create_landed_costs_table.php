@@ -18,19 +18,13 @@ return new class extends Migration
             $table->id();
             $table->string('code', 155)->unique();
             $table->bigInteger('user_id')->nullable();
+            $table->bigInteger('supplier_id')->nullable();
             $table->bigInteger('account_id')->nullable();
             $table->bigInteger('company_id')->nullable();
             $table->date('post_date')->nullable();
             $table->string('reference', 155)->nullable();
             $table->bigInteger('currency_id')->nullable();
             $table->double('currency_rate')->nullable();
-            $table->bigInteger('tax_id')->nullable();
-            $table->bigInteger('wtax_id')->nullable();
-            $table->char('is_tax',1)->nullable();
-            $table->char('is_include_tax',1)->nullable();
-            $table->double('percent_tax')->nullable();
-            $table->char('is_wtax',1)->nullable();
-            $table->double('percent_wtax')->nullable();
             $table->text('note')->nullable();
             $table->string('document')->nullable();
             $table->double('total')->nullable();
@@ -44,7 +38,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id', 'account_id', 'company_id', 'tax_id', 'wtax_id'], 'landed_cost_indexes');
+            $table->index(['user_id', 'supplier_id', 'account_id', 'company_id'], 'landed_cost_indexes');
         });
     }
 

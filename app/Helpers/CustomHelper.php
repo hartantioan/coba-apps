@@ -70,10 +70,10 @@ class CustomHelper {
 				'warehouse_id'	=> $warehouse_id,
 				'item_id'		=> $item_id,
 				'qty_in'		=> $qty,
-				'price_in'		=> $total / $qty,
+				'price_in'		=> $qty > 0 ? $total / $qty : 0,
 				'total_in'		=> $total,
 				'qty_final'		=> $old_data ? $old_data->qty_final + $qty : $qty,
-				'price_final'	=> $old_data ? round((($old_data->total_final + $total) / ($old_data->qty_final + $qty)),3) : round($total / $qty,3),
+				'price_final'	=> $old_data ? round((($old_data->total_final + $total) / ($old_data->qty_final + $qty)),3) : ($qty > 0 ? round($total / $qty,3) : 0),
 				'total_final'	=> $old_data ? round(($old_data->total_final + $total),3) : $total,
 				'date'			=> $date,
 				'type'			=> $type
@@ -695,8 +695,6 @@ class CustomHelper {
 			
 		}elseif($table_name == 'landed_costs'){
 
-			/* $arrCoa = [];
-
 			$lc = LandedCost::find($data->id);
 			
 			if($lc){
@@ -711,43 +709,60 @@ class CustomHelper {
 				]);
 
 				foreach($lc->landedCostDetail as $rowdetail){
-					$pricelc = $rowdetail->nominal / $rowdetail->qty;
 
-					$pricenew = 0;
-					$itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$lc->good_receipt_id)->where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->first();
+					$itemdata = ItemCogs::where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->orderByDesc('date')->orderByDesc('id')->first();
 					if($itemdata){
-						$pricenew = $pricelc + $itemdata->price_in;
-						$itemdata->update([
-							'price_in'	=> $pricenew,
-							'total_in'	=> round($pricenew * $itemdata->qty_in,3),
-						]);
+						if($itemdata->qty_final > 0){
+							self::sendCogs('landed_costs',
+								$lc->id,
+								$rowdetail->place->company_id,
+								$rowdetail->place_id,
+								$rowdetail->warehouse_id,
+								$rowdetail->item_id,
+								0,
+								$rowdetail->nominal,
+								'IN',
+								$lc->post_date
+							);
+
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+								'place_id'		=> $rowdetail->place_id,
+								'account_id'	=> $lc->account_id,
+								'department_id'	=> $rowdetail->department_id,
+								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'type'			=> '1',
+								'nominal'		=> $rowdetail->nominal
+							]);
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $rowdetail->coa_id,
+								'place_id'		=> $rowdetail->place_id,
+								'account_id'	=> $lc->account_id,
+								'department_id'	=> $rowdetail->department_id,
+								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'type'			=> '1',
+								'nominal'		=> $rowdetail->nominal
+							]);
+						}
 					}
 
-					ResetCogs::dispatch($lc->goodReceipt->post_date,$rowdetail->place_id,$rowdetail->item_id);
-
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
-						'place_id'		=> $rowdetail->place_id,
-						'account_id'	=> $lc->account_id,
-						'department_id'	=> $rowdetail->department_id,
-						'warehouse_id'	=> $rowdetail->warehouse_id,
-						'type'			=> '1',
-						'nominal'		=> $rowdetail->nominal
-					]);
+					
 						
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->coa_id,
+						'coa_id'		=> Coa::where('code','200.01.03.01.02')->where('company_id',$rowdetail->place->company_id)->first()->id,
 						'place_id'		=> $rowdetail->place_id,
 						'account_id'	=> $lc->account_id,
 						'department_id'	=> $rowdetail->department_id,
 						'warehouse_id'	=> $rowdetail->warehouse_id,
 						'type'			=> '2',
-						'nominal'		=> $nominal,
+						'nominal'		=> $rowdetail->nominal,
 					]);
 				}
-			} */
+			}
 		}elseif($table_name == 'fund_requests'){
 		
 		}elseif($table_name == 'capitalizations'){		
@@ -1004,7 +1019,153 @@ class CustomHelper {
 					'nominal'		=> $row->nominal,
 				]);
 			}
+			
+		}elseif($table_name == 'purchase_invoices'){
+			#start untuk po tipe biaya / jasa
+			$totalOutSide = 0;
 
+			$pi = PurchaseInvoice::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'currency_id'	=> isset($data->currency_id) ? $data->currency_id : NULL,
+				'currency_rate'	=> isset($data->currency_rate) ? $data->currency_rate : NULL,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+
+			$coauangmukapembelian = Coa::where('code','100.01.07.01.01')->where('company_id',$pi->company_id)->first()->id;
+			$coahutangbelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$pi->company_id)->first()->id;
+			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pi->company_id)->first()->id;
+			$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$pi->company_id)->first()->id;
+
+			foreach($pi->purchaseInvoiceDetail as $row){
+				
+				if($row->lookable_type == 'coas'){
+
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->lookable_id,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'account_id'	=> $account_id,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $row->total
+					]);
+
+				}elseif($row->lookable_type == 'purchase_order_details'){
+					$pod = $row->lookable;
+
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $pod->coa_id,
+						'place_id'		=> $pod->place_id,
+						'account_id'	=> $account_id,
+						'department_id'	=> $pod->department_id,
+						'type'			=> '1',
+						'nominal'		=> $pod->getArrayTotal()['total'],
+					]);
+
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coahutangbelumditagih,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'account_id'	=> $account_id,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $row->total,
+					]);
+				}
+
+				if($row->tax_id){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->taxMaster->coa_id,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'account_id'	=> $account_id,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $row->tax,
+					]);
+				}
+
+				if($row->wtax_id){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->wTaxMaster->coa_id,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'account_id'	=> $account_id,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+						'type'			=> '2',
+						'nominal'		=> $row->wtax,
+					]);
+				}
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha,
+					'place_id'		=> $row->place_id ? $row->place_id : NULL,
+					'account_id'	=> $account_id,
+					'department_id'	=> $row->department_id ? $row->department_id : NULL,
+					'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> $row->grandtotal,
+				]);
+			}
+
+			#start journal down payment
+
+			if($pi->downpayment > 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha,
+					'place_id'		=> $row->place_id ? $row->place_id : NULL,
+					'account_id'	=> $account_id,
+					'department_id'	=> $row->department_id ? $row->department_id : NULL,
+					'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> $pi->downpayment,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coauangmukapembelian,
+					'place_id'		=> $row->place_id ? $row->place_id : NULL,
+					'account_id'	=> $account_id,
+					'department_id'	=> $row->department_id ? $row->department_id : NULL,
+					'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+					'type'			=> '2',
+					'nominal'		=> $pi->downpayment,
+				]);
+			}
+
+			#start journal rounding
+			if($pi->rounding > 0 || $pi->rounding < 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coarounding,
+					'account_id'	=> $account_id,
+					'type'			=> $pi->rounding > 0 ? '1' : '2',
+					'nominal'		=> abs($pi->rounding),
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coahutangusaha,
+					'account_id'	=> $account_id,
+					'type'			=> $pi->rounding > 0 ? '2' : '1',
+					'nominal'		=> abs($pi->rounding),
+				]);
+			}
 		}else{
 
 			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
@@ -1030,90 +1191,9 @@ class CustomHelper {
 					'status'		=> '3'
 				]);
 
-				#start untuk po tipe biaya / jasa
-				$totalOutSide = 0;
-
-				if($table_name == 'purchase_invoices'){
-					$pi = PurchaseInvoice::find($table_id);
-
-					foreach($pi->purchaseInvoiceDetail()->where('lookable_type','purchase_order_details')->get() as $row){
-						$pod = $row->lookable;
-
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $pod->coa_id,
-							'place_id'		=> $pod->place_id,
-							'account_id'	=> $account_id,
-							'department_id'	=> $pod->department_id,
-							'type'			=> '1',
-							'nominal'		=> $pod->getArrayTotal()['total'],
-						]);
-						
-						$totalOutSide += $pod->getArrayTotal()['total'];
-					}
-
-					foreach($pi->purchaseInvoiceDetail()->where('lookable_type','coas')->get() as $row){
-						$coa = $row->lookable;
-
-						$typeround = $row->grandtotal >= 0 ? '1' : '2';
-						/* $typeenemy = $typeround == '1' ? '2' : '1'; */
-
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->lookable_id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'account_id'	=> $account_id,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'type'			=> $typeround,
-							'nominal'		=> -1 * $row->grandtotal
-						]);
-
-						/* JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> Coa::where('code','200.01.03.01.01')->where('company_id',$pi->company_id)->first()->id,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'account_id'	=> $account_id,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'type'			=> $typeenemy,
-							'nominal'		=> -1 * $row->grandtotal
-						]); */
-						
-						$totalOutSide += $row->grandtotal;
-					}
-
-					#start journal rounding
-					if($pi->rounding > 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> Coa::where('code','700.01.01.01.05')->where('company_id',$pi->company_id)->first()->id,
-							'account_id'	=> $account_id,
-							'type'			=> '1',
-							'nominal'		=> abs($pi->rounding),
-						]);
-					}
-					
-					if($pi->rounding < 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> Coa::where('code','700.01.01.01.05')->where('company_id',$pi->company_id)->first()->id,
-							'account_id'	=> $account_id,
-							'type'			=> '2',
-							'nominal'		=> abs($pi->rounding),
-						]);
-					}
-					#end journal rounding
-				}
-				#end untuk po tipe biaya / jasa
-
 				foreach($journalMap as $row){
 					
 					$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
-
-					if($totalOutSide > 0 || $totalOutSide < 0){
-						if($row->field_name == 'total'){
-							$nominal -= $totalOutSide;
-						}
-					}
 
 					if($nominal > 0){
 						JournalDetail::create([

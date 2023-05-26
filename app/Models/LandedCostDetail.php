@@ -17,6 +17,7 @@ class LandedCostDetail extends Model
     protected $fillable = [
         'landed_cost_id',
         'item_id',
+        'coa_id',
         'qty',
         'nominal',
         'place_id',
@@ -40,6 +41,11 @@ class LandedCostDetail extends Model
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
+    public function coa()
+    {
+        return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
+    }
+
     public function department()
     {
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
@@ -52,5 +58,30 @@ class LandedCostDetail extends Model
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+    }
+
+    public function goodReceiptDetail()
+    {
+        if($this->lookable_type == 'good_receipt_details'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function landedCostDetail()
+    {
+        if($this->lookable_type == 'landed_cost_details'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function landedCostDetailSelf()
+    {
+        return $this->hasMany('App\Models\LandedCostDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('landedCost',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 }

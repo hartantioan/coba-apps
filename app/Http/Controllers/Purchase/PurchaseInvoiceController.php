@@ -163,7 +163,7 @@ class PurchaseInvoiceController extends Controller
                             'tax'           => number_format($arrTotal['tax'],2,',','.'),
                             'wtax'          => number_format($arrTotal['wtax'],2,',','.'),
                             'grandtotal'    => number_format($arrTotal['grandtotal'],2,',','.'),
-                            'info'          => '',
+                            'info'          => $rowdetail->note,
                             'top'           => $datapo->payment_term,
                             'delivery_no'   => '-',
                             'purchase_no'   => 'NO PO - '.$datapo->code,
@@ -173,6 +173,9 @@ class PurchaseInvoiceController extends Controller
                             'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
                             'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
                             'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '',
+                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '',
+                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '',
                         ];
                     }
                 }
@@ -214,6 +217,9 @@ class PurchaseInvoiceController extends Controller
                             'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
                             'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
                             'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '',
+                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '',
+                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '',
                         ];
                     }
                 }
@@ -248,6 +254,9 @@ class PurchaseInvoiceController extends Controller
                             'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
                             'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
                             'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '',
+                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '',
+                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '',
                         ];
                     }
                 }
@@ -634,10 +643,10 @@ class PurchaseInvoiceController extends Controller
 			}
 			
 			if($query) {
-                
-                if($request->arr_type){
-                    DB::beginTransaction();
-                    try {
+                DB::beginTransaction();
+                try {
+                    if($request->arr_type){
+                        
                         foreach($request->arr_type as $key => $row){
                             PurchaseInvoiceDetail::create([
                                 'purchase_invoice_id'   => $query->id,
@@ -646,6 +655,8 @@ class PurchaseInvoiceController extends Controller
                                 'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                                 'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                                 'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                'tax_id'                => $request->arr_tax_id[$key] ? $request->arr_tax_id[$key] : NULL,
+                                'wtax_id'               => $request->arr_wtax_id[$key] ? $request->arr_wtax_id[$key] : NULL,
                                 'is_include_tax'        => $request->arr_include_tax[$key],
                                 'percent_tax'           => $request->arr_percent_tax[$key],
                                 'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
@@ -658,15 +669,10 @@ class PurchaseInvoiceController extends Controller
                                 'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                             ]);
                         }
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
+                            
                     }
-                }
 
-                if($request->arr_dp_code){
-                    DB::beginTransaction();
-                    try {
+                    if($request->arr_dp_code){
                         foreach($request->arr_dp_code as $key => $row){
                             PurchaseInvoiceDp::create([
                                 'purchase_invoice_id'       => $query->id,
@@ -674,10 +680,11 @@ class PurchaseInvoiceController extends Controller
                                 'nominal'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                             ]);
                         }
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
                     }
+                
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
                 }
 
                 CustomHelper::sendApproval('purchase_invoices',$query->id,$query->note);

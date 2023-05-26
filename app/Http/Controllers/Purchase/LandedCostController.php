@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Jobs\ResetCogs;
 use App\Jobs\ResetStock;
+use App\Models\Coa;
 use App\Models\Company;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
@@ -39,6 +40,7 @@ class LandedCostController extends Controller
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
+    
     public function index(Request $request)
     {
         $data = [
@@ -79,7 +81,7 @@ class LandedCostController extends Controller
             }
         }
     
-        $datalc = LandedCost::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
+        $datalc = LandedCost::where('supplier_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datalc as $row){
             if(!$row->used()->exists()){
@@ -105,40 +107,91 @@ class LandedCostController extends Controller
     public function getGoodReceipt(Request $request){
         $arr_main = [];
 
-        foreach($request->arr_gr_id as $row){
-            $data = GoodReceipt::find(intval($row));
+        if($request->arr_gr_id){
+            foreach($request->arr_gr_id as $row){
+                $data = GoodReceipt::find(intval($row));
+                $data['lookable_type'] = $data->getTable();
+            
+                if($data->used()->exists()){
+                    $data['status'] = '500';
+                    $data['message'] = 'Goods Receipt '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+                }else{
+                    CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
         
-            if($data->used()->exists()){
-                $data['status'] = '500';
-                $data['message'] = 'Goods Receipt '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
-            }else{
-                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
-    
-                $details = [];
-                
-                foreach($data->goodReceiptDetail as $row){
-                    $details[] = [
-                        'item_id'                   => $row->item_id,
-                        'item_name'                 => $row->item->code.' - '.$row->item->name,
-                        'qty'                       => number_format($row->qtyConvert(),3,',','.'),
-                        'totalrow'                  => $row->getRowTotal(),
-                        'qtyRaw'                    => $row->qtyConvert(),
-                        'unit'                      => $row->item->uomUnit->code,
-                        'place_name'                => $row->place->name.' - '.$row->place->company->name,
-                        'department_name'           => $row->department->name,
-                        'warehouse_name'            => $row->warehouse->name,
-                        'place_id'                  => $row->place_id,
-                        'department_id'             => $row->department_id,
-                        'warehouse_id'              => $row->warehouse_id,
-                        'lookable_id'               => $row->id,
-                        'lookable_type'             => $row->getTable(),
-                    ];
+                    $details = [];
+                    
+                    foreach($data->goodReceiptDetail as $row){
+                        $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
+                        $details[] = [
+                            'item_id'                   => $row->item_id,
+                            'item_name'                 => $row->item->code.' - '.$row->item->name,
+                            'qty'                       => number_format($row->qtyConvert(),3,',','.'),
+                            'totalrow'                  => $row->getRowTotal(),
+                            'qtyRaw'                    => $row->qtyConvert(),
+                            'unit'                      => $row->item->uomUnit->code,
+                            'place_name'                => $row->place->code,
+                            'department_name'           => $row->department->name,
+                            'warehouse_name'            => $row->warehouse->name,
+                            'place_id'                  => $row->place_id,
+                            'department_id'             => $row->department_id,
+                            'warehouse_id'              => $row->warehouse_id,
+                            'lookable_id'               => $row->id,
+                            'lookable_type'             => $row->getTable(),
+                            'stock'                     => $row->item->getStockPlace($row->place_id),
+                            'coa_id'                    => $coa ? $coa->id : '',
+                            'coa_name'                  => $coa ? $coa->name : '',
+                        ];
+                    }
+        
+                    $data['details'] = $details;
                 }
-    
-                $data['details'] = $details;
-            }
 
-            $arr_main[] = $data;
+                $arr_main[] = $data;
+            }
+        }
+
+        if($request->arr_lc_id){
+            foreach($request->arr_lc_id as $row){
+                $data = LandedCost::find(intval($row));
+                $data['lookable_type'] = $data->getTable();
+                $data['account_name'] = $data->vendor->name;
+            
+                if($data->used()->exists()){
+                    $data['status'] = '500';
+                    $data['message'] = 'Landed Cost '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+                }else{
+                    CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
+        
+                    $details = [];
+                    
+                    foreach($data->landedCostDetail as $row){
+                        $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
+                        $details[] = [
+                            'item_id'                   => $row->item_id,
+                            'item_name'                 => $row->item->code.' - '.$row->item->name,
+                            'qty'                       => number_format($row->qty,3,',','.'),
+                            'totalrow'                  => $row->lookable->total,
+                            'qtyRaw'                    => $row->qty,
+                            'unit'                      => $row->item->uomUnit->code,
+                            'place_name'                => $row->place->code,
+                            'department_name'           => $row->department->name,
+                            'warehouse_name'            => $row->warehouse->name,
+                            'place_id'                  => $row->place_id,
+                            'department_id'             => $row->department_id,
+                            'warehouse_id'              => $row->warehouse_id,
+                            'lookable_id'               => $row->id,
+                            'lookable_type'             => $row->getTable(),
+                            'stock'                     => $row->item->getStockPlace($row->place_id),
+                            'coa_id'                    => $coa ? $coa->id : '',
+                            'coa_name'                  => $coa ? $coa->name : '',
+                        ];
+                    }
+        
+                    $data['details'] = $details;
+                }
+
+                $arr_main[] = $data;
+            }
         }
 
         return response()->json($arr_main);
@@ -149,6 +202,7 @@ class LandedCostController extends Controller
             'id',
             'code',
             'user_id',
+            'supplier_id',
             'account_id',
             'purchase_order_id',
             'company_id',
@@ -156,11 +210,6 @@ class LandedCostController extends Controller
             'reference',
             'currency_id',
             'currency_rate',
-            'is_tax',
-            'is_included_tax',
-            'percent_tax',
-            'is_wtax',
-            'percent_wtax',
             'note',
             'document',
             'total',
@@ -216,18 +265,6 @@ class LandedCostController extends Controller
                     $query->whereIn('account_id',$request->vendor_id);
                 }
 
-                if($request->is_tax){
-                    if($request->is_tax == '1'){
-                        $query->whereNotNull('is_tax');
-                    }else{
-                        $query->whereNull('is_tax');
-                    }
-                }
-
-                if($request->is_include_tax){
-                    $query->where('is_include_tax',$request->is_include_tax);
-                }
-                
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
                 }
@@ -276,18 +313,6 @@ class LandedCostController extends Controller
                     $query->whereIn('account_id',$request->vendor_id);
                 }
 
-                if($request->is_tax){
-                    if($request->is_tax == '1'){
-                        $query->whereNotNull('is_tax');
-                    }else{
-                        $query->whereNull('is_tax');
-                    }
-                }
-
-                if($request->is_include_tax){
-                    $query->where('is_include_tax',$request->is_include_tax);
-                }
-                
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
                 }
@@ -302,17 +327,13 @@ class LandedCostController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
+                    $val->supplier->name,
                     $val->vendor->name,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
                     $val->reference,
                     $val->currency()->exists() ? $val->currency->code : '',
                     number_format($val->currency_rate,2,',','.'),
-                    $val->isTax(),
-                    $val->isIncludeTax(),
-                    number_format($val->percent_tax,2,',','.'),
-                    $val->isWtax(),
-                    number_format($val->percent_wtax,2,',','.'),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     number_format($val->total,2,',','.'),
@@ -349,6 +370,7 @@ class LandedCostController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
             'company_id' 			    => 'required',
+            'supplier_id'               => 'required',
 			'vendor_id'                 => 'required',
             'post_date'                 => 'required',
             'currency_id'               => 'required',
@@ -361,6 +383,7 @@ class LandedCostController extends Controller
             'arr_qty'                   => 'required|array'
 		], [
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
+            'supplier_id.required'              => 'Supplier tidak boleh kosong.',
 			'vendor_id.required'                => 'Vendor/ekspedisi tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
@@ -415,19 +438,13 @@ class LandedCostController extends Controller
                         }
 
                         $query->user_id = session('bo_id');
+                        $query->supplier_id = $request->supplier_id;
                         $query->account_id = $request->vendor_id;
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
                         $query->reference = $request->reference;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->tax_id = $request->tax_id;
-                        $query->wtax_id = $request->wtax_id;
-                        $query->is_tax = $request->tax_id > 0 ? '1' : NULL;
-                        $query->is_include_tax = $request->is_include_tax ? $request->is_include_tax : '0';
-                        $query->percent_tax = $request->percent_tax;
-                        $query->is_wtax = $request->wtax_id > 0 ? '1' : NULL;
-                        $query->percent_wtax = $request->percent_wtax;
                         $query->note = $request->note;
                         $query->document = $document;
                         $query->total = round($total,3);
@@ -458,19 +475,13 @@ class LandedCostController extends Controller
                     $query = LandedCost::create([
                         'code'			            => LandedCost::generateCode(),
                         'user_id'		            => session('bo_id'),
+                        'supplier_id'               => $request->supplier_id,
                         'account_id'                => $request->vendor_id,
                         'company_id'                => $request->company_id,
                         'post_date'                 => $request->post_date,
                         'reference'                 => $request->reference,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'tax_id'                    => $request->tax_id,
-                        'wtax_id'                   => $request->wtax_id,
-                        'is_tax'                    => $request->tax_id > 0 ? '1' : NULL,
-                        'is_include_tax'            => $request->is_include_tax ? $request->is_include_tax : '0',
-                        'percent_tax'               => $request->percent_tax,
-                        'is_wtax'                   => $request->wtax_id > 0 ? '1' : NULL,
-                        'percent_wtax'              => $request->percent_wtax,
                         'note'                      => $request->note,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/landed_costs') : NULL,
                         'total'                     => round($total,3),
@@ -495,12 +506,14 @@ class LandedCostController extends Controller
                             LandedCostDetail::create([
                                 'landed_cost_id'        => $query->id,
                                 'item_id'               => $row,
+                                'coa_id'                => $request->arr_coa[$key] ? $request->arr_coa[$key] : NULL,
                                 'qty'                   => floatval($request->arr_qty[$key]),
                                 'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                                 'place_id'              => $request->arr_place[$key],
                                 'department_id'         => $request->arr_department[$key],
                                 'warehouse_id'          => $request->arr_warehouse[$key],
-                                'good_receipt_detail_id'=> $request->arr_good_receipt[$key],
+                                'lookable_type'         => $request->arr_lookable_type[$key],
+                                'lookable_id'           => $request->arr_lookable_id[$key],
                             ]);
                         }
 
@@ -509,7 +522,7 @@ class LandedCostController extends Controller
                                 'landed_cost_id'        => $query->id,
                                 'landed_cost_fee_id'    => $row,
                                 'total'                 => str_replace(',','.',str_replace('.','',$request->arr_fee_nominal[$key])),
-                                'is_include_tax'        => $request->arr_fee_include_tax[$key] ? $request->arr_fee_include_tax[$key] : '0', 
+                                'is_include_tax'        => $request->arr_fee_include_tax[$key],
                                 'percent_tax'           => $request->arr_fee_tax[$key],
                                 'percent_wtax'          => $request->arr_fee_wtax[$key],
                                 'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_fee_tax_rp[$key])),
@@ -525,7 +538,6 @@ class LandedCostController extends Controller
 
                 CustomHelper::sendApproval('landed_costs',$query->id,$query->note);
                 CustomHelper::sendNotification('landed_costs',$query->id,'Pengajuan Landed Cost No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::removeUsedData('good_receipts',$query->goodReceipt->id);
 
                 activity()
                     ->performedOn(new LandedCost())
@@ -592,6 +604,34 @@ class LandedCostController extends Controller
         
         $string .= '</tbody></table></div>';
 
+        $string .= '<div class="col s12 mt-1"><table style="max-width:850px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="6">Rincian Biaya</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No</th>
+                                <th class="center-align">Deskripsi</th>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">PPN</th>
+                                <th class="center-align">PPH</th>
+                                <th class="center-align">Grandtotal</th>
+                            </tr>
+                        </thead><tbody>';
+
+        foreach($data->landedCostFeeDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td>'.$row->landedCostFee->name.'</td>
+                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
+
         $string .= '<div class="col s12 mt-1"><table style="max-width:500px;">
                         <thead>
                             <tr>
@@ -644,23 +684,24 @@ class LandedCostController extends Controller
     public function show(Request $request){
         $lc = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
         $lc['vendor_name'] = $lc->vendor->name;
-        $lc['good_receipt_note'] = $lc->goodReceipt->code.' - '.$lc->note;
+        $lc['supplier_name'] = $lc->supplier->name;
         $lc['total'] = number_format($lc->total,2,',','.');
         $lc['tax'] = number_format($lc->tax,2,',','.');
         $lc['wtax'] = number_format($lc->wtax,2,',','.');
         $lc['grandtotal'] = number_format($lc->grandtotal,2,',','.');
-        $lc['percent_tax'] = number_format($lc->percent_tax,2,',','.');
         $lc['currency_rate'] = number_format($lc->currency_rate,2,',','.');
 
         $arr = [];
+        $fees = [];
 
         foreach($lc->landedCostDetail as $row){
             $arr[] = [
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->name.' - '.$row->item->name,
                 'qtyRaw'                    => $row->qty,
+                'totalrow'                  => $row->lookable_type == 'landed_cost_details' ? $row->lookable->goodReceiptDetail->total : $row->lookable->total,
                 'qty'                       => number_format($row->qty,3,',','.'),
-                'nominal'                   => number_format($row->nominal,5,',','.'),
+                'nominal'                   => number_format($row->nominal,2,',','.'),
                 'unit'                      => $row->item->uomUnit->code,
                 'place_name'                => $row->place->name.' - '.$row->place->company->name,
                 'department_name'           => $row->department->name,
@@ -668,11 +709,28 @@ class LandedCostController extends Controller
                 'place_id'                  => $row->place_id,
                 'department_id'             => $row->department_id,
                 'warehouse_id'              => $row->warehouse_id,
-                'good_receipt_detail_id'    => $row->good_receipt_detail_id,
+                'lookable_type'             => $row->lookable_type,
+                'lookable_id'               => $row->lookable_id,
+                'coa_id'                    => $row->coa_id ? $row->coa_id : '',
+                'coa_name'                  => $row->coa_id ? $row->coa->code.' - '.$row->coa->name : '',
+                'stock'                     => $row->item->getStockPlace($row->place_id),
+            ];
+        }
+
+        foreach($lc->landedCostFeeDetail as $row){
+            $fees[] = [
+                'id'                => $row->landed_cost_fee_id,
+                'total'             => number_format($row->total,2,',','.'),
+                'is_include_tax'    => $row->is_include_tax,
+                'percent_tax'       => $row->percent_tax,
+                'tax'               => number_format($row->tax,2,',','.'),
+                'wtax'              => number_format($row->wtax,2,',','.'),
+                'grandtotal'        => number_format($row->grandtotal,2,',','.'),
             ];
         }
 
         $lc['details'] = $arr;
+        $lc['fees'] = $fees;
         				
 		return response()->json($lc);
     }
@@ -700,17 +758,7 @@ class LandedCostController extends Controller
                 ]);
 
                 foreach($query->landedCostDetail as $rowdetail){
-                    $pricelc = $rowdetail->nominal / $rowdetail->qty;
-    
-                    $pricenew = 0;
-                    $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$rowdetail->goodReceiptDetail->good_receipt_id)->where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->first();
-                    if($itemdata){
-                        $pricenew = $pricelc - $itemdata->price_in;
-                        $itemdata->update([
-                            'price_in'	=> $pricenew,
-                            'total_in'	=> round($pricenew * $itemdata->qty_in,3),
-                        ]);
-                    }
+                    ItemCogs::where('lookable_type','landed_costs')->where('lookable_id',$query->id)->delete();
                     ResetCogs::dispatch($query->post_date,$rowdetail->place_id,$rowdetail->item_id);
                 }
     
@@ -765,18 +813,7 @@ class LandedCostController extends Controller
             CustomHelper::removeApproval('landed_costs',$query->id);
             
             foreach($query->landedCostDetail as $rowdetail){
-                $pricelc = $rowdetail->nominal / $rowdetail->qty;
-
-                $pricenew = 0;
-                $itemdata = ItemCogs::where('lookable_type','good_receipts')->where('lookable_id',$rowdetail->goodReceiptDetail->good_receipt_id)->where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->first();
-                if($itemdata){
-                    $pricenew = $pricelc - $itemdata->price_in;
-                    $itemdata->update([
-                        'price_in'	=> $pricenew,
-                        'total_in'	=> round($pricenew * $itemdata->qty_in,3),
-                    ]);
-                }
-
+                ItemCogs::where('lookable_type','landed_costs')->where('lookable_id',$query->id)->delete();
                 ResetCogs::dispatch($query->post_date,$rowdetail->place_id,$rowdetail->item_id);
             }
 
@@ -839,18 +876,6 @@ class LandedCostController extends Controller
                     $query->whereIn('account_id',$request->vendor_id);
                 }
 
-                if($request->is_tax){
-                    if($request->is_tax == '1'){
-                        $query->whereNotNull('is_tax');
-                    }else{
-                        $query->whereNull('is_tax');
-                    }
-                }
-
-                if($request->is_include_tax){
-                    $query->where('is_include_tax',$request->is_include_tax);
-                }
-                
                 if($request->currency_id){
                     $query->whereIn('currency_id',$request->currency_id);
                 }
@@ -862,11 +887,11 @@ class LandedCostController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportLandedCost($request->search,$request->status,$request->is_tax,$request->is_include_tax,$request->vendor,$request->currency,$this->dataplaces), 'landed_cost'.uniqid().'.xlsx');
+		return Excel::download(new ExportLandedCost($request->search,$request->status,$request->vendor,$request->currency,$this->dataplaces), 'landed_cost'.uniqid().'.xlsx');
     }
     
     public function removeUsedData(Request $request){
-        CustomHelper::removeUsedData('good_receipts',$request->id);
+        CustomHelper::removeUsedData($request->type,$request->id);
         return response()->json([
             'status'    => 200,
             'message'   => ''

@@ -83,7 +83,7 @@ function loadingClose(element){
 
 function select2ServerSide(selector, endpoint) {
 	$(selector).select2({
-		placeholder: '-- Choose --',
+		placeholder: '-- Pilih ya --',
 		minimumInputLength: 1,
 		allowClear: true,
 		cache: true,

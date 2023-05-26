@@ -116,6 +116,13 @@ class GoodReceiptDetail extends Model
         });
     }
 
+    public function landedCostDetail()
+    {
+        return $this->hasMany('App\Models\LandedCostDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('landedCost',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function balanceInvoice(){
         $total = round($this->grandtotal,2);
 

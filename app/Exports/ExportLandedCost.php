@@ -15,12 +15,10 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, string $is_tax = null, string $is_include_tax = null, string $vendor = null, string $currency = null, array $dataplaces = null)
+    public function __construct(string $search = null, string $status = null, string $vendor = null, string $currency = null, array $dataplaces = null)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
-        $this->is_tax = $is_tax ? $is_tax : '';
-        $this->is_include_tax = $is_include_tax ? $is_include_tax : '';
         $this->vendor = $vendor ? $vendor : '';
         $this->currency = $currency ? $currency : '';
         $this->dataplaces = $dataplaces ? $dataplaces : [];
@@ -77,18 +75,6 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
             if($this->vendor){
                 $arrVendor = explode(',',$this->vendor);
                 $query->whereIn('account_id',$arrVendor);
-            }
-
-            if($this->is_tax){
-                if($this->is_tax == '1'){
-                    $query->whereNotNull('is_tax');
-                }else{
-                    $query->whereNull('is_tax');
-                }
-            }
-
-            if($this->is_include_tax){
-                $query->where('is_include_tax',$this->is_include_tax);
             }
             
             if($this->currency){

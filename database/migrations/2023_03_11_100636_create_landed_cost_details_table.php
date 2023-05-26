@@ -18,6 +18,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('landed_cost_id')->nullable();
             $table->bigInteger('item_id')->nullable();
+            $table->bigInteger('coa_id')->nullable();
             $table->double('qty')->nullable();
             $table->double('nominal')->nullable();
             $table->bigInteger('place_id')->nullable();
@@ -28,7 +29,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['landed_cost_id', 'item_id', 'place_id', 'department_id', 'warehouse_id'], 'landed_cost_detail_index');
+            $table->index(['landed_cost_id', 'item_id', 'coa_id', 'place_id', 'department_id', 'warehouse_id'], 'landed_cost_detail_index');
         });
     }
 

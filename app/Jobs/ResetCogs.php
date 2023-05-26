@@ -43,7 +43,7 @@ class ResetCogs implements ShouldQueue
 		foreach($data as $key => $row){
 			if($key == 0){
 				if($row->type == 'IN'){
-					$finalprice = $row->total_in / $row->qty_in;
+					$finalprice = $row->qty_in > 0 ? $row->total_in / $row->qty_in : 0;
 					$totalprice = $finalprice * $row->qty_in;
 					$row->update([
 						'qty_final' 	=> $row->qty_in,

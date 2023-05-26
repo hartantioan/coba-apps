@@ -34,6 +34,7 @@ use App\Http\Controllers\MasterData\BankController;
 use App\Http\Controllers\MasterData\ProjectController;
 use App\Http\Controllers\MasterData\TaxController;
 use App\Http\Controllers\MasterData\BenchmarkPriceController;
+use App\Http\Controllers\MasterData\CostDistributionController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -68,7 +69,6 @@ use App\Http\Controllers\Setting\DataAccessController;
 
 use App\Http\Controllers\Misc\Select2Controller;
 use App\Http\Controllers\Misc\NotificationController;
-
 
 use App\Http\Controllers\Maintenance\WorkOrderController;
 use App\Http\Controllers\Maintenance\RequestSparepartController;
@@ -500,6 +500,14 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[ProjectController::class, 'export']);
                         Route::post('create',[ProjectController::class, 'create'])->middleware('operation.access:project,update');
                         Route::post('destroy', [ProjectController::class, 'destroy'])->middleware('operation.access:project,delete');
+                    });
+
+                    Route::prefix('cost_distribution')->middleware('operation.access:cost_distribution,view')->group(function () {
+                        Route::get('/',[CostDistributionController::class, 'index']);
+                        Route::get('datatable',[CostDistributionController::class, 'datatable']);
+                        Route::post('show', [CostDistributionController::class, 'show']);
+                        Route::post('create',[CostDistributionController::class, 'create'])->middleware('operation.access:cost_distribution,update');
+                        Route::post('destroy', [CostDistributionController::class, 'destroy'])->middleware('operation.access:cost_distribution,delete');
                     });
                 });
             });

@@ -16,8 +16,10 @@ return new class extends Migration
         Schema::create('distribution_details', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('distribution_id')->nullable();
-            $table->string('lookable_type')->nullable();
-            $table->bigInteger('lookable_id')->nullable();
+            $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('line_id')->nullable();
+            $table->bigInteger('department_id')->nullable();
+            $table->bigInteger('warehouse_id')->nullable();
             $table->double('percentage')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');

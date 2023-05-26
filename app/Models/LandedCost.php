@@ -18,6 +18,7 @@ class LandedCost extends Model
     protected $fillable = [
         'code',
         'user_id',
+        'supplier_id',
         'account_id',
         'good_receipt_id',
         'company_id',
@@ -25,13 +26,6 @@ class LandedCost extends Model
         'reference',
         'currency_id',
         'currency_rate',
-        'tax_id',
-        'wtax_id',
-        'is_tax',
-        'is_include_tax',
-        'percent_tax',
-        'is_wtax',
-        'percent_wtax',
         'note',
         'document',
         'total',
@@ -53,19 +47,14 @@ class LandedCost extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
+    public function supplier()
+    {
+        return $this->belongsTo('App\Models\User', 'supplier_id', 'id')->withTrashed();
+    }
+
     public function vendor()
     {
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
-    }
-
-    public function tax()
-    {
-        return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
-    }
-
-    public function wtax()
-    {
-        return $this->belongsTo('App\Models\Tax', 'wtax_id', 'id')->withTrashed();
     }
 
     public function currency()
@@ -91,36 +80,6 @@ class LandedCost extends Model
     public function landedCostFeeDetail()
     {
         return $this->hasMany('App\Models\LandedCostFeeDetail');
-    }
-
-    public function isIncludeTax(){
-        $type = match ($this->is_include_tax) {
-          '0' => 'Tidak',
-          '1' => 'Termasuk',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function isTax(){
-        $type = match ($this->is_tax) {
-          NULL => 'Tidak',
-          '1' => 'Ya',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function isWtax(){
-        $type = match ($this->is_wtax) {
-          NULL => 'Tidak',
-          '1' => 'Ya',
-          default => 'Invalid',
-        };
-
-        return $type;
     }
 
     public function status(){

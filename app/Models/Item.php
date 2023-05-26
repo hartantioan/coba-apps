@@ -157,4 +157,15 @@ class Item extends Model
         
         return $arrData;
     }
+
+    public function itemStock()
+    {
+        return $this->hasMany('App\Models\ItemStock','item_id','id');
+    }
+
+    public function getStockPlace($place_id){
+        $total = $this->itemStock()->where('place_id',$place_id)->sum('qty');
+
+        return $total;
+    }
 }

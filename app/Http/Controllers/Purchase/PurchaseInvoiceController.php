@@ -229,7 +229,7 @@ class PurchaseInvoiceController extends Controller
                 foreach($datalc->landedCostDetail as $rowdetail){
                     if($datalc->balanceInvoice() > 0){
                         $details[] = [
-                            'type'          => 'good_receipt_details',
+                            'type'          => 'landed_cost_details',
                             'id'            => $rowdetail->id,
                             'name'          => $rowdetail->item->code.' - '.$rowdetail->item->name,
                             'qty_received'  => number_format($rowdetail->qty,3,',','.'),

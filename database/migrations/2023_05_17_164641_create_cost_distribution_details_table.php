@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('distribution_details', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('distribution_id')->nullable();
+            $table->bigInteger('cost_distribution_id')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('line_id')->nullable();
             $table->bigInteger('department_id')->nullable();

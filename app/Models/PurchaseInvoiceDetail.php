@@ -69,9 +69,9 @@ class PurchaseInvoiceDetail extends Model
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
     
-    public function landedCostDetail()
+    public function landedCost()
     {
-        if($this->lookable_type == 'landed_cost_details'){
+        if($this->lookable_type == 'landed_costs'){
             return true;
         }else{
             return false;

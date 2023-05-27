@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
+use App\Models\Department;
+use App\Models\Line;
 use App\Models\Place;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
@@ -15,8 +18,12 @@ class CostDistributionController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Mesin',
-            'content'   => 'admin.master_data.cost_distribution',
+            'title'         => 'Distribusi Biaya',
+            'content'       => 'admin.master_data.cost_distribution',
+            'place'         => Place::where('status','1')->get(),
+            'line'          => Line::where('status','1')->get(),
+            'department'    => Department::where('status','1')->get(),
+            'warehouse'     => Warehouse::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -75,7 +82,7 @@ class CostDistributionController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    $nomor,
+                    '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->name,
                     $val->status(),
@@ -102,16 +109,22 @@ class CostDistributionController extends Controller
         return response()->json($response);
     }
 
+    public function rowDetail(Request $request){
+        
+    }
+
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('lines', 'code')->ignore($request->temp)] : 'required|unique:lines,code',
-            'place_id'          => 'required',
+            'code' 				=> $request->temp ? ['required', Rule::unique('cost_distributions', 'code')->ignore($request->temp)] : 'required|unique:cost_distributions,code',
             'name'              => 'required',
+            'arr_place.*'       => 'required',
+            'arr_percentage.*'  => 'required',
         ], [
-            'code.required' 	    => 'Kode tidak boleh kosong.',
-            'code.unique'           => 'Kode telah terpakai.',
-            'place_id.required'     => 'Plant tidak boleh kosong.',
-            'name.required'         => 'Nama tidak boleh kosong.',
+            'code.required' 	            => 'Kode tidak boleh kosong.',
+            'code.unique'                   => 'Kode telah terpakai.',
+            'name.required'                 => 'Nama tidak boleh kosong.',
+            'arr_place.*.required'          => 'Plant tidak boleh kosong',
+            'arr_percentage.*.required'     => 'Prosentase distribusi tidak boleh kosong',
         ]);
 
         if($validation->fails()) {
@@ -120,74 +133,95 @@ class CostDistributionController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-			if($request->temp){
-                DB::beginTransaction();
-                try {
-                    $query = Line::find($request->temp);
+            DB::beginTransaction();
+            try {
+
+                if($request->temp){
+                    $query = CostDistribution::find($request->temp);
                     $query->code            = $request->code;
-                    $query->place_id        = $request->place_id;
                     $query->name	        = $request->name;
                     $query->note            = $request->note;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
-                    $query = Line::create([
+
+                    $query->costDistributionDetail()->delete();
+                }else{
+                    $query = CostDistribution::create([
                         'code'          => $request->code,
                         'place_id'      => $request->place_id,
                         'name'			=> $request->name,
                         'note'          => $request->note,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
+                
+                if($query) {
 
-                activity()
-                    ->performedOn(new Line())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit line.');
+                    foreach($request->arr_place as $key => $row){
+                        CostDistributionDetail::create([
+                            'cost_distribution_id'  => $query->id,
+                            'place_id'              => $row,
+                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                            'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                            'percentage'            => str_replace(',','.',str_replace('.','',$request->arr_percentage[$key])),
+                        ]);
+                    }
 
-				$response = [
-					'status'  => 200,
-					'message' => 'Data successfully saved.'
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
+                    activity()
+                        ->performedOn(new CostDistribution())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit cost distribution.');
+
+                    $response = [
+                        'status'  => 200,
+                        'message' => 'Data successfully saved.'
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+
+                DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            }
 		}
 		
 		return response()->json($response);
     }
 
     public function show(Request $request){
-        $line = Line::find($request->id);
+        $cd = CostDistribution::find($request->id);
+        
+        $details = [];
+        foreach($cd->costDistributionDetail as $cdd){
+            $details[] = [
+                'place_id'      => $cdd->place_id,
+                'line_id'       => $cdd->line_id ? $cdd->line_id : '',
+                'department_id' => $cdd->department_id ? $cdd->department_id : '',
+                'warehouse_id'  => $cdd->warehouse_id ? $cdd->warehouse_id : '',
+                'percentage'    => number_format($cdd->percentage,2,',','.'),
+            ];
+        }
+
+        $cd['details'] = $details;
         				
-		return response()->json($line);
+		return response()->json($cd);
     }
 
     public function destroy(Request $request){
-        $query = Line::find($request->id);
+        $query = CostDistribution::find($request->id);
 		
         if($query->delete()) {
             activity()
-                ->performedOn(new Line())
+                ->performedOn(new CostDistribution())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the line data');
+                ->log('Delete the cost distribution data');
 
             $response = [
                 'status'  => 200,

@@ -1164,7 +1164,7 @@
                     -
                 </td>
                 <td class="center">
-                    <input class="browser-default" type="text" name="arr_qty[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
+                    <input class="browser-default" type="text" name="arr_qty[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
                 </td>
                 <td class="center">
                     <input class="browser-default" type="text" name="arr_price[]" value="0" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
@@ -1433,11 +1433,11 @@
                 formData.delete("arr_warehouse[]");
 
                 $('select[name^="arr_percent_tax"]').each(function(){
-                    formData.append('arr_tax_id[]',$(this).find(':selected').data('id'));
+                    formData.append('arr_tax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
                 });
 
                 $('select[name^="arr_percent_wtax"]').each(function(){
-                    formData.append('arr_wtax_id[]',$(this).find(':selected').data('id'));
+                    formData.append('arr_wtax_id[]',($(this).find(':selected').data('id') ? $(this).find(':selected').data('id') : ''));
                 });
 
                 $('input[name^="arr_code"]').each(function(){

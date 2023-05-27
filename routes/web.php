@@ -505,6 +505,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('cost_distribution')->middleware('operation.access:cost_distribution,view')->group(function () {
                         Route::get('/',[CostDistributionController::class, 'index']);
                         Route::get('datatable',[CostDistributionController::class, 'datatable']);
+                        Route::get('row_detail',[CostDistributionController::class, 'rowDetail']);
                         Route::post('show', [CostDistributionController::class, 'show']);
                         Route::post('create',[CostDistributionController::class, 'create'])->middleware('operation.access:cost_distribution,update');
                         Route::post('destroy', [CostDistributionController::class, 'destroy'])->middleware('operation.access:cost_distribution,delete');

@@ -69,25 +69,25 @@ class PurchaseInvoiceDetail extends Model
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
     
-    public function landedCost()
+    public function landedCostDetail()
     {
-        if($this->lookable_type == 'landed_costs'){
+        if($this->lookable_type == 'landed_cost_details'){
             return true;
         }else{
             return false;
         }
     }
 
-    public function goodReceipt(){
-        if($this->lookable_type == 'good_receipts'){
+    public function goodReceiptDetail(){
+        if($this->lookable_type == 'good_receipt_details'){
             return true;
         }else{
             return false;
         }
     }
 
-    public function purchaseOrder(){
-        if($this->lookable_type == 'purchase_orders'){
+    public function purchaseOrderDetail(){
+        if($this->lookable_type == 'purchase_orders_details'){
             return true;
         }else{
             return false;

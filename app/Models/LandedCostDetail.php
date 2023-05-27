@@ -84,4 +84,10 @@ class LandedCostDetail extends Model
             $query->whereIn('status',['2','3']);
         });
     }
+
+    public function qtyBuy(){
+        $qty = round($this->qty / $this->item->buy_convert,3);
+
+        return $qty;
+    }
 }

@@ -116,7 +116,19 @@ class PurchaseInvoiceController extends Controller
         $datalc = LandedCost::where('account_id',$request->id)->whereIn('status',['2','3'])->get();
 
         foreach($datalc as $row){
-
+            $invoice = $row->totalInvoice();
+            if(($row->grandtotal - $invoice) > 0){
+                $details[] = [
+                    'type'          => 'landed_costs',
+                    'id'            => $row->id,
+                    'code'          => $row->code,
+                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'invoice'       => number_format($invoice,2,',','.'),
+                    'balance'       => number_format($row->grandtotal - $invoice,2,',','.'),
+                    'info'          => $row->note,
+                ];
+            }
         }
 
         $account['details'] = $details;
@@ -226,39 +238,38 @@ class PurchaseInvoiceController extends Controller
             }elseif($row == 'landed_costs'){
                 $datalc = LandedCost::find(intval($request->arr_id[$key]));
 
-                foreach($datalc->landedCostDetail as $rowdetail){
-                    if($datalc->balanceInvoice() > 0){
-                        $details[] = [
-                            'type'          => 'landed_cost_details',
-                            'id'            => $rowdetail->id,
-                            'name'          => $rowdetail->item->code.' - '.$rowdetail->item->name,
-                            'qty_received'  => number_format($rowdetail->qty,3,',','.'),
-                            'qty_returned'  => number_format($rowdetail->qtyReturn(),3,',','.'),
-                            'qty_balance'   => number_format(($rowdetail->qty - $rowdetail->qtyReturn()),3,',','.'),
-                            'price'         => number_format($rowdetail->total / ($rowdetail->qty - $rowdetail->qtyReturn()),2,',','.'),
-                            'buy_unit'      => $rowdetail->item->buyUnit->code,
-                            'rawcode'       => $datalc->code,
-                            'post_date'     => date('d/m/y',strtotime($datalc->post_date)),
-                            'due_date'      => date('d/m/y',strtotime($datalc->post_date)),
-                            'total'         => number_format($rowdetail->total,2,',','.'),
-                            'tax'           => number_format($rowdetail->tax,2,',','.'),
-                            'wtax'          => number_format($rowdetail->wtax,2,',','.'),
-                            'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
-                            'info'          => $info,
-                            'top'           => $top,
-                            'delivery_no'   => 'NO SJ - '.$datalc->delivery_no,
-                            'purchase_no'   => 'NO PO - '.$rowdetail->purchaseOrderDetail->purchaseOrder->code,
-                            'percent_tax'   => $rowdetail->purchaseOrderDetail->percent_tax,
-                            'percent_wtax'  => $rowdetail->purchaseOrderDetail->percent_wtax,
-                            'include_tax'   => $rowdetail->purchaseOrderDetail->is_include_tax,
-                            'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
-                            'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
-                            'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
-                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '',
-                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '',
-                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '',
-                        ];
-                    }
+                if($datalc->balanceInvoice() > 0){
+                    $arrInfo = $datalc->getArrayDetail();
+                    $details[] = [
+                        'type'          => 'landed_costs',
+                        'id'            => $datalc->id,
+                        'name'          => $datalc->code,
+                        'qty_received'  => 1,
+                        'qty_returned'  => 0,
+                        'qty_balance'   => 1,
+                        'price'         => number_format($datalc->total,2,',','.'),
+                        'buy_unit'      => '-',
+                        'rawcode'       => $datalc->code,
+                        'post_date'     => date('d/m/y',strtotime($datalc->post_date)),
+                        'due_date'      => date('d/m/y',strtotime($datalc->post_date)),
+                        'total'         => number_format($datalc->total,2,',','.'),
+                        'tax'           => number_format($datalc->tax,2,',','.'),
+                        'wtax'          => number_format($datalc->wtax,2,',','.'),
+                        'grandtotal'    => number_format($datalc->grandtotal,2,',','.'),
+                        'info'          => $datalc->note,
+                        'top'           => 0,
+                        'delivery_no'   => '-',
+                        'purchase_no'   => '-',
+                        'percent_tax'   => 0,
+                        'percent_wtax'  => 0,
+                        'include_tax'   => 0,
+                        'place_id'      => $arrInfo['place_id'],
+                        'department_id' => $arrInfo['department_id'],
+                        'warehouse_id'  => $arrInfo['warehouse_id'],
+                        'place_name'    => $arrInfo['place_name'],
+                        'department_name' => $arrInfo['department_name'],
+                        'warehouse_name'=> $arrInfo['warehouse_name'],
+                    ];
                 }
             }
         }

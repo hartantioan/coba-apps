@@ -169,23 +169,6 @@ class LandedCost extends Model
         }
     }
 
-    public function purchaseInvoiceDetail()
-    {
-        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
-            $query->whereIn('status',['2','3']);
-        });
-    }
-
-    public function balanceInvoice(){
-        $total = round($this->grandtotal,2);
-
-        foreach($this->purchaseInvoiceDetail as $row){
-            $total -= $row->grandtotal;
-        }
-
-        return $total;
-    }
-
     public function getListItem(){
         $html = '<ol>';
 
@@ -206,5 +189,49 @@ class LandedCost extends Model
         }
 
         return $hasRelation;
+    }
+
+    public function purchaseInvoiceDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balanceInvoice(){
+        $total = round($this->grandtotal,2);
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $total -= $row->grandtotal;
+        }
+
+        return $total;
+    }
+
+    public function getArrayDetail(){
+        $arrInfo = [];
+        
+        foreach($this->landedCostDetail as $row){
+            $arrInfo = [
+                'place_id'          => $row->place_id,
+                'place_name'        => $row->place->code,
+                'department_id'     => $row->department_id,
+                'department_name'   => $row->department->name,
+                'warehouse_id'      => $row->warehouse_id,
+                'warehouse_name'    => $row->warehouse->name,
+            ];
+        }
+
+        return $arrInfo;
+    }
+
+    public function totalInvoice(){
+        $total = 0;
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $total += $row->grandtotal;
+        }
+
+        return $total;
     }
 }

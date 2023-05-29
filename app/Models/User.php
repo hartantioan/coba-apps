@@ -123,7 +123,12 @@ class User extends Authenticatable
 
     public function signature() 
     {
-        return '<img src="'.asset(Storage::url($this->signature)).'" width="100px">';
+        $image = storage_path('app/'.$this->signature);
+        $extencion = explode('.',$image);
+        $base64 = base64_encode(file_get_contents($image));
+        $path_img = 'data:image/' . $extencion[1] . ';base64,' . $base64;
+
+        return '<img src="'.$path_img.'" width="100px">';
     }
 
     public static function generateCode($type)

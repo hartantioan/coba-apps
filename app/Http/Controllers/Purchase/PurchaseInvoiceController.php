@@ -12,10 +12,15 @@ use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoiceDp;
 use App\Models\PurchaseOrder;
 use App\Models\Warehouse;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Dompdf;
+use iio\libmergepdf\Merger;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\LandedCost;
 use App\Models\PurchaseInvoice;
@@ -546,178 +551,179 @@ class PurchaseInvoiceController extends Controller
             }
 
             $balance = $grandtotal - $downpayment + $rounding;
+            for ($lastNumber = 1; $lastNumber <= 100; $lastNumber++) {
+                if($request->temp){
+                    DB::beginTransaction();
+                    try {
+                        $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
 
-			if($request->temp){
-                DB::beginTransaction();
-                try {
-                    $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
+                        if($query->approval()){
+                            foreach($query->approval()->approvalMatrix as $row){
+                                if($row->status == '2'){
+                                    return response()->json([
+                                        'status'  => 500,
+                                        'message' => 'Purchase Order Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
+                                    ]);
+                                }
+                            }
+                        }
 
-                    if($query->approval()){
-                        foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Purchase Order Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
+                        if($query->status == '1'){
+
+                            if($request->has('document')) {
+                                if(Storage::exists($query->document)){
+                                    Storage::delete($query->document);
+                                }
+                                $document = $request->file('document')->store('public/purchase_invoices');
+                            } else {
+                                $document = $query->document;
+                            }
+
+                            $query->user_id = session('bo_id');
+                            $query->account_id = $request->account_id;
+                            $query->company_id = $request->company_id;
+                            $query->post_date = $request->post_date;
+                            $query->received_date = $request->received_date;
+                            $query->due_date = $request->due_date;
+                            $query->document_date = $request->document_date;
+                            $query->type = $request->type;
+                            $query->total = round($total,3);
+                            $query->tax = round($tax,3);
+                            $query->wtax = round($wtax,3);
+                            $query->grandtotal = round($grandtotal,3);
+                            $query->downpayment = round($downpayment,3);
+                            $query->rounding = round($rounding,3);
+                            $query->balance = round($balance,3);
+                            $query->document = $document;
+                            $query->note = $request->note;
+                            $query->tax_no = $request->tax_no;
+                            $query->tax_cut_no = $request->tax_cut_no;
+                            $query->cut_date = $request->cut_date;
+                            $query->spk_no = $request->spk_no;
+                            $query->invoice_no = $request->invoice_no;
+
+                            $query->save();
+
+                            foreach($query->purchaseInvoiceDetail as $row){
+                                $row->delete();
+                            }
+
+                            foreach($query->purchaseInvoiceDp as $row){
+                                $row->delete();
+                            }
+
+                            DB::commit();
+                        }else{
+                            return response()->json([
+                                'status'  => 500,
+                                'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            ]);
+                        }
+                    }catch(\Exception $e){
+                        DB::rollback();
+                    }
+                }else{
+                    DB::beginTransaction();
+                    try {
+                        $query = PurchaseInvoice::create([
+                            'code'			            => PurchaseInvoice::generateCode(),
+                            'user_id'		            => session('bo_id'),
+                            'account_id'                => $request->account_id,
+                            'company_id'                => $request->company_id,
+                            'post_date'                 => $request->post_date,
+                            'received_date'             => $request->received_date,
+                            'due_date'                  => $request->due_date,
+                            'document_date'             => $request->document_date,
+                            'type'                      => $request->type,
+                            'total'                     => round($total,3),
+                            'tax'                       => round($tax,3),
+                            'wtax'                      => round($wtax,3),
+                            'grandtotal'                => round($grandtotal,3),
+                            'downpayment'               => round($downpayment,3),
+                            'rounding'                  => round($rounding,3),
+                            'balance'                   => round($balance,3),
+                            'note'                      => $request->note,
+                            'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
+                            'status'                    => '1',
+                            'tax_no'                    => $request->tax_no,
+                            'tax_cut_no'                => $request->tax_cut_no,
+                            'cut_date'                  => $request->cut_date,
+                            'spk_no'                    => $request->spk_no,
+                            'invoice_no'                => $request->invoice_no
+                        ]);
+
+                        DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
+                    }
+                }
+                
+                if($query) {
+                    DB::beginTransaction();
+                    try {
+                        if($request->arr_type){
+                            
+                            foreach($request->arr_type as $key => $row){
+                                PurchaseInvoiceDetail::create([
+                                    'purchase_invoice_id'   => $query->id,
+                                    'lookable_type'         => $row,
+                                    'lookable_id'           => $request->arr_code[$key],
+                                    'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                    'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                                    'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                    'tax_id'                => $request->arr_tax_id[$key] ? $request->arr_tax_id[$key] : NULL,
+                                    'wtax_id'               => $request->arr_wtax_id[$key] ? $request->arr_wtax_id[$key] : NULL,
+                                    'is_include_tax'        => $request->arr_include_tax[$key],
+                                    'percent_tax'           => $request->arr_percent_tax[$key],
+                                    'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                    'percent_wtax'          => $request->arr_percent_wtax[$key],
+                                    'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
+                                    'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                                    'note'                  => $request->arr_note[$key],
+                                    'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                                    'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                    'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
+                                ]);
+                            }
+                                
+                        }
+
+                        if($request->arr_dp_code){
+                            foreach($request->arr_dp_code as $key => $row){
+                                PurchaseInvoiceDp::create([
+                                    'purchase_invoice_id'       => $query->id,
+                                    'purchase_down_payment_id'  => PurchaseDownPayment::where('code',CustomHelper::decrypt($row))->first()->id,
+                                    'nominal'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                                 ]);
                             }
                         }
-                    }
-
-                    if($query->status == '1'){
-
-                        if($request->has('document')) {
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
-                            }
-                            $document = $request->file('document')->store('public/purchase_invoices');
-                        } else {
-                            $document = $query->document;
-                        }
-
-                        $query->user_id = session('bo_id');
-                        $query->account_id = $request->account_id;
-                        $query->company_id = $request->company_id;
-                        $query->post_date = $request->post_date;
-                        $query->received_date = $request->received_date;
-                        $query->due_date = $request->due_date;
-                        $query->document_date = $request->document_date;
-                        $query->type = $request->type;
-                        $query->total = round($total,3);
-                        $query->tax = round($tax,3);
-                        $query->wtax = round($wtax,3);
-                        $query->grandtotal = round($grandtotal,3);
-                        $query->downpayment = round($downpayment,3);
-                        $query->rounding = round($rounding,3);
-                        $query->balance = round($balance,3);
-                        $query->document = $document;
-                        $query->note = $request->note;
-                        $query->tax_no = $request->tax_no;
-                        $query->tax_cut_no = $request->tax_cut_no;
-                        $query->cut_date = $request->cut_date;
-                        $query->spk_no = $request->spk_no;
-                        $query->invoice_no = $request->invoice_no;
-
-                        $query->save();
-
-                        foreach($query->purchaseInvoiceDetail as $row){
-                            $row->delete();
-                        }
-
-                        foreach($query->purchaseInvoiceDp as $row){
-                            $row->delete();
-                        }
-
+                    
                         DB::commit();
-                    }else{
-                        return response()->json([
-                            'status'  => 500,
-					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
-                    $query = PurchaseInvoice::create([
-                        'code'			            => PurchaseInvoice::generateCode(),
-                        'user_id'		            => session('bo_id'),
-                        'account_id'                => $request->account_id,
-                        'company_id'                => $request->company_id,
-                        'post_date'                 => $request->post_date,
-                        'received_date'             => $request->received_date,
-                        'due_date'                  => $request->due_date,
-                        'document_date'             => $request->document_date,
-                        'type'                      => $request->type,
-                        'total'                     => round($total,3),
-                        'tax'                       => round($tax,3),
-                        'wtax'                      => round($wtax,3),
-                        'grandtotal'                => round($grandtotal,3),
-                        'downpayment'               => round($downpayment,3),
-                        'rounding'                  => round($rounding,3),
-                        'balance'                   => round($balance,3),
-                        'note'                      => $request->note,
-                        'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
-                        'status'                    => '1',
-                        'tax_no'                    => $request->tax_no,
-                        'tax_cut_no'                => $request->tax_cut_no,
-                        'cut_date'                  => $request->cut_date,
-                        'spk_no'                    => $request->spk_no,
-                        'invoice_no'                => $request->invoice_no
-                    ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}
-			
-			if($query) {
-                DB::beginTransaction();
-                try {
-                    if($request->arr_type){
-                        
-                        foreach($request->arr_type as $key => $row){
-                            PurchaseInvoiceDetail::create([
-                                'purchase_invoice_id'   => $query->id,
-                                'lookable_type'         => $row,
-                                'lookable_id'           => $request->arr_code[$key],
-                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                                'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                                'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                                'tax_id'                => $request->arr_tax_id[$key] ? $request->arr_tax_id[$key] : NULL,
-                                'wtax_id'               => $request->arr_wtax_id[$key] ? $request->arr_wtax_id[$key] : NULL,
-                                'is_include_tax'        => $request->arr_include_tax[$key],
-                                'percent_tax'           => $request->arr_percent_tax[$key],
-                                'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
-                                'percent_wtax'          => $request->arr_percent_wtax[$key],
-                                'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
-                                'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
-                                'note'                  => $request->arr_note[$key],
-                                'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                                'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
-                                'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
-                            ]);
-                        }
-                            
+                    }catch(\Exception $e){
+                        DB::rollback();
                     }
 
-                    if($request->arr_dp_code){
-                        foreach($request->arr_dp_code as $key => $row){
-                            PurchaseInvoiceDp::create([
-                                'purchase_invoice_id'       => $query->id,
-                                'purchase_down_payment_id'  => PurchaseDownPayment::where('code',CustomHelper::decrypt($row))->first()->id,
-                                'nominal'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                            ]);
-                        }
-                    }
-                
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+                    CustomHelper::sendApproval('purchase_invoices',$query->id,$query->note);
+                    CustomHelper::sendNotification('purchase_invoices',$query->id,'Pengajuan Purchase Invoice No. '.$query->code,$query->note,session('bo_id'));
+                    CustomHelper::removeDeposit($query->account_id,$query->downpayment);
+
+                    activity()
+                        ->performedOn(new PurchaseInvoice())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit purchase invoice.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
-
-                CustomHelper::sendApproval('purchase_invoices',$query->id,$query->note);
-                CustomHelper::sendNotification('purchase_invoices',$query->id,'Pengajuan Purchase Invoice No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::removeDeposit($query->account_id,$query->downpayment);
-
-                activity()
-                    ->performedOn(new PurchaseInvoice())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit purchase invoice.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
+            }
 		}
 		
 		return response()->json($response);
@@ -835,6 +841,48 @@ class PurchaseInvoiceController extends Controller
             ];
 
             return view('admin.approval.purchase_invoice', $data);
+        }else{
+            abort(404);
+        }
+    }
+
+    public function printIndividual(Request $request,$id){
+        
+        $pr = PurchaseInvoice::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($pr){
+            $data = [
+                'title'     => 'Print Purchase Invoice',
+                'data'      => $pr
+            ];
+
+            $opciones_ssl=array(
+                "ssl"=>array(
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+                ),
+            );
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+             
+            $pdf = Pdf::loadView('admin.print.purchase.invoice_individual', $data)->setPaper('a5', 'landscape');
+            $pdf->render();
+    
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            
+            
+            $content = $pdf->download()->getOriginalContent();
+            
+            Storage::put('public/pdf/bubla.pdf',$content);
+            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+    
+    
+            return $document_po;
         }else{
             abort(404);
         }
@@ -997,6 +1045,330 @@ class PurchaseInvoiceController extends Controller
     }
 
     public function print(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_id'                => 'required',
+        ], [
+            'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
+        ]);
+        
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $var_link=[];
+            $pdf = new Dompdf();
+         
+            $html = '';
+            foreach($request->arr_id as $key =>$row){
+                $pr = PurchaseInvoice::where('code',$row)->first();
+                
+                if($pr){
+                    $data = [
+                        'title'     => 'Print Purchase Invoice',
+                        'data'      => $pr
+                    ];
+       
+                    $img_path = 'website/logo_web_fix.png';
+                    $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                    $image_temp = file_get_contents($img_path);
+                    $img_base_64 = base64_encode($image_temp);
+                    $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                    $data["image"]=$path_img;
+
+                    $additionalView = View::make('admin.print.purchase.invoice_individual', $data);
+                    $html .= $additionalView->render();
+                    
+                    // $pdf = Pdf::loadView('admin.print.purchase.invoice_individual', $data)->setPaper('a5', 'landscape');
+                    // $pdf->render();
+            
+                    // $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                    // $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    
+
+                }
+                    
+            }
+            $pdf = PDF::loadHTML($html)->setPaper('a5', 'landscape');
+            $content = $pdf->download()->getOriginalContent();
+            
+            Storage::put('public/pdf/bubla.pdf',$content);
+            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $var_link=$document_po;
+
+            $response =[
+                'status'=>200,
+                'data'  =>$var_link
+            ];
+        }
+        
+		
+		return response()->json($response);
+    }
+    public function printByRangeTemp(Request $request){
+        if($request->type_date == 1){
+            $validation = Validator::make($request->all(), [
+                'range_start'                => 'required',
+                'range_end'                  => 'required',
+            ], [
+                'range_start.required'       => 'Isi code awal yang ingin di pilih menjadi awal range',
+                'range_end.required'         => 'Isi code terakhir yang menjadi akhir range',
+            ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            }else{
+
+                if($request->range_start>$request->range_end){
+                    $kambing["kambing"][]="code awal lebih besar daripada code akhir";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ]; 
+                }else{
+                    $pdf = new Dompdf();
+         
+                    $html = '';
+                    for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
+                        $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$nomor)->first();
+                        if($query){
+                            $data = [
+                                'title'     => 'Print Purchase Invoice',
+                                'data'      => $query
+                            ];
+            
+                            $img_path = 'website/logo_web_fix.png';
+                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                            $image_temp = file_get_contents($img_path);
+                            $img_base_64 = base64_encode($image_temp);
+                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                            $data["image"]=$path_img;
+        
+                            $additionalView = View::make('admin.print.purchase.invoice_individual', $data);
+                            $html .= $additionalView->render();
+                        }
+                    }
+                    $pdf = PDF::loadHTML($html)->setPaper('a5', 'landscape');
+                    $content = $pdf->download()->getOriginalContent();
+                    
+                    Storage::put('public/pdf/bubla.pdf',$content);
+                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $var_link=$document_po;
+        
+                    $response =[
+                        'status'=>200,
+                        'message'  =>$var_link
+                    ];
+                } 
+
+            }
+        }elseif($request->type_date == 2){
+            $validation = Validator::make($request->all(), [
+                'range_comma'                => 'required',
+                
+            ], [
+                'range_comma.required'       => 'Isi input untuk comma',
+                
+            ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            }else{
+                $arr = explode(',', $request->range_comma);
+                
+                $merged = array_unique(array_filter($arr));
+                $pdf = new Dompdf();
+        
+                $html = '';
+
+                foreach($merged as $code){
+                    $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$code)->first();
+                    if($query){
+                        $data = [
+                            'title'     => 'Print Purchase Invoice',
+                            'data'      => $query
+                        ];
+        
+                        $img_path = 'website/logo_web_fix.png';
+                        $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                        $image_temp = file_get_contents($img_path);
+                        $img_base_64 = base64_encode($image_temp);
+                        $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                        $data["image"]=$path_img;
+    
+                        $additionalView = View::make('admin.print.purchase.invoice_individual', $data);
+                        $html .= $additionalView->render();
+                    }
+                }
+                $pdf = PDF::loadHTML($html)->setPaper('a5', 'landscape');
+                $content = $pdf->download()->getOriginalContent();
+                
+                Storage::put('public/pdf/bubla.pdf',$content);
+                $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                $var_link=$document_po;
+    
+                $response =[
+                    'status'=>200,
+                    'message'  =>$merged
+                ];
+                
+
+            }
+        }
+        return response()->json($response);
+    }
+    public function printByRange(Request $request){
+        $currentDateTime = Date::now();
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+        if($request->type_date == 1){
+            $validation = Validator::make($request->all(), [
+                'range_start'                => 'required',
+                'range_end'                  => 'required',
+            ], [
+                'range_start.required'       => 'Isi code awal yang ingin di pilih menjadi awal range',
+                'range_end.required'         => 'Isi code terakhir yang menjadi akhir range',
+            ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            }else{
+                $total_pdf = intval($request->range_end)-intval($request->range_start);
+                $temp_pdf=[];
+                if($request->range_start>$request->range_end){
+                    $kambing["kambing"][]="code awal lebih besar daripada code akhir";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ]; 
+                }
+                elseif($total_pdf>31){
+                    $kambing["kambing"][]="PDF lebih dari 30 buah";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ];
+                }else{   
+                    for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
+                        $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$nomor)->first();
+                        if($query){
+                            $data = [
+                                'title'     => 'Print Purchase Invoice',
+                                'data'      => $query
+                            ];
+                            $img_path = 'website/logo_web_fix.png';
+                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                            $image_temp = file_get_contents($img_path);
+                            $img_base_64 = base64_encode($image_temp);
+                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                            $data["image"]=$path_img;
+                            $pdf = Pdf::loadView('admin.print.purchase.invoice_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf->render();
+                            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $content = $pdf->download()->getOriginalContent();
+                            $temp_pdf[]=$content;
+                           
+                        }
+                    }
+                    $merger = new Merger();
+                    foreach ($temp_pdf as $pdfContent) {
+                        $merger->addRaw($pdfContent);
+                    }
+
+
+                    $result = $merger->merge();
+
+
+                    Storage::put('public/pdf/bubla.pdf',$result);
+                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $var_link=$document_po;
+        
+                    $response =[
+                        'status'=>200,
+                        'message'  =>$var_link
+                    ];
+                } 
+
+            }
+        }elseif($request->type_date == 2){
+            $validation = Validator::make($request->all(), [
+                'range_comma'                => 'required',
+                
+            ], [
+                'range_comma.required'       => 'Isi input untuk comma',
+                
+            ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            }else{
+                $arr = explode(',', $request->range_comma);
+                
+                $merged = array_unique(array_filter($arr));
+
+                if(count($merged)>31){
+                    $kambing["kambing"][]="PDF lebih dari 30 buah";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ];
+                }else{
+                    foreach($merged as $code){
+                        $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$code)->first();
+                        if($query){
+                            $data = [
+                                'title'     => 'Print Purchase Invoice',
+                                'data'      => $query
+                            ];
+                            $img_path = 'website/logo_web_fix.png';
+                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                            $image_temp = file_get_contents($img_path);
+                            $img_base_64 = base64_encode($image_temp);
+                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                            $data["image"]=$path_img;
+                            $pdf = Pdf::loadView('admin.print.purchase.invoice_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf->render();
+                            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $content = $pdf->download()->getOriginalContent();
+                            $temp_pdf[]=$content;
+                           
+                        }
+                    }
+                    $merger = new Merger();
+                    foreach ($temp_pdf as $pdfContent) {
+                        $merger->addRaw($pdfContent);
+                    }
+    
+    
+                    $result = $merger->merge();
+    
+    
+                    Storage::put('public/pdf/bubla.pdf',$result);
+                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $var_link=$document_po;
+        
+                    $response =[
+                        'status'=>200,
+                        'message'  =>$var_link
+                    ];
+                }
+            }
+        }
+        return response()->json($response);
+    }
+    public function printALL(Request $request){
 
         $data = [
             'title' => 'PURCHASE INVOICE REPORT',
@@ -1076,6 +1448,7 @@ class PurchaseInvoiceController extends Controller
         $data_outgoingpayments = [];
         $data_lcs=[];
         $data_invoices=[];
+        $data_id_lc=[];
 
         $data_go_chart=[];
         $data_link=[];
@@ -1391,10 +1764,98 @@ class PurchaseInvoiceController extends Controller
                                 }
                             }
                         }
+                        //landed cost searching
+                        if($good_receipt_detail->landedCostDetail()->exists()){
+                            foreach($good_receipt_detail->landedCostDetail->landedCost as $landed_cost){
+                                $data_lc=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal : ".$landed_cost->post_date],
+                                        ['name'=> "Nominal : Rp.".number_format($landed_cost->grandtotal,2,',','.')]
+                                    ],
+                                    'key'=>$landed_cost->code,
+                                    'name'=>$landed_cost->code,
+                                    'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost->code),    
+                                ];
+                                if(count($data_lcs)<1){
+                                    $data_lcs[]=$data_lc;
+                                    $data_go_chart[]=$data_lc;
+                                    $data_link[]=[
+                                        'from'=>$query_gr->code,
+                                        'to'=>$landed_cost->code,
+                                    ];
+                                    $data_id_lc = $landed_cost->id;
+                                }else{
+                                    $found = false;
+                                    foreach ($data_lcs as $key => $row_lc) {
+                                        if ($row_lc["key"] == $data_lc["key"]) {
+                                            $found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!$found) {
+                                        $data_lcs[]=$data_lc;
+                                        $data_go_chart[]=$data_lc;
+                                        $data_link[]=[
+                                            'from'=>$query_gr->code,
+                                            'to'=>$landed_cost->code,
+                                        ];
+                                        $data_id_lc = $landed_cost->id;
+                                    }
+                                }
+                                
+                            }
+                        }
+                        //invoice searching
+                        if($good_receipt_detail->purchaseInvoiceDetail()->exists()){
+                            foreach($good_receipt_detail->purchaseInvoiceDetail as $invoice_detail){
+                                $invoice_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal : ".$invoice_detail->purchaseInvoice->post_date],
+                                        ['name'=> "Nominal : Rp.".number_format($invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
+                                        
+                                    ],
+                                    'key'=>$invoice_detail->purchaseInvoice->code,
+                                    'name'=>$invoice_detail->purchaseInvoice->code,
+                                    'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
+                                ];
+                                if(count($data_invoices)<1){
+                                    $data_invoices[]=$invoice_tempura;
+                                    $data_go_chart[]=$invoice_tempura;
+                                    $data_link[]=[
+                                        'from'=>$query_gr->code,
+                                        'to'=>$invoice_detail->purchaseInvoice->code,
+                                    ];
+                                    
+                                }else{
+                                    $found = false;
+                                    foreach ($data_invoices as $key => $row_invoice) {
+                                        if ($row_invoice["key"] == $invoice_tempura["key"]) {
+                                            $found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!$found) {
+                                        $data_invoices[]=$invoice_tempura;
+                                        $data_go_chart[]=$invoice_tempura;
+                                        $data_link[]=[
+                                            'from'=>$query_gr->code,
+                                            'to'=>$invoice_detail->purchaseInvoice->code,
+                                        ];
+                                        
+                                    }
+                                    
+                                }
+                                if(!in_array($invoice_detail->purchaseInvoice->id, $data_id_invoice)){
+                                    $data_id_invoice[] = $invoice_detail->purchaseInvoice->id;
+                                    $added = true; 
+                                }
+                            }
+                        }
 
                     }
 
-                    //landed cost searching
+                
+                    
                     if($query_gr->landedCost()->exists()){
                         foreach($query_gr->landedCost as $landed_cost){
                             $data_lc=[
@@ -1435,7 +1896,7 @@ class PurchaseInvoiceController extends Controller
                             
                         }
                     }
-                    //invoice searching
+                    
                     if($query_gr->purchaseInvoiceDetail()->exists()){
                         foreach($query_gr->purchaseInvoiceDetail as $invoice_detail){
                             $invoice_tempura=[
@@ -1483,6 +1944,9 @@ class PurchaseInvoiceController extends Controller
                     }
 
                 }
+
+
+
 
                 //mencari goodreturn foreign
                 foreach($data_id_greturns as $good_return_id){
@@ -2648,6 +3112,115 @@ class PurchaseInvoiceController extends Controller
 
                 }
                 
+                foreach($data_id_lc as $landed_cost_id){
+                    $query= LandedCost::find($landed_cost_id);
+                    foreach($query->landedCostDetail as $lc_detail ){
+                        if($lc_detail->goodReceiptDetail()){
+                            $data_good_receipt = [
+                                "key" => $lc_detail->lookable->goodReceipt->code,
+                                'name'=> $lc_detail->lookable->goodReceipt->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$lc_detail->lookable->goodReceipt->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->goodReceipt->grandtotal,2,',','.')],
+                                 ],
+                                'url'=>request()->root()."/admin/purchase/good_receipt?code=".CustomHelper::encrypt($lc_detail->lookable->goodReceipt->code),
+                            ];
+                            if(count($data_good_receipts)<1){
+                                            
+                                $data_good_receipts[]=$data_good_receipt;
+                                $data_go_chart[]=$data_good_receipt;
+                                $data_link[]=[
+                                    'from'=>$data_good_receipt["key"],
+                                    'to'=>$query->code,
+                                ];
+                               
+                            }else{
+                                $found = false;
+                                foreach ($data_good_receipts as $key => $row_pos) {
+                                    if ($row_pos["key"] == $data_good_receipt["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data_good_receipts[]=$data_good_receipt;
+                                    $data_go_chart[]=$data_good_receipt;
+                                    $data_link[]=[
+                                        'from'=>$data_good_receipt["key"],
+                                        'to'=>$query->code,
+                                    ];
+                                    
+                                   
+                                }
+                            }
+                            if(!in_array($lc_detail->lookable->goodReceipt->id, $data_id_gr)){
+                                $data_id_gr[] = $lc_detail->lookable->goodReceipt->id;
+                                $added = true;
+                            }
+
+                        }
+                        if($lc_detail->landedCostDetail()){
+                            $lc_other = [
+                                "key" => $lc_detail->lookable->landedCost->code,
+                                "name" => $lc_detail->lookable->landedCost->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$lc_detail->lookable->landedCost->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->landedCost->grandtotal,2,',','.')],
+                                 ],
+                                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
+                            ];
+                            if(count($data_lcs)<1){
+                                $data_lcs[]=$lc_other;
+                                $data_go_chart[]=$lc_other;
+                                $data_link[]=[
+                                    'from'=>$query->code,
+                                    'to'=>$lc_detail->lookable->landedCost->code,
+                                ];
+                                $data_id_lc = $lc_detail->lookable->landedCost->id;
+                            }else{
+                                $found = false;
+                                foreach ($data_lcs as $key => $lc_other) {
+                                    if ($lc_other["key"] == $data_lc["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data_lcs[]=$lc_other;
+                                    $data_go_chart[]=$lc_other;
+                                    $data_link[]=[
+                                        'from'=>$query->code,
+                                        'to'=>$lc_detail->lookable->landedCost->code,
+                                    ];
+                                    $data_id_lc = $row->lookable->id;
+                                }elseif($found){
+                                    $data_links=[
+                                        'from'=>$query->code,
+                                        'to'=>$lc_detail->lookable->landedCost->code,
+                                    ];  
+                                    $found_inlink = false;
+                                    foreach($data_link as $key=>$row_link){
+                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                            $found_inlink = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!$found_inlink){
+                                        $data_link[] = $data_links;
+                                    }
+                                }
+                            }
+                            $data_go_chart[]=$lc_other;
+                            $data_lcs[]=$lc_other;
+                            $data_link[]=[
+                                'from'=>$lc_detail->lookable->landedCost->code,
+                                'to'=>$query->code,
+                            ];
+                            $data_id_lc[]=$lc_detail->lookable->landedCost->id;
+                        }
+                    }
+                }
+
                 //Pengambilan foreign branch po
                 foreach($data_id_po as $po_id){
                     $query_po = PurchaseOrder::find($po_id);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodReturnPO;
+use App\Models\LandedCost;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
@@ -821,6 +822,7 @@ class GoodReceiptPOController extends Controller
         $data_good_returns = [];
         $data_outgoingpayments = [];
         $data_lcs=[];
+        $data_id_lc=[];
         $data_invoices=[];
        
         $data_pos = [];
@@ -1022,10 +1024,98 @@ class GoodReceiptPOController extends Controller
                                 }
                             }
                         }
+                        //landed cost searching
+                        if($good_receipt_detail->landedCostDetail()->exists()){
+                            foreach($good_receipt_detail->landedCostDetail->landedCost as $landed_cost){
+                                $data_lc=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal : ".$landed_cost->post_date],
+                                        ['name'=> "Nominal : Rp.".number_format($landed_cost->grandtotal,2,',','.')]
+                                    ],
+                                    'key'=>$landed_cost->code,
+                                    'name'=>$landed_cost->code,
+                                    'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost->code),    
+                                ];
+                                if(count($data_lcs)<1){
+                                    $data_lcs[]=$data_lc;
+                                    $data_go_chart[]=$data_lc;
+                                    $data_link[]=[
+                                        'from'=>$query_gr->code,
+                                        'to'=>$landed_cost->code,
+                                    ];
+                                    $data_id_lc = $landed_cost->id;
+                                }else{
+                                    $found = false;
+                                    foreach ($data_lcs as $key => $row_lc) {
+                                        if ($row_lc["key"] == $data_lc["key"]) {
+                                            $found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!$found) {
+                                        $data_lcs[]=$data_lc;
+                                        $data_go_chart[]=$data_lc;
+                                        $data_link[]=[
+                                            'from'=>$query_gr->code,
+                                            'to'=>$landed_cost->code,
+                                        ];
+                                        $data_id_lc = $landed_cost->id;
+                                    }
+                                }
+                                
+                            }
+                        }
+                        //invoice searching
+                        if($good_receipt_detail->purchaseInvoiceDetail()->exists()){
+                            foreach($good_receipt_detail->purchaseInvoiceDetail as $invoice_detail){
+                                $invoice_tempura=[
+                                    'properties'=> [
+                                        ['name'=> "Tanggal : ".$invoice_detail->purchaseInvoice->post_date],
+                                        ['name'=> "Nominal : Rp.".number_format($invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
+                                        
+                                    ],
+                                    'key'=>$invoice_detail->purchaseInvoice->code,
+                                    'name'=>$invoice_detail->purchaseInvoice->code,
+                                    'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
+                                ];
+                                if(count($data_invoices)<1){
+                                    $data_invoices[]=$invoice_tempura;
+                                    $data_go_chart[]=$invoice_tempura;
+                                    $data_link[]=[
+                                        'from'=>$query_gr->code,
+                                        'to'=>$invoice_detail->purchaseInvoice->code,
+                                    ];
+                                    
+                                }else{
+                                    $found = false;
+                                    foreach ($data_invoices as $key => $row_invoice) {
+                                        if ($row_invoice["key"] == $invoice_tempura["key"]) {
+                                            $found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!$found) {
+                                        $data_invoices[]=$invoice_tempura;
+                                        $data_go_chart[]=$invoice_tempura;
+                                        $data_link[]=[
+                                            'from'=>$query_gr->code,
+                                            'to'=>$invoice_detail->purchaseInvoice->code,
+                                        ];
+                                        
+                                    }
+                                    
+                                }
+                                if(!in_array($invoice_detail->purchaseInvoice->id, $data_id_invoice)){
+                                    $data_id_invoice[] = $invoice_detail->purchaseInvoice->id;
+                                    $added = true; 
+                                }
+                            }
+                        }
 
                     }
 
-                    //landed cost searching
+                
+                    
                     if($query_gr->landedCost()->exists()){
                         foreach($query_gr->landedCost as $landed_cost){
                             $data_lc=[
@@ -1066,7 +1156,7 @@ class GoodReceiptPOController extends Controller
                             
                         }
                     }
-                    //invoice searching
+                    
                     if($query_gr->purchaseInvoiceDetail()->exists()){
                         foreach($query_gr->purchaseInvoiceDetail as $invoice_detail){
                             $invoice_tempura=[
@@ -1114,6 +1204,9 @@ class GoodReceiptPOController extends Controller
                     }
 
                 }
+
+
+
 
                 //mencari goodreturn foreign
                 foreach($data_id_greturns as $good_return_id){
@@ -2279,6 +2372,115 @@ class GoodReceiptPOController extends Controller
 
                 }
                 
+                foreach($data_id_lc as $landed_cost_id){
+                    $query= LandedCost::find($landed_cost_id);
+                    foreach($query->landedCostDetail as $lc_detail ){
+                        if($lc_detail->goodReceiptDetail()){
+                            $data_good_receipt = [
+                                "key" => $lc_detail->lookable->goodReceipt->code,
+                                'name'=> $lc_detail->lookable->goodReceipt->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$lc_detail->lookable->goodReceipt->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->goodReceipt->grandtotal,2,',','.')],
+                                 ],
+                                'url'=>request()->root()."/admin/purchase/good_receipt?code=".CustomHelper::encrypt($lc_detail->lookable->goodReceipt->code),
+                            ];
+                            if(count($data_good_receipts)<1){
+                                            
+                                $data_good_receipts[]=$data_good_receipt;
+                                $data_go_chart[]=$data_good_receipt;
+                                $data_link[]=[
+                                    'from'=>$data_good_receipt["key"],
+                                    'to'=>$query->code,
+                                ];
+                               
+                            }else{
+                                $found = false;
+                                foreach ($data_good_receipts as $key => $row_pos) {
+                                    if ($row_pos["key"] == $data_good_receipt["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data_good_receipts[]=$data_good_receipt;
+                                    $data_go_chart[]=$data_good_receipt;
+                                    $data_link[]=[
+                                        'from'=>$data_good_receipt["key"],
+                                        'to'=>$query->code,
+                                    ];
+                                    
+                                   
+                                }
+                            }
+                            if(!in_array($lc_detail->lookable->goodReceipt->id, $data_id_gr)){
+                                $data_id_gr[] = $lc_detail->lookable->goodReceipt->id;
+                                $added = true;
+                            }
+
+                        }
+                        if($lc_detail->landedCostDetail()){
+                            $lc_other = [
+                                "key" => $lc_detail->lookable->landedCost->code,
+                                "name" => $lc_detail->lookable->landedCost->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$lc_detail->lookable->landedCost->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($lc_detail->lookable->landedCost->grandtotal,2,',','.')],
+                                 ],
+                                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
+                            ];
+                            if(count($data_lcs)<1){
+                                $data_lcs[]=$lc_other;
+                                $data_go_chart[]=$lc_other;
+                                $data_link[]=[
+                                    'from'=>$query->code,
+                                    'to'=>$lc_detail->lookable->landedCost->code,
+                                ];
+                                $data_id_lc = $lc_detail->lookable->landedCost->id;
+                            }else{
+                                $found = false;
+                                foreach ($data_lcs as $key => $lc_other) {
+                                    if ($lc_other["key"] == $data_lc["key"]) {
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data_lcs[]=$lc_other;
+                                    $data_go_chart[]=$lc_other;
+                                    $data_link[]=[
+                                        'from'=>$query->code,
+                                        'to'=>$lc_detail->lookable->landedCost->code,
+                                    ];
+                                    $data_id_lc = $row->lookable->id;
+                                }elseif($found){
+                                    $data_links=[
+                                        'from'=>$query->code,
+                                        'to'=>$lc_detail->lookable->landedCost->code,
+                                    ];  
+                                    $found_inlink = false;
+                                    foreach($data_link as $key=>$row_link){
+                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
+                                            $found_inlink = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!$found_inlink){
+                                        $data_link[] = $data_links;
+                                    }
+                                }
+                            }
+                            $data_go_chart[]=$lc_other;
+                            $data_lcs[]=$lc_other;
+                            $data_link[]=[
+                                'from'=>$lc_detail->lookable->landedCost->code,
+                                'to'=>$query->code,
+                            ];
+                            $data_id_lc[]=$lc_detail->lookable->landedCost->id;
+                        }
+                    }
+                }
+
                 //Pengambilan foreign branch po
                 foreach($data_id_po as $po_id){
                     $query_po = PurchaseOrder::find($po_id);

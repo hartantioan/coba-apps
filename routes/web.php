@@ -615,6 +615,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [PurchaseRequestController::class, 'show']);
                     Route::post('print',[PurchaseRequestController::class, 'print']);
                     Route::get('export',[PurchaseRequestController::class, 'export']);
+                    Route::get('print_individual/{id}',[PurchaseRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[PurchaseRequestController::class, 'viewStructureTree']);
                     Route::post('create',[PurchaseRequestController::class, 'create'])->middleware('operation.access:purchase_request,update');
                     Route::post('void_status', [PurchaseRequestController::class, 'voidStatus'])->middleware('operation.access:purchase_request,void');
@@ -634,6 +635,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('remove_used_data', [PurchaseOrderController::class, 'removeUsedData']);
                     Route::post('create',[PurchaseOrderController::class, 'create'])->middleware('operation.access:purchase_order,update');
                     Route::get('approval/{id}',[PurchaseOrderController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[PurchaseOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [PurchaseOrderController::class, 'voidStatus'])->middleware('operation.access:purchase_order,void');
                     Route::post('destroy', [PurchaseOrderController::class, 'destroy'])->middleware('operation.access:purchase_order,delete');
                 });
@@ -644,7 +646,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[PurchaseDownPaymentController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseDownPaymentController::class, 'rowDetail']);
                     Route::post('show', [PurchaseDownPaymentController::class, 'show']);
-                    Route::post('print',[PurchaseDownPaymentController::class, 'print']);
+                    Route::get('print',[PurchaseDownPaymentController::class, 'print']);
+                    Route::get('print_individual/{id}',[PurchaseDownPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[PurchaseDownPaymentController::class, 'viewStructureTree']);
                     Route::get('export',[PurchaseDownPaymentController::class, 'export']);
                     Route::post('create',[PurchaseDownPaymentController::class, 'create'])->middleware('operation.access:purchase_down_payment,update');
@@ -661,6 +664,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[LandedCostController::class, 'rowDetail']);
                     Route::post('show', [LandedCostController::class, 'show']);
                     Route::post('print',[LandedCostController::class, 'print']);
+                    Route::get('print_individual/{id}',[LandedCostController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[LandedCostController::class, 'export']);
                     Route::get('viewstructuretree',[LandedCostController::class, 'viewStructureTree']);
                     Route::post('remove_used_data', [LandedCostController::class, 'removeUsedData']);
@@ -679,6 +683,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[PurchaseInvoiceController::class, 'rowDetail']);
                     Route::post('show', [PurchaseInvoiceController::class, 'show']);
                     Route::post('print',[PurchaseInvoiceController::class, 'print']);
+                    Route::post('print_by_range',[PurchaseInvoiceController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[PurchaseInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[PurchaseInvoiceController::class, 'export']);
                     Route::get('viewstructuretree',[PurchaseInvoiceController::class, 'viewStructureTree']);
                     Route::post('create',[PurchaseInvoiceController::class, 'create'])->middleware('operation.access:purchase_invoice,update');

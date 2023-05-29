@@ -184,7 +184,7 @@ return [
         /*
          * Package Service Providers...
          */
-        
+        niklasravnsborg\LaravelPdf\PdfServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -208,6 +208,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
+        'PDF' => niklasravnsborg\LaravelPdf\Facades\Pdf::class
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 

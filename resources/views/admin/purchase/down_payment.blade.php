@@ -49,10 +49,20 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
+                        
                     </div>
                 </div>
             </div>
         </div>
+        <label class="checkbox">
+            <input type="checkbox" id="useDefaultPrinter" /> <strong>Print to Default printer</strong>
+        </label>
+        <p>or...</p>
+        <div id="installedPrinters">
+            <label for="installedPrinterName">Select an installed Printer:</label>
+            <select name="installedPrinterName" id="installedPrinterName"></select>
+        </div>
+        <div id="my-target-id"></div>
         <div class="col s12">
             <div class="container">
                 <div class="section section-data-tables">
@@ -417,6 +427,7 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
+       
 
         $('#datatable_serverside').on('click', 'td.details-control', function() {
             var tr    = $(this).closest('tr');
@@ -502,8 +513,11 @@
             }
         });
 
+        
+
         select2ServerSide('#supplier_id,#filter_supplier', '{{ url("admin/select2/supplier") }}');
     });
+
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -998,7 +1012,7 @@
 
     function printPreview(code){
         $.ajax({
-            url: '{{ Request::url() }}/approval/' + code,
+            url: '{{ Request::url() }}/print_individual/' + code,
             type:'GET',
             beforeSend: function() {
                 loadingOpen('.modal-content');
@@ -1007,9 +1021,7 @@
                 
             },
             success: function(data){
-                loadingClose('.modal-content');
-                $('#modal2').modal('open');
-                $('#show_print').html(data);
+                console.log(data);
             }
         });
     }
@@ -1192,12 +1204,24 @@
             }
         });
     }
+    var printService = new WebSocketPrinter({
+        onConnect: function () {
+            
+        },
+        onDisconnect: function () {
+           
+        },
+        onUpdate: function (message) {
+            
+        },
+    });
 
     function printData(){
         var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
         
+        var random = Math.random();
         $.ajax({
-            type : "POST",
+            type : "GET",
             url  : '{{ Request::url() }}/print',
             data : {
                 search : search,
@@ -1214,12 +1238,16 @@
             },
             cache: false,
             success: function(data){
-                var w = window.open('about:blank');
-                w.document.open();
-                w.document.write(data);
-                w.document.close();
+                
+                /* printService.submit({
+                    'type': 'INVOICE',
+                    'url': data
+                }); */
+                console.log(data);
             }
         });
+    
+		/* var newWin = window.open("{{ Request::url() }}/print?search="+search+"&status="+status+"&type="+type+"&company="+company+"&supplier="+supplier+"&currency="+currency+"&is_tax="+is_tax+"&is_include_tax="+is_include_tax, 'New Document' + random, 'width=600,height=400'); */
     }
 
     function exportExcel(){

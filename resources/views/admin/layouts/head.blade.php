@@ -45,6 +45,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/waitMe.min.css') }}">
     <!-- END: Custom CSS-->
 	<script src="{{ url('app-assets/js/vendors.min.js') }}"></script>
+    <script src="{{ url('app-assets/js/custom/websocket-printer.js') }}"></script>
 </head>
 <!-- END: Head-->
 

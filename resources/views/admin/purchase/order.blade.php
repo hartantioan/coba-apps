@@ -1719,7 +1719,7 @@
 
     function printPreview(code){
         $.ajax({
-            url: '{{ Request::url() }}/approval/' + code,
+            url: '{{ Request::url() }}/print_individual/' + code,
             type:'GET',
             beforeSend: function() {
                 loadingOpen('.modal-content');
@@ -1728,9 +1728,8 @@
                 
             },
             success: function(data){
-                loadingClose('.modal-content');
-                $('#modal2').modal('open');
-                $('#show_print').html(data);
+                
+                console.log(data);
             }
         });
     }
@@ -1900,6 +1899,18 @@
         );
     }
 
+    var printService = new WebSocketPrinter({
+        onConnect: function () {
+            
+        },
+        onDisconnect: function () {
+           
+        },
+        onUpdate: function (message) {
+            
+        },
+    });
+
     function printData(){
         var search = window.table.search(), status = $('#filter_status').val(), inventory = $('#filter_inventory').val(), type = $('#filter_type').val(), shipping = $('#filter_shipping').val(), company = $('#filter_company').val(), payment = $('#filter_payment').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val();
         
@@ -1922,10 +1933,11 @@
             },
             cache: false,
             success: function(data){
-                var w = window.open('about:blank');
-                w.document.open();
-                w.document.write(data);
-                w.document.close();
+                /* printService.submit({
+                    'type': 'INVOICE',
+                    'url': data
+                }); */
+                console.log(data);
             }
         });
     }

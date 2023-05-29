@@ -7,6 +7,7 @@ use App\Models\ApprovalSource;
 use App\Models\Company;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
+use App\Models\Line;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
@@ -45,6 +46,7 @@ class PurchaseRequestController extends Controller
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'=> Department::where('status','1')->get(),
+            'line'      => Line::where('status','1')->get(),
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
@@ -198,7 +200,7 @@ class PurchaseRequestController extends Controller
         $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="9">Daftar Item</th>
+                                <th class="center-align" colspan="10">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -208,6 +210,7 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Tgl.Dipakai</th>
                                 <th class="center-align">Plant</th>
+                                <th class="center-align">Mesin</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Departemen</th>
                             </tr>
@@ -221,7 +224,8 @@ class PurchaseRequestController extends Controller
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
-                <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
+                <td class="center-align">'.$row->place->name.'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
                 <td class="center-align">'.($row->department()->exists() ? $row->department->name : '-').'</td>
             </tr>';
@@ -469,6 +473,7 @@ class PurchaseRequestController extends Controller
                             'note'                  => $request->arr_note[$key],
                             'required_date'         => $request->arr_required_date[$key],
                             'place_id'              => $request->arr_place[$key],
+                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'department_id'         => $request->arr_department[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key]
                         ]);
@@ -513,13 +518,14 @@ class PurchaseRequestController extends Controller
             $arr[] = [
                 'item_id'           => $row->item_id,
                 'item_name'         => $row->item->name,
-                'qty'               => $row->qty,
+                'qty'               => number_format($row->qty,3,',','.'),
                 'unit'              => $row->item->buyUnit->code,
                 'note'              => $row->note,
                 'date'              => $row->required_date,
                 'warehouse_name'    => $row->warehouse->name,
                 'warehouse_id'      => $row->warehouse_id,
                 'place_id'          => $row->place_id,
+                'line_id'           => $row->line_id,
                 'department_id'     => $row->department_id
             ];
         }

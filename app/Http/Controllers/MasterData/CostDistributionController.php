@@ -34,6 +34,7 @@ class CostDistributionController extends Controller
             'id',
             'code',
             'name',
+            'coa_id',
             'note',
         ];
 
@@ -85,6 +86,7 @@ class CostDistributionController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->name,
+                    $val->coa_id ? $val->coa->name : '-',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -110,7 +112,34 @@ class CostDistributionController extends Controller
     }
 
     public function rowDetail(Request $request){
-        
+        $data   = CostDistribution::find($request->id);
+
+        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Mesin</th>
+                                <th class="center-align">Departemen</th>
+                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Prosentase(%)</th>
+                            </tr>
+                        </thead><tbody>';
+
+        foreach($data->costDistributionDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->place->code.' - '.$row->place->name.'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->code.' - '.$row->line->name : '-').'</td>
+                <td class="center-align">'.($row->department()->exists() ? $row->department->code.' - '.$row->department->name : '-').'</td>
+                <td class="center-align">'.($row->warehouse()->exists() ? $row->warehouse->code.' - '.$row->warehouse->name : '-').'</td>
+                <td class="center-align">'.number_format($row->percentage,2,',','.').'</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div></div>';
+		
+        return response()->json($string);
     }
 
     public function create(Request $request){
@@ -140,7 +169,7 @@ class CostDistributionController extends Controller
                     $query = CostDistribution::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
-                    $query->note            = $request->note;
+                    $query->coa_id          = $request->coa_id ? $request->coa_id : NULL;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
 
@@ -150,7 +179,7 @@ class CostDistributionController extends Controller
                         'code'          => $request->code,
                         'place_id'      => $request->place_id,
                         'name'			=> $request->name,
-                        'note'          => $request->note,
+                        'coa_id'        => $request->coa_id ? $request->coa_id : NULL,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                 }
@@ -217,6 +246,8 @@ class CostDistributionController extends Controller
         $query = CostDistribution::find($request->id);
 		
         if($query->delete()) {
+            $query->costDistributionDetail()->delete();
+
             activity()
                 ->performedOn(new CostDistribution())
                 ->causedBy(session('bo_id'))

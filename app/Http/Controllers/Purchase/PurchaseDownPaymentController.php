@@ -243,7 +243,7 @@ class PurchaseDownPaymentController extends Controller
             foreach($query_data as $val) {
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
-                    $val->code,
+                    $val->code.' - '.($val->journal()->exists() ? 'ADA' : 'TIDAK'),
                     $val->user->name,
                     $val->supplier->name,
                     $val->company->name,

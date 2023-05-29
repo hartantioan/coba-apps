@@ -185,16 +185,39 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="col s12" style="overflow:auto;width:100% !important;">
-                                <h6>Detail Coa</h6>
+                            <div class="col s12">
+                                <h5>Tambah dari Distribusi (Opsional)</h5>
+                                <div class="input-field col s3">
+                                    <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
+                                    <label class="active" for="cost_distribution_id">Distribusi Biaya</label>
+                                </div>
+                                <div class="input-field col s2">
+                                    <input name="nominal" id="nominal" type="text" value="0" onkeyup="formatRupiah(this);">
+                                    <label class="active" for="nominal">Nominal</label>
+                                </div>
+                                <div class="input-field col s2">
+                                    <select class="" id="type" name="type">
+                                        <option value="1">Debit</option>
+                                        <option value="2">Kredit</option>
+                                    </select>
+                                    <label class="" for="type">Tipe</label>
+                                </div>
+                                <div class="input-field col s3">
+                                    <a class="waves-effect waves-light green btn mr-1" onclick="addCostDistribution()" href="javascript:void(0);">
+                                        <i class="material-icons left">add</i> Tambah
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col s12 mt-2" style="overflow:auto;width:100% !important;">
+                                <h5>Detail Coa</h5>
                                 <p class="mt-2 mb-2">
                                     <table class="bordered" style="min-width:1500px;">
                                         <thead>
                                             <tr>
                                                 <th class="center">Coa</th>
-                                                <th class="center">Plant</th>
                                                 <th class="center">BP</th>
-                                                <th class="center">Item</th>
+                                                <th class="center">Plant</th>
+                                                <th class="center">Mesin</th>
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Gudang</th>
                                                 <th class="center">Debit</th>
@@ -246,9 +269,9 @@
                                                 <th class="center">Mata Uang</th>
                                                 <th class="center" style="width:75px;">Konversi</th>
                                                 <th class="center" style="width:75px;">Coa</th>
-                                                <th class="center" style="width:75px;">Plant</th>
                                                 <th class="center" style="width:75px;">BP</th>
-                                                <th class="center" style="width:75px;">Item</th>
+                                                <th class="center" style="width:75px;">Plant</th>
+                                                <th class="center" style="width:75px;">Mesin</th>
                                                 <th class="center" style="width:75px;">Departemen</th>
                                                 <th class="center" style="width:75px;">Gudang</th>
                                                 <th class="center">Debit</th>
@@ -354,6 +377,7 @@
                 M.updateTextFields();
                 resetDetailForm();
                 $('.row_coa').remove();
+                $('#cost_distribution_id').empty();
                 countAll();
             }
         });
@@ -384,6 +408,8 @@
             $(this).closest('tr').remove();
             countAllMulti();
         });
+
+        select2ServerSide('#cost_distribution_id', '{{ url("admin/select2/cost_distribution") }}');
     });
 
     function resetDetailForm(){
@@ -396,14 +422,102 @@
         });
     }
 
+    function addCostDistribution(){
+        if($('#cost_distribution_id').val() && $('#nominal').val() && parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")) > 0){
+            var total = parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")), type = $('#type').val();
+            $.each($('#cost_distribution_id').select2('data')[0].details, function (i, val) {
+                var count = makeid(10), nominal = parseFloat(total * (val.percentage / 100));
+                $('#last-row-coa').before(`
+                    <tr class="row_coa">
+                        <input type="hidden" name="arr_type[]" value="` + type + `">
+                        <input type="hidden" name="arr_cost_distribution_detail[]" value="` + val.id + `">
+                        <td>
+                            <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
+                                @foreach ($place as $row)
+                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"></select>
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
+                                <option value="">--Kosong--</option>
+                                @foreach ($department as $row)
+                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                        </td>
+                        <td>
+                            ` + (type == '1' ? `<input name="arr_nominal[]" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                        </td>
+                        <td>
+                            ` + (type == '2' ? `<input name="arr_nominal[]" type="text" value="` + formatRupiahIni(roundTwoDecimal(nominal).toString().replace('.',',')) + `" style="width:150px !important;" onkeyup="formatRupiah(this);countAll();">` : `-`) + `
+                        </td>
+                        <td class="center">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa" href="javascript:void(0);">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                `);
+
+                if(val.line_id){
+                    $('#arr_line' + count).append(`
+                        <option value="` + val.line_id + `">` + val.line_name + `</option>
+                    `);
+                }
+
+                if(val.warehouse_id){
+                    $('#arr_warehouse' + count).append(`
+                        <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                    `);
+                }
+
+                if($('#cost_distribution_id').select2('data')[0].coa_id){
+                    $('#arr_coa' + count).append(`
+                        <option value="` + $('#cost_distribution_id').select2('data')[0].coa_id + `">` + $('#cost_distribution_id').select2('data')[0].coa_name + `</option>
+                    `);
+                }
+                
+                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
+                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
+                select2ServerSide('#arr_line' + count, '{{ url("admin/select2/line") }}');
+                select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
+                $('#arr_place' + count).val(val.place_id).formSelect();
+                $('#arr_department' + count).val(val.department_id).formSelect();
+            });
+
+            countAll();
+        }
+        $('#cost_distribution_id').empty();
+        $('#nominal').val('0');
+        $('#type').val('1').formSelect();
+    }
+
     function addCoa(type){
         var count = makeid(10);
 
         $('#last-row-coa').before(`
             <tr class="row_coa">
                 <input type="hidden" name="arr_type[]" value="` + type + `">
+                <input type="hidden" name="arr_cost_distribution_detail[]" value="">
                 <td>
                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
                 </td>
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
@@ -413,10 +527,7 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_item` + count + `" name="arr_item[]"></select>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"></select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
@@ -444,8 +555,9 @@
         `);
         
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
+        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
         select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+        select2ServerSide('#arr_line' + count, '{{ url("admin/select2/line") }}');
         select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
         $('#arr_place' + count).formSelect();
         $('#arr_department' + count).formSelect();
@@ -455,49 +567,49 @@
         $('#last-row-coa-multi').before(`
             <tr class="row_coa_multi">
                 <td>
-                    <input type="text" name="arr_multi_code" placeholder="Kode Jurnal">
+                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_company" placeholder="ID Perusahaan">
+                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_note" placeholder="Keterangan">
+                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_post_date" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
+                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_due_date" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
+                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_currency" placeholder="ID Mata Uang">
+                    <input type="text" name="arr_multi_currency[]" placeholder="ID Mata Uang">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_conversion" placeholder="Konversi">
+                    <input type="text" name="arr_multi_conversion[]" placeholder="Konversi">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_coa" placeholder="ID Coa">
+                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_place" placeholder="ID Plant">
+                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis">    
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_bp" placeholder="ID Partner Bisnis">    
+                    <input type="text" name="arr_multi_place[]" placeholder="ID Plant">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_item" placeholder="ID Item">
+                    <input type="text" name="arr_multi_line[]" placeholder="ID Mesin">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_department" placeholder="ID Departemen">
+                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_warehouse" placeholder="ID Gudang">
+                    <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
+                    <input type="text" name="arr_multi_debit[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
+                    <input type="text" name="arr_multi_kredit[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
@@ -572,49 +684,49 @@
                         $('#last-row-coa-multi').before(`
                             <tr class="row_coa_multi">
                                 <td>
-                                    <input type="text" name="arr_multi_code" placeholder="Kode Jurnal">
+                                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_company" placeholder="ID Perusahaan">
+                                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_note" placeholder="Keterangan">
+                                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_post_date" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
+                                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_due_date" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
+                                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_currency" placeholder="ID Mata Uang">
+                                    <input type="text" name="arr_multi_currency[]" placeholder="ID Mata Uang">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_conversion" placeholder="Konversi">
+                                    <input type="text" name="arr_multi_conversion[]" placeholder="Konversi">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_coa" placeholder="ID Coa">
+                                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_place" placeholder="ID Plant">
+                                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis">    
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_bp" placeholder="ID Partner Bisnis">    
+                                    <input type="text" name="arr_multi_place[]" placeholder="ID Plant">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_item" placeholder="ID Item">
+                                    <input type="text" name="arr_multi_line[]" placeholder="ID Mesin">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_department" placeholder="ID Departemen">
+                                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_warehouse" placeholder="ID Gudang">
+                                    <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_debit" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
+                                    <input type="text" name="arr_multi_debit[]" placeholder="Nominal Debit" value="0" onkeyup="countAllMulti()">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_kredit" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
+                                    <input type="text" name="arr_multi_kredit[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
@@ -797,8 +909,10 @@
                     var formData = new FormData($('#form_data')[0]);
 
                     formData.delete("arr_type[]");
+                    formData.delete("arr_cost_distribution_detail[]");
                     formData.delete("arr_coa[]");
                     formData.delete("arr_place[]");
+                    formData.delete("arr_line[]");
                     formData.delete("arr_account[]");
                     formData.delete("arr_item[]");
                     formData.delete("arr_department[]");
@@ -808,7 +922,9 @@
                     $('input[name^="arr_type"]').each(function(index){
                         formData.append('arr_type[]',$(this).val());
                         formData.append('arr_coa[]',($('select[name^="arr_coa"]').eq(index).val() ? $('select[name^="arr_coa"]').eq(index).val() : 'NULL'));
+                        formData.append('arr_cost_distribution_detail[]',($('input[name^="arr_cost_distribution_detail"]').eq(index).val() ? $('input[name^="arr_cost_distribution_detail"]').eq(index).val() : 'NULL'));
                         formData.append('arr_place[]',$('select[name^="arr_place"]').eq(index).val());
+                        formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : 'NULL'));
                         formData.append('arr_account[]',($('select[name^="arr_account"]').eq(index).val() ? $('select[name^="arr_account"]').eq(index).val() : 'NULL'));
                         formData.append('arr_item[]',($('select[name^="arr_item"]').eq(index).val() ? $('select[name^="arr_item"]').eq(index).val() : 'NULL'));
                         formData.append('arr_department[]',$('select[name^="arr_department"]').eq(index).val());
@@ -914,7 +1030,7 @@
                 formData.delete("arr_multi_coa[]");
                 formData.delete("arr_multi_place[]");
                 formData.delete("arr_multi_bp[]");
-                formData.delete("arr_multi_item[]");
+                formData.delete("arr_multi_line[]");
                 formData.delete("arr_multi_department[]");
                 formData.delete("arr_multi_warehouse[]");
                 formData.delete("arr_multi_debit[]");
@@ -932,7 +1048,7 @@
                         formData.append('arr_multi_coa[]',($('input[name^="arr_multi_coa"]').eq(index).val() ? $('input[name^="arr_multi_coa"]').eq(index).val() : ''));
                         formData.append('arr_multi_place[]',($('input[name^="arr_multi_place"]').eq(index).val() ? $('input[name^="arr_multi_place"]').eq(index).val() : ''));
                         formData.append('arr_multi_bp[]',($('input[name^="arr_multi_bp"]').eq(index).val() ? $('input[name^="arr_multi_bp"]').eq(index).val() : ''));
-                        formData.append('arr_multi_item[]',($('input[name^="arr_multi_item"]').eq(index).val() ? $('input[name^="arr_multi_item"]').eq(index).val() : ''));
+                        formData.append('arr_multi_line[]',($('input[name^="arr_multi_line"]').eq(index).val() ? $('input[name^="arr_multi_line"]').eq(index).val() : ''));
                         formData.append('arr_multi_department[]',($('input[name^="arr_multi_department"]').eq(index).val() ? $('input[name^="arr_multi_department"]').eq(index).val() : ''));
                         formData.append('arr_multi_warehouse[]',($('input[name^="arr_multi_warehouse"]').eq(index).val() ? $('input[name^="arr_multi_warehouse"]').eq(index).val() : ''));
                         formData.append('arr_multi_debit[]',($('input[name^="arr_multi_debit"]').eq(index).val() ? $('input[name^="arr_multi_debit"]').eq(index).val() : '0'));
@@ -1060,8 +1176,12 @@
                     $('#last-row-coa').before(`
                         <tr class="row_coa">
                             <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                            <input type="hidden" name="arr_cost_distribution_detail[]" value="` + val.cost_distribution_detail_id + `">
                             <td>
                                 <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
                             </td>
                             <td>
                                 <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
@@ -1071,10 +1191,7 @@
                                 </select>
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
-                            </td>
-                            <td>
-                                <select class="browser-default" id="arr_item` + count + `" name="arr_item[]"></select>
+                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]"></select>
                             </td>
                             <td>
                                 <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
@@ -1103,16 +1220,16 @@
                     
                     select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
                     select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
-                    select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+                    select2ServerSide('#arr_line' + count, '{{ url("admin/select2/line") }}');
                     select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
                     $('#arr_place' + count).formSelect().val(val.place_id).formSelect();
                     $('#arr_department' + count).formSelect().val(val.department_id).formSelect();
                     $('#arr_coa' + count).append(`
                         <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                     `);
-                    if(val.item_id){
-                        $('#arr_item' + count).append(`
-                            <option value="` + val.item_id + `">` + val.item_name + `</option>
+                    if(val.line_id){
+                        $('#arr_line' + count).append(`
+                            <option value="` + val.line_id + `">` + val.line_name + `</option>
                         `);
                     }
                     if(val.account_id){

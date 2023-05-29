@@ -17,6 +17,7 @@ class CostDistribution extends Model
     protected $fillable = [
         'code',
         'name',
+        'coa_id',
         'status',
     ];
 
@@ -31,5 +32,9 @@ class CostDistribution extends Model
 
     public function costDistributionDetail(){
         return $this->hasMany('App\Models\CostDistributionDetail', 'cost_distribution_id', 'id');
+    }
+
+    public function coa(){
+        return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
 }

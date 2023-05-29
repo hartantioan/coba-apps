@@ -148,6 +148,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('fund_request_bs', [Select2Controller::class, 'fundRequestBs']);
                 Route::get('purchase_invoice', [Select2Controller::class, 'purchaseInvoice']);
                 Route::get('purchase_down_payment', [Select2Controller::class, 'purchaseDownPayment']);
+                Route::get('cost_distribution', [Select2Controller::class, 'costDistribution']);
+                Route::get('line', [Select2Controller::class, 'line']);
             });
 
             Route::prefix('personal')->middleware('direct.access')->group(function () {

@@ -2940,7 +2940,7 @@ optgroup,
 select,
 textarea
 {
-    font-family: sans-serif;
+    font-family: Tahoma, "Trebuchet MS", sans-serif;
     /* 1 */
     font-size: 100%;
     /* 1 */
@@ -3189,7 +3189,7 @@ select,
 textarea
 {
     /* font-family: 'Muli', sans-serif; */
-    font-family: 'serif' !important;
+    font-family: Tahoma, "Trebuchet MS", sans-serif;
 }
 
 ul:not(.browser-default)
@@ -5642,7 +5642,7 @@ a
 html
 {
     /* font-family: 'Muli', sans-serif; */
-    font-family: 'serif' !important;
+    font-family: Tahoma, "Trebuchet MS", sans-serif;
     font-weight: normal;
     line-height: 1.5;
 

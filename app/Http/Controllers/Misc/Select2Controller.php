@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Misc;
 
 use App\Helpers\CustomHelper;
 use App\Models\ApprovalStage;
+use App\Models\CostDistribution;
 use App\Models\FundRequest;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
+use App\Models\Line;
 use App\Models\Menu;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
@@ -973,6 +975,69 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->note,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function costDistribution(Request $request)
+    {   
+        $response = [];
+        $search   = $request->search;
+        $data = CostDistribution::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                 })
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            $details = [];
+
+            foreach($d->costDistributionDetail as $row){
+                $details[] = [
+                    'id'                => $row->id,
+                    'place_id'          => $row->place_id,
+                    'place_name'        => $row->place_id ? $row->place->code : '',
+                    'line_id'           => $row->line_id ? $row->line_id : '',
+                    'line_name'         => $row->line_id ? $row->line->code.' - '.$row->line->name : '',
+                    'department_id'     => $row->department_id ? $row->department_id : '',
+                    'department_name'   => $row->department_id ? $row->department->name : '',
+                    'warehouse_id'      => $row->warehouse_id ? $row->warehouse_id : '',
+                    'warehouse_name'    => $row->warehouse_id ? $row->warehouse->name : '',
+                    'percentage'        => $row->percentage,
+                ];
+            }
+
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'coa_id'            => $d->coa_id ? $d->coa_id : '',
+                'coa_name'          => $d->coa_id ? $d->coa->name : '',
+                'details'           => $details,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function line(Request $request)
+    {   
+        $response = [];
+        $search   = $request->search;
+        $data = Line::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('note', 'like', "%$search%");
+                 })
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
             ];
         }
 

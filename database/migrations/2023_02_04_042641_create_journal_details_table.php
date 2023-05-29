@@ -17,6 +17,7 @@ return new class extends Migration
         Schema::create('journal_details', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('journal_id')->nullable();
+            $table->bigInteger('cost_distribution_detail_id')->nullable();
             $table->bigInteger('coa_id')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('line_id')->nullable();

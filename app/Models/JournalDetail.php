@@ -16,11 +16,11 @@ class JournalDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'journal_id',
+        'cost_distribution_detail_id',
         'coa_id',
         'place_id',
         'line_id',
         'account_id',
-        'item_id',
         'department_id',
         'warehouse_id',
         'type',
@@ -30,6 +30,10 @@ class JournalDetail extends Model
 
     public function journal(){
         return $this->belongsTo('App\Models\Journal', 'journal_id', 'id')->withTrashed();
+    }
+
+    public function costDistributionDetail(){
+        return $this->belongsTo('App\Models\CostDistributionDetail', 'cost_distribution_detail_id', 'id')->withTrashed();
     }
 
     public function coa(){
@@ -50,10 +54,6 @@ class JournalDetail extends Model
 
     public function place(){
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function item(){
-        return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
     }
 
     public function department(){

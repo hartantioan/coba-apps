@@ -174,8 +174,9 @@ class JournalController extends Controller
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Perusahaan</th>
-                                <th class="center-align">Plant</th>
                                 <th class="center-align">Bisnis Partner</th>
+                                <th class="center-align">Plant</th>
+                                <th class="center-align">Mesin</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
@@ -189,8 +190,9 @@ class JournalController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
                 <td class="center-align">'.$row->coa->company->name.'</td>
-                <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
                 <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->item_id ? $row->item->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
@@ -358,15 +360,16 @@ class JournalController extends Controller
                     try {
                         foreach($request->arr_type as $key => $row){
                             JournalDetail::create([
-                                'journal_id'        => $query->id,
-                                'coa_id'            => $request->arr_coa[$key],
-                                'place_id'          => $request->arr_place[$key],
-                                'account_id'        => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
-                                'item_id'           => $request->arr_item[$key] == 'NULL' ? NULL : $request->arr_item[$key],
-                                'department_id'     => $request->arr_department[$key],
-                                'warehouse_id'      => $request->arr_warehouse[$key] == 'NULL' ? NULL : $request->arr_warehouse[$key],
-                                'type'              => $row,
-                                'nominal'           => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                                'journal_id'                    => $query->id,
+                                'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
+                                'coa_id'                        => $request->arr_coa[$key],
+                                'place_id'                      => $request->arr_place[$key],
+                                'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
+                                'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
+                                'department_id'                 => $request->arr_department[$key],
+                                'warehouse_id'                  => $request->arr_warehouse[$key] == 'NULL' ? NULL : $request->arr_warehouse[$key],
+                                'type'                          => $row,
+                                'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                             ]);
                         }
                         DB::commit();
@@ -475,9 +478,9 @@ class JournalController extends Controller
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
                                 'coa_id'            => $request->arr_multi_coa[$key],
-                                'place_id'          => $request->arr_multi_place[$key],
                                 'account_id'        => $request->arr_multi_bp[$key],
-                                'item_id'           => $request->arr_multi_item[$key],
+                                'place_id'          => $request->arr_multi_place[$key],
+                                'line_id'           => $request->arr_multi_line[$key],
                                 'department_id'     => $request->arr_multi_department[$key],
                                 'warehouse_id'      => $request->arr_multi_warehouse[$key],
                                 'type'              => '1',
@@ -489,9 +492,9 @@ class JournalController extends Controller
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
                                 'coa_id'            => $request->arr_multi_coa[$key],
-                                'place_id'          => $request->arr_multi_place[$key],
                                 'account_id'        => $request->arr_multi_bp[$key],
-                                'item_id'           => $request->arr_multi_item[$key],
+                                'place_id'          => $request->arr_multi_place[$key],
+                                'line_id'           => $request->arr_multi_line[$key],
                                 'department_id'     => $request->arr_multi_department[$key],
                                 'warehouse_id'      => $request->arr_multi_warehouse[$key],
                                 'type'              => '2',
@@ -523,20 +526,21 @@ class JournalController extends Controller
 
         $arr = [];
         
-        foreach($jou->journalDetail as $row){
+        foreach($jou->journalDetail()->orderBy('id')->get() as $row){
             $arr[] = [
-                'type'              => $row->type,
-                'coa_id'            => $row->coa_id,
-                'coa_name'          => $row->coa->code.' - '.$row->coa->name.' - '.$row->coa->company->name,
-                'place_id'          => $row->place_id,
-                'account_id'        => $row->account_id ? $row->account_id : '',
-                'account_name'      => $row->account_id ? $row->account->name : '',
-                'item_id'           => $row->item_id ? $row->item_id : '',
-                'item_name'         => $row->item_id ? $row->item->name : '',
-                'department_id'     => $row->department_id,
-                'warehouse_id'      => $row->warehouse_id,
-                'warehouse_name'    => $row->warehouse_id ? $row->warehouse->name : '',
-                'nominal'           => number_format($row->nominal,2,',','.')
+                'type'                          => $row->type,
+                'cost_distribution_detail_id'   => $row->cost_distribution_detail_id ? $row->cost_distribution_detail_id : '', 
+                'coa_id'                        => $row->coa_id,
+                'coa_name'                      => $row->coa->code.' - '.$row->coa->name,
+                'place_id'                      => $row->place_id,
+                'account_id'                    => $row->account_id ? $row->account_id : '',
+                'account_name'                  => $row->account_id ? $row->account->name : '',
+                'line_id'                       => $row->line_id ? $row->line_id : '',
+                'line_name'                     => $row->line_id ? $row->line->code.' - '.$row->line->name : '',
+                'department_id'                 => $row->department_id,
+                'warehouse_id'                  => $row->warehouse_id,
+                'warehouse_name'                => $row->warehouse_id ? $row->warehouse->name : '',
+                'nominal'                       => number_format($row->nominal,2,',','.')
             ];
         }
 

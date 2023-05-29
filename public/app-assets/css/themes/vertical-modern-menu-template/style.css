@@ -3894,7 +3894,7 @@ a
 html
 {
     /* font-family: 'Muli', sans-serif !important; */
-    font-family: 'serif' !important;
+    font-family: Tahoma, "Trebuchet MS", sans-serif;
     font-weight: normal;
     line-height: 1.5;
 
@@ -3933,7 +3933,7 @@ h5,
 h6
 {
     /* font-family: 'Muli', sans-serif; */
-    font-family: 'serif' !important;
+    font-family: Tahoma, "Trebuchet MS", sans-serif;
     font-weight: 400;
     line-height: 1.1;
 
@@ -3943,7 +3943,7 @@ h6
 p
 {
     /* font-family: 'Muli', sans-serif; */
-    font-family: 'serif' !important;
+    font-family: Tahoma, "Trebuchet MS", sans-serif;
 }
 
 h1 a,
@@ -8547,7 +8547,7 @@ span.badge.pill
 .navbar .notification-badge
 {
     /* font-family: 'Muli', sans-serif; */
-    font-family: 'serif' !important;
+    font-family: Tahoma, "Trebuchet MS", sans-serif;
 
     position: relative;
     top: -20px;

@@ -64,6 +64,7 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
+                                                        <th>Coa</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -103,6 +104,10 @@
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
+                            <select class="browser-default" id="coa_id" name="coa_id"></select>
+                            <label class="active" for="coa_id">Coa (Opsional)</label>
+                        </div>
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
                                 <label>
@@ -118,7 +123,7 @@
                                 <thead>
                                     <tr>
                                         <th class="center">Plant</th>
-                                        <th class="center">Line</th>
+                                        <th class="center">Mesin</th>
                                         <th class="center">Departemen</th>
                                         <th class="center">Gudang</th>
                                         <th class="center">Prosentase</th>
@@ -174,7 +179,9 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('.row_distribution').remove();
                 M.updateTextFields();
+                $('#coa_id').empty();
             }
         });
 
@@ -202,6 +209,8 @@
                 icon.first().html('remove');
             }
         });
+
+        select2ServerSide('#coa_id', '{{ url("admin/select2/coa_journal") }}');
     });
 
     function rowDetail(data) {
@@ -309,6 +318,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'coa_id', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -442,6 +452,13 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                if(response.coa_name){
+                    $('#coa_id').empty().append(`
+                        <option value="` + response.coa_id + `">` + response.coa_name + `</option>
+                    `);
+                }else{
+                    $('#coa_id').empty();
+                }
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

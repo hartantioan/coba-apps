@@ -21,6 +21,7 @@ class PurchaseRequestDetail extends Model
         'note',
         'required_date',
         'place_id',
+        'line_id',
         'department_id',
         'warehouse_id',
     ];
@@ -33,6 +34,11 @@ class PurchaseRequestDetail extends Model
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 
     public function place()

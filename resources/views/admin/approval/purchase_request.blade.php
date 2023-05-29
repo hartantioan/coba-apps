@@ -210,6 +210,7 @@
                     <th class="center">Catatan</th>
                     <th class="center">Tgl.Dipakai</th>
                     <th class="center">Plant</th>
+                    <th class="center">Mesin</th>
                     <th class="center">Gudang</th>
                     <th class="center">Departemen</th>
                 </tr>
@@ -223,6 +224,7 @@
                     <td>{{ $row->note }}</td>
                     <td class="indigo-text center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
                     <td class="center">{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                    <td class="center">{{ $row->line()->exists() ? $row->line->name : '-' }}</td>
                     <td class="center">{{ $row->warehouse->name }}</td>
                     <td class="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                 </tr>

@@ -181,6 +181,7 @@
                                                 <th class="center">Tgl.Dipakai</th>
                                                 <th class="center">Gudang Tujuan</th>
                                                 <th class="center">Plant</th>
+                                                <th class="center">Mesin</th>
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Hapus</th>
                                             </tr>
@@ -211,6 +212,14 @@
                                                     <select class="browser-default" id="arr_place0" name="arr_place[]">
                                                         @foreach ($place as $rowplace)
                                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                        @endforeach
+                                                    </select>    
+                                                </td>
+                                                <td>
+                                                    <select class="browser-default" id="arr_line0" name="arr_line[]">
+                                                        <option value="">--Kosong--</option>
+                                                        @foreach ($line as $rowline)
+                                                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
                                                         @endforeach
                                                     </select>    
                                                 </td>
@@ -639,6 +648,13 @@
             if (willDelete) {
                 
                 var formData = new FormData($('#form_data')[0]);
+
+                formData.delete("arr_line[]");
+
+                $('select[name^="arr_line"]').each(function(index){
+                    formData.append('arr_line[]',($(this).val() ? $(this).val() : ''));
+                });
+
                 $.ajax({
                     url: '{{ Request::url() }}/create',
                     type: 'POST',
@@ -773,14 +789,22 @@
                                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                                 </td>
                                 <td>
-                                    <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                         @foreach ($place as $rowplace)
                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                         @endforeach
                                     </select>    
                                 </td>
                                 <td>
-                                    <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($line as $rowline)
+                                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                                         <option value="">--Kosong--</option>
                                         @foreach ($department as $rowdept)
                                             <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
@@ -801,8 +825,9 @@
                         $('#arr_warehouse' + count).append(`
                             <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
                         `);
-                        $('#arr_place' + count).val(val.place_id).formSelect();
-                        $('#arr_department' + count).val(val.department_id).formSelect();
+                        $('#arr_place' + count).val(val.place_id);
+                        $('#arr_line' + count).val(val.line_id);
+                        $('#arr_department' + count).val(val.department_id);
                     });
                 }
                 
@@ -919,6 +944,14 @@
                     </select>    
                 </td>
                 <td>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                        <option value="">--Kosong--</option>
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td>
                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                         <option value="">--Kosong--</option>
                         @foreach ($department as $rowdept)
@@ -933,8 +966,6 @@
                 </td>
             </tr>
         `);
-        $('#arr_place' + count).formSelect();
-        $('#arr_department' + count).formSelect();
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
     }
 

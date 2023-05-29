@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('note')->nullable();
             $table->date('required_date')->nullable();
             $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('line_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();

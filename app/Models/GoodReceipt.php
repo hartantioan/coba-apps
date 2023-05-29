@@ -218,4 +218,8 @@ class GoodReceipt extends Model
 
         return $total;
     }
+
+    public function journal(){
+        return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

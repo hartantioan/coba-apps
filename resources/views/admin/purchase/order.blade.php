@@ -318,7 +318,7 @@
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. kirim">
-                                <label class="active" for="due_date">Tgl. Kirim</label>
+                                <label class="active" for="delivery_date">Tgl. Kirim</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
@@ -333,7 +333,7 @@
                                 <label class="active" for="receiver_phone">Kontak Penerima</label>
                             </div>
                             <div class="col m12 s12">
-                                <div class="col m4 s4">
+                                <div class="col m3 s3">
                                     <p class="mt-2 mb-2">
                                         <h5>Purchase Request</h5>
                                         <div class="row">
@@ -349,7 +349,7 @@
                                         </div> 
                                     </p>
                                 </div>
-                                <div class="col m4 s4">
+                                <div class="col m3 s3">
                                     <p class="mt-2 mb-2">
                                         <h5>Goods Issue / Barang Keluar</h5>
                                         <div class="row">
@@ -365,7 +365,7 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="col m4 s4">
+                                <div class="col m6 s6">
                                     <h6><b>PR/GI Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
@@ -400,6 +400,8 @@
                                                 <th class="center">Subtotal</th>
                                                 <th class="center">Keterangan</th>
                                                 <th class="center">Plant</th>
+                                                <th class="center">Line</th>
+                                                <th class="center">Mesin</th>
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Gudang</th>
                                                 <th class="center">Hapus</th>
@@ -407,7 +409,7 @@
                                         </thead>
                                         <tbody id="body-item">
                                             <tr id="last-row-item">
-                                                <td colspan="16" class="center">
+                                                <td colspan="18" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -927,7 +929,7 @@
                                             <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
                                                 <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                                                 @foreach ($tax as $row)
-                                                    <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                                    <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                                 @endforeach
                                             </select>
                                         </td>
@@ -941,7 +943,7 @@
                                             <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
                                                 <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
                                                 @foreach ($wtax as $row)
-                                                    <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                                    <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                                 @endforeach
                                             </select>
                                         </td>
@@ -966,6 +968,22 @@
                                                     <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                                 @endforeach
                                             </select>    
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($line as $rowline)
+                                                    <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($machine as $row)
+                                                    <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                @endforeach    
+                                            </select>
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
@@ -994,8 +1012,10 @@
                                     <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
                                 `);
                                 select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-                                $('#arr_place' + count).val(val.place_id).formSelect();
-                                $('#arr_department' + count).val(val.department_id).formSelect();
+                                $('#arr_place' + count).val(val.place_id);
+                                $('#arr_line' + count).val(val.line_id);
+                                $('#arr_machine' + count).val(val.machine_id);
+                                $('#arr_department' + count).val(val.department_id);
                                 if(val.old_prices.length > 0){
                                     $.each(val.old_prices, function(i, value) {
                                         if($('#supplier_id').val()){
@@ -1058,7 +1078,7 @@
                         <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
                             <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                             @foreach ($tax as $row)
-                                <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                             @endforeach
                         </select>
                     </td>
@@ -1099,6 +1119,22 @@
                         </select>    
                     </td>
                     <td>
+                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                            <option value="">--Kosong--</option>
+                            @foreach ($line as $rowline)
+                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                            @endforeach
+                        </select>    
+                    </td>
+                    <td>
+                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                            <option value="">--Kosong--</option>
+                            @foreach ($machine as $row)
+                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                            @endforeach    
+                        </select>
+                    </td>
+                    <td>
                         <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                             <option value="">--Kosong--</option>
                             @foreach ($department as $rowdept)
@@ -1119,7 +1155,6 @@
                 </tr>
             `);
             select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-            $('#arr_place' + count + ',#arr_department' + count).formSelect();
             
         }else if($('#inventory_type').val() == '2'){
 
@@ -1143,7 +1178,7 @@
                         <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
                             <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                             @foreach ($tax as $row)
-                                <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                             @endforeach
                         </select>
                     </td>
@@ -1177,11 +1212,27 @@
                         <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
                     </td>
                     <td>
-                        <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                             @foreach ($place as $rowplace)
                                 <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                             @endforeach
                         </select>    
+                    </td>
+                    <td>
+                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                            <option value="">--Kosong--</option>
+                            @foreach ($line as $rowline)
+                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                            @endforeach
+                        </select>    
+                    </td>
+                    <td>
+                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                            <option value="">--Kosong--</option>
+                            @foreach ($machine as $row)
+                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                            @endforeach    
+                        </select>
                     </td>
                     <td>
                         <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
@@ -1201,8 +1252,23 @@
                     </td>
                 </tr>
             `);
-            $('#arr_place' + count + ',#arr_department' + count).formSelect();
             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        }
+    }
+
+    function changePlace(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
+        }else{
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
+        }
+    }
+
+    function changeLine(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
+        }else{
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
         }
     }
 
@@ -1370,6 +1436,7 @@
                 formData.delete("arr_wtax[]");
                 formData.delete("arr_note[]");
                 formData.delete("arr_warehouse[]");
+                formData.delete("arr_line[]");
 
                 $('select[name^="arr_tax"]').each(function(index){
                     formData.append('arr_tax[]',$(this).val());
@@ -1378,6 +1445,7 @@
                     formData.append('arr_is_include_tax[]',($('input[name^="arr_is_include_tax"]').eq(index).is(':checked') ? '1' : '0'));
                     formData.append('arr_wtax[]',$('select[name^="arr_wtax"]').eq(index).val());
                     formData.append('arr_note[]',($('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''));
+                    formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : ''));
                     formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : ''));
                 });
 
@@ -1532,7 +1600,7 @@
                                         <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
                                             <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                                             @foreach ($tax as $row)
-                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -1546,7 +1614,7 @@
                                         <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
                                             <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
                                             @foreach ($wtax as $row)
-                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -1566,14 +1634,30 @@
                                         <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                                     </td>
                                     <td>
-                                        <select class="form-control" id="arr_place` + count + `" name="arr_place[]">
+                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                             @foreach ($place as $rowplace)
                                                 <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                             @endforeach
                                         </select>    
                                     </td>
                                     <td>
-                                        <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
+                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($line as $rowline)
+                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($machine as $row)
+                                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                            @endforeach    
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                                             <option value="">--Kosong--</option>
                                             @foreach ($department as $rowdept)
                                                 <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
@@ -1600,8 +1684,10 @@
                             $('#arr_warehouse' + count).append(`
                                 <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
                             `);
-                            $('#arr_place' + count).val(val.place_id).formSelect();
-                            $('#arr_department' + count).val(val.department_id).formSelect();
+                            $('#arr_place' + count).val(val.place_id);
+                            $('#arr_line' + count).val(val.line_id);
+                            $('#arr_department' + count).val(val.department_id);
+                            $('#arr_machine' + count).val(val.machine_id);
                             $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
                             $("#arr_wtax" + count + " option[data-id='" + val.wtax_id + "']").prop("selected",true);
 
@@ -1627,7 +1713,7 @@
                                         <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
                                             <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                                             @foreach ($tax as $row)
-                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -1641,7 +1727,7 @@
                                         <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
                                             <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
                                             @foreach ($wtax as $row)
-                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -1666,6 +1752,22 @@
                                                 <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                             @endforeach
                                         </select>    
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($line as $rowline)
+                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($machine as $row)
+                                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                            @endforeach    
+                                        </select>
                                     </td>
                                     <td>
                                         <select class="form-control" id="arr_department` + count + `" name="arr_department[]">
@@ -1693,8 +1795,10 @@
                                 <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                             `);
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-                            $('#arr_place' + count).val(val.place_id).formSelect();
-                            $('#arr_department' + count).val(val.department_id).formSelect();
+                            $('#arr_place' + count).val(val.place_id);
+                            $('#arr_department' + count).val(val.department_id);
+                            $('#arr_line' + count).val(val.line_id);
+                            $('#arr_machine' + count).val(val.machine_id);
                             $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
                             $("#arr_wtax" + count + " option[data-id='" + val.wtax_id + "']").prop("selected",true);
                         }

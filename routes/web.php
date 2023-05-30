@@ -19,6 +19,7 @@ use App\Http\Controllers\MasterData\RegionController;
 use App\Http\Controllers\MasterData\ResidenceController;
 use App\Http\Controllers\MasterData\WarehouseController;
 use App\Http\Controllers\MasterData\LineController;
+use App\Http\Controllers\MasterData\MachineController;
 use App\Http\Controllers\MasterData\BomController;
 use App\Http\Controllers\MasterData\ShiftController;
 use App\Http\Controllers\MasterData\ActivityController;
@@ -335,14 +336,24 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('master_production')->group(function () {
 
-                    Route::prefix('machine')->middleware('operation.access:machine,view')->group(function () {
+                    Route::prefix('line')->middleware('operation.access:line,view')->group(function () {
                         Route::get('/',[LineController::class, 'index']);
                         Route::get('datatable',[LineController::class, 'datatable']);
                         Route::post('show', [LineController::class, 'show']);
                         Route::post('print',[LineController::class, 'print']);
                         Route::get('export',[LineController::class, 'export']);
-                        Route::post('create',[LineController::class, 'create'])->middleware('operation.access:machine,update');
-                        Route::post('destroy', [LineController::class, 'destroy'])->middleware('operation.access:machine,delete');
+                        Route::post('create',[LineController::class, 'create'])->middleware('operation.access:line,update');
+                        Route::post('destroy', [LineController::class, 'destroy'])->middleware('operation.access:line,delete');
+                    });
+
+                    Route::prefix('machine')->middleware('operation.access:machine,view')->group(function () {
+                        Route::get('/',[MachineController::class, 'index']);
+                        Route::get('datatable',[MachineController::class, 'datatable']);
+                        Route::post('show', [MachineController::class, 'show']);
+                        Route::post('print',[MachineController::class, 'print']);
+                        Route::get('export',[MachineController::class, 'export']);
+                        Route::post('create',[MachineController::class, 'create'])->middleware('operation.access:machine,update');
+                        Route::post('destroy', [MachineController::class, 'destroy'])->middleware('operation.access:machine,delete');
                     });
 
                     Route::prefix('bom')->middleware('operation.access:bom,view')->group(function () {

@@ -31,6 +31,7 @@ class PurchaseInvoiceDetail extends Model
         'grandtotal',
         'note',
         'place_id',
+        'line_id',
         'department_id',
         'warehouse_id',
     ];
@@ -57,6 +58,11 @@ class PurchaseInvoiceDetail extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 
     public function department()

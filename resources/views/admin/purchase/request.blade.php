@@ -168,10 +168,10 @@
                                 <select class="browser-default" id="project_id" name="project_id"></select>
                                 <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <table class="bordered">
+                                    <table class="bordered" style="width:1800px;">
                                         <thead>
                                             <tr>
                                                 <th class="center">Item</th>
@@ -179,9 +179,10 @@
                                                 <th class="center">Satuan</th>
                                                 <th class="center">Keterangan</th>
                                                 <th class="center">Tgl.Dipakai</th>
-                                                <th class="center">Gudang Tujuan</th>
                                                 <th class="center">Plant</th>
+                                                <th class="center">Line</th>
                                                 <th class="center">Mesin</th>
+                                                <th class="center">Gudang Tujuan</th>
                                                 <th class="center">Departemen</th>
                                                 <th class="center">Hapus</th>
                                             </tr>
@@ -204,11 +205,6 @@
                                                     <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
                                                 </td>
                                                 <td>
-                                                    <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]">\
-                                                        <option value="">--Silahkan pilih item--</option>
-                                                    </select>
-                                                </td>
-                                                <td>
                                                     <select class="browser-default" id="arr_place0" name="arr_place[]">
                                                         @foreach ($place as $rowplace)
                                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
@@ -216,12 +212,25 @@
                                                     </select>    
                                                 </td>
                                                 <td>
-                                                    <select class="browser-default" id="arr_line0" name="arr_line[]">
+                                                    <select class="browser-default" id="arr_line0" name="arr_line[]" onchange="changePlace(this);">
                                                         <option value="">--Kosong--</option>
                                                         @foreach ($line as $rowline)
-                                                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                                         @endforeach
                                                     </select>    
+                                                </td>
+                                                <td>
+                                                    <select class="browser-default" id="arr_machine0" name="arr_machine[]" onchange="changeLine(this);">
+                                                        <option value="">--Kosong--</option>
+                                                        @foreach ($machine as $row)
+                                                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                        @endforeach    
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]">\
+                                                        <option value="">--Silahkan pilih item--</option>
+                                                    </select>
                                                 </td>
                                                 <td>
                                                     <select class="browser-default" id="arr_department0" name="arr_department[]">
@@ -238,7 +247,7 @@
                                                 </td>
                                             </tr>
                                             <tr id="last-row-item">
-                                                <td colspan="9" class="center">
+                                                <td colspan="10" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -650,9 +659,13 @@
                 var formData = new FormData($('#form_data')[0]);
 
                 formData.delete("arr_line[]");
+                formData.delete("arr_machine[]");
 
                 $('select[name^="arr_line"]').each(function(index){
                     formData.append('arr_line[]',($(this).val() ? $(this).val() : ''));
+                });
+                $('select[name^="arr_machine"]').each(function(index){
+                    formData.append('arr_machine[]',($(this).val() ? $(this).val() : ''));
                 });
 
                 $.ajax({
@@ -786,9 +799,6 @@
                                     <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
-                                </td>
-                                <td>
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                         @foreach ($place as $rowplace)
                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
@@ -796,12 +806,23 @@
                                     </select>    
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
                                         <option value="">--Kosong--</option>
                                         @foreach ($line as $rowline)
-                                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                                         @endforeach
                                     </select>    
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($machine as $row)
+                                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                        @endforeach    
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
@@ -827,6 +848,7 @@
                         `);
                         $('#arr_place' + count).val(val.place_id);
                         $('#arr_line' + count).val(val.line_id);
+                        $('#arr_machine' + count).val(val.machine_id);
                         $('#arr_department' + count).val(val.department_id);
                     });
                 }
@@ -932,11 +954,6 @@
                     <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                        <option value="">--Silahkan pilih item--</option>    
-                    </select>
-                </td>
-                <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                         @foreach ($place as $rowplace)
                             <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
@@ -944,12 +961,25 @@
                     </select>    
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
                         <option value="">--Kosong--</option>
                         @foreach ($line as $rowline)
-                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
                         @endforeach
                     </select>    
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($machine as $row)
+                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                        @endforeach    
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                        <option value="">--Silahkan pilih item--</option>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
@@ -967,6 +997,22 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+    }
+
+    function changePlace(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
+        }else{
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
+        }
+    }
+
+    function changeLine(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
+        }else{
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
+        }
     }
 
     function changeDateMinimum(val){

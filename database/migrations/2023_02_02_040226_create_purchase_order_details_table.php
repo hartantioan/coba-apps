@@ -36,12 +36,14 @@ return new class extends Migration
             $table->bigInteger('tax_id')->nullable();
             $table->bigInteger('wtax_id')->nullable();
             $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('line_id')->nullable();
+            $table->bigInteger('machine_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['purchase_order_id', 'item_id', 'purchase_request_detail_id', 'good_issue_detail_id', 'place_id', 'department_id', 'warehouse_id','tax_id','wtax_id','coa_id'],'podt_index');
+            $table->index(['purchase_order_id', 'item_id', 'purchase_request_detail_id', 'good_issue_detail_id', 'place_id', 'line_id', 'machine_id', 'department_id', 'warehouse_id','tax_id','wtax_id','coa_id'],'podt_index');
         });
     }
 

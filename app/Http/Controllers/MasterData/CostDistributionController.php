@@ -4,6 +4,7 @@ namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Line;
+use App\Models\Machine;
 use App\Models\Place;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class CostDistributionController extends Controller
             'line'          => Line::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->get(),
+            'machine'       => Machine::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -119,6 +121,7 @@ class CostDistributionController extends Controller
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Plant</th>
+                                <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
@@ -130,9 +133,10 @@ class CostDistributionController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->place->code.' - '.$row->place->name.'</td>
-                <td class="center-align">'.($row->line()->exists() ? $row->line->code.' - '.$row->line->name : '-').'</td>
-                <td class="center-align">'.($row->department()->exists() ? $row->department->code.' - '.$row->department->name : '-').'</td>
-                <td class="center-align">'.($row->warehouse()->exists() ? $row->warehouse->code.' - '.$row->warehouse->name : '-').'</td>
+                <td class="center-align">'.($row->line_id ? $row->line->code.' - '.$row->line->name : '-').'</td>
+                <td class="center-align">'.($row->machine_id ? $row->machine->code.' - '.$row->machine->name : '-').'</td>
+                <td class="center-align">'.($row->department_id ? $row->department->code.' - '.$row->department->name : '-').'</td>
+                <td class="center-align">'.($row->warehouse_id ? $row->warehouse->code.' - '.$row->warehouse->name : '-').'</td>
                 <td class="center-align">'.number_format($row->percentage,2,',','.').'</td>
             </tr>';
         }
@@ -191,6 +195,7 @@ class CostDistributionController extends Controller
                             'cost_distribution_id'  => $query->id,
                             'place_id'              => $row,
                             'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                             'percentage'            => str_replace(',','.',str_replace('.','',$request->arr_percentage[$key])),
@@ -231,6 +236,7 @@ class CostDistributionController extends Controller
             $details[] = [
                 'place_id'      => $cdd->place_id,
                 'line_id'       => $cdd->line_id ? $cdd->line_id : '',
+                'machine_id'    => $cdd->machine_id ? $cdd->machine_id : '',
                 'department_id' => $cdd->department_id ? $cdd->department_id : '',
                 'warehouse_id'  => $cdd->warehouse_id ? $cdd->warehouse_id : '',
                 'percentage'    => number_format($cdd->percentage,2,',','.'),

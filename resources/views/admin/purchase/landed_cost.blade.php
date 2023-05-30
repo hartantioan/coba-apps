@@ -396,6 +396,7 @@
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan (UOM)</th>
                                                     <th class="center">Plant</th>
+                                                    <th class="center">Line</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Qty x Harga</th>
@@ -406,7 +407,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="11" class="center">
+                                                    <td colspan="12" class="center">
                                                         Silahkan pilih supplier untuk memulai...
                                                     </td>
                                                 </tr>
@@ -598,7 +599,7 @@
                 if($('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="11" class="center">
+                            <td colspan="12" class="center">
                                 Silahkan pilih supplier untuk memulai...
                             </td>
                         </tr>
@@ -960,6 +961,7 @@
                                                     <input type="hidden" name="arr_qty[]" value="` + valdetail.qtyRaw + `">
                                                     <input type="hidden" name="arr_stock[]" value="` + valdetail.stock + `">
                                                     <input type="hidden" name="arr_place[]" value="` + valdetail.place_id + `">
+                                                    <input type="hidden" name="arr_line[]" value="` + valdetail.line_id + `">
                                                     <input type="hidden" name="arr_department[]" value="` + valdetail.department_id + `">
                                                     <input type="hidden" name="arr_warehouse[]" value="` + valdetail.warehouse_id + `">
                                                     <input type="hidden" name="arr_lookable_id[]" value="` + valdetail.lookable_id + `">
@@ -978,6 +980,9 @@
                                                     </td>
                                                     <td class="center">
                                                         ` + valdetail.place_name + `
+                                                    </td>
+                                                    <td class="center">
+                                                        ` + valdetail.line_name + `
                                                     </td>
                                                     <td class="center">
                                                         ` + valdetail.department_name + `
@@ -1373,10 +1378,24 @@
                 formData.append('percent_wtax',$('#wtax_id').val());
                 formData.delete('arr_fee_include_tax[]');
                 formData.delete('arr_coa[]');
+                formData.delete('arr_department[]');
+                formData.delete('arr_line[]');
 
                 $('input[name^="arr_fee_include_tax"]').each(function(){
                     formData.append('arr_fee_include_tax[]',
                         $(this).is(':checked') ? '1' : '0'
+                    );
+                });
+
+                $('input[name^="arr_department"]').each(function(){
+                    formData.append('arr_department[]',
+                        $(this).val() ? $(this).val() : ''
+                    );
+                });
+
+                $('input[name^="arr_line"]').each(function(){
+                    formData.append('arr_line[]',
+                        $(this).val() ? $(this).val() : ''
                     );
                 });
 
@@ -1529,6 +1548,7 @@
                                 <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
                                 <input type="hidden" name="arr_stock[]" value="` + val.stock + `">
                                 <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                 <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
                                 <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
@@ -1547,6 +1567,9 @@
                                 </td>
                                 <td class="center">
                                     ` + val.place_name + `
+                                </td>
+                                <td class="center">
+                                    ` + val.line_name + `
                                 </td>
                                 <td class="center">
                                     ` + val.department_name + `
@@ -1790,7 +1813,7 @@
                 if($('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="11" class="center">
+                            <td colspan="12" class="center">
                                 Silahkan pilih supplier untuk memulai...
                             </td>
                         </tr>

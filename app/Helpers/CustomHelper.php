@@ -73,8 +73,8 @@ class CustomHelper {
 				'price_in'		=> $qty > 0 ? $total / $qty : 0,
 				'total_in'		=> $total,
 				'qty_final'		=> $old_data ? $old_data->qty_final + $qty : $qty,
-				'price_final'	=> $old_data ? round((($old_data->total_final + $total) / ($old_data->qty_final + $qty)),3) : ($qty > 0 ? round($total / $qty,3) : 0),
-				'total_final'	=> $old_data ? round(($old_data->total_final + $total),3) : $total,
+				'price_final'	=> $old_data ? round((($old_data->total_final + $total) / ($old_data->qty_final + $qty)),2) : ($qty > 0 ? round($total / $qty,2) : 0),
+				'total_final'	=> $old_data ? round(($old_data->total_final + $total),2) : $total,
 				'date'			=> $date,
 				'type'			=> $type
 			]);
@@ -84,7 +84,7 @@ class CustomHelper {
 					$priceout = round($total / $qty,3);
 					$qtybalance = $old_data->qty_final - $qty;
 					$totalfinal = $old_data->total_final - $total;
-					$pricefinal = $qtybalance > 0 ? round($totalfinal / $qtybalance,3) : 0;
+					$pricefinal = $qtybalance > 0 ? round($totalfinal / $qtybalance,2) : 0;
 					ItemCogs::create([
 						'lookable_type'	=> $lookable_type,
 						'lookable_id'	=> $lookable_id,
@@ -103,9 +103,9 @@ class CustomHelper {
 					]);
 				}else{
 					$priceeach = $old_data->price_final;
-					$totalout = round($priceeach * $qty,3);
+					$totalout = round($priceeach * $qty,2);
 					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = round($qtybalance * $priceeach,3);
+					$totalfinal = round($qtybalance * $priceeach,2);
 					ItemCogs::create([
 						'lookable_type'	=> $lookable_type,
 						'lookable_id'	=> $lookable_id,
@@ -325,9 +325,11 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
-					'place_id'		=> $rowdetail->place_id,
 					'account_id'	=> $gr->account_id,
-					'department_id'	=> $rowdetail->department_id,
+					'place_id'		=> $rowdetail->place_id,
+					'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+					'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+					'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 					'warehouse_id'	=> $rowdetail->warehouse_id,
 					'type'			=> '1',
 					'nominal'		=> $rowtotal
@@ -338,8 +340,10 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coa_credit->id,
 						'place_id'		=> $rowdetail->place_id,
+						'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+						'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
 						'account_id'	=> $gr->account_id,
-						'department_id'	=> $rowdetail->department_id,
+						'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 						'warehouse_id'	=> $rowdetail->warehouse_id,
 						'type'			=> '2',
 						'nominal'		=> $rowtotal
@@ -593,7 +597,7 @@ class CustomHelper {
 					'place_id'		=> $row->goodReceiptDetail->place_id,
 					'item_id'		=> $row->item_id,
 					'account_id'	=> $row->goodReturnPO->account_id,
-					'department_id'	=> $row->goodReceiptDetail->department_id,
+					'department_id'	=> $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department_id : NULL,
 					'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
 					'type'			=> '1',
 					'nominal'		=> -1 * $rowtotal,
@@ -606,7 +610,7 @@ class CustomHelper {
 						'place_id'		=> $row->goodReceiptDetail->place_id,
 						'item_id'		=> $row->item_id,
 						'account_id'	=> $row->goodReturnPO->account_id,
-						'department_id'	=> $row->goodReceiptDetail->department_id,
+						'department_id'	=> $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department_id : NULL,
 						'warehouse_id'	=> $row->goodReceiptDetail->warehouse_id,
 						'type'			=> '2',
 						'nominal'		=> -1 * $rowtotal,
@@ -729,8 +733,9 @@ class CustomHelper {
 								'journal_id'	=> $query->id,
 								'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
 								'place_id'		=> $rowdetail->place_id,
+								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
 								'account_id'	=> $lc->account_id,
-								'department_id'	=> $rowdetail->department_id,
+								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 								'warehouse_id'	=> $rowdetail->warehouse_id,
 								'type'			=> '1',
 								'nominal'		=> $rowdetail->nominal
@@ -740,8 +745,9 @@ class CustomHelper {
 								'journal_id'	=> $query->id,
 								'coa_id'		=> $rowdetail->coa_id,
 								'place_id'		=> $rowdetail->place_id,
+								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
 								'account_id'	=> $lc->account_id,
-								'department_id'	=> $rowdetail->department_id,
+								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 								'warehouse_id'	=> $rowdetail->warehouse_id,
 								'type'			=> '1',
 								'nominal'		=> $rowdetail->nominal
@@ -1051,6 +1057,7 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->lookable_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
@@ -1065,6 +1072,7 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $pod->coa_id,
 						'place_id'		=> $pod->place_id,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $pod->department_id,
 						'type'			=> '1',
@@ -1076,6 +1084,7 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangbelumditagih,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
@@ -1089,6 +1098,7 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->taxMaster->coa_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
@@ -1102,6 +1112,7 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->wTaxMaster->coa_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
@@ -1114,6 +1125,7 @@ class CustomHelper {
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coahutangusaha,
 					'place_id'		=> $row->place_id ? $row->place_id : NULL,
+					'line_id'		=> $row->line_id ? $row->line_id : NULL,
 					'account_id'	=> $account_id,
 					'department_id'	=> $row->department_id ? $row->department_id : NULL,
 					'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,

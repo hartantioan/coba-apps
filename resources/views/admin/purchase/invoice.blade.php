@@ -307,13 +307,14 @@
                                                     <th class="center">Grandtotal</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Plant</th>
+                                                    <th class="center">Line</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="22">
+                                                    <td colspan="23">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Pembulatan Manual
                                                         </a>
@@ -1017,6 +1018,7 @@
                                                 <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
                                                 <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
                                                 <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
                                                 <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
                                                 <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
                                                 <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
@@ -1061,7 +1063,7 @@
                                                     <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
                                                         <option value="0" data-id="">-- Non-PPN --</option>
                                                         @foreach ($tax as $row1)
-                                                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code }}</option>
+                                                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                                         @endforeach
                                                     </select>
                                                 </td>
@@ -1078,7 +1080,7 @@
                                                     <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
                                                         <option value="0" data-id="">-- Non-PPH --</option>
                                                         @foreach ($wtax as $row2)
-                                                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code }}</option>
+                                                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                                         @endforeach
                                                     </select>
                                                 </td>
@@ -1093,6 +1095,9 @@
                                                 </td>
                                                 <td class="center">
                                                     ` + val.place_name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.line_name + `
                                                 </td>
                                                 <td class="center">
                                                     ` + val.department_name + `
@@ -1119,7 +1124,7 @@
                                         var count = makeid(10);
                                         $('#body-detail-dp').append(`
                                             <tr class="row_detail_dp">
-                                                <input type="hidden" name="arr_dp_code[]" value="` + val.code + `"onclick="countAll();" data-id="` + count + `">
+                                                <input type="hidden" name="arr_dp_code[]" value="` + val.code + `" data-id="` + count + `">
                                                 <td class="center">
                                                     ` + val.rawcode + `
                                                 </td>
@@ -1356,7 +1361,7 @@
                     <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
                         <option value="0" data-id="">-- Non-PPN --</option>
                         @foreach ($tax as $row1)
-                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code }}</option>
+                            <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                         @endforeach
                     </select>
                 </td>
@@ -1373,7 +1378,7 @@
                     <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
                         <option value="0" data-id="">-- Non-PPH --</option>
                         @foreach ($wtax as $row2)
-                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code }}</option>
+                            <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                         @endforeach
                     </select>
                 </td>
@@ -1393,6 +1398,14 @@
                         @endforeach
                     </select>
                 </td>
+                <td>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
                 <td class="center">
                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                         @foreach ($department as $rowdept)
@@ -1411,6 +1424,14 @@
             </tr>
         `);
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+    }
+
+    function changePlace(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
+        }else{
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
+        }
     }
 
     function countAll(){
@@ -1615,6 +1636,7 @@
                 formData.delete("arr_nominal[]");
                 formData.delete("arr_note[]");
                 formData.delete("arr_place[]");
+                formData.delete("arr_line[]");
                 formData.delete("arr_department[]");
                 formData.delete("arr_warehouse[]");
 
@@ -1645,6 +1667,7 @@
                         formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_note[]',$('input[name^="arr_note"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_place[]',$('#arr_place' + $(this).data('id')).val());
+                        formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : ''));
                         formData.append('arr_department[]',$('#arr_department' + $(this).data('id')).val());
                         formData.append('arr_warehouse[]',$('#arr_warehouse' + $(this).data('id')).val());
                     }
@@ -1850,7 +1873,7 @@
                                         <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
                                             <option value="0" data-id="">-- Non-PPN --</option>
                                             @foreach ($tax as $row1)
-                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code }}</option>
+                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -1867,7 +1890,7 @@
                                         <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
                                             <option value="0" data-id="">-- Non-PPH --</option>
                                             @foreach ($wtax as $row2)
-                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code }}</option>
+                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -1886,6 +1909,14 @@
                                                 <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                             @endforeach
                                         </select>
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($line as $rowline)
+                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                            @endforeach
+                                        </select>    
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
@@ -1908,6 +1939,7 @@
                             $('#arr_percent_tax' + count).val(val.percent_tax);
                             $('#arr_include_tax' + count).val(val.include_tax);
                             $('#arr_place' + count).val(val.place_id);
+                            $('#arr_line' + count).val(val.line_id);
                             $('#arr_department' + count).val(val.department_id);
                             $('#arr_warehouse' + count).val(val.warehouse_id);
                             $('#arr_coa' + count).append(`
@@ -1924,6 +1956,7 @@
                                     <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
                                     <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
                                     <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
                                     <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
@@ -1968,7 +2001,7 @@
                                         <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
                                             <option value="0">-- Non-PPN --</option>
                                             @foreach ($tax as $row1)
-                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code }}</option>
+                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -1985,7 +2018,7 @@
                                         <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
                                             <option value="0">-- Non-PPH --</option>
                                             @foreach ($wtax as $row2)
-                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code }}</option>
+                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -1997,6 +2030,9 @@
                                     </td>
                                     <td>
                                         <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                    </td>
+                                    <td class="center">
+                                        -
                                     </td>
                                     <td class="center">
                                         -
@@ -2023,12 +2059,7 @@
                         var count = makeid(10);
                         $('#body-detail-dp').append(`
                             <tr class="row_detail_dp">
-                                <td class="center-align">
-                                    <label>
-                                        <input type="checkbox" id="check` + count + `" name="arr_dp_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
-                                        <span>Pilih</span>
-                                    </label>
-                                </td>
+                                <input type="hidden" name="arr_dp_code[]" value="` + val.code + `" data-id="` + count + `">
                                 <td class="center">
                                     ` + val.rawcode + `
                                 </td>

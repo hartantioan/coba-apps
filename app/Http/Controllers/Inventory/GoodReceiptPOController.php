@@ -207,19 +207,25 @@ class GoodReceiptPOController extends Controller
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Goods Receipt');
                 $details = [];
                 foreach($data->purchaseOrderDetail as $row){
-                    $details[] = [
-                        'purchase_order_detail_id'  => $row->id,
-                        'item_id'                   => $row->item_id,
-                        'item_name'                 => $row->item->code.' - '.$row->item->name,
-                        'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
-                        'unit'                      => $row->item->buyUnit->code,
-                        'place_id'                  => $row->place_id,
-                        'place_name'                => $row->place->name.' - '.$row->place->company->name,
-                        'department_id'             => $row->department_id,
-                        'department_name'           => $row->department->name,
-                        'warehouse_id'              => $row->warehouse_id,
-                        'warehouse_name'            => $row->warehouse->name,
-                    ];
+                    if($row->getBalanceReceipt() > 0){
+                        $details[] = [
+                            'purchase_order_detail_id'  => $row->id,
+                            'item_id'                   => $row->item_id,
+                            'item_name'                 => $row->item->code.' - '.$row->item->name,
+                            'qty'                       => number_format($row->getBalanceReceipt(),3,',','.'),
+                            'unit'                      => $row->item->buyUnit->code,
+                            'place_id'                  => $row->place_id,
+                            'place_name'                => $row->place->name,
+                            'line_id'                   => $row->line_id ? $row->line_id : '',
+                            'line_name'                 => $row->line()->exists() ? $row->line->name : '-',
+                            'machine_id'                => $row->machine_id ? $row->machine_id : '',
+                            'machine_name'              => $row->machine()->exists() ? $row->machine->name : '-',
+                            'department_id'             => $row->department_id ? $row->department_id : '',
+                            'department_name'           => $row->department_id ? $row->department->name : '-',
+                            'warehouse_id'              => $row->warehouse_id,
+                            'warehouse_name'            => $row->warehouse->name,
+                        ];
+                    }
                 }
 
                 $data['details'] = $details;
@@ -472,7 +478,9 @@ class GoodReceiptPOController extends Controller
                             'note'                      => $request->arr_note[$key],
                             'remark'                    => $request->arr_remark[$key],
                             'place_id'                  => $request->arr_place[$key],
-                            'department_id'             => $request->arr_department[$key],
+                            'line_id'                   => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'machine_id'                => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                            'department_id'             => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                             'warehouse_id'              => $request->arr_warehouse[$key]
                         ]);
                     }
@@ -515,7 +523,7 @@ class GoodReceiptPOController extends Controller
                             <table class="bordered" style="width:auto;">
                                 <thead>
                                     <tr>
-                                        <th class="center-align" colspan="9">Daftar Item</th>
+                                        <th class="center-align" colspan="11">Daftar Item</th>
                                     </tr>
                                     <tr>
                                         <th class="center-align">No.</th>
@@ -525,6 +533,8 @@ class GoodReceiptPOController extends Controller
                                         <th class="center-align">Keterangan</th>
                                         <th class="center-align">Remark</th>
                                         <th class="center-align">Plant</th>
+                                        <th class="center-align">Line</th>
+                                        <th class="center-align">Mesin</th>
                                         <th class="center-align">Departemen</th>
                                         <th class="center-align">Gudang</th>
                                     </tr>
@@ -539,8 +549,10 @@ class GoodReceiptPOController extends Controller
                 <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
                 <td class="center-align">'.$rowdetail->remark.'</td>
-                <td class="center-align">'.$rowdetail->place->name.' - '.$rowdetail->place->company->name.'</td>
-                <td class="center-align">'.$rowdetail->department->name.'</td>
+                <td class="center-align">'.$rowdetail->place->name.'</td>
+                <td class="center-align">'.($rowdetail->line()->exists() ? $rowdetail->line->name : '-').'</td>
+                <td class="center-align">'.($rowdetail->machine()->exists() ? $rowdetail->machine->name : '-').'</td>
+                <td class="center-align">'.($rowdetail->department_id ? $rowdetail->department->name : '-').'</td>
                 <td class="center-align">'.$rowdetail->warehouse->name.'</td>
             </tr>';
         }
@@ -577,40 +589,6 @@ class GoodReceiptPOController extends Controller
             </tr>';
         }
 
-        $string .= '</tbody></table></div>';
-
-        $string .= '<div class="col s12 mt-1"><table style="max-width:500px;">
-                <thead>
-                    <tr>
-                        <th class="center-align" colspan="6">Landed Cost</th>
-                    </tr>
-                    <tr>
-                        <th class="center-align">Nomor/Kode</th>
-                        <th class="center-align">Vendor</th>
-                        <th class="center-align">Keterangan</th>
-                        <th class="center-align">Total</th>
-                        <th class="center-align">Pajak</th>
-                        <th class="center-align">Grandtotal</th>
-                    </tr>
-                </thead><tbody>';
-
-        if($data->landedCost()->exists()){
-            foreach($data->landedCost as $key => $row){
-            $string .= '<tr>
-                <td class="center-align">'.$row->code.'</td>
-                <td class="center-align">'.$row->vendor->name.'</td>
-                <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.number_format($row->total,2,',','.').'</td>
-                <td class="center-align">'.number_format($row->tax,2,',','.').'</td>
-                <td class="center-align">'.number_format($row->grandtotal,2,',','.').'</td>
-            </tr>';
-            }
-        }else{
-            $string .= '<tr>
-            <td class="center-align" colspan="6">Landed cost tidak ditemukan.</td>
-            </tr>';
-        }
-
         $string .= '</tbody></table></div></div>';
 		
         return response()->json($string);
@@ -641,17 +619,22 @@ class GoodReceiptPOController extends Controller
         foreach($grm->goodReceiptDetail as $row){
             $arr[] = [
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
-                'item_id'       => $row->item_id,
-                'item_name'     => $row->item->name,
-                'qty'           => $row->qty,
-                'unit'          => $row->item->buyUnit->code,
-                'note'          => $row->note,
-                'place_id'      => $row->place_id,
-                'place_name'    => $row->place->name.' - '.$row->place->company->name,
-                'department_id' => $row->department_id,
-                'department_name'   => $row->department->name,
-                'warehouse_id'  => $row->warehouse_id,
-                'warehouse_name'=> $row->warehouse->name
+                'item_id'                   => $row->item_id,
+                'item_name'                 => $row->item->name,
+                'qty'                       => number_format($row->qty,3,',','.'),
+                'unit'                      => $row->item->buyUnit->code,
+                'note'                      => $row->note,
+                'remark'                    => $row->remark,
+                'place_id'                  => $row->place_id,
+                'place_name'                => $row->place->name,
+                'line_id'                   => $row->line_id ? $row->line_id : '',
+                'line_name'                 => $row->line_id ? $row->line->name : '-',
+                'machine_id'                => $row->machine_id ? $row->machine_id : '',
+                'machine_name'              => $row->machine_id ? $row->machine->name : '-',
+                'department_id'             => $row->department_id ? $row->department_id : '',
+                'department_name'           => $row->department_id ? $row->department->name : '-',
+                'warehouse_id'              => $row->warehouse_id,
+                'warehouse_name'            => $row->warehouse->name,
             ];
         }
 

@@ -126,27 +126,27 @@
                             <select class="select2 browser-default" id="asset_group_id" name="asset_group_id">
                                 @foreach($group->whereNull('parent_id') as $c)
                                         @if(!$c->childSub()->exists())
-                                            <option value="{{ $c->id }}"> - {{ $c->name.' COA '.$c->coa->code.' - '.$c->coa->name }}</option>
+                                            <option value="{{ $c->id }}"> - {{ $c->name }}</option>
                                         @else
                                             <optgroup label=" - {{ $c->code.' - '.$c->name }}">
                                             @foreach($c->childSub as $bc)
                                                 @if(!$bc->childSub()->exists())
-                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name.' COA '.$bc->coa->code.' - '.$bc->coa->name }}</option>
+                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
                                                 @else
                                                     <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
                                                         @foreach($bc->childSub as $bcc)
                                                             @if(!$bcc->childSub()->exists())
-                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name.' COA '.$bcc->coa->code.' - '.$bcc->coa->name }}</option>
+                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
                                                             @else
                                                                 <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
                                                                     @foreach($bcc->childSub as $bccc)
                                                                         @if(!$bccc->childSub()->exists())
-                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name.' COA '.$bccc->coa->code.' - '.$bccc->coa->name }}</option>
+                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
                                                                         @else
                                                                             <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
                                                                                 @foreach($bccc->childSub as $bcccc)
                                                                                     @if(!$bcccc->childSub()->exists())
-                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name.' COA '.$bcccc->coa->code.' - '.$bcccc->coa->name }}</option>
+                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
                                                                                     @endif
                                                                                 @endforeach
                                                                             </optgroup>

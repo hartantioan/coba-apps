@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
+use App\Models\Line;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Line;
+use App\Models\Machine;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ExportLine;
+use App\Exports\ExportMachine;
 
-class LineController extends Controller
+class MachineController extends Controller
 {
     public function index()
     {
         $data = [
-            'title'     => 'Line',
-            'content'   => 'admin.master_data.line',
-            'place'     => Place::where('status','1')->get(),
+            'title'     => 'Mesin',
+            'content'   => 'admin.master_data.machine',
+            'line'      => Line::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -28,7 +29,7 @@ class LineController extends Controller
         $column = [
             'id',
             'code',
-            'place_id',
+            'line_id',
             'name',
             'note',
         ];
@@ -39,17 +40,21 @@ class LineController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Line::count();
+        $total_data = Machine::count();
         
-        $query_data = Line::where(function($query) use ($search, $request) {
+        $query_data = Machine::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('place',function($query) use ($search, $request) {
+                            ->orWhereHas('line',function($query) use ($search, $request) {
                                 $query->where('code', 'like', "%$search%")
-                                    ->orWhere('name', 'like', "%$search%");
+                                    ->orWhere('name', 'like', "%$search%")
+                                    ->orWhereHas('place',function($query) use ($search, $request) {
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name', 'like', "%$search%");
+                                    });
                             });
                     });
                 }
@@ -63,15 +68,19 @@ class LineController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = Line::where(function($query) use ($search, $request) {
+        $total_filtered = Machine::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('place',function($query) use ($search, $request) {
+                            ->orWhereHas('line',function($query) use ($search, $request) {
                                 $query->where('code', 'like', "%$search%")
-                                    ->orWhere('name', 'like', "%$search%");
+                                    ->orWhere('name', 'like', "%$search%")
+                                    ->orWhereHas('place',function($query) use ($search, $request) {
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name', 'like', "%$search%");
+                                    });
                             });
                     });
                 }
@@ -90,7 +99,7 @@ class LineController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->place->code.' - '.$val->place->name,
+                    $val->line->name.' - '.$val->line->place->name,
                     $val->name,
                     $val->note,
                     $val->status(),
@@ -119,13 +128,13 @@ class LineController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('lines', 'code')->ignore($request->temp)] : 'required|unique:lines,code',
-            'place_id'          => 'required',
+            'code' 				=> $request->temp ? ['required', Rule::unique('machines', 'code')->ignore($request->temp)] : 'required|unique:machines,code',
+            'line_id'           => 'required',
             'name'              => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
-            'place_id.required'     => 'Plant tidak boleh kosong.',
+            'line_id.required'      => 'Line tidak boleh kosong.',
             'name.required'         => 'Nama tidak boleh kosong.',
         ]);
 
@@ -138,9 +147,9 @@ class LineController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = Line::find($request->temp);
+                    $query = Machine::find($request->temp);
                     $query->code            = $request->code;
-                    $query->place_id        = $request->place_id;
+                    $query->line_id         = $request->line_id;
                     $query->name	        = $request->name;
                     $query->note            = $request->note;
                     $query->status          = $request->status ? $request->status : '2';
@@ -152,9 +161,9 @@ class LineController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = Line::create([
+                    $query = Machine::create([
                         'code'          => $request->code,
-                        'place_id'      => $request->place_id,
+                        'line_id'       => $request->line_id,
                         'name'			=> $request->name,
                         'note'          => $request->note,
                         'status'        => $request->status ? $request->status : '2'
@@ -168,10 +177,10 @@ class LineController extends Controller
 			if($query) {
 
                 activity()
-                    ->performedOn(new Line())
+                    ->performedOn(new Machine())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit line.');
+                    ->log('Add / edit machine.');
 
 				$response = [
 					'status'  => 200,
@@ -189,20 +198,20 @@ class LineController extends Controller
     }
 
     public function show(Request $request){
-        $line = Line::find($request->id);
+        $line = Machine::find($request->id);
         				
 		return response()->json($line);
     }
 
     public function destroy(Request $request){
-        $query = Line::find($request->id);
+        $query = Machine::find($request->id);
 		
         if($query->delete()) {
             activity()
-                ->performedOn(new Line())
+                ->performedOn(new Machine())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the line data');
+                ->log('Delete the machine data');
 
             $response = [
                 'status'  => 200,
@@ -221,16 +230,20 @@ class LineController extends Controller
     public function print(Request $request){
 
         $data = [
-            'title' => 'LINE REPORT',
-            'data' => Line::where(function ($query) use ($request) {
+            'title' => 'MACHINE REPORT',
+            'data' => Machine::where(function ($query) use ($request) {
                 if ($request->search) {
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('name', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
-                            ->orWhereHas('place',function($query) use ($request) {
+                            ->orWhereHas('line',function($query) use ($request) {
                                 $query->where('code', 'like', "%$request->search%")
-                                    ->orWhere('name', 'like', "%$request->search%");
+                                    ->orWhere('name', 'like', "%$request->search%")
+                                    ->orWhereHas('place',function($query) use ($request) {
+                                        $query->where('code', 'like', "%$request->search%")
+                                            ->orWhere('name', 'like', "%$request->search%");
+                                    });
                             });
                     });
                 }
@@ -241,13 +254,13 @@ class LineController extends Controller
             })->get()
 		];
 		
-		return view('admin.print.master_data.line', $data);
+		return view('admin.print.master_data.machine', $data);
     }
 
     public function export(Request $request){
         $search = $request->search ? $request->search : '';
 		$status = $request->status ? $request->status : '';
 		
-		return Excel::download(new ExportLine($search,$status), 'line_'.uniqid().'.xlsx');
+		return Excel::download(new ExportMachine($search,$status), 'line_'.uniqid().'.xlsx');
     }
 }

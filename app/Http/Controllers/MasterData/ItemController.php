@@ -131,7 +131,7 @@ class ItemController extends Controller
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->name,
-                    $val->itemGroup->name.' Coa : '.$val->itemGroup->coa->code.' - '.$val->itemGroup->coa->name,
+                    $val->itemGroup->name,
                     $val->uomUnit->code,
                     $val->status(),
                     '

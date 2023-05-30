@@ -210,7 +210,7 @@
                     <th class="center">Catatan</th>
                     <th class="center">Tgl.Dipakai</th>
                     <th class="center">Plant</th>
-                    <th class="center">Mesin</th>
+                    <th class="center">Line</th>
                     <th class="center">Gudang</th>
                     <th class="center">Departemen</th>
                 </tr>

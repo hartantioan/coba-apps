@@ -123,6 +123,7 @@
                                 <thead>
                                     <tr>
                                         <th class="center">Plant</th>
+                                        <th class="center">Line</th>
                                         <th class="center">Mesin</th>
                                         <th class="center">Departemen</th>
                                         <th class="center">Gudang</th>
@@ -132,7 +133,7 @@
                                 </thead>
                                 <tbody id="body-detail">
                                     <tr id="last-row-detail">
-                                        <td colspan="6" class="center">
+                                        <td colspan="7" class="center">
                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
                                                 <i class="material-icons left">add</i> Tambah Baris
                                             </a>
@@ -249,10 +250,18 @@
                     </select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
                         <option value="">--Kosong--</option>
                         @foreach ($line as $rowline)
-                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                        @endforeach    
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($machine as $row)
+                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
                         @endforeach    
                     </select>
                 </td>
@@ -282,6 +291,22 @@
                 </td>
             </tr>
         `);
+    }
+
+    function changePlace(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
+        }else{
+            $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
+        }
+    }
+
+    function changeLine(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
+        }else{
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
+        }
     }
 
     function loadDataTable() {
@@ -346,11 +371,13 @@
         
         if(passed){
             formData.delete("arr_line[]");
+            formData.delete("arr_machine[]");
             formData.delete("arr_department[]");
             formData.delete("arr_warehouse[]");
 
             $('select[name^="arr_place"]').each(function(index){
                 formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : ''));
+                formData.append('arr_machine[]',($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : ''));
                 formData.append('arr_department[]',($('select[name^="arr_department"]').eq(index).val() ? $('select[name^="arr_department"]').eq(index).val() : ''));
                 formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : ''));
             });
@@ -479,10 +506,18 @@
                                 </select>
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
                                     <option value="">--Kosong--</option>
                                     @foreach ($line as $rowline)
-                                        <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                                        <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                    @endforeach    
+                                </select>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                    <option value="">--Kosong--</option>
+                                    @foreach ($machine as $row)
+                                        <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
                                     @endforeach    
                                 </select>
                             </td>

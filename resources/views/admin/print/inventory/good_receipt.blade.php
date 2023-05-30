@@ -171,6 +171,7 @@
 											<th>Sat.</th>
 											<th>Catatan</th>
 											<th>Plant</th>
+											<th>Line</th>
 											<th>Departemen</th>
 											<th>Gudang</th>
 										</tr>
@@ -183,7 +184,8 @@
 											<td align="center">{{ $rowdetail->qty }}</td>
 											<td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
 											<td>{{ $rowdetail->note }}</td>
-											<td align="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
+											<td align="center">{{ $rowdetail->place->name }}</td>
+											<td align="center">{{ $rowdetail->line()->exists() ? $rowdetail->line->name : '-' }}</td>
 											<td align="center">{{ $rowdetail->department->name }}</td>
 											<td align="center">{{ $rowdetail->warehouse->name }}</td>
 										</tr>

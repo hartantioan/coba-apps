@@ -192,7 +192,7 @@
                         <th class="center">Perusahaan</th>
                         <th class="center">Bisnis Partner</th>
                         <th class="center">Plant</th>
-                        <th class="center">Mesin</th>
+                        <th class="center">Line</th>
                         <th class="center">Departemen</th>
                         <th class="center">Gudang</th>
                         <th class="center">Debit</th>

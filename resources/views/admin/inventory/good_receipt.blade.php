@@ -220,6 +220,8 @@
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Remark</th>
                                                     <th class="center">Plant</th>
+                                                    <th class="center">Line</th>
+                                                    <th class="center">Mesin</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Hapus</th>
@@ -227,7 +229,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="9" class="center">
+                                                    <td colspan="11" class="center">
                                                         Pilih purchase order untuk memulai...
                                                     </td>
                                                 </tr>
@@ -346,7 +348,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="9" class="center">
+                            <td colspan="11" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -400,7 +402,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="9" class="center">
+                        <td colspan="11" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -505,7 +507,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="9" class="center">
+                        <td colspan="11" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -763,6 +765,22 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]);
+
+                formData.delete("arr_department[]");
+                formData.delete("arr_line[]");
+                formData.delete("arr_machine[]");
+
+                $('input[name^="arr_department"]').each(function(index){
+                    formData.append('arr_department[]',($(this).val() ? $(this).val() : ''));
+                });
+
+                $('input[name^="arr_line"]').each(function(index){
+                    formData.append('arr_line[]',($(this).val() ? $(this).val() : ''));
+                });
+
+                $('input[name^="arr_machine"]').each(function(index){
+                    formData.append('arr_machine[]',($(this).val() ? $(this).val() : ''));
+                });
         
                 $.ajax({
                     url: '{{ Request::url() }}/create',
@@ -884,6 +902,8 @@
                                         <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
                                         <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                        <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
+                                        <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                         <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
                                         <td>
@@ -903,6 +923,12 @@
                                         </td>
                                         <td class="center">
                                             <span>` + val.place_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.line_name + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.machine_name + `</span>
                                         </td>
                                         <td class="center">
                                             <span>` + val.department_name + `</span>
@@ -942,7 +968,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="9" class="center">
+                        <td colspan="11" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -970,7 +996,7 @@
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="9" class="center">
+                            <td colspan="11" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -1030,6 +1056,8 @@
                                 <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
                                 <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
+                                <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                 <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
                                 <td>
@@ -1049,6 +1077,12 @@
                                 </td>
                                 <td class="center">
                                     <span>` + val.place_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.line_name + `</span>
+                                </td>
+                                <td class="center">
+                                    <span>` + val.machine_name + `</span>
                                 </td>
                                 <td class="center">
                                     <span>` + val.department_name + `</span>

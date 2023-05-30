@@ -21,6 +21,7 @@ return new class extends Migration
             $table->bigInteger('coa_id')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('line_id')->nullable();
+            $table->bigInteger('machine_id')->nullable();
             $table->bigInteger('account_id')->nullable();
             $table->bigInteger('item_id')->nullable();
             $table->bigInteger('department_id')->nullable();

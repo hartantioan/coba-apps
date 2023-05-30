@@ -27,12 +27,14 @@ return new class extends Migration
             $table->string('note')->nullable();
             $table->string('remark')->nullable();
             $table->bigInteger('place_id')->nullable();
+            $table->bigInteger('line_id')->nullable();
+            $table->bigInteger('machine_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['good_receipt_id', 'purchase_order_detail_id', 'item_id', 'place_id', 'department_id', 'warehouse_id'],'grpodetail_index');
+            $table->index(['good_receipt_id', 'purchase_order_detail_id', 'item_id', 'place_id', 'line_id', 'machine_id', 'department_id', 'warehouse_id'],'grpodetail_index');
         });
     }
 

@@ -18,13 +18,14 @@ return new class extends Migration
             $table->bigInteger('cost_distribution_id')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('line_id')->nullable();
+            $table->bigInteger('machine_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
             $table->double('percentage')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['distribution_id','lookable_id']);
+            $table->index(['cost_distribution_id','place_id','line_id','machine_id','department_id','warehouse_id']);
         });
     }
 

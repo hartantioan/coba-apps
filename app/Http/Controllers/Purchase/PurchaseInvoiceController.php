@@ -6,6 +6,7 @@ use App\Models\Coa;
 use App\Models\Company;
 use App\Models\GoodReturnPO;
 use App\Models\Department;
+use App\Models\Line;
 use App\Models\PaymentRequest;
 use App\Models\Place;
 use App\Models\PurchaseDownPayment;
@@ -54,6 +55,7 @@ class PurchaseInvoiceController extends Controller
             'place'         => Place::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->get(),
+            'line'          => Line::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -188,9 +190,11 @@ class PurchaseInvoiceController extends Controller
                             'percent_wtax'  => $rowdetail->percent_wtax,
                             'include_tax'   => $rowdetail->is_include_tax,
                             'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                            'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
                             'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
                             'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
                             'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '',
+                            'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '',
                             'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '',
                             'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '',
                         ];
@@ -215,7 +219,7 @@ class PurchaseInvoiceController extends Controller
                             'qty_received'  => number_format($rowdetail->qty,3,',','.'),
                             'qty_returned'  => number_format($rowdetail->qtyReturn(),3,',','.'),
                             'qty_balance'   => number_format(($rowdetail->qty - $rowdetail->qtyReturn()),3,',','.'),
-                            'price'         => number_format($rowdetail->total / ($rowdetail->qty - $rowdetail->qtyReturn()),2,',','.'),
+                            'price'         => number_format($rowdetail->purchaseOrderDetail->price,2,',','.'),
                             'buy_unit'      => $rowdetail->item->buyUnit->code,
                             'rawcode'       => $datagr->code,
                             'post_date'     => date('d/m/y',strtotime($datagr->post_date)),
@@ -232,9 +236,11 @@ class PurchaseInvoiceController extends Controller
                             'percent_wtax'  => $rowdetail->purchaseOrderDetail->percent_wtax,
                             'include_tax'   => $rowdetail->purchaseOrderDetail->is_include_tax,
                             'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                            'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
                             'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
                             'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
                             'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '',
+                            'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '',
                             'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '',
                             'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '',
                         ];
@@ -269,9 +275,11 @@ class PurchaseInvoiceController extends Controller
                         'percent_wtax'  => 0,
                         'include_tax'   => 0,
                         'place_id'      => $arrInfo['place_id'],
+                        'line_id'       => $arrInfo['line_id'],
                         'department_id' => $arrInfo['department_id'],
                         'warehouse_id'  => $arrInfo['warehouse_id'],
                         'place_name'    => $arrInfo['place_name'],
+                        'line_name'     => $arrInfo['line_name'],
                         'department_name' => $arrInfo['department_name'],
                         'warehouse_name'=> $arrInfo['warehouse_name'],
                     ];
@@ -551,178 +559,177 @@ class PurchaseInvoiceController extends Controller
             }
 
             $balance = $grandtotal - $downpayment + $rounding;
-            for ($lastNumber = 1; $lastNumber <= 100; $lastNumber++) {
-                if($request->temp){
-                    DB::beginTransaction();
-                    try {
-                        $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
+            if($request->temp){
+                DB::beginTransaction();
+                try {
+                    $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                        if($query->approval()){
-                            foreach($query->approval()->approvalMatrix as $row){
-                                if($row->status == '2'){
-                                    return response()->json([
-                                        'status'  => 500,
-                                        'message' => 'Purchase Order Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
-                                    ]);
-                                }
+                    if($query->approval()){
+                        foreach($query->approval()->approvalMatrix as $row){
+                            if($row->status == '2'){
+                                return response()->json([
+                                    'status'  => 500,
+                                    'message' => 'Purchase Order Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
+                                ]);
                             }
                         }
+                    }
 
-                        if($query->status == '1'){
+                    if($query->status == '1'){
 
-                            if($request->has('document')) {
-                                if(Storage::exists($query->document)){
-                                    Storage::delete($query->document);
-                                }
-                                $document = $request->file('document')->store('public/purchase_invoices');
-                            } else {
-                                $document = $query->document;
+                        if($request->has('document')) {
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
                             }
+                            $document = $request->file('document')->store('public/purchase_invoices');
+                        } else {
+                            $document = $query->document;
+                        }
 
-                            $query->user_id = session('bo_id');
-                            $query->account_id = $request->account_id;
-                            $query->company_id = $request->company_id;
-                            $query->post_date = $request->post_date;
-                            $query->received_date = $request->received_date;
-                            $query->due_date = $request->due_date;
-                            $query->document_date = $request->document_date;
-                            $query->type = $request->type;
-                            $query->total = round($total,3);
-                            $query->tax = round($tax,3);
-                            $query->wtax = round($wtax,3);
-                            $query->grandtotal = round($grandtotal,3);
-                            $query->downpayment = round($downpayment,3);
-                            $query->rounding = round($rounding,3);
-                            $query->balance = round($balance,3);
-                            $query->document = $document;
-                            $query->note = $request->note;
-                            $query->tax_no = $request->tax_no;
-                            $query->tax_cut_no = $request->tax_cut_no;
-                            $query->cut_date = $request->cut_date;
-                            $query->spk_no = $request->spk_no;
-                            $query->invoice_no = $request->invoice_no;
+                        $query->user_id = session('bo_id');
+                        $query->account_id = $request->account_id;
+                        $query->company_id = $request->company_id;
+                        $query->post_date = $request->post_date;
+                        $query->received_date = $request->received_date;
+                        $query->due_date = $request->due_date;
+                        $query->document_date = $request->document_date;
+                        $query->type = $request->type;
+                        $query->total = round($total,3);
+                        $query->tax = round($tax,3);
+                        $query->wtax = round($wtax,3);
+                        $query->grandtotal = round($grandtotal,3);
+                        $query->downpayment = round($downpayment,3);
+                        $query->rounding = round($rounding,3);
+                        $query->balance = round($balance,3);
+                        $query->document = $document;
+                        $query->note = $request->note;
+                        $query->tax_no = $request->tax_no;
+                        $query->tax_cut_no = $request->tax_cut_no;
+                        $query->cut_date = $request->cut_date;
+                        $query->spk_no = $request->spk_no;
+                        $query->invoice_no = $request->invoice_no;
 
-                            $query->save();
+                        $query->save();
 
-                            foreach($query->purchaseInvoiceDetail as $row){
-                                $row->delete();
-                            }
+                        foreach($query->purchaseInvoiceDetail as $row){
+                            $row->delete();
+                        }
 
-                            foreach($query->purchaseInvoiceDp as $row){
-                                $row->delete();
-                            }
+                        foreach($query->purchaseInvoiceDp as $row){
+                            $row->delete();
+                        }
 
-                            DB::commit();
-                        }else{
-                            return response()->json([
-                                'status'  => 500,
-                                'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                        DB::commit();
+                    }else{
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+            }else{
+                DB::beginTransaction();
+                try {
+                    $query = PurchaseInvoice::create([
+                        'code'			            => PurchaseInvoice::generateCode(),
+                        'user_id'		            => session('bo_id'),
+                        'account_id'                => $request->account_id,
+                        'company_id'                => $request->company_id,
+                        'post_date'                 => $request->post_date,
+                        'received_date'             => $request->received_date,
+                        'due_date'                  => $request->due_date,
+                        'document_date'             => $request->document_date,
+                        'type'                      => $request->type,
+                        'total'                     => round($total,3),
+                        'tax'                       => round($tax,3),
+                        'wtax'                      => round($wtax,3),
+                        'grandtotal'                => round($grandtotal,3),
+                        'downpayment'               => round($downpayment,3),
+                        'rounding'                  => round($rounding,3),
+                        'balance'                   => round($balance,3),
+                        'note'                      => $request->note,
+                        'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
+                        'status'                    => '1',
+                        'tax_no'                    => $request->tax_no,
+                        'tax_cut_no'                => $request->tax_cut_no,
+                        'cut_date'                  => $request->cut_date,
+                        'spk_no'                    => $request->spk_no,
+                        'invoice_no'                => $request->invoice_no
+                    ]);
+
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+            }
+            
+            if($query) {
+                DB::beginTransaction();
+                try {
+                    if($request->arr_type){
+                        
+                        foreach($request->arr_type as $key => $row){
+                            PurchaseInvoiceDetail::create([
+                                'purchase_invoice_id'   => $query->id,
+                                'lookable_type'         => $row,
+                                'lookable_id'           => $request->arr_code[$key],
+                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                                'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                'tax_id'                => $request->arr_tax_id[$key] ? $request->arr_tax_id[$key] : NULL,
+                                'wtax_id'               => $request->arr_wtax_id[$key] ? $request->arr_wtax_id[$key] : NULL,
+                                'is_include_tax'        => $request->arr_include_tax[$key],
+                                'percent_tax'           => $request->arr_percent_tax[$key],
+                                'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                'percent_wtax'          => $request->arr_percent_wtax[$key],
+                                'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
+                                'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                                'note'                  => $request->arr_note[$key],
+                                'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                                'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                             ]);
                         }
-                    }catch(\Exception $e){
-                        DB::rollback();
-                    }
-                }else{
-                    DB::beginTransaction();
-                    try {
-                        $query = PurchaseInvoice::create([
-                            'code'			            => PurchaseInvoice::generateCode(),
-                            'user_id'		            => session('bo_id'),
-                            'account_id'                => $request->account_id,
-                            'company_id'                => $request->company_id,
-                            'post_date'                 => $request->post_date,
-                            'received_date'             => $request->received_date,
-                            'due_date'                  => $request->due_date,
-                            'document_date'             => $request->document_date,
-                            'type'                      => $request->type,
-                            'total'                     => round($total,3),
-                            'tax'                       => round($tax,3),
-                            'wtax'                      => round($wtax,3),
-                            'grandtotal'                => round($grandtotal,3),
-                            'downpayment'               => round($downpayment,3),
-                            'rounding'                  => round($rounding,3),
-                            'balance'                   => round($balance,3),
-                            'note'                      => $request->note,
-                            'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_invoices') : NULL,
-                            'status'                    => '1',
-                            'tax_no'                    => $request->tax_no,
-                            'tax_cut_no'                => $request->tax_cut_no,
-                            'cut_date'                  => $request->cut_date,
-                            'spk_no'                    => $request->spk_no,
-                            'invoice_no'                => $request->invoice_no
-                        ]);
-
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
-                    }
-                }
-                
-                if($query) {
-                    DB::beginTransaction();
-                    try {
-                        if($request->arr_type){
                             
-                            foreach($request->arr_type as $key => $row){
-                                PurchaseInvoiceDetail::create([
-                                    'purchase_invoice_id'   => $query->id,
-                                    'lookable_type'         => $row,
-                                    'lookable_id'           => $request->arr_code[$key],
-                                    'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                                    'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                                    'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                                    'tax_id'                => $request->arr_tax_id[$key] ? $request->arr_tax_id[$key] : NULL,
-                                    'wtax_id'               => $request->arr_wtax_id[$key] ? $request->arr_wtax_id[$key] : NULL,
-                                    'is_include_tax'        => $request->arr_include_tax[$key],
-                                    'percent_tax'           => $request->arr_percent_tax[$key],
-                                    'tax'                   => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
-                                    'percent_wtax'          => $request->arr_percent_wtax[$key],
-                                    'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
-                                    'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
-                                    'note'                  => $request->arr_note[$key],
-                                    'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                                    'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
-                                    'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
-                                ]);
-                            }
-                                
-                        }
-
-                        if($request->arr_dp_code){
-                            foreach($request->arr_dp_code as $key => $row){
-                                PurchaseInvoiceDp::create([
-                                    'purchase_invoice_id'       => $query->id,
-                                    'purchase_down_payment_id'  => PurchaseDownPayment::where('code',CustomHelper::decrypt($row))->first()->id,
-                                    'nominal'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                                ]);
-                            }
-                        }
-                    
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
                     }
 
-                    CustomHelper::sendApproval('purchase_invoices',$query->id,$query->note);
-                    CustomHelper::sendNotification('purchase_invoices',$query->id,'Pengajuan Purchase Invoice No. '.$query->code,$query->note,session('bo_id'));
-                    CustomHelper::removeDeposit($query->account_id,$query->downpayment);
-
-                    activity()
-                        ->performedOn(new PurchaseInvoice())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit purchase invoice.');
-
-                    $response = [
-                        'status'    => 200,
-                        'message'   => 'Data successfully saved.',
-                    ];
-                } else {
-                    $response = [
-                        'status'  => 500,
-                        'message' => 'Data failed to save.'
-                    ];
+                    if($request->arr_dp_code){
+                        foreach($request->arr_dp_code as $key => $row){
+                            PurchaseInvoiceDp::create([
+                                'purchase_invoice_id'       => $query->id,
+                                'purchase_down_payment_id'  => PurchaseDownPayment::where('code',CustomHelper::decrypt($row))->first()->id,
+                                'nominal'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
+                            ]);
+                        }
+                    }
+                
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
                 }
+
+                CustomHelper::sendApproval('purchase_invoices',$query->id,$query->note);
+                CustomHelper::sendNotification('purchase_invoices',$query->id,'Pengajuan Purchase Invoice No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::removeDeposit($query->account_id,$query->downpayment);
+
+                activity()
+                    ->performedOn(new PurchaseInvoice())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit purchase invoice.');
+
+                $response = [
+                    'status'    => 200,
+                    'message'   => 'Data successfully saved.',
+                ];
+            } else {
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data failed to save.'
+                ];
             }
 		}
 		
@@ -936,6 +943,7 @@ class PurchaseInvoiceController extends Controller
                 'percent_wtax'  => $row->percent_wtax,
                 'include_tax'   => $row->is_include_tax,
                 'place_id'      => $row->place_id ? $row->place_id : '',
+                'line_id'       => $row->line_id ? $row->line_id : '',
                 'department_id' => $row->department_id ? $row->department_id : '',
                 'warehouse_id'  => $row->warehouse_id ? $row->warehouse_id : '',
             ];

@@ -35,6 +35,8 @@ class PurchaseOrderDetail extends Model
         'tax_id',
         'wtax_id',
         'place_id',
+        'line_id',
+        'machine_id',
         'department_id',
         'warehouse_id',
     ];
@@ -78,12 +80,20 @@ class PurchaseOrderDetail extends Model
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }
 
+    public function machine(){
+        return $this->belongsTo('App\Models\Machine','machine_id','id')->withTrashed();
+    }
+
     public function coa(){
         return $this->belongsTo('App\Models\Coa','coa_id','id')->withTrashed();
     }
 
     public function place(){
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
+    }
+
+    public function line(){
+        return $this->belongsTo('App\Models\Line','line_id','id')->withTrashed();
     }
 
     public function department(){

@@ -8,8 +8,10 @@ use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
 use App\Models\LandedCost;
+use App\Models\Line;
 use App\Models\PaymentRequest;
 use App\Models\Place;
+use App\Models\Machine;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\UsedData;
@@ -52,6 +54,8 @@ class PurchaseOrderController extends Controller
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'line'          => Line::where('status','1')->get(),
+            'machine'       => Machine::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -355,6 +359,8 @@ class PurchaseOrderController extends Controller
                                 'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
                                 'warehouse_id'                  => $row->warehouse_id,
                                 'place_id'                      => $row->place_id,
+                                'line_id'                       => $row->line_id,
+                                'machine_id'                    => $row->machine_id,
                                 'department_id'                 => $row->department_id,
                             ];
                         }
@@ -372,6 +378,8 @@ class PurchaseOrderController extends Controller
                             'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
                             'warehouse_id'                  => $row->warehouse_id,
                             'place_id'                      => $row->place_id,
+                            'line_id'                       => '',
+                            'machine_id'                    => '',
                             'department_id'                 => $row->department_id,
                         ];
                     }
@@ -659,7 +667,9 @@ class PurchaseOrderController extends Controller
                                     'tax_id'                        => $request->arr_tax_id[$key],
                                     'wtax_id'                       => $request->arr_wtax_id[$key],
                                     'place_id'                      => $request->arr_place[$key],
-                                    'department_id'                 => $request->arr_department[$key],
+                                    'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                    'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                                    'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                     'warehouse_id'                  => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                                 ]);
                                 
@@ -706,7 +716,9 @@ class PurchaseOrderController extends Controller
                                     'tax_id'                        => $request->arr_tax_id[$key],
                                     'wtax_id'                       => $request->arr_wtax_id[$key],
                                     'place_id'                      => $request->arr_place[$key],
-                                    'department_id'                 => $request->arr_department[$key]
+                                    'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                    'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                                    'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                 ]);
                             }
                         }
@@ -748,7 +760,7 @@ class PurchaseOrderController extends Controller
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="14">Daftar Item</th>
+                                <th class="center-align" colspan="16">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -762,6 +774,8 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Subtotal</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Plant</th>
+                                <th class="center-align">Line</th>
+                                <th class="center-align">Mesin</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Referensi</th>
@@ -781,7 +795,9 @@ class PurchaseOrderController extends Controller
                 <td class="right-align">'.number_format($row->subtotal,2,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->place->name.'</td>
-                <td class="center-align">'.$row->department->name.'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
+                <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
+                <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                 <td class="center-align">'.($row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : ($row->goodIssueDetail()->exists() ? $row->goodIssueDetail->goodIssue->code : ' - ')).'</td>
             </tr>';
@@ -858,7 +874,9 @@ class PurchaseOrderController extends Controller
                 'warehouse_id'                      => $row->warehouse_id,
                 'warehouse_name'                    => $row->warehouse_id ? $row->warehouse->name : '',
                 'place_id'                          => $row->place_id,
-                'department_id'                     => $row->department_id,
+                'line_id'                           => $row->line_id ? $row->line_id : '',
+                'machine_id'                        => $row->machine_id ? $row->machine_id : '',
+                'department_id'                     => $row->department_id ? $row->department_id : '',
                 'tax_id'                            => $row->tax_id,
                 'wtax_id'                           => $row->wtax_id,
                 'type'                              => $row->purchase_request_detail_id ? 'po' : ($row->good_issue_detail_id ? 'gi' : ''),

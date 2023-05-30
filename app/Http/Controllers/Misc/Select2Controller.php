@@ -609,7 +609,8 @@ class Select2Controller extends Controller {
                                 $query->whereHas('item',function($query) use($search){
                                     $query->where('code', 'like', "%$search%")
                                         ->orWhere('name','like',"%$search%");
-                                });
+                                })
+                                ->orWhere;
                             })
                             ->orWhereHas('user',function($query) use($search){
                                 $query->where('name','like',"%$search%")
@@ -617,7 +618,9 @@ class Select2Controller extends Controller {
                             });
                     });
                 })
-                ->whereDoesntHave('purchaseInvoiceDetail')
+                ->whereHas('goodReceiptDetail',function($query) use($search){
+                    $query->whereDoesntHave('purchaseInvoiceDetail');
+                })
                 ->whereDoesntHave('used')
                 ->whereIn('status',['2','3'])->get();
 
@@ -1002,6 +1005,8 @@ class Select2Controller extends Controller {
                     'place_name'        => $row->place_id ? $row->place->code : '',
                     'line_id'           => $row->line_id ? $row->line_id : '',
                     'line_name'         => $row->line_id ? $row->line->code.' - '.$row->line->name : '',
+                    'machine_id'        => $row->machine_id ? $row->machine_id : '',
+                    'machine_name'      => $row->machine_id ? $row->machine->name : '',
                     'department_id'     => $row->department_id ? $row->department_id : '',
                     'department_name'   => $row->department_id ? $row->department->name : '',
                     'warehouse_id'      => $row->warehouse_id ? $row->warehouse_id : '',

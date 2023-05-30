@@ -137,8 +137,6 @@
 						<th rowspan="2">Tanggal</th>
                         <th rowspan="2">Referensi</th>
                         <th colspan="2">Mata Uang</th>
-                        <th colspan="3">PPN</th>
-						<th colspan="2">PPH</th>
                         <th rowspan="2">Keterangan</th>
                         <th rowspan="2">Lampiran</th>
                         <th rowspan="2">Status</th>
@@ -150,11 +148,6 @@
                     <tr align="center">
                         <th>Kode</th>
                         <th>Konversi</th>
-                        <th>Ya/Tidak</th>
-                        <th>Termasuk</th>
-                        <th>Prosentase</th>
-						<th>Ya/Tidak</th>
-						<th>Prosentase</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -169,11 +162,6 @@
                             <td>{{ $row->reference }}</td>
                             <td>{{ $row->currency->symbol }}</td>
                             <td>{{ $row->currency_rate }}</td>
-                            <td>{{ $row->isTax() }}</td>
-                            <td>{{ $row->isIncludeTax() }}</td>
-                            <td>{{ number_format($row->percent_tax,2,',','.') }}</td>
-							<td>{{ $row->isWtax() }}</td>
-							<td>{{ number_format($row->percent_wtax,2,',','.') }}</td>
                             <td>{{ $row->note }}</td>
                             <td><a href="{{ $row->attachment() }}">File</a></td>
                             <td>{!! $row->statusRaw() !!}</td>
@@ -188,6 +176,7 @@
                                     <thead>
                                         <tr align="center">
 											<th>Plant</th>
+											<th>Line</th>
 											<th>Departemen</th>
 											<th>Gudang</th>
                                             <th>Item</th>
@@ -201,7 +190,8 @@
                                         @foreach($row->landedCostDetail as $key => $rowdetail)
                                         <tr align="center">
 											<td>{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
-											<td>{{ $rowdetail->department->name }}</td>
+											<td>{{ $rowdetail->line_id ? $rowdetail->line->name : '-' }}</td>
+											<td>{{ $rowdetail->department_id ? $rowdetail->department->name : '-' }}</td>
 											<td>{{ $rowdetail->warehouse->name }}</td>
                                             <td>{{ $rowdetail->item->name }}</td>
                                             <td>{{ $rowdetail->qty }}</td>

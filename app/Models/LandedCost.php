@@ -215,6 +215,8 @@ class LandedCost extends Model
             $arrInfo = [
                 'place_id'          => $row->place_id,
                 'place_name'        => $row->place->code,
+                'line_id'           => $row->line_id ? $row->line_id : '',
+                'line_name'         => $row->line_id ? $row->line->name : '-',
                 'department_id'     => $row->department_id,
                 'department_name'   => $row->department->name,
                 'warehouse_id'      => $row->warehouse_id,

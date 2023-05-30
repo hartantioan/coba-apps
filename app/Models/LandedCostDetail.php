@@ -21,6 +21,7 @@ class LandedCostDetail extends Model
         'qty',
         'nominal',
         'place_id',
+        'line_id',
         'department_id',
         'warehouse_id',
         'lookable_type',
@@ -39,6 +40,11 @@ class LandedCostDetail extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 
     public function coa()

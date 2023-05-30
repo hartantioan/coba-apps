@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Currency;
 use App\Models\Department;
+use App\Models\Line;
+use App\Models\Machine;
 use App\Models\Place;
 use App\Models\User;
 use App\Models\Journal;
@@ -38,6 +40,8 @@ class JournalController extends Controller
             'currency'  => Currency::where('status','1')->get(),
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
             'department'=> Department::where('status','1')->get(),
+            'line'      => Line::where('status','1')->get(),
+            'machine'   => Machine::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -176,8 +180,8 @@ class JournalController extends Controller
                                 <th class="center-align">Perusahaan</th>
                                 <th class="center-align">Bisnis Partner</th>
                                 <th class="center-align">Plant</th>
+                                <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
-                                <th class="center-align">Item</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Debit</th>
@@ -193,7 +197,7 @@ class JournalController extends Controller
                 <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
                 <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
                 <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
-                <td class="center-align">'.($row->item_id ? $row->item->name : '-').'</td>
+                <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
                 <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
@@ -365,6 +369,7 @@ class JournalController extends Controller
                                 'coa_id'                        => $request->arr_coa[$key],
                                 'place_id'                      => $request->arr_place[$key],
                                 'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
+                                'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
                                 'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
                                 'department_id'                 => $request->arr_department[$key],
                                 'warehouse_id'                  => $request->arr_warehouse[$key] == 'NULL' ? NULL : $request->arr_warehouse[$key],
@@ -478,11 +483,12 @@ class JournalController extends Controller
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
                                 'coa_id'            => $request->arr_multi_coa[$key],
-                                'account_id'        => $request->arr_multi_bp[$key],
-                                'place_id'          => $request->arr_multi_place[$key],
-                                'line_id'           => $request->arr_multi_line[$key],
-                                'department_id'     => $request->arr_multi_department[$key],
-                                'warehouse_id'      => $request->arr_multi_warehouse[$key],
+                                'account_id'        => $request->arr_multi_bp[$key] ? $request->arr_multi_bp[$key] : NULL,
+                                'place_id'          => $request->arr_multi_place[$key] ? $request->arr_multi_place[$key] : NULL,
+                                'line_id'           => $request->arr_multi_line[$key] ? $request->arr_multi_line[$key] : NULL,
+                                'machine_id'        => $request->arr_multi_machine[$key] ? $request->arr_multi_machine[$key] : NULL,
+                                'department_id'     => $request->arr_multi_department[$key] ? $request->arr_multi_department[$key] : NULL,
+                                'warehouse_id'      => $request->arr_multi_warehouse[$key] ? $request->arr_multi_warehouse[$key] : NULL,
                                 'type'              => '1',
                                 'nominal'           => floatval($request->arr_multi_debit[$key]),
                             ]);
@@ -492,13 +498,14 @@ class JournalController extends Controller
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
                                 'coa_id'            => $request->arr_multi_coa[$key],
-                                'account_id'        => $request->arr_multi_bp[$key],
-                                'place_id'          => $request->arr_multi_place[$key],
-                                'line_id'           => $request->arr_multi_line[$key],
-                                'department_id'     => $request->arr_multi_department[$key],
-                                'warehouse_id'      => $request->arr_multi_warehouse[$key],
+                                'account_id'        => $request->arr_multi_bp[$key] ? $request->arr_multi_bp[$key] : NULL,
+                                'place_id'          => $request->arr_multi_place[$key] ? $request->arr_multi_place[$key] : NULL,
+                                'line_id'           => $request->arr_multi_line[$key] ? $request->arr_multi_line[$key] : NULL,
+                                'machine_id'        => $request->arr_multi_machine[$key] ? $request->arr_multi_machine[$key] : NULL,
+                                'department_id'     => $request->arr_multi_department[$key] ? $request->arr_multi_department[$key] : NULL,
+                                'warehouse_id'      => $request->arr_multi_warehouse[$key] ? $request->arr_multi_warehouse[$key] : NULL,
                                 'type'              => '2',
-                                'nominal'           => floatval($request->arr_multi_kredit[$key]),
+                                'nominal'           => floatval($request->arr_multi_debit[$key]),
                             ]);
                         }
                     }

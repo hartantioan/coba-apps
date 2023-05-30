@@ -130,11 +130,13 @@ class LandedCostController extends Controller
                             'qtyRaw'                    => $row->qtyConvert(),
                             'unit'                      => $row->item->uomUnit->code,
                             'place_name'                => $row->place->code,
-                            'department_name'           => $row->department->name,
+                            'department_name'           => $row->department_id ? $row->department->name : '-',
                             'warehouse_name'            => $row->warehouse->name,
                             'place_id'                  => $row->place_id,
-                            'department_id'             => $row->department_id,
+                            'department_id'             => $row->department_id ? $row->department_id : '',
                             'warehouse_id'              => $row->warehouse_id,
+                            'line_name'                 => $row->line_id ? $row->line->name : '-',
+                            'line_id'                   => $row->line_id ? $row->line_id : '',
                             'lookable_id'               => $row->id,
                             'lookable_type'             => $row->getTable(),
                             'stock'                     => $row->item->getStockPlace($row->place_id),
@@ -174,10 +176,12 @@ class LandedCostController extends Controller
                             'qtyRaw'                    => $row->qty,
                             'unit'                      => $row->item->uomUnit->code,
                             'place_name'                => $row->place->code,
-                            'department_name'           => $row->department->name,
+                            'department_name'           => $row->department_id ? $row->department->name : '',
                             'warehouse_name'            => $row->warehouse->name,
                             'place_id'                  => $row->place_id,
-                            'department_id'             => $row->department_id,
+                            'line_name'                 => $row->line_id ? $row->line->name : '-',
+                            'line_id'                   => $row->line_id ? $row->line_id : '',
+                            'department_id'             => $row->department_id ? $row->department_id : '',
                             'warehouse_id'              => $row->warehouse_id,
                             'lookable_id'               => $row->id,
                             'lookable_type'             => $row->getTable(),
@@ -510,7 +514,8 @@ class LandedCostController extends Controller
                                 'qty'                   => floatval($request->arr_qty[$key]),
                                 'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                                 'place_id'              => $request->arr_place[$key],
-                                'department_id'         => $request->arr_department[$key],
+                                'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                 'warehouse_id'          => $request->arr_warehouse[$key],
                                 'lookable_type'         => $request->arr_lookable_type[$key],
                                 'lookable_id'           => $request->arr_lookable_id[$key],
@@ -567,7 +572,7 @@ class LandedCostController extends Controller
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="10">Daftar Order Pembelian</th>
+                                <th class="center-align" colspan="11">Daftar Order Pembelian</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -577,6 +582,7 @@ class LandedCostController extends Controller
                                 <th class="center-align">Harga Total</th>
                                 <th class="center-align">Harga Satuan</th>
                                 <th class="center-align">Plant</th>
+                                <th class="center-align">Line</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                             </tr>
@@ -591,8 +597,9 @@ class LandedCostController extends Controller
                     <td class="center-align">'.$row->item->uomUnit->code.'</td>
                     <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     <td class="right-align">'.number_format(round($row->nominal / $row->qty,3),2,',','.').'</td>
-                    <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
-                    <td class="center-align">'.$row->department->name.'</td>
+                    <td class="center-align">'.$row->place->name.'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                     <td class="center-align">'.$row->warehouse->name.'</td>
                 </tr>';
             }
@@ -704,10 +711,12 @@ class LandedCostController extends Controller
                 'nominal'                   => number_format($row->nominal,2,',','.'),
                 'unit'                      => $row->item->uomUnit->code,
                 'place_name'                => $row->place->name.' - '.$row->place->company->name,
-                'department_name'           => $row->department->name,
+                'department_name'           => $row->department_id ? $row->department->name : '-',
                 'warehouse_name'            => $row->warehouse->name,
                 'place_id'                  => $row->place_id,
-                'department_id'             => $row->department_id,
+                'line_id'                   => $row->line_id,
+                'line_name'                 => $row->line_id ? $row->line->name : '-',
+                'department_id'             => $row->department_id ? $row->department_id : '',
                 'warehouse_id'              => $row->warehouse_id,
                 'lookable_type'             => $row->lookable_type,
                 'lookable_id'               => $row->lookable_id,

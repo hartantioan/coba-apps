@@ -18,6 +18,7 @@ class CostDistributionDetail extends Model
         'cost_distribution_id',
         'place_id',
         'line_id',
+        'machine_id',
         'department_id',
         'warehouse_id',
         'percentage',
@@ -33,6 +34,10 @@ class CostDistributionDetail extends Model
 
     public function line(){
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function machine(){
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
     }
 
     public function department(){

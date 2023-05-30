@@ -182,7 +182,7 @@ class GoodReturnPOController extends Controller
             $data['message'] = 'Good Receipt / Penerimaan Barang PO '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
             if($data->hasBalanceReturn()){
-                if(!$data->purchaseInvoiceDetail()->exists()){
+                if($data->totalInvoice() == 0){
                     CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Good Return PO / Pengembalian Barang PO');
                     $details = [];
                     foreach($data->goodReceiptDetail as $row){
@@ -193,9 +193,9 @@ class GoodReturnPOController extends Controller
                             'qty'                       => number_format($row->qty,3,',','.'),
                             'unit'                      => $row->item->buyUnit->code,
                             'place_id'                  => $row->place_id,
-                            'place_name'                => $row->place->name.' - '.$row->place->company->name,
-                            'department_id'             => $row->department_id,
-                            'department_name'           => $row->department->name,
+                            'place_name'                => $row->place->name,
+                            'department_id'             => $row->department_id ? $row->department_id : '',
+                            'department_name'           => $row->department_id ? $row->department->name : '-',
                             'warehouse_id'              => $row->warehouse_id,
                             'warehouse_name'            => $row->warehouse->name,
                         ];
@@ -444,7 +444,7 @@ class GoodReturnPOController extends Controller
                 <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
                 <td class="center-align">'.$rowdetail->goodReceiptDetail->place->name.' - '.$rowdetail->goodReceiptDetail->place->company->name.'</td>
-                <td class="center-align">'.$rowdetail->goodReceiptDetail->department->name.'</td>
+                <td class="center-align">'.($rowdetail->goodReceiptDetail->department_id ? $rowdetail->goodReceiptDetail->department->name : '-').'</td>
                 <td class="center-align">'.$rowdetail->goodReceiptDetail->warehouse->name.'</td>
                 <td class="center-align">'.$rowdetail->goodReceiptDetail->goodReceipt->code.'</td>
             </tr>';
@@ -520,7 +520,7 @@ class GoodReturnPOController extends Controller
                 'unit'                      => $row->item->buyUnit->code,
                 'note'                      => $row->note,
                 'place_name'                => $row->goodReceiptDetail->place->name.' - '.$row->goodReceiptDetail->place->company->name,
-                'department_name'           => $row->goodReceiptDetail->department->name,
+                'department_name'           => $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department->name : '-',
                 'warehouse_name'            => $row->goodReceiptDetail->warehouse->name
             ];
         }

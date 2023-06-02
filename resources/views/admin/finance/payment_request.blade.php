@@ -900,7 +900,6 @@
                         if(!$('#arr_coa' + $(this).data('id')).val() || !$('#arr_pay' + $(this).data('id')).val()){
                             passed = false;
                         }
-                        alert($('#arr_coa' + $(this).data('id')).val());
                     }
                 });
 

@@ -1777,9 +1777,11 @@ class FundRequestController extends Controller
     public function updateDocumentStatus(Request $request){
         $data = FundRequest::where('code',CustomHelper::decrypt($request->code))->first();
         if($data){
-            $data->update([
-                'document_status'   => $request->status ? $request->status : NULL,
-            ]);
+            if(!$data->hasPaymentRequestDetail()->exists()){
+                $data->update([
+                    'document_status'   => $request->status ? $request->status : NULL,
+                ]);
+            }
         }
     }
 }

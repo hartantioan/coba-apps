@@ -664,6 +664,9 @@
                             <td>
                                 ` + val.asset_name + `
                             </td>
+                            <td>
+                                ` + val.place_name + `
+                            </td>
                             <td class="center">
                                 <input type="text" id="arr_price` + count + `" name="arr_price[]" value="` + val.price + `" onkeyup="formatRupiah(this);count();">
                             </td>

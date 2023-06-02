@@ -714,7 +714,6 @@
 
     function updateDocumentStatus(code,element){
         var status = $(element).val();
-
         $.ajax({
             type : "POST",
             url  : '{{ Request::url() }}/update_document_status',

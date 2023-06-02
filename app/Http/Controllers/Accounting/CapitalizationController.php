@@ -373,6 +373,7 @@ class CapitalizationController extends Controller
                 'asset_id'          => $row->asset_id,
                 'asset_code'        => $row->asset->code,
                 'asset_name'        => $row->asset->name,
+                'place_name'        => $row->asset->place->name,
                 'qty'               => $row->qty,
                 'unit_id'           => $row->unit_id,
                 'unit_name'         => $row->unit->name,

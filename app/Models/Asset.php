@@ -38,6 +38,16 @@ class Asset extends Model
         return $status;
     }
 
+    public function statusRaw(){
+        $status = match ($this->status) {
+          '1' => 'Active',
+          '2' => 'Not Active',
+          default => 'Invalid',
+        };
+
+        return $status;
+    }
+
     public function method(){
         $method = match ($this->method) {
           '1' => 'Straight Line',

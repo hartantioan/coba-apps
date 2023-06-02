@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
 use App\Models\AssetGroup;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -24,9 +25,19 @@ use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\ValidationException;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use App\Exports\ExportAsset;
 
 class AssetController extends Controller
 {
+
+    protected $dataplaces;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
+    }
+
     public function index()
     {
         $data = [
@@ -76,6 +87,14 @@ class AssetController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
+
+                if($request->balance){
+                    if($request->balance == '1'){
+                        $query->where('book_balance', '>', 0)->whereNotNull('book_balance');
+                    }elseif($request->balance == '2'){
+                        $query->where('book_balance', '=', 0)->whereNotNull('book_balance');
+                    }
+                }
             })
             ->offset($start)
             ->limit($length)
@@ -94,6 +113,14 @@ class AssetController extends Controller
 
                 if($request->status){
                     $query->where('status', $request->status);
+                }
+
+                if($request->balance){
+                    if($request->balance == '1'){
+                        $query->where('book_balance', '>', 0)->whereNotNull('book_balance');
+                    }elseif($request->balance == '2'){
+                        $query->where('book_balance', '=', 0)->whereNotNull('book_balance');
+                    }
                 }
             })
             ->count();
@@ -312,5 +339,9 @@ class AssetController extends Controller
             ];
             return response()->json($response);
         }
+    }
+
+    public function export(Request $request){
+		return Excel::download(new ExportAsset($request->search,$request->status,$request->balance,$this->dataplaces), 'asset_'.uniqid().'.xlsx');
     }
 }

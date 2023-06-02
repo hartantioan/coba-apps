@@ -97,7 +97,17 @@
                                         <div class="col s12">
                                             <div class="card-alert card purple">
                                                 <div class="card-content white-text">
-                                                    <p>Info : Data yang anda tambahkan disini akan mempengaruhi nilai saldo buku aset terpilih.</p>
+                                                    <p>Info 1 : Data yang anda tambahkan disini akan mempengaruhi nilai saldo buku aset terpilih.</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-alert card cyan">
+                                                <div class="card-content white-text">
+                                                    <p>Info 2 : Aset yang sudah didepresiasi pada bulan terpilih, tidak bisa dipilih kembali pada bulan tersebut.</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>Info 3 : Nilai depresiasi per periode sebelum periode akhir depresiasi dibulatkan normal (tanpa desimal). Pada saat akhir periode depresiasi, nilai akumulasi sisa (jika ada desimal) akan digunakan sebagai nilai akhir depresiasi.</p>
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>

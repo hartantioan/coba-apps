@@ -19,10 +19,15 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right modal-trigger" href="#modal2">
                             <i class="material-icons hide-on-med-and-up">file_upload</i>
                             <span class="hide-on-small-onl">Import</span>
                             <i class="material-icons right">file_upload</i>
+                        </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                            <span class="hide-on-small-onl">Excel</span>
+                            <i class="material-icons right">view_list</i>
                         </a>
                     </div>
                 </div>
@@ -34,27 +39,35 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <div class="card-panel">
-                                <div class="row">
-                                    <div class="col s12 ">
-                                        @if ($errors->any())
-                                            <ul>
-                                                @foreach ($errors->all() as $error)
-                                                    <li>{{$error}}</li>
-                                                @endforeach
-                                            </ul>
-                                        @endif
-                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
-                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
-                                            <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Non-Aktif</option>
-                                            </select>
-                                        </div>
+                            <ul class="collapsible collapsible-accordion">
+                                <li>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-body">
+                                        <div class="row">
+                                            <div class="col m3 s3 ">
+                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Aktif</option>
+                                                        <option value="2">Non-Aktif</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m3 s3 ">
+                                                <label for="filter_balance" style="font-size:1rem;">Saldo Buku :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_balance" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Ada</option>
+                                                        <option value="2">Tidak</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>  
                                     </div>
-                                </div>
-                            </div>
+                                </li>
+                            </ul>
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">List Data</h4>
@@ -117,7 +130,7 @@
                                     <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->code }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="plant_id">Plant</label>
+                            <label class="" for="place_id">Plant</label>
                         </div>
                         <div class="input-field col m4 s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
@@ -186,7 +199,7 @@
                         </div>
                         <div class="input-field col m4 s12">
                             <div class="switch mb-1">
-                                <label for="order">Status</label>
+                                <label for="status">Status</label>
                                 <label>
                                     Non-Active
                                     <input checked type="checkbox" id="status" name="status" value="1">
@@ -412,7 +425,8 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val()
+                    status : $('#filter_status').val(),
+                    balance : $('#filter_balance').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -691,5 +705,13 @@
                 });
             }
         });
+    }
+
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        var balance = $('#filter_balance').val();
+        
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&balance=" + balance;
     }
 </script>

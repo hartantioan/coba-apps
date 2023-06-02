@@ -95,6 +95,11 @@
                                     <h4 class="card-title">List Data</h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card purple">
+                                                <div class="card-content white-text">
+                                                    <p>Info 1 : Aset yang bisa di purna operasikan, hanyalah aset yang sudah dikapitalisasi dan memiliki nilai saldo buku diatas 0.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
@@ -169,22 +174,25 @@
                             <label class="active" for="note">Keterangan</label>
                         </div>
                         <div class="col m12 s12">
-                            <div class="col m6 s6">
-                                <p class="mt-2 mb-2">
-                                    <h4>Aset</h4>
-                                    <div class="row">
-                                        <div class="input-field col m6 s6">
-                                            <select class="browser-default" id="asset_id" name="asset_id"></select>
-                                            <label class="active" for="asset_id">Aset</label>
-                                        </div>
-                                        <div class="col m6 s6 mt-4">
-                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addAsset();" href="javascript:void(0);">
-                                                <i class="material-icons left">add</i> Tambah Aset
-                                            </a>
-                                        </div>
-                                    </div>
-                                </p>
+                            <div class="card-alert card purple">
+                                <div class="card-content white-text">
+                                    <p>Jika nominal retirement / jual diisi maka jurnal akan terbit <b>Ayat Silang Penjualan Aset</b>. <b>0 untuk Beban Aktiva Tetap Rusak/Hilang</b>.</p>
+                                </div>
                             </div>
+                            <p class="mt-2 mb-2">
+                                <h4>Aset</h4>
+                                <div class="row">
+                                    <div class="input-field col m3 s3">
+                                        <select class="browser-default" id="asset_id" name="asset_id"></select>
+                                        <label class="active" for="asset_id">Aset</label>
+                                    </div>
+                                    <div class="col m3 s3 mt-2">
+                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addAsset();" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Tambah Aset
+                                        </a>
+                                    </div>
+                                </div>
+                            </p>
                         </div>
                         <div class="col s12" style="overflow:auto;">
                             <table class="bordered" style="width:1500px;">
@@ -198,7 +206,7 @@
                                         <th class="center">Nominal Aset</th>
                                         <th class="center">Nominal Retirement/Jual</th>
                                         <th class="center">Keterangan</th>
-                                        <th class="center">Coa Debit Setelah Akumulasi</th>
+                                        <th class="center">Coa Selisih</th>
                                         <th class="center">Hapus</th>
                                     </tr>
                                 </thead>
@@ -300,7 +308,7 @@
             }
         });
 
-        select2ServerSide('#asset_id', '{{ url("admin/select2/asset") }}');
+        select2ServerSide('#asset_id', '{{ url("admin/select2/asset_retirement") }}');
         
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
@@ -353,7 +361,7 @@
                             ` + $("#asset_id").select2('data')[0].nominal + `
                         </td>
                         <td class="center">
-                            <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);">
+                            <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right !important;">
                         </td>
                         <td>
                             <input name="arr_note[]" type="text" placeholder="Keterangan">

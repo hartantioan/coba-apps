@@ -467,6 +467,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[AssetController::class, 'index']);
                         Route::get('datatable',[AssetController::class, 'datatable']);
                         Route::post('show', [AssetController::class, 'show']);
+                        Route::post('print', [AssetController::class, 'print']);
                         Route::get('export',[AssetController::class, 'export']);
                         Route::post('create',[AssetController::class, 'create'])->middleware('operation.access:asset,update');
                         Route::post('destroy', [AssetController::class, 'destroy'])->middleware('operation.access:asset,delete');

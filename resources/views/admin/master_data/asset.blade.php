@@ -24,6 +24,11 @@
                             <span class="hide-on-small-onl">Import</span>
                             <i class="material-icons right">file_upload</i>
                         </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="print();">
+                            <i class="material-icons hide-on-med-and-up">local_printshop</i>
+                            <span class="hide-on-small-onl">Print</span>
+                            <i class="material-icons right">local_printshop</i>
+                        </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
                             <i class="material-icons hide-on-med-and-up">view_list</i>
                             <span class="hide-on-small-onl">Excel</span>
@@ -713,5 +718,31 @@
         var balance = $('#filter_balance').val();
         
         window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&balance=" + balance;
+    }
+
+    function print(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        var balance = $('#filter_balance').val();
+        
+        $.ajax({
+            type : "POST",
+            url  : '{{ Request::url() }}/print',
+            data : {
+                search : search,
+                status : status,
+                balance : balance
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            cache: false,
+            success: function(data){
+                var w = window.open('about:blank');
+                w.document.open();
+                w.document.write(data);
+                w.document.close();
+            }
+        });
     }
 </script>

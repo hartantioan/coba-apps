@@ -2235,7 +2235,6 @@
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_invoice.push(poin);
         });
-        console.log(arr_id_invoice);
         $.ajax({
             url: '{{ Request::url() }}/print',
             type: 'POST',
@@ -2262,11 +2261,7 @@
                             'url': val
                         })
                     }
-                    
-                   
                 });
-                
-               
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -2278,27 +2273,6 @@
                 });
             }
         });
-        /* $.ajax({
-            type : "POST",
-            url  : '{{ Request::url() }}/print',
-            data : {
-                search : search,
-                status : status,
-                type : type,
-                company : company,
-                'account[]' : account,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            cache: false,
-            success: function(data){
-                var w = window.open('about:blank');
-                w.document.open();
-                w.document.write(data);
-                w.document.close();
-            }
-        }); */
     }
 
     function exportExcel(){

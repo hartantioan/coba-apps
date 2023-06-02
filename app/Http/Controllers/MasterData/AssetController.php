@@ -344,4 +344,35 @@ class AssetController extends Controller
     public function export(Request $request){
 		return Excel::download(new ExportAsset($request->search,$request->status,$request->balance,$this->dataplaces), 'asset_'.uniqid().'.xlsx');
     }
+
+    public function print(Request $request){
+
+        $data = [
+            'title' => 'ASSET REPORT',
+            'data' => Asset::where(function ($query) use ($request) {
+                if($request->search) {
+                    $query->where(function($query) use ($request) {
+                        $query->where('code', 'like', "%$request->search%")
+                            ->orWhere('name', 'like', "%$request->search%")
+                            ->orWhere('nominal','like', "%$request->search%")
+                            ->orWhere('note','like',"%$request->search%");
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
+                if($request->balance){
+                    if($request->balance == '1'){
+                        $query->where('book_balance', '>', 0)->whereNotNull('book_balance');
+                    }elseif($request->balance == '2'){
+                        $query->where('book_balance', '=', 0)->whereNotNull('book_balance');
+                    }
+                }
+            })->get()
+		];
+		
+		return view('admin.print.master_data.asset', $data);
+    }
 }

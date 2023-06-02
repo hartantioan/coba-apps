@@ -560,6 +560,7 @@
                 formData.delete("arr_coa[]");
 
                 $('select[name^="arr_coa"]').each(function(index){
+                    formData.append("arr_coa[]",$(this).val());
                     if(!$(this).val()){
                         passed = false;
                     }

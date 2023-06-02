@@ -35,6 +35,7 @@ return new class extends Migration
             $table->double('tax')->nullable();
             $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
+            $table->char('document_status','1')->nullable();
             $table->char('status','1')->nullable();
             $table->bigInteger('void_id')->nullable();
             $table->string('void_note')->nullable();

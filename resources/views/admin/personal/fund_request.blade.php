@@ -140,7 +140,7 @@
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="type" name="type">
                                     <option value="1">BS</option>
-                                    <option value="2">OPM</option>
+                                    {{-- <option value="2">OPM</option> --}}
                                 </select>
                                 <label class="" for="type">Tipe Permohonan</label>
                             </div>

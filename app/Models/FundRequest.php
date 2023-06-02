@@ -36,6 +36,7 @@ class FundRequest extends Model
         'tax',
         'wtax',
         'grandtotal',
+        'document_status',
         'status',
         'void_id',
         'void_note',
@@ -140,6 +141,16 @@ class FundRequest extends Model
         };
 
         return $type;
+    }
+
+    public function documentStatus(){
+        $status = match ($this->document_status) {
+          '1' => 'LENGKAP',
+          '2' => 'TIDAK LENGKAP',
+          default => 'MENUNGGU',
+        };
+
+        return $status;
     }
 
     public function status(){

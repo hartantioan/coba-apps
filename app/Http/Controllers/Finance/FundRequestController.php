@@ -1778,7 +1778,7 @@ class FundRequestController extends Controller
         $data = FundRequest::where('code',CustomHelper::decrypt($request->code))->first();
         if($data){
             $data->update([
-                'document_status'   => $request->status,
+                'document_status'   => $request->status ? $request->status : NULL,
             ]);
         }
     }

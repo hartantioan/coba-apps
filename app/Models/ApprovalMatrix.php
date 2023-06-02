@@ -46,6 +46,7 @@ class ApprovalMatrix extends Model
           '0' => 'Menunggu',
           '1' => 'Dibuka',
           '2' => 'Ditutup',
+          '3' => 'Revisi',
           default => 'Invalid',
         };
 

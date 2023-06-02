@@ -377,7 +377,6 @@ class CustomHelper {
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'code'			=> Journal::generateCode(),
-				'place_id'		=> $ret->place_id,
 				'lookable_type'	=> 'retirements',
 				'lookable_id'	=> $ret->id,
 				'currency_id'	=> $ret->currency_id,
@@ -403,7 +402,7 @@ class CustomHelper {
 				if($row->asset->book_balance > 0 && $row->retirement_nominal == 0){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->coa_id,
+						'coa_id'		=> Coa::where('code','701.01.01.01.07')->where('company_id',$ret->company_id)->first()->id,
 						'place_id'		=> $row->asset->place_id,
 						'type'			=> '1',
 						'nominal'		=> $row->asset->book_balance,
@@ -413,35 +412,32 @@ class CustomHelper {
 				if($row->retirement_nominal > 0){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->coa_id,
+						'coa_id'		=> Coa::where('code','100.01.01.99.05')->where('company_id',$ret->company_id)->first()->id,
 						'place_id'		=> $row->asset->place_id,
 						'type'			=> '1',
 						'nominal'		=> $row->retirement_nominal,
 					]);
 
 					$balanceProfitLoss = ($totalDepre + $row->retirement_nominal) - $row->asset->nominal;
-					$coaProfitLoss = Coa::where('code','700.01.01.01.04')->where('status','1')->where('company_id',$row->asset->place->company_id)->first();
+					$coaProfitLoss = $row->coa_id;
+					if($balanceProfitLoss > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coaProfitLoss,
+							'place_id'		=> $row->asset->place_id,
+							'type'			=> '2',
+							'nominal'		=> $balanceProfitLoss,
+						]);
+					}
 
-					if($coaProfitLoss){
-						if($balanceProfitLoss > 0){
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $coaProfitLoss->id,
-								'place_id'		=> $row->asset->place_id,
-								'type'			=> '2',
-								'nominal'		=> $balanceProfitLoss,
-							]);
-						}
-
-						if($balanceProfitLoss < 0){
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $coaProfitLoss->id,
-								'place_id'		=> $row->asset->place_id,
-								'type'			=> '1',
-								'nominal'		=> abs($balanceProfitLoss),
-							]);
-						}
+					if($balanceProfitLoss < 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coaProfitLoss,
+							'place_id'		=> $row->asset->place_id,
+							'type'			=> '1',
+							'nominal'		=> abs($balanceProfitLoss),
+						]);
 					}
 				}
 

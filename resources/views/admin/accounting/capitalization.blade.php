@@ -97,7 +97,12 @@
                                         <div class="col s12">
                                             <div class="card-alert card purple">
                                                 <div class="card-content white-text">
-                                                    <p>Info : Data yang anda tambahkan disini akan mempengaruhi nilai awal dan saldo buku aset terpilih.</p>
+                                                    <p>Info 1 : Data yang anda tambahkan disini akan mempengaruhi nilai awal dan saldo buku aset terpilih.</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-alert card cyan">
+                                                <div class="card-content white-text">
+                                                    <p>Info 2 : Aset yang bisa dikapitalisasi hanyalah aset yang belum pernah dikapitalisasikan.</p>
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>

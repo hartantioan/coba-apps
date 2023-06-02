@@ -140,6 +140,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('business_partner', [Select2Controller::class, 'businessPartner']);
                 Route::get('asset', [Select2Controller::class, 'asset']);
                 Route::get('asset_capitalization', [Select2Controller::class, 'assetCapitalization']);
+                Route::get('asset_retirement', [Select2Controller::class, 'assetRetirement']);
                 Route::get('unit', [Select2Controller::class, 'unit']);
                 Route::get('coa_cash_bank', [Select2Controller::class, 'coaCashBank']);
                 Route::get('payment_request', [Select2Controller::class, 'paymentRequest']);
@@ -466,6 +467,8 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[AssetController::class, 'index']);
                         Route::get('datatable',[AssetController::class, 'datatable']);
                         Route::post('show', [AssetController::class, 'show']);
+                        Route::post('print', [AssetController::class, 'print']);
+                        Route::get('export',[AssetController::class, 'export']);
                         Route::post('create',[AssetController::class, 'create'])->middleware('operation.access:asset,update');
                         Route::post('destroy', [AssetController::class, 'destroy'])->middleware('operation.access:asset,delete');
                         Route::post('import', [AssetController::class, 'import'])->middleware('operation.access:asset,update');

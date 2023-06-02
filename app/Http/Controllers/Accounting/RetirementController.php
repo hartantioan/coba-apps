@@ -69,6 +69,7 @@ class RetirementController extends Controller
                             ->orWhere('note', 'like', "%$search%");
                     });
                 }
+                
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('post_date', '>=', $request->start_date)
                         ->whereDate('post_date', '<=', $request->finish_date);

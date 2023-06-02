@@ -2308,7 +2308,6 @@
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_invoice.push(poin);
         });
-        console.log(arr_id_invoice);
         $.ajax({
             url: '{{ Request::url() }}/print',
             type: 'POST',
@@ -2335,11 +2334,7 @@
                             'url': val
                         })
                     }
-                    
-                   
                 });
-                
-               
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

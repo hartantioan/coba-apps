@@ -823,6 +823,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('viewstructuretree',[FundRequestController::class, 'viewStructureTree']);
                     Route::get('export',[FundRequestController::class, 'export']);
                     Route::post('create',[FundRequestController::class, 'create'])->middleware('operation.access:fund_request,update');
+                    Route::post('update_document_status',[FundRequestController::class, 'updateDocumentStatus'])->middleware('operation.access:fund_request,update');
                     Route::post('void_status', [FundRequestController::class, 'voidStatus'])->middleware('operation.access:fund_request,void');
                     Route::get('approval/{id}',[FundRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                 });

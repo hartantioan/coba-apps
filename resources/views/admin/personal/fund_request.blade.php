@@ -95,6 +95,7 @@
                                                         <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPH</th>
                                                         <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
@@ -384,7 +385,7 @@
             count();
         });
 
-        select2ServerSide('#account_id', '{{ url("admin/select2/business_partner") }}');
+        select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
     });
 
     function getRekening(){
@@ -503,6 +504,7 @@
                 { name: 'wtax', className: 'center-align' },
                 { name: 'grandtotal', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

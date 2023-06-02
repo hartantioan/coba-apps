@@ -109,6 +109,7 @@
                                                         <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPH</th>
                                                         <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
@@ -277,6 +278,7 @@
                 { name: 'wtax', className: 'center-align' },
                 { name: 'grandtotal', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -706,6 +708,29 @@
                     text: 'Check your internet connection.',
                     icon: 'error'
                 });
+            }
+        });
+    }
+
+    function updateDocumentStatus(code,element){
+        var status = $(element).val();
+
+        $.ajax({
+            type : "POST",
+            url  : '{{ Request::url() }}/update_document_status',
+            data : {
+                code : code,
+                status : status,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            cache: false,
+            beforeSend: function() {
+                loadingOpen('#datatable_serverside');
+            },
+            success: function(data){
+                loadingClose('#datatable_serverside');
             }
         });
     }

@@ -151,17 +151,24 @@ class FundRequestController extends Controller
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->required_date)),
                     $val->currency->code,
-                    number_format($val->currency_rate,3,',','.'),
+                    number_format($val->currency_rate,2,',','.'),
                     $val->note,
                     $val->termin_note,
                     $val->paymentType(),
                     $val->name_account,
                     $val->no_account,
-                    number_format($val->total,3,',','.'),
-                    number_format($val->tax,3,',','.'),
-                    number_format($val->wtax,3,',','.'),
-                    number_format($val->grandtotal,3,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->tax,2,',','.'),
+                    number_format($val->wtax,2,',','.'),
+                    number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    '
+                        <select class="browser-default" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
+                            <option value="" '.($val->document_status == NULL ? 'selected' : '').'>MENUNGGU</option>
+                            <option value="1" '.($val->document_status == '1' ? 'selected' : '').'>LENGKAP</option>
+                            <option value="2" '.($val->document_status == '2' ? 'selected' : '').'>TIDAK LENGKAP</option>
+                        </select>
+                    ',
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -427,17 +434,18 @@ class FundRequestController extends Controller
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->required_date)),
                     $val->currency->code,
-                    number_format($val->currency_rate,3,',','.'),
+                    number_format($val->currency_rate,2,',','.'),
                     $val->note,
                     $val->termin_note,
                     $val->paymentType(),
                     $val->name_account,
                     $val->no_account,
-                    number_format($val->total,3,',','.'),
-                    number_format($val->tax,3,',','.'),
-                    number_format($val->wtax,3,',','.'),
-                    number_format($val->grandtotal,3,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->tax,2,',','.'),
+                    number_format($val->wtax,2,',','.'),
+                    number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    $val->documentStatus(),
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-small btn-flat waves-effect waves-light orange accent-2 white-text" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -1764,5 +1772,14 @@ class FundRequestController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    public function updateDocumentStatus(Request $request){
+        $data = FundRequest::where('code',CustomHelper::decrypt($request->code))->first();
+        if($data){
+            $data->update([
+                'document_status'   => $request->status,
+            ]);
+        }
     }
 }

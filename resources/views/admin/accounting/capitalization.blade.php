@@ -376,7 +376,7 @@
             }
         });
 
-        select2ServerSide('#asset_id', '{{ url("admin/select2/asset") }}');
+        select2ServerSide('#asset_id', '{{ url("admin/select2/asset_capitalization") }}');
         
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');

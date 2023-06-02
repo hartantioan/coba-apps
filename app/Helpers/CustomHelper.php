@@ -472,6 +472,8 @@ class CustomHelper {
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->coa_id,
 					'account_id'	=> $op->account_id,
+					'place_id'		=> $row->lookable_type == 'fund_requests' ? $row->lookable->place_id : NULL,
+					'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> $row->nominal,
 				]);
@@ -1035,9 +1037,7 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->fundRequest->getCoaPaymentRequestOne(),
-					'place_id'		=> $row->fundRequest->place_id,
 					'account_id'	=> $row->fundRequest->account_id,
-					'department_id'	=> $row->fundRequest->department_id,
 					'type'			=> '2',
 					'nominal'		=> $row->nominal,
 				]);

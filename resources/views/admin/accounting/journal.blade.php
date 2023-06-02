@@ -441,6 +441,7 @@
                         </td>
                         <td>
                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
+                                <option value="">--Kosong--</option>
                                 @foreach ($place as $row)
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
                                 @endforeach
@@ -531,6 +532,7 @@
                 </td>
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
+                        <option value="">--Kosong--</option>
                         @foreach ($place as $row)
                             <option value="{{ $row->id }}">{{ $row->code }}</option>
                         @endforeach
@@ -968,7 +970,7 @@
                         formData.append('arr_type[]',$(this).val());
                         formData.append('arr_coa[]',($('select[name^="arr_coa"]').eq(index).val() ? $('select[name^="arr_coa"]').eq(index).val() : 'NULL'));
                         formData.append('arr_cost_distribution_detail[]',($('input[name^="arr_cost_distribution_detail"]').eq(index).val() ? $('input[name^="arr_cost_distribution_detail"]').eq(index).val() : 'NULL'));
-                        formData.append('arr_place[]',$('select[name^="arr_place"]').eq(index).val());
+                        formData.append('arr_place[]',($('select[name^="arr_place"]').eq(index).val() ? $('select[name^="arr_place"]').eq(index).val() : 'NULL'));
                         formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : 'NULL'));
                         formData.append('arr_machine[]',($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : 'NULL'));
                         formData.append('arr_account[]',($('select[name^="arr_account"]').eq(index).val() ? $('select[name^="arr_account"]').eq(index).val() : 'NULL'));
@@ -1233,13 +1235,14 @@
                             </td>
                             <td>
                                 <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
+                                    <option value="">--Kosong--</option>
                                     @foreach ($place as $row)
                                         <option value="{{ $row->id }}">{{ $row->code }}</option>
                                     @endforeach
                                 </select>
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);" style="width:200px !important;">
                                     <option value="">--Kosong--</option>
                                     @foreach ($line as $rowline)
                                         <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
@@ -1247,7 +1250,7 @@
                                 </select>    
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" style="width:200px !important;">
                                     <option value="">--Kosong--</option>
                                     @foreach ($machine as $row)
                                         <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
@@ -1282,8 +1285,8 @@
                     select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_journal") }}');
                     select2ServerSide('#arr_warehouse' + count, '{{ url("admin/select2/warehouse") }}');
                     select2ServerSide('#arr_account' + count, '{{ url("admin/select2/business_partner") }}');
-                    $('#arr_place' + count).formSelect().val(val.place_id).formSelect();
-                    $('#arr_department' + count).formSelect().val(val.department_id).formSelect();
+                    $('#arr_place' + count).val(val.place_id);
+                    $('#arr_department' + count).val(val.department_id);
                     $('#arr_coa' + count).append(`
                         <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                     `);

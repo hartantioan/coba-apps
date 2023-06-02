@@ -144,12 +144,12 @@ class JournalController extends Controller
                     $val->note,
                     $val->lookable_id ? $val->lookable->code : '-',
                     $val->status(),
-                    !$val->lookable_id ? '
+                    /* !$val->lookable_id ?  */'
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
-					' : '-',
+					'/*  : '-' */,
                 ];
 
                 $nomor++;
@@ -367,7 +367,7 @@ class JournalController extends Controller
                                 'journal_id'                    => $query->id,
                                 'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
                                 'coa_id'                        => $request->arr_coa[$key],
-                                'place_id'                      => $request->arr_place[$key],
+                                'place_id'                      => $request->arr_place[$key] == 'NULL' ? NULL : $request->arr_place[$key],
                                 'line_id'                       => $request->arr_line[$key] == 'NULL' ? NULL : $request->arr_line[$key],
                                 'machine_id'                    => $request->arr_machine[$key] == 'NULL' ? NULL : $request->arr_machine[$key],
                                 'account_id'                    => $request->arr_account[$key] == 'NULL' ? NULL : $request->arr_account[$key],
@@ -539,13 +539,13 @@ class JournalController extends Controller
                 'cost_distribution_detail_id'   => $row->cost_distribution_detail_id ? $row->cost_distribution_detail_id : '', 
                 'coa_id'                        => $row->coa_id,
                 'coa_name'                      => $row->coa->code.' - '.$row->coa->name,
-                'place_id'                      => $row->place_id,
+                'place_id'                      => $row->place_id ? $row->place_id : '',
                 'account_id'                    => $row->account_id ? $row->account_id : '',
                 'account_name'                  => $row->account_id ? $row->account->name : '',
                 'line_id'                       => $row->line_id ? $row->line_id : '',
                 'line_name'                     => $row->line_id ? $row->line->code.' - '.$row->line->name : '',
-                'department_id'                 => $row->department_id,
-                'warehouse_id'                  => $row->warehouse_id,
+                'department_id'                 => $row->department_id ? $row->department_id : '',
+                'warehouse_id'                  => $row->warehouse_id ? $row->warehouse_id : '',
                 'warehouse_name'                => $row->warehouse_id ? $row->warehouse->name : '',
                 'nominal'                       => number_format($row->nominal,2,',','.')
             ];

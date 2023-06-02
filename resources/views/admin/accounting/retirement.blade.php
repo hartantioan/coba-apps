@@ -453,7 +453,6 @@
                 select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
                 select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                 $('#asset_id').empty();
-                $('#place_id').val($("#asset_id").select2('data')[0].place_id);
 
             }else{
                 swal({
@@ -556,70 +555,87 @@
         }).then(function (willDelete) {
             if (willDelete) {
 
-                var formData = new FormData($('#form_data')[0]);
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
+                var formData = new FormData($('#form_data')[0]), passed = true;
 
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
-                                });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
+                formData.delete("arr_coa[]");
+
+                $('select[name^="arr_coa"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
                     }
                 });
+
+                if(passed){
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Coa selisih tidak boleh kosong.',
+                        icon: 'warning'
+                    });
+                }
             }
         });
     }

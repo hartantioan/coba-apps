@@ -958,7 +958,7 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $balance = $d->balanceCloseBill();
-            if($balance > 0){
+            if($balance > 0 && $d->document_status == '2'){
                 $response[] = [
                     'id'   			=> $d->id,
                     'text' 			=> $d->code.' - '.$d->note.' - Saldo '.number_format($balance,2,',','.'),

@@ -49,7 +49,7 @@
                                         <div class="row">
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
-                                                <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
+                                                <div class="input-field col s12">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
                                                         <option value="1">Menunggu</option>

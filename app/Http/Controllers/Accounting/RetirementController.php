@@ -191,8 +191,6 @@ class RetirementController extends Controller
             'arr_unit.array'                    => 'Satuan harus dalam bentuk array.',
             'arr_total.required'                => 'Total tidak boleh kosong',
             'arr_total.array'                   => 'Total harus dalam bentuk array.',
-            'arr_coa.required'                  => 'Coa tidak boleh kosong',
-            'arr_coa.array'                     => 'Coa harus dalam bentuk array.',
 		]);
 
         if($validation->fails()) {
@@ -236,8 +234,6 @@ class RetirementController extends Controller
                     foreach($query->retirementDetail as $row){
                         $row->delete();
                     }
-
-                    /* CustomHelper::removeJournal('capitalizations',$query->id); */
 
                 }else{
                     return response()->json([

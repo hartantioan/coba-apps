@@ -270,9 +270,9 @@ class PaymentRequestController extends Controller
             }
 
             foreach($data->fundRequest as $row){
-                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0){
+                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0 && $row->document_status !== NULL){
                     CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
-                    $coa = Coa::where('code','100.01.03.04.02')->where('company_id',$row->place->company_id)->first();
+                    $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$row->place->company_id)->first();
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'fund_requests',
@@ -285,8 +285,8 @@ class PaymentRequestController extends Controller
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                         'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
-                        'coa_id'        => $row->type == '1' ? ($coa ? $coa->id : '') : '',
-                        'coa_name'      => $row->type == '1' ? ($coa ? $coa->code.' - '.$coa->name : '') : '',
+                        'coa_id'        => $row->document_status == '2' ? ($coa ? $coa->id : '') : '',
+                        'coa_name'      => $row->document_status == '2' ? ($coa ? $coa->code.' - '.$coa->name : '') : '',
                     ];
                 }
             }

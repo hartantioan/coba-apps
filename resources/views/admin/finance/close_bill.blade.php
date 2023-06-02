@@ -169,7 +169,7 @@
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col m12 s12">
-                                <div class="col m6 s6">
+                                <div class="col m8 s8">
                                     <p class="mt-2 mb-2">
                                         <h6>Fund Request / Permohonan Dana (Tipe BS)</h6>
                                         <div class="row">
@@ -184,7 +184,7 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="col m6 s6">
+                                <div class="col m4 s4">
                                     <h6><b>FR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
@@ -795,6 +795,7 @@
                         $('.row_detail').each(function(){
                             $(this).remove();
                         });
+                        $('#empty-detail').remove();
 
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);

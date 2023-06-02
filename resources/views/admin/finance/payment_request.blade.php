@@ -601,6 +601,7 @@
                             $('#body-detail').append(`
                                 <tr class="row_detail" data-code="` + val.rawcode + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                    ` + ( val.coa_id ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
                                     <td class="center-align">
                                         <label>
                                             <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
@@ -632,19 +633,16 @@
                                         <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.grandtotal + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                     </td>
                                     <td class="center">
-                                        <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;">
+                                        <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="-">
                                     </td>
                                     <td class="center">
-                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>
+                                        ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>` ) + `
                                     </td>
                                 </tr>
                             `);
-
-                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-                            if(val.coa_id){
-                                $('#arr_coa' + count).append(`
-                                    <option value="` + val.coa_id + `">` + val.coa_name + `</option>
-                                `);
+                            
+                            if(!val.coa_id){
+                                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                             }
                         });                        
                     }else{
@@ -902,6 +900,7 @@
                         if(!$('#arr_coa' + $(this).data('id')).val() || !$('#arr_pay' + $(this).data('id')).val()){
                             passed = false;
                         }
+                        alert($('#arr_coa' + $(this).data('id')).val());
                     }
                 });
 
@@ -1088,10 +1087,11 @@
                             </tr>
                         `);
 
-                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         $('#arr_coa' + count).append(`
                             <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                         `);
+
+                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                     });
                 }
 

@@ -199,4 +199,8 @@ class PurchaseInvoice extends Model
 
         return $hasRelation;
     }
+
+    public function journal(){
+        return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

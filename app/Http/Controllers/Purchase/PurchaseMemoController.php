@@ -8,6 +8,9 @@ use App\Models\Place;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\UsedData;
+use Barryvdh\DomPDF\Facade\Pdf;
+use iio\libmergepdf\Merger;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -213,6 +216,11 @@ class PurchaseMemoController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                if($val->journal()->exists()){
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
+                }else{
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
@@ -231,6 +239,7 @@ class PurchaseMemoController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
@@ -516,5 +525,252 @@ class PurchaseMemoController extends Controller
             'status'    => 200,
             'message'   => ''
         ]);
+    }
+
+    public function viewJournal(Request $request,$id){
+        $query = PurchaseMemo::where('code',CustomHelper::decrypt($id))->first();
+        if($query->journal()->exists()){
+            $response = [
+                'title'     => 'Journal',
+                'status'    => 200,
+                'message'   => $query->journal,
+                'user'      => $query->user->name,
+                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+            ];
+            $string='';
+            foreach($query->journal->journalDetail()->orderBy('id')->get() as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    <td class="center-align">'.$row->coa->company->name.'</td>
+                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                </tr>';
+            }
+            $response["tbody"] = $string; 
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data masih belum di approve.'
+            ]; 
+        }
+        return response()->json($response);
+    }
+
+    public function print(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_id'                => 'required',
+        ], [
+            'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
+        ]);
+        
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $var_link=[];
+            $currentDateTime = Date::now();
+            $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+            foreach($request->arr_id as $key =>$row){
+                $pr = PurchaseMemo::where('code',$row)->first();
+                
+                if($pr){
+                    $data = [
+                        'title'     => 'Print Purchase Invoice',
+                        'data'      => $pr
+                    ];
+                    $img_path = 'website/logo_web_fix.png';
+                    $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                    $image_temp = file_get_contents($img_path);
+                    $img_base_64 = base64_encode($image_temp);
+                    $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                    $data["image"]=$path_img;
+                    $pdf = Pdf::loadView('admin.print.purchase.memo_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf->render();
+                    $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $content = $pdf->download()->getOriginalContent();
+                    $temp_pdf[]=$content;
+                }
+                    
+            }
+            $merger = new Merger();
+            foreach ($temp_pdf as $pdfContent) {
+                $merger->addRaw($pdfContent);
+            }
+
+
+            $result = $merger->merge();
+
+
+            Storage::put('public/pdf/bubla.pdf',$result);
+            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $var_link=$document_po;
+
+            $response =[
+                'status'=>200,
+                'message'  =>$var_link
+            ];
+        }
+        
+		
+		return response()->json($response);
+    }
+
+
+    public function printByRange(Request $request){
+        $currentDateTime = Date::now();
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+        if($request->type_date == 1){
+            $validation = Validator::make($request->all(), [
+                'range_start'                => 'required',
+                'range_end'                  => 'required',
+            ], [
+                'range_start.required'       => 'Isi code awal yang ingin di pilih menjadi awal range',
+                'range_end.required'         => 'Isi code terakhir yang menjadi akhir range',
+            ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            }else{
+                $total_pdf = intval($request->range_end)-intval($request->range_start);
+                $temp_pdf=[];
+                if($request->range_start>$request->range_end){
+                    $kambing["kambing"][]="code awal lebih besar daripada code akhir";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ]; 
+                }
+                elseif($total_pdf>31){
+                    $kambing["kambing"][]="PDF lebih dari 30 buah";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ];
+                }else{   
+                    for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
+                        $query = PurchaseMemo::where('Code', 'LIKE', '%'.$nomor)->first();
+                        if($query){
+                            $data = [
+                                'title'     => 'Print Purchase Memo',
+                                'data'      => $query
+                            ];
+                            $img_path = 'website/logo_web_fix.png';
+                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                            $image_temp = file_get_contents($img_path);
+                            $img_base_64 = base64_encode($image_temp);
+                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                            $data["image"]=$path_img;
+                            $pdf = Pdf::loadView('admin.print.purchase.memo_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf->render();
+                            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $content = $pdf->download()->getOriginalContent();
+                            $temp_pdf[]=$content;
+                           
+                        }
+                    }
+                    $merger = new Merger();
+                    foreach ($temp_pdf as $pdfContent) {
+                        $merger->addRaw($pdfContent);
+                    }
+
+
+                    $result = $merger->merge();
+
+
+                    Storage::put('public/pdf/bubla.pdf',$result);
+                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $var_link=$document_po;
+        
+                    $response =[
+                        'status'=>200,
+                        'message'  =>$var_link
+                    ];
+                } 
+
+            }
+        }elseif($request->type_date == 2){
+            $validation = Validator::make($request->all(), [
+                'range_comma'                => 'required',
+                
+            ], [
+                'range_comma.required'       => 'Isi input untuk comma',
+                
+            ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            }else{
+                $arr = explode(',', $request->range_comma);
+                
+                $merged = array_unique(array_filter($arr));
+
+                if(count($merged)>31){
+                    $kambing["kambing"][]="PDF lebih dari 30 buah";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ];
+                }else{
+                    foreach($merged as $code){
+                        $query = PurchaseMemo::where('Code', 'LIKE', '%'.$code)->first();
+                        if($query){
+                            $data = [
+                                'title'     => 'Print Purchase Memo',
+                                'data'      => $query
+                            ];
+                            $img_path = 'website/logo_web_fix.png';
+                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                            $image_temp = file_get_contents($img_path);
+                            $img_base_64 = base64_encode($image_temp);
+                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                            $data["image"]=$path_img;
+                            $pdf = Pdf::loadView('admin.print.purchase.memo_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf->render();
+                            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $content = $pdf->download()->getOriginalContent();
+                            $temp_pdf[]=$content;
+                           
+                        }
+                    }
+                    $merger = new Merger();
+                    foreach ($temp_pdf as $pdfContent) {
+                        $merger->addRaw($pdfContent);
+                    }
+    
+    
+                    $result = $merger->merge();
+    
+    
+                    Storage::put('public/pdf/bubla.pdf',$result);
+                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $var_link=$document_po;
+        
+                    $response =[
+                        'status'=>200,
+                        'message'  =>$var_link
+                    ];
+                }
+            }
+        }
+        return response()->json($response);
     }
 }

@@ -108,12 +108,11 @@ class Asset extends Model
         $nominal = 0;
 
         if($this->method == '1'){
-            $depreciation = round($this->nominal / $this->assetGroup->depreciation_period,3);
-            $balance = $this->book_balance - $depreciation;
-            if($balance > 0){
-                $nominal = $depreciation;
-            }else{
+            $depreciation = round($this->nominal / $this->assetGroup->depreciation_period);
+            if($this->getCountDepreciation() == ($this->assetGroup->depreciation_period - 1)){
                 $nominal = $this->book_balance;
+            }else{
+                $nominal = $depreciation;
             }
         }
 
@@ -141,5 +140,21 @@ class Asset extends Model
         }else{
             return '';
         }
+    }
+
+    public function getCountDepreciation(){
+        $count = $this->depreciationDetail()->count();
+
+        return $count;
+    }
+
+    public function totalDepreciation(){
+        $total = 0;
+
+        foreach($this->depreciationDetail as $row){
+            $total += $row->nominal;
+        }
+
+        return $total;
     }
 }

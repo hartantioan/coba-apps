@@ -22,6 +22,7 @@ class LandedCostDetail extends Model
         'nominal',
         'place_id',
         'line_id',
+        'machine_id',
         'department_id',
         'warehouse_id',
         'lookable_type',
@@ -45,6 +46,11 @@ class LandedCostDetail extends Model
     public function line()
     {
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function machine()
+    {
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
     }
 
     public function coa()
@@ -95,5 +101,24 @@ class LandedCostDetail extends Model
         $qty = round($this->qty / $this->item->buy_convert,3);
 
         return $qty;
+    }
+
+    public function getLocalImportCost(){
+        $arr = [];
+
+        $totalLocal = $this->landedCost->landedCostFeeDetail()->whereHas('landedCostFee', function($query){
+            $query->where('type','1');
+        })->sum('total');
+
+        $totalImport = $this->landedCost->landedCostFeeDetail()->whereHas('landedCostFee', function($query){
+            $query->where('type','2');
+        })->sum('total');
+
+        $arr['total_local'] = round(($this->nominal / $this->landedCost->total) * $totalLocal,2);
+        $arr['coa_local'] = Coa::where('code','200.01.05.01.10')->where('company_id',$this->place->company_id)->first()->id;
+        $arr['total_import'] = round(($this->nominal / $this->landedCost->total) * $totalImport,2);
+        $arr['coa_import'] = Coa::where('code','200.01.05.01.11')->where('company_id',$this->place->company_id)->first()->id;
+
+        return $arr;
     }
 }

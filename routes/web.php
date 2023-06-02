@@ -139,6 +139,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('project', [Select2Controller::class, 'project']);
                 Route::get('business_partner', [Select2Controller::class, 'businessPartner']);
                 Route::get('asset', [Select2Controller::class, 'asset']);
+                Route::get('asset_capitalization', [Select2Controller::class, 'assetCapitalization']);
                 Route::get('unit', [Select2Controller::class, 'unit']);
                 Route::get('coa_cash_bank', [Select2Controller::class, 'coaCashBank']);
                 Route::get('payment_request', [Select2Controller::class, 'paymentRequest']);

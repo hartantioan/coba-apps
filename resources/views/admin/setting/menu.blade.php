@@ -329,11 +329,12 @@
     }
 
     function success(){
-        $('#form_data')[0].reset();
+        /* $('#form_data')[0].reset();
         $('#temp').val('');
         $('#name').focus();
         loadDataTable();
-        $('#modal1').modal('close');
+        $('#modal1').modal('close'); */
+        location.reload();
     }
 
     function show(id){

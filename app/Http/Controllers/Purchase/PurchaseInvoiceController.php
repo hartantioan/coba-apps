@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\GoodReturnPO;
 use App\Models\Department;
 use App\Models\Line;
+use App\Models\Machine;
 use App\Models\PaymentRequest;
 use App\Models\Place;
 use App\Models\PurchaseDownPayment;
@@ -56,6 +57,7 @@ class PurchaseInvoiceController extends Controller
             'department'    => Department::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->get(),
             'line'          => Line::where('status','1')->get(),
+            'machine'       => Machine::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -191,12 +193,14 @@ class PurchaseInvoiceController extends Controller
                             'include_tax'   => $rowdetail->is_include_tax,
                             'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
                             'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
+                            'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
                             'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
                             'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
-                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '',
-                            'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '',
-                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '',
-                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '',
+                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '-',
+                            'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '-',
+                            'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '-',
+                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
+                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
                         ];
                     }
                 }
@@ -237,12 +241,14 @@ class PurchaseInvoiceController extends Controller
                             'include_tax'   => $rowdetail->purchaseOrderDetail->is_include_tax,
                             'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
                             'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
+                            'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
                             'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
                             'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
-                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '',
-                            'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '',
-                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '',
-                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '',
+                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->code : '-',
+                            'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '-',
+                            'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '-',
+                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '-',
+                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '-',
                         ];
                     }
                 }
@@ -276,10 +282,12 @@ class PurchaseInvoiceController extends Controller
                         'include_tax'   => 0,
                         'place_id'      => $arrInfo['place_id'],
                         'line_id'       => $arrInfo['line_id'],
+                        'machine_id'    => $arrInfo['machine_id'],
                         'department_id' => $arrInfo['department_id'],
                         'warehouse_id'  => $arrInfo['warehouse_id'],
                         'place_name'    => $arrInfo['place_name'],
                         'line_name'     => $arrInfo['line_name'],
+                        'machine_name'  => $arrInfo['machine_name'],
                         'department_name' => $arrInfo['department_name'],
                         'warehouse_name'=> $arrInfo['warehouse_name'],
                     ];
@@ -689,6 +697,7 @@ class PurchaseInvoiceController extends Controller
                                 'note'                  => $request->arr_note[$key],
                                 'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
                                 'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                                 'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                 'warehouse_id'          => $request->arr_warehouse[$key] ? $request->arr_warehouse[$key] : NULL,
                             ]);

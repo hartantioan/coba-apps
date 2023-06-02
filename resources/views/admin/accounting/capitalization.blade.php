@@ -197,7 +197,7 @@
                                         <th class="center">Plant</th>
                                         <th class="center">Harga@</th>
                                         <th class="center">Qty</th>
-                                        <th class="center">Unit</th>
+                                        <th class="center">Satuan</th>
                                         <th class="center">Total</th>
                                         <th class="center">Keterangan</th>
                                         <th class="center">Hapus</th>
@@ -301,7 +301,7 @@
             }
         });
 
-        select2ServerSide('#asset_id', '{{ url("admin/select2/asset") }}');
+        select2ServerSide('#asset_id', '{{ url("admin/select2/asset_capitalization") }}');
         
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
@@ -316,7 +316,7 @@
     function count(){
         $('input[name^="arr_price"]').each(function(index){
             let price = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), qty = parseFloat($('input[name^="arr_qty"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-            $('input[name^="arr_total"]').eq(index).val(formatRupiahIni((price * qty).toFixed(3).toString().replace('.',',')));
+            $('input[name^="arr_total"]').eq(index).val(formatRupiahIni((price * qty).toFixed(2).toString().replace('.',',')));
         });
     }
 
@@ -377,7 +377,6 @@
             `);
             select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
             $('#asset_id').empty();
-            $('#place_id').val($("#asset_id").select2('data')[0].place_id);
         }
     }
 

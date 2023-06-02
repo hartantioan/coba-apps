@@ -348,6 +348,39 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function assetCapitalization(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Asset::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->whereNull('nominal')
+                ->get();
+
+        foreach($data as $d) {
+            $capital = $d->getUnitFromCapitalization();
+            $response[] = [
+                'id'   			        => $d->id,
+                'text' 			        => $d->code.' - '.$d->name,
+                'code'                  => $d->code,
+                'name'                  => $d->name,
+                'unit_name'             => $capital ? $capital->unit->name : '',
+                'unit_id'               => $capital ? $capital->unit_id : '',
+                'nominal'               => $d->nominal > 0 ? number_format($d->nominal,3,',','.') : '0,000',
+                'price'                 => $capital ? number_format($capital->price,3,',','.') : '0,000',
+                'place_id'              => $d->place_id,
+                'place_name'            => $d->place->name,
+                'book_balance'          => $d->book_balance,
+                'qty_balance'           => $d->qtyBalance(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function supplier(Request $request)
     {
         $response = [];

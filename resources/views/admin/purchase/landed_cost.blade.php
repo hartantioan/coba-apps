@@ -19,7 +19,7 @@
     }
     @media (min-width: 960px) {
         #modal4 {
-            width:75%;
+            width:85%;
         }
     }
 
@@ -397,6 +397,7 @@
                                                     <th class="center">Satuan (UOM)</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
+                                                    <th class="center">Mesin</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                     <th class="center">Qty x Harga</th>
@@ -407,7 +408,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="12" class="center">
+                                                    <td colspan="13" class="center">
                                                         Silahkan pilih supplier untuk memulai...
                                                     </td>
                                                 </tr>
@@ -494,6 +495,7 @@
                                             <th class="center-align">PPH</th>
                                             <th class="center-align">Grandtotal</th>
                                             <th class="center-align">Keterangan</th>
+                                            <th class="center-align">Landed Cost</th>
                                         </tr>
                                     </thead>
                                     <tbody id="body-detail-goods-receipt"></tbody>
@@ -514,6 +516,7 @@
                                             <th class="center-align">PPH</th>
                                             <th class="center-align">Grandtotal</th>
                                             <th class="center-align">Keterangan</th>
+                                            <th class="center-align">Landed Cost</th>
                                         </tr>
                                     </thead>
                                     <tbody id="body-detail-landed-cost"></tbody>
@@ -599,7 +602,7 @@
                 if($('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="12" class="center">
+                            <td colspan="13" class="center">
                                 Silahkan pilih supplier untuk memulai...
                             </td>
                         </tr>
@@ -962,6 +965,7 @@
                                                     <input type="hidden" name="arr_stock[]" value="` + valdetail.stock + `">
                                                     <input type="hidden" name="arr_place[]" value="` + valdetail.place_id + `">
                                                     <input type="hidden" name="arr_line[]" value="` + valdetail.line_id + `">
+                                                    <input type="hidden" name="arr_machine[]" value="` + valdetail.machine_id + `">
                                                     <input type="hidden" name="arr_department[]" value="` + valdetail.department_id + `">
                                                     <input type="hidden" name="arr_warehouse[]" value="` + valdetail.warehouse_id + `">
                                                     <input type="hidden" name="arr_lookable_id[]" value="` + valdetail.lookable_id + `">
@@ -983,6 +987,9 @@
                                                     </td>
                                                     <td class="center">
                                                         ` + valdetail.line_name + `
+                                                    </td>
+                                                    <td class="center">
+                                                        ` + valdetail.machine_name + `
                                                     </td>
                                                     <td class="center">
                                                         ` + valdetail.department_name + `
@@ -1025,7 +1032,7 @@
 
                                 $('#body-item').append(`
                                     <tr class="row_item">
-                                        <td class="right-align" colspan="7">
+                                        <td class="right-align" colspan="9">
                                             TOTAL
                                         </td>
                                         <td class="right-align">
@@ -1124,6 +1131,9 @@
                                     <td class="">
                                         ` + val.note + `
                                     </td>
+                                    <td class="">
+                                        ` + val.landed_cost + `
+                                    </td>
                                 </tr>
                             `);
                         });
@@ -1154,6 +1164,9 @@
                                     </td>
                                     <td class="">
                                         ` + val.note + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.landed_cost + `
                                     </td>
                                 </tr>
                             `);
@@ -1380,6 +1393,7 @@
                 formData.delete('arr_coa[]');
                 formData.delete('arr_department[]');
                 formData.delete('arr_line[]');
+                formData.delete('arr_machine[]');
 
                 $('input[name^="arr_fee_include_tax"]').each(function(){
                     formData.append('arr_fee_include_tax[]',
@@ -1395,6 +1409,12 @@
 
                 $('input[name^="arr_line"]').each(function(){
                     formData.append('arr_line[]',
+                        $(this).val() ? $(this).val() : ''
+                    );
+                });
+
+                $('input[name^="arr_machine"]').each(function(){
+                    formData.append('arr_machine[]',
                         $(this).val() ? $(this).val() : ''
                     );
                 });
@@ -1549,6 +1569,7 @@
                                 <input type="hidden" name="arr_stock[]" value="` + val.stock + `">
                                 <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
                                 <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
+                                <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                 <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
                                 <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
@@ -1570,6 +1591,9 @@
                                 </td>
                                 <td class="center">
                                     ` + val.line_name + `
+                                </td>
+                                <td class="center">
+                                    ` + val.machine_name + `
                                 </td>
                                 <td class="center">
                                     ` + val.department_name + `
@@ -1621,7 +1645,7 @@
 
                     $('#body-item').append(`
                         <tr class="row_item">
-                            <td class="right-align" colspan="7">
+                            <td class="right-align" colspan="9">
                                 TOTAL
                             </td>
                             <td class="right-align">
@@ -1813,7 +1837,7 @@
                 if($('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="12" class="center">
+                            <td colspan="13" class="center">
                                 Silahkan pilih supplier untuk memulai...
                             </td>
                         </tr>

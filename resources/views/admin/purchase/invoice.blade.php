@@ -308,13 +308,14 @@
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
+                                                    <th class="center">Mesin</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="23">
+                                                    <td colspan="24">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Pembulatan Manual
                                                         </a>
@@ -1019,6 +1020,7 @@
                                                 <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
                                                 <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
                                                 <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
+                                                <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
                                                 <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
                                                 <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
                                                 <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
@@ -1098,6 +1100,9 @@
                                                 </td>
                                                 <td class="center">
                                                     ` + val.line_name + `
+                                                </td>
+                                                <td class="center">
+                                                    ` + val.machine_name + `
                                                 </td>
                                                 <td class="center">
                                                     ` + val.department_name + `
@@ -1406,6 +1411,14 @@
                         @endforeach
                     </select>    
                 </td>
+                <td>
+                    <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                        <option value="">--Kosong--</option>
+                        @foreach ($machine as $rowmachine)
+                            <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
+                        @endforeach
+                    </select>    
+                </td>
                 <td class="center">
                     <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                         @foreach ($department as $rowdept)
@@ -1431,6 +1444,14 @@
             $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).find(':selected').data('place'));
         }else{
             $(element).parent().prev().find('select[name="arr_place[]"]').val($(element).parent().prev().find('select[name="arr_place[]"] option:first').val());
+        }
+    }
+
+    function changeLine(element){
+        if($(element).val()){
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).find(':selected').data('line')).trigger('change');
+        }else{
+            $(element).parent().prev().find('select[name="arr_line[]"]').val($(element).parent().prev().find('select[name="arr_line[]"] option:first').val()).trigger('change');
         }
     }
 
@@ -1637,6 +1658,7 @@
                 formData.delete("arr_note[]");
                 formData.delete("arr_place[]");
                 formData.delete("arr_line[]");
+                formData.delete("arr_machine[]");
                 formData.delete("arr_department[]");
                 formData.delete("arr_warehouse[]");
 
@@ -1668,8 +1690,9 @@
                         formData.append('arr_note[]',$('input[name^="arr_note"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_place[]',$('#arr_place' + $(this).data('id')).val());
                         formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : ''));
-                        formData.append('arr_department[]',$('#arr_department' + $(this).data('id')).val());
-                        formData.append('arr_warehouse[]',$('#arr_warehouse' + $(this).data('id')).val());
+                        formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : ''));
+                        formData.append('arr_department[]',($('#arr_department' + $(this).data('id')).val() ? $('#arr_department' + $(this).data('id')).val() : ''));
+                        formData.append('arr_warehouse[]',($('#arr_warehouse' + $(this).data('id')).val() ? $('#arr_warehouse' + $(this).data('id')).val() : ''));
                     }
                     let qtyreal = parseFloat($('input[name^="arr_temp_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), qtynow = parseFloat($('input[name^="arr_qty"][data-id="' + $(this).data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
 
@@ -1918,6 +1941,14 @@
                                             @endforeach
                                         </select>    
                                     </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($machine as $rowmachine)
+                                                <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
                                             @foreach ($department as $rowdept)
@@ -1940,6 +1971,7 @@
                             $('#arr_include_tax' + count).val(val.include_tax);
                             $('#arr_place' + count).val(val.place_id);
                             $('#arr_line' + count).val(val.line_id);
+                            $('#arr_machine' + count).val(val.machine_id);
                             $('#arr_department' + count).val(val.department_id);
                             $('#arr_warehouse' + count).val(val.warehouse_id);
                             $('#arr_coa' + count).append(`
@@ -1957,6 +1989,7 @@
                                     <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
                                     <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
                                     <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
+                                    <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
                                     <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
                                     <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
@@ -2030,6 +2063,9 @@
                                     </td>
                                     <td>
                                         <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                    </td>
+                                    <td class="center">
+                                        -
                                     </td>
                                     <td class="center">
                                         -

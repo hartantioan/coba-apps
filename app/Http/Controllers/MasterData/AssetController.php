@@ -47,6 +47,7 @@ class AssetController extends Controller
             'asset_group_id',
             'date',
             'nominal',
+            '',
             'book_balance',
             'method',
             'note',
@@ -109,11 +110,12 @@ class AssetController extends Controller
                     $val->assetGroup->name.' - '.$val->assetGroup->coa->name,
                     $val->date ? date('d/m/y',strtotime($val->date)) : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
                     $val->nominal > 0 ? number_format($val->nominal,2,',','.') : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
+                    $val->nominal > 0 ? number_format($val->totalDepreciation(),2,',','.') : '<span class=""><div class="chip red white-text z-depth-4">Belum dikapitalisasi.</div></span>',
                     number_format($val->book_balance,2,',','.'),
                     $val->method(),
                     $val->note,
                     $val->status(),
-                    $val->place_id ? $val->place->name.' - '.$val->place->company->name : '-',
+                    $val->place_id ? $val->place->name : '-',
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
@@ -224,7 +226,7 @@ class AssetController extends Controller
 
     public function show(Request $request){
         $asset = Asset::find($request->id);
-        $asset['nominal'] = number_format($asset->nominal,3,',','.');
+        $asset['nominal'] = number_format($asset->nominal,2,',','.');
         				
 		return response()->json($asset);
     }

@@ -33,12 +33,13 @@ return new class extends Migration
             $table->string('note')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('line_id')->nullable();
+            $table->bigInteger('machine_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['purchase_invoice_id', 'lookable_id', 'tax_id', 'wtax_id', 'place_id', 'line_id', 'department_id', 'warehouse_id'],'purchase_invoice_detail_index');
+            $table->index(['purchase_invoice_id', 'lookable_id', 'tax_id', 'wtax_id', 'place_id', 'line_id', 'machine_id', 'department_id', 'warehouse_id'],'purchase_invoice_detail_index');
         });
     }
 

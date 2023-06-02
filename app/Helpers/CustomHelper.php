@@ -734,6 +734,7 @@ class CustomHelper {
 								'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
 								'place_id'		=> $rowdetail->place_id,
 								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
 								'account_id'	=> $lc->account_id,
 								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 								'warehouse_id'	=> $rowdetail->warehouse_id,
@@ -746,6 +747,7 @@ class CustomHelper {
 								'coa_id'		=> $rowdetail->coa_id,
 								'place_id'		=> $rowdetail->place_id,
 								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
 								'account_id'	=> $lc->account_id,
 								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 								'warehouse_id'	=> $rowdetail->warehouse_id,
@@ -755,18 +757,37 @@ class CustomHelper {
 						}
 					}
 
+					$arrCost = $rowdetail->getLocalImportCost();
 					
-						
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> Coa::where('code','200.01.03.01.02')->where('company_id',$rowdetail->place->company_id)->first()->id,
-						'place_id'		=> $rowdetail->place_id,
-						'account_id'	=> $lc->account_id,
-						'department_id'	=> $rowdetail->department_id,
-						'warehouse_id'	=> $rowdetail->warehouse_id,
-						'type'			=> '2',
-						'nominal'		=> $rowdetail->nominal,
-					]);
+					if($arrCost['total_local'] > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $arrCost['coa_local'],
+							'place_id'		=> $rowdetail->place_id,
+							'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+							'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+							'account_id'	=> $lc->account_id,
+							'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+							'warehouse_id'	=> $rowdetail->warehouse_id,
+							'type'			=> '2',
+							'nominal'		=> $arrCost['total_local'],
+						]);
+					}
+					
+					if($arrCost['total_import'] > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $arrCost['coa_import'],
+							'place_id'		=> $rowdetail->place_id,
+							'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+							'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+							'account_id'	=> $lc->account_id,
+							'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+							'warehouse_id'	=> $rowdetail->warehouse_id,
+							'type'			=> '2',
+							'nominal'		=> $arrCost['total_import'],
+						]);
+					}
 				}
 			}
 		}elseif($table_name == 'fund_requests'){
@@ -1058,6 +1079,7 @@ class CustomHelper {
 						'coa_id'		=> $row->lookable_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
@@ -1073,18 +1095,54 @@ class CustomHelper {
 						'coa_id'		=> $pod->coa_id,
 						'place_id'		=> $pod->place_id,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $pod->department_id,
 						'type'			=> '1',
 						'nominal'		=> $pod->getArrayTotal()['total'],
 					]);
 
+				}elseif($row->lookable_type == 'landed_costs'){
+					foreach($row->lookable->landedCostDetail as $rowdetail){
+						$arrCost = $rowdetail->getLocalImportCost();
+					
+						if($arrCost['total_local'] > 0){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $arrCost['coa_local'],
+								'place_id'		=> $rowdetail->place_id,
+								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+								'account_id'	=> $row->lookable->account_id,
+								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'type'			=> '1',
+								'nominal'		=> $arrCost['total_local'],
+							]);
+						}
+						
+						if($arrCost['total_import'] > 0){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $arrCost['coa_import'],
+								'place_id'		=> $rowdetail->place_id,
+								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
+								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
+								'account_id'	=> $row->lookable->account_id,
+								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
+								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'type'			=> '1',
+								'nominal'		=> $arrCost['total_import'],
+							]);
+						}
+					}
 				}else{
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangbelumditagih,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
@@ -1099,6 +1157,7 @@ class CustomHelper {
 						'coa_id'		=> $row->taxMaster->coa_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
@@ -1113,6 +1172,7 @@ class CustomHelper {
 						'coa_id'		=> $row->wTaxMaster->coa_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 						'account_id'	=> $account_id,
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
@@ -1126,6 +1186,7 @@ class CustomHelper {
 					'coa_id'		=> $coahutangusaha,
 					'place_id'		=> $row->place_id ? $row->place_id : NULL,
 					'line_id'		=> $row->line_id ? $row->line_id : NULL,
+					'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 					'account_id'	=> $account_id,
 					'department_id'	=> $row->department_id ? $row->department_id : NULL,
 					'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
@@ -1140,10 +1201,7 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coahutangusaha,
-					'place_id'		=> $row->place_id ? $row->place_id : NULL,
 					'account_id'	=> $account_id,
-					'department_id'	=> $row->department_id ? $row->department_id : NULL,
-					'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
 					'type'			=> '1',
 					'nominal'		=> $pi->downpayment,
 				]);
@@ -1151,10 +1209,7 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coauangmukapembelian,
-					'place_id'		=> $row->place_id ? $row->place_id : NULL,
 					'account_id'	=> $account_id,
-					'department_id'	=> $row->department_id ? $row->department_id : NULL,
-					'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
 					'type'			=> '2',
 					'nominal'		=> $pi->downpayment,
 				]);

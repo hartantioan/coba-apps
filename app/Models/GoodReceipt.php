@@ -222,4 +222,18 @@ class GoodReceipt extends Model
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function getLandedCostList(){
+        $arr = [];
+
+        foreach($this->goodReceiptDetail as $row){
+            foreach($row->landedCostDetail as $rowdetail){
+                $arr[] = $rowdetail->landedCost->code;
+            }
+        }
+
+        $result = array_unique($arr);
+
+        return implode(', ',$result);
+    }
 }

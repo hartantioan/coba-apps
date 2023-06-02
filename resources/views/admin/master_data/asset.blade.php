@@ -70,6 +70,7 @@
                                                         <th>Grup</th>
                                                         <th>Tgl.Kapitalisasi</th>
                                                         <th>Nominal</th>
+                                                        <th>Akum.Depresiasi</th>
                                                         <th>Saldo Buku</th>
                                                         <th>Metode</th>
                                                         <th>Keterangan</th>
@@ -435,6 +436,7 @@
                 { name: 'asset_group_id', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'nominal', className: 'center-align' },
+                { name: 'depreciation', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'book_balance', className: 'center-align' },
                 { name: 'method', className: 'center-align' },
                 { name: 'note', className: 'center-align' },

@@ -217,8 +217,10 @@ class LandedCost extends Model
                 'place_name'        => $row->place->code,
                 'line_id'           => $row->line_id ? $row->line_id : '',
                 'line_name'         => $row->line_id ? $row->line->name : '-',
-                'department_id'     => $row->department_id,
-                'department_name'   => $row->department->name,
+                'machine_id'        => $row->machine_id ? $row->machine_id : '',
+                'machine_name'      => $row->machine_id ? $row->machine->name : '-',
+                'department_id'     => $row->department_id ? $row->department_id : '',
+                'department_name'   => $row->department_id ? $row->department->name : '-',
                 'warehouse_id'      => $row->warehouse_id,
                 'warehouse_name'    => $row->warehouse->name,
             ];
@@ -239,5 +241,19 @@ class LandedCost extends Model
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function getLandedCostList(){
+        $arr = [];
+
+        foreach($this->landedCostDetail as $row){
+            foreach($row->landedCostDetailSelf as $rowdetail){
+                $arr[] = $rowdetail->landedCost->code;
+            }
+        }
+
+        $result = array_unique($arr);
+
+        return implode(', ',$result);
     }
 }

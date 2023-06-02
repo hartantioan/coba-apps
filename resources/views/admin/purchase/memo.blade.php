@@ -434,8 +434,8 @@
                             <th class="center-align">Perusahaan</th>
                             <th class="center-align">Bisnis Partner</th>
                             <th class="center-align">Plant</th>
+                            <th class="center-align">Line</th>
                             <th class="center-align">Mesin</th>
-                            <th class="center-align">Item</th>
                             <th class="center-align">Department</th>
                             <th class="center-align">Gudang</th>
                             <th class="center-align">Debit</th>

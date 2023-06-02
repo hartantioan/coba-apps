@@ -132,6 +132,11 @@ class InventoryTransferController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                if($val->journal()->exists()){
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
+                }else{
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
                     $val->code,
@@ -144,6 +149,7 @@ class InventoryTransferController extends Controller
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
@@ -583,5 +589,41 @@ class InventoryTransferController extends Controller
 
     public function export(Request $request){
 		return Excel::download(new ExportInventoryTransfer($request->search,$request->status,$this->dataplaces), 'inventory_transfer_'.uniqid().'.xlsx');
+    }
+
+    public function viewJournal(Request $request,$id){
+        $query = InventoryTransfer::where('code',CustomHelper::decrypt($id))->first();
+        if($query->journal()->exists()){
+            $response = [
+                'title'     => 'Journal',
+                'status'    => 200,
+                'message'   => $query->journal,
+                'user'      => $query->user->name,
+                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+            ];
+            $string='';
+            foreach($query->journal->journalDetail()->orderBy('id')->get() as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    <td class="center-align">'.$row->coa->company->name.'</td>
+                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                </tr>';
+            }
+            $response["tbody"] = $string; 
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data masih belum di approve.'
+            ]; 
+        }
+        return response()->json($response);
     }
 }

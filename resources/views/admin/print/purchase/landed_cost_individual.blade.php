@@ -9,20 +9,20 @@
             {
                 font-family: Tahoma, "Trebuchet MS", sans-serif;
             }
-
+        
             .break-row {
                 page-break-inside: avoid;
             }
-
+        
             .row {
-            margin-left:-5px;
-            margin-right:-5px;
+                margin-left:-5px;
+                margin-right:-5px;
             }
             
             .column1 {
-            float: left;
-            width: 50%;
-            padding: 5px;
+                float: left;
+                width: 50%;
+                padding: 5px;
             }
             .column2 {
                 margin-right: 60%;
@@ -30,15 +30,15 @@
                 width: 50%;
                 padding: 5px;
             }
-
+        
             .row::after {
-            content: "";
-            clear: both;
-            display: table;
+                content: "";
+                clear: both;
+                display: table;
             }
-
+        
             
-
+        
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
                     zoom:0.4;
@@ -50,7 +50,7 @@
                     zoom:0.6;
                     font-size:11px !important;
                 }
-
+        
                 table > thead > tr > th {
                     font-size:13px !important;
                     font-weight: 800 !important;
@@ -65,16 +65,16 @@
                     font-size:1em !important;
                 }
                 .table-data-item td{
-                    font-size:0.6em !important;
+                    font-size:0.9em !important;
                 }
                 .table-data-item th{
                     border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:0.6em !important;
+                    font-size:1em !important;
                 }
                 .table-bot1 td{
-                    font-size:0.7em !important;
+                    font-size:1em !important;
                 }
             }
         
@@ -152,12 +152,9 @@
                 border:1px solid black;
                 min-height: 23%;
             }
-
+        
             @page { margin: 5em 3em 6em 3em; }
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
-                
-        
-           
         </style>
     </head>
     <body>
@@ -167,7 +164,7 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1">DOWNPAYMENT # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1" style="font-size:1em">NO # {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -177,7 +174,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="indigo-text">Purchase Down Payment</h5>
+                                <h5 style="margin-top: -2px">Landed Cost</h5>
                             </td>
                         </tr>
                                 
@@ -201,133 +198,146 @@
         </header>
         <main>
             <div class="card">
-                <div class="card-content invoice-print-area ">
-                    <table border="0" width="100%">
+                <div class="card-content invoice-print-area">
+                    <table border="0" width="100%" class="tbl-info">
                         <tr>
-                            <td width="50%" class="left-align">
-                                <table border="0" width="50%" class="tbl-info">
+                            <td width="33%" class="left-align" style="vertical-align: top !important;">
+                                <table border="0" width="100%">
                                     <tr>
-                                        <td width="25%">
-                                            Supplier
+                                        <td width="40%">
+                                            Dari
                                         </td>
-                                        <td width="50%">
-                                            {{ $data->supplier->name }}
+                                        <td width="60%">
+                                            {{ $data->user->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="50%">
-                                            Alamat
+                                        <td width="40%">
+                                            Posisi
                                         </td>
-                                        <td width="50%">
-                                            {{ $data->supplier->address }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="50%">
-                                            Telepon
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->supplier->phone.' / '.$data->supplier->office_no }}
+                                        <td width="60%">
+                                            {{ $data->user->position->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="50%">
-                                            Tipe Pembayaran
+                                        <td width="40%">
+                                            Depart.
                                         </td>
-                                        <td width="50%">
-                                            {{ $data->type() }}
+                                        <td width="60%">
+                                            {{ $data->user->department->name }}
                                         </td>
                                     </tr>
                                 </table>
                             </td>
-                            
+                            <td width="33%" class="left-align" style="vertical-align: top !important;">
+                                <table border="0" width="100%">
+                                    <tr>
+                                        <td width="40%">
+                                            Vendor
+                                        </td>
+                                        <td width="60%">
+                                            {{ $data->vendor->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Alamat
+                                        </td>
+                                        <td width="60%">
+                                            {{ $data->vendor->address }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Telepon
+                                        </td>
+                                        <td width="60%">
+                                            {{ $data->vendor->phone.' / '.$data->vendor->office_no }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td width="33%" class="left-align" style="vertical-align: top !important;">
+                                <table border="0" width="100%">
+                                    <tr>
+                                        <td width="40%">
+                                            Lampiran
+                                        </td>
+                                        <td width="60%">
+                                            <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Status
+                                        </td>
+                                        <td width="60%">
+                                            {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
                     </table>
-                    <!-- product details table-->
-                    
-                    @if(count($data->purchaseDownPaymentDetail) > 0)
-                    <h6 class="center mt-3">Referensi Order Pembelian</h6>
-                        <div class="invoice-product-details">
-                            @if(count($data->purchaseDownPaymentDetail) > 0)
-                                
-                                <table border="1" style="border-collapse:collapse" width="100%">
-                                    <thead>
-                                        <tr>
-                                            <th class="center-align">PO No.</th>
-                                            
-                                            <th class="center-align">PR No.</th>
-                                            
-                                            <th class="center-align">Tgl.Post</th>
-                                            
-                                            <th class="center-align">Tgl.Kirim</th>
-                                            <th class="center-align">Keterangan</th>
-                                            <th class="center-align">Total</th>
-                                            <th class="center-align">DP Total</th>
-                                           
-                                        </tr>
-                                        
-                                    </thead>
-                                @foreach($data->purchaseDownPaymentDetail as $key => $row)
-                                @php
-                                $arr_pr=[];
-                                    foreach ($row->purchaseOrder->purchaseOrderDetail as $key => $row_detail_po) {
-                                        $arr_pr[]=$row_detail_po->purchaseRequestDetail->purchaseRequest->code;
-                                    }
-                                    
-                                @endphp
-                                    
-                                        
-                                        <tbody>
-                                            <tr>
-                                                <td class="center-align">{{ $row->purchaseOrder->code }}</td>
-                                                <td class="center-align">{{ implode(', ',$arr_pr) }}</td>
-                                                <td class="center-align">{{ date('d/m/y',strtotime($row->purchaseOrder->post_date)) }}</td>
-                                                <td class="center-align">{{ date('d/m/y',strtotime($row->purchaseOrder->delivery_date)) }}</td>
-                                                <td class="center-align">{{ $row->note }}</td>                                             
-                                                <td class="center-align" style="text-align: right">{{ number_format($row->purchaseOrder->grandtotal,2,',','.') }}</td>
-                                                <td class="center-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                    <div class="invoice-product-details mt-3  ">
+                        <table class="bordered table-data-item" border="1" style="border-collapse:collapse;" width="100%">
+                            <thead>
+                                <tr>
+                                    <th class="center">No</th>
+                                    <th class="center">Plant</th>
+                                    <th class="center">Departemen</th>
+                                    <th class="center">Gudang</th>
+                                    <th class="center">Item</th>
+                                    <th class="center">Qty</th>
+                                    <th class="center">Satuan</th>
+                                    <th class="center">Harga Total</th>
+                                    <th class="center">Harga Satuan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($data->landedCostDetail as $key => $row)
+                                <tr>
+                                    <td class="center" style="text-align: center">{{ ($key + 1) }}</td>
+                                    <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
+                                    <td>{{ $row->department->name }}</td>
+                                    <td>{{ $row->warehouse->name }}</td>
+                                    <td>{{ $row->item->name }}</td>
+                                    <td style="text-align: center">{{ $row->qty }}</td>
+                                    <td style="text-align: center">{{ $row->item->uomUnit->code }}</td>
+                                    <td class="right-align" style="text-align: right">{{ number_format($row->nominal,2,',','.') }}</td>
+                                    <td class="right-align" style="text-align: right">{{ number_format(round($row->nominal / $row->qty,3),2,',','.') }}</td>
+                                </tr>
                                 @endforeach
-                            @endif
-                        </div>
-                    @endif
-                    <!-- invoice subtotal -->
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
                     <div class="invoice-subtotal break-row">
                         <div class="row">
                         <div class="column1">
-                            <table style="width:100%">
+                            <table style="width:100%" class="table-bot">
                                 <tr class="break-row">
                                     <td>
-                                        Rekening :
-                                        {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
-                                        <div class="mt-3">
-                                            Catatan : {{ $data->note }}
-                                        </div>
-                                        Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
+                                        Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal) }}
                                     </td>
                                     
                                 </tr>
                             </table>
                         </div>
-                        <div class="column2">
-                            <table style="border-collapse:collapse;text-align: right; padding-right:6%;" width="100%">
-                                <tr class="break-row">
-                                    <td class="right-align" style="padding-right:15px">Subtotal</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->subtotal,2,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td class="right-align" style="padding-right:15px">Diskon</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->discount,2,',','.') }}</td>
-                                </tr>
+                        <div class="column2" >
+                            <table class="table-bot" style="border-collapse:collapse;text-align: right; padding-right:6%;" width="100%">
                                 <tr>
-                                    <td class="right-align" style="padding-right:15px">Total</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
-                                </tr>
+                                    <td class="right-align" style="padding-right:15px" >Total</td>
+                                    <td class="right-align" style="border:0.6px solid black;padding-left:20px;" width="25.5%">{{ number_format($data->total,2,',','.') }}</td>
+                                </tr class="break-row">
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">PPN</td>
                                     <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
+                                </tr>
+                                <tr class="break-row">
+                                    <td class="right-align" style="padding-right:15px">PPH</td>
+                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">Grandtotal</td>
@@ -363,9 +373,7 @@
                             </tr>
                         </table>  
                     </div>
-                    
                 </div>
             </div>
         </main>
     </body>
-</html>

@@ -224,13 +224,20 @@
             @if(count($data->purchaseDownPaymentDetail) > 0)
                 <h6 class="center mt-3">Referensi Order Pembelian</h6>
                 @foreach($data->purchaseDownPaymentDetail as $key => $row)
+                @php
+                $arr_pr=[];
+                    foreach ($row->purchaseOrder->purchaseOrderDetail as $key => $row_detail_po) {
+                        $arr_pr[]=$row_detail_po->purchaseRequestDetail->purchaseRequest->code;
+                    }
+                    
+                @endphp
                     <table class="bordered mt-3 purple lighten-5">
                         <thead>
                             <tr>
                                 <th class="center-align">PO No.</th>
                                 <th class="center-align">{{ $row->purchaseOrder->code }}</th>
                                 <th class="center-align">PR No.</th>
-                                <th class="center-align">{{ $row->purchaseOrder->purchaseRequest()->exists() ? $row->purchaseOrder->purchaseRequest->code : '-' }}</th>
+                                <th class="center-align">{{ implode(', ',$arr_pr) }}</th>
                                 <th class="center-align">Tgl.Post</th>
                                 <th class="center-align">{{ date('d/m/y',strtotime($row->purchaseOrder->post_date)) }}</th>
                                 <th class="center-align">Tgl.Kirim</th>

@@ -12,6 +12,7 @@ use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseRequest;
 use App\Models\Tax;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -844,28 +845,16 @@ class FundRequestController extends Controller
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$fr;
-        $data_good_receipts = [];
-        $data_purchase_requests = [];
         
         $data_id_dp=[];
         $data_id_po = [];
         $data_id_gr = [];
         $data_id_invoice=[];
-        $data_purchase_downpayment=[];
         $data_id_pyrs=[];
-        $data_id_frs=[];
-        $data_id_greturns=[];
-        $data_frs=[];
-        $data_pyrs = [];
-        $data_good_returns = [];
-        $data_outgoingpayments = [];
-        $data_lcs=[];
         $data_id_lc=[];
-        $data_invoices=[];
+        $data_id_greturns=[];
+        $data_id_pr=[];
 
-        $data_frs[]=$fr;
-
-        $data_pos=[];
         if($query) {
 
             //Pengambilan Main Branch beserta id terkait
@@ -880,51 +869,15 @@ class FundRequestController extends Controller
                         "name" => $row_pyr_detail->paymentRequest->code,
                         'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
                     ];
-                    if(count($data_pyrs)<1){
-                        $data_pyrs[]=$data_pyr_tempura;
-                        $data_go_chart[]=$data_pyr_tempura;
-                        $data_link[]=[
-                            'from'=>$query->code,
-                            'to'=>$row_pyr_detail->paymentRequest->code,
-                        ]; 
-                        $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
-                        
-                    }else{
-                        $found = false;
-                        foreach ($data_pyrs as $key => $row_pyr) {
-                            if ($row_pyr["key"] == $data_pyr_tempura["key"]) {
-                                $found = true;
-                                break;
-                            }
-                        }
-                     
-                        if($found){
-                            $data_links=[
-                                'from'=>$query->code,
-                                'to'=>$row_pyr_detail->paymentRequest->code,
-                            ]; 
-                            $found_inlink = false;
-                            foreach($data_link as $key=>$row_link){
-                                if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                    $found_inlink = true;
-                                    break;
-                                }
-                            }
-                            if(!$found_inlink){
-                                $data_link[] = $data_links;
-                            }
-                            
-                        }
-                        if (!$found) {
-                            $data_pyrs[]=$data_pyr_tempura;
-                            $data_go_chart[]=$data_pyr_tempura;
-                            $data_link[]=[
-                                'from'=>$query->code,
-                                'to'=>$row_pyr_detail->paymentRequest->code,
-                            ]; 
-                            $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;   
-                        }
-                    }
+
+                    $data_go_chart[]=$data_pyr_tempura;
+                    $data_link[]=[
+                        'from'=>$query->code,
+                        'to'=>$row_pyr_detail->paymentRequest->code,
+                        'string_link'=>$query->code.$row_pyr_detail->paymentRequest->code,
+                    ]; 
+                    $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
+
                     if($row_pyr_detail->fundRequest()){
                        
                         $data_fund_tempura=[
@@ -937,51 +890,15 @@ class FundRequestController extends Controller
                             'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                         ];
                         
-                        if(count($data_frs)<1){
-                            $data_frs[]=$data_fund_tempura;
-                            $data_go_chart[]=$data_fund_tempura;
-                            $data_link[]=[
-                                'from'=>$row_pyr_detail->lookable->code,
-                                'to'=>$row_pyr_detail->paymentRequest->code,
-                            ]; 
-                            $data_id_frs[]= $row_pyr_detail->lookable->id;  
+                        $data_go_chart[]=$data_fund_tempura;
+                        $data_link[]=[
+                            'from'=>$row_pyr_detail->lookable->code,
+                            'to'=>$row_pyr_detail->paymentRequest->code,
+                            'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                        ]; 
+                        $data_id_frs[]= $row_pyr_detail->lookable->id;  
                             
-                        }else{
-                            $found = false;
-                            foreach ($data_frs as $key => $row_fundreq) {
-                                if ($row_fundreq["key"] == $data_fund_tempura["key"]) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                            
-                            if($found){
-                                $data_links=[
-                                    'from'=>$row_pyr_detail->lookable->code,
-                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                ]; 
-                                $found_inlink = false;
-                                foreach($data_link as $key=>$row_link){
-                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                        $found_inlink = true;
-                                        break;
-                                    }
-                                }
-                                if(!$found_inlink){
-                                    $data_link[] = $data_links;
-                                }
-                                
-                            }
-                            if (!$found) {
-                                $data_frs[]=$data_fund_tempura;
-                                $data_go_chart[]=$data_fund_tempura;
-                                $data_link[]=[
-                                    'from'=>$row_pyr_detail->lookable->code,
-                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                ]; 
-                                $data_id_frs[]= $row_pyr_detail->lookable->id;   
-                            }
-                        }
+                        
                         
                     }
                     foreach($row_pyr_detail->paymentRequest->paymentRequestDetail as $row_pyrd){
@@ -996,51 +913,16 @@ class FundRequestController extends Controller
                                 "name" => $row_pyrd->lookable->code,
                                 'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyrd->lookable->code),  
                             ];
-                            if(count($data_purchase_downpayment)<1){
-                                $data_purchase_downpayment[]=$data_downp_tempura;
-                                $data_go_chart[]=$data_downp_tempura;
-                                $data_link[]=[
-                                    'from'=>$row_pyrd->lookable->code,
-                                    'to'=>$row_pyrd->paymentRequest->code,
-                                ]; 
-                                $data_id_dp[]= $row_pyrd->lookable->id;  
+
+                            $data_go_chart[]=$data_downp_tempura;
+                            $data_link[]=[
+                                'from'=>$row_pyrd->lookable->code,
+                                'to'=>$row_pyrd->paymentRequest->code,
+                                'string_link'=>$row_pyrd->lookable->code.$row_pyrd->paymentRequest->code,
+                            ]; 
+                            $data_id_dp[]= $row_pyrd->lookable->id;  
                                 
-                            }else{
-                                $found = false;
-                                foreach ($data_purchase_downpayment as $key => $row_dp) {
-                                    if ($row_dp["key"] == $data_downp_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                
-                                if($found){
-                                    $data_links=[
-                                        'from'=>$row_pyrd->lookable->code,
-                                        'to'=>$row_pyrd->paymentRequest->code,
-                                    ]; 
-                                    $found_inlink = false;
-                                    foreach($data_link as $key=>$row_link){
-                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                            $found_inlink = true;
-                                            break;
-                                        }
-                                    }
-                                    if(!$found_inlink){
-                                        $data_link[] = $data_links;
-                                    }
-                                    
-                                }
-                                if (!$found) {
-                                    $data_purchase_downpayment[]=$data_downp_tempura;
-                                    $data_go_chart[]=$data_downp_tempura;
-                                    $data_link[]=[
-                                        'from'=>$row_pyrd->lookable->code,
-                                        'to'=>$row_pyrd->paymentRequest->code,
-                                    ]; 
-                                    $data_id_dp[]= $row_pyrd->lookable->id;    
-                                }
-                            }
+                            
                         }  
                     }
                 }
@@ -1065,110 +947,61 @@ class FundRequestController extends Controller
                             'name'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
                             'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($good_receipt_detail->purchaseOrderDetail->purchaseOrder->code),
                         ];
-                        if(count($data_pos)<1){
-                            $data_pos[]=$po;
-                            $data_go_chart[]=$po;
-                            $data_link[]=[
-                                'from'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
-                                'to'=>$query_gr->code,
-                            ];
-                            $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
-                            
-                        }else{
-                            $found = false;
-                            foreach ($data_pos as $key => $row_pos) {
-                                if ($row_pos["key"] == $po["key"]) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                            if (!$found) {
-                                $data_pos[] = $po;
-                                $data_link[]=[
-                                    'from'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
-                                    'to'=>$query_gr->code,
-                                ];  
-                                $data_go_chart[]=$po;
-                                $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id;
-                            }
-                        }
+
+                        $data_go_chart[]=$po;
+                        $data_link[]=[
+                            'from'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
+                            'to'=>$query_gr->code,
+                            'string_link'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code.$query_gr->code
+                        ];
+                        $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
 
                         if($good_receipt_detail->goodReturnPODetail()->exists()){
-                            $good_return_tempura =[
-                                "name"=> $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
-                                "key" =>  $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
-                                
-                                'properties'=> [
-                                    ['name'=> "Tanggal :". $good_receipt_detail->goodReturnPODetail->goodReturnPO->post_date],
-                                ],
-                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt( $good_receipt_detail->goodReturnPODetail->goodReturnPO->code),
-                            ];
-                            if(count($data_good_returns)<1){
-                                $data_good_returns[]=$good_return_tempura;
+                            foreach($good_receipt_detail->goodReturnPODetail as $goodReturnPODetail){
+                                $good_return_tempura =[
+                                    "name"=> $goodReturnPODetail->goodReturnPO->code,
+                                    "key" => $goodReturnPODetail->goodReturnPO->code,
+                                    
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :". $goodReturnPODetail->goodReturnPO->post_date],
+                                    ],
+                                    'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt( $goodReturnPODetail->goodReturnPO->code),
+                                ];
+                                                    
                                 $data_go_chart[] = $good_return_tempura;;
                                 $data_link[]=[
-                                    'from'=> $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
+                                    'from'=> $goodReturnPODetail->goodReturnPO->code,
                                     'to'=>$query_gr->code,
+                                    'string_link'=>$goodReturnPODetail->goodReturnPO->code.$query_gr->code
                                 ];
-                                $data_id_greturns[]=  $good_receipt_detail->goodReturnPODetail->goodReturnPO->id; 
-                                
-                            }else{
-                                $found = false;
-                                foreach ($data_good_returns as $key => $row_return) {
-                                    if ($row_return["key"] == $good_return_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_good_returns[]=$good_return_tempura;
-                                    $data_go_chart[] = $good_return_tempura;;
-                                    $data_link[]=[
-                                        'from'=> $good_receipt_detail->goodReturnPODetail->goodReturnPO->code,
-                                        'to'=>$query_gr->code,
-                                    ];
-                                    $data_id_greturns[]=  $good_receipt_detail->goodReturnPODetail->goodReturnPO->id; 
-                                }
+                                $data_id_greturns[]=  $goodReturnPODetail->goodReturnPO->id;
+
                             }
+                             
+                                
+                            
                         }
                         //landed cost searching
                         if($good_receipt_detail->landedCostDetail()->exists()){
-                            foreach($good_receipt_detail->landedCostDetail->landedCost as $landed_cost){
+                            foreach($good_receipt_detail->landedCostDetail as $landed_cost_detail){
                                 $data_lc=[
                                     'properties'=> [
-                                        ['name'=> "Tanggal : ".$landed_cost->post_date],
-                                        ['name'=> "Nominal : Rp.".number_format($landed_cost->grandtotal,2,',','.')]
+                                        ['name'=> "Tanggal : ".$landed_cost_detail->landedCost->post_date],
+                                        ['name'=> "Nominal : Rp.".number_format($landed_cost_detail->landedCost->grandtotal,2,',','.')]
                                     ],
-                                    'key'=>$landed_cost->code,
-                                    'name'=>$landed_cost->code,
-                                    'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost->code),    
+                                    'key'=>$landed_cost_detail->landedCost->code,
+                                    'name'=>$landed_cost_detail->landedCost->code,
+                                    'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost_detail->landedCost->code),    
                                 ];
-                                if(count($data_lcs)<1){
-                                    $data_lcs[]=$data_lc;
-                                    $data_go_chart[]=$data_lc;
-                                    $data_link[]=[
-                                        'from'=>$query_gr->code,
-                                        'to'=>$landed_cost->code,
-                                    ];
-                                    $data_id_lc = $landed_cost->id;
-                                }else{
-                                    $found = false;
-                                    foreach ($data_lcs as $key => $row_lc) {
-                                        if ($row_lc["key"] == $data_lc["key"]) {
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!$found) {
-                                        $data_lcs[]=$data_lc;
-                                        $data_go_chart[]=$data_lc;
-                                        $data_link[]=[
-                                            'from'=>$query_gr->code,
-                                            'to'=>$landed_cost->code,
-                                        ];
-                                        $data_id_lc = $landed_cost->id;
-                                    }
-                                }
+
+                                $data_go_chart[]=$data_lc;
+                                $data_link[]=[
+                                    'from'=>$query_gr->code,
+                                    'to'=>$landed_cost_detail->landedCost->code,
+                                    'string_link'=>$query_gr->code.$landed_cost_detail->landedCost->code,
+                                ];
+                                $data_id_lc[] = $landed_cost_detail->landedCost->id;
+                                
                                 
                             }
                         }
@@ -1185,33 +1018,14 @@ class FundRequestController extends Controller
                                     'name'=>$invoice_detail->purchaseInvoice->code,
                                     'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
                                 ];
-                                if(count($data_invoices)<1){
-                                    $data_invoices[]=$invoice_tempura;
-                                    $data_go_chart[]=$invoice_tempura;
-                                    $data_link[]=[
-                                        'from'=>$query_gr->code,
-                                        'to'=>$invoice_detail->purchaseInvoice->code,
-                                    ];
-                                    
-                                }else{
-                                    $found = false;
-                                    foreach ($data_invoices as $key => $row_invoice) {
-                                        if ($row_invoice["key"] == $invoice_tempura["key"]) {
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!$found) {
-                                        $data_invoices[]=$invoice_tempura;
-                                        $data_go_chart[]=$invoice_tempura;
-                                        $data_link[]=[
-                                            'from'=>$query_gr->code,
-                                            'to'=>$invoice_detail->purchaseInvoice->code,
-                                        ];
-                                        
-                                    }
-                                    
-                                }
+
+                                $data_go_chart[]=$invoice_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_gr->code,
+                                    'to'=>$invoice_detail->purchaseInvoice->code,
+                                    'string_link'=>$query_gr->code.$invoice_detail->purchaseInvoice->code
+                                ];
+                                
                                 if(!in_array($invoice_detail->purchaseInvoice->id, $data_id_invoice)){
                                     $data_id_invoice[] = $invoice_detail->purchaseInvoice->id;
                                     $added = true; 
@@ -1220,96 +1034,6 @@ class FundRequestController extends Controller
                         }
 
                     }
-
-                
-                    
-                    if($query_gr->landedCost()->exists()){
-                        foreach($query_gr->landedCost as $landed_cost){
-                            $data_lc=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal : ".$landed_cost->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($landed_cost->grandtotal,2,',','.')]
-                                ],
-                                'key'=>$landed_cost->code,
-                                'name'=>$landed_cost->code,
-                                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost->code),    
-                            ];
-                            if(count($data_lcs)<1){
-                                $data_lcs[]=$data_lc;
-                                $data_go_chart[]=$data_lc;
-                                $data_link[]=[
-                                    'from'=>$query_gr->code,
-                                    'to'=>$landed_cost->code,
-                                ];
-                                $data_id_lc = $landed_cost->id;
-                            }else{
-                                $found = false;
-                                foreach ($data_lcs as $key => $row_lc) {
-                                    if ($row_lc["key"] == $data_lc["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_lcs[]=$data_lc;
-                                    $data_go_chart[]=$data_lc;
-                                    $data_link[]=[
-                                        'from'=>$query_gr->code,
-                                        'to'=>$landed_cost->code,
-                                    ];
-                                    $data_id_lc = $landed_cost->id;
-                                }
-                            }
-                            
-                        }
-                    }
-                    
-                    if($query_gr->purchaseInvoiceDetail()->exists()){
-                        foreach($query_gr->purchaseInvoiceDetail as $invoice_detail){
-                            $invoice_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal : ".$invoice_detail->purchaseInvoice->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
-                                    
-                                ],
-                                'key'=>$invoice_detail->purchaseInvoice->code,
-                                'name'=>$invoice_detail->purchaseInvoice->code,
-                                'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
-                            ];
-                            if(count($data_invoices)<1){
-                                $data_invoices[]=$invoice_tempura;
-                                $data_go_chart[]=$invoice_tempura;
-                                $data_link[]=[
-                                    'from'=>$query_gr->code,
-                                    'to'=>$invoice_detail->purchaseInvoice->code,
-                                ];
-                                
-                            }else{
-                                $found = false;
-                                foreach ($data_invoices as $key => $row_invoice) {
-                                    if ($row_invoice["key"] == $invoice_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_invoices[]=$invoice_tempura;
-                                    $data_go_chart[]=$invoice_tempura;
-                                    $data_link[]=[
-                                        'from'=>$query_gr->code,
-                                        'to'=>$invoice_detail->purchaseInvoice->code,
-                                    ];
-                                    
-                                }
-                                
-                            }
-                            if(!in_array($invoice_detail->purchaseInvoice->id, $data_id_invoice)){
-                                $data_id_invoice[] = $invoice_detail->purchaseInvoice->id;
-                                $added = true; 
-                            }
-                        }
-                    }
-
                 }
 
 
@@ -1328,48 +1052,15 @@ class FundRequestController extends Controller
                             ],
                             'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_return_detail->goodReceiptDetail->goodReceipt->code),
                         ];
-                        if(count($data_good_receipts)<1){
-                            $data_good_receipt[]=$data_good_receipt;
-                            $data_go_chart[]=$data_good_receipt;
-                            $data_link[]=[
-                                'from'=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
-                                'to'=>$data_good_receipt["key"],
-                            ];
-                        }else{
-                            $found = false;
-                            foreach ($data_good_receipts as $key => $row_gr) {
-                                if ($row_gr["key"] == $data_good_receipt["key"]) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                            if($found){
-                                $data_links=[
-                                    'from'=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
-                                    'to'=>$data_good_receipt["key"],
-                                ];  
-                                $found_inlink = false;
-                                foreach($data_link as $key=>$row_link){
-                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                        $found_inlink = true;
-                                        break;
-                                    }
-                                }
-                                if(!$found_inlink){
-                                    $data_link[] = $data_links;
-                                }
-                                
-                            }
-                            if (!$found) {
-                                $data_good_receipt[]=$data_good_receipt;
-                                $data_go_chart[]=$data_good_receipt;
-                                $data_link[]=[
-                                    'from'=>$good_return_detail->goodReceiptDetail->goodReceipt->code,
-                                    'to'=>$data_good_receipt["key"],
-                                ];
-                                  
-                            }
-                        }
+                        
+                        $data_good_receipt[]=$data_good_receipt;
+                        $data_go_chart[]=$data_good_receipt;
+                        $data_link[]=[
+                            'from'=>$query_return->code,
+                            'to'=>$data_good_receipt["key"],
+                            'string_link'=>$good_return_detail->goodReceiptDetail->goodReceipt->code.$data_good_receipt["key"],
+                        ];
+                        
                         if(!in_array($good_return_detail->goodReceiptDetail->goodReceipt->id, $data_id_gr)){
                             $data_id_gr[] = $good_return_detail->goodReceiptDetail->goodReceipt->id;
                             $added = true;
@@ -1382,12 +1073,11 @@ class FundRequestController extends Controller
                 foreach($data_id_invoice as $invoice_id){
                     $query_invoice = PurchaseInvoice::where('id',$invoice_id)->first();
                     foreach($query_invoice->purchaseInvoiceDetail as $row){
-                        if($row->purchaseOrder()){
-                            $row_po=$row->lookable;
+                        if($row->purchaseOrderDetail()){
+                            $row_po=$row->lookable->purchaseOrder;
                                 $po =[
                                     "name"=>$row_po->code,
                                     "key" => $row_po->code,
-                                    "color"=>"lightblue",
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_po->post_date],
                                         ['name'=> "Vendor  : ".$row_po->supplier->name],
@@ -1395,54 +1085,15 @@ class FundRequestController extends Controller
                                      ],
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->post_date),           
                                 ];
-                                /*memasukkan ke node data dan linknya*/
-                                if(count($data_pos)<1){
-                                    $data_pos[]=$po;
-                                    $data_go_chart[]=$po;
-                                    $data_link[]=[
-                                        'from'=>$row_po->code,
-                                        'to'=>$query_invoice->code,
-                                    ]; 
-                                    $data_id_po[]= $purchase_order_detail->purchaseOrder->id;  
-                                    
-                                }else{
-                                    $found = false;
-                                    foreach ($data_pos as $key => $row_pos) {
-                                        if ($row_pos["key"] == $po["key"]) {
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                    //po yang memiliki request yang sama
-                                    if($found){
-                                        $data_links=[
-                                            'from'=>$row_po->code,
-                                            'to'=>$query_invoice->code,
-                                        ]; 
-                                        $found_inlink = false;
-                                        foreach($data_link as $key=>$row_link){
-                                            if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                $found_inlink = true;
-                                                break;
-                                            }
-                                        }
-                                        if(!$found_inlink){
-                                            $data_link[] = $data_links;
-                                        }
-                                        
-                                    }
-                                    if (!$found) {
-                                        $data_pos[] = $po;
-                                        $data_link[]=[
-                                            'from'=>$row_po->code,
-                                            'to'=>$query_invoice->code,
-                                        ];  
-                                        $data_go_chart[]=$po;
-                                        $data_id_po[]= $purchase_order_detail->purchaseOrder->id; 
-                                    }
-                                }
-                                //memasukkan dengan yang sama atau tidak
-                                
+
+                                $data_go_chart[]=$po;
+                                $data_link[]=[
+                                    'from'=>$row_po->code,
+                                    'to'=>$query_invoice->code,
+                                    'string_link'=>$row_po->code.$query_invoice->code
+                                ]; 
+                                $data_id_po[]= $purchase_order_detail->purchaseOrder->id;  
+                                      
                                 foreach($row_po->purchaseOrderDetail as $po_detail){
                                     if($po_detail->goodReceiptDetail()->exists()){
                                         foreach($po_detail->goodReceiptDetail as $good_receipt_detail){
@@ -1455,78 +1106,41 @@ class FundRequestController extends Controller
                                                 "name" => $good_receipt_detail->goodReceipt->code,
                                                 'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code),
                                             ];
-                                            if(count($data_good_receipts)<1){
-                                                $data_good_receipts[]=$data_good_receipt;
-                                                $data_go_chart[]=$data_good_receipt;
-                                                $data_link[]=[
-                                                    'from'=>$row_po->code,
-                                                    'to'=>$data_good_receipt["key"],
-                                                ];
-                                                $data_id_gr[]=$good_receipt_detail->goodReceipt->id;  
-                                            }else{
-                                                $found = false;
-                                                foreach ($data_good_receipts as $key => $row_pos) {
-                                                    if ($row_pos["key"] == $data_good_receipt["key"]) {
-                                                        $found = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if (!$found) {
-                                                    $data_good_receipts[]=$data_good_receipt;
-                                                    $data_go_chart[]=$data_good_receipt;
-                                                    $data_link[]=[
-                                                        'from'=>$row_po->code,
-                                                        'to'=>$data_good_receipt["key"],
-                                                    ]; 
-                                                    $data_id_gr[]=$good_receipt_detail->goodReceipt->id; 
-                                                }
-                                            }
+                                            
+                                            $data_go_chart[]=$data_good_receipt;
+                                            $data_link[]=[
+                                                'from'=>$row_po->code,
+                                                'to'=>$data_good_receipt["key"],
+                                                'string_link'=>$row_po->code.$data_good_receipt["key"]
+                                            ];
+                                            $data_id_gr[]=$good_receipt_detail->goodReceipt->id;  
+                                            
                                         }
                                     }
                                 }
                             
                         }
                         /*  melihat apakah ada hubungan grpo tanpa po */
-                        if($row->goodReceipt()){
+                        if($row->goodReceiptDetail()){
         
                             $data_good_receipt=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row->lookable->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row->lookable->goodReceipt->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->goodReceipt->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row->lookable->code,
-                                "name" => $row->lookable->code,
-                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($row->lookable->code),
+                                "key" => $row->lookable->goodReceipt->code,
+                                "name" => $row->lookable->goodReceipt->code,
+                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($row->lookable->goodReceipt->code),
                             ];
-        
-                            if(count($data_good_receipts)<1){
-                                $data_good_receipts[]=$data_good_receipt;
-                                $data_go_chart[]=$data_good_receipt;
-                                $data_link[]=[
-                                    'from'=>$data_good_receipt["key"],
-                                    'to'=>$query_invoice->code,
-                                ];
-                               
-                            }else{
-                                $found = false;
-                                foreach ($data_good_receipts as $key => $row_pos) {
-                                    if ($row_pos["key"] == $data_good_receipt["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_good_receipts[]=$data_good_receipt;
-                                    $data_go_chart[]=$data_good_receipt;
-                                    $data_link[]=[
-                                        'from'=>$data_good_receipt["key"],
-                                        'to'=>$query_invoice->code,
-                                    ]; 
-                                   
-                                }
-                            }
-                            if(!in_array($row->lookable->id, $data_id_gr)){
-                                $data_id_gr[] = $row->lookable->id; 
+
+                            $data_go_chart[]=$data_good_receipt;
+                            $data_link[]=[
+                                'from'=>$data_good_receipt["key"],
+                                'to'=>$query_invoice->code,
+                                'string_link'=>$data_good_receipt["key"].$query_invoice->code,
+                            ];
+                            if(!in_array($row->lookable->goodReceipt->id, $data_id_gr)){
+                                $data_id_gr[] = $row->lookable->goodReceipt->id; 
                                 $added = true;
                             } 
                         }
@@ -1541,32 +1155,15 @@ class FundRequestController extends Controller
                                 "name" => $row->lookable->code,
                                 'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->code),
                             ];
-                            if(count($data_lcs)<1){
-                                $data_lcs[]=$data_lc;
-                                $data_go_chart[]=$data_lc;
-                                $data_link[]=[
-                                    'from'=>$query_invoice->code,
-                                    'to'=>$row->lookable->code,
-                                ];
-                                $data_id_lc = $row->lookable->id;
-                            }else{
-                                $found = false;
-                                foreach ($data_lcs as $key => $row_lc) {
-                                    if ($row_lc["key"] == $data_lc["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_lcs[]=$data_lc;
-                                    $data_go_chart[]=$data_lc;
-                                    $data_link[]=[
-                                        'from'=>$query_invoice->code,
-                                        'to'=>$row->lookable->code,
-                                    ];
-                                    $data_id_lc = $row->lookable->id;
-                                }
-                            }
+
+                            $data_go_chart[]=$data_lc;
+                            $data_link[]=[
+                                'from'=>$query_invoice->code,
+                                'to'=>$row->lookable->code,
+                                'string_link'=>$query_invoice->code.$row->lookable->code,
+                            ];
+                            $data_id_lc[] = $row->lookable->id;
+                            
                         }
                         
                     }
@@ -1581,39 +1178,13 @@ class FundRequestController extends Controller
                                 "name" => $row_pi->purchaseDownPayment->code,
                                 'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
                             ];
-                            $found = false;
-                            foreach($data_purchase_downpayment as $data_dp){
-                                if($data_dp["key"]==$data_down_payment["key"]){
-                                    $found= true;
-                                    break;
-                                }
-
-                            }
-                            if($found){
-                                $data_links=[
-                                    'from'=>$row_pi->purchaseDownPayment->code,
-                                    'to'=>$query_invoice->code,
-                                ];
-                                $found_inlink = false;
-                                foreach($data_link as $key=>$row_link){
-                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                        $found_inlink = true;
-                                        break;
-                                    }
-                                }
-                                if(!$found_inlink){
-                                    $data_link[] = $data_links;
-                                }
-                                
-                            }
-                            if(!$found){
                                 $data_go_chart[]=$data_down_payment;
                                 $data_link[]=[
                                     'from'=>$row_pi->purchaseDownPayment->code,
                                     'to'=>$query_invoice->code,
+                                    'string_link'=>$row_pi->purchaseDownPayment->code.$query_invoice->code,
                                 ];
-                                $data_purchase_downpayment[]=$data_down_payment;
-                            }
+            
                             if($row_pi->purchaseDownPayment->hasPaymentRequestDetail()->exists()){
                                 foreach($row_pi->purchaseDownPayment->hasPaymentRequestDetail as $row_pyr_detail){
                                     $data_pyr_tempura=[
@@ -1625,52 +1196,15 @@ class FundRequestController extends Controller
                                         "name" => $row_pyr_detail->paymentRequest->code,
                                         'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
                                     ];
-
-                                    if(count($data_pyrs)<1){
-                                        $data_pyrs[]=$data_pyr_tempura;
-                                        $data_go_chart[]=$data_pyr_tempura;
-                                        $data_link[]=[
-                                            'from'=>$row_pi->purchaseDownPayment->code,
-                                            'to'=>$row_pyr_detail->paymentRequest->code,
-                                        ]; 
-                                        $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
+                                    $data_go_chart[]=$data_pyr_tempura;
+                                    $data_link[]=[
+                                        'from'=>$row_pi->purchaseDownPayment->code,
+                                        'to'=>$row_pyr_detail->paymentRequest->code,
+                                        'string_link'=>$row_pi->purchaseDownPayment->code.$row_pyr_detail->paymentRequest->code,
+                                    ]; 
+                                    $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
                                         
-                                    }else{
-                                        $found = false;
-                                        foreach ($data_pyrs as $key => $row_pyr) {
-                                            if ($row_pyr["key"] == $data_pyr_tempura["key"]) {
-                                                $found = true;
-                                                break;
-                                            }
-                                        }
-                                     
-                                        if($found){
-                                            $data_links=[
-                                                'from'=>$row_pi->purchaseDownPayment->code,
-                                                'to'=>$row_pyr_detail->paymentRequest->code,
-                                            ]; 
-                                            $found_inlink = false;
-                                            foreach($data_link as $key=>$row_link){
-                                                if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                    $found_inlink = true;
-                                                    break;
-                                                }
-                                            }
-                                            if(!$found_inlink){
-                                                $data_link[] = $data_links;
-                                            }
-                                            
-                                        }
-                                        if (!$found) {
-                                            $data_pyrs[]=$data_pyr_tempura;
-                                            $data_go_chart[]=$data_pyr_tempura;
-                                            $data_link[]=[
-                                                'from'=>$row_pi->purchaseDownPayment->code,
-                                                'to'=>$row_pyr_detail->paymentRequest->code,
-                                            ]; 
-                                            $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;   
-                                        }
-                                    }
+
 
                                     if($row_pyr_detail->fundRequest()){
                                         $data_fund_tempura=[
@@ -1682,51 +1216,13 @@ class FundRequestController extends Controller
                                             "name" => $row_pyr_detail->lookable->code,
                                             'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                         ];
-                                        if(count($data_frs)<1){
-                                            $data_frs[]=$data_fund_tempura;
-                                            $data_go_chart[]=$data_fund_tempura;
-                                            $data_link[]=[
-                                                'from'=>$row_pyr_detail->lookable->code,
-                                                'to'=>$row_pyr_detail->paymentRequest->code,
-                                            ]; 
-                                            $data_id_frs[]= $row_pyr_detail->lookable->id;  
-                                            
-                                        }else{
-                                            $found = false;
-                                            foreach ($data_frs as $key => $row_fundreq) {
-                                                if ($row_fundreq["key"] == $data_fund_tempura["key"]) {
-                                                    $found = true;
-                                                    break;
-                                                }
-                                            }
-                                            
-                                            if($found){
-                                                $data_links=[
-                                                    'from'=>$row_pyr_detail->lookable->code,
-                                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                                ]; 
-                                                $found_inlink = false;
-                                                foreach($data_link as $key=>$row_link){
-                                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                        $found_inlink = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if(!$found_inlink){
-                                                    $data_link[] = $data_links;
-                                                }
-                                                
-                                            }
-                                            if (!$found) {
-                                                $data_frs[]=$data_fund_tempura;
-                                                $data_go_chart[]=$data_fund_tempura;
-                                                $data_link[]=[
-                                                    'from'=>$row_pyr_detail->lookable->code,
-                                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                                ]; 
-                                                $data_id_frs[]= $row_pyr_detail->lookable->id;   
-                                            }
-                                        }
+                                       
+                                        $data_go_chart[]=$data_fund_tempura;
+                                        $data_link[]=[
+                                            'from'=>$row_pyr_detail->lookable->code,
+                                            'to'=>$row_pyr_detail->paymentRequest->code,
+                                            'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                                        ];        
                                         
                                     }
                                     if($row_pyr_detail->purchaseDownPayment()){
@@ -1739,51 +1235,16 @@ class FundRequestController extends Controller
                                             "name" => $row_pyr_detail->lookable->code,
                                             'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                         ];
-                                        if(count($data_purchase_downpayment)<1){
-                                            $data_purchase_downpayment[]=$data_downp_tempura;
-                                            $data_go_chart[]=$data_downp_tempura;
-                                            $data_link[]=[
-                                                'from'=>$row_pyr_detail->lookable->code,
-                                                'to'=>$row_pyr_detail->paymentRequest->code,
-                                            ]; 
-                                            $data_id_dp[]= $row_pyr_detail->lookable->id;  
+                                         
+                                        $data_go_chart[]=$data_downp_tempura;
+                                        $data_link[]=[
+                                            'from'=>$row_pyr_detail->lookable->code,
+                                            'to'=>$row_pyr_detail->paymentRequest->code,
+                                            'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                                        ]; 
+                                        $data_id_dp[]= $row_pyr_detail->lookable->id;  
                                             
-                                        }else{
-                                            $found = false;
-                                            foreach ($data_purchase_downpayment as $key => $row_dp) {
-                                                if ($row_dp["key"] == $data_downp_tempura["key"]) {
-                                                    $found = true;
-                                                    break;
-                                                }
-                                            }
-                                            
-                                            if($found){
-                                                $data_links=[
-                                                    'from'=>$row_pyr_detail->lookable->code,
-                                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                                ]; 
-                                                $found_inlink = false;
-                                                foreach($data_link as $key=>$row_link){
-                                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                        $found_inlink = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if(!$found_inlink){
-                                                    $data_link[] = $data_links;
-                                                }
-                                                
-                                            }
-                                            if (!$found) {
-                                                $data_purchase_downpayment[]=$data_downp_tempura;
-                                                $data_go_chart[]=$data_downp_tempura;
-                                                $data_link[]=[
-                                                    'from'=>$row_pyr_detail->lookable->code,
-                                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                                ]; 
-                                                $data_id_dp[]= $row_pyr_detail->lookable->id;    
-                                            }
-                                        }
+                                        
                                     }
                                     if($row_pyr_detail->purchaseInvoice()){
                                         $data_invoices_tempura = [
@@ -1795,34 +1256,15 @@ class FundRequestController extends Controller
                                             "name" => $row_pyr_detail->lookable->code,
                                             'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                         ];
-                                        if(count($data_invoices)<1){
+                                   
                                                
-                                            $data_go_chart[]=$data_invoices_tempura;
-                                            $data_link[]=[
-                                                'from'=>$row_pyr_detail->lookable->code,
-                                                'to'=>$row_pyr_detail->paymentRequest->code,
-                                            ];
-                                            
-                                            $data_invoices[]=$data_invoices_tempura;
-                                        }else{
-                                            $found = false;
-                                            foreach ($data_invoices as $key => $row_invoice) {
-                                                if ($row_invoice["key"] == $data_invoices_tempura["key"]) {
-                                                    $found = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (!$found) {
-                                               
-                                                $data_go_chart[]=$data_invoices_tempura;
-                                                $data_link[]=[
-                                                   'from'=>$row_pyr_detail->lookable->code,
-                                                   'to'=>$row_pyr_detail->paymentRequest->code,
-                                                ];
-                                            
-                                                $data_invoices[]=$data_invoices_tempura;
-                                            }
-                                        }
+                                        $data_go_chart[]=$data_invoices_tempura;
+                                        $data_link[]=[
+                                            'from'=>$row_pyr_detail->lookable->code,
+                                            'to'=>$row_pyr_detail->paymentRequest->code,
+                                            'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code
+                                        ];
+                                        
                                         if(!in_array($row_pyr_detail->lookable->id, $data_id_invoice)){
                                             $data_id_invoice[] = $row_pyr_detail->lookable->id;
                                             $added=true;
@@ -1844,51 +1286,16 @@ class FundRequestController extends Controller
                                 "name" => $row_pyr_detail->paymentRequest->code,
                                 'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
                             ];
-                            if(count($data_pyrs)<1){
-                                $data_pyrs[]=$data_pyr_tempura;
-                                $data_go_chart[]=$data_pyr_tempura;
-                                $data_link[]=[
-                                    'from'=>$query_invoice->code,
-                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                ]; 
-                                $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
+                            
+                            $data_go_chart[]=$data_pyr_tempura;
+                            $data_link[]=[
+                                'from'=>$query_invoice->code,
+                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                'string_link'=>$query_invoice->code.$row_pyr_detail->paymentRequest->code,
+                            ]; 
+                            $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;  
                                 
-                            }else{
-                                $found = false;
-                                foreach ($data_pyrs as $key => $row_pyr) {
-                                    if ($row_pyr["key"] == $data_pyr_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                             
-                                if($found){
-                                    $data_links=[
-                                        'from'=>$query_invoice->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $found_inlink = false;
-                                    foreach($data_link as $key=>$row_link){
-                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                            $found_inlink = true;
-                                            break;
-                                        }
-                                    }
-                                    if(!$found_inlink){
-                                        $data_link[] = $data_links;
-                                    }
-                                    
-                                }
-                                if (!$found) {
-                                    $data_pyrs[]=$data_pyr_tempura;
-                                    $data_go_chart[]=$data_pyr_tempura;
-                                    $data_link[]=[
-                                        'from'=>$query_invoice->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $data_id_pyrs[]= $row_pyr_detail->paymentRequest->id;   
-                                }
-                            }
+                            
                             if($row_pyr_detail->fundRequest()){
                                 $data_fund_tempura=[
                                     'properties'=> [
@@ -1899,51 +1306,14 @@ class FundRequestController extends Controller
                                     "name" => $row_pyr_detail->lookable->code,
                                     'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                 ];
-                                if(count($data_frs)<1){
-                                    $data_frs[]=$data_fund_tempura;
-                                    $data_go_chart[]=$data_fund_tempura;
-                                    $data_link[]=[
-                                        'from'=>$row_pyr_detail->lookable->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $data_id_frs[]= $row_pyr_detail->lookable->id;  
-                                    
-                                }else{
-                                    $found = false;
-                                    foreach ($data_frs as $key => $row_fundreq) {
-                                        if ($row_fundreq["key"] == $data_fund_tempura["key"]) {
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if($found){
-                                        $data_links=[
-                                            'from'=>$row_pyr_detail->lookable->code,
-                                            'to'=>$row_pyr_detail->paymentRequest->code,
-                                        ]; 
-                                        $found_inlink = false;
-                                        foreach($data_link as $key=>$row_link){
-                                            if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                $found_inlink = true;
-                                                break;
-                                            }
-                                        }
-                                        if(!$found_inlink){
-                                            $data_link[] = $data_links;
-                                        }
-                                        
-                                    }
-                                    if (!$found) {
-                                        $data_frs[]=$data_fund_tempura;
-                                        $data_go_chart[]=$data_fund_tempura;
-                                        $data_link[]=[
-                                            'from'=>$row_pyr_detail->lookable->code,
-                                            'to'=>$row_pyr_detail->paymentRequest->code,
-                                        ]; 
-                                        $data_id_frs[]= $row_pyr_detail->lookable->id;   
-                                    }
-                                }
+                             
+                                
+                                $data_go_chart[]=$data_fund_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code
+                                ];             
                                 
                             }
                             if($row_pyr_detail->purchaseDownPayment()){
@@ -1956,51 +1326,16 @@ class FundRequestController extends Controller
                                     "name" => $row_pyr_detail->lookable->code,
                                     'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                 ];
-                                if(count($data_purchase_downpayment)<1){
-                                    $data_purchase_downpayment[]=$data_downp_tempura;
-                                    $data_go_chart[]=$data_downp_tempura;
-                                    $data_link[]=[
-                                        'from'=>$row_pyr_detail->lookable->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $data_id_dp[]= $row_pyr_detail->lookable->id;  
+
+                                $data_go_chart[]=$data_downp_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                                ]; 
+                                $data_id_dp[]= $row_pyr_detail->lookable->id;  
                                     
-                                }else{
-                                    $found = false;
-                                    foreach ($data_purchase_downpayment as $key => $row_dp) {
-                                        if ($row_dp["key"] == $data_downp_tempura["key"]) {
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if($found){
-                                        $data_links=[
-                                            'from'=>$row_pyr_detail->lookable->code,
-                                            'to'=>$row_pyr_detail->paymentRequest->code,
-                                        ]; 
-                                        $found_inlink = false;
-                                        foreach($data_link as $key=>$row_link){
-                                            if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                $found_inlink = true;
-                                                break;
-                                            }
-                                        }
-                                        if(!$found_inlink){
-                                            $data_link[] = $data_links;
-                                        }
-                                        
-                                    }
-                                    if (!$found) {
-                                        $data_purchase_downpayment[]=$data_downp_tempura;
-                                        $data_go_chart[]=$data_downp_tempura;
-                                        $data_link[]=[
-                                            'from'=>$row_pyr_detail->lookable->code,
-                                            'to'=>$row_pyr_detail->paymentRequest->code,
-                                        ]; 
-                                        $data_id_dp[]= $row_pyr_detail->lookable->id;    
-                                    }
-                                }
+                                
                             }
                             if($row_pyr_detail->purchaseInvoice()){
                                 $data_invoices_tempura = [
@@ -2012,34 +1347,15 @@ class FundRequestController extends Controller
                                     "name" => $row_pyr_detail->lookable->code,
                                     'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                                 ];
-                                if(count($data_invoices)<1){
+                                
                                        
-                                    $data_go_chart[]=$data_invoices_tempura;
-                                    $data_link[]=[
-                                        'from'=>$row_pyr_detail->lookable->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ];
-                                    
-                                    $data_invoices[]=$data_invoices_tempura;
-                                }else{
-                                    $found = false;
-                                    foreach ($data_invoices as $key => $row_invoice) {
-                                        if ($row_invoice["key"] == $data_invoices_tempura["key"]) {
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!$found) {
-                                       
-                                        $data_go_chart[]=$data_invoices_tempura;
-                                        $data_link[]=[
-                                           'from'=>$row_pyr_detail->lookable->code,
-                                           'to'=>$row_pyr_detail->paymentRequest->code,
-                                        ];
-                                    
-                                        $data_invoices[]=$data_invoices_tempura;
-                                    }
-                                }
+                                $data_go_chart[]=$data_invoices_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_detail->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                                ];
+                                
                                 if(!in_array($row_pyr_detail->lookable->id, $data_id_invoice)){
                                     $data_id_invoice[] = $row_pyr_detail->lookable->id;
                                     $added=true;
@@ -2062,45 +1378,14 @@ class FundRequestController extends Controller
                             "name" => $query_pyr->outgoingPayment->code,
                             'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
                         ];
-                        if(count($data_outgoingpayments) < 1){
-                            $data_outgoingpayments[]=$outgoing_payment;
-                            $data_go_chart[]=$outgoing_payment;
-                            $data_link[]=[
-                                'from'=>$query_pyr->code,
-                                'to'=>$query_pyr->outgoingPayment->code,
-                            ]; 
-                        }else{
-                            $found = false;
-                            foreach($data_outgoingpayments as $row_op){
-                                if($outgoing_payment["key"]== $row_op["key"]){
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                            if($found){
-                                $data_links=[
-                                    'from'=>$query_pyr->code,
-                                    'to'=>$query_pyr->outgoingPayment->code, 
-                                ];
-                                foreach($data_link as $key=>$row_link){
-                                    if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                        $found_inlink = true;
-                                        break;
-                                    }
-                                }
-                                if(!$found_inlink){
-                                    $data_link[] = $data_links;
-                                }
-                            }
-                            if(!$found){
-                                $data_outgoingpayments[]=$outgoing_payment;
-                                $data_go_chart[]=$outgoing_payment;
-                                $data_link[]=[
-                                    'from'=>$query_pyr->code,
-                                    'to'=>$query_pyr->outgoingPayment->code,
-                                ]; 
-                            }
-                        }
+
+                        $data_go_chart[]=$outgoing_payment;
+                        $data_link[]=[
+                            'from'=>$query_pyr->code,
+                            'to'=>$query_pyr->outgoingPayment->code,
+                            'string_link'=>$query_pyr->code.$query_pyr->outgoingPayment->code,
+                        ]; 
+                        
                     }
                     
                     foreach($query_pyr->paymentRequestDetail as $row_pyr_detail){
@@ -2125,51 +1410,14 @@ class FundRequestController extends Controller
                                 "name" => $row_pyr_detail->lookable->code,
                                 'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                             ];
-                            if(count($data_frs)<1){
-                                $data_frs[]=$data_fund_tempura;
+                           
+                               
                                 $data_go_chart[]=$data_fund_tempura;
                                 $data_link[]=[
                                     'from'=>$row_pyr_detail->lookable->code,
                                     'to'=>$row_pyr_detail->paymentRequest->code,
-                                ]; 
-                                $data_id_frs[]= $row_pyr_detail->lookable->id;  
-                                
-                            }else{
-                                $found = false;
-                                foreach ($data_frs as $key => $row_fundreq) {
-                                    if ($row_fundreq["key"] == $data_fund_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                
-                                if($found){
-                                    $data_links=[
-                                        'from'=>$row_pyr_detail->lookable->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $found_inlink = false;
-                                    foreach($data_link as $key=>$row_link){
-                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                            $found_inlink = true;
-                                            break;
-                                        }
-                                    }
-                                    if(!$found_inlink){
-                                        $data_link[] = $data_links;
-                                    }
-                                    
-                                }
-                                if (!$found) {
-                                    $data_frs[]=$data_fund_tempura;
-                                    $data_go_chart[]=$data_fund_tempura;
-                                    $data_link[]=[
-                                        'from'=>$row_pyr_detail->lookable->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $data_id_frs[]= $row_pyr_detail->lookable->id;   
-                                }
-                            }
+                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                                ];
                             
                         }
                         if($row_pyr_detail->purchaseDownPayment()){
@@ -2181,66 +1429,19 @@ class FundRequestController extends Controller
                                 "key" => $row_pyr_detail->lookable->code,
                                 "name" => $row_pyr_detail->lookable->code,
                                 'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
-                            ];
-                            if(count($data_purchase_downpayment)<1){
-                                
-                                $data_purchase_downpayment[]=$data_downp_tempura;
-                                $data_go_chart[]=$data_downp_tempura;
-                                $data_link[]=[
-                                    'from'=>$row_pyr_detail->lookable->code,
-                                    'to'=>$row_pyr_detail->paymentRequest->code,
-                                ]; 
-                                
-                                
-                            }else{
-                                $found = false;
-                                foreach ($data_purchase_downpayment as $key => $row_dp) {
-                                    if ($row_dp["key"] == $data_downp_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                
-                                if($found){
-                                    
-                                    $data_links=[
-                                        'from'=>$row_pyr_detail->lookable->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    $found_inlink = false;
-                                    foreach($data_link as $key=>$row_link){
-                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                            $found_inlink = true;
-                                            break;
-                                        }
-                                    }
-                                    if(!$found_inlink){
-                                        $data_link[] = $data_links;
-                                    }
-                                    
-                                }
-                                if (!$found) {
-                                    $data_purchase_downpayment[]=$data_downp_tempura;
-                                    $data_go_chart[]=$data_downp_tempura;
-                                    $data_link[]=[
-                                        'from'=>$row_pyr_detail->lookable->code,
-                                        'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ]; 
-                                    
-                                }
-                                if(count($data_id_dp)<1){
-                                    $data_id_dp[] = $row_pyr_detail->lookable->id;
-                                    $added = true;
-                                    
-                                }
-                                
-                                
-                            }
+                            ];       
+                            
+                            $data_go_chart[]=$data_downp_tempura;
+                            $data_link[]=[
+                                'from'=>$row_pyr_detail->lookable->code,
+                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                            ]; 
+                            
                             if(!in_array($row_pyr_detail->lookable->id, $data_id_dp)){
                                 $data_id_dp[] = $row_pyr_detail->lookable->id;
                                 $added = true; 
                                
-                            }else{
                             }
                         }
                         if($row_pyr_detail->purchaseInvoice()){
@@ -2253,34 +1454,15 @@ class FundRequestController extends Controller
                                 "name" => $row_pyr_detail->lookable->code,
                                 'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
                             ];
-                            if(count($data_invoices)<1){
+                          
                                    
                                 $data_go_chart[]=$data_invoices_tempura;
                                 $data_link[]=[
                                     'from'=>$row_pyr_detail->lookable->code,
                                     'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
                                 ];
-                                
-                                $data_invoices[]=$data_invoices_tempura;
-                            }else{
-                                $found = false;
-                                foreach ($data_invoices as $key => $row_invoice) {
-                                    if ($row_invoice["key"] == $data_invoices_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                   
-                                    $data_go_chart[]=$data_invoices_tempura;
-                                    $data_link[]=[
-                                       'from'=>$row_pyr_detail->lookable->code,
-                                       'to'=>$row_pyr_detail->paymentRequest->code,
-                                    ];
-                                
-                                    $data_invoices[]=$data_invoices_tempura;
-                                }
-                            }
+                            
                             if(!in_array($row_pyr_detail->lookable->id, $data_id_invoice)){
                                 $data_id_invoice[] = $row_pyr_detail->lookable->id;
                                 $added=true;
@@ -2303,35 +1485,17 @@ class FundRequestController extends Controller
                                 ],
                                 'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),
                             ];
-                            if(count($data_pos)<1){
-                                $data_go_chart[]=$po;
-                                $data_link[]=[
-                                    'from'=>$row->purchaseOrder->code,
-                                    'to'=>$query_dp->code,
-                                ];
-                                $data_pos[]=$po;
+                          
+                            $data_go_chart[]=$po;
+                            $data_link[]=[
+                                'from'=>$row->purchaseOrder->code,
+                                'to'=>$query_dp->code,
+                                'string_link'=>$row->purchaseOrder->code.$query_dp->code,
+                            ];
+                            
+                            $data_id_po []=$row->purchaseOrder->id; 
                                 
-                                $data_id_po []=$row->purchaseOrder->id; 
-                                
-                            }else{
-                                $found = false;
-                                foreach ($data_pos as $key => $row_pos) {
-                                    if ($row_pos["key"] == $po["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_go_chart[]=$po;
-                                    $data_link[]=[
-                                        'from'=>$row->purchaseOrder->code,
-                                        'to'=>$query_dp->code,
-                                    ];
-                                    $data_pos[]=$po;
-                                
-                                    $data_id_po []=$row->purchaseOrder->id;
-                                }
-                            }
+                            
                            
                             
                             
@@ -2349,31 +1513,15 @@ class FundRequestController extends Controller
                                          ],
                                         'url'=>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($po_detail->purchaseRequestDetail->purchaseRequest->code),
                                     ];
-                                    if(count($data_purchase_requests)<1){
-                                        $data_purchase_requests[]=$pr;
-                                        $data_go_chart[]=$pr;
-                                        $data_link[]=[
-                                            'from'=>$po_detail->purchaseRequestDetail->purchaseRequest->code,
-                                            'to'=>$row->purchaseOrder->code,
-                                        ]; 
+                                    $data_go_chart[]=$pr;
+                                    $data_link[]=[
+                                        'from'=>$po_detail->purchaseRequestDetail->purchaseRequest->code,
+                                        'to'=>$row->purchaseOrder->code,
+                                        'string_link'=>$po_detail->purchaseRequestDetail->purchaseRequest->code.$row->purchaseOrder->code
+                                    ];
+                                    $data_id_pr[]=$po_detail->purchaseRequestDetail->purchaseRequest->id;
                                         
-                                    }else{
-                                        $found = false;
-                                        foreach ($data_purchase_requests as $key => $row_pos) {
-                                            if ($row_pos["key"] == $pr["key"]) {
-                                                $found = true;
-                                                break;
-                                            }
-                                        }
-                                        if (!$found) {
-                                            $data_purchase_requests[]=$pr;
-                                            $data_go_chart[]=$pr;
-                                            $data_link[]=[
-                                                'from'=>$po_detail->purchaseRequestDetail->purchaseRequest->code,
-                                                'to'=>$row->purchaseOrder->code,
-                                            ]; 
-                                        }
-                                    }
+                                    
                                 }
                                 /* mendapatkan gr po */
                                 if($po_detail->goodReceiptDetail()->exists()){
@@ -2388,35 +1536,15 @@ class FundRequestController extends Controller
                                             "name" => $good_receipt_detail->goodReceipt->code,
                                             'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code),  
                                         ];
-                    
-                                        if(count($data_good_receipts)<1){
-                                            
-                                            $data_good_receipts[]=$data_good_receipt;
-                                            $data_go_chart[]=$data_good_receipt;
-                                            $data_link[]=[
-                                                'from'=>$row->purchaseOrder->code,
-                                                'to'=>$data_good_receipt["key"],
-                                            ];
-                                           
-                                        }else{
-                                            $found = false;
-                                            foreach ($data_good_receipts as $key => $row_pos) {
-                                                if ($row_pos["key"] == $data_good_receipt["key"]) {
-                                                    $found = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (!$found) {
-                                                $data_good_receipts[]=$data_good_receipt;
-                                                $data_go_chart[]=$data_good_receipt;
-                                                $data_link[]=[
-                                                    'from'=>$row->purchaseOrder->code,
-                                                    'to'=>$data_good_receipt["key"],
-                                                ];
-                                                
                                                
-                                            }
-                                        }
+                                        $data_go_chart[]=$data_good_receipt;
+                                        $data_link[]=[
+                                            'from'=>$row->purchaseOrder->code,
+                                            'to'=>$data_good_receipt["key"],
+                                            'string_link'=>$row->purchaseOrder->code.$data_good_receipt["key"],
+                                        ];
+                                           
+                                        
                                         if(!in_array($good_receipt_detail->goodReceipt->id, $data_id_gr)){
                                             $data_id_gr[] = $good_receipt_detail->goodReceipt->id;
                                             $added = true;
@@ -2442,34 +1570,15 @@ class FundRequestController extends Controller
                                 ],
                             'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoicedp->purchaseInvoice->code),           
                         ];
-                        if(count($data_invoices)<1){
+                        
                            
-                            $data_go_chart[]=$invoice_tempura;
-                            $data_link[]=[
-                                'from'=>$query_dp->code,
-                                'to'=>$purchase_invoicedp->purchaseInvoice->code,
-                            ];
-                            
-                            $data_invoices[]=$invoice_tempura;
-                        }else{
-                            $found = false;
-                            foreach ($data_invoices as $key => $row_invoice) {
-                                if ($row_invoice["key"] == $invoice_tempura["key"]) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                            if (!$found) {
-                               
-                                $data_go_chart[]=$invoice_tempura;
-                                $data_link[]=[
-                                    'from'=>$query_dp->code,
-                                    'to'=>$purchase_invoicedp->purchaseInvoice->code,
-                                ];
-                                
-                                $data_invoices[]=$invoice_tempura;
-                            }
-                        }
+                        $data_go_chart[]=$invoice_tempura;
+                        $data_link[]=[
+                            'from'=>$query_dp->code,
+                            'to'=>$purchase_invoicedp->purchaseInvoice->code,
+                            'string_link'=>$query_dp->code.$purchase_invoicedp->purchaseInvoice->code,
+                        ];
+                        
                         if(!in_array($purchase_invoicedp->purchaseInvoice->id, $data_id_invoice)){
                             
                             $data_id_invoice[] = $purchase_invoicedp->purchaseInvoice->id;
@@ -2492,34 +1601,15 @@ class FundRequestController extends Controller
                                  ],
                                 'url'=>request()->root()."/admin/purchase/good_receipt?code=".CustomHelper::encrypt($lc_detail->lookable->goodReceipt->code),
                             ];
-                            if(count($data_good_receipts)<1){
-                                            
-                                $data_good_receipts[]=$data_good_receipt;
-                                $data_go_chart[]=$data_good_receipt;
-                                $data_link[]=[
-                                    'from'=>$data_good_receipt["key"],
-                                    'to'=>$query->code,
-                                ];
+                            
+                            $data_go_chart[]=$data_good_receipt;
+                            $data_link[]=[
+                                'from'=>$data_good_receipt["key"],
+                                'to'=>$query->code,
+                                'string_link'=>$data_good_receipt["key"].$query->code,
+                            ];
                                
-                            }else{
-                                $found = false;
-                                foreach ($data_good_receipts as $key => $row_pos) {
-                                    if ($row_pos["key"] == $data_good_receipt["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_good_receipts[]=$data_good_receipt;
-                                    $data_go_chart[]=$data_good_receipt;
-                                    $data_link[]=[
-                                        'from'=>$data_good_receipt["key"],
-                                        'to'=>$query->code,
-                                    ];
-                                    
-                                   
-                                }
-                            }
+                            
                             if(!in_array($lc_detail->lookable->goodReceipt->id, $data_id_gr)){
                                 $data_id_gr[] = $lc_detail->lookable->goodReceipt->id;
                                 $added = true;
@@ -2536,54 +1626,15 @@ class FundRequestController extends Controller
                                  ],
                                 'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
                             ];
-                            if(count($data_lcs)<1){
-                                $data_lcs[]=$lc_other;
-                                $data_go_chart[]=$lc_other;
-                                $data_link[]=[
-                                    'from'=>$query->code,
-                                    'to'=>$lc_detail->lookable->landedCost->code,
-                                ];
-                                $data_id_lc = $lc_detail->lookable->landedCost->id;
-                            }else{
-                                $found = false;
-                                foreach ($data_lcs as $key => $lc_other) {
-                                    if ($lc_other["key"] == $data_lc["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    $data_lcs[]=$lc_other;
-                                    $data_go_chart[]=$lc_other;
-                                    $data_link[]=[
-                                        'from'=>$query->code,
-                                        'to'=>$lc_detail->lookable->landedCost->code,
-                                    ];
-                                    $data_id_lc = $row->lookable->id;
-                                }elseif($found){
-                                    $data_links=[
-                                        'from'=>$query->code,
-                                        'to'=>$lc_detail->lookable->landedCost->code,
-                                    ];  
-                                    $found_inlink = false;
-                                    foreach($data_link as $key=>$row_link){
-                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                            $found_inlink = true;
-                                            break;
-                                        }
-                                    }
-                                    if(!$found_inlink){
-                                        $data_link[] = $data_links;
-                                    }
-                                }
-                            }
+
                             $data_go_chart[]=$lc_other;
-                            $data_lcs[]=$lc_other;
                             $data_link[]=[
-                                'from'=>$lc_detail->lookable->landedCost->code,
-                                'to'=>$query->code,
+                                'from'=>$query->code,
+                                'to'=>$lc_detail->lookable->landedCost->code,
+                                'string_link'=>$query->code.$lc_detail->lookable->landedCost->code,
                             ];
-                            $data_id_lc[]=$lc_detail->lookable->landedCost->id;
+                            $data_id_lc[] = $lc_detail->lookable->landedCost->id;
+                                              
                         }
                     }
                 }
@@ -2606,48 +1657,15 @@ class FundRequestController extends Controller
                                 ],
                                 'url'   =>request()->root()."/admin/purchase/purchase_request?code=".CustomHelper::encrypt($purchase_order_detail->purchaseRequestDetail->purchaseRequest->code),
                             ];
-                            if($data_purchase_requests < 1){
-                                $data_purchase_requests[]=$pr_tempura;
-                                $data_go_chart[]=$pr_tempura;
-                                $data_link[]=[
-                                    'from'=>$purchase_order_detail->purchaseRequestDetail->purchaseRequest->code,
-                                    'to'=>$query_po->code,
-                                ];
-                            }else{
-                                $found = false;
-                                foreach ($data_purchase_requests as $key => $row_pr) {
-                                    if ($row_pr["key"] == $pr_tempura["key"]) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                //pr yang memiliki request yang sama
-                                if($found){
-                                    $data_links=[
-                                        'from'=>$purchase_order_detail->purchaseRequestDetail->purchaseRequest->code,
-                                        'to'=>$query_po->code,
-                                    ];  
-                                    $found_inlink = false;
-                                    foreach($data_link as $key=>$row_link){
-                                        if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                            $found_inlink = true;
-                                            break;
-                                        }
-                                    }
-                                    if(!$found_inlink){
-                                        $data_link[] = $data_links;
-                                    }
-                                    
-                                }
-                                if (!$found) {
-                                    $data_purchase_requests[]=$pr_tempura;
-                                    $data_go_chart[]=$pr_tempura;
-                                    $data_link[]=[
-                                        'from'=>$purchase_order_detail->purchaseRequestDetail->purchaseRequest->code,
-                                        'to'=>$query_po->code,
-                                    ];
-                                }
-                            }
+                    
+                            $data_go_chart[]=$pr_tempura;
+                            $data_link[]=[
+                                'from'=>$purchase_order_detail->purchaseRequestDetail->purchaseRequest->code,
+                                'to'=>$query_po->code,
+                                'string_link'=>$purchase_order_detail->purchaseRequestDetail->purchaseRequest->code.$query_po->code,
+                            ];
+                            $data_id_pr[]=$purchase_order_detail->purchaseRequestDetail->purchaseRequest->id;
+                            
                         }
                         if($purchase_order_detail->goodReceiptDetail()->exists()){
                             foreach($purchase_order_detail->goodReceiptDetail as $good_receipt_detail){
@@ -2662,49 +1680,15 @@ class FundRequestController extends Controller
                                     'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code),
                                     
                                 ];
-                                if(count($data_good_receipts)<1){
-                                    $data_good_receipts[]=$data_good_receipt;
-                                    $data_link[]=[
-                                        'from'=>$purchase_order_detail->purchaseOrder->code,
-                                        'to'=>$data_good_receipt["key"],
-                                    ];
-                                   
-                                    $data_go_chart[]=$data_good_receipt;  
-                                }else{
-                                    $found = false;
-                                    foreach($data_good_receipts as $tempdg){
-                                        if ($tempdg["key"] == $data_good_receipt["key"]) {
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                    if($found){
-                                        $data_links=[
-                                            'from'=>$purchase_order_detail->purchaseOrder->code,
-                                            'to'=>$data_good_receipt["key"],
-                                        ];  
-                                        $found_inlink = false;
-                                        foreach($data_link as $key=>$row_link){
-                                            if ($row_link["from"] == $data_links["from"]&&$row_link["to"] == $data_links["to"]) {
-                                                $found_inlink = true;
-                                                break;
-                                            }
-                                        }
-                                        if(!$found_inlink){
-                                            $data_link[] = $data_links;
-                                        }
-                                        
-                                    }
-                                    if (!$found) {
-                                        $data_good_receipts[]=$data_good_receipt;
-                                        $data_link[]=[
-                                            'from'=>$purchase_order_detail->purchaseOrder->code,
-                                            'to'=>$data_good_receipt["key"],
-                                        ];  
-                                       
-                                        $data_go_chart[]=$data_good_receipt; 
-                                    }
-                                }
+                                
+                                $data_link[]=[
+                                    'from'=>$purchase_order_detail->purchaseOrder->code,
+                                    'to'=>$data_good_receipt["key"],
+                                    'string_link'=>$purchase_order_detail->purchaseOrder->code.$data_good_receipt["key"],
+                                ];
+                                
+                                $data_go_chart[]=$data_good_receipt;  
+                                
                                 if(!in_array($good_receipt_detail->goodReceipt->id, $data_id_gr)){
                                     $data_id_gr[] = $good_receipt_detail->goodReceipt->id;
                                     $added = true;
@@ -2714,12 +1698,62 @@ class FundRequestController extends Controller
                     }
 
                 }
-            }  
+
+                foreach($data_id_pr as $pr_id){
+                    $query_pr = PurchaseRequest::find($pr_id);
+                    info($query_pr);
+                    foreach($query_pr->purchaseRequestDetail as $purchase_request_detail){
+                        if($purchase_request_detail->purchaseOrderDetail()->exists()){
+                        
+                            foreach($purchase_request_detail->purchaseOrderDetail as $purchase_order_detail){
+                                $po_tempura = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal : ".$purchase_order_detail->purchaseOrder->post_date],
+                                        ['name'=> "Vendor  : ".$purchase_order_detail->purchaseOrder->supplier->name],
+                                     ],
+                                    'key'=>$purchase_order_detail->purchaseOrder->code,
+                                    'name'=>$purchase_order_detail->purchaseOrder->code,
+                                    'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($purchase_order_detail->purchaseOrder->code),
+                                ];
+    
+                                $data_go_chart[]=$po_tempura;
+                                $data_link[]=[
+                                    'from'=>$query_pr->code,
+                                    'to'=>$purchase_order_detail->purchaseOrder->code,
+                                    'string_link'=>$query_pr->code.$purchase_order_detail->purchaseOrder->code,
+                                ];
+                                if(!in_array($purchase_order_detail->purchaseOrder->id,$data_id_po)){
+                                    $data_id_po[] = $purchase_order_detail->purchaseOrder->id;
+                                    $added = true;
+                                }
+                            }                     
+                           
+                        }
+                    }
+                }
+            } 
+            function unique_key($array,$keyname){
+
+                $new_array = array();
+                foreach($array as $key=>$value){
+                
+                    if(!isset($new_array[$value[$keyname]])){
+                    $new_array[$value[$keyname]] = $value;
+                    }
+                
+                }
+                $new_array = array_values($new_array);
+                return $new_array;
+            }
+
+           
+            $data_go_chart = unique_key($data_go_chart,'name');
+            $data_link=unique_key($data_link,'string_link');
 
             $response = [
                 'status'  => 200,
                 'message' => $data_go_chart,
-                'link'    => $data_link,
+                'link'    => $data_link
             ];
             
         } else {

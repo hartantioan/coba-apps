@@ -221,6 +221,59 @@
     </div>
 </div>
 
+<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row" >
+            <div class="col m3 s12">
+                
+            </div>
+            <div class="col m6 s12">
+                <h4 id="title_data" style="text-align:center"></h4>
+                <h5 id="code_data" style="text-align:center"></h5>
+            </div>
+            <div class="col m3 s12 right-align">
+                <img src="{{ url('website/logo_web_fix.png') }}" width="40%" height="60%">
+            </div>
+        </div>
+        <div class="divider mb-1 mt-2"></div>
+        <div class="row">
+            <div class="col" id="user_jurnal">
+            </div>
+            <div class="col" id="post_date_jurnal">
+            </div>
+            <div class="col" id="note_jurnal">
+            </div>
+            <div class="col" id="ref_jurnal">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <table class="bordered Highlight striped">
+                <thead>
+                        <tr>
+                            <th class="center-align">No</th>
+                            <th class="center-align">Coa</th>
+                            <th class="center-align">Perusahaan</th>
+                            <th class="center-align">Bisnis Partner</th>
+                            <th class="center-align">Plant</th>
+                            <th class="center-align">Mesin</th>
+                            <th class="center-align">Item</th>
+                            <th class="center-align">Department</th>
+                            <th class="center-align">Gudang</th>
+                            <th class="center-align">Debit</th>
+                            <th class="center-align">Kredit</th>
+                        </tr>
+                    
+                </thead>
+                <tbody id="body-journal-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -281,6 +334,23 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_print').html('');
+            }
+        });
+
+        $('#modal6').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#title_data').empty();
+                $('#code_data').empty();             
+                $('#body-journal-table').empty();
+                $('#user_jurnal').empty();
+                $('#note_jurnal').empty();
+                $('#ref_jurnal').empty();
+                $('#post_date_jurnal').empty();
             }
         });
         
@@ -758,6 +828,35 @@
                 loadingClose('.modal-content');
                 $('#modal2').modal('open');
                 $('#show_print').html(data);
+            }
+        });
+    }
+
+    function viewJournal(id){
+        $.ajax({
+            url: '{{ Request::url() }}/view_journal/' + id,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                $('#modal6').modal('open');
+                $('#title_data').append(``+data.title+``);
+                $('#code_data').append(data.message.code);
+                $('#body-journal-table').append(data.tbody);
+                $('#user_jurnal').append(`Pengguna `+data.user);
+                $('#note_jurnal').append(`Keterangan `+data.message.note);
+                $('#ref_jurnal').append(`Referensi `+data.reference);
+                $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                
+                
+
+
+                console.log(data);
             }
         });
     }

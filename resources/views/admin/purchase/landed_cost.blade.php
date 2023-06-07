@@ -704,6 +704,11 @@
             }
         });
 
+        $('#datatable_serverside').on('click', 'button', function(event) {
+            event.stopPropagation();
+            
+        });
+
         loadDataTable();
         
         window.table.search('{{ $code }}').draw();

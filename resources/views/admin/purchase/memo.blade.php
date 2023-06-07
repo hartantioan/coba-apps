@@ -1451,10 +1451,6 @@
                 $('#ref_jurnal').append(`Referensi `+data.reference);
                 $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
                 
-                
-
-
-                console.log(data);
             }
         });
     }

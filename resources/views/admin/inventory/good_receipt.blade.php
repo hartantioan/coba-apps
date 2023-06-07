@@ -269,6 +269,81 @@
     </div>
 </div>
 
+<div id="modal5" class="modal modal-fixed-footer" style="height: 70% !important;width:50%">
+    <div class="modal-header ml-6 mt-2">
+        <h6>Range Printing</h6>
+    </div>
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <form class="row" id="form_data_print_multi" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_multi" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <ul class="tabs">
+                            <li class="tab">
+                                <a href="#range-tabs" class="" id="part-tabs-btn">
+                                <span>By No</span>
+                                </a>
+                            </li>
+                            <li class="tab">
+                                <a href="#date-tabs" class="">
+                                <span>By Date</span>
+                                </a>
+                            </li>
+                            <li class="indicator" style="left: 0px; right: 0px;"></li>
+                        </ul>
+                        <div id="range-tabs" style="display: block;" class="">                           
+                            <div class="row ml-2 mt-2">
+                                <div class="row">
+                                    <div class="input-field col m4 s12">
+                                        <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
+                                        <label class="" for="range_end">No Awal</label>
+                                    </div>
+                                    
+                                    <div class="input-field col m4 s12">
+                                        <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
+                                        <label class="active" for="range_end">No akhir</label>
+                                    </div>
+                                    <div class="input-field col m4 s12">
+                                        <label>
+                                            <input name="type_date" type="radio" checked value="1"/>
+                                            <span>Dengan range biasa</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                <div class="input-field col m8 s12">
+                                    <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
+                                    <label class="" for="range_end">Masukkan angka dengan koma</label>
+                                </div>
+                               
+                                <div class="input-field col m4 s12">
+                                    <label>
+                                        <input name="type_date" type="radio" value="2"/>
+                                        <span>Dengan Range koma</span>
+                                    </label>
+                                </div>
+                                </div>
+                                <div class="col s12 mt-3">
+                                    <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
+                                </div>
+                            </div>                         
+                        </div>
+                        <div id="date-tabs" style="display: none;" class="">
+                            
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+    </div>
+</div>
+
 <div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content row">
         <div class="col s12" id="show_structure">
@@ -341,6 +416,12 @@
     </a>
 </div>
 
+<div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
+        <i class="material-icons">view_comfy</i>
+    </a>
+</div>
+
 <!-- END: Page Main-->
 <script>
     $(function() {
@@ -368,6 +449,11 @@
                 badge.first().addClass('red');
                 icon.first().html('remove');
             }
+        });
+
+        $('#datatable_serverside').on('click', 'button', function(event) {
+            event.stopPropagation();
+            
         });
         
         loadDataTable();
@@ -428,6 +514,23 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_print').html('');
+            }
+        });
+
+        $('#modal5').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert_multi').hide();
+                $('#validation_alert_multi').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#temp').val('');
+                
             }
         });
 
@@ -627,8 +730,7 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                console.log("");
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -790,8 +892,17 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
-            ]
+                'columnsToggle',
+                'selectNone' 
+            ],
+            language: {
+                buttons: {
+                    selectNone: "Hapus pilihan"
+                }
+            },
+            select: {
+                style: 'multi'
+            },
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
 
@@ -1290,26 +1401,147 @@
         });
     }
 
+    var printService = new WebSocketPrinter({
+        onConnect: function () {
+            
+        },
+        onDisconnect: function () {
+           
+        },
+        onUpdate: function (message) {
+            
+        },
+    });
+    
     function printData(){
-        var search = window.table.search();
-        var status = $('#filter_status').val();
-        
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
+        arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(5)').text().trim();
+            arr_id_temp.push(poin);
+            
+        });
         $.ajax({
-            type : "POST",
-            url  : '{{ Request::url() }}/print',
-            data : {
-                search : search,
-                status : status,
+            url: '{{ Request::url() }}/print',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                arr_id: arr_id_temp,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            cache: false,
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': response.message
+                })
+                
+               
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function printMultiSelect(){
+        var formData = new FormData($('#form_data_print_multi')[0]);
+        console.log(formData);
+        $.ajax({
+            url: '{{ Request::url() }}/print_by_range',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert_multi').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    $('#modal5').modal('close');
+                   /*  printService.submit({
+                        'type': 'INVOICE',
+                        'url': response.message
+                    }) */
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alert_multi').show();
+                    $('.modal-content').scrollTop(0);
+                    console.log(response.error);
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+                    
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert_multi').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+            
+        });
+    }
+
+    function printPreview(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
             success: function(data){
-                var w = window.open('about:blank');
-                w.document.open();
-                w.document.write(data);
-                w.document.close();
+                loadingClose('.modal-content');
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': data
+                })
             }
         });
     }

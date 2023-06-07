@@ -360,7 +360,7 @@
     }
 
     function takeSparepart(count){
-        console.log("kambing");
+
         $('#arr_item'+count).empty();
         $('#arr_item' + count).append(`
             <option>Silahkan pilih sparepart</option>

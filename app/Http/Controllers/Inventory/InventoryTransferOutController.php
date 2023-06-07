@@ -175,7 +175,7 @@ class InventoryTransferOutController extends Controller
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
                 }
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
                     $val->code,
                     $val->user->name,
                     $val->company->name,
@@ -592,7 +592,7 @@ class InventoryTransferOutController extends Controller
                 ->performedOn(new InventoryTransferOut())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the inventory transfer data');
+                ->log('Delete the inventory transfer out data');
 
             $response = [
                 'status'  => 200,

@@ -2,12 +2,12 @@
 
 namespace App\Exports;
 
-use App\Models\InventoryTransferOut;
+use App\Models\InventoryTransferIn;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Database\Eloquent\Builder;
 
-class ExportInventoryTransferOut implements FromView
+class ExportInventoryTransferIn implements FromView
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -23,22 +23,12 @@ class ExportInventoryTransferOut implements FromView
 
     public function view(): View
     {
-        return view('admin.exports.inventory_transfer_out', [
-            'data' => InventoryTransferOut::where(function($query) {
+        return view('admin.exports.inventory_transfer_in', [
+            'data' => InventoryTransferIn::where(function($query) {
                 if($this->search) {
                     $query->where(function($query) {
                         $query->where('code', 'like', "%$this->search%")
-                            ->orWhere('note', 'like', "%$this->search%")
-                            ->orWhereHas('inventoryTransferOutDetail', function($query){
-                                $query->whereHas('item',function($query){
-                                    $query->where('code', 'like', "%$this->search%")
-                                        ->orWhere('name','like',"%$this->search%");
-                                });
-                            })
-                            ->orWhereHas('user',function($query){
-                                $query->where('name','like',"%$this->search%")
-                                    ->orWhere('employee_no','like',"%$this->search%");
-                            });
+                            ->orWhere('note', 'like', "%$this->search%");
                     });
                 }
 
@@ -46,7 +36,7 @@ class ExportInventoryTransferOut implements FromView
                     $query->where('status', $this->status);
                 }
             })
-            ->where(function($query){
+            ->whereHas('inventoryTransferOut',function($query){
                 $query->where(function($query){
                     $query->whereIn('place_from',$this->dataplaces)
                         ->whereIn('warehouse_from',$this->datawarehouses);

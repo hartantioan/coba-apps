@@ -683,26 +683,7 @@
         });
 
 
-        $('#datatable_serverside').on('click', 'td.details-control', function() {
-            var tr    = $(this).closest('tr');
-            var badge = tr.find('button.btn-floating');
-            var icon  = tr.find('i');
-            var row   = table.row(tr);
-
-            if(row.child.isShown()) {
-                row.child.hide();
-                tr.removeClass('shown');
-                badge.first().removeClass('red');
-                badge.first().addClass('green');
-                icon.first().html('add');
-            } else {
-                row.child(rowDetail(row.data())).show();
-                tr.addClass('shown');
-                badge.first().removeClass('green');
-                badge.first().addClass('red');
-                icon.first().html('remove');
-            }
-        });
+        
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
@@ -1654,17 +1635,34 @@
         
     }
 
-    function rowDetail(data) {
+    function rowDetail(id, element) {
         var content = '';
         $.ajax({
             url: '{{ Request::url() }}/row_detail',
             type: 'GET',
             async: false,
             data: {
-                id: $(data[0]).data('id')
+                id: id
             },
             success: function(response) {
-                content += response;
+                var tr    = $(element).closest('tr');
+                var badge = tr.find('button.btn-floating');
+                var icon  = tr.find('i');
+                var row   = table.row(tr);
+
+                if(row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    badge.first().removeClass('red');
+                    badge.first().addClass('green');
+                    icon.first().html('add');
+                } else {
+                    row.child(response).show();
+                    tr.addClass('shown');
+                    badge.first().removeClass('green');
+                    badge.first().addClass('red');
+                    icon.first().html('remove');
+                }
             },
             error: function() {
                 swal({
@@ -1674,8 +1672,6 @@
                 });
             }
         });
-
-        return content;
 	}
 
     function save(){

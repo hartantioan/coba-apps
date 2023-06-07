@@ -209,7 +209,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
-            "responsive": true,
+            "responsive": false,
+            "scrollX": true,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,

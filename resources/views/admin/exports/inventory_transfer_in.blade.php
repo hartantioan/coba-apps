@@ -8,6 +8,8 @@
             <th>Tanggal</th>
             <th>Keterangan</th>
             <th>Dokumen</th>
+            <th>Asal</th>
+            <th>Tujuan</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -21,6 +23,8 @@
                 <td>{{ date('d/m/y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->note }}</td>
                 <td><a href="{{ $row->attachment() }}">File</a></td>
+                <td>{{ $row->inventoryTransferOut->placeFrom->name.' - '.$row->inventoryTransferOut->warehouseFrom->name }}</td>
+                <td>{{ $row->inventoryTransferOut->placeTo->name.' - '.$row->inventoryTransferOut->warehouseTo->name }}</td>
                 <td>{!! $row->status() !!}</td>
             </tr>
             <tr align="center">
@@ -28,18 +32,14 @@
                 <th>Item</th>
                 <th>Qty</th>
                 <th>Satuan</th>
-                <th>Gudang Asal</th>
-                <th>Gudang Tujuan</th>
                 <th>Keterangan</th>
             </tr>
-            @foreach($row->inventoryTransferDetail as $key1 => $rowdetail)
+            @foreach($row->inventoryTransferOut->inventoryTransferOutDetail as $key1 => $rowdetail)
                 <tr align="center">
                     <td></td>
                     <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
                     <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                     <td>{{ $rowdetail->item->uomUnit->code }}</td>
-                    <td>{{ $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->code }}</td>
-                    <td>{{ $rowdetail->toPlace->code.' - '.$rowdetail->toWarehouse->code }}</td>
                     <td>{{ $rowdetail->note }}</td>
                 </tr>
             @endforeach

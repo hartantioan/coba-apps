@@ -9,10 +9,6 @@
     table.bordered th {
         padding: 5px !important;
     }
-
-    .select2-dropdown {
-        width: 200px !important;
-    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -98,6 +94,21 @@
                                         List Data
                                     </h4>
                                     <div class="row">
+                                        <div class="col s12 m6 l4">
+                                            <div class="card padding-4 animate fadeLeft">
+                                               <div class="row">
+                                                  <div class="col s4 m4">
+                                                     <h5 class="mb-0" id="totalNewInventoryOut">0</h5>
+                                                     <p class="no-margin">New</p>
+                                                     <p class="mb-0 pt-8">0</p>
+                                                  </div>
+                                                  <div class="col s8 m8 right-align">
+                                                     <i class="material-icons background-round mt-5 mb-5 gradient-45deg-purple-amber gradient-shadow white-text">rv_hookup</i>
+                                                     <p class="mb-0">Antrian Transfer Masuk</p>
+                                                  </div>
+                                               </div>
+                                            </div>
+                                        </div>
                                         <div class="col s12">
                                             <div class="card-alert card purple">
                                                 <div class="card-content white-text">
@@ -173,18 +184,20 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="col m6 s6">
+                            <div class="col m12 s12">
                                 <p class="mb-2">
                                     <h6>Silahkan pilih Inventori Transfer Keluar (Asal)</h6>
                                 </p>
-                                <div class="input-field col m6 s12">
+                                <div class="input-field col m4 s4">
                                     <select class="browser-default" id="inventory_transfer_out_id" name="inventory_transfer_out_id" onchange="getTransferOut();"></select>
+                                </div>
+                                <div class="col m8 s8">
+                                    <h6><b>Inventory Transfer - Keluar Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
                                         <table class="bordered">
                                             <thead>
@@ -194,12 +207,11 @@
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
                                                     <th class="center">Keterangan</th>
-                                                    <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="6" class="center">
+                                                    <td colspan="5" class="center">
                                                         Silahkan pilih Inventori Transfer Keluar
                                                     </td>
                                                 </tr>
@@ -306,28 +318,11 @@
             width: '100%',
         });
 
-        $('#datatable_serverside').on('click', 'td.details-control', function() {
-            var tr    = $(this).closest('tr');
-            var badge = tr.find('button.btn-floating');
-            var icon  = tr.find('i');
-            var row   = table.row(tr);
-
-            if(row.child.isShown()) {
-                row.child.hide();
-                tr.removeClass('shown');
-                badge.first().removeClass('red');
-                badge.first().addClass('green');
-                icon.first().html('add');
-            } else {
-                row.child(rowDetail(row.data())).show();
-                tr.addClass('shown');
-                badge.first().removeClass('green');
-                badge.first().addClass('red');
-                icon.first().html('remove');
-            }
-        });
-
         loadDataTable();
+
+        $('#datatable_serverside').on('click', 'button', function(event) {
+            event.stopPropagation();
+        });
 
         $('#modal1').modal({
             dismissible: false,
@@ -347,13 +342,38 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('.row_item').each(function(){
-                    $(this).remove();
-                });
+                $('#body-item').empty().append(`
+                    <tr id="last-row-item">
+                        <td colspan="5" class="center">
+                            Silahkan pilih Inventori Transfer Keluar
+                        </td>
+                    </tr>
+                `);
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+                $('#inventory_transfer_out_id').empty();
                 M.updateTextFields();
                 window.onbeforeunload = function() {
                     return null;
                 };
+            }
+        });
+
+        $('#modal6').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#title_data').empty();
+                $('#code_data').empty();             
+                $('#body-journal-table').empty();
+                $('#user_jurnal').empty();
+                $('#note_jurnal').empty();
+                $('#ref_jurnal').empty();
+                $('#post_date_jurnal').empty();
             }
         });
 
@@ -413,10 +433,469 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle' 
-            ]
+            ],
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
+
+        $.ajax({
+            url: '{{ Request::url() }}/get_total_transfer_out',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {},
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#totalNewInventoryOut').text(response);
+            }
+        });
 	}
+
+    function rowDetail(id, element) {
+        var content = '';
+        $.ajax({
+            url: '{{ Request::url() }}/row_detail',
+            type: 'GET',
+            async: false,
+            data: {
+                id: id
+            },
+            success: function(response) {
+                var tr    = $(element).closest('tr');
+                var badge = tr.find('button.btn-floating');
+                var icon  = tr.find('i');
+                var row   = table.row(tr);
+
+                if(row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    badge.first().removeClass('red');
+                    badge.first().addClass('green');
+                    icon.first().html('add');
+                } else {
+                    row.child(response).show();
+                    tr.addClass('shown');
+                    badge.first().removeClass('green');
+                    badge.first().addClass('red');
+                    icon.first().html('remove');
+                }
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+	}
+
+    function viewJournal(id){
+        $.ajax({
+            url: '{{ Request::url() }}/view_journal/' + id,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                $('#modal6').modal('open');
+                $('#title_data').append(``+data.title+``);
+                $('#code_data').append(data.message.code);
+                $('#body-journal-table').append(data.tbody);
+                $('#user_jurnal').append(`Pengguna `+data.user);
+                $('#note_jurnal').append(`Keterangan `+data.message.note);
+                $('#ref_jurnal').append(`Referensi `+data.reference);
+                $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+            }
+        });
+    }
+
+    function getTransferOut(){
+        if($('#inventory_transfer_out_id').val()){
+            $('#body-item').empty();
+            $.ajax({
+                url: '{{ Request::url() }}/send_used_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#inventory_transfer_out_id').val()
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                        $('#purchase_order_id').empty();
+                    }else{
+                        
+                        $('#list-used-data').empty().append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + response.code + `
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
+                            </div>
+                        `);
+
+                        $.each($("#inventory_transfer_out_id").select2('data')[0].details, function(i, val) {
+                            $('#body-item').append(`
+                                <tr>
+                                    <td>` + val.name + `</td>
+                                    <td>` + val.origin + `</td>
+                                    <td class="center-align">` + val.qty + `</td>
+                                    <td>` + val.unit + `</td>
+                                    <td>` + val.note + `</td>
+                                </tr
+                            `);
+                        });
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            $('#body-item').empty().append(`
+                <tr id="last-row-item">
+                    <td colspan="5" class="center">
+                        Silahkan pilih Inventori Transfer Keluar
+                    </td>
+                </tr>
+            `);
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }
+        }
+    }
+
+    function removeUsedData(id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('#body-item').empty().append(`
+                    <tr id="last-row-item">
+                        <td colspan="5" class="center">
+                            Silahkan pilih Inventori Transfer Keluar
+                        </td>
+                    </tr>
+                `);
+                $('#inventory_transfer_out_id').empty();
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function save(){
+        swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+
+                var formData = new FormData($('#form_data')[0]);
+
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function success(){
+        loadDataTable();
+        $('#modal1').modal('close');
+    }
+
+    function show(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal1').modal('open');
+                
+                $('#temp').val(id);
+                $('#company_id').val(response.company_id).formSelect();
+                $('#note').val(response.note);
+                $('#post_date').val(response.post_date);
+
+                $('#body-item').empty();
+
+                $('#inventory_transfer_out_id').append(`
+                    <option value="` + response.inventory_transfer_out_id + `">` + response.inventory_transfer_out_name + `<option>
+                `);
+
+                $.each(response.details, function(i, val) {
+                    $('#body-item').append(`
+                        <tr>
+                            <td>` + val.name + `</td>
+                            <td>` + val.origin + `</td>
+                            <td class="center-align">` + val.qty + `</td>
+                            <td>` + val.unit + `</td>
+                            <td>` + val.note + `</td>
+                        </tr
+                    `);
+                });
+
+                $('.modal-content').scrollTop(0);
+                $('#note').focus();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function voidStatus(id){
+        var msg = '';
+        swal({
+            title: "Alasan mengapa anda menutup!",
+            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/void_status',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, msg : message },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function destroy(id){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Anda tidak bisa mengembalikan data yang terhapus!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/destroy',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function printPreview(code){
+        $.ajax({
+            url: '{{ Request::url() }}/approval/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                $('#modal2').modal('open');
+                $('#show_print').html(data);
+            }
+        });
+    }
+
+    function printData(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        $.ajax({
+            type : "POST",
+            url  : '{{ Request::url() }}/print',
+            data : {
+                search : search,
+                status : status,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            cache: false,
+            success: function(data){
+                var w = window.open('about:blank');
+                w.document.open();
+                w.document.write(data);
+                w.document.close();
+            }
+        });
+    }
+
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
+    }
 </script>

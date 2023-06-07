@@ -797,10 +797,13 @@ Route::prefix('admin')->group(function () {
                     Route::get('/',[InventoryTransferInController::class, 'index']);
                     Route::get('datatable',[InventoryTransferInController::class, 'datatable']);
                     Route::get('row_detail',[InventoryTransferInController::class, 'rowDetail']);
+                    Route::post('get_total_transfer_out',[InventoryTransferInController::class, 'getTotalTransferOut']);
                     Route::post('show', [InventoryTransferInController::class, 'show']);
                     Route::post('print',[InventoryTransferInController::class, 'print']);
                     Route::get('export',[InventoryTransferInController::class, 'export']);
                     Route::get('view_journal/{id}',[InventoryTransferInController::class, 'viewJournal']);
+                    Route::post('send_used_data',[InventoryTransferInController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [InventoryTransferInController::class, 'removeUsedData']);
                     Route::post('create',[InventoryTransferInController::class, 'create'])->middleware('operation.access:transfer_in,update');
                     Route::get('approval/{id}',[InventoryTransferInController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [InventoryTransferInController::class, 'voidStatus'])->middleware('operation.access:transfer_in,void');

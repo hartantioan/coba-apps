@@ -1175,19 +1175,30 @@ class Select2Controller extends Controller {
                             ->whereIn('warehouse_to',$this->datawarehouses);
                     });
                 })
-                ->whereIn('status',['2','3'])->get();
+                ->whereIn('status',['2','3'])
+                ->whereDoesntHave('used')
+                ->get();
 
         foreach($data as $d) {
-            $response[] = [
-                'id'   			    => $d->id,
-                'text' 			    => $d->code.' - '.$d->name,
-                'code'              => $d->code,
-                'name'              => $d->name,
-                'uom'               => $d->uomUnit->code,
-                'price_list'        => $d->currentCogs($this->dataplaces),
-                'stock_list'        => $d->currentStock($this->dataplaces),
-                'list_warehouse'    => $d->warehouseList(),
-            ];
+            if(!$d->inventoryTransferIn()->exists()){
+                $details = [];
+
+                foreach($d->inventoryTransferOutDetail as $row){
+                    $details[] = [
+                        'name'      => $row->item->name,
+                        'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name,
+                        'qty'       => number_format($row->qty,3,',','.'),
+                        'unit'      => $row->item->uomUnit->code,
+                        'note'      => $row->note,
+                    ];
+                }
+    
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->code.' - '.$d->user->name,
+                    'details'           => $details,
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);

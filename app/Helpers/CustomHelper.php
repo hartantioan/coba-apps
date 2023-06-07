@@ -922,9 +922,9 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coabdp ? $coabdp->id : NULL,
-					'place_id'		=> $iti->inventoryTransferOut->place_to,
+					'place_id'		=> $iti->inventoryTransferOut->place_from,
 					'item_id'		=> $rowdetail->item_id,
-					'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_to,
+					'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_from,
 					'type'			=> '2',
 					'nominal'		=> $rowdetail->total,
 				]);

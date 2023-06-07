@@ -744,6 +744,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[GoodReceiptPOController::class, 'rowDetail']);
                     Route::post('show', [GoodReceiptPOController::class, 'show']);
                     Route::post('print',[GoodReceiptPOController::class, 'print']);
+                    Route::post('print_by_range',[GoodReceiptPOController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[GoodReceiptPOController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[GoodReceiptPOController::class, 'export']);
                     Route::get('view_journal/{id}',[GoodReceiptPOController::class, 'viewJournal']);
                     Route::get('viewstructuretree',[GoodReceiptPOController::class, 'viewStructureTree']);
@@ -763,6 +765,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[GoodReturnPOController::class, 'rowDetail']);
                     Route::post('show', [GoodReturnPOController::class, 'show']);
                     Route::post('print',[GoodReturnPOController::class, 'print']);
+                    Route::post('print_by_range',[GoodReturnPOController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[GoodReturnPOController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[GoodReturnPOController::class, 'export']);
                     Route::get('viewstructuretree',[GoodReturnPOController::class, 'viewStructureTree']);
                     Route::post('get_good_receipt', [GoodReturnPOController::class, 'getGoodReceipt']);
@@ -779,6 +783,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[InventoryTransferOutController::class, 'rowDetail']);
                     Route::post('show', [InventoryTransferOutController::class, 'show']);
                     Route::post('print',[InventoryTransferOutController::class, 'print']);
+                    Route::post('print_by_range',[InventoryTransferController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[InventoryTransferController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[InventoryTransferOutController::class, 'export']);
                     Route::get('view_journal/{id}',[InventoryTransferOutController::class, 'viewJournal']);
                     Route::post('create',[InventoryTransferOutController::class, 'create'])->middleware('operation.access:transfer_out,update');
@@ -808,6 +814,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [GoodReceiveController::class, 'show']);
                     Route::get('view_journal/{id}',[GoodReceiveController::class, 'viewJournal']);
                     Route::post('print',[GoodReceiveController::class, 'print']);
+                    Route::post('print_by_range',[GoodReceiveController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[GoodReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[GoodReceiveController::class, 'export']);
                     Route::post('create',[GoodReceiveController::class, 'create'])->middleware('operation.access:good_receive,update');
                     Route::get('approval/{id}',[GoodReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
@@ -821,6 +829,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[GoodIssueController::class, 'rowDetail']);
                     Route::post('show', [GoodIssueController::class, 'show']);
                     Route::post('print',[GoodIssueController::class, 'print']);
+                    Route::post('print_by_range',[GoodIssueController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[GoodIssueController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[GoodIssueController::class, 'export']);
                     Route::get('view_journal/{id}',[GoodIssueController::class, 'viewJournal']);
                     Route::post('create',[GoodIssueController::class, 'create'])->middleware('operation.access:good_issue,update');
@@ -837,6 +847,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[FundRequestController::class, 'rowDetail']);
                     Route::post('show', [FundRequestController::class, 'show']);
                     Route::post('print',[FundRequestController::class, 'print']);
+                    Route::post('print_by_range',[FundRequestController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[FundRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[FundRequestController::class, 'viewStructureTree']);
                     Route::get('export',[FundRequestController::class, 'export']);
                     Route::post('create',[FundRequestController::class, 'create'])->middleware('operation.access:fund_request,update');
@@ -853,6 +865,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[PaymentRequestController::class, 'rowDetail']);
                     Route::post('show', [PaymentRequestController::class, 'show']);
                     Route::post('print',[PaymentRequestController::class, 'print']);
+                    Route::post('print_by_range',[PaymentRequestController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[PaymentRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[PaymentRequestController::class, 'export']);
                     Route::get('viewstructuretree',[PaymentRequestController::class, 'viewStructureTree']);
                     Route::post('remove_used_data', [PaymentRequestController::class, 'removeUsedData']);
@@ -869,6 +883,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[OutgoingPaymentController::class, 'rowDetail']);
                     Route::post('show', [OutgoingPaymentController::class, 'show']);
                     Route::post('print',[OutgoingPaymentController::class, 'print']);
+                    Route::post('print_by_range',[OutgoingPaymentController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[OutgoingPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[OutgoingPaymentController::class, 'export']);
                     Route::get('view_journal/{id}',[OutgoingPaymentController::class, 'viewJournal']);
                     Route::get('viewstructuretree',[OutgoingPaymentController::class, 'viewStructureTree']);
@@ -887,6 +903,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('view_journal/{id}',[CloseBillController::class, 'viewJournal']);
                     Route::post('show', [CloseBillController::class, 'show']);
                     Route::post('print',[CloseBillController::class, 'print']);
+                    Route::post('print_by_range',[CloseBillController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[CloseBillController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[CloseBillController::class, 'export']);
                     Route::get('viewstructuretree',[CloseBillController::class, 'viewStructureTree']);
                     Route::post('remove_used_data', [CloseBillController::class, 'removeUsedData']);
@@ -909,6 +927,8 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [CapitalizationController::class, 'show']);
                         Route::get('view_journal/{id}',[CapitalizationController::class, 'viewJournal']);
                         Route::post('print',[CapitalizationController::class, 'print']);
+                        Route::post('print_by_range',[CapitalizationController::class, 'printByRange']);
+                        Route::get('print_individual/{id}',[CapitalizationController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                         Route::get('export',[CapitalizationController::class, 'export']);
                         Route::post('create',[CapitalizationController::class, 'create'])->middleware('operation.access:capitalization,update');
                         Route::get('approval/{id}',[CapitalizationController::class, 'approval'])->withoutMiddleware('direct.access');
@@ -922,6 +942,8 @@ Route::prefix('admin')->group(function () {
                         Route::get('row_detail',[RetirementController::class, 'rowDetail']);
                         Route::post('show', [RetirementController::class, 'show']);
                         Route::post('print',[RetirementController::class, 'print']);
+                        Route::post('print_by_range',[RetirementController::class, 'printByRange']);
+                        Route::get('print_individual/{id}',[RetirementController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                         Route::post('get_code',[RetirementController::class, 'getCode']);
                         Route::get('export',[RetirementController::class, 'export']);
                         Route::get('view_journal/{id}',[RetirementController::class, 'viewJournal']);
@@ -938,6 +960,8 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [DepreciationController::class, 'show']);
                         Route::post('preview', [DepreciationController::class, 'preview']);
                         Route::post('print',[DepreciationController::class, 'print']);
+                        Route::post('print_by_range',[DepreciationController::class, 'printByRange']);
+                        Route::get('print_individual/{id}',[DepreciationController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                         Route::get('export',[DepreciationController::class, 'export']);
                         Route::get('view_journal/{id}',[DepreciationController::class, 'viewJournal']);
                         Route::post('create',[DepreciationController::class, 'create'])->middleware('operation.access:depreciation,update');
@@ -965,6 +989,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [JournalController::class, 'show']);
                     Route::post('print',[JournalController::class, 'print']);
                     Route::get('export',[JournalController::class, 'export']);
+                    Route::post('print_by_range',[JournalController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[JournalController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('create',[JournalController::class, 'create'])->middleware('operation.access:journal,update');
                     Route::post('create_multi',[JournalController::class, 'createMulti'])->middleware('operation.access:journal,update');
                     Route::get('approval/{id}',[JournalController::class, 'approval'])->withoutMiddleware('direct.access');

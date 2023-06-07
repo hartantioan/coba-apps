@@ -660,6 +660,13 @@
                 badge.first().addClass('red');
                 icon.first().html('remove');
             }
+
+            
+        });
+
+        $('#datatable_serverside').on('click', 'button', function(event) {
+            event.stopPropagation();
+            
         });
 
         loadDataTable();
@@ -1610,7 +1617,8 @@
                 }
             },
             select: {
-                style: 'multi'
+                style: 'multi',
+                selector: 'td:not(.btn-floating)'
             },
             ajax: {
                 url: '{{ Request::url() }}/datatable',

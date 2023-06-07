@@ -810,11 +810,11 @@ class PurchaseRequestController extends Controller
                                     'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt( $goodReturnPODetail->goodReturnPO->code),
                                 ];
                                                     
-                                $data_go_chart[] = $good_return_tempura;;
+                                $data_go_chart[] = $good_return_tempura;
                                 $data_link[]=[
-                                    'from'=> $goodReturnPODetail->goodReturnPO->code,
-                                    'to'=>$query_gr->code,
-                                    'string_link'=>$goodReturnPODetail->goodReturnPO->code.$query_gr->code
+                                    'from'=> $query_gr->code,
+                                    'to'=>$goodReturnPODetail->goodReturnPO->code,
+                                    'string_link'=>$query_gr->code.$goodReturnPODetail->goodReturnPO->code,
                                 ];
                                 $data_id_greturns[]=  $goodReturnPODetail->goodReturnPO->id;
 
@@ -898,9 +898,9 @@ class PurchaseRequestController extends Controller
                         $data_good_receipt[]=$data_good_receipt;
                         $data_go_chart[]=$data_good_receipt;
                         $data_link[]=[
-                            'from'=>$query_return->code,
-                            'to'=>$data_good_receipt["key"],
-                            'string_link'=>$good_return_detail->goodReceiptDetail->goodReceipt->code.$data_good_receipt["key"],
+                            'from'=>$data_good_receipt["key"],
+                            'to'=>$query_return->code,
+                            'string_link'=>$data_good_receipt["key"].$query_return->code,
                         ];
                         
                         if(!in_array($good_return_detail->goodReceiptDetail->goodReceipt->id, $data_id_gr)){

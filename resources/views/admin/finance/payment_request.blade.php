@@ -428,6 +428,12 @@
     </a>
 </div>
 
+<div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
+        <i class="material-icons">view_comfy</i>
+    </a>
+</div>
+
 <!-- END: Page Main-->
 <script>
     $(function() {
@@ -455,6 +461,11 @@
                 badge.first().addClass('red');
                 icon.first().html('remove');
             }
+        });
+
+        $('#datatable_serverside').on('click', 'button', function(event) {
+            event.stopPropagation();
+            
         });
 
         loadDataTable();
@@ -553,6 +564,23 @@
                     `<div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;"></div>
                     `
                 );
+            }
+        });
+
+        $('#modal5').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert_multi').hide();
+                $('#validation_alert_multi').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#temp').val('');
+                
             }
         });
 
@@ -836,8 +864,17 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
-            ]
+                'columnsToggle',
+                'selectNone' 
+            ],
+            language: {
+                buttons: {
+                    selectNone: "Hapus pilihan"
+                }
+            },
+            select: {
+                style: 'multi'
+            },
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
         
@@ -1214,28 +1251,146 @@
         });
     }
 
+    var printService = new WebSocketPrinter({
+        onConnect: function () {
+            
+        },
+        onDisconnect: function () {
+           
+        },
+        onUpdate: function (message) {
+            
+        },
+    });
+    
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
-        
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
+        arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(2)').text().trim();
+            arr_id_temp.push(poin);
+        });
         $.ajax({
-            type : "POST",
-            url  : '{{ Request::url() }}/print',
-            data : {
-                search : search,
-                status : status,
-                company : company,
-                'account[]' : account,
-                'currency[]' : currency
+            url: '{{ Request::url() }}/print',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                arr_id: arr_id_temp,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            cache: false,
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': response.message
+                })
+                
+               
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function printMultiSelect(){
+        var formData = new FormData($('#form_data_print_multi')[0]);
+        console.log(formData);
+        $.ajax({
+            url: '{{ Request::url() }}/print_by_range',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert_multi').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    $('#modal5').modal('close');
+                   /*  printService.submit({
+                        'type': 'INVOICE',
+                        'url': response.message
+                    }) */
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alert_multi').show();
+                    $('.modal-content').scrollTop(0);
+                    console.log(response.error);
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+                    
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert_multi').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+            
+        });
+    }
+
+    function printPreview(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
             success: function(data){
-                var w = window.open('about:blank');
-                w.document.open();
-                w.document.write(data);
-                w.document.close();
+                loadingClose('.modal-content');
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': data
+                })
             }
         });
     }

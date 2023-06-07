@@ -29,7 +29,7 @@ class ExportInventoryTransferOut implements FromView
                     $query->where(function($query) {
                         $query->where('code', 'like', "%$this->search%")
                             ->orWhere('note', 'like', "%$this->search%")
-                            ->orWhereHas('inventoryTransferDetail', function($query){
+                            ->orWhereHas('inventoryTransferOutDetail', function($query){
                                 $query->whereHas('item',function($query){
                                     $query->where('code', 'like', "%$this->search%")
                                         ->orWhere('name','like',"%$this->search%");

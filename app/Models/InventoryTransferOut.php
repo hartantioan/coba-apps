@@ -40,6 +40,10 @@ class InventoryTransferOut extends Model
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
+    public function inventoryTransferIn(){
+        return $this->hasOne('App\Models\InventoryTransferIn','inventory_transfer_out_id','id');
+    }
+
     public function placeFrom(){
         return $this->belongsTo('App\Models\Place','place_from','id')->withTrashed();
     }

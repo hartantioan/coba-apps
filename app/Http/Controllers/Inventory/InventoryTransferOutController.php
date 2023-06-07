@@ -82,7 +82,7 @@ class InventoryTransferOutController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('inventoryTransferDetail', function($query) use($search, $request){
+                            ->orWhereHas('inventoryTransferOutDetail', function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -126,7 +126,7 @@ class InventoryTransferOutController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('inventoryTransferDetail', function($query) use($search, $request){
+                            ->orWhereHas('inventoryTransferOutDetail', function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -630,7 +630,7 @@ class InventoryTransferOutController extends Controller
                     $query->where(function($query) use ($request) {
                         $query->where('code', 'like', "%$request->search%")
                             ->orWhere('note', 'like', "%$request->search%")
-                            ->orWhereHas('inventoryTransferDetail', function($query) use($request){
+                            ->orWhereHas('inventoryTransferOutDetail', function($query) use($request){
                                 $query->whereHas('item',function($query) use($request){
                                     $query->where('code', 'like', "%$request->search%")
                                         ->orWhere('name','like',"%$request->search%");

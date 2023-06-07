@@ -173,6 +173,14 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
+                            <div class="col m6 s6">
+                                <p class="mb-2">
+                                    <h6>Silahkan pilih Inventori Transfer Keluar (Asal)</h6>
+                                </p>
+                                <div class="input-field col m6 s12">
+                                    <select class="browser-default" id="inventory_transfer_out_id" name="inventory_transfer_out_id" onchange="getTransferOut();"></select>
+                                </div>
+                            </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
@@ -348,6 +356,8 @@
                 };
             }
         });
+
+        select2ServerSide('#inventory_transfer_out_id', '{{ url("admin/select2/inventory_transfer_out") }}');
     });
 
     function loadDataTable() {

@@ -320,18 +320,29 @@ class PurchaseMemoController extends Controller
                 try {
                     $query = PurchaseMemo::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Purchase Memo telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Purchase Memo telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
 
                         if($request->has('document')) {
                             if(Storage::exists($query->document)){
@@ -352,6 +363,7 @@ class PurchaseMemoController extends Controller
                         $query->grandtotal = round($grandtotal,3);
                         $query->document = $document;
                         $query->note = $request->note;
+                        $query->status = '1';
 
                         $query->save();
 

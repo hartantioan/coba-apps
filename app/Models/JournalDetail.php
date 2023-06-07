@@ -24,6 +24,7 @@ class JournalDetail extends Model
         'account_id',
         'department_id',
         'warehouse_id',
+        'item_id',
         'type',
         'nominal',
         'note',
@@ -43,6 +44,10 @@ class JournalDetail extends Model
 
     public function line(){
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
+    }
+
+    public function item(){
+        return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
     }
 
     public function machine(){

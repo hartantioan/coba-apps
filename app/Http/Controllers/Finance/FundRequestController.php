@@ -69,10 +69,10 @@ class FundRequestController extends Controller
             'payment_type',
             'name_account',
             'no_account',
-            'total',
-            'tax',
+            'grandtotal',
+            /* 'tax',
             'wtax',
-            'grandtotal'
+            'grandtotal' */
         ];
 
         $start  = $request->start;
@@ -104,6 +104,10 @@ class FundRequestController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
+
+                if($request->document){
+                    $query->where('document_status', $request->document);
+                }
             })
             ->whereIn('place_id',$this->dataplaces)
             ->offset($start)
@@ -132,6 +136,10 @@ class FundRequestController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
+
+                if($request->document){
+                    $query->where('document_status', $request->document);
+                }
             })
             ->whereIn('place_id',$this->dataplaces)
             ->count();
@@ -157,16 +165,16 @@ class FundRequestController extends Controller
                     $val->paymentType(),
                     $val->name_account,
                     $val->no_account,
-                    number_format($val->total,2,',','.'),
+                    /* number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
-                    number_format($val->wtax,2,',','.'),
+                    number_format($val->wtax,2,',','.'), */
                     number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     '
                         <select class="browser-default" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
-                            <option value="" '.($val->document_status == NULL ? 'selected' : '').'>MENUNGGU</option>
-                            <option value="1" '.($val->document_status == '1' ? 'selected' : '').'>LENGKAP</option>
-                            <option value="2" '.($val->document_status == '2' ? 'selected' : '').'>TIDAK LENGKAP</option>
+                            <option value="1" '.($val->document_status == '1' ? 'selected' : '').'>MENUNGGU</option>
+                            <option value="2" '.($val->document_status == '2' ? 'selected' : '').'>LENGKAP</option>
+                            <option value="3" '.($val->document_status == '3' ? 'selected' : '').'>TIDAK LENGKAP</option>
                         </select>
                     ',
                     $val->status(),
@@ -323,6 +331,10 @@ class FundRequestController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
+
+                if($request->document){
+                    $query->where('document_status', $request->document);
+                }
             })
             ->get()
 		];
@@ -333,8 +345,9 @@ class FundRequestController extends Controller
     public function export(Request $request){
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';
+        $document = $request->document ? $request->document : '';
 		
-		return Excel::download(new ExportFundRequest($search,$status,$this->dataplaces), 'fund_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportFundRequest($search,$status,$document,$this->dataplaces), 'fund_request_'.uniqid().'.xlsx');
     }
 
     public function userIndex()
@@ -369,9 +382,9 @@ class FundRequestController extends Controller
             'payment_type',
             'name_account',
             'no_account',
-            'total',
+            /* 'total',
             'tax',
-            'wtax',
+            'wtax', */
             'grandtotal'
         ];
 
@@ -440,10 +453,10 @@ class FundRequestController extends Controller
                     $val->paymentType(),
                     $val->name_account,
                     $val->no_account,
-                    number_format($val->total,2,',','.'),
-                    number_format($val->tax,2,',','.'),
-                    number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
+                    /* number_format($val->tax,2,',','.'),
+                    number_format($val->wtax,2,',','.'),
+                    number_format($val->grandtotal,2,',','.'), */
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->documentStatus(),
                     $val->status(),
@@ -541,32 +554,44 @@ class FundRequestController extends Controller
 
             $total = 0; 
             $grandtotal = 0;
-            $tax = str_replace(',','.',str_replace('.','',$request->tax));
-            $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
+            /* $tax = str_replace(',','.',str_replace('.','',$request->tax));
+            $wtax = str_replace(',','.',str_replace('.','',$request->wtax)); */
 
             foreach($request->arr_total as $key => $row){
                 $total += str_replace(',','.',str_replace('.','',$row));
             }
 
-            $grandtotal = $total + $tax - $wtax;
+            /* $grandtotal = $total + $tax - $wtax; */
+            $grandtotal = $total;
                     
 			if($request->temp){
                 DB::beginTransaction();
                 try {
                     $query = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Pengajuan dana telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
@@ -592,9 +617,11 @@ class FundRequestController extends Controller
                         $query->no_account = $request->no_account;
                         $query->document = $document;
                         $query->total = $total;
-                        $query->tax = $tax;
-                        $query->wtax = $wtax;
+                        /* $query->tax = $tax;
+                        $query->wtax = $wtax; */
                         $query->grandtotal = $grandtotal;
+                        $query->status = '1';
+                        
                         $query->save();
 
                         foreach($query->fundRequestDetail as $row){
@@ -632,9 +659,10 @@ class FundRequestController extends Controller
                         'no_account'    => $request->no_account,
                         'document'      => $request->file('file') ? $request->file('file')->store('public/fund_requests') : NULL,
                         'total'         => $total,
-                        'tax'           => $tax,
-                        'wtax'          => $wtax,
+                        'tax'           => 0,
+                        'wtax'          => 0,
                         'grandtotal'    => $grandtotal,
+                        'document_status'   => '1',
                         'status'        => '1',
                     ]);
 
@@ -1781,7 +1809,29 @@ class FundRequestController extends Controller
                 $data->update([
                     'document_status'   => $request->status ? $request->status : NULL,
                 ]);
+
+                CustomHelper::sendNotification('fund_requests',$data->id,'Status Dokumen Permohonan Dana No. '.$data->code.' telah diupdate','Status dokumen anda telah dinyatakan '.$data->documentStatus().'.',session('bo_id'));
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Status berhasil dirubah.',
+                    'value'   => $data->document_status,
+                ];
+            }else{
+                $response = [
+                    'status'  => 422,
+                    'message' => 'Maaf, data sudah dijadikan payment request.',
+                    'value'   => $data->document_status,
+                ];
             }
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Maaf, data tidak ditemukan.',
+                'value'   => '',
+            ];
         }
+
+        return response()->json($response);
     }
 }

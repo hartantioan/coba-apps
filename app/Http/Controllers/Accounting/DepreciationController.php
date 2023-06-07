@@ -203,23 +203,35 @@ class DepreciationController extends Controller
                 
                 $query = Depreciation::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                $approved = false;
+                $revised = false;
+
                 if($query->approval()){
                     foreach($query->approval()->approvalMatrix as $row){
-                        if($row->status == '2'){
-                            return response()->json([
-                                'status'  => 500,
-                                'message' => 'Depresiasi aset telah diapprove, anda tidak bisa melakukan perubahan.'
-                            ]);
+                        if($row->approved){
+                            $approved = true;
+                        }
+
+                        if($row->revised){
+                            $revised = true;
                         }
                     }
                 }
 
-                if($query->status == '1'){
+                if($approved && !$revised){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Depresiasi telah diapprove, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+
+                if(in_array($query->status,['1','6'])){
                     $query->user_id = session('bo_id');
                     $query->company_id = $request->company_id;
                     $query->post_date = date('Y-m-d');
                     $query->period = $request->period;
                     $query->note = $request->note;
+                    $query->status = '1';
                     $query->save();
 
                     foreach($query->depreciationDetail as $row){

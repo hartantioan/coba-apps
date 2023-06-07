@@ -112,6 +112,10 @@
                                                         <th>Code</th>
                                                         <th>Pengguna</th>
                                                         <th>Perusahaan</th>
+                                                        <th>Plant Asal</th>
+                                                        <th>Gudang Asal</th>
+                                                        <th>Plant Tujuan</th>
+                                                        <th>Gudang Tujuan</th>
                                                         <th>Tanggal</th>
                                                         <th>Keterangan</th>
                                                         <th>Dokumen</th>
@@ -168,27 +172,67 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
+                            <div class="col m6 s6">
+                                <p class="mb-2">
+                                    <h6>Plant & Gudang Asal</h6>
+                                </p>
+                                <div class="input-field col m6 s12">
+                                    <select class="browser-default" id="place_from" name="place_from" onchange="resetItem()">
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code.' - '.$rowplace->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="place_from">Plant</label>
+                                </div>
+                                <div class="input-field col m6 s12">
+                                    <select class="browser-default" id="warehouse_from" name="warehouse_from" onchange="resetItem()">
+                                        @foreach ($warehouse as $rowwarehouse)
+                                            <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->code.' - '.$rowwarehouse->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="warehouse_from">Gudang</label>
+                                </div>
+                            </div>
+                            <div class="col m6 s6">
+                                <p class="mb-2">
+                                    <h6>Plant & Gudang Tujuan</h6>
+                                </p>
+                                <div class="input-field col m6 s12">
+                                    <select class="browser-default" id="place_to" name="place_to">
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code.' - '.$rowplace->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="place_to">Plant</label>
+                                </div>
+                                <div class="input-field col m6 s12">
+                                    <select class="browser-default" id="warehouse_to" name="warehouse_to">
+                                        @foreach ($warehouse as $rowwarehouse)
+                                            <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->code.' - '.$rowwarehouse->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="warehouse_to">Gudang</label>
+                                </div>
+                            </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:1600px !important;">
+                                        <table class="bordered">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
                                                     <th class="center">Ambil Dari</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
-                                                    <th class="center">Plant Tujuan</th>
-                                                    <th class="center">Gudang Tujuan</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="8" class="center">
+                                                    <td colspan="6" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </a>
@@ -385,34 +429,26 @@
 
     function getRowUnit(val){
         $("#arr_warehouse" + val).empty();
-        if($("#arr_item" + val).val()){
-            if($("#arr_item" + val).select2('data')[0].stock_list.length){
+        if($("#arr_itemkuy" + val).val()){
+            if($("#arr_itemkuy" + val).select2('data')[0].stock_list.length){
                 $('#arr_item_stock' + val).empty();
-                $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
+                $.each($("#arr_itemkuy" + val).select2('data')[0].stock_list, function(i, value) {
                     $('#arr_item_stock' + val).append(`
                         <option value="` + value.id + `" data-qty="` + value.qty_raw + `">` + value.warehouse + ` - ` + value.qty + `</option>
                     `);
                 });
 
                 $('#arr_item_stock' + val).formSelect();
-            }
-
-            $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
-
-            if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
-                $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
-                    $('#arr_warehouse' + val).append(`
-                        <option value="` + value.id + `">` + value.name + `</option>
-                    `);
-                });
             }else{
-                $("#arr_warehouse" + val).append(`
-                    <option value="">--Gudang tidak diatur di master data Grup Item--</option>
+                $('#arr_item_stock' + val).append(`
+                    <option value="" disabled selected>--Data stok tidak ditemukan--</option>
                 `);
             }
+
+            $('#arr_unit' + val).text($("#arr_itemkuy" + val).select2('data')[0].uom);
+
         }else{
-            $('#arr_item_stock' + val).empty().formSelect();
-            $("#arr_warehouse" + val).append(`
+            $('#arr_item_stock' + val).empty().append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
         }
@@ -434,12 +470,18 @@
         }
     }
 
+    function resetItem(){
+        $('select[name^="arr_itemkuy"]').each(function(){
+            $(this).empty().trigger('change');
+        });
+    }
+
     function addItem(){
         var count = makeid(10);
         $('#last-row-item').before(`
             <tr class="row_item">
                 <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                    <select class="browser-default" id="arr_itemkuy` + count + `" name="arr_itemkuy[]" data-code="` + count + `" onchange="getRowUnit('` + count + `')"></select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]"></select>
@@ -451,18 +493,6 @@
                     <span id="arr_unit` + count + `">-</span>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                        @foreach ($place as $rowplace)
-                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                        @endforeach
-                    </select>    
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                        <option value="">--Silahkan pilih item--</option>    
-                    </select>
-                </td>
-                <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
                 </td>
                 <td class="center">
@@ -472,9 +502,34 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
-        $('#arr_place' + count).formSelect();
+
         M.updateTextFields();
+
+        $('#arr_itemkuy' + count).select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/item_transfer") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        place: $('#place_from').val(),
+                        warehouse: $('#warehouse_from').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function loadDataTable() {
@@ -516,6 +571,10 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
+                { name: 'place_from', className: 'center-align' },
+                { name: 'warehouse_from', className: 'center-align' },
+                { name: 'place_to', className: 'center-align' },
+                { name: 'warehouse_to', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
@@ -568,71 +627,97 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]);
-        
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
 
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
+                var place_from = $('#place_from').val(), warehouse_from = $('#warehouse_from').val(), place_to = $('#place_to').val(), warehouse_to = $('#warehouse_to').val();
+
+                if(place_from == place_to && warehouse_from == warehouse_to){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Plant Asal dan Tujuan, dan Gudang Asal dan Tujuan tidak boleh sama.',
+                        icon: 'warning'
+                    });
+                }else{
+
+                    var formData = new FormData($('#form_data')[0]);
+
+                    formData.delete("arr_itemkuy[]");
+                    formData.delete("arr_item_stock[]");
+                    formData.delete("arr_qty[]");
+                    formData.delete("arr_note[]");
+
+                    $('select[name^="arr_itemkuy"]').each(function(index){
+                        if($(this).val()){
+                            formData.append('arr_item[]',$(this).val());
+                            formData.append('arr_item_stock[]',$('select[name^="arr_item_stock"]').eq(index).val());
+                            formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
+                            formData.append('arr_note[]',$('input[name^="arr_note"]').eq(index).val());
+                        }
+                    });
+                    
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
                                 });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
                             });
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+                    });
+                }
             }
         });
     }
@@ -666,6 +751,10 @@
                 $('#modal1').modal('open');
                 $('#temp').val(id);
                 $('#company_id').val(response.company_id).formSelect();
+                $('#place_from').val(response.place_from);
+                $('#warehouse_from').val(response.warehouse_from);
+                $('#place_to').val(response.place_to);
+                $('#warehouse_to').val(response.warehouse_to);
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
                 $('#post_date').removeAttr('min');
@@ -676,7 +765,7 @@
                         $('#last-row-item').before(`
                         <tr class="row_item">
                             <td>
-                                <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                <select class="browser-default item-array" id="arr_itemkuy` + count + `" name="arr_itemkuy[]" onchange="getRowUnit('` + count + `')"></select>
                             </td>
                             <td>
                                 <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]"></select>
@@ -688,18 +777,6 @@
                                 <span id="arr_unit` + count + `">` + val.unit + `</span>
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>    
-                            </td>
-                            <td class="center">
-                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                    
-                                </select>
-                            </td>
-                            <td>
                                 <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                             </td>
                             <td class="center">
@@ -709,14 +786,35 @@
                             </td>
                         </tr>
                         `);
-                        $('#arr_item' + count).append(`
+                        $('#arr_itemkuy' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        $('#arr_warehouse' + count).append(`
-                            <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
-                        `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
-                        $('#arr_place' + count).val(val.place_id).formSelect();
+
+                        $('#arr_itemkuy' + count).select2({
+                            placeholder: '-- Pilih ya --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/item_transfer") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        place: $('#place_from').val(),
+                                        warehouse: $('#warehouse_from').val(),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
                         
                         if(val.stock_list.length){
                             $('#arr_item_stock' + count).empty();

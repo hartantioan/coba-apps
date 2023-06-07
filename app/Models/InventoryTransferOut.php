@@ -8,20 +8,28 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class InventoryTransfer extends Model
+class InventoryTransferOut extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'inventory_transfers';
+    protected $table = 'inventory_transfer_outs';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
         'company_id',
+        'place_from',
+        'warehouse_from',
+        'place_to',
+        'warehouse_to',
         'post_date',
         'document',
         'note',
+        'receiver_id',
+        'received_date',
+        'document_received',
+        'note_received',
         'status',
         'void_id',
         'void_note',
@@ -32,8 +40,28 @@ class InventoryTransfer extends Model
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
+    public function placeFrom(){
+        return $this->belongsTo('App\Models\Place','place_from','id')->withTrashed();
+    }
+
+    public function warehouseFrom(){
+        return $this->belongsTo('App\Models\Warehouse','warehouse_from','id')->withTrashed();
+    }
+
+    public function placeTo(){
+        return $this->belongsTo('App\Models\Place','place_to','id')->withTrashed();
+    }
+
+    public function warehouseTo(){
+        return $this->belongsTo('App\Models\Warehouse','warehouse_to','id')->withTrashed();
+    }
+
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
+    }
+
+    public function receiver(){
+        return $this->belongsTo('App\Models\User','receiver_id','id')->withTrashed();
     }
 
     public function voidUser(){
@@ -45,9 +73,9 @@ class InventoryTransfer extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function inventoryTransferDetail()
+    public function inventoryTransferOutDetail()
     {
-        return $this->hasMany('App\Models\InventoryTransferDetail');
+        return $this->hasMany('App\Models\InventoryTransferOutDetail');
     }
 
     public function status(){
@@ -57,6 +85,7 @@ class InventoryTransfer extends Model
           '3' => '<span class="green medium-small white-text padding-3">Selesai</span>',
           '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
           '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
+          '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
@@ -70,6 +99,7 @@ class InventoryTransfer extends Model
             '3' => 'Selesai',
             '4' => 'Ditolak',
             '5' => 'Ditutup',
+            '6' => 'Direvisi',
             default => 'Invalid',
         };
 
@@ -95,7 +125,7 @@ class InventoryTransfer extends Model
 
     public static function generateCode()
     {
-        $query = InventoryTransfer::selectRaw('RIGHT(code, 9) as code')
+        $query = InventoryTransferOut::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
@@ -109,7 +139,7 @@ class InventoryTransfer extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'INT-'.date('y').date('m').date('d').'-';
+        $pre = 'ITO-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }
@@ -141,9 +171,14 @@ class InventoryTransfer extends Model
         $journal = Journal::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
         
         if($journal){
-            foreach($this->inventoryTransferDetail as $row){
-                $priceout = $row->item->priceNow($row->itemStock->place_id);
-				$nominal = $row->qty * $priceout;
+            foreach($this->inventoryTransferOutDetail as $row){
+                $priceout = $row->item->priceNow($row->itemStock->place_id,$this->post_date);
+				$nominal = round($row->qty * $priceout,2);
+
+                $row->update([
+                    'price'     => $priceout,
+                    'total'     => $nominal
+                ]);
 
                 if($journal){
                     foreach($journal->journalDetail()->where('item_id',$row->item_id)->get() as $rowupdate){

@@ -391,18 +391,29 @@ class PaymentRequestController extends Controller
                 try {
                     $query = PaymentRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Purchase Order Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Permintaan Pembayaran telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
 
                         if($request->has('document')) {
                             if(Storage::exists($query->document)){
@@ -430,6 +441,7 @@ class PaymentRequestController extends Controller
                         $query->account_no = $request->account_no;
                         $query->account_name = $request->account_name;
                         $query->note = $request->note;
+                        $query->status = '1';
 
                         $query->save();
 
@@ -836,9 +848,9 @@ class PaymentRequestController extends Controller
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Tipe</th>
-                                <th class="center-align">Bayar</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Coa</th>
+                                <th class="center-align">Bayar</th>
                             </tr>
                         </thead><tbody>';
         
@@ -848,12 +860,22 @@ class PaymentRequestController extends Controller
                         <td class="center-align">'.($key + 1).'</td>
                         <td class="center-align">'.$row->lookable->code.'</td>
                         <td class="center-align">'.$row->type().'</td>
-                        <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
                         <td class="center-align">'.$row->note.'</td>
                         <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     </tr>';
                 }
-                
+
+                $html .= '<tr>
+                    <td class="right-align" colspan="5">ADMIN</td>
+                    <td class="right-align">'.number_format($data->admin,2,',','.').'</td>
+                </tr>';
+
+                $html .= '<tr>
+                    <td class="right-align" colspan="5">TOTAL</td>
+                    <td class="right-align">'.number_format($data->grandtotal,2,',','.').'</td>
+                </tr>';
+
                 $html .= '</tbody></table></div>';
 
                 $html .= '<div class="col s12 mt-1"><table style="max-width:500px;">

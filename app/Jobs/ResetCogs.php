@@ -4,7 +4,8 @@ namespace App\Jobs;
 
 use App\Helpers\CustomHelper;
 use App\Models\GoodIssue;
-use App\Models\InventoryTransfer;
+use App\Models\InventoryTransferIn;
+use App\Models\InventoryTransferOut;
 use App\Models\ItemCogs;
 use App\Models\Journal;
 use Illuminate\Bus\Queueable;
@@ -63,6 +64,11 @@ class ResetCogs implements ShouldQueue
 				$prevqty = $data[$key-1]->qty_final;
 				$prevtotal = $data[$key-1]->total_final;
 				if($row->type == 'IN'){
+					if($row->lookable_type == 'inventory_transfer_ins'){
+						$it = InventoryTransferIn::find($row->lookable_id);
+						$it->updateJournal();
+					}
+
 					$finalprice = round(($prevtotal + $row->total_in) / ($prevqty + $row->qty_in),2);
 					$totalprice = $prevtotal + $row->total_in;
 					$row->update([
@@ -71,7 +77,7 @@ class ResetCogs implements ShouldQueue
 						'total_final'	=> $totalprice
 					]);
 				}elseif($row->type == 'OUT'){
-					if($row->lookable_type == 'good_issues' || $row->lookable_type == 'inventory_transfers'){
+					if($row->lookable_type == 'good_issues' || $row->lookable_type == 'inventory_transfer_outs'){
 						$prevprice = $data[$key-1]->price_final;
 						if($row->lookable_type == 'good_issues'){
 							$gi = GoodIssue::find($row->lookable_id);
@@ -90,12 +96,12 @@ class ResetCogs implements ShouldQueue
 								}
 							}
 							GoodIssue::find($row->lookable_id)->updateGrandtotal();
-						}elseif($row->lookable_type == 'inventory_transfers'){
-							$it = InventoryTransfer::find($row->lookable_id);
+						}elseif($row->lookable_type == 'inventory_transfer_outs'){
+							$it = InventoryTransferOut::find($row->lookable_id);
 							$it->updateJournal();
 						}
 						$finalprice = $prevprice;
-						$totalprice = round($finalprice * ($prevqty - $row->qty_out),2);
+						$totalprice = $prevtotal - $row->total_out;
 						$row->update([
 							'price_out'		=> $finalprice,
 							'total_out'		=> $finalprice * $row->qty_out,

@@ -13,27 +13,27 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('close_bills', function (Blueprint $table) {
+        if(!Schema::hasTable('inventory_transfer_outs'))
+        Schema::create('inventory_transfer_outs', function (Blueprint $table) {
             $table->id();
             $table->string('code',155)->unique();
-            $table->bigInteger('company_id')->nullable();
             $table->bigInteger('user_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
+            $table->bigInteger('place_from')->nullable();
+            $table->bigInteger('warehouse_from')->nullable();
+            $table->bigInteger('place_to')->nullable();
+            $table->bigInteger('warehouse_to')->nullable();
             $table->date('post_date')->nullable();
-            $table->string('note')->nullable();
+            $table->string('document')->nullable();
+            $table->text('note')->nullable();
             $table->char('status',1)->nullable();
-            $table->double('nominal')->nullable();
-            $table->double('total')->nullable();
-            $table->double('tax')->nullable();
-            $table->double('wtax')->nullable();
-            $table->double('grandtotal')->nullable();
-            $table->double('balance')->nullable();
             $table->bigInteger('void_id')->nullable();
             $table->string('void_note')->nullable();
             $table->timestamp('void_date')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id','company_id','void_id'],'close_bills_index');
+            $table->index(['user_id','company_id','place_from','warehouse_from','place_to','warehouse_to'],'inventory_transfer_index');
         });
     }
 
@@ -44,6 +44,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('close_temp_bills');
+        Schema::dropIfExists('inventory_transfer_outs');
     }
 };

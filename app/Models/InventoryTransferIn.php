@@ -8,23 +8,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class GoodIssue extends Model
+class InventoryTransferIn extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'good_issues';
+    protected $table = 'inventory_transfer_ins';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
         'company_id',
+        'inventory_transfer_out_id',
         'post_date',
-        'currency_id',
-        'currency_rate',
-        'note',
         'document',
-        'grandtotal',
+        'note',
         'status',
         'void_id',
         'void_note',
@@ -43,19 +41,14 @@ class GoodIssue extends Model
         return $this->belongsTo('App\Models\User','void_id','id')->withTrashed();
     }
 
-    public function currency()
-    {
-        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
-    }
-
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function goodIssueDetail()
+    public function inventoryTransferOut()
     {
-        return $this->hasMany('App\Models\GoodIssueDetail');
+        return $this->belongsTo('App\Models\InventoryTransferOut', 'inventory_transfer_out_id', 'id')->withTrashed();
     }
 
     public function status(){
@@ -105,7 +98,7 @@ class GoodIssue extends Model
 
     public static function generateCode()
     {
-        $query = GoodIssue::selectRaw('RIGHT(code, 9) as code')
+        $query = InventoryTransferIn::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
@@ -119,7 +112,7 @@ class GoodIssue extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'GI-'.date('y').date('m').date('d').'-';
+        $pre = 'ITI-'.date('y').date('m').date('d').'-';
 
         return $pre.$no;
     }
@@ -147,30 +140,20 @@ class GoodIssue extends Model
         }
     }
 
-    public function hasBalance(){
-        $qty = 0;
-
-        foreach($this->goodIssueDetail as $row){
-            $qty += $row->qtyBalance();
+    public function updateJournal(){
+        $journal = Journal::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
+        
+        if($journal){
+            foreach($this->inventoryTransferOut->inventoryTransferOutDetail as $row){
+                if($journal){
+                    foreach($journal->journalDetail()->where('item_id',$row->item_id)->get() as $rowupdate){
+                        $rowupdate->update([
+                            'nominal'   => $row->total,
+                        ]);
+                    }
+                }
+            }
         }
-
-        if($qty > 0){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    public function updateGrandtotal(){
-        $total = 0;
-
-        foreach($this->goodIssueDetail as $row){
-            $total += $row->total;
-        }
-
-        $gi = GoodIssue::find($this->id)->update([
-            'grandtotal'    => $total
-        ]);
     }
 
     public function journal(){

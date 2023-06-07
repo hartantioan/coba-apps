@@ -390,18 +390,29 @@ class GoodReceiptPOController extends Controller
                 try {
                     $query = GoodReceipt::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Purchase Order / Pembelian telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Goods Receipt PO telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
@@ -425,6 +436,8 @@ class GoodReceiptPOController extends Controller
                         $query->tax = $taxall;
                         $query->wtax = $wtaxall;
                         $query->grandtotal = $grandtotalall;
+                        $query->status = '1';
+
                         $query->save();
 
                         foreach($query->goodReceiptDetail as $row){

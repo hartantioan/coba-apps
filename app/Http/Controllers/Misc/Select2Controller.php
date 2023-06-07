@@ -1114,4 +1114,36 @@ class Select2Controller extends Controller {
 
         return response()->json(['items' => $response]);
     }
+
+    public function itemTransfer(Request $request)
+    {
+        $response   = [];
+        $search     = $request->search;
+        $place      = $request->place;
+        $warehouse  = $request->warehouse;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->whereHas('itemStock',function($query)use($place,$warehouse){
+                    $query->where('place_id',$place)
+                        ->where('warehouse_id',$warehouse);
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'price_list'        => $d->currentCogs($this->dataplaces),
+                'stock_list'        => $d->currentStock($this->dataplaces),
+                'list_warehouse'    => $d->warehouseList(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
 }

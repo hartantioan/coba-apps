@@ -144,10 +144,9 @@ class GoodIssueController extends Controller
                 }else{
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
                 }
-                $journal = Journal::where('lookable_type','good_issues')->where('lookable_id',$val->id)->first();
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-id="' . $val->id . '"><i class="material-icons">add</i></button>',
-                    $val->code.' - '.$journal->code,
+                    $val->code,
                     $val->user->name,
                     $val->company->name,
                     date('d M Y',strtotime($val->post_date)),
@@ -226,18 +225,29 @@ class GoodIssueController extends Controller
                 try {
                     $query = GoodIssue::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Barang keluar telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Barang Keluar telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
@@ -253,6 +263,8 @@ class GoodIssueController extends Controller
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->grandtotal = $grandtotal;
+                        $query->status = '1';
+
                         $query->save();
 
                         foreach($query->goodIssueDetail as $row){

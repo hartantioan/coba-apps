@@ -47,8 +47,8 @@
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
                                     <div class="collapsible-body">
                                         <div class="row">
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                            <div class="col m3 s6 ">
+                                                <label for="filter_status" style="font-size:1.2rem;">Filter Status Transaksi :</label>
                                                 <div class="input-field col s12">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
@@ -60,13 +60,24 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
+                                            <div class="col m3 s6 ">
+                                                <label for="filter_document" style="font-size:1.2rem;">Filter Status Dokumen :</label>
+                                                <div class="input-field col s12">
+                                                    <select class="form-control" id="filter_document" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Menunggu</option>
+                                                        <option value="2">Lengkap</option>
+                                                        <option value="3">Tidak Lengkap</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m3 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Start Date (Tanggal Mulai) :</label>
                                                 <div class="input-field col s12">
                                                 <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
+                                            <div class="col m3 s6 ">
                                                 <label for="finish_date" style="font-size:1rem;">End Date (Tanggal Berhenti) :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" id="finish_date" name="finish_date"  onchange="loadDataTable()">
@@ -106,9 +117,9 @@
                                                         <th rowspan="2">Rekening Penerima</th>
                                                         <th rowspan="2">Bank & No.Rek</th>
                                                         <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
+                                                        {{-- <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPH</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">Grandtotal</th> --}}
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
@@ -238,6 +249,7 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
+                    document : $('#filter_document').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
                 },
@@ -274,9 +286,9 @@
                 { name: 'name_account', className: 'center-align' },
                 { name: 'no_account', className: 'center-align' },
                 { name: 'total', className: 'center-align' },
-                { name: 'tax', className: 'center-align' },
+                /* { name: 'tax', className: 'center-align' },
                 { name: 'wtax', className: 'center-align' },
-                { name: 'grandtotal', className: 'center-align' },
+                { name: 'grandtotal', className: 'center-align' }, */
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -530,6 +542,7 @@
     function printData(){
         var search = window.table.search();
         var status = $('#filter_status').val();
+        var document = $('#filter-document').val();
         
         $.ajax({
             type : "POST",
@@ -537,6 +550,7 @@
             data : {
                 search : search,
                 status : status,
+                document : document
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -554,8 +568,9 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
+        var document = $('#filter_document').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&document=" + document;
     }
 
     function makeTreeOrg(data,link){
@@ -730,6 +745,20 @@
             },
             success: function(data){
                 loadingClose('#datatable_serverside');
+                if(data.status == '200'){
+                    M.toast({
+                        html: response.message
+                    });
+                }else{
+                    if(data.status == '422'){
+                        $(element).val(data.value);
+                    }
+                    swal({
+                        title: 'Ups!',
+                        text: data.message,
+                        icon: 'warning'
+                    });
+                }
             }
         });
     }

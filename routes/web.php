@@ -51,7 +51,8 @@ use App\Http\Controllers\Purchase\PurchaseMemoController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
-use App\Http\Controllers\Inventory\InventoryTransferController;
+use App\Http\Controllers\Inventory\InventoryTransferOutController;
+use App\Http\Controllers\Inventory\InventoryTransferInController;
 use App\Http\Controllers\Inventory\GoodReceiveController;
 use App\Http\Controllers\Inventory\GoodIssueController;
 
@@ -153,6 +154,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('purchase_down_payment', [Select2Controller::class, 'purchaseDownPayment']);
                 Route::get('cost_distribution', [Select2Controller::class, 'costDistribution']);
                 Route::get('line', [Select2Controller::class, 'line']);
+                Route::get('item_transfer', [Select2Controller::class, 'itemTransfer']);
             });
 
             Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -770,18 +772,32 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [GoodReturnPOController::class, 'destroy'])->middleware('operation.access:good_return_po,delete');
                 });
 
-                Route::prefix('transfer')->middleware('operation.access:transfer,view')->group(function () {
-                    Route::get('/',[InventoryTransferController::class, 'index']);
-                    Route::get('datatable',[InventoryTransferController::class, 'datatable']);
-                    Route::get('row_detail',[InventoryTransferController::class, 'rowDetail']);
-                    Route::post('show', [InventoryTransferController::class, 'show']);
-                    Route::post('print',[InventoryTransferController::class, 'print']);
-                    Route::get('export',[InventoryTransferController::class, 'export']);
-                    Route::get('view_journal/{id}',[InventoryTransferController::class, 'viewJournal']);
-                    Route::post('create',[InventoryTransferController::class, 'create'])->middleware('operation.access:transfer,update');
-                    Route::get('approval/{id}',[InventoryTransferController::class, 'approval'])->withoutMiddleware('direct.access');
-                    Route::post('void_status', [InventoryTransferController::class, 'voidStatus'])->middleware('operation.access:transfer,void');
-                    Route::post('destroy', [InventoryTransferController::class, 'destroy'])->middleware('operation.access:transfer,delete');
+                Route::prefix('transfer_out')->middleware('operation.access:transfer_out,view')->group(function () {
+                    Route::get('/',[InventoryTransferOutController::class, 'index']);
+                    Route::get('datatable',[InventoryTransferOutController::class, 'datatable']);
+                    Route::get('row_detail',[InventoryTransferOutController::class, 'rowDetail']);
+                    Route::post('show', [InventoryTransferOutController::class, 'show']);
+                    Route::post('print',[InventoryTransferOutController::class, 'print']);
+                    Route::get('export',[InventoryTransferOutController::class, 'export']);
+                    Route::get('view_journal/{id}',[InventoryTransferOutController::class, 'viewJournal']);
+                    Route::post('create',[InventoryTransferOutController::class, 'create'])->middleware('operation.access:transfer_out,update');
+                    Route::get('approval/{id}',[InventoryTransferOutController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [InventoryTransferOutController::class, 'voidStatus'])->middleware('operation.access:transfer_out,void');
+                    Route::post('destroy', [InventoryTransferOutController::class, 'destroy'])->middleware('operation.access:transfer_out,delete');
+                });
+
+                Route::prefix('transfer_in')->middleware('operation.access:transfer_in,view')->group(function () {
+                    Route::get('/',[InventoryTransferInController::class, 'index']);
+                    Route::get('datatable',[InventoryTransferInController::class, 'datatable']);
+                    Route::get('row_detail',[InventoryTransferInController::class, 'rowDetail']);
+                    Route::post('show', [InventoryTransferInController::class, 'show']);
+                    Route::post('print',[InventoryTransferInController::class, 'print']);
+                    Route::get('export',[InventoryTransferInController::class, 'export']);
+                    Route::get('view_journal/{id}',[InventoryTransferInController::class, 'viewJournal']);
+                    Route::post('create',[InventoryTransferInController::class, 'create'])->middleware('operation.access:transfer_in,update');
+                    Route::get('approval/{id}',[InventoryTransferInController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [InventoryTransferInController::class, 'voidStatus'])->middleware('operation.access:transfer_in,void');
+                    Route::post('destroy', [InventoryTransferInController::class, 'destroy'])->middleware('operation.access:transfer_in,delete');
                 });
 
                 Route::prefix('good_receive')->middleware('operation.access:good_receive,view')->group(function () {

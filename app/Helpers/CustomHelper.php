@@ -19,7 +19,8 @@ use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
 use App\Models\GoodReturnPO;
-use App\Models\InventoryTransfer;
+use App\Models\InventoryTransferIn;
+use App\Models\InventoryTransferOut;
 use App\Models\Item;
 use App\Models\ItemGroupWarehouse;
 use App\Models\OutgoingPayment;
@@ -105,7 +106,7 @@ class CustomHelper {
 					$priceeach = $old_data->price_final;
 					$totalout = round($priceeach * $qty,2);
 					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = round($qtybalance * $priceeach,2);
+					$totalfinal = $old_data->total_final - $totalout;
 					ItemCogs::create([
 						'lookable_type'	=> $lookable_type,
 						'lookable_id'	=> $lookable_id,
@@ -825,9 +826,9 @@ class CustomHelper {
 					]);
 				}
 			}
-		}elseif($table_name == 'inventory_transfers'){
+		}elseif($table_name == 'inventory_transfer_outs'){
 
-			$it = InventoryTransfer::find($table_id);
+			$ito = InventoryTransferOut::find($table_id);
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -839,16 +840,23 @@ class CustomHelper {
 				'status'		=> '3'
 			]);
 
-			foreach($it->inventoryTransferDetail as $rowdetail){
-				$priceout = $rowdetail->item->priceNow($rowdetail->itemStock->place_id);
-				$nominal = $rowdetail->qty * $priceout;
+			$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$ito->company_id)->first();
+
+			foreach($ito->inventoryTransferOutDetail as $rowdetail){
+				$priceout = $rowdetail->item->priceNow($rowdetail->itemStock->place_id,$ito->post_date);
+				$nominal = round($rowdetail->qty * $priceout,2);
+
+				$rowdetail->update([
+					'price'	=> $priceout,
+					'total'	=> $nominal,
+				]);
 				
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
-					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
-					'place_id'		=> $rowdetail->to_place_id,
+					'coa_id'		=> $coabdp ? $coabdp->id : NULL,
+					'place_id'		=> $rowdetail->itemStock->place_id,
 					'item_id'		=> $rowdetail->item_id,
-					'warehouse_id'	=> $rowdetail->to_warehouse_id,
+					'warehouse_id'	=> $rowdetail->itemStock->warehouse_id,
 					'type'			=> '1',
 					'nominal'		=> $nominal,
 				]);
@@ -863,8 +871,8 @@ class CustomHelper {
 					'nominal'		=> $nominal,
 				]);
 
-				self::sendCogs('inventory_transfers',
-					$it->id,
+				self::sendCogs('inventory_transfer_outs',
+					$ito->id,
 					$rowdetail->itemStock->place->company_id,
 					$rowdetail->itemStock->place_id,
 					$rowdetail->itemStock->warehouse_id,
@@ -872,7 +880,7 @@ class CustomHelper {
 					$rowdetail->qty,
 					$nominal,
 					'OUT',
-					$it->post_date
+					$ito->post_date
 				);
 
 				self::sendStock(
@@ -882,27 +890,66 @@ class CustomHelper {
 					$rowdetail->qty,
 					'OUT'
 				);
+			}
+		}elseif($table_name == 'inventory_transfer_ins'){
 
-				self::sendCogs('inventory_transfers',
-					$it->id,
-					$rowdetail->toPlace->company_id,
-					$rowdetail->to_place_id,
-					$rowdetail->to_warehouse_id,
+			$iti = InventoryTransferIn::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode(),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+
+			$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$iti->company_id)->first();
+
+			foreach($iti->inventoryTransferOut->inventoryTransferOutDetail as $rowdetail){
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+					'place_id'		=> $iti->inventoryTransferOut->place_to,
+					'item_id'		=> $rowdetail->item_id,
+					'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_to,
+					'type'			=> '1',
+					'nominal'		=> $rowdetail->total,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coabdp ? $coabdp->id : NULL,
+					'place_id'		=> $iti->inventoryTransferOut->place_to,
+					'item_id'		=> $rowdetail->item_id,
+					'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_to,
+					'type'			=> '2',
+					'nominal'		=> $rowdetail->total,
+				]);
+
+				self::sendCogs('inventory_transfer_ins',
+					$iti->id,
+					$iti->company_id,
+					$iti->inventoryTransferOut->place_to,
+					$iti->inventoryTransferOut->warehouse_to,
 					$rowdetail->item_id,
 					$rowdetail->qty,
-					$nominal,
+					$rowdetail->total,
 					'IN',
-					$it->post_date
+					$iti->post_date
 				);
 
 				self::sendStock(
-					$rowdetail->to_place_id,
-					$rowdetail->to_warehouse_id,
+					$iti->inventoryTransferOut->place_to,
+					$iti->inventoryTransferOut->warehouse_to,
 					$rowdetail->item_id,
 					$rowdetail->qty,
 					'IN'
 				);
 			}
+
 		}elseif($table_name == 'depreciations'){
 
 			$dpr = Depreciation::find($table_id);

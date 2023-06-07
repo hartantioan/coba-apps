@@ -579,18 +579,29 @@ class PurchaseInvoiceController extends Controller
                 try {
                     $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Purchase Order Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Purchase Invoice telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
 
                         if($request->has('document')) {
                             if(Storage::exists($query->document)){
@@ -623,6 +634,7 @@ class PurchaseInvoiceController extends Controller
                         $query->cut_date = $request->cut_date;
                         $query->spk_no = $request->spk_no;
                         $query->invoice_no = $request->invoice_no;
+                        $query->status = '1';
 
                         $query->save();
 

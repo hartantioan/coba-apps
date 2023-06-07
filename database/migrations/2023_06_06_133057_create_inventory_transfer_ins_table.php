@@ -13,12 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('inventory_transfers'))
-        Schema::create('inventory_transfers', function (Blueprint $table) {
+        if(!Schema::hasTable('inventory_transfer_ins'))
+        Schema::create('inventory_transfer_ins', function (Blueprint $table) {
             $table->id();
             $table->string('code',155)->unique();
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('company_id')->nullable();
+            $table->bigInteger('inventory_transfer_out_id')->nullable();
             $table->date('post_date')->nullable();
             $table->string('document')->nullable();
             $table->text('note')->nullable();
@@ -29,7 +30,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id','company_id'],'inventory_transfer_index');
+            $table->index(['user_id', 'company_id', 'inventory_transfer_out_id'],'inventory_transfer_in_index');
         });
     }
 
@@ -40,6 +41,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('inventory_transfers');
+        Schema::dropIfExists('inventory_transfer_ins');
     }
 };

@@ -298,18 +298,29 @@ class JournalController extends Controller
                 try {
                     $query = Journal::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Jurnal telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Jurnal entri telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
 
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
@@ -318,6 +329,7 @@ class JournalController extends Controller
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->note = $request->note;
+                        $query->status = '1';
 
                         $query->save();
 

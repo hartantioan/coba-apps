@@ -25,6 +25,7 @@ return new class extends Migration
             $table->dateTime('date_process')->nullable();
             $table->char('approved',1)->nullable();
             $table->char('rejected',1)->nullable();
+            $table->char('revised',1)->nullable();
             $table->char('status',1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');

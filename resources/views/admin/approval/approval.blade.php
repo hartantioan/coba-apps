@@ -114,20 +114,17 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12 center">
-                        <div class="input-field col s12" style="zoom:1.5;">
-                            <div class="switch mb-1">
-                                <label class="center">
-                                    TOLAK
-                                    <input checked type="checkbox" id="approve_reject" name="approve_reject" value="1">
-                                    <span class="lever"></span>
-                                    SETUJU
-                                </label>
-                            </div>
+                        <div class="input-field col s12">
+                            <select class="form-control" id="approve_reject_revision" name="approve_reject_revision">
+                                <option value="1">Setuju</option>
+                                <option value="2">Tolak</option>
+                                <option value="3">Revisi</option>
+                            </select>
                         </div>
                         <div class="input-field col s12">
                             <input type="hidden" id="temp" name="temp">
                             <textarea id="note" name="note" placeholder="Keterangan" class="materialize-textarea"></textarea>
-                            <label class="active" for="code">Keterangan</label>
+                            <label class="active" for="note">Keterangan</label>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="approve();">Kirim <i class="material-icons right">send</i></button>
@@ -161,14 +158,11 @@
                     </div>
                     <div class="col s12 center">
                         <div class="input-field col s12" style="zoom:1.5;">
-                            <div class="switch mb-1">
-                                <label class="center">
-                                    TOLAK
-                                    <input checked type="checkbox" id="approve_reject_multi" name="approve_reject_multi" value="1">
-                                    <span class="lever"></span>
-                                    SETUJU
-                                </label>
-                            </div>
+                            <select class="form-control" id="approve_reject_revision_multi" name="approve_reject_revision_multi">
+                                <option value="1">Setuju</option>
+                                <option value="2">Tolak</option>
+                                <option value="3">Revisi</option>
+                            </select>
                         </div>
                         <div class="input-field col s12">
                             <input type="hidden" name="tempMulti" id="tempMulti">
@@ -202,6 +196,7 @@
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
+                $('#approve_reject_revision').formSelect();
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('#body_show').html('');
@@ -220,6 +215,7 @@
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
+                $('#approve_reject_revision_multi').formSelect();
                 $('#form_data_multi')[0].reset();
                 $('#tempMulti').val('');
                 M.updateTextFields();
@@ -252,6 +248,10 @@
                 });
 			}
 		});
+
+        $('#datatable_serverside tbody').on('click', 'button', function (event) {
+            event.stopPropagation();
+        });
     });
 
     function multiApprove(){

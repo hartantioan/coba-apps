@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\CloseBill;
 use App\Models\CloseBillDetail;
+use App\Models\CostDistribution;
 use App\Models\FundRequest;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
@@ -14,6 +15,7 @@ use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
+use App\Models\Tax;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -41,6 +43,9 @@ class CloseBillController extends Controller
             'content'       => 'admin.finance.close_bill',
             'company'       => Company::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
+            'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
+            'distribution'  => CostDistribution::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -209,7 +214,12 @@ class CloseBillController extends Controller
                                 <th class="center-align">Partner Bisnis</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Keterangan</th>
-                                <th class="center-align">Nominal</th>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">PPN</th>
+                                <th class="center-align">PPH</th>
+                                <th class="center-align">Grandtotal</th>
+                                <th class="center-align">Dibayarkan</th>
+                                <th class="center-align">Balance</th>
                             </tr>
                         </thead><tbody>';
         
@@ -220,7 +230,12 @@ class CloseBillController extends Controller
                 <td class="center-align">'.$row->fundRequest->account->name.'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
                 <td class="">'.$row->note.'</td>
+                <td class="right-align">'.number_format($row->total,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->wtax,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,3,',','.').'</td>
                 <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->balance,3,',','.').'</td>
             </tr>';
         }
         
@@ -339,23 +354,35 @@ class CloseBillController extends Controller
                 try {
                     $query = CloseBill::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Penutupan BS Karyawan telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
 
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
                         $query->note = $request->note;
+                        $query->status = '1';
 
                         $query->save();
 

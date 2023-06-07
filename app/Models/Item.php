@@ -46,6 +46,16 @@ class Item extends Model
         return implode(', ',$arr);
     }
 
+    public function arrWarehouse(){
+        $arr = [];
+
+        foreach($this->itemGroup->itemGroupWarehouse as $row){
+            $arr[] = $row->warehouse_id;
+        }
+
+        return $arr;
+    }
+
     public function warehouseList(){
         $arr = [];
 
@@ -116,9 +126,9 @@ class Item extends Model
         return $arrPrice;
     }
 
-    public function priceNow($place_id){
+    public function priceNow($place_id,$date){
         $pricenow = 0;
-        $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->orderByDesc('date')->orderByDesc('id')->first();
+        $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
         if($price){
             $pricenow = $price->price_final;
         }

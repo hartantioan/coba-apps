@@ -316,7 +316,7 @@ class ApprovalController extends Controller
                     $val->approvalSource->note,
                     $val->status == '1' ? '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small btn-approve" data-popup="tooltip" title="show" onclick="show(`' . url('admin/'.$val->approvalSource->fullUrl() . '/approval/' . CustomHelper::encrypt($val->approvalSource->lookable->code)) . '`,`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons dp48">pageview</i></button>
-                    ' : ($val->approved ? 'Disetujui' : ($val->rejected ? 'Ditolak' : 'Invalid')),
+                    ' : ($val->approved ? 'Disetujui' : ($val->rejected ? 'Ditolak' : ($val->revised ? 'Direvisi' : 'Invalid'))),
                     $val->status(),
                     $val->note,
                     $val->status == '1' ? 'pending' : ''
@@ -388,26 +388,33 @@ class ApprovalController extends Controller
             if($work_orders_rp == 0){
                 if($query) {
 
-                    /* DB::beginTransaction();
-                    try { */
+                    DB::beginTransaction();
+                    try {
     
                         $query->note = $request->note;
     
-                        if($request->approve_reject){
+                        if($request->approve_reject_revision == '1'){
                             $query->approved = '1';
                             $query->rejected = NULL;
+                            $query->revised = NULL;
                             $text = 'disetujui';
-                        }else{
+                        }elseif($request->approve_reject_revision == '2'){
                             $query->approved = NULL;
                             $query->rejected = '1';
+                            $query->revised = NULL;
                             $text = 'ditolak';
+                        }elseif($request->approve_reject_revision == '3'){
+                            $query->approved = NULL;
+                            $query->rejected = NULL;
+                            $query->revised = '1';
+                            $text = 'direvisi';
                         }
     
                         $query->date_process = date('Y-m-d H:i:s');
                         $query->status = '2';
                         $query->save();
                         
-                        if($request->approve_reject){
+                        if($request->approve_reject_revision == '1'){
                             if($query->passedApprove()){
                                 if($query->updateNextLevelApproval() !== ''){
                                     $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
@@ -429,19 +436,24 @@ class ApprovalController extends Controller
                                     CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
                                 }
                             }
-                        }else{
+                        }elseif($request->approve_reject_revision == '2'){
                             if($query->passedReject()){
                                 $updaterealtable = $query->approvalSource->lookable;
                                 $updaterealtable->update([
                                     'status'    => '4'
                                 ]);
                             }
+                        }elseif($request->approve_reject_revision == '3'){
+                            $updaterealtable = $query->approvalSource->lookable;
+                            $updaterealtable->update([
+                                'status'    => '6'
+                            ]);
                         }
     
-                        /* DB::commit();
+                        DB::commit();
                     }catch(\Exception $e){
                         DB::rollback();
-                    } */
+                    }
     
                     CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);
     
@@ -531,21 +543,28 @@ class ApprovalController extends Controller
         
                             $query->note = $request->note_multi;
     
-                            if($request->approve_reject_multi){
+                            if($request->approve_reject_revision_multi == '1'){
                                 $query->approved = '1';
                                 $query->rejected = NULL;
+                                $query->revised = NULL;
                                 $text = 'disetujui';
-                            }else{
+                            }elseif($request->approve_reject_revision_multi == '2'){
                                 $query->approved = NULL;
                                 $query->rejected = '1';
+                                $query->revised = NULL;
                                 $text = 'ditolak';
+                            }elseif($request->approve_reject_revision_multi == '3'){
+                                $query->approved = NULL;
+                                $query->rejected = NULL;
+                                $query->revised = '1';
+                                $text = 'direvisi';
                             }
     
                             $query->date_process = date('Y-m-d H:i:s');
                             $query->status = '2';
                             $query->save();
                             
-                            if($request->approve_reject_multi){
+                            if($request->approve_reject_revision_multi == '1'){
                                 if($query->passedApprove()){
                                     if($query->updateNextLevelApproval() !== ''){
                                         $am = ApprovalMatrix::where('approval_template_stage_id',$query->updateNextLevelApproval())->where('approval_source_id',$query->approval_source_id)->where('status','0')->get();
@@ -566,13 +585,18 @@ class ApprovalController extends Controller
                                         CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
                                     }
                                 }
-                            }else{
+                            }elseif($request->approve_reject_revision_multi == '2'){
                                 if($query->passedReject()){
                                     $updaterealtable = $query->approvalSource->lookable;
                                     $updaterealtable->update([
                                         'status'    => '4'
                                     ]);
                                 }
+                            }elseif($request->approve_reject_revision_multi == '3'){
+                                $updaterealtable = $query->approvalSource->lookable;
+                                $updaterealtable->update([
+                                    'status'    => '6'
+                                ]);
                             }
         
                             CustomHelper::sendNotification($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,'Pengajuan '.$query->approvalSource->fullName().' No. '.$query->approvalSource->lookable->code.' telah '.$text.' di level '.$query->approvalTemplateStage->approvalStage->level.'.',$query->note,$query->approvalSource->lookable->user_id);

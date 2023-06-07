@@ -134,7 +134,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Barang Transfer</h5>
+                <h5 class="indigo-text">Barang Transfer Keluar</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -196,22 +196,28 @@
         <table class="bordered">
             <thead>
                 <tr>
+                    <th class="center">Dari</th>
+                    <th class="center">{{ $data->placeFrom->name.' - '.$data->warehouseFrom->name }}</th>
+                    <th class="center">Tujuan</th>
+                    <th class="center">{{ $data->placeTo->name.' - '.$data->warehouseTo->name }}</th>
+                </tr>
+            </thead>
+        </table>
+        <table class="bordered" style="margin-top:25px;">
+            <thead>
+                <tr>
                     <th class="center">Item</th>
                     <th class="center">Jum.</th>
                     <th class="center">Sat.</th>
-                    <th class="center">Gudang Asal</th>
-                    <th class="center">Gudang Tujuan</th>
                     <th class="center">Keterangan</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data->inventoryTransferDetail as $row)
+                @foreach($data->inventoryTransferOutDetail as $row)
                 <tr>
                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                     <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
-                    <td class="center-align">{{ $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code }}</td>
-                    <td class="center-align">{{ $row->toPlace->code.' - '.$row->toWarehouse->code }}</td>
                     <td>{{ $row->note }}</td>
                 </tr>
                 @endforeach

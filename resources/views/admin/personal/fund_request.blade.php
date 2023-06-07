@@ -92,9 +92,9 @@
                                                         <th rowspan="2">Rekening Penerima</th>
                                                         <th rowspan="2">Bank & No.Rek</th>
                                                         <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
+                                                        {{-- <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPH</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">Grandtotal</th> --}}
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
@@ -266,7 +266,7 @@
                                             <td>Total</td>
                                             <td class="right-align" colspan="2"><span id="total">0,00</span></td>
                                         </tr>
-                                        <tr>
+                                        {{-- <tr>
                                             <td>PPN</td>
                                             <td class="right-align">
                                                 <select class="browser-default" id="percent_tax" name="percent_tax" onchange="count();">
@@ -297,7 +297,7 @@
                                         <tr>
                                             <td>Grandtotal</td>
                                             <td class="right-align" colspan="2"><span id="grandtotal">0,00</span></td>
-                                        </tr>
+                                        </tr> --}}
                                     </thead>
                                 </table>
                             </div>
@@ -398,20 +398,20 @@
     }
 
     function count(){
-        let totalall = 0, grandtotal = 0, tax = 0, wtax = 0, percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), percent_wtax = parseFloat($('#percent_wtax').val().replaceAll(".", "").replaceAll(",","."));
+        let totalall = 0, grandtotal = 0, tax = 0, wtax = 0/* , percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), percent_wtax = parseFloat($('#percent_wtax').val().replaceAll(".", "").replaceAll(",",".")) */;
         $('input[name^="arr_qty"]').each(function(index){
             let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), price = parseFloat($('input[name^="arr_price"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
             let total = qty * price;
             $('input[name^="arr_total"]').eq(index).val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
             totalall += total;
         });
-        tax = totalall * (percent_tax / 100);
+        /* tax = totalall * (percent_tax / 100);
         wtax = totalall * (percent_wtax / 100);
         grandtotal = totalall + tax - wtax;
         $('#tax').val(formatRupiahIni(tax.toFixed(2).toString().replace('.',',')));
-        $('#wtax').val(formatRupiahIni(wtax.toFixed(2).toString().replace('.',',')));
+        $('#wtax').val(formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))); */
         $('#total').text(formatRupiahIni(totalall.toFixed(2).toString().replace('.',',')));
-        $('#grandtotal').text(formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',',')));
+        /* $('#grandtotal').text(formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))); */
     }
 
     function addItem(){
@@ -422,7 +422,7 @@
                     <textarea class="materialize-textarea" name="arr_item[]" type="text" placeholder="Keterangan Barang"></textarea>
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this);count();">
+                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
@@ -500,9 +500,9 @@
                 { name: 'name_account', className: 'center-align' },
                 { name: 'no_account', className: 'center-align' },
                 { name: 'total', className: 'center-align' },
-                { name: 'tax', className: 'center-align' },
+                /* { name: 'tax', className: 'center-align' },
                 { name: 'wtax', className: 'center-align' },
-                { name: 'grandtotal', className: 'center-align' },
+                { name: 'grandtotal', className: 'center-align' }, */
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -730,7 +730,7 @@
                                     <textarea class="materialize-textarea" name="arr_item[]" type="text" placeholder="Keterangan Barang">` + val.item + `</textarea>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);count();">
+                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();">
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>

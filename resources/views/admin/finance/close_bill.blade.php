@@ -192,7 +192,7 @@
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Fund Request / Permohonan Dana (Tipe BS)</h6>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="max-width:1650px !important;">
+                                        <table class="bordered" style="max-width:2200px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Referensi</th>
@@ -201,15 +201,22 @@
                                                     <th class="center">Tgl.Req.Bayar</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">Coa Debit</th>
+                                                    <th class="center">Dist.Debit</th>
                                                     <th class="center">Coa Kredit</th>
-                                                    <th class="center">Nominal</th>
+                                                    <th class="center">Total</th>
+                                                    <th class="center">PPN</th>
+                                                    <th class="center">Termasuk PPN</th>
+                                                    <th class="center">PPH</th>
+                                                    <th class="center">Grandtotal</th>
+                                                    <th class="center">Dibayarkan</th>
+                                                    <th class="center">Sisa</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="empty-detail">
-                                                    <td colspan="10" class="center">
+                                                    <td colspan="17" class="center">
                                                         Pilih Fund Request / Permohonan Dana untuk memulai...
                                                     </td>
                                                 </tr>
@@ -217,6 +224,40 @@
                                         </table>
                                     </div>
                                 </p>
+                            </div>
+                            <div class="input-field col m4 s12">
+                            </div>
+                            <div class="input-field col m4 s12">
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <table width="100%" class="bordered">
+                                    <thead>
+                                        <tr>
+                                            <td>Total</td>
+                                            <td class="right-align"><span id="total">0,00</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>PPN</td>
+                                            <td class="right-align"><span id="tax">0,00</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>PPH</td>
+                                            <td class="right-align"><span id="wtax">0,00</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Grandtotal</td>
+                                            <td class="right-align"><span id="grandtotal">0,00</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Bayar</td>
+                                            <td class="right-align"><span id="pay">0,00</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sisa</td>
+                                            <td class="right-align"><span id="balance">0,00</span></td>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
                             <div class="col s12 mt-3">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -669,12 +710,51 @@
                                 <td class="center">
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>
                                 </td>
+                                <td>
+                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" style="width:150px;">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($distribution as $row)
+                                            <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
                                 <td class="center">
                                     ` + response.coa_list + `
                                 </td>
                                 <td class="center">
-                                        <input id="arr_nominal` + count + `" name="arr_nominal[]" class="browser-default" type="text" value="` + response.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;">
-                                    </td>
+                                    <input id="arr_total` + count + `" name="arr_total[]" class="browser-default" type="text" value="` + response.balance + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();" style="width:150px;">
+                                        <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                        @foreach ($tax as $row)
+                                            <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" onchange="countAll();" style="width:150px;">
+                                        <option value="0">Tidak</option>
+                                        <option value="1">Ya</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();" style="width:150px;">
+                                        <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                                        @foreach ($wtax as $row)
+                                            <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="center">
+                                    <input id="arr_grandtotal` + count + `" name="arr_grandtotal[]" class="browser-default" type="text" value="` + response.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                                </td>
+                                <td class="center">
+                                    <input id="arr_nominal` + count + `" name="arr_nominal[]" class="browser-default" type="text" value="` + response.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                                </td>
+                                <td class="center">
+                                    <input id="arr_balance` + count + `" name="arr_balance[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                                </td>
                                 <td>
                                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value=" - " style="width:100%;">
                                 </td>
@@ -689,6 +769,7 @@
                         $('#fund_request_id').empty();
                         $('.modal-content').scrollTop(0);
                         M.updateTextFields();
+                        countAll();
                     }
                 },
                 error: function() {
@@ -704,6 +785,53 @@
         }else{
 
         }
+    }
+
+    function countAll(){
+        var total = 0, tax = 0, grandtotal = 0, balance = 0, wtax = 0, pay = 0;
+        
+        $('select[name^="arr_coa"]').each(function(index){
+            var rowgrandtotal = 0, rowtotal = parseFloat($('input[name^="arr_total"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('select[name^="arr_tax"]').eq(index).val()), percent_wtax = parseFloat($('select[name^="arr_wtax"]').eq(index).val()), rowpay = parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")), rowbalance = 0;
+            if(percent_tax > 0 && $('select[name^="arr_include_tax"]').eq(index).val() == '1'){
+                rowtotal = rowtotal / (1 + (percent_tax / 100));
+            }
+            rowtax = rowtotal * (percent_tax / 100);
+            rowwtax = rowtotal * (percent_wtax / 100);
+            total += rowtotal;
+            tax += rowtax;
+            wtax += rowwtax;
+            rowgrandtotal = rowtotal + rowtax - rowwtax;
+            grandtotal += rowgrandtotal;
+            rowbalance = rowgrandtotal - rowpay;
+            pay += rowpay;
+            balance += rowbalance;
+            
+            $('input[name^="arr_grandtotal"]').eq(index).val(
+                (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
+            );
+            $('input[name^="arr_balance"]').eq(index).val(
+                (rowbalance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowbalance).toString().replace('.',','))
+            );
+        });
+        
+        $('#total').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
+        );
+        $('#tax').text(
+            (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
+        );
+        $('#wtax').text(
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',','))
+        );
+        $('#grandtotal').text(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
+        );
+        $('#pay').text(
+            (pay >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(pay).toString().replace('.',','))
+        );
+        $('#balance').text(
+            (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
+        );
     }
 
     function removeUsedData(id){
@@ -1154,11 +1282,6 @@
                 $('#note_jurnal').append(`Keterangan `+data.message.note);
                 $('#ref_jurnal').append(`Referensi `+data.reference);
                 $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
-                
-                
-
-
-                console.log(data);
             }
         });
     }

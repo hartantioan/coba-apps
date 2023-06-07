@@ -433,18 +433,29 @@ class LandedCostController extends Controller
                 try {
                     $query = LandedCost::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Purchase Order Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
 
                         if($request->has('document')) {
                             if(Storage::exists($query->document)){
@@ -469,6 +480,7 @@ class LandedCostController extends Controller
                         $query->tax = round($tax,3);
                         $query->wtax = round($wtax,3);
                         $query->grandtotal = round($grandtotal,3);
+                        $query->status = '1';
 
                         $query->save();
 

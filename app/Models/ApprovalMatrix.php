@@ -26,6 +26,7 @@ class ApprovalMatrix extends Model
         'date_process',
         'approved',
         'rejected',
+        'revised',
         'status',
     ];
 

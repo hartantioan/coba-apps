@@ -528,18 +528,29 @@ class PurchaseOrderController extends Controller
                 try {
                     $query = PurchaseOrder::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Purchase Order telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Purchase Order telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
                         if($request->has('document_po')) {
                             if(Storage::exists($query->document_po)){
                                 Storage::delete($query->document_po);
@@ -573,6 +584,7 @@ class PurchaseOrderController extends Controller
                         $query->receiver_name = $request->receiver_name;
                         $query->receiver_address = $request->receiver_address;
                         $query->receiver_phone = $request->receiver_phone;
+                        $query->status = '1';
 
                         $query->save();
                         

@@ -256,10 +256,24 @@ class PurchaseRequestController extends Controller
         
         if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
             foreach($data->approval()->approvalMatrix as $key => $row){
+                $icon = '';
+
+                if($row->status == '1' || $row->status == '0'){
+                    $icon = '<i class="material-icons">hourglass_empty</i>';
+                }elseif($row->status == '2'){
+                    if($row->approved){
+                        $icon = '<i class="material-icons">thumb_up</i>';
+                    }elseif($row->rejected){
+                        $icon = '<i class="material-icons">thumb_down</i>';
+                    }elseif($row->revised){
+                        $icon = '<i class="material-icons">border_color</i>';
+                    }
+                }
+
                 $string .= '<tr>
                     <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                     <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
+                    <td class="center-align">'.$icon.'<br></td>
                     <td class="center-align">'.$row->note.'</td>
                 </tr>';
             }
@@ -466,18 +480,29 @@ class PurchaseRequestController extends Controller
                 try {
                     $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    $approved = false;
+                    $revised = false;
+
                     if($query->approval()){
                         foreach($query->approval()->approvalMatrix as $row){
-                            if($row->status == '2'){
-                                return response()->json([
-                                    'status'  => 500,
-                                    'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
-                                ]);
+                            if($row->approved){
+                                $approved = true;
+                            }
+
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
 
-                    if($query->status == '1'){
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+
+                    if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
                             if(Storage::exists($query->document)){
                                 Storage::delete($query->document);
@@ -494,6 +519,7 @@ class PurchaseRequestController extends Controller
                         $query->document = $document;
                         $query->project_id = $request->project_id ? $request->project_id : NULL;
                         $query->company_id = $request->company_id;
+                        $query->status = '1';
                         $query->save();
 
                         foreach($query->purchaseRequestDetail as $row){

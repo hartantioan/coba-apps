@@ -23,9 +23,9 @@ return new class extends Migration
             $table->bigInteger('line_id')->nullable();
             $table->bigInteger('machine_id')->nullable();
             $table->bigInteger('account_id')->nullable();
-            $table->bigInteger('item_id')->nullable();
             $table->bigInteger('department_id')->nullable();
             $table->bigInteger('warehouse_id')->nullable();
+            $table->bigInteger('item_id')->nullable();
             $table->char('type', 1)->nullable();
             $table->double('nominal')->nullable();
             $table->string('note')->nullable();

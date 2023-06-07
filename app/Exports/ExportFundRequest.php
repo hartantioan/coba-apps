@@ -15,10 +15,11 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search, string $status, array $dataplaces)
+    public function __construct(string $search, string $status, string $document, array $dataplaces)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
+        $this->document = $document ? $document : '';
         $this->dataplaces = $dataplaces ? $dataplaces : [];
     }
 
@@ -60,6 +61,10 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
 
             if($this->status){
                 $query->where('status', $this->status);
+            }
+
+            if($this->document){
+                $query->where('document_status', $this->document);
             }
         })
         ->whereIn('place_id',$this->dataplaces)

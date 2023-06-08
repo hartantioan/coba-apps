@@ -38,9 +38,6 @@ class ExportInventoryTransferIn implements FromView
             })
             ->whereHas('inventoryTransferOut',function($query){
                 $query->where(function($query){
-                    $query->whereIn('place_from',$this->dataplaces)
-                        ->whereIn('warehouse_from',$this->datawarehouses);
-                })->orWhere(function($query){
                     $query->whereIn('place_to',$this->dataplaces)
                         ->whereIn('warehouse_to',$this->datawarehouses);
                 });

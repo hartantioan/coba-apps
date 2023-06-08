@@ -751,10 +751,25 @@
                         'selectAll',
                         'selectNone'
                     ],
-                    language: {
-                        buttons: {
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
                             selectAll: "Pilih semua",
                             selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
                         }
                     },
                     select: {
@@ -772,12 +787,27 @@
                         'selectAll',
                         'selectNone'
                     ],
-                    language: {
-                        buttons: {
-                            selectAll: "Pilih semua",
-                            selectNone: "Hapus pilihan"
-                        }
-                    },
+                    "language": {
+                "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan / kosong",
+                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "infoEmpty": "Data tidak ditemukan / kosong",
+                "infoFiltered": "(disaring dari _MAX_ total data)",
+                "search": "Cari",
+                "paginate": {
+                    first:      "<<",
+                    previous:   "<",
+                    next:       ">",
+                    last:       ">>"
+                },
+                "buttons": {
+                    selectAll: "Pilih semua",
+                    selectNone: "Hapus pilihan"
+                },
+                "select": {
+                    rows: "%d baris terpilih"
+                }
+            },
                     select: {
                         style: 'multi'
                     }
@@ -1611,9 +1641,25 @@
             buttons: [
                 'selectNone'
             ],
-            language: {
-                buttons: {
+            "language": {
+                "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan / kosong",
+                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "infoEmpty": "Data tidak ditemukan / kosong",
+                "infoFiltered": "(disaring dari _MAX_ total data)",
+                "search": "Cari",
+                "paginate": {
+                    first:      "<<",
+                    previous:   "<",
+                    next:       ">",
+                    last:       ">>"
+                },
+                "buttons": {
+                    selectAll: "Pilih semua",
                     selectNone: "Hapus pilihan"
+                },
+                "select": {
+                    rows: "%d baris terpilih"
                 }
             },
             select: {

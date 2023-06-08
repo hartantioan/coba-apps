@@ -8,6 +8,7 @@ use App\Models\Coa;
 use App\Models\Company;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
+use App\Models\InventoryTransferIn;
 use App\Models\LandedCostFee;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
@@ -37,12 +38,13 @@ use App\Models\User;
 
 class LandedCostController extends Controller
 {
-    protected $dataplaces;
+    protected $dataplaces, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
     
     public function index(Request $request)
@@ -62,50 +64,82 @@ class LandedCostController extends Controller
     }
 
     public function getAccountData(Request $request){
-        $account = User::find($request->id);
 
-        $goods_receipt = [];
-        $landed_cost = [];
+        $account = NULL;
 
-        $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->get();
+        if($request->id){
+            
+            $account = User::find($request->id);
+
+            $goods_receipt = [];
+            $landed_cost = [];
+
+            $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->get();
+            
+            foreach($datagr as $row){
+                if(!$row->used()->exists()){
+                    $goods_receipt[] = [
+                        'id'            => $row->id,
+                        'code'          => $row->code,
+                        'delivery_no'   => $row->delivery_no,
+                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'total'         => number_format($row->total,2,',','.'),
+                        'tax'           => number_format($row->tax,2,',','.'),
+                        'wtax'          => number_format($row->wtax,2,',','.'),
+                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                        'note'          => $row->note,
+                        'landed_cost'   => $row->getLandedCostList()
+                    ];
+                }
+            }
         
-        foreach($datagr as $row){
-            if(!$row->used()->exists()){
-                $goods_receipt[] = [
-                    'id'            => $row->id,
-                    'code'          => $row->code,
-                    'delivery_no'   => $row->delivery_no,
-                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
-                    'total'         => number_format($row->total,2,',','.'),
-                    'tax'           => number_format($row->tax,2,',','.'),
-                    'wtax'          => number_format($row->wtax,2,',','.'),
-                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'note'          => $row->note,
-                    'landed_cost'   => $row->getLandedCostList()
-                ];
-            }
-        }
-    
-        $datalc = LandedCost::where('supplier_id',$request->id)->whereIn('status',['2','3'])->get();
+            $datalc = LandedCost::where('supplier_id',$request->id)->whereIn('status',['2','3'])->get();
 
-        foreach($datalc as $row){
-            if(!$row->used()->exists()){
-                $landed_cost[] = [
-                    'id'            => $row->id,
-                    'code'          => $row->code,
-                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
-                    'total'         => number_format($row->total,2,',','.'),
-                    'tax'           => number_format($row->tax,2,',','.'),
-                    'wtax'          => number_format($row->wtax,2,',','.'),
-                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'note'          => $row->note,
-                    'landed_cost'   => $row->getLandedCostList()
-                ];
+            foreach($datalc as $row){
+                if(!$row->used()->exists()){
+                    $landed_cost[] = [
+                        'id'            => $row->id,
+                        'code'          => $row->code,
+                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'total'         => number_format($row->total,2,',','.'),
+                        'tax'           => number_format($row->tax,2,',','.'),
+                        'wtax'          => number_format($row->wtax,2,',','.'),
+                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                        'note'          => $row->note,
+                        'landed_cost'   => $row->getLandedCostList()
+                    ];
+                }
             }
-        }
 
-        $account['goods_receipt'] = $goods_receipt;
-        $account['landed_cost'] = $landed_cost;
+            $account['goods_receipt'] = $goods_receipt;
+            $account['landed_cost'] = $landed_cost;
+
+        }else{
+            $inventory_transfer_in = [];
+
+            $dataiti = InventoryTransferIn::whereHas('inventoryTransferOut',function($query){
+                    $query->where(function($query){
+                        $query->whereIn('place_to',$this->dataplaces)
+                            ->whereIn('warehouse_to',$this->datawarehouses);
+                    })
+                    ->where('place_from','<>','place_to');
+                })
+                ->whereIn('status',['2','3'])
+                ->get();
+
+            foreach($dataiti as $row){
+                if(!$row->used()->exists()){
+                    $inventory_transfer_in[] = [
+                        'code_iti'          => $row->code,
+                        'code_ito'          => $row->inventoryTransferOut->code,
+                        'post_date'         => date('d/m/y',strtotime($row->post_date)),
+                        'note'              => $row->note,
+                    ];
+                }
+            }
+
+            $account['inventory_transfer_in'] = $inventory_transfer_in;
+        }
 
         return response()->json($account);
     }

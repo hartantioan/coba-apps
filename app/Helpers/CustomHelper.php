@@ -1204,6 +1204,7 @@ class CustomHelper {
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
 						'type'			=> '1',
 						'nominal'		=> $row->tax,
+						'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 					]);
 				}
 
@@ -1219,6 +1220,7 @@ class CustomHelper {
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->wtax,
+						'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
 					]);
 				}
 

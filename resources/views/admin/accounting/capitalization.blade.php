@@ -628,9 +628,25 @@
                 'columnsToggle',
                 'selectNone' 
             ],
-            language: {
-                buttons: {
+            "language": {
+                "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan / kosong",
+                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "infoEmpty": "Data tidak ditemukan / kosong",
+                "infoFiltered": "(disaring dari _MAX_ total data)",
+                "search": "Cari",
+                "paginate": {
+                    first:      "<<",
+                    previous:   "<",
+                    next:       ">",
+                    last:       ">>"
+                },
+                "buttons": {
+                    selectAll: "Pilih semua",
                     selectNone: "Hapus pilihan"
+                },
+                "select": {
+                    rows: "%d baris terpilih"
                 }
             },
             select: {
@@ -940,7 +956,7 @@
                 printService.submit({
                     'type': 'INVOICE',
                     'url': response.message
-                })
+                });
                 
                
             },
@@ -981,7 +997,7 @@
                     printService.submit({
                         'type': 'INVOICE',
                         'url': response.message
-                    })
+                    });
                     M.toast({
                         html: response.message
                     });
@@ -1055,8 +1071,6 @@
         window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 
-    
-
     function viewJournal(id){
         $.ajax({
             url: '{{ Request::url() }}/view_journal/' + id,
@@ -1077,11 +1091,7 @@
                 $('#note_jurnal').append(`Keterangan `+data.message.note);
                 $('#ref_jurnal').append(`Referensi `+data.reference);
                 $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
-                
-                
 
-
-                console.log(data);
             }
         });
     }

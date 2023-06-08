@@ -183,12 +183,16 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO atau LC.</i>
+                        <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO, LC atau Inventori Transfer Masuk.</i>
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getAccountData(this.value);"></select>
+                                <select class="browser-default" id="supplier_id" name="supplier_id"></select>
                                 <label class="active" for="supplier_id">Supplier/Vendor</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <a href="javascript:void(0);" class="btn waves-effect waves-light cyan" onclick="getAccountData();" id="btn-show">Tampilkan Data<i class="material-icons right">assignment</i></a>
+                                <label class="active">&nbsp;</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="browser-default" id="vendor_id" name="vendor_id"></select>
@@ -232,7 +236,7 @@
                                 <label class="active" for="reference">No. Referensi</label>
                             </div>
                             <div class="col m12 s12">
-                                <h6><b>GRPO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                                <h6><b>GRPO / Inv.Transfer (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
@@ -469,7 +473,7 @@
 
 <div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
     <div class="modal-header ml-2">
-        <h5>Daftar Goods Receipt PO & Landed Cost <b id="account_name"></b></h5>
+        <h5>Daftar Goods Receipt PO / Landed Cost / Inventori Transfer - Masuk <b id="account_name"></b></h5>
     </div>
     <div class="modal-content">
         <div class="row">
@@ -477,8 +481,9 @@
                 <div class="row">
                     <div class="col s12 mt-2">
                         <ul class="tabs">
-                            <li class="tab col m6"><a class="active" href="#goodsreceipt">Goods Receipt PO</a></li>
-                            <li class="tab col m6"><a href="#landedcost">Landed Cost</a></li>
+                            <li class="tab col m4"><a class="active" href="#goodsreceipt">Goods Receipt PO</a></li>
+                            <li class="tab col m4"><a href="#landedcost">Landed Cost</a></li>
+                            <li class="tab col m4"><a href="#inventorytransferin">Inventori Transfer Masuk</a></li>
                         </ul>
                         <div id="goodsreceipt" class="col s12 active">
                             <p class="mt-2 mb-2">
@@ -520,6 +525,23 @@
                                         </tr>
                                     </thead>
                                     <tbody id="body-detail-landed-cost"></tbody>
+                                </table>
+                            </p>
+                        </div>
+                        <div id="inventorytransferin" class="col s12">
+                            <p class="mt-2 mb-2">
+                                <div id="datatable_buttons_inventory_transfer_in"></div>
+                                <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan. ITI = Inventori Transfer Masuk, ITO = Inventori Transfer Keluar</i>
+                                <table id="table_inventory_transfer_in" class="display" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="center-align">No. ITI</th>
+                                            <th class="center-align">No. ITO</th>
+                                            <th class="center-align">Tgl.Post</th>
+                                            <th class="center-align">Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-detail-inventory-transfer-in"></tbody>
                                 </table>
                             </p>
                         </div>
@@ -682,9 +704,6 @@
             width: '100%',
         });
 
-
-        
-
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
             
@@ -783,14 +802,29 @@
                         'selectAll',
                         'selectNone'
                     ],
-                    language: {
-                        buttons: {
-                            selectAll: "Pilih semua",
-                            selectNone: "Hapus pilihan"
-                        }
-                    },
                     select: {
                         style: 'multi'
+                    },
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
                     }
                 });
                 table_landed_cost = $('#table_landed_cost').DataTable({
@@ -804,32 +838,86 @@
                         'selectAll',
                         'selectNone'
                     ],
-                    language: {
-                        buttons: {
-                            selectAll: "Pilih semua",
-                            selectNone: "Hapus pilihan"
-                        }
-                    },
                     select: {
                         style: 'single'
+                    },
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    }
+                });
+                table_inventory_transfer_in = $('#table_inventory_transfer_in').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'asc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    select: {
+                        style: 'single'
+                    },
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
                     }
                 });
                 $('#table_goods_receipt_wrapper > .dt-buttons').appendTo('#datatable_buttons_goods_receipt');
                 $('#table_landed_cost_wrapper > .dt-buttons').appendTo('#datatable_buttons_landed_cost');
+                $('#table_inventory_transfer_in_wrapper > .dt-buttons').appendTo('#datatable_buttons_inventory_transfer_in');
                 $('select[name="table_goods_receipt_length"]').addClass('browser-default');
                 $('select[name="table_landed_cost_length"]').addClass('browser-default');
+                $('select[name="table_inventory_transfer_in_length"]').addClass('browser-default');
                 $('.tabs').tabs({
                     onShow: function () {
                         table_goods_receipt.columns.adjust().draw();
                         table_landed_cost.columns.adjust().draw();
+                        table_inventory_transfer_in.columns.adjust().draw();
                     }
                 });
             },
             onCloseEnd: function(modal, trigger){
-                $('#body-detail-goods-receipt,#body-detail-landed-cost').empty();
+                $('#body-detail-goods-receipt,#body-detail-landed-cost,#body-detail-inventory-transfer-in').empty();
                 $('#account_name').text('');
                 $('#preview_data').html('');
-                $('#table_goods_receipt,#table_landed_cost').DataTable().clear().destroy();
+                $('#table_goods_receipt,#table_landed_cost,#table_inventory_transfer_in').DataTable().clear().destroy();
             }
         });
         $('#modal5').modal({
@@ -877,6 +965,10 @@
 
         $('#table_landed_cost tbody').on('click', 'tr', function () {
             table_goods_receipt.rows().deselect();
+        });
+
+        $('#table_inventory_transfer_in tbody').on('click', 'tr', function () {
+            table_inventory_transfer_in.rows().deselect();
         });
 
         select2ServerSide('#vendor_id,#filter_vendor', '{{ url("admin/select2/supplier_vendor") }}');
@@ -1308,8 +1400,9 @@
         });
     }
 
-    function getAccountData(val){
-        if(val){
+    function getAccountData(){
+        let val = $('#supplier_id').val();
+        /* f(val){ */
             $.ajax({
                 url: '{{ Request::url() }}/get_account_data',
                 type: 'POST',
@@ -1326,76 +1419,105 @@
                 success: function(response) {
                     loadingClose('.modal-content');
                     $('#modal4').modal('open');
-                    $('#account_name').text($('#supplier_id').select2('data')[0].text);
 
-                    if(response.goods_receipt.length > 0){
-                        $.each(response.goods_receipt, function(i, val) {
-                            $('#body-detail-goods-receipt').append(`
-                                <tr data-id="` + val.id + `">
-                                    <td class="center">
-                                        ` + val.code + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.delivery_no + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.total + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.tax + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.wtax + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.grandtotal + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.note + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.landed_cost + `
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    }
+                    if(val){
+                        $('#account_name').text($('#supplier_id').select2('data')[0].text);
+                        if(response.goods_receipt.length > 0){
+                            $.each(response.goods_receipt, function(i, val) {
+                                $('#body-detail-goods-receipt').append(`
+                                    <tr data-id="` + val.id + `">
+                                        <td class="center">
+                                            ` + val.code + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.delivery_no + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.tax + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.wtax + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.note + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.landed_cost + `
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }
 
-                    if(response.landed_cost.length > 0){
-                        $.each(response.landed_cost, function(i, val) {
-                            var count = makeid(10);
-                            $('#body-detail-landed-cost').append(`
-                                <tr data-id="` + val.id + `">
-                                    <td class="center">
-                                        ` + val.code + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.total + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.tax + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.wtax + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.grandtotal + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.note + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.landed_cost + `
-                                    </td>
-                                </tr>
-                            `);
-                        });                        
+                        if(response.landed_cost.length > 0){
+                            $.each(response.landed_cost, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-detail-landed-cost').append(`
+                                    <tr data-id="` + val.id + `">
+                                        <td class="center">
+                                            ` + val.code + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.tax + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.wtax + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.note + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.landed_cost + `
+                                        </td>
+                                    </tr>
+                                `);
+                            });                        
+                        }
+                    }else{
+
+                        if(response.inventory_transfer_in.length > 0){
+                            $.each(response.inventory_transfer_in, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-detail-inventory-transfer-in').append(`
+                                    <tr data-id="` + val.id + `">
+                                        <td class="center-align">
+                                            ` + val.code_iti + `
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.code_ito + `
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.note + `
+                                        </td>
+                                    </tr>
+                                `);
+                            });  
+                        }
+
+                        setTimeout(function() {
+                            $('ul.tabs').tabs("select", "inventorytransferin");
+                        }, 1000);
                     }
                     
                     $('.modal-content').scrollTop(0);
@@ -1411,9 +1533,9 @@
                     });
                 }
             });
-        }else{
+        /* }else{
             $('.row_item').remove();
-        }
+        } */
     }
     
     function countEach(val){
@@ -1519,9 +1641,25 @@
             buttons: [
                 'selectNone'
             ],
-            language: {
-                buttons: {
+            "language": {
+                "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan / kosong",
+                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "infoEmpty": "Data tidak ditemukan / kosong",
+                "infoFiltered": "(disaring dari _MAX_ total data)",
+                "search": "Cari",
+                "paginate": {
+                    first:      "<<",
+                    previous:   "<",
+                    next:       ">",
+                    last:       ">>"
+                },
+                "buttons": {
+                    selectAll: "Pilih semua",
                     selectNone: "Hapus pilihan"
+                },
+                "select": {
+                    rows: "%d baris terpilih"
                 }
             },
             select: {

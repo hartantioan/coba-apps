@@ -107,9 +107,6 @@ class InventoryTransferInController extends Controller
 
         $total_data = InventoryTransferIn::whereHas('inventoryTransferOut',function($query){
             $query->where(function($query){
-                $query->whereIn('place_from',$this->dataplaces)
-                    ->whereIn('warehouse_from',$this->datawarehouses);
-            })->orWhere(function($query){
                 $query->whereIn('place_to',$this->dataplaces)
                     ->whereIn('warehouse_to',$this->datawarehouses);
             });
@@ -141,9 +138,6 @@ class InventoryTransferInController extends Controller
             })
             ->whereHas('inventoryTransferOut',function($query){
                 $query->where(function($query){
-                    $query->whereIn('place_from',$this->dataplaces)
-                        ->whereIn('warehouse_from',$this->datawarehouses);
-                })->orWhere(function($query){
                     $query->whereIn('place_to',$this->dataplaces)
                         ->whereIn('warehouse_to',$this->datawarehouses);
                 });
@@ -185,9 +179,6 @@ class InventoryTransferInController extends Controller
             })
             ->whereHas('inventoryTransferOut',function($query){
                 $query->where(function($query){
-                    $query->whereIn('place_from',$this->dataplaces)
-                        ->whereIn('warehouse_from',$this->datawarehouses);
-                })->orWhere(function($query){
                     $query->whereIn('place_to',$this->dataplaces)
                         ->whereIn('warehouse_to',$this->datawarehouses);
                 });
@@ -342,7 +333,7 @@ class InventoryTransferInController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = InventoryTransferOut::find($request->id);
+        $data   = InventoryTransferIn::find($request->id);
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12 mt-1"><table style="max-width:800px;">
                         <thead>
@@ -559,7 +550,7 @@ class InventoryTransferInController extends Controller
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
-                $pr = InventoryTransferOut::where('code',$row)->first();
+                $pr = InventoryTransferIn::where('code',$row)->first();
                 
                 if($pr){
                     $data = [

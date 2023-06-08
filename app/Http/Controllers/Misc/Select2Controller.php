@@ -42,7 +42,7 @@ class Select2Controller extends Controller {
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
-        $this->datawarehouses = $user->userWarehouseArray();
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
     
     public function city(Request $request)

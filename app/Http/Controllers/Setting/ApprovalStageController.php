@@ -237,7 +237,7 @@ class ApprovalStageController extends Controller
     public function rowDetail(Request $request){
         $data   = ApprovalStage::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row"><div class="col s12 mt-2"><table style="max-width:500px;">
+        $string = '<div class="row"><div class="col s12 mt-2"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="'.count($data->approvalStageDetail).'">Approval</th>

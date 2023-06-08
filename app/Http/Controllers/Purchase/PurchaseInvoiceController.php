@@ -768,7 +768,7 @@ class PurchaseInvoiceController extends Controller
     {
         $data   = PurchaseInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="6">Daftar Order Pembelian</th>
@@ -802,7 +802,7 @@ class PurchaseInvoiceController extends Controller
         
         $string .= '</tbody></table></div>';
 
-        $string .= '<div class="col s12 mt-1"><table style="max-width:500px;">
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
         <thead>
             <tr>
                 <th class="center-align" colspan="4">Daftar Down Payment Dipakai</th>

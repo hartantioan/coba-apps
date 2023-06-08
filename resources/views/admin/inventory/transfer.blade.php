@@ -297,27 +297,6 @@
             width: '100%',
         });
 
-        $('#datatable_serverside').on('click', 'td.details-control', function() {
-            var tr    = $(this).closest('tr');
-            var badge = tr.find('button.btn-floating');
-            var icon  = tr.find('i');
-            var row   = table.row(tr);
-
-            if(row.child.isShown()) {
-                row.child.hide();
-                tr.removeClass('shown');
-                badge.first().removeClass('red');
-                badge.first().addClass('green');
-                icon.first().html('add');
-            } else {
-                row.child(rowDetail(row.data())).show();
-                tr.addClass('shown');
-                badge.first().removeClass('green');
-                badge.first().addClass('red');
-                icon.first().html('remove');
-            }
-        });
-
         loadDataTable();
 
         $('#modal1').modal({

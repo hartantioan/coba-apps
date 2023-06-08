@@ -265,10 +265,10 @@ class BomController extends Controller
     {
         $data   = Bom::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lime lighten-4">';
+        $string = '<div class="row pt-1 pb-1 lighten-4">';
 
         $string .= '<div class="col s12">
-                        <table class="bordered">
+                        <table class="bordered" style="min-width:100%;max-width:100%;">
                             <thead>
                                 <tr>
                                     <th colspan="7" class="center">MATERIAL</th>

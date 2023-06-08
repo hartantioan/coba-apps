@@ -271,7 +271,7 @@ class ItemController extends Controller
     {
         $data   = Item::where('code',CustomHelper::decrypt($request->id))->first();
 
-        $string = '<table>
+        $string = '<table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th>Satuan Beli</th>

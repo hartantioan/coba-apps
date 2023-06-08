@@ -409,14 +409,6 @@
 <script>
     $(function() {
 
-        $('#datatable_serverside').on('click', 'td.details-control', function() {
-            var tr    = $(this).closest('tr');
-            var badge = tr.find('button.btn-floating');
-            var icon  = tr.find('i');
-            var row   = table.row(tr);
-
-        });
-
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
             

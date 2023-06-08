@@ -275,7 +275,7 @@ class ApprovalTemplateController extends Controller
     public function rowDetail(Request $request){
         $data   = ApprovalTemplate::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row"><div class="col s12 mt-2"><table style="max-width:500px;">
+        $string = '<div class="row"><div class="col s12 mt-2"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="'.count($data->approvalTemplateOriginator).'">Originator</th>
@@ -286,7 +286,7 @@ class ApprovalTemplateController extends Controller
         }
 
         $string .= '</tr></thead></table>
-        <table style="max-width:700px;" class="mt-3">
+        <table style="min-width:100%;max-width:100%;" class="mt-3">
             <thead>
                 <tr>
                     <th class="center-align" colspan="5">Tingkat/Stage</th>

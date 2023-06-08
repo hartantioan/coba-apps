@@ -771,7 +771,7 @@ class PurchaseOrderController extends Controller
     {
         $data   = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="16">Daftar Item</th>
@@ -819,7 +819,7 @@ class PurchaseOrderController extends Controller
         
         $string .= '</tbody></table></div>';
 
-        $string .= '<div class="col s12 mt-1"><table style="max-width:500px;">
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>

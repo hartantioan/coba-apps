@@ -670,7 +670,7 @@ class WorkOrderController extends Controller
     {
         $data   = WorkOrder::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="min-width:50%;max-width:70%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="6">Daftar Equipment Part</th>
@@ -689,7 +689,7 @@ class WorkOrderController extends Controller
         }
         $string .= '</tbody></table></div>';
 
-        $string .= '<div class="col s12 mt-1"><table style="min-width:50%;max-width:70%;">
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="5">Request Sparepart</th>

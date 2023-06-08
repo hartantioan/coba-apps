@@ -541,9 +541,9 @@ class GoodReceiptPOController extends Controller
     {
         $data   = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lime lighten-4">
+        $string = '<div class="row pt-1 pb-1 lighten-4">
                         <div class="col s12">
-                            <table class="bordered" style="width:auto;">
+                            <table class="bordered" style="min-width:100%;max-width:100%;">
                                 <thead>
                                     <tr>
                                         <th class="center-align" colspan="11">Daftar Item</th>
@@ -584,7 +584,7 @@ class GoodReceiptPOController extends Controller
 
         $string .= '</td></tr>';
 
-        $string .= '</tbody></table></div><div class="col s12 mt-1"><table style="max-width:500px;">
+        $string .= '</tbody></table></div><div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>

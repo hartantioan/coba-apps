@@ -580,16 +580,13 @@ class InventoryTransferInController extends Controller
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
-                    
             }
             $merger = new Merger();
             foreach ($temp_pdf as $pdfContent) {
                 $merger->addRaw($pdfContent);
             }
 
-
             $result = $merger->merge();
-
 
             Storage::put('public/pdf/bubla.pdf',$result);
             $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
@@ -600,7 +597,6 @@ class InventoryTransferInController extends Controller
                 'message'  =>$var_link
             ];
         }
-        
 		
 		return response()->json($response);
 

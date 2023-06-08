@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Exports\ExportResidence;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -84,7 +87,7 @@ class ResidenceController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<a class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></a>',
                     $val->employee->name,
                     $val->code,
                     $val->name,
@@ -302,23 +305,56 @@ class ResidenceController extends Controller
 
     public function print(Request $request){
 
-        $data = [
-            'title' => 'RESIDENCE REPORT',
-            'data' => Residence::where(function ($query) use ($request) {
-                if ($request->search) {
-                    $query->where(function($query) use ($request) {
-                        $query->where('code', 'like', "%$request->search%")
-                            ->orWhere('name', 'like', "%$request->search%");
-                    });
-                }
+        $validation = Validator::make($request->all(), [
+            'arr_id'                => 'required',
+        ], [
+            'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
+        ]);
+        
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $pr=[];
+            $currentDateTime = Date::now();
+            $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+            foreach($request->arr_id as $key =>$row){
+                $pr[]= Residence::where('code',$row)->first();
 
-                if($request->status){
-                    $query->where('status',$request->status);
-                }
-            })->get()
-		];
+            }
+            $data = [
+                'title'     => 'Master Shift',
+                'data'      => $pr
+            ];  
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path);
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+            $pdf = Pdf::loadView('admin.print.master_data.residence', $data)->setPaper('a5', 'landscape');
+            $pdf->render();
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+            $content = $pdf->download()->getOriginalContent();
+
+
+            Storage::put('public/pdf/bubla.pdf',$content);
+            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $var_link=$document_po;
+
+            $response =[
+                'status'=>200,
+                'message'  =>$var_link
+            ];
+        }
+        
 		
-		return view('admin.print.master_data.residence', $data);
+		return response()->json($response);
+
     }
 
     public function export(Request $request){

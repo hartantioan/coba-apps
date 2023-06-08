@@ -784,8 +784,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[InventoryTransferOutController::class, 'rowDetail']);
                     Route::post('show', [InventoryTransferOutController::class, 'show']);
                     Route::post('print',[InventoryTransferOutController::class, 'print']);
-                    Route::post('print_by_range',[InventoryTransferController::class, 'printByRange']);
-                    Route::get('print_individual/{id}',[InventoryTransferController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('print_by_range',[InventoryTransferOutController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[InventoryTransferOutController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[InventoryTransferOutController::class, 'export']);
                     Route::get('view_journal/{id}',[InventoryTransferOutController::class, 'viewJournal']);
                     Route::post('create',[InventoryTransferOutController::class, 'create'])->middleware('operation.access:transfer_out,update');
@@ -801,6 +801,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_total_transfer_out',[InventoryTransferInController::class, 'getTotalTransferOut']);
                     Route::post('show', [InventoryTransferInController::class, 'show']);
                     Route::post('print',[InventoryTransferInController::class, 'print']);
+                    Route::post('print_by_range',[InventoryTransferInController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[InventoryTransferInController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[InventoryTransferInController::class, 'export']);
                     Route::get('view_journal/{id}',[InventoryTransferInController::class, 'viewJournal']);
                     Route::post('send_used_data',[InventoryTransferInController::class, 'sendUsedData']);

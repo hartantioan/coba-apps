@@ -1,150 +1,229 @@
+@php
+    use App\Helpers\CustomHelper;
+@endphp
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<title>{{ $title }}</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
-		<style>
-			body {
-				font-family: 'Lato', sans-serif;
-			}
-			
-			th {
-				font-size:12px;
-			}
-		
-			.invoice-box {
-				font-size: 16px;
-				font-family: 'Lato', sans-serif;
-				color: #555;
-				page-break-after: always;
-			}
+    <head>
+        <style>
+            html
+            {
+                font-family: Tahoma, "Trebuchet MS", sans-serif;
+            }
 
-			.invoice-box table {
-				width: 100%;
-				line-height: inherit;
-				text-align: left;
-			}
+            .break-row {
+                page-break-inside: avoid;
+            }
 
-			.invoice-box table td {
-				vertical-align: top;
-			}
+            .row {
+            margin-left:-5px;
+            margin-right:-5px;
+            }
+            
+            .column1 {
+            float: left;
+            width: 50%;
+            padding: 5px;
+            }
+            .column2 {
+                margin-right: 60%;
+                float: left;
+                width: 50%;
+                padding: 5px;
+            }
 
-			.invoice-box table tr td:nth-child(2) {
-				/* text-align: right; */
-			}
+            .row::after {
+            content: "";
+            clear: both;
+            display: table;
+            }
 
-			.invoice-box table tr.top table td {
-				padding-bottom: 0px;
-			}
+            
 
-			.invoice-box table tr.information table td {
-				padding-bottom: 0px;
-			}
+            @media only screen and (max-width : 768px) {
+                .invoice-print-area {
+                    zoom:0.4;
+                }
+            }
+        
+            @media only screen and (max-width : 992px) {
+                .invoice-print-area {
+                    zoom:0.6;
+                    font-size:11px !important;
+                }
 
-			.invoice-box table tr.heading td {
-				background: #cf9604;
-				border-bottom: 1px solid #cf9604;
-				font-weight: bold;
-			}
+                table > thead > tr > th {
+                    font-size:13px !important;
+                    font-weight: 800 !important;
+                }
+                td{
+                    font-size:0.7em !important;
+                }
+                .tb-header td{
+                    font-size:0.6em !important;
+                }
+                .tbl-info td{
+                    font-size:0.8em !important;
+                }
+                .table-data-item td{
+                    font-size:0.4em !important;
+                }
+                .table-data-item th{
+                    border:0.6px solid black;
+					font-size:0.7em !important;
+                }
+                .table-bot td{
+                    font-size:0.6em !important;
+                }
+                .table-bot1 td{
+                    font-size:0.7em !important;
+                }
+            }
+        
+            @media print {
+                .invoice-print-area {
+                    font-size:13px !important;
+                }
+        
+                table > thead > tr > th {
+                    font-size:15px !important;
+                    font-weight: 800 !important;
+                }
+        
+                td {
+                    border:none !important;
+                    border-bottom: none;
+                    border: solid white !important;
+                    padding: 1px !important;
+                    vertical-align:top !important;
+                }
+        
+                body {
+                    background-color:white !important;
+                    zoom:0.8;
+                }
+                
+                .modal {
+                    background-color:white !important;
+                }
+        
+                .card {
+                    background-color:white !important;
+                    padding:25px !important;
+                }
+        
+                .invoice-print-area {
+                    color: #000000 !important;
+                }
+        
+                .invoice-subtotal {
+                    color: #000000 !important;
+                }
+        
+                .invoice-info {
+                    font-size:12px !important;
+                }
+        
+                .modal {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    margin: 0;
+                    padding: 0;
+                    visibility: visible;
+                    overflow: visible !important;
+                    min-width:100% !important;
+                }
+                
+                .modal-content {
+                    visibility: visible !important;
+                    overflow: visible !important;
+                    padding: 0px !important;
+                }
+        
+                .modal-footer {
+                    display:none !important;
+                }
+        
+                .row .col {
+                    padding:0px !important;
+                }
+            }
+            
+            .invoice-product-details{
+                border:1px solid black;
+                min-height: 23%;
+            }
 
-			.invoice-box table tr.details td {
-				padding-bottom: 0px;
-			}
-
-			.invoice-box table tr.item td {
-				border-bottom: 1px solid #eee;
-			}
-
-			.invoice-box table tr.item.last td {
-				border-bottom: none;
-			}
-
-			.invoice-box table tr.total td:nth-child(2) {
-				border-top: 2px solid #eee;
-				font-weight: bold;
-			}
-
-			@media only screen and (max-width: 600px) {
-				.invoice-box table tr.top table td {
-					width: 100%;
-					display: block;
-					text-align: center;
-				}
-
-				.invoice-box table tr.information table td {
-					width: 100%;
-					display: block;
-					text-align: center;
-				}
-			}
-			
-			@media print {
-				@page {size: A4 portrait; }
-			}
-
-			.invoice-box.rtl {
-				direction: rtl;
-				font-family: 'Lato', sans-serif;
-			}
-
-			.invoice-box.rtl table {
-				text-align: right;
-			}
-
-			.invoice-box.rtl table tr td:nth-child(2) {
-				text-align: left;
-			}
-			
-			@page { margin: 1cm; }
-			body { margin: 1cm; }
-		</style>
-	</head>
-	<body onload="window.print();">
-		<div class="invoice-box">
-			<table cellpadding="0" cellspacing="0" width="100%">
-				<tr>
-					<td colspan="2">
-						<table>
-							<tr>
-								<td style="text-align:center;">
-									<img src="{{ url('website/logo_web_fix.png') }}" width="auto" height="75px">
-								</td>
-							</tr>
-                            <tr>
-								<td style="text-align:center;">
-									<h3>{{ $title }}</h3>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-			</table><br>
-			<table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:13px;">
-				<thead>
-					<tr align="center">
-						<th>No</th>
-						<th>Kode</th>
-                        <th>Plant</th>
-						<th>Nama</th>
-                        <th>Keterangan</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach($data as $key => $row)
-                        <tr align="center">
-                            <td>{{ $key+1 }}</td>
-                            <td>{{ $row->code }}</td>
-                            <td>{{ $row->place->code.' - '.$row->place->name }}</td>
-                            <td>{{ $row->name }}</td>
-                            <td>{{ $row->note }}</td>
+            @page { margin: 5em 3em 6em 3em; }
+            header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+                
+        
+           
+        </style>
+    </head>
+    <body>
+        <header>
+            <table border="0" width="100%" style="font-size:1em" class="tb-header">
+                <tr>
+                    <td width="83%" class="left-align" >
+                        <tr>
+                            <td>
+                                <span class="invoice-number mr-1" style="font-size:1em">Master Line</span>
+                            </td>
                         </tr>
-					@endforeach
-				</tbody>
-			</table>
-		</div>
-	</body>
+                        <tr>
+                            <td>
+                                <h5 style="margin-top: -2px">Line Report</h5>
+                            </td>
+                        </tr>
+                                
+                        
+                    </td>
+                    <td width="33%" class="right-align">
+                        
+                        
+                   
+                    </td>
+                    
+                    <td width="34%" class="right-align">
+                        
+                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                       
+                    </td>
+                </tr>
+                
+            </table>
+            <hr style="border-top: 3px solid black; margin-top:-1%">
+        </header>
+        <main>
+            <div class="card">
+                <div class="invoice-product-details mt-2">
+                    <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
+                        <thead>
+                            <tr>
+                                <th>No</th>
+								<th>Kode</th>
+								<th>Plant</th>
+								<th>Nama</th>
+								<th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($data as $key => $row)
+								<tr align="center">
+									<td>{{ $key+1 }}</td>
+									<td>{{ $row->code }}</td>
+									<td>{{ $row->place->code.' - '.$row->place->name }}</td>
+									<td>{{ $row->name }}</td>
+									<td>{{ $row->note }}</td>
+								</tr>
+							@endforeach
+                        </tbody>
+                        
+                    </table>
+                </div>  
+            </div>
+        </main>
+    </body>
 </html>
+

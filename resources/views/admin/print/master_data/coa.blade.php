@@ -129,7 +129,7 @@
 						<th>No</th>
 						<th>Kode</th>
 						<th>Nama</th>
-						<th>Cabang</th>
+						<th>Perusahaan</th>
                         <th>Parent</th>
                         <th>Level</th>
                         <th>Status</th>
@@ -140,17 +140,17 @@
 				</thead>
 				<tbody>
 					@foreach($data as $key => $row)
-                        <tr align="center">
+                        <tr>
                             <td>{{ $key+1 }}</td>
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->name }}</td>
-							<td>{{ $row->branch->name }}</td>
+							<td>{{ $row->company->name }}</td>
                             <td>{{ $row->parentSub()->exists() ? $row->parentSub->name : 'is Parent' }}</td>
-                            <td>{{ $row->level }}</td>
-                            <td>{!! $row->status() !!}</td>
-                            <td>{!! $row->is_confidential ? '&#10003;' : '&#10005;' !!}</td>
-                            <td>{!! $row->is_control_account ? '&#10003;' : '&#10005;' !!}</td>
-                            <td>{!! $row->is_cash_account ? '&#10003;' : '&#10005;' !!}</td>
+                            <td align="center">{{ $row->level }}</td>
+                            <td align="center">{!! $row->status() !!}</td>
+                            <td align="center">{!! $row->is_confidential ? '&#10003;' : '&#10005;' !!}</td>
+                            <td align="center">{!! $row->is_control_account ? '&#10003;' : '&#10005;' !!}</td>
+                            <td align="center">{!! $row->is_cash_account ? '&#10003;' : '&#10005;' !!}</td>
                         </tr>
 					@endforeach
 				</tbody>

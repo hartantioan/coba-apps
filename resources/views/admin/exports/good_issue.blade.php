@@ -28,27 +28,21 @@
                 <th>Item</th>
                 <th>Qty</th>
                 <th>Satuan</th>
-                <th>Harga Satuan</th>
-                <th>Harga Total</th>
                 <th>Keterangan</th>
                 <th>Coa</th>
                 <th>Plant</th>
-                <th>Departemen</th>
                 <th>Gudang</th>
             </tr>
             @foreach($row->goodIssueDetail as $key1 => $rowdetail)
             <tr align="center">
                 <td></td>
-                <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
+                <td>{{ $rowdetail->itemStock->item->code.' - '.$rowdetail->itemStock->item->name }}</td>
                 <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
-                <td>{{ $rowdetail->item->uomUnit->code }}</td>
-                <td align="right">{{ number_format($rowdetail->price,3,',','.') }}</td>
-                <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
+                <td>{{ $rowdetail->itemStock->item->uomUnit->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
-                <td>{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
-                <td>{{ $rowdetail->department->name }}</td>
-                <td>{{ $rowdetail->warehouse->name }}</td>
+                <td>{{ $rowdetail->itemStock->place->name }}</td>
+                <td>{{ $rowdetail->itemStock->warehouse->name }}</td>
             </tr>
             @endforeach
         @endforeach

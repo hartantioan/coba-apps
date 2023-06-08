@@ -16,15 +16,12 @@ class GoodIssueDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'good_issue_id',
-        'item_id',
+        'item_stock_id',
         'qty',
         'price',
         'total',
         'note',
         'coa_id',
-        'place_id',
-        'department_id',
-        'warehouse_id'
     ];
 
     public function goodIssue()
@@ -32,24 +29,9 @@ class GoodIssueDetail extends Model
         return $this->belongsTo('App\Models\GoodReceive', 'good_issue_id', 'id')->withTrashed();
     }
 
-    public function item()
+    public function itemStock()
     {
-        return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
-    }
-
-    public function warehouse()
-    {
-        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
-    }
-
-    public function place()
-    {
-        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function department()
-    {
-        return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ItemStock', 'item_stock_id', 'id');
     }
 
     public function coa()

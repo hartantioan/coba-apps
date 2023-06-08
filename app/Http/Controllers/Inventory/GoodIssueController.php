@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\ItemCogs;
+use App\Models\ItemStock;
 use App\Models\Journal;
 use App\Models\Place;
 use App\Models\PurchaseOrder;
@@ -151,7 +152,6 @@ class GoodIssueController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
                     $val->code,
-                    $val->code,
                     $val->user->name,
                     $val->company->name,
                     date('d M Y',strtotime($val->post_date)),
@@ -188,22 +188,19 @@ class GoodIssueController extends Controller
         $validation = Validator::make($request->all(), [
             'company_id'                => 'required',
 			'post_date'		            => 'required',
-            'arr_item'                  => 'required|array',
+            'arr_item_stock'            => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_coa'                   => 'required|array',
-            'arr_warehouse'             => 'required|array',
 		], [
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'warehouse_id.required'				=> 'Gudang tujuan tidak boleh kosong',
-            'arr_item.required'                 => 'Item tidak boleh kosong',
-            'arr_item.array'                    => 'Item harus dalam bentuk array',
+            'arr_item_stock.required'           => 'Item stok tidak boleh kosong',
+            'arr_item_stock.array'              => 'Item stok harus dalam bentuk array',
             'arr_qty.required'                  => 'Qty item tidak boleh kosong',
             'arr_qty.array'                     => 'Qty item harus dalam bentuk array',
             'arr_coa.required'                  => 'Coa tidak boleh kosong',
             'arr_coa.array'                     => 'Coa harus dalam bentuk array',
-            'arr_warehouse.required'            => 'Gudang tidak boleh kosong',
-            'arr_warehouse.array'               => 'Gudang harus dalam bentuk array',
 		]);
 
         if($validation->fails()) {
@@ -213,21 +210,19 @@ class GoodIssueController extends Controller
             ];
         } else {
 
-            $grandtotal = 0;
+            DB::beginTransaction();
+            try {
 
-            foreach($request->arr_item as $key => $row){
-                $price = NULL;
-                $price = ItemCogs::where('item_id',intval($row))->where('place_id',intval($request->arr_place[$key]))->orderByDesc('date')->orderByDesc('id')->first();
-                $rowprice = 0;
-                if($price){
-                    $rowprice = $price->price_final;
+                $grandtotal = 0;
+
+                foreach($request->arr_item_stock as $key => $row){
+                    $rowprice = NULL;
+                    $item_stock = ItemStock::find(intval($row));
+                    $rowprice = $item_stock->priceNow();
+                    $grandtotal += $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
                 }
-                $grandtotal += $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-            }
 
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+                if($request->temp){
                     $query = GoodIssue::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -275,20 +270,13 @@ class GoodIssueController extends Controller
                         foreach($query->goodIssueDetail as $row){
                             $row->delete();
                         }
-
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status barang keluar sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status barang keluar sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                }else{
                     $query = GoodIssue::create([
                         'code'			        => GoodIssue::generateCode(),
                         'user_id'		        => session('bo_id'),
@@ -299,63 +287,49 @@ class GoodIssueController extends Controller
                         'status'                => '1',
                         'grandtotal'            => $grandtotal
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
-                DB::beginTransaction();
-                try {
-                    foreach($request->arr_item as $key => $row){
-                        $price = NULL;
-                        $price = ItemCogs::where('item_id',intval($row))->where('place_id',intval($request->arr_place[$key]))->orderByDesc('date')->orderByDesc('id')->first();
-                        $rowprice = 0;
-                        if($price){
-                            $rowprice = $price->price_final;
-                        }
-
+                
+                if($query) {
+                    
+                    foreach($request->arr_item_stock as $key => $row){
+                        $rowprice = NULL;
+                        $item_stock = ItemStock::find(intval($row));
+                        $rowprice = $item_stock->priceNow();
                         GoodIssueDetail::create([
                             'good_issue_id'         => $query->id,
-                            'item_id'               => $row,
+                            'item_stock_id'         => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'price'                 => $rowprice,
                             'total'                 => $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
                             'coa_id'                => $request->arr_coa[$key],
-                            'warehouse_id'          => $request->arr_warehouse[$key],
-                            'place_id'              => $request->arr_place[$key],
-                            'department_id'         => $request->arr_department[$key]
                         ]);
-
                     }
 
                     CustomHelper::sendApproval('good_issues',$query->id,$query->note);
                     CustomHelper::sendNotification('good_issues',$query->id,'Barang Keluar No. '.$query->code,$query->note,session('bo_id'));
-                    
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+
+                    activity()
+                        ->performedOn(new GoodIssue())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit penggunaan barang.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
 
-                activity()
-                    ->performedOn(new GoodIssue())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit penggunaan barang.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
+                DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            }
 		}
 		
 		return response()->json($response);
@@ -368,19 +342,16 @@ class GoodIssueController extends Controller
                     <table style="max-width:800px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="11">Daftar Item</th>
+                                <th class="center-align" colspan="8">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
-                                <th class="right-align">Harga Satuan</th>
-                                <th class="right-align">Harga Total</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Plant</th>
-                                <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
                             </tr>
                         </thead><tbody>';
@@ -388,16 +359,13 @@ class GoodIssueController extends Controller
         foreach($data->goodIssueDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
+                <td class="center-align">'.$row->itemStock->item->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->item->uomUnit->code.'</td>
-                <td class="center-align">'.number_format($row->price,3,',','.').'</td>
-                <td class="center-align">'.number_format($row->total,3,',','.').'</td>
+                <td class="center-align">'.$row->itemStock->item->uomUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
-                <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
-                <td class="center-align">'.$row->department->name.'</td>
-                <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.$row->itemStock->place->name.'</td>
+                <td class="center-align">'.$row->itemStock->warehouse->name.'</td>
             </tr>';
         }
         
@@ -443,19 +411,15 @@ class GoodIssueController extends Controller
         
         foreach($gr->goodIssueDetail as $row){
             $arr[] = [
-                'item_id'       => $row->item_id,
-                'item_name'     => $row->item->code.' - '.$row->item->name,
-                'qty'           => number_format($row->qty,3,',','.'),
-                'unit'          => $row->item->uomUnit->code,
-                'price'         => number_format($row->price,3,',','.'),
-                'total'         => number_format($row->total,3,',','.'),
-                'coa_id'        => $row->coa_id,
-                'coa_name'      => $row->coa->code.' - '.$row->coa->name,
-                'place_id'      => $row->place_id,
-                'department_id' => $row->department_id,
-                'warehouse_id'  => $row->warehouse_id,
-                'warehouse_name'=> $row->warehouse->name,
-                'note'          => $row->note,
+                'item_stock_id'     => $row->item_stock_id,
+                'item_stock_name'   => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code.' Qty. '.number_format($row->itemStock->qty + $row->qty,3,',','.').' '.$row->itemStock->item->uomUnit->code,
+                'qty'               => number_format($row->qty,3,',','.'),
+                'qtyraw'            => $row->qty + $row->itemStock->qty,
+                'price'             => number_format($row->price,3,',','.'),
+                'total'             => number_format($row->total,3,',','.'),
+                'coa_id'            => $row->coa_id,
+                'coa_name'          => $row->coa->code.' - '.$row->coa->name,
+                'note'              => $row->note,
             ];
         }
 

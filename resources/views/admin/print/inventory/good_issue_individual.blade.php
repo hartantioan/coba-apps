@@ -252,11 +252,8 @@
                                     <th class="center">Item</th>
                                     <th class="center">Jum.</th>
                                     <th class="center">Sat.</th>
-                                    <th class="center">Harga @</th>
-                                    <th class="center">Harga Total.</th>
                                     <th class="center">Coa</th>
                                     <th class="center">Plant</th>
-                                    <th class="center">Departemen</th>
                                     <th class="center">Dari Gudang</th>
                                     <th class="center">Keterangan</th>
                                 </tr>
@@ -264,15 +261,12 @@
                             <tbody>
                                 @foreach($data->goodIssueDetail as $row)
                                 <tr>
-                                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                                    <td>{{ $row->itemStock->item->code.' - '.$row->itemStock->item->name }}</td>
                                     <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
-                                    <td class="center-align">{{ $row->item->uomUnit->code }}</td>
-                                    <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
-                                    <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
+                                    <td class="center-align">{{ $row->itemStock->item->uomUnit->code }}</td>
                                     <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
-                                    <td class="center-align">{{ $row->department->name }}</td>
-                                    <td class="center-align">{{ $row->warehouse->name }}</td>
+                                    <td class="center-align">{{ $row->itemStock->place->name }}</td>
+                                    <td class="center-align">{{ $row->itemStock->warehouse->name }}</td>
                                     <td>{{ $row->note }}</td>
                                 </tr>
                                 @endforeach

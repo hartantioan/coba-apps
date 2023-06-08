@@ -9,6 +9,7 @@ use App\Models\FundRequest;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\InventoryTransferOut;
+use App\Models\ItemStock;
 use App\Models\Line;
 use App\Models\Menu;
 use App\Models\PaymentRequest;
@@ -1199,6 +1200,31 @@ class Select2Controller extends Controller {
                     'details'           => $details,
                 ];
             }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function itemStock(Request $request)
+    {
+        $response   = [];
+        $search     = $request->search;
+        $data = ItemStock::where(function($query) use($search){
+                        $query->whereHas('item',function($query) use($search){
+                            $query->where('code', 'like', "%$search%")
+                                ->orWhere('name','like',"%$search%");
+                        });
+                    })
+                    ->whereIn('place_id',$this->dataplaces)
+                    ->whereIn('warehouse_id',$this->datawarehouses)
+                    ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
+                'qty'               => $d->qty,
+            ];
         }
 
         return response()->json(['items' => $response]);

@@ -169,14 +169,14 @@
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col m12 s12">
-                                <div class="col m8 s8">
+                                <div class="col m6 s6">
                                     <p class="mt-2 mb-2">
                                         <h6>Fund Request / Permohonan Dana (Tipe BS)</h6>
                                         <div class="row">
-                                            <div class="input-field col m6 s7">
+                                            <div class="input-field col m8 s8">
                                                 <select class="browser-default" id="fund_request_id" name="fund_request_id">&nbsp;</select>
                                             </div>
-                                            <div class="col m6 s6 mt-4">
+                                            <div class="col m4 s4 mt-4">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getFundRequest();" href="javascript:void(0);">
                                                     <i class="material-icons left">add</i> Tambah
                                                 </a>
@@ -184,8 +184,8 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="col m4 s4">
-                                    <h6><b>FR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                                <div class="col m6 s6">
+                                    <b>FR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i>
                                 </div>
                             </div>
                             <div class="col m12 s12">

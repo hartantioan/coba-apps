@@ -16,19 +16,16 @@ return new class extends Migration
         Schema::create('good_issue_details', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('good_issue_id')->nullable();
-            $table->bigInteger('item_id')->nullable();
+            $table->bigInteger('item_stock_id')->nullable();
             $table->double('qty')->nullable();
             $table->double('price')->nullable();
             $table->double('total')->nullable();
             $table->string('note')->nullable();
             $table->bigInteger('coa_id')->nullable();
-            $table->bigInteger('place_id')->nullable();
-            $table->bigInteger('department_id')->nullable();
-            $table->bigInteger('warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['good_issue_id','item_id','place_id','department_id','warehouse_id','coa_id'],'good_issue_details_index');
+            $table->index(['good_issue_id','item_stock_id','coa_id'],'good_issue_details_index');
         });
     }
 

@@ -156,6 +156,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('line', [Select2Controller::class, 'line']);
                 Route::get('item_transfer', [Select2Controller::class, 'itemTransfer']);
                 Route::get('inventory_transfer_out', [Select2Controller::class, 'inventoryTransferOut']);
+                Route::get('item_stock', [Select2Controller::class, 'itemStock']);
             });
 
             Route::prefix('personal')->middleware('direct.access')->group(function () {

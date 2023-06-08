@@ -656,31 +656,29 @@ class CustomHelper {
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->coa_id,
-					'place_id'		=> $row->place_id,
-					'item_id'		=> $row->item_id,
-					'department_id'	=> $row->department_id,
-					'warehouse_id'	=> $row->warehouse_id,
+					'place_id'		=> $row->itemStock->place_id,
+					'item_id'		=> $row->itemStock->item_id,
+					'warehouse_id'	=> $row->itemStock->warehouse_id,
 					'type'			=> '1',
 					'nominal'		=> $row->total,
 				]);
 
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->item->itemGroup->coa_id,
-					'place_id'		=> $row->place_id,
-					'item_id'		=> $row->item_id,
-					'department_id'	=> $row->department_id,
-					'warehouse_id'	=> $row->warehouse_id,
+					'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+					'place_id'		=> $row->itemStock->place_id,
+					'item_id'		=> $row->itemStock->item_id,
+					'warehouse_id'	=> $row->itemStock->warehouse_id,
 					'type'			=> '2',
 					'nominal'		=> $row->total,
 				]);
 
 				self::sendCogs('good_issues',
 					$gr->id,
-					$row->place->company_id,
-					$row->place_id,
-					$row->warehouse_id,
-					$row->item_id,
+					$row->itemStock->place->company_id,
+					$row->itemStock->place_id,
+					$row->itemStock->warehouse_id,
+					$row->itemStock->item_id,
 					$row->qty,
 					$row->total,
 					'OUT',
@@ -688,9 +686,9 @@ class CustomHelper {
 				);
 
 				self::sendStock(
-					$row->place_id,
-					$row->warehouse_id,
-					$row->item_id,
+					$row->itemStock->place_id,
+					$row->itemStock->warehouse_id,
+					$row->itemStock->item_id,
 					$row->qty,
 					'OUT'
 				);

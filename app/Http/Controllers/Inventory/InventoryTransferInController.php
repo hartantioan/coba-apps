@@ -603,6 +603,6 @@ class InventoryTransferInController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportInventoryTransferIn($request->search,$request->status,$this->dataplaces,$this->datawarehouses), 'inventory_transfer_out_'.uniqid().'.xlsx');
+		return Excel::download(new ExportInventoryTransferIn($request->search,$request->status,$this->dataplaces,$this->datawarehouses), 'inventory_transfer_in_'.uniqid().'.xlsx');
     }
 }

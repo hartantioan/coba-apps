@@ -118,11 +118,9 @@ class LandedCostController extends Controller
             $inventory_transfer_in = [];
 
             $dataiti = InventoryTransferIn::whereHas('inventoryTransferOut',function($query){
-                    $query->where(function($query){
-                        $query->whereIn('place_to',$this->dataplaces)
-                            ->whereIn('warehouse_to',$this->datawarehouses);
-                    })
-                    ->where('place_from','<>','place_to');
+                    $query->whereIn('place_to',$this->dataplaces)
+                        ->whereIn('warehouse_to',$this->datawarehouses)
+                        ->whereRaw('place_from <> place_to');
                 })
                 ->whereIn('status',['2','3'])
                 ->get();
@@ -228,6 +226,52 @@ class LandedCostController extends Controller
                             'lookable_id'               => $row->id,
                             'lookable_type'             => $row->getTable(),
                             'stock'                     => $row->item->getStockPlace($row->place_id),
+                            'coa_id'                    => $coa ? $coa->id : '',
+                            'coa_name'                  => $coa ? $coa->name : '',
+                        ];
+                    }
+        
+                    $data['details'] = $details;
+                }
+
+                $arr_main[] = $data;
+            }
+        }
+
+        if($request->arr_iti){
+            foreach($request->arr_iti as $row){
+                $data = InventoryTransferIn::find(intval($row));
+                $data['lookable_type'] = $data->getTable();
+                $data['account_name'] = '-';
+            
+                if($data->used()->exists()){
+                    $data['status'] = '500';
+                    $data['message'] = 'Landed Cost '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+                }else{
+                    CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
+        
+                    $details = [];
+                    
+                    foreach($data->inventoryTransferOut->inventoryTransferOutDetail as $row){
+                        $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
+                        $details[] = [
+                            'item_id'                   => $row->itemStock->item_id,
+                            'item_name'                 => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
+                            'qty'                       => number_format($row->qty,3,',','.'),
+                            'totalrow'                  => $row->total,
+                            'qtyRaw'                    => $row->qty,
+                            'unit'                      => $row->itemStock->item->uomUnit->code,
+                            'place_name'                => $row->itemStock->place->code,
+                            'department_name'           => '',
+                            'warehouse_name'            => $row->itemStock->warehouse->name,
+                            'place_id'                  => $row->itemStock->place_id,
+                            'line_name'                 => '-',
+                            'line_id'                   => '',
+                            'department_id'             => '',
+                            'warehouse_id'              => $row->itemStock->warehouse_id,
+                            'lookable_id'               => $row->id,
+                            'lookable_type'             => $row->getTable(),
+                            'stock'                     => $row->qty,
                             'coa_id'                    => $coa ? $coa->id : '',
                             'coa_name'                  => $coa ? $coa->name : '',
                         ];

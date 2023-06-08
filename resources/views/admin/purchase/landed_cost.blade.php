@@ -985,14 +985,17 @@
 
         $('#table_goods_receipt tbody').on('click', 'tr', function () {
             table_landed_cost.rows().deselect();
+            table_inventory_transfer_in.rows().deselect();
         });
 
         $('#table_landed_cost tbody').on('click', 'tr', function () {
             table_goods_receipt.rows().deselect();
+            table_inventory_transfer_in.rows().deselect();
         });
 
         $('#table_inventory_transfer_in tbody').on('click', 'tr', function () {
-            table_inventory_transfer_in.rows().deselect();
+            table_goods_receipt.rows().deselect();
+            table_landed_cost.rows().deselect();
         });
 
         select2ServerSide('#vendor_id,#filter_vendor', '{{ url("admin/select2/supplier_vendor") }}');
@@ -1234,7 +1237,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                let arr_lc_id = [], arr_gr_id = [], passed = true;
+                let arr_lc_id = [], arr_gr_id = [], arr_iti = [], passed = true;
                 $.map(table_goods_receipt.rows('.selected').nodes(), function (item) {
                     arr_gr_id.push($(item).data('id'));
                 });
@@ -1242,8 +1245,12 @@
                 $.map(table_landed_cost.rows('.selected').nodes(), function (item) {
                     arr_lc_id.push($(item).data('id'));
                 });
+
+                $.map(table_inventory_transfer_in.rows('.selected').nodes(), function (item) {
+                    arr_iti.push($(item).data('id'));
+                });
                 
-                if(arr_gr_id.length == 0 && arr_lc_id.length == 0){
+                if(arr_gr_id.length == 0 && arr_lc_id.length == 0 && arr_iti.length == 0){
                     passed = false;
                 }
 
@@ -1255,6 +1262,7 @@
                         data: {
                             arr_gr_id: arr_gr_id,
                             arr_lc_id: arr_lc_id,
+                            arr_iti: arr_iti,
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

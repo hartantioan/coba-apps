@@ -122,7 +122,7 @@ class UserController extends Controller
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>';
 
                 $response['data'][] = [
-                    '<a class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></a>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->name,
                     $val->username,
                     $val->employee_no,
@@ -243,7 +243,7 @@ class UserController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = User::find($request->id);
+        $data   = User::where('employee_no',CustomHelper::decrypt($request->id))->first();
 
         $banks = [];
         $infos = [];

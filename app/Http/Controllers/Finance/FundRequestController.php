@@ -152,7 +152,7 @@ class FundRequestController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->user->name,
                     $val->code,
                     $val->place->name.' - '.$val->place->company->name,
@@ -206,7 +206,7 @@ class FundRequestController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = FundRequest::find($request->id);
+        $data   = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12">
                     <table style="max-width:800px;">
@@ -670,7 +670,7 @@ class FundRequestController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->place->name.' - '.$val->place->company->name,
                     $val->department->name,

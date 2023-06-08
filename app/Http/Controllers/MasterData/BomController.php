@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\BomDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -106,7 +107,7 @@ class BomController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<a class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></a>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->name,
                     $val->item->name,
@@ -262,7 +263,7 @@ class BomController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = Bom::find($request->id);
+        $data   = Bom::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4">';
 

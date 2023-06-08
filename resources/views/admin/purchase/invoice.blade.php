@@ -432,6 +432,19 @@
     </div>
 </div>
 
+<div id="modal4_1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="show_detail">
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
     <div class="modal-header ml-2">
         <h5>Daftar Tunggakan Dokumen <b id="account_name"></b></h5>
@@ -822,6 +835,17 @@
                 $('#account_name').text('');
                 $('#preview_data').html('');
                 $('#table_multi,#table_multi_dp').DataTable().clear().destroy();
+            }
+        });
+
+        $('#modal4_1').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#show_detail').empty();
             }
         });
 
@@ -1732,34 +1756,20 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
-    function rowDetail(id, element) {
-        var content = '';
+    function rowDetail(data) {
         $.ajax({
             url: '{{ Request::url() }}/row_detail',
             type: 'GET',
-            async: false,
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
             data: {
-                id: id
+                id: data
             },
             success: function(response) {
-                var tr    = $(element).closest('tr');
-                var badge = tr.find('button.btn-floating');
-                var icon  = tr.find('i');
-                var row   = table.row(tr);
-
-                if(row.child.isShown()) {
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    badge.first().removeClass('red');
-                    badge.first().addClass('green');
-                    icon.first().html('add');
-                } else {
-                    row.child(response).show();
-                    tr.addClass('shown');
-                    badge.first().removeClass('green');
-                    badge.first().addClass('red');
-                    icon.first().html('remove');
-                }
+                $('#modal4_1').modal('open');
+                $('#show_detail').html(response);
+                loadingClose('.modal-content');
             },
             error: function() {
                 swal({
@@ -2454,11 +2464,6 @@
                 $('#note_jurnal').append(`Keterangan `+data.message.note);
                 $('#ref_jurnal').append(`Referensi `+data.reference);
                 $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
-                
-                
-
-
-                console.log(data);
             }
         });
     }

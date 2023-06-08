@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Line;
@@ -85,7 +86,7 @@ class CostDistributionController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->name,
                     $val->coa_id ? $val->coa->name : '-',
@@ -114,7 +115,7 @@ class CostDistributionController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = CostDistribution::find($request->id);
+        $data   = CostDistribution::where('code',CustomHelper::decrypt($request->id))->first();
 
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>

@@ -177,7 +177,7 @@ class OutgoingPaymentController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
                     $val->account->name,
@@ -217,7 +217,7 @@ class OutgoingPaymentController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = OutgoingPayment::find($request->id);
+        $data   = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12 mt-1"><table style="max-width:500px;">
                         <thead>

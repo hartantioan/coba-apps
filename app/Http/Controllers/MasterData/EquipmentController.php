@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+use App\Helpers\CustomHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -111,7 +112,7 @@ class EquipmentController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->name,
                     $val->place->name.' - '.$val->place->company->name,
@@ -247,7 +248,7 @@ class EquipmentController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = Equipment::find($request->id);
+        $data   = Equipment::where('code',CustomHelper::decrypt($request->id))->first();
 
         $string = '<h6>List Parts & Spare Parts</h6>
                     <ol>

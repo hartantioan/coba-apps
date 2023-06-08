@@ -175,7 +175,7 @@ class InventoryTransferOutController extends Controller
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
                 }
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
                     $val->company->name,
@@ -431,7 +431,7 @@ class InventoryTransferOutController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = InventoryTransferOut::find($request->id);
+        $data   = InventoryTransferOut::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12">
                     <table style="max-width:800px;">

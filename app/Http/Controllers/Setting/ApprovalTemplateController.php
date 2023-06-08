@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Setting;
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use Illuminate\Support\Str;
@@ -88,7 +89,7 @@ class ApprovalTemplateController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
                     $val->name,
@@ -272,7 +273,7 @@ class ApprovalTemplateController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = ApprovalTemplate::find($request->id);
+        $data   = ApprovalTemplate::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row"><div class="col s12 mt-2"><table style="max-width:500px;">
                         <thead>

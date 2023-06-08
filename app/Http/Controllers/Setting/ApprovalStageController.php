@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Setting;
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -100,7 +101,7 @@ class ApprovalStageController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->approval->name.' - '.$val->approval->document_text,
                     $val->level,
@@ -234,7 +235,7 @@ class ApprovalStageController extends Controller
     }
 
     public function rowDetail(Request $request){
-        $data   = ApprovalStage::find($request->id);
+        $data   = ApprovalStage::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row"><div class="col s12 mt-2"><table style="max-width:500px;">
                         <thead>

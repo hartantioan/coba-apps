@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+use App\Helpers\CustomHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -132,7 +133,7 @@ class ItemController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->name,
                     $val->itemGroup->name,
@@ -268,7 +269,7 @@ class ItemController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = Item::find($request->id);
+        $data   = Item::where('code',CustomHelper::decrypt($request->id))->first();
 
         $string = '<table>
                         <thead>

@@ -101,7 +101,7 @@
                                         <div class="col s12">
                                             <div class="card-alert card purple">
                                                 <div class="card-content white-text">
-                                                    <p>Info : Harga yand anda masukkan disini akan mempengaruhi nilai rata-rata barang dan qty stock saat ini.</p>
+                                                    <p>Info : Data yang anda masukkan disini akan mempengaruhi nilai qty stock saat ini.</p>
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>
@@ -113,8 +113,6 @@
                                                         <th>Pengguna</th>
                                                         <th>Perusahaan</th>
                                                         <th>Tanggal</th>
-                                                        <th>Mata Uang</th>
-                                                        <th>Konversi</th>
                                                         <th>Keterangan</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
@@ -161,18 +159,6 @@
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="currency_id" name="currency_id">
-                                    @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="currency_id">Mata Uang</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                <label class="active" for="currency_rate">Konversi</label>
-                            </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
                                     <span>Lampiran Bukti</span>
@@ -187,29 +173,25 @@
                                     <h4>Detail Produk</h4>
                                     Coa debit mengikuti coa pada masing-masing grup item.
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="min-width:2000px !important;">
+                                        <table class="bordered" style="min-width:1600px !important;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
-                                                    <th class="center">Stok Skrg</th>
+                                                    <th class="center">Ambil Dari</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
-                                                    <th class="center">Harga</th>
-                                                    <th class="center">Total</th>
+                                                    <th class="center">Plant Tujuan</th>
+                                                    <th class="center">Gudang Tujuan</th>
                                                     <th class="center">Keterangan</th>
-                                                    <th class="center">Coa Kredit</th>
-                                                    <th class="center">Plant</th>
-                                                    <th class="center">Departemen</th>
-                                                    <th class="center">Gudang</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="12" class="center">
-                                                        <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                    <td colspan="8" class="center">
+                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
-                                                        </button>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -245,94 +227,6 @@
     </div>
     <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
-    </div>
-</div>
-
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12" id="show_detail">
-
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
-    </div>
-</div>
-
-<div id="modal5" class="modal modal-fixed-footer" style="height: 70% !important;width:50%">
-    <div class="modal-header ml-6 mt-2">
-        <h6>Range Printing</h6>
-    </div>
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12">
-                <form class="row" id="form_data_print_multi" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert_multi" style="display:none;"></div>
-                    </div>
-                    <div class="col s12">
-                        <ul class="tabs">
-                            <li class="tab">
-                                <a href="#range-tabs" class="" id="part-tabs-btn">
-                                <span>By No</span>
-                                </a>
-                            </li>
-                            <li class="tab">
-                                <a href="#date-tabs" class="">
-                                <span>By Date</span>
-                                </a>
-                            </li>
-                            <li class="indicator" style="left: 0px; right: 0px;"></li>
-                        </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
-                            <div class="row ml-2 mt-2">
-                                <div class="row">
-                                    <div class="input-field col m4 s12">
-                                        <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
-                                        <label class="" for="range_end">No Awal</label>
-                                    </div>
-                                    
-                                    <div class="input-field col m4 s12">
-                                        <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
-                                        <label class="active" for="range_end">No akhir</label>
-                                    </div>
-                                    <div class="input-field col m4 s12">
-                                        <label>
-                                            <input name="type_date" type="radio" checked value="1"/>
-                                            <span>Dengan range biasa</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                <div class="input-field col m8 s12">
-                                    <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
-                                    <label class="" for="range_end">Masukkan angka dengan koma</label>
-                                </div>
-                               
-                                <div class="input-field col m4 s12">
-                                    <label>
-                                        <input name="type_date" type="radio" value="2"/>
-                                        <span>Dengan Range koma</span>
-                                    </label>
-                                </div>
-                                </div>
-                                <div class="col s12 mt-3">
-                                    <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
-                                </div>
-                            </div>                         
-                        </div>
-                        <div id="date-tabs" style="display: none;" class="">
-                            
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
     </div>
 </div>
 
@@ -395,12 +289,6 @@
     </a>
 </div>
 
-<div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
-        <i class="material-icons">view_comfy</i>
-    </a>
-</div>
-
 <!-- END: Page Main-->
 <script>
     $(function() {
@@ -409,25 +297,28 @@
             width: '100%',
         });
 
-        
+        $('#datatable_serverside').on('click', 'td.details-control', function() {
+            var tr    = $(this).closest('tr');
+            var badge = tr.find('button.btn-floating');
+            var icon  = tr.find('i');
+            var row   = table.row(tr);
 
-        $('#datatable_serverside').on('click', 'button', function(event) {
-            event.stopPropagation();
-            
+            if(row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                badge.first().removeClass('red');
+                badge.first().addClass('green');
+                icon.first().html('add');
+            } else {
+                row.child(rowDetail(row.data())).show();
+                tr.addClass('shown');
+                badge.first().removeClass('green');
+                badge.first().addClass('red');
+                icon.first().html('remove');
+            }
         });
 
         loadDataTable();
-
-        $('#modal4').modal({
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) { 
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#show_detail').empty();
-            }
-        });
 
         $('#modal1').modal({
             dismissible: false,
@@ -445,7 +336,6 @@
                 };
             },
             onCloseEnd: function(modal, trigger){
-                $("#form_data :input").prop("disabled", false);
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('.row_item').each(function(){
@@ -468,23 +358,6 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_print').html('');
-            }
-        });
-
-        $('#modal5').modal({
-            dismissible: false,
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) {
-                $('#validation_alert_multi').hide();
-                $('#validation_alert_multi').html('');
-                M.updateTextFields();
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#form_data')[0].reset();
-                $('#temp').val('');
-                
             }
         });
 
@@ -511,25 +384,21 @@
     });
 
     function getRowUnit(val){
-        $('#tempPrice' + val).empty();
         $("#arr_warehouse" + val).empty();
         if($("#arr_item" + val).val()){
-            $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
-            if($("#arr_item" + val).select2('data')[0].price_list.length){
-                $.each($("#arr_item" + val).select2('data')[0].price_list, function(i, value) {
-                    $('#tempPrice' + val).append(`
-                        <option value="` + value.price + `">` + value.description + `</option>
-                    `);
-                });
-            }
             if($("#arr_item" + val).select2('data')[0].stock_list.length){
-                $('#arr_stock' + val).empty();
+                $('#arr_item_stock' + val).empty();
                 $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
-                    $('#arr_stock' + val).append(`
-                        ` + value.warehouse + ` - ` + value.qty + `<br>
+                    $('#arr_item_stock' + val).append(`
+                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `">` + value.warehouse + ` - ` + value.qty + `</option>
                     `);
                 });
+
+                $('#arr_item_stock' + val).formSelect();
             }
+
+            $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
+
             if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
                 $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
                     $('#arr_warehouse' + val).append(`
@@ -542,12 +411,70 @@
                 `);
             }
         }else{
-            $('#tempPrice' + val).empty();
-            $('#arr_stock' + val).text('-');
+            $('#arr_item_stock' + val).empty().formSelect();
             $("#arr_warehouse" + val).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
         }
+    }
+
+    function cekRow(val){
+        var qtystock = 0, balance = 0, stockinput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
+        if($('#arr_item_stock' + val).val()){
+            qtystock = parseFloat($('#arr_item_stock' + val).find(':selected').data('qty').replaceAll(".", "").replaceAll(",","."));
+        }
+
+        balance = qtystock - stockinput;
+
+        if(balance < 0){
+            M.toast({
+                html: 'Maaf, stock yang anda masukkan lebih dari stok yang ada pada gudang.'
+            });
+            $('#rowQty' + val).val(formatRupiahIni(qtystock.toFixed(2).toString().replace('.',',')));
+        }
+    }
+
+    function addItem(){
+        var count = makeid(10);
+        $('#last-row-item').before(`
+            <tr class="row_item">
+                <td>
+                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]"></select>
+                </td>
+                <td>
+                    <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);cekRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                </td>
+                <td class="center">
+                    <span id="arr_unit` + count + `">-</span>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                        @foreach ($place as $rowplace)
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                        @endforeach
+                    </select>    
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                        <option value="">--Silahkan pilih item--</option>    
+                    </select>
+                </td>
+                <td>
+                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
+        $('#arr_place' + count).formSelect();
+        M.updateTextFields();
     }
 
     function loadDataTable() {
@@ -590,8 +517,6 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
-                { name: 'currency_id', className: 'center-align' },
-                { name: 'currency_rate', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -599,33 +524,8 @@
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle',
-                'selectNone' 
-            ],
-            "language": {
-                "lengthMenu": "Menampilkan _MENU_ data per halaman",
-                "zeroRecords": "Data tidak ditemukan / kosong",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
-                "infoEmpty": "Data tidak ditemukan / kosong",
-                "infoFiltered": "(disaring dari _MAX_ total data)",
-                "search": "Cari",
-                "paginate": {
-                    first:      "<<",
-                    previous:   "<",
-                    next:       ">",
-                    last:       ">>"
-                },
-                "buttons": {
-                    selectAll: "Pilih semua",
-                    selectNone: "Hapus pilihan"
-                },
-                "select": {
-                    rows: "%d baris terpilih"
-                }
-            },
-            select: {
-                style: 'multi'
-            },
+                'columnsToggle' 
+            ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
 
@@ -633,19 +533,16 @@
 	}
 
     function rowDetail(data) {
+        var content = '';
         $.ajax({
             url: '{{ Request::url() }}/row_detail',
             type: 'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
+            async: false,
             data: {
-                id: data
+                id: $(data[0]).data('id')
             },
             success: function(response) {
-                $('#modal4').modal('open');
-                $('#show_detail').html(response);
-                loadingClose('.modal-content');
+                content += response;
             },
             error: function() {
                 swal({
@@ -655,80 +552,9 @@
                 });
             }
         });
+
+        return content;
 	}
-
-    function addItem(){
-        var count = makeid(10);
-        $('#last-row-item').before(`
-            <tr class="row_item">
-                <input type="hidden" name="arr_purchase[]" value="0">
-                <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                </td>
-                <td class="center">
-                    <span id="arr_stock` + count + `">-</span>
-                </td>
-                <td>
-                    <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
-                </td>
-                <td class="center">
-                    <span id="arr_unit` + count + `">-</span>
-                </td>
-                <td class="center">
-                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
-                    <datalist id="tempPrice` + count + `"></datalist>
-                </td>
-                <td class="right-align">
-                    <span id="arr_total` + count + `" class="arr_total">0</span>
-                </td>
-                <td>
-                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                        @foreach ($place as $rowplace)
-                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                        @endforeach
-                    </select>    
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
-                        @foreach ($department as $rowdept)
-                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                        @endforeach
-                    </select>    
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                        <option value="">--Silahkan pilih item--</option>    
-                    </select>
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
-        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-        $('#arr_place' + count).formSelect();
-        $('#arr_department' + count).formSelect();
-        M.updateTextFields();
-    }
-
-    function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",","."));
-
-        if((price * qty).toFixed(3) >= 0){
-            $('#arr_total' + id).text(formatRupiahIni((price * qty).toFixed(3).toString().replace('.',',')));
-        }else{
-            $('#arr_total' + id).text('-' + formatRupiahIni((price * qty).toFixed(3).toString().replace('.',',')));
-        }
-    }
 
     function save(){
         swal({
@@ -813,8 +639,7 @@
 
     function success(){
         loadDataTable();
-        /* $('#modal1').modal('close'); */
-        $("#form_data :input").prop("disabled", true);
+        $('#modal1').modal('close');
     }
 
     function show(id){
@@ -843,78 +668,67 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
-                $('#currency_id').val(response.currency_id).formSelect();
-                $('#currency_rate').val(response.currency_rate);
                 $('#post_date').removeAttr('min');
                 
                 if(response.details.length > 0){
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#last-row-item').before(`
-                            <tr class="row_item">
-                                <input type="hidden" name="arr_purchase[]" value="0">
-                                <td>
-                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                                </td>
-                                <td class="center">
-                                    <span id="arr_stock` + count + `">-</span>
-                                </td>
-                                <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
-                                </td>
-                                <td class="center">
-                                    <span id="arr_unit` + count + `">` + val.unit + `</span>
-                                </td>
-                                <td class="center">
-                                    <input name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowPrice`+ count +`">
-                                    <datalist id="tempPrice` + count + `"></datalist>
-                                </td>
-                                <td class="right-align">
-                                    <span id="arr_total` + count + `" class="arr_total">` + val.total + `</span>
-                                </td>
-                                <td>
-                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
-                                </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
-                                </td>
-                                <td>
-                                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                        @foreach ($place as $rowplace)
-                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                        @endforeach
-                                    </select>    
-                                </td>
-                                <td>
-                                    <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
-                                        @foreach ($department as $rowdept)
-                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                                        @endforeach
-                                    </select>    
-                                </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
+                        <tr class="row_item">
+                            <td>
+                                <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]"></select>
+                            </td>
+                            <td>
+                                <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);cekRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                            </td>
+                            <td class="center">
+                                <span id="arr_unit` + count + `">` + val.unit + `</span>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>    
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                    
+                                </select>
+                            </td>
+                            <td>
+                                <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
+                            </td>
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
                         `);
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
-                        `);
-                        $('#arr_coa' + count).append(`
-                            <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                         `);
                         $('#arr_warehouse' + count).append(`
                             <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/item") }}');
-                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         $('#arr_place' + count).val(val.place_id).formSelect();
-                        $('#arr_department' + count).val(val.department_id).formSelect();
+                        
+                        if(val.stock_list.length){
+                            $('#arr_item_stock' + count).empty();
+                            $.each(val.stock_list, function(i, value) {
+                                $('#arr_item_stock' + count).append(`
+                                    <option value="` + value.id + `" data-qty="` + value.qty_raw + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                `);
+                            });
+
+                            $('#arr_item_stock' + count).formSelect();
+                            $('#arr_item_stock' + count).val(val.item_stock_id).formSelect();
+                        }
                     });
                 }
                 
@@ -1036,146 +850,26 @@
         });
     }
 
-    var printService = new WebSocketPrinter({
-        onConnect: function () {
-            
-        },
-        onDisconnect: function () {
-           
-        },
-        onUpdate: function (message) {
-            
-        },
-    });
-    
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
-        arr_id_temp=[];
-        $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(2)').text().trim();
-            arr_id_temp.push(poin);
-        });
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
         $.ajax({
-            url: '{{ Request::url() }}/print',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                arr_id: arr_id_temp,
+            type : "POST",
+            url  : '{{ Request::url() }}/print',
+            data : {
+                search : search,
+                status : status,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                printService.submit({
-                    'type': 'INVOICE',
-                    'url': response.message
-                })
-                
-               
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
-    function printMultiSelect(){
-        var formData = new FormData($('#form_data_print_multi')[0]);
-        console.log(formData);
-        $.ajax({
-            url: '{{ Request::url() }}/print_by_range',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert_multi').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    $('#modal5').modal('close');
-                   /*  printService.submit({
-                        'type': 'INVOICE',
-                        'url': response.message
-                    }) */
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert_multi').show();
-                    $('.modal-content').scrollTop(0);
-                    console.log(response.error);
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
-                    
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert_multi').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
-                        });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-            
-        });
-    }
-
-    function printPreview(code){
-        $.ajax({
-            url: '{{ Request::url() }}/print_individual/' + code,
-            type:'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            complete: function() {
-                
-            },
+            cache: false,
             success: function(data){
-                loadingClose('.modal-content');
-                printService.submit({
-                    'type': 'INVOICE',
-                    'url': data
-                })
+                var w = window.open('about:blank');
+                w.document.open();
+                w.document.write(data);
+                w.document.close();
             }
         });
     }
@@ -1207,6 +901,7 @@
                 $('#note_jurnal').html('Keterangan '+data.message.note);
                 $('#ref_jurnal').html( 'Referensi '+data.reference);
                 $('#post_date_jurnal').html('Tanggal '+data.message.post_date);
+                
             }
         });
     }

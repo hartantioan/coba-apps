@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Exports\ExportResidence;
+use App\Helpers\CustomHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -87,7 +88,7 @@ class ResidenceController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<a class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></a>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->employee->name,
                     $val->code,
                     $val->name,
@@ -245,7 +246,7 @@ class ResidenceController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = Residence::find($request->id);
+        $data   = Residence::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>

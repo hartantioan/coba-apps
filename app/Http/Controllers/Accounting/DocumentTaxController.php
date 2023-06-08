@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Accounting;
 
 use App\Exports\ExportDocumentTax;
+use App\Helpers\CustomHelper;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -117,7 +118,7 @@ class DocumentTaxController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" onclick="rowDetail('.$val->id.',this)"><i class="material-icons">add</i></button>',
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->transaction_code,
                     $val->replace,
                     $val->code,
@@ -158,7 +159,7 @@ class DocumentTaxController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = DocumentTax::find($request->id);
+        $data   = DocumentTax::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lime lighten-4"><div class="col s12"><table style="max-width:500px;">
                         <thead>

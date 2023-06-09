@@ -261,23 +261,24 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="33%" class="left-align" style="vertical-align: top !important;">
-                                <table border="0" width="100%" class="tbl-info">
+                            <td width="33%" class="left-align">
+                                <table border="0" width="100%">
                                     <tr>
-                                        <td width="40%">
-                                            Lampiran
-                                        </td>
-                                        <td width="60%">
-                                            <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
+                                        <td align="right">
+                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="40%">
-                                            Status
+                                        <td>
+                                           <br>
                                         </td>
-                                        <td width="60%">
-                                            {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                                        
+                                    </tr>
+                                    <tr>
+                                        <td >
+                                            <br>
                                         </td>
+                                        
                                     </tr>
                                 </table>
                             </td>

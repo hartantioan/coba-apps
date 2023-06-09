@@ -257,23 +257,24 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="33%" class="left-align" style="vertical-align: top !important;">
+                            <td width="33%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="40%">
-                                            Lampiran
-                                        </td>
-                                        <td width="60%">
-                                            <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
+                                        <td>
+                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:100%;" height="5%" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="40%">
-                                            Status
+                                        <td>
+                                           <br>
                                         </td>
-                                        <td width="60%">
-                                            {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                                        
+                                    </tr>
+                                    <tr>
+                                        <td >
+                                            <br>
                                         </td>
+                                        
                                     </tr>
                                 </table>
                             </td>
@@ -299,7 +300,7 @@
                                 <tr>
                                     <td class="center" style="text-align: center">{{ ($key + 1) }}</td>
                                     <td>{{ $row->place->name.' - '.$row->place->company->name }}</td>
-                                    <td>{{ $row->department->name }}</td>
+                                    <td>{{ isset($row->department->name) ? $row->department->name: ''  }}</td>
                                     <td>{{ $row->warehouse->name }}</td>
                                     <td>{{ $row->item->name }}</td>
                                     <td style="text-align: center">{{ $row->qty }}</td>

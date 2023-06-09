@@ -202,7 +202,7 @@
             <div class="card">
                 <table border="0" width="100%" class="tbl-info">
                     <tr>
-                        <td width="50%" class="left-align" style="vertical-align: top !important;">
+                        <td width="33%" class="left-align" style="vertical-align: top !important;">
                             <table border="0" width="100%">
                                 <tr>
                                     <td width="40%">
@@ -230,7 +230,7 @@
                                 </tr>
                             </table>
                         </td>
-                        <td width="50%" class="left-align" style="vertical-align: top !important;">
+                        <td width="33%" class="left-align" style="vertical-align: top !important;">
                             <table border="0" width="100%">
                                 <tr>
                                     <td width="40%">
@@ -239,6 +239,27 @@
                                     <td width="60%">
                                         {{ $data->note }}
                                     </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="33%" class="left-align">
+                            <table border="0" width="100%">
+                                <tr>
+                                    <td align="right">
+                                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                       <br>
+                                    </td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td >
+                                        <br>
+                                    </td>
+                                    
                                 </tr>
                             </table>
                         </td>

@@ -34,6 +34,8 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseOrder;
 use App\Models\User;
 use App\Models\Tax;
+use Milon\Barcode\DNS2D;
+use Milon\Barcode\Facades\DNS2DFacade;
 
 class PurchaseOrderController extends Controller
 {
@@ -2213,11 +2215,13 @@ class PurchaseOrderController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = PurchaseOrder::where('code',$row)->first();
+               
                 
                 if($pr){
                     $data = [
                         'title'     => 'Print Purchase Invoice',
-                        'data'      => $pr
+                        'data'      => $pr,
+                      
                     ];
                     $img_path = 'website/logo_web_fix.png';
                     $extencion = pathinfo($img_path, PATHINFO_EXTENSION);

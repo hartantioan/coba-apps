@@ -64,7 +64,6 @@ class ExportPurchaseMemo implements FromView
                 if($this->company){
                     $query->where('company_id',$this->company);
                 }
-                
             })
             ->get()
         ]);

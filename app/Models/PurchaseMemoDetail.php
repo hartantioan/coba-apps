@@ -19,6 +19,11 @@ class PurchaseMemoDetail extends Model
         'lookable_type',
         'lookable_id',
         'description',
+        'is_include_tax',
+        'tax_id',
+        'wtax_id',
+        'percent_tax',
+        'percent_wtax',
         'total',
         'tax',
         'wtax',
@@ -28,6 +33,16 @@ class PurchaseMemoDetail extends Model
     public function purchaseMemo()
     {
         return $this->belongsTo('App\Models\PurchaseMemo', 'purchase_memo_id', 'id')->withTrashed();
+    }
+
+    public function taxMaster()
+    {
+        return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
+    }
+
+    public function wTaxMaster()
+    {
+        return $this->belongsTo('App\Models\Tax', 'wtax_id', 'id')->withTrashed();
     }
     
     public function lookable(){

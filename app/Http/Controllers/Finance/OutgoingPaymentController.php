@@ -488,6 +488,7 @@ class OutgoingPaymentController extends Controller
     
                 CustomHelper::sendNotification('outgoing_payments',$query->id,'Kas / Bank Keluar No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('outgoing_payments',$query->id);
+                CustomHelper::removeJournal('outgoing_payments',$query->id);
 
                 $response = [
                     'status'  => 200,

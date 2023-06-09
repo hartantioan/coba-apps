@@ -1001,55 +1001,95 @@ class CustomHelper {
 				'status'		=> '3'
 			]);
 
+			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pm->company_id)->first()->id;
+
 			foreach($pm->purchaseMemoDetail as $row){
 				$coacode = '';
 
-				if($row->lookable_type == 'purchase_invoices'){
+				if($row->lookable_type == 'purchase_invoice_details'){
 					$coacode = '700.01.01.01.99';
+					if($row->total > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> Coa::where('code',$coacode)->where('company_id',$pm->company_id)->first()->id,
+							'account_id'	=> $row->lookable->purchaseInvoice->account_id,
+							'type'			=> '1',
+							'nominal'		=> -1 * $row->total,
+						]);
+					}
+
+					if($row->tax > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->taxMaster->coa_id,
+							'account_id'	=> $row->lookable->purchaseInvoice->account_id,
+							'type'			=> '1',
+							'nominal'		=> -1 * $row->tax,
+						]);
+					}
+	
+					if($row->wtax > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->wTaxMaster->coa_id,
+							'account_id'	=> $row->lookable->purchaseInvoice->account_id,
+							'type'			=> '2',
+							'nominal'		=> -1 * $row->wtax,
+						]);
+					}
+					
+					if($row->grandtotal > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coahutangusaha,
+							'account_id'	=> $row->lookable->purchaseInvoice->account_id,
+							'type'			=> '2',
+							'nominal'		=> -1 * $row->grandtotal,
+						]);
+					}
 				}
 
 				if($row->lookable_type == 'purchase_down_payments'){
 					$coacode = '100.01.07.01.01';
-				}
+					if($row->total > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> Coa::where('code',$coacode)->where('company_id',$pm->company_id)->first()->id,
+							'account_id'	=> $row->lookable->account_id,
+							'type'			=> '1',
+							'nominal'		=> -1 * $row->total,
+						]);
+					}
 
-				if($row->total > 0){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> Coa::where('code',$coacode)->where('company_id',$pm->company_id)->first()->id,
-						'account_id'	=> $row->lookable->account_id,
-						'type'			=> '1',
-						'nominal'		=> -1 * $row->total,
-					]);
-				}
-
-				if($row->tax > 0){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> Coa::where('code','100.01.08.01.05')->where('company_id',$pm->company_id)->first()->id,
-						'account_id'	=> $row->lookable->account_id,
-						'type'			=> '1',
-						'nominal'		=> -1 * $row->tax,
-					]);
-				}
-
-				if($row->wtax > 0){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> Coa::where('code','100.01.03.03.06')->where('company_id',$pm->company_id)->first()->id,
-						'account_id'	=> $row->lookable->account_id,
-						'type'			=> '2',
-						'nominal'		=> -1 * $row->wtax,
-					]);
-				}
-				
-				if($row->grandtotal > 0){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> Coa::where('code','200.01.03.01.01')->where('company_id',$pm->company_id)->first()->id,
-						'account_id'	=> $row->lookable->account_id,
-						'type'			=> '2',
-						'nominal'		=> -1 * $row->grandtotal,
-					]);
+					if($row->tax > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->taxMaster->coa_id,
+							'account_id'	=> $row->lookable->account_id,
+							'type'			=> '1',
+							'nominal'		=> -1 * $row->tax,
+						]);
+					}
+	
+					if($row->wtax > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->wTaxMaster->coa_id,
+							'account_id'	=> $row->lookable->account_id,
+							'type'			=> '2',
+							'nominal'		=> -1 * $row->wtax,
+						]);
+					}
+					
+					if($row->grandtotal > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coahutangusaha,
+							'account_id'	=> $row->lookable->account_id,
+							'type'			=> '2',
+							'nominal'		=> -1 * $row->grandtotal,
+						]);
+					}
 				}
 			}
 

@@ -212,7 +212,7 @@ class PurchaseDownPayment extends Model
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type','purchase_down_payments')->where('lookable_id',$this->id)->first();
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
         if($source && $source->approvalMatrix()->exists()){
             return $source;
         }else{
@@ -250,5 +250,35 @@ class PurchaseDownPayment extends Model
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function purchaseMemoDetail(){
+        return $this->hasMany('App\Models\PurchaseMemoDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseMemo',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balanceMemo(){
+        $total = str_replace(',','.',str_replace('.','',$this->total));
+
+        foreach($this->purchaseMemoDetail as $row){
+            $total -= $row->total;
+        }
+
+        return $total;
+    }
+
+    public function hasBalanceMemo(){
+        $total = $this->grandtotal;
+
+        foreach($this->purchaseMemoDetail as $row){
+            $total -= $row->grandtotal;
+        }
+
+        if($total > 0){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

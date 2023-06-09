@@ -639,8 +639,10 @@ class PurchaseDownPaymentController extends Controller
                     'message' => 'Data telah digunakan pada Payment Request / Purchase Invoice sebagai DP.'
                 ];
             }else{
+                
                 CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
                 CustomHelper::removeApproval('purchase_down_payments',$query->id);
+                CustomHelper::removeJournal('purchase_down_payments',$query->id);
 
                 $query->update([
                     'status'    => '5',

@@ -1015,6 +1015,7 @@ class PurchaseInvoiceController extends Controller
                 CustomHelper::sendNotification('purchase_invoices',$query->id,'Purchase Invoice No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('purchase_invoices',$query->id);
                 CustomHelper::addDeposit($query->account_id,$query->downpayment);
+                CustomHelper::removeJournal('purchase_invoices',$query->id);
 
                 $response = [
                     'status'  => 200,

@@ -203,6 +203,22 @@ class PurchaseInvoiceDetail extends Model
             default => '-',
         };
 
+        return $list;
+    }
 
+    public function purchaseMemoDetail(){
+        return $this->hasMany('App\Models\PurchaseMemoDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseMemo',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balanceMemo(){
+        $total = $this->total;
+
+        foreach($this->purchaseMemoDetail as $row){
+            $total -= $row->total;
+        }
+
+        return $total;
     }
 }

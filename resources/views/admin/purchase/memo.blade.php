@@ -78,7 +78,7 @@
                                                 </div>
                                             </div>
                                             <div class="col m3 s6 ">
-                                                <label for="filter_company" style="font-size:1rem;">Plant :</label>
+                                                <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_company" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
@@ -236,6 +236,7 @@
                                                     <th class="center">Ref.Dokumen / Coa</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Keterangan</th>
+                                                    <th class="center">Edit Nominal</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">PPN</th>
                                                     <th class="center">PPH</th>
@@ -245,10 +246,8 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="8" class="center">
-                                                        {{-- <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Tambah Coa
-                                                        </a> --}}
+                                                    <td colspan="9" class="center">
+                                                        Silahkan pilih A/P Invoice atau A/P Down Payment
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -486,7 +485,10 @@
             width: '100%',
         });
 
-        
+        $('#datatable_serverside').on('click', 'button', function(event) {
+            event.stopPropagation();
+            
+        });
 
         loadDataTable();
 
@@ -590,6 +592,15 @@
 
         $('#body-detail').on('click', '.delete-data-detail', function() {
             $(this).closest('tr').remove();
+            if($('.row_detail').length == 0){
+                $('#body-detail').append(`
+                    <tr id="last-row-detail">
+                        <td colspan="9" class="center">
+                            Silahkan pilih A/P Invoice atau A/P Down Payment
+                        </td>
+                    </tr>
+                `);
+            }
             countAll();
         });
     });
@@ -638,15 +649,19 @@
                                 <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `','` + response.type + `')">close</i>
                             </div>
                         `);
-                        
-                        var count = makeid(10);
 
                         if(type == 'podp'){
-                        
+                            var count = makeid(10);
                             $('#body-detail').append(`
                                 <tr class="row_detail" data-id="` + response.id + `">
                                     <input type="hidden" name="arr_type[]" value="` + response.type + `" data-id="` + count + `">
                                     <input type="hidden" name="arr_code[]" value="` + response.id + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_is_include_tax[]" value="` + response.is_include_tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_id_tax[]" value="` + response.tax_id + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_id_wtax[]" value="` + response.wtax_id + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_percent_tax[]" value="` + response.percent_tax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_percent_wtax[]" value="` + response.percent_wtax + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_limit[]" value="` + response.balance + `" data-id="` + count + `">
                                     <td>
                                         ` + response.rawcode + `
                                     </td>
@@ -657,16 +672,19 @@
                                         <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + response.note + ` - ` + response.account_name + `">
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_total[]" value="` + response.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        <input type="text" name="arr_nominal[]" value="` + response.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_tax[]" value="` + response.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        <input type="text" name="arr_total[]" value="` + response.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_wtax[]" value="` + response.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        <input type="text" name="arr_tax[]" value="` + response.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;">
                                     </td>
                                     <td>
-                                        <input type="text" name="arr_grandtotal[]" value="` + response.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        <input type="text" name="arr_wtax[]" value="` + response.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_grandtotal[]" value="` + response.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                     </td>
                                     <td class="center">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
@@ -675,13 +693,19 @@
                                     </td>
                                 </tr>
                             `);
-
                         }else if(type == 'pi'){
                             $.each(response.details, function(i, val) {
+                                var count = makeid(10);
                                 $('#body-detail').append(`
-                                    <tr class="row_detail" data-id="` + val.id + `">
+                                    <tr class="row_detail" data-id="` + response.id + `">
                                         <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
                                         <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_is_include_tax[]" value="` + val.is_include_tax + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_id_tax[]" value="` + val.tax_id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_id_wtax[]" value="` + val.wtax_id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_limit[]" value="` + val.balance + `" data-id="` + count + `">
                                         <td>
                                             ` + response.rawcode + `
                                         </td>
@@ -692,16 +716,19 @@
                                             <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + val.note + ` - ` + val.account_name + `">
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_total[]" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                            <input type="text" name="arr_nominal[]" value="` + val.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                            <input type="text" name="arr_total[]" value="` + val.balanceformat + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                            <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                         </td>
                                         <td>
-                                            <input type="text" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                            <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
@@ -740,13 +767,34 @@
         
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
-                var rowgrandtotal = 0;
                 let element = $(this);
-                total += parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                tax += parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                wtax += parseFloat($('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
-                rowgrandtotal = parseFloat($('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")) + parseFloat($('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")) - parseFloat($('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                var rowgrandtotal = 0, rowtotal = 0, rowtax = 0, rowwtax = 0, percent_tax = parseFloat($('input[name^="arr_percent_tax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), percent_wtax = parseFloat($('input[name^="arr_percent_wtax"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",",".")), rowlimit = parseFloat($('input[name^="arr_limit"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                rowtotal = parseFloat($('input[name^="arr_nominal"][data-id="' + element.data('id') + '"]').val().replaceAll(".", "").replaceAll(",","."));
+                if(percent_tax > 0 && $('input[name^="arr_is_include_tax"][data-id="' + element.data('id') + '"]').val() == '1'){
+                    rowtotal = rowtotal / (1 + (percent_tax / 100));
+                }
+                if(rowtotal > rowlimit){
+                    rowtotal = rowlimit;
+                    $('input[name^="arr_nominal"][data-id="' + element.data('id') + '"]').val(
+                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                    );
+                }
+                rowtax = (percent_tax / 100) * rowtotal;
+                rowwtax = (percent_wtax / 100) * rowtotal;
+                rowgrandtotal = rowtotal + rowtax - rowwtax;
+                total += rowtotal;
+                tax += rowtax;
+                wtax += rowwtax;
                 grandtotal += rowgrandtotal;
+                $('input[name^="arr_total"][data-id="' + element.data('id') + '"]').val(
+                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                );
+                $('input[name^="arr_tax"][data-id="' + element.data('id') + '"]').val(
+                    (rowtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtax).toString().replace('.',','))
+                );
+                $('input[name^="arr_wtax"][data-id="' + element.data('id') + '"]').val(
+                    (rowwtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowwtax).toString().replace('.',','))
+                );
                 $('input[name^="arr_grandtotal"][data-id="' + element.data('id') + '"]').val(
                     (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowgrandtotal).toString().replace('.',','))
                 );
@@ -784,6 +832,17 @@
             },
             success: function(response) {
                 $('.row_detail[data-id="' + id + '"]').remove();
+                $('#last-row-detail').remove();
+                if($('.row_detail').length == 0 || $('#last-row-detail').length == 0){
+                    $('#body-detail').append(`
+                        <tr id="last-row-detail">
+                            <td colspan="9" class="center">
+                                Silahkan pilih A/P Invoice atau A/P Down Payment
+                            </td>
+                        </tr>
+                    `);
+                }
+                countAll();
             },
             error: function() {
                 swal({
@@ -1121,7 +1180,7 @@
     });
 
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
+        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(2)').text().trim();
@@ -1325,62 +1384,58 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#supplier_id').empty();
-                $('#supplier_id').append(`
-                    <option value="` + response.account_id + `">` + response.supplier_name + `</option>
+                $('#account_id').empty();
+                $('#account_id').append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
                 $('#type').val(response.type).formSelect();
                 $('#company_id').val(response.company_id).formSelect();
-                $('#currency_id').val(response.currency_id).formSelect();
-                $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
-                $('#percent_tax').val(response.percent_tax);
-                
-                $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
-
-                if(response.is_include_tax == '1'){
-                    $('#is_include_tax').prop( "checked", true);
-                }else{
-                    $('#is_include_tax').prop( "checked", false);
-                }
                 
                 $('#note').val(response.note);
-                $('#grandtotal').text(response.grandtotal);
-                $('#total').text(response.total);
-                $('#tax').text(response.tax);
-                $('#subtotal').val(response.subtotal);
-                $('#discount').text(response.discount);
                 
                 if(response.details.length > 0){
-                    $('#body-purchase').empty();
+                    $('#last-row-detail').remove();
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        $('#body-purchase').append(`
-                            <tr class="row_purchase">
-                                <td class="center-align">
-                                    <label>
-                                        <input type="checkbox" checked id="check` + count + `" name="arr_code[]" value="` + val.purchase_order_encrypt + `" onclick="countAll()" data-id="` + count + `">
-                                        <span>Pilih</span>
-                                    </label>
+                        $('#body-detail').append(`
+                            <tr class="row_detail" data-id="` + response.id + `">
+                                <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_is_include_tax[]" value="` + val.is_include_tax + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_id_tax[]" value="` + val.tax_id + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_id_wtax[]" value="` + val.wtax_id + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" data-id="` + count + `">
+                                <input type="hidden" name="arr_limit[]" value="` + val.balance + `" data-id="` + count + `">
+                                <td>
+                                    ` + val.rawcode + `
                                 </td>
                                 <td>
-                                    ` + val.purchase_order_code + `
-                                </td>
-                                <td class="center">
                                     ` + val.post_date + `
                                 </td>
-                                <td class="center">
-                                    ` + val.delivery_date + `
+                                <td>
+                                    <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + val.note + ` - ` + val.account_name + `">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_nominal[]" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_total[]" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
                                 </td>
                                 <td class="center">
-                                    <input name="arr_note[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="rowNote` + count + `">
-                                </td>
-                                <td class="center">
-                                    ` + val.total + `
-                                </td>
-                                <td class="center">
-                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.total_dp + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
                                 </td>
                             </tr>
                         `);
@@ -1389,6 +1444,7 @@
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
+                countAll();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -1486,12 +1542,10 @@
         });
     }
 
-    
-
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
+        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), start_date = $('#start_date').val(), finish_date = $('#finish_date').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&company=" + company + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&supplier=" + supplier + "&currency=" + currency;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&company=" + company + "&account=" + account + "&start_date=" + start_date + "&finish_date=" + finish_date;
     }
 
     function viewJournal(id){

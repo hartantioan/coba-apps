@@ -205,4 +205,32 @@ class PurchaseInvoice extends Model
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function hasBalanceMemo(){
+        $total = $this->grandtotal;
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            foreach($row->purchaseMemoDetail as $rowdetail){
+                $total -= $rowdetail->grandtotal;
+            }
+        }
+
+        if($total > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function balanceMemo(){
+        $total = $this->grandtotal;
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            foreach($row->purchaseMemoDetail as $rowdetail){
+                $total -= $rowdetail->grandtotal;
+            }
+        }
+
+        return $total;
+    }
 }

@@ -55,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
             'good_receipt_details'      => 'App\Models\GoodReceiptDetail',
             'purchase_order_details'    => 'App\Models\PurchaseOrderDetail',
             'landed_cost_details'       => 'App\Models\LandedCostDetail',
+            'purchase_invoice_details'  => 'App\Models\PurchaseInvoiceDetail',
         ]);
     }
 }

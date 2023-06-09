@@ -878,10 +878,8 @@ class LandedCostController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                foreach($query->landedCostDetail as $rowdetail){
-                    ItemCogs::where('lookable_type','landed_costs')->where('lookable_id',$query->id)->delete();
-                    ResetCogs::dispatch($query->post_date,$rowdetail->place_id,$rowdetail->item_id);
-                }
+                CustomHelper::removeJournal('landed_costs',$query->id);
+                CustomHelper::removeCogs('landed_costs',$query->id);
     
                 activity()
                     ->performedOn(new LandedCost())

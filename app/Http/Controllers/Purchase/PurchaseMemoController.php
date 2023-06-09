@@ -73,16 +73,29 @@ class PurchaseMemoController extends Controller
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Memo');
 
                 if($request->type == 'pi'){
+                    $details = [];
+                    foreach($data->purchaseInvoiceDetail as $row){
+                        $details[] = [
+                            'id'            => $row->id,
+                            'rawcode'       => $row->getCode(),
+                            'code'          => CustomHelper::encrypt($data->code),
+                            'type'          => $row->getTable(),
+                            'post_date'     => date('d/m/y',strtotime($data->post_date)),
+                            'total'         => number_format($row->total,2,',','.'),
+                            'tax'           => number_format($row->tax,2,',','.'),
+                            'wtax'          => number_format($row->wtax,2,',','.'),
+                            'grandtotal'    => number_format($data->grandtotal,2,',','.'),
+                            'account_id'    => $data->account_id,
+                            'account_name'  => $data->account->name,
+                            'note'          => $row->note,
+                            'percent_tax'   => $row->percent_tax,
+                            'percent_wtax'  => 
+                        ];
+                    }
                     $data['rawcode'] = $data->code;
                     $data['code'] = CustomHelper::encrypt($data->code);
                     $data['type'] = $data->getTable();
-                    $data['post_date'] = date('d/m/y',strtotime($data->post_date));
-                    $data['total'] = number_format($data->total,2,',','.');
-                    $data['tax'] = number_format($data->tax,2,',','.');
-                    $data['wtax'] = number_format($data->wtax,2,',','.');
-                    $data['grandtotal'] = number_format($data->balance,2,',','.');
-                    $data['account_id'] = $data->account_id;
-                    $data['account_name'] = $data->account->name;
+                    $data['details'] = $details;
                 }elseif($request->type == 'podp'){
                     $data['rawcode'] = $data->code;
                     $data['code'] = CustomHelper::encrypt($data->code);

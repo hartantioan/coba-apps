@@ -128,6 +128,7 @@ class LandedCostController extends Controller
             foreach($dataiti as $row){
                 if(!$row->used()->exists()){
                     $inventory_transfer_in[] = [
+                        'id'                => $row->id,
                         'code_iti'          => $row->code,
                         'code_ito'          => $row->inventoryTransferOut->code,
                         'post_date'         => date('d/m/y',strtotime($row->post_date)),
@@ -221,6 +222,8 @@ class LandedCostController extends Controller
                             'place_id'                  => $row->place_id,
                             'line_name'                 => $row->line_id ? $row->line->name : '-',
                             'line_id'                   => $row->line_id ? $row->line_id : '',
+                            'machine_name'              => $row->machine_id ? $row->machine->name : '-',
+                            'machine_id'                => $row->machine_id ? $row->machine_id : '',
                             'department_id'             => $row->department_id ? $row->department_id : '',
                             'warehouse_id'              => $row->warehouse_id,
                             'lookable_id'               => $row->id,
@@ -253,7 +256,7 @@ class LandedCostController extends Controller
                     $details = [];
                     
                     foreach($data->inventoryTransferOut->inventoryTransferOutDetail as $row){
-                        $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
+                        $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->itemStock->place->company_id)->where('status','1')->first();
                         $details[] = [
                             'item_id'                   => $row->itemStock->item_id,
                             'item_name'                 => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
@@ -267,6 +270,8 @@ class LandedCostController extends Controller
                             'place_id'                  => $row->itemStock->place_id,
                             'line_name'                 => '-',
                             'line_id'                   => '',
+                            'machine_name'              => '-',
+                            'machine_id'                => '',
                             'department_id'             => '',
                             'warehouse_id'              => $row->itemStock->warehouse_id,
                             'lookable_id'               => $row->id,
@@ -422,7 +427,7 @@ class LandedCostController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->supplier->name,
+                    $val->supplier_id ? $val->supplier->name : '-',
                     $val->vendor->name,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
@@ -466,7 +471,6 @@ class LandedCostController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
             'company_id' 			    => 'required',
-            'supplier_id'               => 'required',
 			'vendor_id'                 => 'required',
             'post_date'                 => 'required',
             'currency_id'               => 'required',
@@ -479,7 +483,6 @@ class LandedCostController extends Controller
             'arr_qty'                   => 'required|array'
 		], [
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'supplier_id.required'              => 'Supplier tidak boleh kosong.',
 			'vendor_id.required'                => 'Vendor/ekspedisi tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
@@ -545,7 +548,7 @@ class LandedCostController extends Controller
                         }
 
                         $query->user_id = session('bo_id');
-                        $query->supplier_id = $request->supplier_id;
+                        $query->supplier_id = $request->supplier_id ? $request->supplier_id : NULL;
                         $query->account_id = $request->vendor_id;
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
@@ -583,7 +586,7 @@ class LandedCostController extends Controller
                     $query = LandedCost::create([
                         'code'			            => LandedCost::generateCode(),
                         'user_id'		            => session('bo_id'),
-                        'supplier_id'               => $request->supplier_id,
+                        'supplier_id'               => $request->supplier_id ? $request->supplier_id : NULL,
                         'account_id'                => $request->vendor_id,
                         'company_id'                => $request->company_id,
                         'post_date'                 => $request->post_date,

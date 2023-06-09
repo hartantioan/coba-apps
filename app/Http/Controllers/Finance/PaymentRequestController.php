@@ -1049,6 +1049,9 @@ class PaymentRequestController extends Controller
                 $html = '<div class="row pt-1 pb-1"><div class="col s12"><table>
                         <thead>
                             <tr>
+                                <th class="" colspan="10"><h6>Mata Uang : '.$data->currency->code.', Konversi = '.number_format($data->currency_rate,2,',','.').'</h6></th>
+                            </tr>
+                            <tr>
                                 <th class="center-align" colspan="10">Daftar Item</th>
                             </tr>
                             <tr>

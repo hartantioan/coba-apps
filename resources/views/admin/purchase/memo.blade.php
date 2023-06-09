@@ -629,6 +629,9 @@
                             icon: 'warning'
                         });
                     }else{
+
+                        $('#last-row-detail').remove();
+
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
                                 ` + response.rawcode + `
@@ -637,39 +640,78 @@
                         `);
                         
                         var count = makeid(10);
+
+                        if(type == 'podp'){
                         
-                        $('#last-row-detail').before(`
-                            <tr class="row_detail" data-id="` + response.id + `">
-                                <input type="hidden" name="arr_type[]" value="` + response.type + `" data-id="` + count + `">
-                                <input type="hidden" name="arr_code[]" value="` + response.code + `" data-id="` + count + `">
-                                <td>
-                                    ` + response.rawcode + `
-                                </td>
-                                <td>
-                                    ` + response.post_date + `
-                                </td>
-                                <td>
-                                    <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + response.note + ` - ` + response.account_name + `">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_total[]" value="` + response.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_tax[]" value="` + response.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_wtax[]" value="` + response.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
-                                </td>
-                                <td>
-                                    <input type="text" name="arr_grandtotal[]" value="` + response.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
+                            $('#body-detail').append(`
+                                <tr class="row_detail" data-id="` + response.id + `">
+                                    <input type="hidden" name="arr_type[]" value="` + response.type + `" data-id="` + count + `">
+                                    <input type="hidden" name="arr_code[]" value="` + response.id + `" data-id="` + count + `">
+                                    <td>
+                                        ` + response.rawcode + `
+                                    </td>
+                                    <td>
+                                        ` + response.post_date + `
+                                    </td>
+                                    <td>
+                                        <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + response.note + ` - ` + response.account_name + `">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_total[]" value="` + response.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_tax[]" value="` + response.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_wtax[]" value="` + response.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="arr_grandtotal[]" value="` + response.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+
+                        }else if(type == 'pi'){
+                            $.each(response.details, function(i, val) {
+                                $('#body-detail').append(`
+                                    <tr class="row_detail" data-id="` + val.id + `">
+                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
+                                        <td>
+                                            ` + response.rawcode + `
+                                        </td>
+                                        <td>
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td>
+                                            <input name="arr_description[]" type="text" placeholder="Keterangan" value="` + val.note + ` - ` + val.account_name + `">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_total[]" value="` + val.total + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }
                     }
                     M.updateTextFields();
                     $('#purchase_invoice_id,#purchase_down_payment_id').empty();

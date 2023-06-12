@@ -22,7 +22,7 @@ class Place extends Model
         'type',
         'province_id',
         'city_id',
-        'subdistrict',
+        'subdistrict_id',
         'status'
     ];
 
@@ -42,6 +42,10 @@ class Place extends Model
         $no = str_pad($code, 3, 0, STR_PAD_LEFT);
 
         return 'PL'.$no;
+    }
+
+    public function subdistrict(){
+        return $this->belongsTo('App\Models\Region','subdistrict_id','id')->withTrashed();
     }
 
     public function city(){

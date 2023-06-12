@@ -75,6 +75,7 @@
                                                         <th>Tipe</th>
                                                         <th>Provinsi</th>
                                                         <th>Kota</th>
+                                                        <th>Kecamatan</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -126,23 +127,29 @@
                             <label class="" for="company_id">Perusahaan</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="form-control" id="type" name="type">
+                            <select class="browser-default" id="type" name="type">
                                 <option value="1">Kantor/Office</option>
                                 <option value="2">Pabrik/Plant</option>
                             </select>
-                            <label class="" for="type">Tipe</label>
+                            <label class="active" for="type">Tipe</label>
                         </div>
                         <div class="input-field col s6">
                             <select class="browser-default" id="province_id" name="province_id"></select>
                             <label class="active" for="province_id">Provinsi</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="browser-default" id="city_id" name="city_id"></select>
+                            <select class="browser-default" id="city_id" name="city_id" onchange="getSubdistrict()"></select>
                             <label class="active" for="city_id">Kota/Kabupaten</label>
                         </div>
                         <div class="input-field col s6">
+                            <select class="browser-default select2" id="subdistrict_id" name="subdistrict_id">
+                                <option value="">--Pilih ya--</option>
+                            </select>
+                            <label class="active" for="subdistrict_id">Kecamatan</label>
+                        </div>
+                        <div class="input-field col s6">
                             <div class="switch mb-1">
-                                <label for="order">Status</label>
+                                <label for="status">Status</label>
                                 <label>
                                     Non-Active
                                     <input checked type="checkbox" id="status" name="status" value="1">
@@ -194,7 +201,15 @@
                 $('#province_id').empty();
                 $('#city_id').empty();
                 M.updateTextFields();
+                $('#subdistrict_id').empty().append(`
+                    <option value="">--Pilih ya--</option>
+                `);
             }
+        });
+
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
         });
 
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
@@ -203,7 +218,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
-            "responsive": true,
+            "responsive": false,
+            "scrollX": true,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -240,6 +256,7 @@
                 { name: 'type', className: 'center-align' },
                 { name: 'province', className: 'center-align' },
                 { name: 'city', className: 'center-align' },
+                { name: 'subdistrict', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -277,6 +294,21 @@
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
+    
+    function getSubdistrict(){
+        if($('#city_id').val()){
+            $('#subdistrict_id').empty();
+            $.each($('#city_id').select2('data')[0].subdistrict, function(i, value) {
+                $('#subdistrict_id').append(`
+                    <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
+                `);
+            });
+        }else{
+            $('#subdistrict_id').empty().append(`
+                <option value="">--Pilih ya--</option>
+            `);
+        }
+    }
 
     function save(){
 			
@@ -383,11 +415,21 @@
                     <option value="` + response.city_id + `">` + response.city_name + `</option>
                 `);
 
+                $('#subdistrict_id').empty();
+                $.each(response.subdistrict_list, function(i, value) {
+                    $('#subdistrict_id').append(`
+                        <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
+                    `);
+                });
+
+                $('#subdistrict_id').val(response.subdistrict_id).trigger('change');
+
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
                 }
+
                 $('.modal-content').scrollTop(0);
                 $('#name').focus();
                 M.updateTextFields();

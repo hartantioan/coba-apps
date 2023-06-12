@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('code',155)->unique();
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('account_id')->nullable();
+            $table->string('name')->nullable();
             $table->date('valid_from')->nullable();
             $table->date('valid_to')->nullable();
             $table->bigInteger('from_city_id')->nullable();

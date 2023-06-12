@@ -61,8 +61,9 @@ class PlaceController extends Controller
                                 }
                             )->orWhereHas('city', function ($query) use ($search) {
                                     $query->where('name', 'like', "%$search%");
-                                }
-                            );
+                            })->orWhereHas('subdistrict', function ($query) use ($search) {
+                                $query->where('name', 'like', "%$search%");
+                            });
                     });
                 }
 
@@ -87,7 +88,9 @@ class PlaceController extends Controller
                             )->orWhereHas('city', function ($query) use ($search) {
                                     $query->where('name', 'like', "%$search%");
                                 }
-                            );
+                            )->orWhereHas('subdistrict', function ($query) use ($search) {
+                                $query->where('name', 'like', "%$search%");
+                            });
                     });
                 }
 
@@ -111,6 +114,7 @@ class PlaceController extends Controller
                     $val->type(),
                     $val->province->name,
                     $val->city->name,
+                    $val->subdistrict->name,
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -143,16 +147,18 @@ class PlaceController extends Controller
             'company_id'        => 'required',
             'type'              => 'required',
             'province_id'       => 'required',
-            'city_id'           => 'required'
+            'city_id'           => 'required',
+            'subdistrict_id'    => 'required',
         ], [
-            'code.required'         => 'Kode tidak boleh kosong.',
-            'code.unique'           => 'Kode telah terpakai.',
-            'name.required' 	    => 'Nama tidak boleh kosong.',
-            'address.required'      => 'Alamat tidak boleh kosong.',
-            'company_id.required'   => 'Cabang tidak boleh kosong.',
-            'type.required'         => 'Tipe tidak boleh kosong.',
-            'province_id.required'  => 'Provinsi tidak boleh kosong.',
-            'city_id.required'      => 'Kota tidak boleh kosong.',
+            'code.required'             => 'Kode tidak boleh kosong.',
+            'code.unique'               => 'Kode telah terpakai.',
+            'name.required' 	        => 'Nama tidak boleh kosong.',
+            'address.required'          => 'Alamat tidak boleh kosong.',
+            'company_id.required'       => 'Cabang tidak boleh kosong.',
+            'type.required'             => 'Tipe tidak boleh kosong.',
+            'province_id.required'      => 'Provinsi tidak boleh kosong.',
+            'city_id.required'          => 'Kota tidak boleh kosong.',
+            'subdistrict_id.required'   => 'Kecamatan tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -172,6 +178,7 @@ class PlaceController extends Controller
                     $query->type	        = $request->type;
                     $query->province_id     = $request->province_id;
                     $query->city_id         = $request->city_id;
+                    $query->subdistrict_id  = $request->subdistrict_id;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -189,6 +196,7 @@ class PlaceController extends Controller
                         'type'          => $request->type,
                         'province_id'   => $request->province_id,
                         'city_id'       => $request->city_id,
+                        'subdistrict_id'=> $request->subdistrict_id,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
@@ -224,6 +232,7 @@ class PlaceController extends Controller
         $plant = Place::find($request->id);
         $plant['province_name'] = $plant->province->name;
         $plant['city_name'] = $plant->city->name;
+        $plant['subdistrict_list'] = $plant->city->getSubdistrict();
         				
 		return response()->json($plant);
     }

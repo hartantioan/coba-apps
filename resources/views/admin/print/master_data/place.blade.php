@@ -209,6 +209,7 @@
 								<th>Tipe</th>
 								<th>Provinsi</th>
 								<th>Kota</th>
+                                <th>Kecamatan</th>
 							</tr>
                         </thead>
                         <tbody>
@@ -222,6 +223,7 @@
 									<td>{{ $row->type() }}</td>
 									<td>{{ $row->province->name }}</td>
 									<td>{{ $row->city->name }}</td>
+                                    <td>{{ $row->subdistrict->name }}</td>
 								</tr>
 							@endforeach
                         </tbody>

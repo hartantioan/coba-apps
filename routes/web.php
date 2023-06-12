@@ -36,6 +36,7 @@ use App\Http\Controllers\MasterData\ProjectController;
 use App\Http\Controllers\MasterData\TaxController;
 use App\Http\Controllers\MasterData\BenchmarkPriceController;
 use App\Http\Controllers\MasterData\CostDistributionController;
+use App\Http\Controllers\MasterData\DeliveryCostController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -227,14 +228,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [CompanyController::class, 'destroy'])->middleware('operation.access:company,delete');
                     });
 
-                    Route::prefix('place')->middleware('operation.access:place,view')->group(function () {
+                    Route::prefix('plant')->middleware('operation.access:plant,view')->group(function () {
                         Route::get('/',[PlaceController::class, 'index']);
                         Route::get('datatable',[PlaceController::class, 'datatable']);
                         Route::post('show', [PlaceController::class, 'show']);
                         Route::post('print',[PlaceController::class, 'print']);
                         Route::get('export',[PlaceController::class, 'export']);
-                        Route::post('create',[PlaceController::class, 'create'])->middleware('operation.access:place,update');
-                        Route::post('destroy', [PlaceController::class, 'destroy'])->middleware('operation.access:place,delete');
+                        Route::post('create',[PlaceController::class, 'create'])->middleware('operation.access:plant,update');
+                        Route::post('destroy', [PlaceController::class, 'destroy'])->middleware('operation.access:plant,delete');
                     });
 
                     Route::prefix('department')->middleware('operation.access:department,view')->group(function () {
@@ -532,6 +533,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [CostDistributionController::class, 'show']);
                         Route::post('create',[CostDistributionController::class, 'create'])->middleware('operation.access:cost_distribution,update');
                         Route::post('destroy', [CostDistributionController::class, 'destroy'])->middleware('operation.access:cost_distribution,delete');
+                    });
+
+                    Route::prefix('delivery_cost')->middleware('operation.access:delivery_cost,view')->group(function () {
+                        Route::get('/',[DeliveryCostController::class, 'index']);
+                        Route::get('datatable',[DeliveryCostController::class, 'datatable']);
+                        Route::post('show', [DeliveryCostController::class, 'show']);
+                        Route::post('create',[DeliveryCostController::class, 'create'])->middleware('operation.access:delivery_cost,update');
+                        Route::post('destroy', [DeliveryCostController::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');
                     });
                 });
             });

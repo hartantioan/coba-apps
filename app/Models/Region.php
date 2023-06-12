@@ -19,6 +19,19 @@ class Region extends Model
         'name',
     ];
 
+    public function getSubdistrict(){
+        $arr = [];
+        $data = Region::where('code', 'like', "$this->code%")->whereRaw("CHAR_LENGTH(code) = 13")->get();
+        foreach($data as $row){
+            $arr[] = [
+                'id'    => $row->id,
+                'code'  => $row->code,
+                'name'  => $row->name,
+            ];
+        }
+        return $arr;
+    }
+
     public function parentRegion(){
         $arr = explode('.', $this->code);
         $count = count($arr);

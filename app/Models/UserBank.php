@@ -24,10 +24,10 @@ class UserBank extends Model
     ];
 
     public function user(){
-        return $this->belongsTo('App\Models\User','user_id','id');
+        return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
     public function bank(){
-        return $this->belongsTo('App\Models\Bank','bank_id','id');
+        return $this->belongsTo('App\Models\Bank','bank_id','id')->withTrashed();
     }
 
     public function isDefault(){

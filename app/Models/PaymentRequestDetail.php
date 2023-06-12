@@ -18,6 +18,7 @@ class PaymentRequestDetail extends Model
         'payment_request_id',
         'lookable_type',
         'lookable_id',
+        'cost_distribution_id',
         'coa_id',
         'nominal',
         'note',
@@ -32,6 +33,11 @@ class PaymentRequestDetail extends Model
     {
         return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
     
     public function lookable(){
         return $this->morphTo();
@@ -44,6 +50,20 @@ class PaymentRequestDetail extends Model
         }else{
             return false;
         }
+    }
+
+    public function getMemo(){
+        $total = 0;
+
+        if($this->lookable_type == 'purchase_down_payments'){
+            $total = $this->lookable->totalMemo();
+        }
+
+        if($this->lookable_type == 'purchase_invoices'){
+            $total = $this->lookable->totalMemo();
+        }
+        
+        return $total;
     }
  
     public function purchaseInvoice()

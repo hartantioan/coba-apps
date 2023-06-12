@@ -34,7 +34,7 @@
     <!-- END: VENDOR CSS-->
     <!-- BEGIN: Page Level CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=6') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=2') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=3') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/dashboard-modern.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/intro.css?v=7') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/data-tables.css?v=2') }}">

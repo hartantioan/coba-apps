@@ -169,6 +169,16 @@ class PurchaseInvoice extends Model
         return $pre.$no;
     }
 
+    public function balancePaymentRequest(){
+        $total = $this->balance - $this->totalMemo();
+
+        foreach($this->hasPaymentRequestDetail as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
     public function approval(){
         $source = ApprovalSource::where('lookable_type','purchase_invoices')->where('lookable_id',$this->id)->first();
         if($source && $source->approvalMatrix()->exists()){
@@ -231,6 +241,16 @@ class PurchaseInvoice extends Model
             }
         }
 
+        return $total;
+    }
+
+    public function totalMemo(){
+        $total = 0;
+        foreach($this->purchaseInvoiceDetail as $row){
+            foreach($row->purchaseMemoDetail as $rowdetail){
+                $total += $rowdetail->grandtotal;
+            }
+        }
         return $total;
     }
 }

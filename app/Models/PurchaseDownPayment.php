@@ -136,7 +136,7 @@ class PurchaseDownPayment extends Model
     }
 
     public function balancePaymentRequest(){
-        $total = $this->grandtotal;
+        $total = $this->grandtotal - $this->totalMemo();
 
         foreach($this->hasPaymentRequestDetail as $row){
             $total -= $row->nominal;
@@ -280,5 +280,13 @@ class PurchaseDownPayment extends Model
         }else{
             return false;
         }
+    }
+
+    public function totalMemo(){
+        $total = 0;
+        foreach($this->purchaseMemoDetail as $row){
+            $total += $row->grandtotal;
+        }
+        return $total;
     }
 }

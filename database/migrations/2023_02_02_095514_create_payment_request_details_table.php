@@ -19,16 +19,14 @@ return new class extends Migration
             $table->bigInteger('payment_request_id')->nullable();
             $table->string('lookable_type',155)->nullable();
             $table->bigInteger('lookable_id')->nullable();
+            $table->bigInteger('cost_distribution_id')->nullable();
             $table->bigInteger('coa_id')->nullable();
             $table->double('nominal')->nullable();
             $table->string('note')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['payment_request_id']);
-            $table->index(['fund_request_id']);
-            $table->index(['purchase_down_payment_id']);
-            $table->index(['purchase_invoice_id']);
+            $table->index(['payment_request_id','lookable_id','cost_distribution_id','coa_id'],'pyr_details_index');
         });
     }
 

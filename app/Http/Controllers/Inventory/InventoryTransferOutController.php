@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
-use App\Models\Currency;
 use App\Models\Item;
 use App\Models\ItemStock;
 use App\Models\Place;
@@ -12,10 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -506,7 +502,7 @@ class InventoryTransferOutController extends Controller
                 'qty'           => number_format($row->qty,3,',','.'),
                 'unit'          => $row->item->uomUnit->code,
                 'note'          => $row->note,
-                'stock_list'    => $row->item->currentStock($this->dataplaces)
+                'stock_list'    => $row->item->currentStock($this->dataplaces,$this->datawarehouses)
             ];
         }
 

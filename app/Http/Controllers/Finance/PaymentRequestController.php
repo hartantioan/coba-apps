@@ -290,6 +290,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
                         'coa_id'        => $row->document_status == '2' ? ($coa ? $coa->id : '') : '',
                         'coa_name'      => $row->document_status == '2' ? ($coa ? $coa->code.' - '.$coa->name : '') : '',
+                        'memo'          => number_format(0,2,',','.'),
                     ];
                 }
             }
@@ -312,6 +313,7 @@ class PaymentRequestController extends Controller
                         'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
                         'coa_id'        => $coa ? $coa->id : '',
                         'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
+                        'memo'          => number_format($row->totalMemo(),2,',','.'),
                     ];
                 }
             }
@@ -331,9 +333,10 @@ class PaymentRequestController extends Controller
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'balance'       => number_format($row->balance,2,',','.'),
+                        'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
                         'coa_id'        => $coa ? $coa->id : '',
                         'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
+                        'memo'          => number_format($row->totalMemo(),2,',','.'),
                     ];
                 }
             }
@@ -513,6 +516,7 @@ class PaymentRequestController extends Controller
                                 'payment_request_id'            => $query->id,
                                 'lookable_type'                 => $row,
                                 'lookable_id'                   => $idDetail,
+                                'cost_distribution_id'          => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
                                 'coa_id'                        => $request->arr_coa[$key],
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
                                 'note'                          => $request->arr_note[$key]
@@ -562,7 +566,7 @@ class PaymentRequestController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="10">Daftar Item</th>
+                                <th class="center-align" colspan="7">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -570,6 +574,7 @@ class PaymentRequestController extends Controller
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Bayar</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Coa</th>
                             </tr>
                         </thead><tbody>';
@@ -582,6 +587,7 @@ class PaymentRequestController extends Controller
                 <td class="center-align">'.$row->type().'</td>
                 <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
                 <td class="center-align">'.$row->note.'</td>
+                <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
             </tr>';
         }
@@ -657,8 +663,11 @@ class PaymentRequestController extends Controller
                 'grandtotal'    => number_format($row->lookable->grandtotal,3,',','.'),
                 'nominal'       => number_format($row->nominal,3,',','.'),
                 'note'          => $row->note,
+                'cost_distribution_id'        => $row->cost_distribution_id ? $row->cost_distribution_id : '',
+                'cost_distribution_name'      => $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
                 'coa_id'        => $row->coa_id,
-                'coa_name'      => $row->coa->code.' - '.$row->coa->name
+                'coa_name'      => $row->coa->code.' - '.$row->coa->name,
+                'memo'          => number_format($row->getMemo(),2,',','.'),
             ];
         }
 
@@ -1052,13 +1061,14 @@ class PaymentRequestController extends Controller
                                 <th class="" colspan="10"><h6>Mata Uang : '.$data->currency->code.', Konversi = '.number_format($data->currency_rate,2,',','.').'</h6></th>
                             </tr>
                             <tr>
-                                <th class="center-align" colspan="10">Daftar Item</th>
+                                <th class="center-align" colspan="7">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Dist.Biaya</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Bayar</th>
                             </tr>
@@ -1071,18 +1081,19 @@ class PaymentRequestController extends Controller
                         <td class="center-align">'.$row->lookable->code.'</td>
                         <td class="center-align">'.$row->type().'</td>
                         <td class="center-align">'.$row->note.'</td>
+                        <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
                         <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
                         <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
                     </tr>';
                 }
 
                 $html .= '<tr>
-                    <td class="right-align" colspan="5">ADMIN</td>
+                    <td class="right-align" colspan="6">ADMIN</td>
                     <td class="right-align">'.number_format($data->admin,2,',','.').'</td>
                 </tr>';
 
                 $html .= '<tr>
-                    <td class="right-align" colspan="5">TOTAL</td>
+                    <td class="right-align" colspan="6">TOTAL</td>
                     <td class="right-align">'.number_format($data->grandtotal,2,',','.').'</td>
                 </tr>';
 

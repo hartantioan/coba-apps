@@ -98,7 +98,7 @@
                                         <div class="col s12">
                                             <div class="card-alert card purple">
                                                 <div class="card-content white-text">
-                                                    <p>Info : Item yang anda masukkan disini akan mempengaruhi qty stock saat ini.</p>
+                                                    <p>Info : Data yang anda masukkan disini akan mempengaruhi nilai qty stock saat ini.</p>
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>
@@ -111,7 +111,6 @@
                                                         <th>Perusahaan</th>
                                                         <th>Tanggal</th>
                                                         <th>Keterangan</th>
-                                                        <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -156,39 +155,42 @@
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
-                            <div class="file-field input-field col m3 s12">
-                                <div class="btn">
-                                    <span>Lampiran Bukti</span>
-                                    <input type="file" name="document" id="document">
-                                </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
-                                </div>
-                            </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h5>Detail Produk</h5>
-                                    Coa debit mengikuti coa pada masing-masing grup item.
+                                    <h4>Detail Produk</h4>
                                     <div style="overflow:auto;">
-                                        <table class="bordered" style="width:100%;">
+                                        <table class="bordered">
                                             <thead>
                                                 <tr>
-                                                    <th class="center">Stok Item</th>
-                                                    <th class="center">Qty</th>
-                                                    <th class="center">Keterangan</th>
-                                                    <th class="center">Coa Debit</th>
+                                                    <th class="center">Item</th>
+                                                    <th class="center">Ambil Dari</th>
+                                                    <th class="center">Nominal</th>
+                                                    <th class="center">Coa</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
                                                     <td colspan="5" class="center">
-                                                        <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
-                                                        </button>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="2" class="right-align">
+                                                        TOTAL
+                                                    </td>
+                                                    <td class="right-align">
+                                                        <h6 id="total">0,00</h6>
+                                                    </td>
+                                                    <td colspan="2">
+                                                        
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 </p>
@@ -234,81 +236,6 @@
     </div>
     <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
-    </div>
-</div>
-
-<div id="modal5" class="modal modal-fixed-footer" style="height: 70% !important;width:50%">
-    <div class="modal-header ml-6 mt-2">
-        <h6>Range Printing</h6>
-    </div>
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12">
-                <form class="row" id="form_data_print_multi" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert_multi" style="display:none;"></div>
-                    </div>
-                    <div class="col s12">
-                        <ul class="tabs">
-                            <li class="tab">
-                                <a href="#range-tabs" class="" id="part-tabs-btn">
-                                <span>By No</span>
-                                </a>
-                            </li>
-                            <li class="tab">
-                                <a href="#date-tabs" class="">
-                                <span>By Date</span>
-                                </a>
-                            </li>
-                            <li class="indicator" style="left: 0px; right: 0px;"></li>
-                        </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
-                            <div class="row ml-2 mt-2">
-                                <div class="row">
-                                    <div class="input-field col m4 s12">
-                                        <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
-                                        <label class="" for="range_end">No Awal</label>
-                                    </div>
-                                    
-                                    <div class="input-field col m4 s12">
-                                        <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
-                                        <label class="active" for="range_end">No akhir</label>
-                                    </div>
-                                    <div class="input-field col m4 s12">
-                                        <label>
-                                            <input name="type_date" type="radio" checked value="1"/>
-                                            <span>Dengan range biasa</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                <div class="input-field col m8 s12">
-                                    <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
-                                    <label class="" for="range_end">Masukkan angka dengan koma</label>
-                                </div>
-                               
-                                <div class="input-field col m4 s12">
-                                    <label>
-                                        <input name="type_date" type="radio" value="2"/>
-                                        <span>Dengan Range koma</span>
-                                    </label>
-                                </div>
-                                </div>
-                                <div class="col s12 mt-3">
-                                    <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
-                                </div>
-                            </div>                         
-                        </div>
-                        <div id="date-tabs" style="display: none;" class="">
-                            
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
     </div>
 </div>
 
@@ -371,12 +298,6 @@
     </a>
 </div>
 
-<div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
-        <i class="material-icons">view_comfy</i>
-    </a>
-</div>
-
 <!-- END: Page Main-->
 <script>
     $(function() {
@@ -385,24 +306,10 @@
             width: '100%',
         });
 
-        
+        loadDataTable();
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
-        });
-
-        loadDataTable();
-
-        $('#modal4').modal({
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) { 
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#show_detail').empty();
-            }
         });
 
         $('#modal1').modal({
@@ -421,46 +328,27 @@
                 };
             },
             onCloseEnd: function(modal, trigger){
-                $("#form_data :input").prop("disabled", false);
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('.row_item').each(function(){
-                    $(this).remove();
-                });
+                $('.row_item').remove();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
                 M.updateTextFields();
-                $('#list-used-data').empty();
                 window.onbeforeunload = function() {
                     return null;
                 };
             }
         });
 
-        $('#modal2').modal({
+        $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
                 
             },
-            onOpenEnd: function(modal, trigger) {
-                window.print();
+            onOpenEnd: function(modal, trigger) { 
             },
             onCloseEnd: function(modal, trigger){
-                $('#show_print').html('');
-            }
-        });
-
-        $('#modal5').modal({
-            dismissible: false,
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) {
-                $('#validation_alert_multi').hide();
-                $('#validation_alert_multi').html('');
-                M.updateTextFields();
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#form_data')[0].reset();
-                $('#temp').val('');
-                
+                $('#show_detail').empty();
             }
         });
 
@@ -481,10 +369,98 @@
             }
         });
 
+        select2ServerSide('#inventory_transfer_out_id', '{{ url("admin/select2/inventory_transfer_out") }}');
+
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
+            countAll();
         });
     });
+
+    function addItem(){
+        var count = makeid(10);
+        $('#last-row-item').before(`
+            <tr class="row_item">
+                <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `">
+                <input type="hidden" name="arr_place[]" id="arr_place` + count + `">
+                <input type="hidden" name="arr_qty[]" id="arr_qty` + count + `" value="0">
+                <td>
+                    <select class="browser-default" id="arr_itemkuy` + count + `" name="arr_itemkuy[]" data-code="` + count + `" onchange="getRowUnit('` + count + `')"></select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="getPlaceWarehouse('` + count + `')"></select>
+                </td>
+                <td class="center">
+                    <input name="arr_nominal[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+
+        M.updateTextFields();
+
+        select2ServerSide('#arr_itemkuy' + count, '{{ url("admin/select2/item") }}');
+        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        
+        $('#arr_item_stock' + count).append(`
+            <option value="">--Silahkan pilih item--</option>
+        `).select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+    }
+
+    function countAll(){
+        let total = 0;
+        $('input[name^="arr_nominal"]').each(function(){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#total').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
+        );
+    }
+
+    function getPlaceWarehouse(val){
+        if($("#arr_item_stock" + val).val()){
+            $('#arr_place' + val).val($("#arr_item_stock" + val).select2().find(":selected").data("place"));
+            $('#arr_warehouse' + val).val($("#arr_item_stock" + val).select2().find(":selected").data("warehouse"));
+            $('#arr_qty' + val).val($("#arr_item_stock" + val).select2().find(":selected").data("qty"));
+        }else{
+            $('#arr_place' + val).val('');
+            $('#arr_warehouse' + val).val('');
+            $('#arr_qty' + val).val('0');
+        }
+    }
+
+    function getRowUnit(val){
+        if($("#arr_itemkuy" + val).val()){
+            if($("#arr_itemkuy" + val).select2('data')[0].stock_list.length){
+                $('#arr_item_stock' + val).empty().append(`
+                    <option value="">--Silahkan pilih item--</option>
+                `);
+                $.each($("#arr_itemkuy" + val).select2('data')[0].stock_list, function(i, value) {
+                    $('#arr_item_stock' + val).append(`
+                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-place="` + value.place_id + `" data-warehouse="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                    `);
+                });
+            }else{
+                $('#arr_item_stock' + val).append(`
+                    <option value="" disabled selected>--Data stok tidak ditemukan--</option>
+                `);
+            }
+        }else{
+            $('#arr_item_stock' + val).empty().append(`
+                <option value="">--Silahkan pilih item--</option>
+            `);
+        }
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -501,7 +477,6 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
-                    'warehouse[]' : $('#filter_warehouse').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
                 },
@@ -527,39 +502,13 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'note', className: '' },
-                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle',
-                'selectNone' 
+                'columnsToggle' 
             ],
-            "language": {
-                "lengthMenu": "Menampilkan _MENU_ data per halaman",
-                "zeroRecords": "Data tidak ditemukan / kosong",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
-                "infoEmpty": "Data tidak ditemukan / kosong",
-                "infoFiltered": "(disaring dari _MAX_ total data)",
-                "search": "Cari",
-                "paginate": {
-                    first:      "<<",
-                    previous:   "<",
-                    next:       ">",
-                    last:       ">>"
-                },
-                "buttons": {
-                    selectAll: "Pilih semua",
-                    selectNone: "Hapus pilihan"
-                },
-                "select": {
-                    rows: "%d baris terpilih"
-                }
-            },
-            select: {
-                style: 'multi'
-            },
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
 
@@ -591,75 +540,62 @@
         });
 	}
 
-    function addItem(){
-        var count = makeid(10);
-        $('#last-row-item').before(`
-            <tr class="row_item">
-                <input type="hidden" id="tempQty` + count + `" value="0">
-                <td>
-                    <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
-                </td>
-                <td>
-                    <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);setStock('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`">
-                </td>
-                <td>
-                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        select2ServerSide('#arr_item_stock' + count, '{{ url("admin/select2/item_stock") }}');
-        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+    function viewJournal(id){
+        $.ajax({
+            url: '{{ Request::url() }}/view_journal/' + id,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                $('#modal6').modal('open');
+                $('#title_data').html(data.title);
+                $('#code_data').html(data.message.code);
+                $('#body-journal-table').html(data.tbody);
+                $('#user_jurnal').html('Pengguna '+data.user);
+                $('#note_jurnal').html('Keterangan '+data.message.note);
+                $('#ref_jurnal').html( 'Referensi '+data.reference);
+                $('#post_date_jurnal').html('Tanggal '+data.message.post_date);
+            }
+        });
     }
 
-    function setStock(val){
-        if($('#arr_item_stock' + val).val()){
-
-            let passed = true;
-
-            $('select[name^="arr_item_stock"]').each(function(){
-                if($(this).attr("id") !== 'arr_item_stock' + val){
-                    if($(this).val()){
-                        if($(this).val() == $('#arr_item_stock' + val).val()){
-                            passed = false;
-                        }
-                    }
-                }
-            });
-
-            if(passed){
-                if($('#rowQty' + val).val()){
-                    $('#tempQty' + val).val(
-                        $('#arr_item_stock' + val).select2('data')[0].qty ? $('#arr_item_stock' + val).select2('data')[0].qty : $('#tempQty' + val).val()
-                    );
-                    let max = parseFloat($('#tempQty' + val).val());
-                    let qty = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
-
-                    if(qty > max){
-                        $('#rowQty' + val).val(
-                            formatRupiahIni(max.toString().replace('.',','))
-                        );
-                    }
-                }
-            }else{
-                $('#tempQty' + val).val('0');
-                $('#arr_item_stock' + val).empty();
+    function removeUsedData(id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('#body-item').empty().append(`
+                    <tr id="last-row-item">
+                        <td colspan="4" class="center">
+                            Silahkan pilih Inventori Transfer Keluar
+                        </td>
+                    </tr>
+                `);
+                $('#inventory_transfer_out_id').empty();
+            },
+            error: function() {
                 swal({
                     title: 'Ups!',
-                    text: 'Mohon maaf, anda tidak bisa menambahkan lebih dari 1 baris stock item yang sama.',
-                    icon: 'warning'
+                    text: 'Check your internet connection.',
+                    icon: 'error'
                 });
             }
-        }else{
-            $('#tempQty' + val).val('0');
-        }
+        });
     }
 
     function save(){
@@ -674,40 +610,32 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
+
                 var formData = new FormData($('#form_data')[0]), passed = true;
 
+                formData.delete('arr_itemkuy[]');
                 formData.delete('arr_item_stock[]');
                 formData.delete('arr_qty[]');
-                formData.delete('arr_note[]');
+                formData.delete('arr_nominal[]');
+                formData.delete('arr_place[]');
+                formData.delete('arr_warehouse[]');
                 formData.delete('arr_coa[]');
-                
-                $('select[name^="arr_item_stock"]').each(function(index){
-                    if(!$(this).val()){
-                        passed = false;
-                    }else{
-                        formData.append('arr_item_stock[]',$(this).val());
-                    }
-                });
 
-                $('input[name^="arr_qty"]').each(function(index){
-                    if(!$(this).val() || $(this).val() == '0'){
-                        passed = false;
+                $('select[name^="arr_itemkuy"]').each(function(){
+                    if($(this).val() && $('#arr_item_stock' + $(this).data('code')).val() && $('#arr_nominal' + $(this).data('code')).val() && $('#arr_place' + $(this).data('code')).val() && $('#arr_warehouse' + $(this).data('code')).val() && $('#arr_coa' + $(this).data('code')).val() && $('#arr_qty' + $(this).data('code')).val()){
+                        formData.append('arr_item[]',$(this).val());
+                        formData.append('arr_item_stock[]',$('#arr_item_stock' + $(this).data('code')).val());
+                        formData.append('arr_nominal[]',$('#arr_nominal' + $(this).data('code')).val());
+                        formData.append('arr_qty[]',$('#arr_qty' + $(this).data('code')).val());
+                        formData.append('arr_place[]',$('#arr_place' + $(this).data('code')).val());
+                        formData.append('arr_warehouse[]',$('#arr_warehouse' + $(this).data('code')).val());
+                        formData.append('arr_coa[]',$('#arr_coa' + $(this).data('code')).val());
                     }else{
-                        formData.append('arr_qty[]',$(this).val());
-                    }
-                });
-
-                $('select[name^="arr_coa"]').each(function(index){
-                    if(!$(this).val()){
                         passed = false;
-                    }else{
-                        formData.append('arr_coa[]',$(this).val());
-                        formData.append('arr_note[]',($('select[name^="arr_note"]').eq(index).val() ? $('select[name^="arr_note"]').eq(index).val() : ''));
                     }
                 });
 
                 if(passed){
-
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',
@@ -774,7 +702,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Mohon maaf, stok item / qty / coa tidak boleh kosong atau diisi 0.',
+                        text: 'Form harus lengkap ya.',
                         icon: 'warning'
                     });
                 }
@@ -784,8 +712,7 @@
 
     function success(){
         loadDataTable();
-        /* $('#modal1').modal('close'); */
-        $("#form_data :input").prop("disabled", true);
+        $('#modal1').modal('close');
     }
 
     function show(id){
@@ -821,17 +748,19 @@
                         var count = makeid(10);
                         $('#last-row-item').before(`
                             <tr class="row_item">
-                                <input type="hidden" id="tempQty` + count + `" value="` + val.qtyraw + `">
+                                <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
+                                <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
+                                <input type="hidden" name="arr_qty[]" id="arr_qty` + count + `" value="` + val.qty_new + `">
                                 <td>
-                                    <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
+                                    <select class="browser-default" id="arr_itemkuy` + count + `" name="arr_itemkuy[]" data-code="` + count + `" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
-                                </td>
-                                <td>
-                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
+                                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="getPlaceWarehouse('` + count + `')"></select>
                                 </td>
                                 <td class="center">
+                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" id="arr_nominal` + count + `">
+                                </td>
+                                <td>
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                                 </td>
                                 <td class="center">
@@ -841,14 +770,36 @@
                                 </td>
                             </tr>
                         `);
-                        $('#arr_item_stock' + count).append(`
-                            <option value="` + val.item_stock_id + `">` + val.item_stock_name + `</option>
+                        $('#arr_itemkuy' + count).append(`
+                            <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
+
                         $('#arr_coa' + count).append(`
                             <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                         `);
-                        select2ServerSide('#arr_item_stock' + count, '{{ url("admin/select2/item_stock") }}');
+
+                        select2ServerSide('#arr_itemkuy' + count, '{{ url("admin/select2/item") }}');
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        
+                        $('#arr_item_stock' + count).append(`
+                            <option value="">--Silahkan pilih item--</option>
+                        `).select2({
+                            dropdownAutoWidth: true,
+                            width: '100%',
+                        });
+
+                        if(val.stock_list.length){
+                            $('#arr_item_stock' + count).empty().append(`
+                                <option value="">--Silahkan pilih item--</option>
+                            `);
+                            $.each(val.stock_list, function(i, value) {
+                                $('#arr_item_stock' + count).append(`
+                                    <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-place="` + value.place_id + `" data-warehouse="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                `);
+                            });
+
+                            $('#arr_item_stock' + count).val(val.item_stock_id).trigger('change');
+                        }
                     });
                 }
                 
@@ -970,178 +921,33 @@
         });
     }
 
-    var printService = new WebSocketPrinter({
-        onConnect: function () {
-            
-        },
-        onDisconnect: function () {
-           
-        },
-        onUpdate: function (message) {
-            
-        },
-    });
-    
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
-        arr_id_temp=[];
-        $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(2)').text().trim();
-            arr_id_temp.push(poin);
-        });
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
         $.ajax({
-            url: '{{ Request::url() }}/print',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                arr_id: arr_id_temp,
+            type : "POST",
+            url  : '{{ Request::url() }}/print',
+            data : {
+                search : search,
+                status : status,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                printService.submit({
-                    'type': 'INVOICE',
-                    'url': response.message
-                })
-                
-               
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
-    function printMultiSelect(){
-        var formData = new FormData($('#form_data_print_multi')[0]);
-        console.log(formData);
-        $.ajax({
-            url: '{{ Request::url() }}/print_by_range',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert_multi').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    $('#modal5').modal('close');
-                   /*  printService.submit({
-                        'type': 'INVOICE',
-                        'url': response.message
-                    }) */
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert_multi').show();
-                    $('.modal-content').scrollTop(0);
-                    console.log(response.error);
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
-                    
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert_multi').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
-                        });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-            
-        });
-    }
-
-    function printPreview(code){
-        $.ajax({
-            url: '{{ Request::url() }}/print_individual/' + code,
-            type:'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            complete: function() {
-                
-            },
+            cache: false,
             success: function(data){
-                loadingClose('.modal-content');
-                printService.submit({
-                    'type': 'INVOICE',
-                    'url': data
-                })
+                var w = window.open('about:blank');
+                w.document.open();
+                w.document.write(data);
+                w.document.close();
             }
         });
     }
 
     function exportExcel(){
-        var search = window.table.search();
-        var status = $('#filter_status').val();
+        var search = window.table.search(), status = $('#filter_status').val(), start_date = $('#start_date').val(), finish_date = $('#finish_date').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
-    }
-
-    function viewJournal(id){
-        $.ajax({
-            url: '{{ Request::url() }}/view_journal/' + id,
-            type:'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            complete: function() {
-                
-            },
-            success: function(data){
-                loadingClose('.modal-content');
-                $('#modal6').modal('open');
-                $('#title_data').html(data.title);
-                $('#code_data').html(data.message.code);
-                $('#body-journal-table').html(data.tbody);
-                $('#user_jurnal').html('Pengguna '+data.user);
-                $('#note_jurnal').html('Keterangan '+data.message.note);
-                $('#ref_jurnal').html( 'Referensi '+data.reference);
-                $('#post_date_jurnal').html('Tanggal '+data.message.post_date);
-            }
-        });
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&start_date" + start_date + "&finish_date" + finish_date;
     }
 </script>

@@ -56,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
             'purchase_order_details'    => 'App\Models\PurchaseOrderDetail',
             'landed_cost_details'       => 'App\Models\LandedCostDetail',
             'purchase_invoice_details'  => 'App\Models\PurchaseInvoiceDetail',
+            'inventory_revaluations'    => 'App\Models\InventoryRevaluation',
         ]);
     }
 }

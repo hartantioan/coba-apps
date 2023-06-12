@@ -55,6 +55,7 @@ use App\Http\Controllers\Inventory\InventoryTransferOutController;
 use App\Http\Controllers\Inventory\InventoryTransferInController;
 use App\Http\Controllers\Inventory\GoodReceiveController;
 use App\Http\Controllers\Inventory\GoodIssueController;
+use App\Http\Controllers\Inventory\InventoryRevaluationController;
 
 use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
@@ -157,6 +158,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_transfer', [Select2Controller::class, 'itemTransfer']);
                 Route::get('inventory_transfer_out', [Select2Controller::class, 'inventoryTransferOut']);
                 Route::get('item_stock', [Select2Controller::class, 'itemStock']);
+                Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
             });
 
             Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -843,6 +845,22 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[GoodIssueController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodIssueController::class, 'voidStatus'])->middleware('operation.access:good_issue,void');
                     Route::post('destroy', [GoodIssueController::class, 'destroy'])->middleware('operation.access:good_issue,delete');
+                });
+
+                Route::prefix('revaluation')->middleware('operation.access:revaluation,view')->group(function () {
+                    Route::get('/',[InventoryRevaluationController::class, 'index']);
+                    Route::get('datatable',[InventoryRevaluationController::class, 'datatable']);
+                    Route::get('row_detail',[InventoryRevaluationController::class, 'rowDetail']);
+                    Route::post('show', [InventoryRevaluationController::class, 'show']);
+                    Route::post('print',[InventoryRevaluationController::class, 'print']);
+                    Route::post('print_by_range',[InventoryRevaluationController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[InventoryRevaluationController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('export',[InventoryRevaluationController::class, 'export']);
+                    Route::get('view_journal/{id}',[InventoryRevaluationController::class, 'viewJournal']);
+                    Route::post('create',[InventoryRevaluationController::class, 'create'])->middleware('operation.access:revaluation,update');
+                    Route::get('approval/{id}',[InventoryRevaluationController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [InventoryRevaluationController::class, 'voidStatus'])->middleware('operation.access:revaluation,void');
+                    Route::post('destroy', [InventoryRevaluationController::class, 'destroy'])->middleware('operation.access:revaluation,delete');
                 });
             });
 

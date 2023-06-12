@@ -73,6 +73,7 @@
                                                         <option value="3">Selesai</option>
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
+                                                        <option value="6">Direvisi</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -656,7 +657,6 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
-                    'warehouse[]' : $('#filter_warehouse').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
                 },

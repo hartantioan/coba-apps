@@ -159,7 +159,7 @@ class Select2Controller extends Controller {
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'price_list'        => $d->currentCogs($this->dataplaces),
-                'stock_list'        => $d->currentStock($this->dataplaces),
+                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
             ];
         }
@@ -1087,7 +1087,7 @@ class Select2Controller extends Controller {
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' - '.$d->name,
                 'coa_id'            => $d->coa_id ? $d->coa_id : '',
-                'coa_name'          => $d->coa_id ? $d->coa->name : '',
+                'coa_name'          => $d->coa_id ? $d->coa->code.' - '.$d->coa->name : '',
                 'details'           => $details,
             ];
         }
@@ -1141,7 +1141,7 @@ class Select2Controller extends Controller {
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'price_list'        => $d->currentCogs($this->dataplaces),
-                'stock_list'        => $d->currentStock($this->dataplaces),
+                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
             ];
         }

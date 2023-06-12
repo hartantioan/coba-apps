@@ -19,6 +19,7 @@ use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
 use App\Models\GoodReturnPO;
+use App\Models\InventoryRevaluation;
 use App\Models\InventoryTransferIn;
 use App\Models\InventoryTransferOut;
 use App\Models\Item;
@@ -255,6 +256,8 @@ class CustomHelper {
 				$arrUser[] = $row->user_id;
 			}
 
+			$arrUser = array_values(array_unique($arrUser));
+
 			$targets = User::whereIn('id',$arrUser)->where('status','1')->where('type','1')->get();
 
 			$adato = false;
@@ -469,15 +472,42 @@ class CustomHelper {
 			]);
 
 			foreach($op->paymentRequest->paymentRequestDetail as $row){
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->coa_id,
-					'account_id'	=> $op->account_id,
-					'place_id'		=> $row->lookable_type == 'fund_requests' ? $row->lookable->place_id : NULL,
-					'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
-					'type'			=> '1',
-					'nominal'		=> $row->nominal,
-				]);
+				if($row->cost_distribution_id){
+					$total = $row->nominal;
+					$lastIndex = $row->costDistribution->costDistributionDetail()->count() - 1;
+					$accumulation = 0;
+					foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+						if($key == $lastIndex){
+							$nominal = $total - $accumulation;
+						}else{
+							$nominal = round(($rowcost->percentage / 100) * $total);
+							$accumulation += $nominal;
+						}
+						JournalDetail::create([
+							'journal_id'                    => $query->id,
+							'cost_distribution_detail_id'   => $rowcost->id,
+							'coa_id'                        => $row->coa_id,
+							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+							'account_id'                    => $op->account_id,
+							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+							'type'                          => '1',
+							'nominal'                       => $nominal
+						]);
+					}
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->coa_id,
+						'account_id'	=> $op->account_id,
+						'place_id'		=> $row->lookable_type == 'fund_requests' ? $row->lookable->place_id : NULL,
+						'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $row->nominal,
+					]);
+				}
 			}
 
 			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
@@ -783,6 +813,76 @@ class CustomHelper {
 							'warehouse_id'	=> $rowdetail->warehouse_id,
 							'type'			=> '2',
 							'nominal'		=> $arrCost['total_import'],
+						]);
+					}
+				}
+			}
+		}elseif($table_name == 'inventory_revaluations'){
+
+			$ir = InventoryRevaluation::find($data->id);
+			
+			if($ir){
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'code'			=> Journal::generateCode(),
+					'lookable_type'	=> $ir->getTable(),
+					'lookable_id'	=> $ir->id,
+					'post_date'		=> $data->post_date,
+					'note'			=> $data->code,
+					'status'		=> '3'
+				]);
+
+				foreach($ir->inventoryRevaluationDetail as $rowdetail){
+					self::sendCogs($ir->getTable(),
+						$ir->id,
+						$rowdetail->place->company_id,
+						$rowdetail->place_id,
+						$rowdetail->warehouse_id,
+						$rowdetail->item_id,
+						0,
+						$rowdetail->nominal,
+						'IN',
+						$ir->post_date
+					);
+					
+					if($rowdetail->nominal < 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $rowdetail->coa_id,
+							'place_id'		=> $rowdetail->place_id,
+							'warehouse_id'	=> $rowdetail->warehouse_id,
+							'item_id'		=> $rowdetail->item_id,
+							'type'			=> '1',
+							'nominal'		=> -1 * $rowdetail->nominal
+						]);
+
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+							'place_id'		=> $rowdetail->place_id,
+							'warehouse_id'	=> $rowdetail->warehouse_id,
+							'item_id'		=> $rowdetail->item_id,
+							'type'			=> '2',
+							'nominal'		=> -1 * $rowdetail->nominal
+						]);
+					}else{
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+							'place_id'		=> $rowdetail->place_id,
+							'warehouse_id'	=> $rowdetail->warehouse_id,
+							'item_id'		=> $rowdetail->item_id,
+							'type'			=> '1',
+							'nominal'		=> $rowdetail->nominal
+						]);
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $rowdetail->coa_id,
+							'place_id'		=> $rowdetail->place_id,
+							'warehouse_id'	=> $rowdetail->warehouse_id,
+							'item_id'		=> $rowdetail->item_id,
+							'type'			=> '2',
+							'nominal'		=> $rowdetail->nominal
 						]);
 					}
 				}

@@ -24,12 +24,13 @@ use App\Models\Activity;
 
 class RequestSparepartController extends Controller
 {
-    protected $dataplaces;
+    protected $dataplaces,$datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
 
     public function index(Request $request)
@@ -171,7 +172,7 @@ class RequestSparepartController extends Controller
                         'rawcode'       => $sparepart_temp->code,
                         "name" => $sparepart_temp->item->name,
                         "type" => "sparepart",
-                        "stock" =>$sparepart_temp->item->currentStock($this->dataplaces),
+                        "stock" =>$sparepart_temp->item->currentStock($this->dataplaces,$this->datawarehouses),
                     ];
                     $spareparts[]=$sparepart;
                 }
@@ -357,7 +358,7 @@ class RequestSparepartController extends Controller
                     'code'          => CustomHelper::encrypt($sparepart_temp->code),
                     'rawcode'       => $sparepart_temp->code,
                     "name"          => $sparepart_temp->item->name,
-                    "stock"         => $sparepart_temp->item->currentStock($this->dataplaces),
+                    "stock"         => $sparepart_temp->item->currentStock($this->dataplaces,$this->datawarehouses),
                     "type"          => "sparepart",
                 ];
                 $spareparts[]=$sparepart;

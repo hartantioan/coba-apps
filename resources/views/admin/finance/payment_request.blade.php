@@ -74,6 +74,7 @@
                                                         <option value="3">Selesai</option>
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
+                                                        <option value="6">Direvisi</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -204,7 +205,7 @@
                                 <label class="active" for="coa_source_id">Kas / Bank</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="payment_type" name="payment_type">
+                                <select class="form-control" id="payment_type" name="payment_type" onchange="showRekening();">
                                     <option value="1">Tunai</option>
                                     <option value="2">Transfer</option>
                                     <option value="3">Cek</option>
@@ -249,7 +250,7 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="col m12">
+                            <div class="col m12" id="rekening-element" style="display:none;">
                                 <h6>Rekening (Jika transfer)</h6>
                                 <div class="input-field col m3 s12">
                                     <select class="form-control" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
@@ -290,14 +291,16 @@
                                                     <th class="center">PPN</th>
                                                     <th class="center">PPH</th>
                                                     <th class="center">Grandtotal</th>
+                                                    <th class="center">Potongan/Memo</th>
                                                     <th class="center">Bayar</th>
                                                     <th class="center">Keterangan</th>
+                                                    <th class="center">Dist.Biaya</th>
                                                     <th class="center">Coa</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="empty-detail">
-                                                    <td colspan="10" class="center">
+                                                    <td colspan="12" class="center">
                                                         Pilih supplier/vendor untuk memulai...
                                                     </td>
                                                 </tr>
@@ -453,8 +456,6 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
-        
-        
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
@@ -503,7 +504,7 @@
                 M.updateTextFields();
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
-                        <td colspan="10" class="center">
+                        <td colspan="12" class="center">
                             Pilih supplier/vendor untuk memulai...
                         </td>
                     </tr>
@@ -602,6 +603,16 @@
         }
     }
 
+    function showRekening(){
+        if(['2','3','4'].includes($('#payment_type').val())){
+            $('#rekening-element').show();
+        }else{
+            $('#user_bank_id').val('').formSelect();
+            $('#account_bank,#account_no,#account_name').val('');
+            $('#rekening-element').hide();
+        }
+    }
+
     function getAccountInfo(){
         if($('#account_id').val()){
             $.ajax({
@@ -661,11 +672,17 @@
                                     <td class="right-align" id="row_grandtotal` + count + `">
                                         ` + val.grandtotal + `
                                     </td>
+                                    <td class="right-align" id="row_memo` + count + `">
+                                        ` + val.memo + `
+                                    </td>
                                     <td class="center">
                                         <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.grandtotal + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                     </td>
                                     <td class="center">
                                         <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="-">
+                                    </td>
+                                    <td class="center">
+                                        ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
                                     </td>
                                     <td class="center">
                                         ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>` ) + `
@@ -675,12 +692,14 @@
                             
                             if(!val.coa_id){
                                 select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                             }
+                            
                         });                        
                     }else{
                         $('#body-detail').empty().append(`
                             <tr id="empty-detail">
-                                <td colspan="10" class="center">
+                                <td colspan="12" class="center">
                                     Pilih supplier/vendor untuk memulai...
                                 </td>
                             </tr>
@@ -727,7 +746,7 @@
             }
             $('#body-detail').empty().append(`
                 <tr id="empty-detail">
-                    <td colspan="10" class="center">
+                    <td colspan="12" class="center">
                         Pilih supplier/vendor untuk memulai...
                     </td>
                 </tr>
@@ -735,6 +754,18 @@
             $('#deposit').val('0,000');
             $('#top').val('0');
             $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
+        }
+    }
+
+    function applyCoa(code){
+        if($('#arr_cost_distribution' + code).val()){
+            if($('#arr_cost_distribution' + code).select2('data')[0].coa_name){
+                $('#arr_coa' + code).append(`
+                    <option value="` + $('#arr_cost_distribution' + code).select2('data')[0].coa_id + `">` + $('#arr_cost_distribution' + code).select2('data')[0].coa_name + `</option>
+                `)
+            }
+        }else{
+            $('#arr_coa' + code).empty();
         }
     }
 
@@ -757,7 +788,7 @@
             });
         }
         pay += admin;
-        $('#grandtotal').val(formatRupiahIni(pay.toFixed(3).toString().replace('.',',')));
+        $('#grandtotal').val(formatRupiahIni(pay.toFixed(2).toString().replace('.',',')));
     }
 
     function chooseAll(element){
@@ -944,6 +975,7 @@
                 formData.delete("arr_type[]");
                 formData.delete("arr_pay[]");
                 formData.delete("arr_note[]");
+                formData.delete("arr_cost_distribution[]");
                 formData.delete("arr_coa[]");
 
                 let passed = true;
@@ -955,6 +987,11 @@
                         formData.append('arr_pay[]',$('#arr_pay' + $(this).data('id')).val());
                         formData.append('arr_note[]',$('#arr_note' + $(this).data('id')).val());
                         formData.append('arr_coa[]',$('#arr_coa' + $(this).data('id')).val());
+                        formData.append('arr_cost_distribution[]',
+                            ($('#arr_cost_distribution' + $(this).data('id')).length > 0 ? 
+                                ($('#arr_cost_distribution' + $(this).data('id')).val() ? $('#arr_cost_distribution' + $(this).data('id')).val() : '') 
+                            : '')
+                        );
                         if(!$('#arr_coa' + $(this).data('id')).val() || !$('#arr_pay' + $(this).data('id')).val()){
                             passed = false;
                         }
@@ -1105,6 +1142,7 @@
                         $('#body-detail').append(`
                             <tr class="row_detail" data-code="` + val.rawcode + `">
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                ` + ( val.type !== 'fund_requests' ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
                                 <td class="center-align">
                                     <label>
                                         <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
@@ -1132,6 +1170,9 @@
                                 <td class="right-align" id="row_grandtotal` + count + `">
                                     ` + val.grandtotal + `
                                 </td>
+                                <td class="right-align" id="row_memo` + count + `">
+                                    ` + val.memo + `
+                                </td>
                                 <td class="center">
                                     <input id="arr_pay` + count + `" name="arr_pay[]" class="browser-default" type="text" value=" `+ val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
                                 </td>
@@ -1139,16 +1180,27 @@
                                     <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
                                 </td>
                                 <td class="center">
+                                    ` + ( val.type !== 'fund_requests' ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
+                                </td>
+                                <td class="center">
                                     <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>
                                 </td>
                             </tr>
                         `);
-
-                        $('#arr_coa' + count).append(`
-                            <option value="` + val.coa_id + `">` + val.coa_name + `</option>
-                        `);
-
-                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        
+                        if(val.type == 'fund_requests'){
+                            $('#arr_coa' + count).append(`
+                                <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                            `);
+                            if(val.cost_distribution_id){
+                                $('#arr_cost_distribution' + count).append(`
+                                    <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                                `);
+                            }
+                            select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        }
+                        
                     });
                 }
 

@@ -214,7 +214,7 @@ class GoodReturnPOController extends Controller
                     $data['details'] = $details;
                 }else{
                     $data['status'] = '500';
-                    $data['message'] = 'Good Receipt / Penerimaan Barang No '.$data->code.' telah menjadi Purchase Invoice, anda tidak bisa menambahkannya.';
+                    $data['message'] = 'Good Receipt / Penerimaan Barang No '.$data->code.' telah menjadi A/P Invoice, anda tidak bisa menambahkannya.';
                 }
             }else{
                 $data['status'] = '500';

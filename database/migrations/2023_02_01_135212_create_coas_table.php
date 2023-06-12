@@ -17,6 +17,7 @@ return new class extends Migration
         Schema::create('coas', function (Blueprint $table) {
             $table->id();
             $table->string('code', 155)->nullable();
+            $table->string('prefix', 25)->nullable();
             $table->string('name', 155)->nullable();
             $table->bigInteger('company_id')->nullable();
             $table->bigInteger('parent_id')->nullable();

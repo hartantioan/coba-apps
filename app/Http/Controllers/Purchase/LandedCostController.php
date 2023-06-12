@@ -868,7 +868,7 @@ class LandedCostController extends Controller
             }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data telah digunakan pada Purchase Invoice.'
+                    'message' => 'Data telah digunakan pada A/P Invoice.'
                 ];
             }else{
                 $query->update([
@@ -1026,7 +1026,7 @@ class LandedCostController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Purchase Invoice',
+                        'title'     => 'Print A/P Invoice',
                         'data'      => $pr
                     ];
                     $img_path = 'website/logo_web_fix.png';
@@ -1173,7 +1173,7 @@ class LandedCostController extends Controller
                         $query = LandedCost::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Purchase Invoice',
+                                'title'     => 'Print A/P Invoice',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -1221,7 +1221,7 @@ class LandedCostController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Print Purchase Invoice',
+                'title'     => 'Print A/P Invoice',
                 'data'      => $pr
             ];
 

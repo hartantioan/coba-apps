@@ -174,7 +174,8 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = Coa::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
-                    ->orWhere('name', 'like', "%$search%");
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('prefix', 'like', "%$search%");
                 /* })->whereDoesntHave('childSub') */
                  })->where('level',5)
                 ->where('status','1')
@@ -185,7 +186,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
+                'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
                 'uom'           => '-',
                 'code'          => CustomHelper::encrypt($d->code),
             ];
@@ -201,7 +202,8 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = Coa::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
-                    ->orWhere('name', 'like', "%$search%");
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('prefix', 'like', "%$search%");
                  })->where('level',5)
                 ->where('status','1')
                 ->whereIn('company_id',$arrCompany)
@@ -211,7 +213,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
+                'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
             ];
         }
 
@@ -224,14 +226,15 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = Coa::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
-                    ->orWhere('name', 'like', "%$search%");
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('prefix', 'like', "%$search%");
                 })->where('status','1')->get();
 
         foreach($data as $d) {
             $pre_text = str_repeat(" - ", $d->level);
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $pre_text.$d->code.' - '.$d->name,
+                'text' 			=> $pre_text.($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
             ];
         }
 
@@ -907,7 +910,8 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = Coa::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
-                    ->orWhere('name', 'like', "%$search%");
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('prefix', 'like', "%$search%");
                  })->where('level',5)
                 ->where('status','1')
                 ->whereIn('company_id',$arrCompany)

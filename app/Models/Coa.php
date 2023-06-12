@@ -16,6 +16,7 @@ class Coa extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
+        'prefix',
         'name',
         'company_id',
         'parent_id',

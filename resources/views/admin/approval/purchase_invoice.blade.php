@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Purchase Invoice # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">A/P Invoice # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -134,7 +134,7 @@
         <!-- logo and title -->
         <div class="row mt-1 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Purchase Invoice</h5>
+                <h5 class="indigo-text">A/P Invoice</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="35%">

@@ -87,7 +87,7 @@ class PaymentRequestDetail extends Model
     public function type(){
         $type = match ($this->lookable_type) {
             'fund_requests'             => 'Permohonan Dana',
-            'purchase_invoices'         => 'AP Invoice',
+            'purchase_invoices'         => 'A/P Invoice',
             'purchase_down_payments'    => 'AP Down Payment',
             default                     => 'Belum ditentukan',
           };

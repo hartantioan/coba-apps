@@ -636,7 +636,7 @@ class PurchaseDownPaymentController extends Controller
             }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data telah digunakan pada Payment Request / Purchase Invoice sebagai DP.'
+                    'message' => 'Data telah digunakan pada Payment Request / A/P Invoice sebagai DP.'
                 ];
             }else{
                 
@@ -824,7 +824,7 @@ class PurchaseDownPaymentController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Purchase Invoice',
+                        'title'     => 'Print A/P Invoice',
                         'data'      => $pr
                     ];
                     $img_path = 'website/logo_web_fix.png';

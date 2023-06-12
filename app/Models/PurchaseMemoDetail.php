@@ -35,6 +35,16 @@ class PurchaseMemoDetail extends Model
         return $this->belongsTo('App\Models\PurchaseMemo', 'purchase_memo_id', 'id')->withTrashed();
     }
 
+    public function getCode(){
+        $code = match ($this->lookable_type) {
+            'purchase_invoice_details'  => $this->lookable->purchaseInvoice->code,
+            'purchase_down_payments'    => $this->lookable->code,
+            default => '-',
+        };
+
+        return $code;
+    }
+
     public function taxMaster()
     {
         return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();

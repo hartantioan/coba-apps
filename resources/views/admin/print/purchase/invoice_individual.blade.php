@@ -167,7 +167,7 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1" style="font-size:1em">Purchase Invoice # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1" style="font-size:1em">A/P Invoice # {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -177,7 +177,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">Purchase Invoice</h5>
+                                <h5 style="margin-top: -2px">A/P Invoice</h5>
                             </td>
                         </tr>
                                 

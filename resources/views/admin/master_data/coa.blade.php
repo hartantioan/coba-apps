@@ -96,6 +96,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
+                                                        <th>Prefix</th>
                                                         <th>Kode</th>
                                                         <th>Nama</th>
                                                         <th>Perusahaan</th>
@@ -137,6 +138,10 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field col s6">
+                            <input id="prefix" name="prefix" type="text" placeholder="Kode Prefix">
+                            <label class="active" for="prefix">Prefix</label>
+                        </div>
+                        <div class="input-field col s6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
@@ -146,12 +151,12 @@
                             <label class="active" for="code">Nama</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="select2 browser-default" id="company_id" name="company_id">
+                            <select class="" id="company_id" name="company_id">
                                 @foreach($company as $m)
                                     <option value="{{ $m->id }}">{{ $m->code.' '.$m->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="active" for="company_id">Perusahaan</label>
+                            <label class="" for="company_id">Perusahaan</label>
                         </div>
                         <div class="input-field col s6">
                             <select class="browser-default" id="parent_id" name="parent_id"></select>
@@ -200,8 +205,6 @@
                                     Ya
                                 </label>
                             </div>
-                        </div>
-                        <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="bp_journal">BP di Form Jurnal</label>
                                 <label class="right">
@@ -211,8 +214,6 @@
                                     Ya
                                 </label>
                             </div>
-                        </div>
-                        <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="is_hidden">Sembunyikan dari Transaksi</label>
                                 <label class="right">
@@ -302,11 +303,6 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
-        $(".select2").select2({
-            dropdownAutoWidth: true,
-            width: '100%',
-        });
-
         $('#form_dataimport').submit(function(event) {
             event.preventDefault();
 
@@ -445,7 +441,7 @@
                 
             },
             onOpenEnd: function(modal, trigger) { 
-                $('#code').focus();
+                $('#prefix').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -499,7 +495,7 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            "order": [[1, 'asc']],
+            "order": [[2, 'asc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
@@ -525,6 +521,7 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align' },
+                { name: 'prefix', className: '' },
                 { name: 'code', className: '' },
                 { name: 'name', className: '' },
                 { name: 'company_id', className: 'center-align' },
@@ -678,6 +675,7 @@
                 
                 $('#temp').val(id);
                 $('#code').val(response.code);
+                $('#prefix').val(response.prefix);
                 $('#name').val(response.name);
                 $('#company_id').val(response.company_id).trigger('change');
                 $('#parent_id').val(response.parent_id).trigger('change');

@@ -59,7 +59,7 @@ class PurchaseMemoController extends Controller
         if($data->used()->exists()){
             if($request->type == 'pi'){
                 $data['status'] = '500';
-                $data['message'] = 'Purchase Invoice '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+                $data['message'] = 'A/P Invoice '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
             }elseif($request->type == 'podp'){
                 $data['status'] = '500';
                 $data['message'] = 'Purchase Down Payment '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
@@ -133,7 +133,7 @@ class PurchaseMemoController extends Controller
 
             }else{
                 $data['status'] = '500';
-                $data['message'] = 'Seluruh item pada purchase invoice / purchase down payment '.$data->code.' telah digunakan pada purchase memo.';
+                $data['message'] = 'Seluruh item pada A/P Invoice / purchase down payment '.$data->code.' telah digunakan pada purchase memo.';
             }
         }
 
@@ -515,7 +515,7 @@ class PurchaseMemoController extends Controller
             foreach($data->purchaseMemoDetail as $key => $row){
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
-                    <td class="center-align">'.$row->lookable->code.'</td>
+                    <td class="center-align">'.$row->getCode().'</td>
                     <td class="center-align">'.$row->description.'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
@@ -780,7 +780,7 @@ class PurchaseMemoController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Purchase Invoice',
+                        'title'     => 'Print A/P Invoice',
                         'data'      => $pr
                     ];
                     $img_path = 'website/logo_web_fix.png';

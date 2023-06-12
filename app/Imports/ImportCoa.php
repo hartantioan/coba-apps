@@ -22,6 +22,7 @@ class ImportCoa implements ToModel,WithHeadingRow, WithValidation,WithBatchInser
         return new Coa([
             'id' => intval($row['id']),
             'code' => $row['code'],
+            'prefix' => $row['prefix'],
             'name'=> $row['name'],
             'company_id'=> $row['company_id'],
             'parent_id'=> $row['parent_id'],
@@ -40,6 +41,7 @@ class ImportCoa implements ToModel,WithHeadingRow, WithValidation,WithBatchInser
         return [
             '*.id'  => 'required|unique:coas,id',
             '*.code' => 'required',
+            '*.prefix' => 'nullable',
             '*.name' => 'required|string',
             '*.company_id' => 'required|numeric',
             '*.parent_id' => 'nullable',

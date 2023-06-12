@@ -678,7 +678,7 @@ class GoodReceiptPOController extends Controller
             }elseif($query->hasChildDocument()){
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data telah digunakan pada Landed Cost / Purchase Invoice.'
+                    'message' => 'Data telah digunakan pada Landed Cost / A/P Invoice.'
                 ];
             }else{
                 $query->update([

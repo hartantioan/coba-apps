@@ -273,7 +273,7 @@
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h6>Detail Req. Dana / Uang Muka Pembelian / Invoice Pembelian</h6>
+                                    <h6>Detail Req. Dana / Uang Muka Pembelian / A/P Invoice</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered" style="max-width:1650px !important;">
                                             <thead>

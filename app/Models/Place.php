@@ -22,6 +22,7 @@ class Place extends Model
         'type',
         'province_id',
         'city_id',
+        'subdistrict',
         'status'
     ];
 

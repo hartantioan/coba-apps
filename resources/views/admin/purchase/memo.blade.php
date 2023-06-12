@@ -193,15 +193,15 @@
                             <div class="col m12 s12">
                                 <div class="col m3 s4">
                                     <p class="mt-2 mb-2">
-                                        <h6>Purchase Invoice</h6>
+                                        <h6>A/P Invoice</h6>
                                         <div class="row">
                                             <div class="input-field col m12 s12">
                                                 <select class="browser-default" id="purchase_invoice_id" name="purchase_invoice_id"></select>
-                                                <label class="active" for="purchase_invoice_id">Purchase Invoice (Jika ada)</label>
+                                                <label class="active" for="purchase_invoice_id">A/P Invoice (Jika ada)</label>
                                             </div>
                                             <div class="col m12 12">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getDetails('pi');" href="javascript:void(0);">
-                                                    <i class="material-icons left">add</i> Purchase Invoice
+                                                    <i class="material-icons left">add</i> A/P Invoice
                                                 </a>
                                             </div>
                                         </div> 

@@ -2219,7 +2219,7 @@ class PurchaseOrderController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Purchase Invoice',
+                        'title'     => 'Print A/P Invoice',
                         'data'      => $pr,
                       
                     ];

@@ -391,7 +391,7 @@ class PurchaseRequestController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Purchase Invoice',
+                        'title'     => 'Print A/P Invoice',
                         'data'      => $pr
                     ];
                     $img_path = 'website/logo_web_fix.png';

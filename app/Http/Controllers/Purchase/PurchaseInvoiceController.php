@@ -48,7 +48,7 @@ class PurchaseInvoiceController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'Invoice Pembelian',
+            'title'         => 'A/P Invoice',
             'content'       => 'admin.purchase.invoice',
             'company'       => Company::where('status','1')->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
@@ -597,7 +597,7 @@ class PurchaseInvoiceController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Purchase Invoice telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'A/P Invoice telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -740,14 +740,14 @@ class PurchaseInvoiceController extends Controller
                 }
 
                 CustomHelper::sendApproval('purchase_invoices',$query->id,$query->note);
-                CustomHelper::sendNotification('purchase_invoices',$query->id,'Pengajuan Purchase Invoice No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendNotification('purchase_invoices',$query->id,'Pengajuan A/P Invoice No. '.$query->code,$query->note,session('bo_id'));
                 CustomHelper::removeDeposit($query->account_id,$query->downpayment);
 
                 activity()
                     ->performedOn(new PurchaseInvoice())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit purchase invoice.');
+                    ->log('Add / edit A/P Invoice.');
 
                 $response = [
                     'status'    => 200,
@@ -871,7 +871,7 @@ class PurchaseInvoiceController extends Controller
                 
         if($pi){
             $data = [
-                'title'     => 'Print Purchase Invoice',
+                'title'     => 'Print A/P Invoice',
                 'data'      => $pi
             ];
 
@@ -887,7 +887,7 @@ class PurchaseInvoiceController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Print Purchase Invoice',
+                'title'     => 'Print A/P Invoice',
                 'data'      => $pr
             ];
 
@@ -1010,9 +1010,9 @@ class PurchaseInvoiceController extends Controller
                     ->performedOn(new PurchaseInvoice())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the purchase invoice data');
+                    ->log('Void the A/P Invoice data');
     
-                CustomHelper::sendNotification('purchase_invoices',$query->id,'Purchase Invoice No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification('purchase_invoices',$query->id,'A/P Invoice No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('purchase_invoices',$query->id);
                 CustomHelper::addDeposit($query->account_id,$query->downpayment);
                 CustomHelper::removeJournal('purchase_invoices',$query->id);
@@ -1065,7 +1065,7 @@ class PurchaseInvoiceController extends Controller
                 ->performedOn(new PurchaseInvoice())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the purchase invoice data');
+                ->log('Delete the A/P Invoice data');
 
             $response = [
                 'status'  => 200,
@@ -1103,7 +1103,7 @@ class PurchaseInvoiceController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Purchase Invoice',
+                        'title'     => 'Print A/P Invoice',
                         'data'      => $pr
                     ];
                     $img_path = 'website/logo_web_fix.png';
@@ -1174,7 +1174,7 @@ class PurchaseInvoiceController extends Controller
                         $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$nomor)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Purchase Invoice',
+                                'title'     => 'Print A/P Invoice',
                                 'data'      => $query
                             ];
             
@@ -1228,7 +1228,7 @@ class PurchaseInvoiceController extends Controller
                     $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$code)->first();
                     if($query){
                         $data = [
-                            'title'     => 'Print Purchase Invoice',
+                            'title'     => 'Print A/P Invoice',
                             'data'      => $query
                         ];
         
@@ -1297,7 +1297,7 @@ class PurchaseInvoiceController extends Controller
                         $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$nomor)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Purchase Invoice',
+                                'title'     => 'Print A/P Invoice',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -1365,7 +1365,7 @@ class PurchaseInvoiceController extends Controller
                         $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Purchase Invoice',
+                                'title'     => 'Print A/P Invoice',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -1409,7 +1409,7 @@ class PurchaseInvoiceController extends Controller
     public function printALL(Request $request){
 
         $data = [
-            'title' => 'PURCHASE INVOICE REPORT',
+            'title' => 'A/P Invoice REPORT',
             'data' => PurchaseInvoice::where(function($query) use ($request) {
                 if($request->search) {
                     $query->where(function($query) use ($request) {

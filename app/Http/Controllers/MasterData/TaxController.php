@@ -32,7 +32,8 @@ class TaxController extends Controller
             'id',
             'code',
             'name',
-            'coa_id',
+            'coa_purchase_id',
+            'coa_sale_id',
             'type',
             'percentage',
             'is_default_ppn',
@@ -87,7 +88,8 @@ class TaxController extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
-                    $val->coa()->exists() ? $val->coa->code.' - '.$val->coa->name : ' - ',
+                    $val->coa_purchase_id ? $val->coaPurchase->code.' - '.$val->coaPurchase->name : ' - ',
+                    $val->coa_sale_id ? $val->coaSale->code.' - '.$val->coaSale->name : ' - ',
                     $val->type(),
                     number_format($val->percentage,2,',','.'),
                     $val->isDefaultPpn(),
@@ -120,16 +122,18 @@ class TaxController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('banks', 'code')->ignore($request->temp)] : 'required|unique:banks,code',
             'name'              => 'required',
-            'coa_id'            => 'required',
+            'coa_purchase_id'   => 'required',
+            'coa_sale_id'       => 'required',
             'type'              => 'required',
             'percentage'        => 'required',
         ], [
-            'code.required' 	    => 'Kode tidak boleh kosong.',
-            'code.unique'           => 'Kode telah terpakai.',
-            'name.required'         => 'Nama tidak boleh kosong.',
-            'coa_id.required'       => 'Coa tidak boleh kosong.',
-            'type.required'         => 'Tipe pajak tidak boleh kosong.',
-            'percentage.required'   => 'Prosentase tidak boleh kosong.'
+            'code.required' 	        => 'Kode tidak boleh kosong.',
+            'code.unique'               => 'Kode telah terpakai.',
+            'name.required'             => 'Nama tidak boleh kosong.',
+            'coa_purchase_id.required'  => 'Coa beli tidak boleh kosong.',
+            'coa_sale_id.required'      => 'Coa jual tidak boleh kosong.',
+            'type.required'             => 'Tipe pajak tidak boleh kosong.',
+            'percentage.required'       => 'Prosentase tidak boleh kosong.'
         ]);
 
         if($validation->fails()) {
@@ -144,7 +148,8 @@ class TaxController extends Controller
                     $query = Tax::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
-                    $query->coa_id          = $request->coa_id;
+                    $query->coa_purchase_id = $request->coa_purchase_id;
+                    $query->coa_sale_id     = $request->coa_sale_id;
                     $query->type            = $request->type;
                     $query->percentage      = str_replace(',','.',str_replace('.','',$request->percentage));
                     $query->is_default_ppn  = $request->is_default_ppn ? $request->is_default_ppn : '0';
@@ -155,7 +160,8 @@ class TaxController extends Controller
                     $query = Tax::create([
                         'code'              => $request->code,
                         'name'			    => $request->name,
-                        'coa_id'            => $request->coa_id,
+                        'coa_purchase_id'   => $request->coa_purchase_id,
+                        'coa_sale_id'       => $request->coa_sale_id,
                         'type'              => $request->type,
                         'percentage'        => str_replace(',','.',str_replace('.','',$request->percentage)),
                         'is_default_ppn'    => $request->is_default_ppn ? $request->is_default_ppn : '0',
@@ -195,7 +201,8 @@ class TaxController extends Controller
     public function show(Request $request){
         $tax = Tax::find($request->id);
         $tax['percentage'] = number_format($tax->percentage,2,',','.');
-        $tax['coa_name'] = $tax->coa()->exists() ? $tax->coa->name.' - '.$tax->coa->name : '-';
+        $tax['coa_purchase_name'] = $tax->coa_purchase_id ? $tax->coaPurchase->name.' - '.$tax->coaPurchase->name : '-';
+        $tax['coa_sale_name'] = $tax->coa_sale_id ? $tax->coaSale->name.' - '.$tax->coaSale->name : '-';
         				
 		return response()->json($tax);
     }

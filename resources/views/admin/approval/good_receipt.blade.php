@@ -212,7 +212,8 @@
                         <th class="center">Item</th>
                         <th class="center">Jum.</th>
                         <th class="center">Sat.</th>
-                        <th class="center">Keterangan</th>
+                        <th class="center">Keterangan 1</th>
+                        <th class="center">Keterangan 2</th>
                         <th class="center">Remark</th>
                         <th class="center">Plant</th>
                         <th class="center">Departemen</th>
@@ -227,6 +228,7 @@
                         <td class="center">{{ $rowdetail->qty }}</td>
                         <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
                         <td>{{ $rowdetail->note }}</td>
+                        <td>{{ $rowdetail->note2 }}</td>
                         <td>{{ $rowdetail->remark }}</td>
                         <td class="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
                         <td class="center">{{ $rowdetail->department->name }}</td>

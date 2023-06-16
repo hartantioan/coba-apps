@@ -250,7 +250,7 @@ class DepreciationController extends Controller
                 }
 			}else{
                 $query = Depreciation::create([
-                    'code'			=> Depreciation::generateCode(),
+                    'code'			=> Depreciation::generateCode($request->post_date),
                     'user_id'		=> session('bo_id'),
                     'company_id'    => $request->company_id,
                     'post_date'	    => date('Y-m-d'),

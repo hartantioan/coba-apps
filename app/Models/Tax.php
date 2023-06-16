@@ -17,7 +17,8 @@ class Tax extends Model
     protected $fillable = [
         'code',
         'name',
-        'coa_id',
+        'coa_purchase_id',
+        'coa_sale_id',
         'type',
         'percentage',
         'is_default_ppn',
@@ -25,8 +26,12 @@ class Tax extends Model
         'status'
     ];
 
-    public function coa(){
-        return $this->belongsTo('App\Models\Coa','coa_id','id')->withTrashed();
+    public function coaPurchase(){
+        return $this->belongsTo('App\Models\Coa','coa_purchase_id','id')->withTrashed();
+    }
+
+    public function coaSale(){
+        return $this->belongsTo('App\Models\Coa','coa_sale_id','id')->withTrashed();
     }
 
     public function status(){

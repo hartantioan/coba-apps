@@ -188,6 +188,7 @@ class JournalController extends Controller
                                 <th class="center-align">Mesin</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
+                                <th class="center-align">Keterangan</th>
                                 <th class="center-align">Debit</th>
                                 <th class="center-align">Kredit</th>
                             </tr>
@@ -204,6 +205,7 @@ class JournalController extends Controller
                 <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                <td class="">'.$row->note.'</td>
                 <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
                 <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
             </tr>';
@@ -356,7 +358,7 @@ class JournalController extends Controller
                 try {
                     
                     $query = Journal::create([
-                        'code'			            => Journal::generateCode(),
+                        'code'			            => Journal::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'currency_id'               => $request->currency_id,
                         'company_id'                => $request->company_id,

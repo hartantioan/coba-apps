@@ -28,7 +28,7 @@ class WorkOrderPersonInChargeDetail extends Model
         return $this->belongsTo('App\Models\User', 'pic_id', 'id')->withTrashed();
     }
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = WorkOrderPersonInChargeDetail::withTrashed()
             ->selectRaw('RIGHT(code, 9) as code')
@@ -44,7 +44,7 @@ class WorkOrderPersonInChargeDetail extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'WOPIC-'.date('y').date('m').date('d').'-';
+        $pre = 'WOPIC-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

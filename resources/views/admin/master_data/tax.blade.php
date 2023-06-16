@@ -55,7 +55,8 @@
                                                         <th>#</th>
                                                         <th>Kode</th>
                                                         <th>Nama</th>
-                                                        <th>Coa</th>
+                                                        <th>Coa Beli</th>
+                                                        <th>Coa Jual</th>
                                                         <th>Type</th>
                                                         <th>Prosentase</th>
                                                         <th>Default PPN</th>
@@ -99,8 +100,12 @@
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="browser-default" id="coa_id" name="coa_id"></select>
-                            <label class="active" for="coa_id">Coa</label>
+                            <select class="browser-default" id="coa_purchase_id" name="coa_purchase_id"></select>
+                            <label class="active" for="coa_purchase_id">Coa Beli</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="browser-default" id="coa_sale_id" name="coa_sale_id"></select>
+                            <label class="active" for="coa_sale_id">Coa Jual</label>
                         </div>
                         <div class="input-field col s6">
                             <input id="percentage" name="percentage" type="text" onkeyup="formatRupiah(this)">
@@ -189,12 +194,13 @@
             }
         });
 
-        select2ServerSide('#coa_id', '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#coa_purchase_id,#coa_sale_id', '{{ url("admin/select2/coa") }}');
     });
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
-            "responsive": true,
+            "responsive": false,
+            "scrollX": true,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -226,7 +232,8 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'coa_id', className: 'center-align' },
+                { name: 'coa_purchase_id', className: 'center-align' },
+                { name: 'coa_sale_id', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'percentage', className: 'center-align' },
                 { name: 'is_default_ppn', className: 'center-align' },
@@ -338,8 +345,11 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#coa_id').empty().append(`
-                    <option value="` + response.coa_id + `">` + response.coa_name + `</option>
+                $('#coa_purchase_id').empty().append(`
+                    <option value="` + response.coa_purchase_id + `">` + response.coa_purchase_name + `</option>
+                `);
+                $('#coa_sale_id').empty().append(`
+                    <option value="` + response.coa_sale_id + `">` + response.coa_sale_name + `</option>
                 `);
                 $('#percentage').val(response.percentage);
                 $('#type').val(response.type).formSelect();

@@ -87,7 +87,7 @@ class Retirement extends Model
         return $status;
     }
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = Retirement::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
@@ -103,7 +103,7 @@ class Retirement extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'RET-'.date('y').date('m').date('d').'-';
+        $pre = 'RET-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

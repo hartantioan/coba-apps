@@ -304,7 +304,8 @@
                                     <th class="center">Jum.Diterima</th>
                                     <th class="center">Jum.Kembali</th>
                                     <th class="center">Sat.</th>
-                                    <th class="center">Keterangan</th>
+                                    <th class="center">Ket. 1</th>
+                                    <th class="center">Ket. 2</th>
                                     <th class="center">Plant</th>
                                     <th class="center">Departemen</th>
                                     <th class="center">Gudang</th>
@@ -320,6 +321,7 @@
                                     <td class="center">{{ $rowdetail->qty }}</td>
                                     <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
                                     <td>{{ $rowdetail->note }}</td>
+                                    <td>{{ $rowdetail->note2 }}</td>
                                     <td class="center">{{ $rowdetail->goodReceiptDetail->place->name.' - '.$rowdetail->goodReceiptDetail->place->company->name }}</td>
                                     <td class="center">{{ isset($rowdetail->goodReceiptDetail->department->name) ? $rowdetail->goodReceiptDetail->department->name : '' }}</td>
                                     <td class="center">{{ $rowdetail->goodReceiptDetail->warehouse->name }}</td>

@@ -29,8 +29,9 @@ function closeLoader(){
 }
 
 function formatRupiah(angka){
-	var number_string = angka.value.replace(/[^,\d]/g, '').toString()
-	sign = angka.value.charAt(0),
+	let val = angka.value ? angka.value : '0';
+	var number_string = val.replace(/[^,\d]/g, '').toString()
+	sign = val.charAt(0),
 	split   		= number_string.split(','),
 	sisa     		= split[0].length % 3,
 	rupiah     		= split[0].substr(0, sisa),
@@ -46,7 +47,8 @@ function formatRupiah(angka){
 }
 
 function formatRupiahNoMinus(angka){
-	var number_string = angka.value.replace(/[^,\d]/g, '').toString()
+	let val = angka.value ? angka.value : '0';
+	var number_string = val.replace(/[^,\d]/g, '').toString()
 	split   		= number_string.split(','),
 	sisa     		= split[0].length % 3,
 	rupiah     		= split[0].substr(0, sisa),

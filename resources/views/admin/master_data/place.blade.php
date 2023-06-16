@@ -201,6 +201,7 @@
                 $('#province_id').empty();
                 $('#city_id').empty();
                 M.updateTextFields();
+                $('#city_id').empty();
                 $('#subdistrict_id').empty().append(`
                     <option value="">--Pilih ya--</option>
                 `);

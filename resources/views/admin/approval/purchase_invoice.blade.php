@@ -200,6 +200,8 @@
                     <tr>
                         <th class="center-align">No.</th>
                         <th class="center-align">Penerimaan Barang / Landed Cost / Purchase Order</th>
+                        <th class="center-align">Keterangan 1</th>
+                        <th class="center-align">Keterangan 2</th>
                         <th class="center-align">Total</th>
                         <th class="center-align">PPN</th>
                         <th class="center-align">PPH</th>
@@ -210,9 +212,9 @@
                     @foreach($data->purchaseInvoiceDetail as $key => $row)
                     <tr>
                         <td class="center-align">{{ ($key + 1) }}</td>
-                        <td class="center-align">{{ 
-                            $row->getCode()
-                        }}</td>
+                        <td class="center-align">{{ $row->getCode() }}</td>
+                        <td class="">{{ $row->note }}</td>
+                        <td class="">{{ $row->note2 }}</td>
                         <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->wtax,2,',','.') }}</td>
@@ -220,7 +222,7 @@
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="6" rowspan="6">
+                        <td colspan="8" rowspan="6">
                             Rekening :
                             {{ $data->account->defaultBank() ? $data->account->defaultBank() : ' - ' }}
                             <div class="mt-3">

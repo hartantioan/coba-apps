@@ -169,7 +169,9 @@
 											<th>Item</th>
 											<th>Jum.</th>
 											<th>Sat.</th>
-											<th>Catatan</th>
+											<th>Keterangan 1</th>
+											<th>Keterangan 2</th>
+											<th>Remark</th>
 											<th>Plant</th>
 											<th>Line</th>
 											<th>Departemen</th>
@@ -184,6 +186,8 @@
 											<td align="center">{{ $rowdetail->qty }}</td>
 											<td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
 											<td>{{ $rowdetail->note }}</td>
+											<td>{{ $rowdetail->note2 }}</td>
+											<td>{{ $rowdetail->remark }}</td>
 											<td align="center">{{ $rowdetail->place->name }}</td>
 											<td align="center">{{ $rowdetail->line()->exists() ? $rowdetail->line->name : '-' }}</td>
 											<td align="center">{{ $rowdetail->department->name }}</td>

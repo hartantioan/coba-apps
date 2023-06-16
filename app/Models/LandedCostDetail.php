@@ -103,6 +103,26 @@ class LandedCostDetail extends Model
         return $qty;
     }
 
+    public function getTax(){
+        $total = $this->landedCost->total;
+        $tax = ($this->nominal / $total) * $this->landedCost->tax;
+
+        return $tax;
+    }
+
+    public function getWtax(){
+        $total = $this->landedCost->total;
+        $wtax = ($this->nominal / $total) * $this->landedCost->wtax;
+
+        return $wtax;
+    }
+
+    public function getGrandtotal(){
+        $grandtotal = $this->nominal + $this->getTax() - $this->getWtax();
+
+        return $grandtotal;
+    }
+
     public function getLocalImportCost(){
         $arr = [];
 

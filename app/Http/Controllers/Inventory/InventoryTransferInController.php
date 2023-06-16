@@ -290,7 +290,7 @@ class InventoryTransferInController extends Controller
                     }
                 }else{
                     $query = InventoryTransferIn::create([
-                        'code'			            => InventoryTransferIn::generateCode(),
+                        'code'			            => InventoryTransferIn::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'company_id'		        => $request->company_id,
                         'inventory_transfer_out_id' => $request->inventory_transfer_out_id,

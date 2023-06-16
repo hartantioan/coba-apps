@@ -29,9 +29,17 @@ class OperationAccess
         if($access > 0) {
             return $next($request);
         } else {
-
             if($request->isMethod('get')){
-                return abort(403);
+                if($request->ajax()){
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Ups. Anda tidak boleh menggunakan fitur ini.'
+                    ];
+                    
+                    return response()->json($response);
+                }else{
+                    return abort(403);
+                }
             }elseif($request->isMethod('post')){
                 $response = [
                     'status'  => 500,

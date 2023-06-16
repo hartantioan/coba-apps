@@ -105,7 +105,7 @@ class PurchaseRequest extends Model
         }
 	}
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = PurchaseRequest::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
@@ -121,7 +121,7 @@ class PurchaseRequest extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'PR-'.date('y').date('m').date('d').'-';
+        $pre = 'PR-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

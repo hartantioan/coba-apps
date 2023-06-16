@@ -267,7 +267,7 @@ class RequestSparepartController extends Controller
                 try {
                     
                     $query = RequestSparepart::create([
-                        'code'			            => RequestSparepart::generateCode(),
+                        'code'			            => RequestSparepart::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'work_order_id'             => $request->work_order_id,
                         'request_date'              => $request->request_date,

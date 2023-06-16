@@ -20,6 +20,7 @@ class GoodReturnPODetail extends Model
         'item_id',
         'qty',
         'note',
+        'note2',
     ];
 
     public function goodReturnPO()

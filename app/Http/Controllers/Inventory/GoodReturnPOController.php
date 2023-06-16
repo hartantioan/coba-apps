@@ -204,10 +204,16 @@ class GoodReturnPOController extends Controller
                             'unit'                      => $row->item->buyUnit->code,
                             'place_id'                  => $row->place_id,
                             'place_name'                => $row->place->name,
+                            'line_id'                   => $row->line_id ? $row->line_id : '',
+                            'line_name'                 => $row->line_id ? $row->line->name : '-',
+                            'machine_id'                => $row->machine_id ? $row->machine_id : '',
+                            'machine_name'              => $row->machine_id ? $row->machine->name : '-',
                             'department_id'             => $row->department_id ? $row->department_id : '',
                             'department_name'           => $row->department_id ? $row->department->name : '-',
                             'warehouse_id'              => $row->warehouse_id,
                             'warehouse_name'            => $row->warehouse->name,
+                            'note'                      => $row->note,
+                            'note2'                     => $row->note2,
                         ];
                     }
 
@@ -367,7 +373,7 @@ class GoodReturnPOController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = GoodReturnPO::create([
-                        'code'			        => GoodReturnPO::generateCode(),
+                        'code'			        => GoodReturnPO::generateCode($request->post_date),
                         'user_id'		        => session('bo_id'),
                         'account_id'            => $request->account_id,
                         'company_id'            => $request->company_id,
@@ -398,6 +404,7 @@ class GoodReturnPOController extends Controller
                             'item_id'                   => $request->arr_item[$key],
                             'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                      => $request->arr_note[$key],
+                            'note2'                     => $request->arr_note2[$key],
                         ]);
                     }
 
@@ -439,7 +446,7 @@ class GoodReturnPOController extends Controller
                             <table class="bordered" style="min-width:100%;max-width:100%;">
                                 <thead>
                                     <tr>
-                                        <th class="center-align" colspan="11">Daftar Item</th>
+                                        <th class="center-align" colspan="12">Daftar Item</th>
                                     </tr>
                                     <tr>
                                         <th class="center-align">No.</th>
@@ -448,7 +455,8 @@ class GoodReturnPOController extends Controller
                                         <th class="center-align">Qty Diterima</th>
                                         <th class="center-align">Qty Dikembalikan</th>
                                         <th class="center-align">Satuan</th>
-                                        <th class="center-align">Keterangan</th>
+                                        <th class="center-align">Keterangan 1</th>
+                                        <th class="center-align">Keterangan 2</th>
                                         <th class="center-align">Plant</th>
                                         <th class="center-align">Departemen</th>
                                         <th class="center-align">Gudang</th>
@@ -465,7 +473,8 @@ class GoodReturnPOController extends Controller
                 <td class="center-align">'.number_format($rowdetail->goodReceiptDetail->qty,3,',','.').'</td>
                 <td class="center-align">'.number_format($rowdetail->qty,3,',','.').'</td>
                 <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
-                <td class="center-align">'.$rowdetail->note.'</td>
+                <td class="">'.$rowdetail->note.'</td>
+                <td class="">'.$rowdetail->note2.'</td>
                 <td class="center-align">'.$rowdetail->goodReceiptDetail->place->name.' - '.$rowdetail->goodReceiptDetail->place->company->name.'</td>
                 <td class="center-align">'.($rowdetail->goodReceiptDetail->department_id ? $rowdetail->goodReceiptDetail->department->name : '-').'</td>
                 <td class="center-align">'.$rowdetail->goodReceiptDetail->warehouse->name.'</td>
@@ -542,9 +551,12 @@ class GoodReturnPOController extends Controller
                 'qty_received'              => number_format($row->goodReceiptDetail->qty,3,',','.'),
                 'unit'                      => $row->item->buyUnit->code,
                 'note'                      => $row->note,
+                'note2'                     => $row->note2,
                 'place_name'                => $row->goodReceiptDetail->place->name.' - '.$row->goodReceiptDetail->place->company->name,
+                'line_name'                 => $row->goodReceiptDetail->line_id ? $row->goodReceiptDetail->line->name : '-',
+                'machine_name'              => $row->goodReceiptDetail->machine_id ? $row->goodReceiptDetail->machine->name : '-',
                 'department_name'           => $row->goodReceiptDetail->department_id ? $row->goodReceiptDetail->department->name : '-',
-                'warehouse_name'            => $row->goodReceiptDetail->warehouse->name
+                'warehouse_name'            => $row->goodReceiptDetail->warehouse->name,
             ];
         }
 

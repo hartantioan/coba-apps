@@ -264,7 +264,7 @@ class InventoryRevaluationController extends Controller
                     }
                 }else{
                     $query = InventoryRevaluation::create([
-                        'code'			        => InventoryRevaluation::generateCode(),
+                        'code'			        => InventoryRevaluation::generateCode($request->post_date),
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,

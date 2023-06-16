@@ -405,7 +405,7 @@ class CloseBillController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = CloseBill::create([
-                        'code'			            => CloseBill::generateCode(),
+                        'code'			            => CloseBill::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'post_date'                 => $request->post_date,

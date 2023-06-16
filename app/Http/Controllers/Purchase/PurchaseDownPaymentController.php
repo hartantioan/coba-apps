@@ -83,9 +83,6 @@ class PurchaseDownPaymentController extends Controller
             'user_id',
             'account_id',
             'company_id',
-            'is_tax',
-            'is_included_tax',
-            'percent_tax',
             'type',
             'document',
             'post_date',
@@ -95,8 +92,6 @@ class PurchaseDownPaymentController extends Controller
             'note',
             'subtotal',
             'discount',
-            'total',
-            'tax',
             'grandtotal'
         ];
 
@@ -260,9 +255,6 @@ class PurchaseDownPaymentController extends Controller
                     $val->user->name,
                     $val->supplier->name,
                     $val->company->name,
-                    $val->isTax(),
-                    $val->isIncludeTax(),
-                    number_format($val->percent_tax,2,',','.'),
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     date('d M Y',strtotime($val->post_date)),
@@ -272,8 +264,6 @@ class PurchaseDownPaymentController extends Controller
                     $val->note,
                     number_format($val->subtotal,2,',','.'),
                     number_format($val->discount,2,',','.'),
-                    number_format($val->total,2,',','.'),
-                    number_format($val->tax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     '
@@ -335,18 +325,10 @@ class PurchaseDownPaymentController extends Controller
             $grandtotal = 0;
             $subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
             $discount = str_replace(',','.',str_replace('.','',$request->discount));
-            $percent_tax = $request->percent_tax;
 
             $total = $subtotal - $discount;
 
-            if($request->tax_id > 0){
-                if($request->is_include_tax){
-                    $total = $total / (1 + ($percent_tax / 100));
-                }
-                $tax = $total * ($percent_tax / 100);
-            }
-
-            $grandtotal = round($total + $tax,3);
+            $grandtotal = $total;
 
 
 			if($request->temp){
@@ -393,9 +375,9 @@ class PurchaseDownPaymentController extends Controller
                         $query->account_id = $request->supplier_id;
                         $query->type = $request->type;
                         $query->company_id = $request->company_id;
-                        $query->tax_id = $request->tax_id;
-                        $query->is_tax = $request->tax_id > 0 ? '1' : NULL;
-                        $query->is_include_tax = $request->is_include_tax ? $request->is_include_tax : '0';
+                        $query->tax_id = 0;
+                        $query->is_tax = NULL;
+                        $query->is_include_tax = '0';
                         $query->percent_tax = $request->percent_tax;
                         $query->document = $document;
                         $query->currency_id = $request->currency_id;
@@ -406,7 +388,7 @@ class PurchaseDownPaymentController extends Controller
                         $query->subtotal = round($subtotal,3);
                         $query->discount = $discount;
                         $query->total = round($total,3);
-                        $query->tax = round($tax,3);
+                        $query->tax = 0;
                         $query->grandtotal = round($grandtotal,3);
                         $query->status = '1';
 
@@ -430,15 +412,15 @@ class PurchaseDownPaymentController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseDownPayment::create([
-                        'code'			            => PurchaseDownPayment::generateCode(),
+                        'code'			            => PurchaseDownPayment::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
                         'type'	                    => $request->type,
                         'company_id'                => $request->company_id,
-                        'tax_id'                    => $request->tax_id,
-                        'is_tax'                    => $request->tax_id > 0 ? '1' : NULL,
-                        'is_include_tax'            => $request->is_include_tax ? $request->is_include_tax : '0',
-                        'percent_tax'               => $request->percent_tax,
+                        'tax_id'                    => 0,
+                        'is_tax'                    => NULL,
+                        'is_include_tax'            => '0',
+                        'percent_tax'               => 0,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/purchase_down_payments') : NULL,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
@@ -482,7 +464,7 @@ class PurchaseDownPaymentController extends Controller
 
                 CustomHelper::sendApproval('purchase_down_payments',$query->id,$query->note);
                 CustomHelper::sendNotification('purchase_down_payments',$query->id,'Pengajuan Purchase Down Payment No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::addDeposit($query->account_id,$grandtotal);
+                CustomHelper::addDeposit($query->account_id,$total);
 
                 activity()
                     ->performedOn(new PurchaseDownPayment())
@@ -640,7 +622,7 @@ class PurchaseDownPaymentController extends Controller
                 ];
             }else{
                 
-                CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
+                CustomHelper::removeDeposit($query->account_id,$query->total);
                 CustomHelper::removeApproval('purchase_down_payments',$query->id);
                 CustomHelper::removeJournal('purchase_down_payments',$query->id);
 

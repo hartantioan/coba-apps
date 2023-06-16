@@ -190,7 +190,7 @@ class PurchaseDownPayment extends Model
         }
 	}
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = PurchaseDownPayment::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
@@ -206,7 +206,7 @@ class PurchaseDownPayment extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'PODP-'.date('y').date('m').date('d').'-';
+        $pre = 'PODP-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

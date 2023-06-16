@@ -363,7 +363,7 @@ class Select2Controller extends Controller {
                         ->orWhere('name', 'like', "%$search%");
                 })
                 ->where('status','1')
-                ->whereNull('nominal')
+                ->whereNull('date')
                 ->get();
 
         foreach($data as $d) {
@@ -498,9 +498,11 @@ class Select2Controller extends Controller {
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('goodIssueDetail',function($query) use($search){
-                                $query->whereHas('item',function($query) use($search){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
+                                $query->whereHas('itemStock',function($query) use($search){
+                                    $query->whereHas('item',function($query) use($search){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
                                 });
                             })
                             ->orWhereHas('user',function($query) use($search){
@@ -922,7 +924,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name.' - '.$d->company->name,
+                'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
                 'must_bp'       => $d->bp_journal ? '1' : '',
             ];
         }
@@ -1092,7 +1094,7 @@ class Select2Controller extends Controller {
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' - '.$d->name,
                 'coa_id'            => $d->coa_id ? $d->coa_id : '',
-                'coa_name'          => $d->coa_id ? $d->coa->code.' - '.$d->coa->name : '',
+                'coa_name'          => $d->coa_id ? ($d->coa->prefix ? $d->coa->prefix.' ' : '').''.$d->coa->code.' - '.$d->coa->name : '',
                 'details'           => $details,
             ];
         }

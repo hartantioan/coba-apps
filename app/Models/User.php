@@ -28,6 +28,7 @@ class User extends Authenticatable
         'address',
         'province_id',
         'city_id',
+        'subdistrict_id',
         'id_card',
         'id_card_address',
         'type',
@@ -246,6 +247,10 @@ class User extends Authenticatable
 
     public function city(){
         return $this->belongsTo('App\Models\Region','city_id','id')->withTrashed();
+    }
+
+    public function subdistrict(){
+        return $this->belongsTo('App\Models\Region','subdistrict_id','id')->withTrashed();
     }
 
     public function country(){

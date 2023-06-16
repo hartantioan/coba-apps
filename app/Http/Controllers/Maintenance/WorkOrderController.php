@@ -292,7 +292,7 @@ class WorkOrderController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = WorkOrder::create([
-                        'code'			            => WorkOrder::generateCode(),
+                        'code'			            => WorkOrder::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'place_id'                  => $request->place_id,
                         'equipment_id'              => $request->equipment_id,

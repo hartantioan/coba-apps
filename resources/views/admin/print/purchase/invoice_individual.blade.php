@@ -285,7 +285,9 @@
                         <thead>
                             <tr>
                                 <th class="center-align" width="5%">No.</th>
-                                <th class="center-align" width="50%">Penerimaan Barang / Landed Cost / Purchase Order</th>
+                                <th class="center-align" width="50%">GRPO/LC/PO</th>
+                                <th class="center-align">Ket.1</th>
+                                <th class="center-align">Ket.2</th>
                                 <th class="center-align" width="10%" style="max-width:10%">Total</th>
                                 <th class="center-align" width="10%" style="max-width:10%">PPN</th>
                                 <th class="center-align" width="10%" style="max-width:10%">PPH</th>
@@ -299,6 +301,8 @@
                                 <td class="center-align">{{ 
                                     $row->getCode()
                                 }}</td>
+                                <td class="">{{ $row->note }}</td>
+                                <td class="">{{ $row->note2 }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->total,2,',','.') }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->tax,2,',','.') }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->wtax,2,',','.') }}</td>

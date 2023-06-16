@@ -278,7 +278,7 @@ class GoodIssueController extends Controller
                     }
                 }else{
                     $query = GoodIssue::create([
-                        'code'			        => GoodIssue::generateCode(),
+                        'code'			        => GoodIssue::generateCode($request->post_date),
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,

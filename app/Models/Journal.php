@@ -107,7 +107,7 @@ class Journal extends Model
         return $status;
     }
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = Journal::selectRaw('RIGHT(code, 11) as code')
             ->withTrashed()
@@ -123,7 +123,7 @@ class Journal extends Model
 
         $no = str_pad($code, 11, 0, STR_PAD_LEFT);
 
-        $pre = 'JR-'.date('y').date('m').date('d').'-';
+        $pre = 'JR-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

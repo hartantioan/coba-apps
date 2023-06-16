@@ -255,7 +255,8 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectAll',
+                'selectNone',
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",

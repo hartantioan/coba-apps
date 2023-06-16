@@ -26,6 +26,7 @@ class OutgoingPayment extends Model
         'currency_rate',
         'post_date',
         'pay_date',
+        'cost_distribution_id',
         'admin',
         'grandtotal',
         'document',
@@ -39,6 +40,11 @@ class OutgoingPayment extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
     }
 
     public function voidUser()
@@ -119,7 +125,7 @@ class OutgoingPayment extends Model
         }
 	}
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = OutgoingPayment::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
@@ -135,7 +141,7 @@ class OutgoingPayment extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'OP-'.date('y').date('m').date('d').'-';
+        $pre = 'OP-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

@@ -96,7 +96,7 @@ class InventoryTransferIn extends Model
         }
 	}
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = InventoryTransferIn::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
@@ -112,7 +112,7 @@ class InventoryTransferIn extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'ITI-'.date('y').date('m').date('d').'-';
+        $pre = 'ITI-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

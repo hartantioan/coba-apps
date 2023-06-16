@@ -218,7 +218,8 @@
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan</th>
-                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Keterangan 1</th>
+                                                    <th class="center">Keterangan 2</th>
                                                     <th class="center">Remark</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
@@ -230,7 +231,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="11" class="center">
+                                                    <td colspan="12" class="center">
                                                         Pilih purchase order untuk memulai...
                                                     </td>
                                                 </tr>
@@ -491,7 +492,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="11" class="center">
+                            <td colspan="12" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -579,7 +580,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="11" class="center">
+                        <td colspan="12" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -684,7 +685,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="11" class="center">
+                        <td colspan="12" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -1118,7 +1119,10 @@
                                             <span>` + val.unit + `</span>
                                         </td>
                                         <td>
-                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + response.code + `" style="width:100%;">
+                                            <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;">
+                                        </td>
+                                        <td>
+                                            <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note2 + `" style="width:100%;">
                                         </td>
                                         <td>
                                             <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="-" style="width:100%;">
@@ -1170,7 +1174,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="11" class="center">
+                        <td colspan="12" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -1198,7 +1202,7 @@
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="11" class="center">
+                            <td colspan="12" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -1273,6 +1277,9 @@
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note + `" style="width:100%;">
+                                </td>
+                                <td>
+                                    <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.note2 + `" style="width:100%;">
                                 </td>
                                 <td>
                                     <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.remark + `"  style="width:100%;">
@@ -1586,14 +1593,20 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal6').modal('open');
-                $('#title_data').html(data.title);
-                $('#code_data').html(data.message.code);
-                $('#body-journal-table').html(data.tbody);
-                $('#user_jurnal').html('Pengguna '+data.user);
-                $('#note_jurnal').html('Keterangan '+data.message.note);
-                $('#ref_jurnal').html( 'Referensi '+data.reference);
-                $('#post_date_jurnal').html('Tanggal '+data.message.post_date);
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal6').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna `+data.user);
+                    $('#note_jurnal').append(`Keterangan `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi `+data.reference);
+                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                }
             }
         });
     }

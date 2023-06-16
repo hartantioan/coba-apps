@@ -27,6 +27,7 @@ class PaymentRequest extends Model
         'pay_date',
         'currency_id',
         'currency_rate',
+        'cost_distribution_id',
         'admin',
         'grandtotal',
         'document',
@@ -43,6 +44,11 @@ class PaymentRequest extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
     }
 
     public function voidUser()
@@ -140,7 +146,7 @@ class PaymentRequest extends Model
         }
 	}
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = PaymentRequest::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
@@ -156,7 +162,7 @@ class PaymentRequest extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'PYR-'.date('y').date('m').date('d').'-';
+        $pre = 'PYR-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

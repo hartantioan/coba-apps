@@ -360,6 +360,7 @@ class PurchaseOrderController extends Controller
                                 'unit'                          => $row->item->buyUnit->code,
                                 'qty'                           => number_format($row->qtyBalance(),3,',','.'),
                                 'note'                          => $row->note,
+                                'note2'                         => $row->note2,
                                 'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
                                 'warehouse_id'                  => $row->warehouse_id,
                                 'place_id'                      => $row->place_id,
@@ -373,18 +374,19 @@ class PurchaseOrderController extends Controller
                     foreach($data->goodIssueDetail as $row){
                         $details[] = [
                             'reference_id'                  => $row->id,
-                            'item_id'                       => $row->item_id,
-                            'item_name'                     => $row->item->code.' - '.$row->item->name,
-                            'old_prices'                    => $row->item->oldPrices($this->dataplaces),
-                            'unit'                          => $row->item->buyUnit->code,
+                            'item_id'                       => $row->itemStock->item_id,
+                            'item_name'                     => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
+                            'old_prices'                    => $row->itemStock->item->oldPrices($this->dataplaces),
+                            'unit'                          => $row->itemStock->item->buyUnit->code,
                             'qty'                           => number_format($row->qtyConvertToBuy(),3,',','.'),
                             'note'                          => $row->note,
-                            'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
-                            'warehouse_id'                  => $row->warehouse_id,
-                            'place_id'                      => $row->place_id,
+                            'note2'                         => '',
+                            'warehouse_name'                => $row->itemStock->warehouse->code.' - '.$row->itemStock->warehouse->name,
+                            'warehouse_id'                  => $row->itemStock->warehouse_id,
+                            'place_id'                      => $row->itemStock->place_id,
                             'line_id'                       => '',
                             'machine_id'                    => '',
-                            'department_id'                 => $row->department_id,
+                            'department_id'                 => '',
                         ];
                     }
                 }
@@ -608,7 +610,7 @@ class PurchaseOrderController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseOrder::create([
-                        'code'			            => PurchaseOrder::generateCode(),
+                        'code'			            => PurchaseOrder::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
                         'inventory_type'	        => $request->inventory_type,
@@ -675,6 +677,7 @@ class PurchaseOrderController extends Controller
                                     'discount_3'                    => $disc3,
                                     'subtotal'                      => $rowsubtotal,
                                     'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
+                                    'note2'                         => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
                                     'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
                                     'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
                                     'percent_tax'                   => $request->arr_tax[$key],
@@ -724,6 +727,7 @@ class PurchaseOrderController extends Controller
                                     'discount_3'                    => $disc3,
                                     'subtotal'                      => $rowsubtotal,
                                     'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
+                                    'note2'                         => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
                                     'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
                                     'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
                                     'percent_tax'                   => $request->arr_tax[$key],
@@ -776,7 +780,7 @@ class PurchaseOrderController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="16">Daftar Item</th>
+                                <th class="center-align" colspan="17">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -788,7 +792,8 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Discount 2 (%)</th>
                                 <th class="center-align">Discount 3 (Rp)</th>
                                 <th class="center-align">Subtotal</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Keterangan 1</th>
+                                <th class="center-align">Keterangan 2</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
@@ -809,7 +814,8 @@ class PurchaseOrderController extends Controller
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->subtotal,2,',','.').'</td>
-                <td class="center-align">'.$row->note.'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="">'.$row->note2.'</td>
                 <td class="center-align">'.$row->place->name.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
@@ -877,6 +883,7 @@ class PurchaseOrderController extends Controller
                 'qty'                               => number_format($row->qty,3,',','.'),
                 'unit'                              => $row->item_id ? $row->item->buyUnit->code : '-',
                 'note'                              => $row->note,
+                'note2'                             => $row->note2,
                 'price'                             => number_format($row->price,2,',','.'),
                 'disc1'                             => number_format($row->percent_discount_1,2,',','.'),
                 'disc2'                             => number_format($row->percent_discount_2,2,',','.'),

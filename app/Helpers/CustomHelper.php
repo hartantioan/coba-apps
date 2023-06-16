@@ -19,6 +19,7 @@ use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
 use App\Models\GoodReturnPO;
+use App\Models\IncomingPayment;
 use App\Models\InventoryRevaluation;
 use App\Models\InventoryTransferIn;
 use App\Models\InventoryTransferOut;
@@ -311,7 +312,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> 'good_receipts',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $data->post_date,
@@ -380,7 +381,7 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> 'retirements',
 				'lookable_id'	=> $ret->id,
 				'currency_id'	=> $ret->currency_id,
@@ -455,13 +456,92 @@ class CustomHelper {
 
 				self::updateBalanceAsset($row->asset_id,$row->asset->book_balance,'OUT');
 			}
+		
+		}elseif($table_name == 'incoming_payments'){
+
+			$ip = IncomingPayment::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode($data->post_date),
+				'lookable_type'	=> 'incoming_payments',
+				'lookable_id'	=> $ip->id,
+				'currency_id'	=> $ip->currency_id,
+				'currency_rate'	=> $ip->currency_rate,
+				'post_date'		=> $ip->post_date,
+				'note'			=> $ip->code,
+				'status'		=> '3'
+			]);
+			
+			if($ip){
+				if($ip->wtax > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $ip->wTaxMaster->coa_purchase_id,
+						'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
+						'type'			=> '1',
+						'nominal'		=> $ip->wtax * $ip->currency_rate,
+					]);
+				}
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $ip->coa_id,
+					'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
+					'type'			=> '1',
+					'nominal'		=> $ip->grandtotal * $ip->currency_rate,
+				]);
+
+				foreach($ip->incomingPaymentDetail as $row){
+					if($row->lookable_type == 'coas'){
+						if($row->cost_distribution_id){
+							$total = $row->subtotal;
+							$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+							$accumulation = 0;
+							foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+								if($key == $lastIndex){
+									$nominal = $total - $accumulation;
+								}else{
+									$nominal = round(($rowcost->percentage / 100) * $total);
+									$accumulation += $nominal;
+								}
+								JournalDetail::create([
+									'journal_id'                    => $query->id,
+									'cost_distribution_detail_id'   => $rowcost->id,
+									'coa_id'                        => $row->lookable_id,
+									'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+									'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+									'account_id'                    => $ip->account_id ? $ip->account_id : NULL,
+									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+									'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+									'type'                          => '2',
+									'nominal'                       => $nominal * $ip->currency_rate,
+									'note'							=> $row->note,
+								]);
+							}
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->lookable_id,
+								'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> $row->subtotal * $ip->currency_rate,
+								'note'			=> $row->note,
+							]);
+						}
+					}else{
+
+					}
+				}
+			}
 
 		}elseif($table_name == 'outgoing_payments'){
 			$op = OutgoingPayment::find($table_id);
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> 'outgoing_payments',
 				'lookable_id'	=> $op->id,
 				'currency_id'	=> $op->currency_id,
@@ -474,7 +554,7 @@ class CustomHelper {
 			foreach($op->paymentRequest->paymentRequestDetail as $row){
 				if($row->cost_distribution_id){
 					$total = $row->nominal;
-					$lastIndex = $row->costDistribution->costDistributionDetail()->count() - 1;
+					$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
 					$accumulation = 0;
 					foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
 						if($key == $lastIndex){
@@ -494,7 +574,7 @@ class CustomHelper {
 							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
 							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
 							'type'                          => '1',
-							'nominal'                       => $nominal
+							'nominal'                       => $nominal * $op->currency_rate
 						]);
 					}
 				}else{
@@ -505,33 +585,46 @@ class CustomHelper {
 						'place_id'		=> $row->lookable_type == 'fund_requests' ? $row->lookable->place_id : NULL,
 						'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->nominal,
+						'nominal'		=> $row->nominal * $op->currency_rate,
 					]);
 				}
 			}
 
-			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
-				$query->where('table_name',$table_name);
-			})
-			->whereHas('coa', function($query) use($data){
-				$query->where('company_id',$data->company_id);
-			})->get();
-
-			if(count($journalMap) > 0){
-				$arrdata = get_object_vars($data);
-
-				foreach($journalMap as $row){
-					$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
-
-					if($nominal > 0){
+			if($op->admin > 0){
+				$coa_admin = Coa::where('code','701.01.01.01.04')->where('company_id',$op->company_id)->first();
+				if($op->cost_distribution_id){
+					$total = $op->admin;
+					$lastIndex = count($op->costDistribution->costDistributionDetail) - 1;
+					$accumulation = 0;
+					foreach($op->costDistribution->costDistributionDetail as $key => $rowcost){
+						if($key == $lastIndex){
+							$nominal = $total - $accumulation;
+						}else{
+							$nominal = round(($rowcost->percentage / 100) * $total);
+							$accumulation += $nominal;
+						}
 						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->coa_id,
-							'account_id'	=> $op->account_id,
-							'type'			=> $row->type,
-							'nominal'		=> $nominal
+							'journal_id'                    => $query->id,
+							'cost_distribution_detail_id'   => $rowcost->id,
+							'coa_id'                        => $coa_admin ? $coa_admin->id : NULL,
+							'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+							'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+							'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+							'account_id'                    => $op->account_id,
+							'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+							'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+							'type'                          => '1',
+							'nominal'                       => $nominal * $op->currency_rate
 						]);
 					}
+				}else{
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coa_admin ? $coa_admin->id : NULL,
+						'account_id'	=> $op->account_id,
+						'type'			=> '1',
+						'nominal'		=> $row->nominal * $op->currency_rate,
+					]);
 				}
 			}
 
@@ -540,7 +633,7 @@ class CustomHelper {
 				'coa_id'		=> $op->coa_source_id,
 				'account_id'	=> $op->account_id,
 				'type'			=> '2',
-				'nominal'		=> $op->grandtotal,
+				'nominal'		=> $op->grandtotal * $op->currency_rate,
 			]);
 
 		}elseif($table_name == 'good_receives'){
@@ -549,7 +642,7 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> 'good_receives',
 				'lookable_id'	=> $gr->id,
 				'currency_id'	=> $gr->currency_id,
@@ -607,7 +700,7 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> 'good_returns',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $gr->post_date,
@@ -673,7 +766,7 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> 'good_issues',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $gr->post_date,
@@ -731,7 +824,7 @@ class CustomHelper {
 			if($lc){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
-					'code'			=> Journal::generateCode(),
+					'code'			=> Journal::generateCode($data->post_date),
 					'lookable_type'	=> 'landed_costs',
 					'lookable_id'	=> $lc->id,
 					'post_date'		=> $data->post_date,
@@ -824,7 +917,7 @@ class CustomHelper {
 			if($ir){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
-					'code'			=> Journal::generateCode(),
+					'code'			=> Journal::generateCode($data->post_date),
 					'lookable_type'	=> $ir->getTable(),
 					'lookable_id'	=> $ir->id,
 					'post_date'		=> $data->post_date,
@@ -894,7 +987,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'currency_id'	=> $data->currency_id,
@@ -930,7 +1023,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -995,7 +1088,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -1054,7 +1147,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -1093,7 +1186,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -1121,7 +1214,7 @@ class CustomHelper {
 					if($row->tax > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->taxMaster->coa_id,
+							'coa_id'		=> $row->taxMaster->coa_purchase_id,
 							'account_id'	=> $row->lookable->purchaseInvoice->account_id,
 							'type'			=> '1',
 							'nominal'		=> -1 * $row->tax,
@@ -1131,7 +1224,7 @@ class CustomHelper {
 					if($row->wtax > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->wTaxMaster->coa_id,
+							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
 							'account_id'	=> $row->lookable->purchaseInvoice->account_id,
 							'type'			=> '2',
 							'nominal'		=> -1 * $row->wtax,
@@ -1164,7 +1257,7 @@ class CustomHelper {
 					if($row->tax > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->taxMaster->coa_id,
+							'coa_id'		=> $row->taxMaster->coa_purchase_id,
 							'account_id'	=> $row->lookable->account_id,
 							'type'			=> '1',
 							'nominal'		=> -1 * $row->tax,
@@ -1174,7 +1267,7 @@ class CustomHelper {
 					if($row->wtax > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->wTaxMaster->coa_id,
+							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
 							'account_id'	=> $row->lookable->account_id,
 							'type'			=> '2',
 							'nominal'		=> -1 * $row->wtax,
@@ -1199,7 +1292,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -1236,7 +1329,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode(),
+				'code'			=> Journal::generateCode($data->post_date),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'currency_id'	=> isset($data->currency_id) ? $data->currency_id : NULL,
@@ -1335,7 +1428,7 @@ class CustomHelper {
 				if($row->tax_id){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->taxMaster->coa_id,
+						'coa_id'		=> $row->taxMaster->coa_purchase_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
@@ -1351,7 +1444,7 @@ class CustomHelper {
 				if($row->wtax_id){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->wTaxMaster->coa_id,
+						'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
@@ -1431,7 +1524,7 @@ class CustomHelper {
 
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
-					'code'			=> Journal::generateCode(),
+					'code'			=> Journal::generateCode($data->post_date),
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 					'currency_id'	=> isset($data->currency_id) ? $data->currency_id : NULL,

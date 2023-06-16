@@ -19,7 +19,7 @@ class WorkOrderPartDetail extends Model
         'part_id'
     ];
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = WorkOrderPartDetail::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
@@ -35,7 +35,7 @@ class WorkOrderPartDetail extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'WOPD-'.date('y').date('m').date('d').'-';
+        $pre = 'WOPD-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

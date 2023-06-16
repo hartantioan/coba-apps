@@ -133,32 +133,29 @@
                                             <table id="datatable_serverside">
                                                 <thead>
                                                     <tr>
-                                                        <th rowspan="2">#</th>
-                                                        <th rowspan="2">Code</th>
-                                                        <th rowspan="2">Pengguna</th>
-                                                        <th rowspan="2">Partner Bisnis</th>
-                                                        <th rowspan="2">Perusahaan</th>
-                                                        <th rowspan="2">Kas/Bank</th>
-                                                        <th rowspan="2">Tipe Pembayaran</th>
-                                                        <th rowspan="2">No.Cek/BG</th>
-                                                        <th colspan="2" class="center-align">Tanggal</th>
+                                                        <th rowspan="2" class="center-align">#</th>
+                                                        <th rowspan="2" class="center-align">Code</th>
+                                                        <th rowspan="2" class="center-align">Pengguna</th>
+                                                        <th rowspan="2" class="center-align">Partner Bisnis</th>
+                                                        <th rowspan="2" class="center-align">Perusahaan</th>
+                                                        <th rowspan="2" class="center-align">Kas/Bank</th>
+                                                        <th rowspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
-                                                        <th rowspan="2">Admin</th>
-                                                        <th rowspan="2">Bayar</th>
-                                                        <th rowspan="2">Dokumen</th>
-                                                        <th rowspan="2">Bank Rekening</th>
-                                                        <th rowspan="2">No Rekening</th>
-                                                        <th rowspan="2">Pemilik Rekening</th>
-                                                        <th rowspan="2">Keterangan</th>
-                                                        <th rowspan="2">Status</th>
-                                                        <th rowspan="2">Action</th>
-                                                        <th rowspan="2">Kas/Bank Keluar</th>
+                                                        <th rowspan="2" class="center-align">Total</th>
+                                                        <th colspan="3" class="center-align">PPH</th>
+                                                        <th rowspan="2" class="center-align">Grandtotal</th>
+                                                        <th rowspan="2" class="center-align">Dokumen</th>
+                                                        <th rowspan="2" class="center-align">Keterangan</th>
+                                                        <th rowspan="2" class="center-align">Proyek</th>
+                                                        <th rowspan="2" class="center-align">Status</th>
+                                                        <th rowspan="2" class="center-align">Action</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>Post</th>
-                                                        <th>Bayar</th>
                                                         <th>Kode</th>
                                                         <th>Konversi</th>
+                                                        <th>Kode</th>
+                                                        <th>%</th>
+                                                        <th>Nominal</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -189,10 +186,6 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
-                                <label class="active" for="account_id">Partner Bisnis</label>
-                            </div>
-                            <div class="input-field col m3 s12">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
                                         <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -201,33 +194,16 @@
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="browser-default" id="coa_source_id" name="coa_source_id"></select>
-                                <label class="active" for="coa_source_id">Kas / Bank</label>
+                                <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
+                                <label class="active" for="account_id">Partner Bisnis <i>(Pilih untuk MO.Invoice)</i></label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="form-control" id="payment_type" name="payment_type" onchange="showRekening();">
-                                    <option value="1">Tunai</option>
-                                    <option value="2">Transfer</option>
-                                    <option value="3">Cek</option>
-                                    <option value="4">BG</option>
-                                </select>
-                                <label class="" for="payment_type">Tipe Pembayaran</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="payment_no" name="payment_no" type="text" value="-">
-                                <label class="active" for="payment_no">No. CEK/BG</label>
+                                <select class="browser-default" id="coa_id" name="coa_id"></select>
+                                <label class="active" for="coa_id">Kas / Bank</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                                <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="top" name="top" min="0" type="number" value="0" readonly>
-                                <label class="active" for="top">TOP (hari) Autofill</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="pay_date" name="pay_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar">
-                                <label class="active" for="pay_date">Tgl. Bayar</label>
+                                <label class="active" for="post_date">Tgl. Transfer</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -250,61 +226,34 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="col m12" id="rekening-element" style="display:none;">
-                                <h6>Rekening (Jika transfer)</h6>
-                                <div class="input-field col m3 s12">
-                                    <select class="form-control" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
-                                        <option value="">--Pilih Partner Bisnis-</option>
-                                    </select>
-                                    <label class="" for="user_bank_id">Pilih Dari Daftar</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input id="account_bank" name="account_bank" type="text" placeholder="Bank Tujuan" readonly>
-                                    <label class="active" for="account_bank">Bank Tujuan</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input id="account_no" name="account_no" type="text" placeholder="No Rekening Tujuan" readonly>
-                                    <label class="active" for="account_no">No Rekening</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input id="account_name" name="account_name" type="text" placeholder="Nama Pemilik Rekening" readonly>
-                                    <label class="active" for="account_name">Nama Pemilik Rekening</label>
-                                </div>
-                            </div>
-                            <div class="col m12 s12">
-                                <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
+                            <div class="input-field col m3 s12">
+                                <select class="browser-default" id="project_id" name="project_id"></select>
+                                <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h6>Detail Req. Dana / Uang Muka Pembelian / A/P Invoice</h6>
+                                    <h6>Detail MO.Invoice / Coa</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered" style="max-width:1650px !important;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center" width="10%">
-                                                        <label>
-                                                            <input type="checkbox" onclick="chooseAll(this)">
-                                                            <span>Semua</span>
-                                                        </label>
-                                                    </th>
-                                                    <th class="center">Referensi</th>
+                                                    <th class="center">MO.Invoice/Coa</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Tenggat</th>
                                                     <th class="center">Total</th>
-                                                    <th class="center">PPN</th>
-                                                    <th class="center">PPH</th>
-                                                    <th class="center">Grandtotal</th>
-                                                    <th class="center">Potongan/Memo</th>
-                                                    <th class="center">Bayar</th>
-                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Pembulatan</th>
+                                                    <th class="center">Subtotal</th>
                                                     <th class="center">Dist.Biaya</th>
-                                                    <th class="center">Coa</th>
+                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail">
-                                                <tr id="empty-detail">
-                                                    <td colspan="12" class="center">
-                                                        Pilih supplier/vendor untuk memulai...
+                                                <tr id="last-row-detail">
+                                                    <td colspan="8" class="center">
+                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                            <i class="material-icons left">add</i> Tambah Baris
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -316,25 +265,36 @@
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="input-field col m3 s12">
-                                
+                            <div class="input-field col m4 s12">
+                                <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
                             </div>
-                            <div class="input-field col m5 s12">
+                            <div class="input-field col m4 s12">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
-                                            <td width="33%">Biaya Admin</td>
-                                            <td width="33%">
-                                                <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
-                                            </td>
-                                            <td class="right-align" width="33%">
-                                                <input class="browser-default" id="admin" name="admin" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                            <td colspan="2">Total</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="2">Total Bayar</td>
+                                            <td width="25%">PPH</td>
+                                            <td width="30%">
+                                                <select class="browser-default" id="wtax_id" name="wtax_id" onchange="countAll();">
+                                                    <option value="0" data-id="">-- Non-PPH --</option>
+                                                    @foreach ($wtax as $row2)
+                                                        <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}" {{ $row2->is_default_pph ? 'selected' : '' }}>{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td width="45%" class="right-align">
+                                                <input class="browser-default" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Diterima</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                             </td>
                                         </tr>
                                     </thead>
@@ -442,6 +402,45 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
+<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-header ml-2">
+        <h5>Daftar Tunggakan Dokumen <b id="account_name"></b></h5>
+    </div>
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <div class="collapsible-header purple lightrn-1 white-text">
+                            <i class="material-icons">layers</i> MO Invoice (COMING SOON...)
+                        </div>
+                        <div class="collapsible-body">
+                            <div id="datatable_buttons_multi"></div>
+                            <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                            <table id="table_multi" class="display" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th class="center-align">GR/LC/PO No.</th>
+                                        <th class="center-align">Tgl.Post</th>
+                                        <th class="center-align">Grandtotal</th>
+                                        <th class="center-align">Ter-Invoice</th>
+                                        <th class="center-align">Sisa</th>
+                                        <th class="center-align">Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-detail-multi"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
@@ -504,25 +503,17 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('.row_purchase').each(function(){
-                    $(this).remove();
-                });
                 M.updateTextFields();
-                $('#body-detail').empty().append(`
-                    <tr id="empty-detail">
-                        <td colspan="12" class="center">
-                            Pilih supplier/vendor untuk memulai...
-                        </td>
-                    </tr>
-                `);
-                $('#account_id,#cost_distribution_id').empty();
-                $('#admin,#grandtotal').val('0,00');
+                $('.row_detail').remove();
+                $('#account_id,#project_id').empty();
+                $('#total,#wtax,#grandtotal').text('0,00');
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }
                 window.onbeforeunload = function() {
                     return null;
                 };
+                countAll();
             }
         });
 
@@ -590,182 +581,66 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+            }
+        });
+
+        $('#modal6').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+
+            },
+            onCloseEnd: function(modal, trigger){
                 
             }
         });
 
-        $('#body-detail').on('click', '.delete-data-detail', function() {
-            $(this).closest('tr').remove();
-            countAll();
-        });
-
+        select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
-        select2ServerSide('#coa_source_id', '{{ url("admin/select2/coa_cash_bank") }}');
-        select2ServerSide('#cost_distribution_id', '{{ url("admin/select2/cost_distribution") }}');
+        select2ServerSide('#coa_id', '{{ url("admin/select2/coa_cash_bank") }}');
     });
 
-    function getRekening(){
-        if($('#user_bank_id').val()){
-            $('#account_bank').val($('#user_bank_id').find(':selected').data('bank'));
-            $('#account_no').val($('#user_bank_id').find(':selected').data('no'));
-            $('#account_name').val($('#user_bank_id').find(':selected').data('name'));
-        }else{
-            $('#account_bank,#account_no,#account_name').val('');
-        }
-    }
+    function addItem(){
+        var count = makeid(10);
 
-    function showRekening(){
-        if(['2','3','4'].includes($('#payment_type').val())){
-            $('#rekening-element').show();
-        }else{
-            $('#user_bank_id').val('').formSelect();
-            $('#account_bank,#account_no,#account_name').val('');
-            $('#rekening-element').hide();
-        }
-    }
-
-    function getAccountInfo(){
-        if($('#account_id').val()){
-            $.ajax({
-                url: '{{ Request::url() }}/get_account_data',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    id: $('#account_id').val()
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-
-                    $('#body-detail').empty();
-                    if(response.details.length > 0){
-                        $.each(response.details, function(i, val) {
-                            var count = makeid(10);
-                            $('#list-used-data').append(`
-                                <div class="chip purple darken-4 gradient-shadow white-text">
-                                    ` + val.rawcode + `
-                                    <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
-                                </div>
-                            `);
-                            $('#body-detail').append(`
-                                <tr class="row_detail" data-code="` + val.rawcode + `">
-                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                    ` + ( val.coa_id ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
-                                    <td class="center-align">
-                                        <label>
-                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
-                                            <span>Pilih</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        ` + val.rawcode + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.due_date + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.total + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.tax + `
-                                    </td>
-                                    <td class="right-align" id="row_wtax` + count + `">
-                                        ` + val.wtax + `
-                                    </td>
-                                    <td class="right-align" id="row_grandtotal` + count + `">
-                                        ` + val.grandtotal + `
-                                    </td>
-                                    <td class="right-align" id="row_memo` + count + `">
-                                        ` + val.memo + `
-                                    </td>
-                                    <td class="center">
-                                        <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.grandtotal + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
-                                    </td>
-                                    <td class="center">
-                                        <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="-">
-                                    </td>
-                                    <td class="center">
-                                        ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
-                                    </td>
-                                    <td class="center">
-                                        ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>` ) + `
-                                    </td>
-                                </tr>
-                            `);
-                            
-                            if(!val.coa_id){
-                                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-                                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
-                            }
-                            
-                        });                        
-                    }else{
-                        $('#body-detail').empty().append(`
-                            <tr id="empty-detail">
-                                <td colspan="12" class="center">
-                                    Pilih supplier/vendor untuk memulai...
-                                </td>
-                            </tr>
-                        `);
-
-                        $('#grandtotal,#admin').val('0,000');
-                    }
-                    
-                    $('#user_bank_id').empty();
-                    if(response.banks.length > 0){
-                        $('#user_bank_id').append(`
-                            <option value="">--Pilih dari daftar-</option>
-                        `);
-                        $.each(response.banks, function(i, val) {
-                            $('#user_bank_id').append(`
-                                <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bank="` + val.bank_name + `" data-no="` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
-                            `);
-                        });                        
-                    }else{
-                        $('#user_bank_id').append(`
-                            <option value="">--Pilih Partner Bisnis-</option>
-                        `);
-                    }
-                    $('#user_bank_id').formSelect();
-
-                    $('#top').val(response.top);
-                    
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-        }else{
-            if($('.data-used').length > 0){
-                $('.data-used').trigger('click');
-            }
-            $('#body-detail').empty().append(`
-                <tr id="empty-detail">
-                    <td colspan="12" class="center">
-                        Pilih supplier/vendor untuk memulai...
-                    </td>
-                </tr>
-            `);
-            $('#deposit').val('0,000');
-            $('#top').val('0');
-            $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
-        }
+        $('#last-row-detail').before(`
+            <tr class="row_detail">
+                <input type="hidden" name="arr_type[]" value="coas">
+                <td>
+                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
+                    -
+                </td>
+                <td class="center">
+                    <input id="arr_total` + count + `" name="arr_total[]" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                </td>
+                <td class="center">
+                    <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                </td>
+                <td class="center">
+                    <input id="arr_subtotal` + count + `" name="arr_subtotal[]" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>
+                </td>
+                <td>
+                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan ...">
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
     }
 
     function applyCoa(code){
@@ -780,6 +655,12 @@
         }
     }
 
+    function getAccountInfo(){
+        if($('#account_id').val()){
+            $('#modal6').modal('open');
+        }
+    }
+
     function checkTotal(element){
         var nil = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")), max = parseFloat($(element).data('grandtotal').replaceAll(".", "").replaceAll(",","."));
         if(nil > max){
@@ -788,18 +669,33 @@
     }
 
     function countAll(){
-        var pay = 0, admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",","."));
+        var total = 0, wtax = 0, pph = parseFloat($('#wtax_id').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0;
         
-        if($('input[name^="arr_code"]').length > 0){
-            $('input[name^="arr_code"]').each(function(){
-                let element = $(this);
-                if($(element).is(':checked')){
-                    pay += parseFloat($('#arr_pay' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
-                }
+        if($('input[name^="arr_total"]').length > 0){
+            $('input[name^="arr_total"]').each(function(index){
+                let rowtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) + parseFloat($('input[name^="arr_rounding"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                total += rowtotal;
+                $('input[name^="arr_subtotal"]').eq(index).val(
+                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                );
             });
         }
-        pay += admin;
-        $('#grandtotal').val(formatRupiahIni(pay.toFixed(2).toString().replace('.',',')));
+
+        wtax = parseFloat((total * (pph / 100))).toFixed(2);
+
+        grandtotal = total - wtax;
+
+        $('#total').val(
+            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
+        );
+
+        $('#wtax').val(
+            (wtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',','))
+        );
+
+        $('#grandtotal').val(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
+        );
     }
 
     function chooseAll(element){
@@ -890,28 +786,24 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
-                { name: 'coa_source_id', className: 'center-align' },
-                { name: 'payment_type', className: 'center-align' },
-                { name: 'payment_no', className: 'center-align' },
+                { name: 'coa_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'pay_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
-                { name: 'admin', className: 'right-align' },
+                { name: 'total', className: 'right-align' },
+                { name: 'wtax_id', className: 'center-align' },
+                { name: 'percent_wtax', className: 'right-align' },
+                { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'document', className: 'center-align' },
-                { name: 'account_bank', className: 'right-align' },
-                { name: 'account_no', className: 'right-align' },
-                { name: 'account_name', className: 'right-align' },
                 { name: 'note', className: 'center-align' },
+                { name: 'project_id', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'cash_bank_out', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectAll',
                 'selectNone' 
             ],
             "language": {
@@ -983,30 +875,32 @@
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]);
 
-                formData.delete("arr_code[]");
-                formData.delete("arr_type[]");
-                formData.delete("arr_pay[]");
-                formData.delete("arr_note[]");
                 formData.delete("arr_cost_distribution[]");
                 formData.delete("arr_coa[]");
+                formData.delete("arr_total[]");
+                formData.delete("arr_rounding[]");
+                formData.delete("arr_subtotal[]");
+                formData.delete("arr_note[]");
+                formData.delete("wtax_id");
+
+                formData.append('wtax_id',($('#wtax_id').find(':selected').data('id') ? $('#wtax_id').find(':selected').data('id') : ''));
+                formData.append('percent_wtax',($('#wtax_id').val() ? $('#wtax_id').val() : ''));
 
                 let passed = true;
 
-                $('input[name^="arr_code"]').each(function(){
-                    if($(this).is(':checked')){
-                        formData.append('arr_code[]',$(this).val());
-                        formData.append('arr_type[]',$('input[name^="arr_type"][data-id="' + $(this).data('id') + '"]').val());
-                        formData.append('arr_pay[]',$('#arr_pay' + $(this).data('id')).val());
-                        formData.append('arr_note[]',$('#arr_note' + $(this).data('id')).val());
-                        formData.append('arr_coa[]',$('#arr_coa' + $(this).data('id')).val());
-                        formData.append('arr_cost_distribution[]',
-                            ($('#arr_cost_distribution' + $(this).data('id')).length > 0 ? 
-                                ($('#arr_cost_distribution' + $(this).data('id')).val() ? $('#arr_cost_distribution' + $(this).data('id')).val() : '') 
-                            : '')
-                        );
-                        if(!$('#arr_coa' + $(this).data('id')).val() || !$('#arr_pay' + $(this).data('id')).val()){
-                            passed = false;
-                        }
+                $('select[name^="arr_coa"]').each(function(index){
+                    formData.append('arr_coa[]',$(this).val());
+                    formData.append('arr_cost_distribution[]',(
+                        $('select[name^="arr_cost_distribution"]').eq(index).val() ? $('select[name^="arr_cost_distribution"]').eq(index).val() : ''
+                    ));
+                    formData.append('arr_total[]',$('input[name^="arr_total"]').eq(index).val());
+                    formData.append('arr_rounding[]',$('input[name^="arr_rounding"]').eq(index).val());
+                    formData.append('arr_subtotal[]',$('input[name^="arr_subtotal"]').eq(index).val());
+                    formData.append('arr_note[]',(
+                        $('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''
+                    ));
+                    if(!$(this).val() || !$('input[name^="arr_total"]').eq(index).val() || !$('input[name^="arr_rounding"]').eq(index).val() || !$('input[name^="arr_subtotal"]').eq(index).val()){
+                        passed = false;
                     }
                 });
 
@@ -1078,7 +972,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Coa atau nominal bayar tidak boleh kosong.',
+                        text: 'Form tidak boleh ada yang kosong.',
                         icon: 'warning',
                     });
                 }
@@ -1133,11 +1027,6 @@
                 $('#coa_source_id').empty().append(`
                     <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
                 `);
-                if(response.cost_distribution_name){
-                    $('#cost_distribution_id').empty().append(`
-                        <option value="` + response.cost_distribution_id + `">` + response.cost_distribution_name + `</option>
-                    `);
-                }
                 $('#company_id').val(response.company_id).formSelect();
                 $('#payment_type').val(response.payment_type).formSelect();
                 $('#payment_no').val(response.payment_no);

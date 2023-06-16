@@ -30,6 +30,7 @@ class PurchaseInvoiceDetail extends Model
         'wtax',
         'grandtotal',
         'note',
+        'note2',
         'place_id',
         'line_id',
         'machine_id',
@@ -133,7 +134,7 @@ class PurchaseInvoiceDetail extends Model
     public function getTop(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->payment_term,
-            'landed_cost_details'       => $this->lookable->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->payment_term,
+            'landed_cost_details'       => isset($this->lookable->lookable->purchaseOrderDetail->purchaseOrder->payment_term) ? $this->lookable->lookable->purchaseOrderDetail->purchaseOrder->payment_term : '0',
             'purchase_order_details'    => $this->lookable->purchaseOrder->payment_term,
             default                     => '-',
         };
@@ -177,7 +178,7 @@ class PurchaseInvoiceDetail extends Model
     public function getPurchaseCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'      => $this->lookable->purchaseOrderDetail->purchaseOrder->code,
-            'landed_cost_details'       => $this->lookable->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->code,
+            'landed_cost_details'       => isset($this->lookable->lookable->purchaseOrderDetail->purchaseOrder->code) ? $this->lookable->lookable->purchaseOrderDetail->purchaseOrder->code : '-',
             'purchase_order_details'    => $this->lookable->purchaseOrder->code.' - '.$this->lookable->purchaseOrder->code,
             'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
             default                     => '-',
@@ -189,7 +190,7 @@ class PurchaseInvoiceDetail extends Model
     public function getDeliveryCode(){
         $code = match ($this->lookable_type) {
             'good_receipt_details'     => $this->lookable->goodReceipt->delivery_no,
-            'landed_cost_details'      => $this->lookable->landedCost->goodReceipt->delivery_no,
+            'landed_cost_details'      => '-',
             default => '-',
         };
 

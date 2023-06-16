@@ -358,6 +358,7 @@ class PaymentRequestController extends Controller
             'pay_date'              => 'required',
             'currency_id'           => 'required',
             'currency_rate'         => 'required',
+            'cost_distribution_id'  => str_replace(',','.',str_replace('.','',$request->admin)) > 0 ? 'required' : '',
             'admin'                 => 'required',
             'grandtotal'            => 'required',
             'arr_type'              => 'required|array',
@@ -373,6 +374,7 @@ class PaymentRequestController extends Controller
             'pay_date.required'                 => 'Tanggal bayar tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
+            'cost_distribution_id.required'     => 'Distribusi biaya admin tidak boleh kosong.',
             'admin.required'                    => 'Biaya admin tidak boleh kosong, minimal 0.',
             'grandtotal.required'               => 'Total bayar tidak boleh kosong.',
             'arr_type.required'                 => 'Tipe dokumen tidak boleh kosong.',
@@ -440,6 +442,7 @@ class PaymentRequestController extends Controller
                         $query->pay_date = $request->pay_date;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
+                        $query->cost_distribution_id = $request->cost_distribution_id ? $request->cost_distribution_id : NULL;
                         $query->admin = str_replace(',','.',str_replace('.','',$request->admin));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
@@ -459,7 +462,7 @@ class PaymentRequestController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status permintaan pembayaraan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -469,7 +472,7 @@ class PaymentRequestController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PaymentRequest::create([
-                        'code'			            => PaymentRequest::generateCode(),
+                        'code'			            => PaymentRequest::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
@@ -480,6 +483,7 @@ class PaymentRequestController extends Controller
                         'pay_date'                  => $request->pay_date,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
+                        'cost_distribution_id'      => $request->cost_distribution_id ? $request->cost_distribution_id : NULL,
                         'admin'                     => str_replace(',','.',str_replace('.','',$request->admin)),
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/payment_requests') : NULL,
@@ -632,6 +636,7 @@ class PaymentRequestController extends Controller
         $pr['account_name'] = $pr->account->name;
         $pr['coa_source_name'] = $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name;
         $pr['currency_rate'] = number_format($pr->currency_rate,3,',','.');
+        $pr['cost_distribution_name'] = $pr->cost_distribution_id ? $pr->costDistribution->code.' - '.$pr->costDistribution->name : '';
         $pr['admin'] = number_format($pr->admin,3,',','.');
         $pr['grandtotal'] = number_format($pr->grandtotal,3,',','.');
         $pr['top'] = $pr->account->top;
@@ -1088,12 +1093,14 @@ class PaymentRequestController extends Controller
                 }
 
                 $html .= '<tr>
-                    <td class="right-align" colspan="6">ADMIN</td>
+                    <td class="right-align" colspan="5">BIAYA ADMIN</td>
+                    <td class="">DIST.BIAYA : '.($data->cost_distribution_id ? $data->costDistribution->code.' - '.$data->costDistribution->name : '-').'</td>
                     <td class="right-align">'.number_format($data->admin,2,',','.').'</td>
                 </tr>';
 
                 $html .= '<tr>
-                    <td class="right-align" colspan="6">TOTAL</td>
+                    <td class="right-align" colspan="5">TOTAL</td>
+                    <td class=""></td>
                     <td class="right-align">'.number_format($data->grandtotal,2,',','.').'</td>
                 </tr>';
 
@@ -1173,7 +1180,7 @@ class PaymentRequestController extends Controller
                     $cek = PaymentRequest::where('code',CustomHelper::decrypt($request->tempPay))->first();
 
                     $query = OutgoingPayment::create([
-                        'code'			            => OutgoingPayment::generateCode(),
+                        'code'			            => OutgoingPayment::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $cek->company_id,
                         'account_id'                => $cek->account_id,
@@ -1183,6 +1190,7 @@ class PaymentRequestController extends Controller
                         'pay_date'                  => $request->pay_date_pay,
                         'currency_id'               => $cek->currency_id,
                         'currency_rate'             => $cek->currency_rate,
+                        'cost_distribution_id'      => $cek->cost_distribution_id ? $cek->cost_distribution_id : NULL,
                         'admin'                     => $cek->admin,
                         'grandtotal'                => $cek->grandtotal,
                         'document'                  => $request->file('documentPay') ? $request->file('documentPay')->store('public/outgoing_payments') : NULL,

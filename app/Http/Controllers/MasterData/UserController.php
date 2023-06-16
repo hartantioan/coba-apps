@@ -271,6 +271,10 @@ class UserController extends Controller
                                 <th>'.$data->address.'</th>
                             </tr>
                             <tr>
+                                <th>Kecamatan</th>
+                                <th>'.($data->subdistrict_id ? $data->subdistrict->name : '-').'</th>
+                            </tr>
+                            <tr>
                                 <th>Kota/Kabupaten</th>
                                 <th>'.$data->city->name.'</th>
                             </tr>
@@ -397,26 +401,28 @@ class UserController extends Controller
                 'position_id'       => 'required',
                 'province_id'       => 'required',
                 'city_id'           => 'required',
+                'subdistrict_id'    => 'required',
                 'country_id'        => 'required',
             ], [
-                'name.required' 	    => 'Nama tidak boleh kosong.',
-                'username.required'     => 'Username tidak boleh kosong.',
-                'username.unique'       => 'Username telah terpakai.',
-                'phone.required'        => 'Telepon tidak boleh kosong.',
-                'phone.unique'          => 'Telepon telah terpakai.',
-                'email.required'	    => 'Email tidak boleh kosong.',
-                'email.unique'          => 'Email telah terpakai.',
-                'address.required'      => 'Alamat tidak boleh kosong.',
-                'type.required'	        => 'Tipe pengguna tidak boleh kosong.',
-                'id_card.required'      => 'No Identitas tidak boleh kosong.',
-                'id_card_address.required' => 'Alamat Identitas tidak boleh kosong.',
-                'company.required'      => 'Perusahaan tidak boleh kosong.',
-                'place_id.required'     => 'Penempatan tidak boleh kosong.',
-                'department_id.required'=> 'Departemen / Divisi tidak boleh kosong.',
-                'position_id.required'  => 'Posisi / level tidak boleh kosong.',
-                'province_id.required'  => 'Provinsi tidak boleh kosong.',
-                'city_id.required'      => 'Kota tidak boleh kosong.',
-                'country_id.required'   => 'Negara tidak boleh kosong.',
+                'name.required' 	            => 'Nama tidak boleh kosong.',
+                'username.required'             => 'Username tidak boleh kosong.',
+                'username.unique'               => 'Username telah terpakai.',
+                'phone.required'                => 'Telepon tidak boleh kosong.',
+                'phone.unique'                  => 'Telepon telah terpakai.',
+                'email.required'	            => 'Email tidak boleh kosong.',
+                'email.unique'                  => 'Email telah terpakai.',
+                'address.required'              => 'Alamat tidak boleh kosong.',
+                'type.required'	                => 'Tipe pengguna tidak boleh kosong.',
+                'id_card.required'              => 'No Identitas tidak boleh kosong.',
+                'id_card_address.required'      => 'Alamat Identitas tidak boleh kosong.',
+                'company.required'              => 'Perusahaan tidak boleh kosong.',
+                'place_id.required'             => 'Penempatan tidak boleh kosong.',
+                'department_id.required'        => 'Departemen / Divisi tidak boleh kosong.',
+                'position_id.required'          => 'Posisi / level tidak boleh kosong.',
+                'province_id.required'          => 'Provinsi tidak boleh kosong.',
+                'city_id.required'              => 'Kota tidak boleh kosong.',
+                'subdistrict_id.required'       => 'Kecamatan tidak boleh kosong.',
+                'country_id.required'           => 'Negara tidak boleh kosong.',
             ]);
         }else{
             $validation = Validator::make($request->all(), [
@@ -427,26 +433,28 @@ class UserController extends Controller
                 'type'              => 'required',
                 'province_id'       => 'required',
                 'city_id'           => 'required',
+                'subdistrict_id'    => 'required',
                 'pic'               => 'required',
                 'pic_no'            => 'required',
                 'office_no'         => 'required',
                 'limit_credit'      => 'required',
                 'country_id'        => 'required',
             ], [
-                'name.required' 	    => 'Nama tidak boleh kosong.',
-                'phone.required'        => 'Telepon tidak boleh kosong.',
-                'phone.unique'          => 'Telepon telah terpakai.',
-                'email.required'	    => 'Email tidak boleh kosong.',
-                'email.unique'          => 'Email telah terpakai.',
-                'address.required'      => 'Alamat tidak boleh kosong.',
-                'type.required'	        => 'Tipe pengguna tidak boleh kosong.',
-                'province_id.required'  => 'Provinsi tidak boleh kosong.',
-                'city_id.required'      => 'Kota tidak boleh kosong.',
-                'pic.required'          => 'PIC tidak boleh kosong.',
-                'pic_no.required'       => 'Nomor PIC tidak boleh kosong.',
-                'office_no.required'    => 'Nomor Kantor tidak boleh kosong.',
-                'limit_credit.required' => 'Limit credit tidak boleh kosong.',
-                'country_id.required'   => 'Negara tidak boleh kosong.',
+                'name.required' 	            => 'Nama tidak boleh kosong.',
+                'phone.required'                => 'Telepon tidak boleh kosong.',
+                'phone.unique'                  => 'Telepon telah terpakai.',
+                'email.required'	            => 'Email tidak boleh kosong.',
+                'email.unique'                  => 'Email telah terpakai.',
+                'address.required'              => 'Alamat tidak boleh kosong.',
+                'type.required'	                => 'Tipe pengguna tidak boleh kosong.',
+                'province_id.required'          => 'Provinsi tidak boleh kosong.',
+                'city_id.required'              => 'Kota tidak boleh kosong.',
+                'subdistrict_id.required'       => 'Kecamatan tidak boleh kosong.',
+                'pic.required'                  => 'PIC tidak boleh kosong.',
+                'pic_no.required'               => 'Nomor PIC tidak boleh kosong.',
+                'office_no.required'            => 'Nomor Kantor tidak boleh kosong.',
+                'limit_credit.required'         => 'Limit credit tidak boleh kosong.',
+                'country_id.required'           => 'Negara tidak boleh kosong.',
             ]);
         }
 
@@ -498,6 +506,7 @@ class UserController extends Controller
                     $query->position_id     = $request->type == '1' ? $request->position_id :NULL;
                     $query->province_id     = $request->province_id;
                     $query->city_id         = $request->city_id;
+                    $query->subdistrict_id  = $request->subdistrict_id;
                     $query->tax_id          = $request->tax_id;
                     $query->tax_name        = $request->tax_name;
                     $query->tax_address     = $request->tax_address;
@@ -543,6 +552,7 @@ class UserController extends Controller
                         'position_id'   => $request->type == '1' ? $request->position_id :NULL,
                         'province_id'   => $request->province_id,
                         'city_id'       => $request->city_id,
+                        'subdistrict_id'=> $request->subdistrict_id,
                         'tax_id'        => $request->tax_id,
                         'tax_name'      => $request->tax_name,
                         'tax_address'   => $request->tax_address,
@@ -788,6 +798,46 @@ class UserController extends Controller
                     }
                 }
 
+                if($request->checkboxJournal){
+                    MenuUser::where('user_id',$request->tempuseraccess)->whereNotIn('menu_id',$request->checkboxJournal)->where('type','journal')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->whereNotIn('menu_id',$request->checkboxJournal)->where('type','journal')->delete();
+                        }
+                    }
+
+                    foreach($request->checkboxJournal as $row){
+                        $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','journal')->count();
+                        if($cek == 0){
+                            MenuUser::create([
+                                'user_id'   => $request->tempuseraccess,
+                                'menu_id'   => $row,
+                                'type'      => 'journal'
+                            ]);
+                        }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','journal')->count();
+                                if($cek2 == 0){
+                                    MenuUser::create([
+                                        'user_id'   => $rowuser,
+                                        'menu_id'   => $row,
+                                        'type'      => 'journal'
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    MenuUser::where('user_id',$request->tempuseraccess)->where('type','journal')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->where('type','journal')->delete();
+                        }
+                    }
+                }
+
                 if($request->checkplace){
                     UserPlace::where('user_id',$request->tempuseraccess)->whereNotIn('place_id',$request->checkplace)->delete();
                     if($request->arr_user){
@@ -884,6 +934,7 @@ class UserController extends Controller
         $user['city_name'] = $user->city->name;
         $user['country_name'] = $user->country->name;
         $user['limit_credit'] = $user->limit_credit ? number_format($user->limit_credit, 0, ',', '.') : '';
+        $user['subdistrict_list'] = $user->city->getSubdistrict();
 
         $banks = [];
 		

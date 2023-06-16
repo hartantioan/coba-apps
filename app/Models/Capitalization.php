@@ -103,7 +103,7 @@ class Capitalization extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'CAP-'.date('y').date('m').date('d').'-';
+        $pre = 'CAP-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

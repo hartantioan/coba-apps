@@ -27,6 +27,7 @@ class PurchaseOrderDetail extends Model
         'discount_3',
         'subtotal',
         'note',
+        'note2',
         'is_tax',
         'is_include_tax',
         'percent_tax',

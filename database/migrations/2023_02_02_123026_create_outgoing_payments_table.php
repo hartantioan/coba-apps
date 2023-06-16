@@ -26,6 +26,7 @@ return new class extends Migration
             $table->double('currency_rate')->nullable();
             $table->date('post_date')->nullable();
             $table->date('pay_date')->nullable();
+            $table->bigInteger('cost_distribution_id')->nullable();
             $table->double('admin')->nullable();
             $table->double('grandtotal')->nullable();
             $table->string('document')->nullable();
@@ -37,7 +38,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id','account_id','company_id','coa_source_id','currency_id','payment_request_id'],'outgoing_payment_index');
+            $table->index(['user_id','account_id','company_id','coa_source_id','currency_id','payment_request_id','cost_distribution_id'],'outgoing_payment_index');
         });
     }
 

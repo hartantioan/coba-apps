@@ -420,7 +420,7 @@ class PurchaseMemoController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseMemo::create([
-                        'code'			            => PurchaseMemo::generateCode(),
+                        'code'			            => PurchaseMemo::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,

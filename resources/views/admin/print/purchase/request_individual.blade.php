@@ -253,7 +253,8 @@
                                 <th class="center">Item</th>
                                 <th class="center">Jum.</th>
                                 <th class="center">Sat.</th>
-                                <th class="center">Catatan</th>
+                                <th class="center">Catatan 1</th>
+                                <th class="center">Catatan 2</th>
                                 <th class="center">Tgl.Dipakai</th>
                                 <th class="center">Site</th>
                                 <th class="center">Gudang</th>
@@ -267,6 +268,7 @@
                                 <td class="center">{{ $row->qty }}</td>
                                 <td class="center">{{ $row->item->buyUnit->code }}</td>
                                 <td>{{ $row->note }}</td>
+                                <td>{{ $row->note2 }}</td>
                                 <td class="indigo-text center">{{ date('d/m/y',strtotime($row->required_date)) }}</td>
                                 <td class="center">{{ $row->place->name.' - '.$row->place->company->name }}</td>
                                 <td class="center">{{ $row->warehouse->name }}</td>

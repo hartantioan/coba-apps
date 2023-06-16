@@ -306,7 +306,8 @@
                                                     <th class="center">PPH (%)</th>
                                                     <th class="center">PPH (Rp)</th>
                                                     <th class="center">Grandtotal</th>
-                                                    <th class="center">Keterangan</th>
+                                                    <th class="center">Keterangan 1</th>
+                                                    <th class="center">Keterangan 2</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
@@ -316,7 +317,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="24">
+                                                    <td colspan="25">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Pembulatan Manual
                                                         </a>
@@ -1202,7 +1203,10 @@
                                                     ` + val.grandtotal + `
                                                 </td>
                                                 <td>
-                                                    <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                                    <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + val.note + `" data-id="` + count + `">
+                                                </td>
+                                                <td>
+                                                    <input class="browser-default" type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
                                                 </td>
                                                 <td class="center">
                                                     ` + val.place_name + `
@@ -1503,7 +1507,10 @@
                     0
                 </td>
                 <td>
-                    <input type="text" name="arr_note[]" value="Pembulatan ..." data-id="` + count + `">
+                    <input type="text" name="arr_note[]" value="Keterangan 1..." data-id="` + count + `">
+                </td>
+                <td>
+                    <input type="text" name="arr_note2[]" value="Keterangan 2..." data-id="` + count + `">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
@@ -1783,6 +1790,7 @@
                 formData.delete("arr_dp_code[]");
                 formData.delete("arr_nominal[]");
                 formData.delete("arr_note[]");
+                formData.delete("arr_note2[]");
                 formData.delete("arr_place[]");
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
@@ -1815,6 +1823,7 @@
                         formData.append('arr_wtax[]',$('input[name^="arr_wtax"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_note[]',$('input[name^="arr_note"][data-id="' + $(this).data('id') + '"]').val());
+                        formData.append('arr_note2[]',$('input[name^="arr_note2"][data-id="' + $(this).data('id') + '"]').val());
                         formData.append('arr_place[]',$('#arr_place' + $(this).data('id')).val());
                         formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : ''));
                         formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : ''));
@@ -2057,6 +2066,9 @@
                                     <td>
                                         <input type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
                                     </td>
+                                    <td>
+                                        <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                    </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                             @foreach ($place as $rowplace)
@@ -2193,22 +2205,25 @@
                                         ` + val.grandtotal + `
                                     </td>
                                     <td>
-                                        <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                        <input class="browser-default" type="text" name="arr_note[]" value="` + val.info + val.note + `" data-id="` + count + `">
+                                    </td>
+                                    <td>
+                                        <input class="browser-default" type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
                                     </td>
                                     <td class="center">
-                                        -
+                                        ` + val.place_name + `
                                     </td>
                                     <td class="center">
-                                        -
+                                        ` + val.line_name + `
                                     </td>
                                     <td class="center">
-                                        -
+                                        ` + val.machine_name + `
                                     </td>
                                     <td class="center">
-                                        -
+                                        ` + val.department_name + `
                                     </td>
                                     <td class="center">
-                                        -
+                                        ` + val.warehouse_name + `
                                     </td>
                                 </tr>
                             `);
@@ -2435,14 +2450,20 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal6').modal('open');
-                $('#title_data').append(``+data.title+``);
-                $('#code_data').append(data.message.code);
-                $('#body-journal-table').append(data.tbody);
-                $('#user_jurnal').append(`Pengguna `+data.user);
-                $('#note_jurnal').append(`Keterangan `+data.message.note);
-                $('#ref_jurnal').append(`Referensi `+data.reference);
-                $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal6').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna `+data.user);
+                    $('#note_jurnal').append(`Keterangan `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi `+data.reference);
+                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                }
             }
         });
     }

@@ -6,6 +6,7 @@ use App\Jobs\ResetCogs;
 use App\Jobs\ResetStock;
 use App\Models\Coa;
 use App\Models\Company;
+use App\Models\DeliveryCost;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
 use App\Models\InventoryTransferIn;
@@ -143,6 +144,26 @@ class LandedCostController extends Controller
         return response()->json($account);
     }
 
+    public function getDeliveryCost(Request $request){
+        $vendor = $request->vendor;
+        $subdistrict_from = $request->subdistrict_from;
+        $subdistrict_to = $request->subdistrict_to;
+        $arr = [];
+
+        $data = DeliveryCost::where('account_id',$vendor)->whereDate('valid_from','<=',date('Y-m-d'))->whereDate('valid_to','>=',date('Y-m-d'))->where('status','1')->where('from_subdistrict_id',$subdistrict_from)->where('to_subdistrict_id',$subdistrict_to)->get();
+
+        foreach($data as $row){
+            $arr[] = [
+                'id'        => $row->id,
+                'tonnage'   => number_format($row->tonnage,2,',','.'),
+                'nominal'   => number_format($row->nominal,2,',','.'),
+                'name'      => $row->code.' - tonase '.number_format($row->tonnage,2,',','.'),
+            ];
+        }
+
+        return response()->json($arr);
+    }
+
     public function getGoodReceipt(Request $request){
         $arr_main = [];
 
@@ -150,6 +171,8 @@ class LandedCostController extends Controller
             foreach($request->arr_gr_id as $row){
                 $data = GoodReceipt::find(intval($row));
                 $data['lookable_type'] = $data->getTable();
+                $data['from_address'] = $data->account->city->name.' - '.$data->account->subdistrict->name;
+                $data['subdistrict_from_id'] = $data->account->subdistrict_id;
             
                 if($data->used()->exists()){
                     $data['status'] = '500';
@@ -184,6 +207,9 @@ class LandedCostController extends Controller
                             'coa_id'                    => $coa ? $coa->id : '',
                             'coa_name'                  => $coa ? $coa->name : '',
                         ];
+
+                        $data['to_address'] = $row->place->city->name.' - '.$row->place->subdistrict->name;
+                        $data['subdistrict_to_id'] = $row->place->subdistrict_id;
                     }
         
                     $data['details'] = $details;
@@ -198,6 +224,8 @@ class LandedCostController extends Controller
                 $data = LandedCost::find(intval($row));
                 $data['lookable_type'] = $data->getTable();
                 $data['account_name'] = $data->vendor->name;
+                $data['from_address'] = $data->supplier->city->name.' - '.$data->supplier->subdistrict->name;
+                $data['subdistrict_from_id'] = $data->supplier->subdistrict_id;
             
                 if($data->used()->exists()){
                     $data['status'] = '500';
@@ -232,6 +260,9 @@ class LandedCostController extends Controller
                             'coa_id'                    => $coa ? $coa->id : '',
                             'coa_name'                  => $coa ? $coa->name : '',
                         ];
+
+                        $data['to_address'] = $row->place->city->name.' - '.$row->place->subdistrict->name;
+                        $data['subdistrict_to_id'] = $row->place->subdistrict_id;
                     }
         
                     $data['details'] = $details;
@@ -246,6 +277,10 @@ class LandedCostController extends Controller
                 $data = InventoryTransferIn::find(intval($row));
                 $data['lookable_type'] = $data->getTable();
                 $data['account_name'] = '-';
+                $data['from_address'] = $data->inventoryTransferOut->placeFrom->city->name.' - '.$data->inventoryTransferOut->placeFrom->subdistrict->name;
+                $data['to_address'] = $data->inventoryTransferOut->placeTo->city->name.' - '.$data->inventoryTransferOut->placeTo->subdistrict->name;
+                $data['subdistrict_from_id'] = $data->inventoryTransferOut->placeFrom->subdistrict_id;
+                $data['subdistrict_to_id'] = $data->inventoryTransferOut->placeTo->subdistrict_id;
             
                 if($data->used()->exists()){
                     $data['status'] = '500';
@@ -584,7 +619,7 @@ class LandedCostController extends Controller
                 try {
 
                     $query = LandedCost::create([
-                        'code'			            => LandedCost::generateCode(),
+                        'code'			            => LandedCost::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'supplier_id'               => $request->supplier_id ? $request->supplier_id : NULL,
                         'account_id'                => $request->vendor_id,
@@ -807,6 +842,8 @@ class LandedCostController extends Controller
         $lc['wtax'] = number_format($lc->wtax,2,',','.');
         $lc['grandtotal'] = number_format($lc->grandtotal,2,',','.');
         $lc['currency_rate'] = number_format($lc->currency_rate,2,',','.');
+        $lc['from_address'] = $lc->supplier->city->name.' - '.$lc->supplier->subdistrict->name;
+        $lc['subdistrict_from_id'] = $lc->supplier->subdistrict_id;
 
         $arr = [];
         $fees = [];
@@ -816,7 +853,7 @@ class LandedCostController extends Controller
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->name.' - '.$row->item->name,
                 'qtyRaw'                    => $row->qty,
-                'totalrow'                  => $row->lookable_type == 'landed_cost_details' ? $row->lookable->goodReceiptDetail->total : $row->lookable->total,
+                'totalrow'                  => $row->lookable->total,
                 'qty'                       => number_format($row->qty,3,',','.'),
                 'nominal'                   => number_format($row->nominal,2,',','.'),
                 'unit'                      => $row->item->uomUnit->code,
@@ -836,6 +873,9 @@ class LandedCostController extends Controller
                 'coa_name'                  => $row->coa_id ? $row->coa->code.' - '.$row->coa->name : '',
                 'stock'                     => $row->item->getStockPlace($row->place_id),
             ];
+
+            $lc['to_address'] = $row->place->city->name.' - '.$row->place->subdistrict->name;
+            $lc['subdistrict_to_id'] = $row->place->subdistrict_id;
         }
 
         foreach($lc->landedCostFeeDetail as $row){

@@ -28,6 +28,7 @@ return new class extends Migration
             $table->double('discount_3')->nullable();
             $table->double('subtotal')->nullable();
             $table->string('note')->nullable();
+            $table->string('note2')->nullable();
             $table->char('is_tax',1)->nullable();
             $table->char('is_include_tax',1)->nullable();
             $table->double('percent_tax')->nullable();

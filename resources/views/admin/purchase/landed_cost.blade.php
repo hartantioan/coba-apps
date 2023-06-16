@@ -184,7 +184,7 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO, LC atau Inventori Transfer Masuk.</i>
+                        <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO & LC. Untuk Inventori Transfer, supplier / vendor kosong dan tekan tombol Tampilkan Data.</i>
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
@@ -196,7 +196,7 @@
                                 <label class="active">&nbsp;</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <select class="browser-default" id="vendor_id" name="vendor_id"></select>
+                                <select class="browser-default" id="vendor_id" name="vendor_id" onchange="getDeliveryCost();"></select>
                                 <label class="active" for="vendor_id">Broker</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -236,6 +236,20 @@
                                 <input id="reference" name="reference" type="text" placeholder="No. Referensi">
                                 <label class="active" for="reference">No. Referensi</label>
                             </div>
+                            <div class="input-field col m3 s12">
+                                <input type="hidden" id="temp_from_address" name="temp_from_address">
+                                Dari : <b><span id="from_address">-</span></b>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input type="hidden" id="temp_to_address" name="temp_to_address">
+                                Tujuan : <b><span id="to_address">-</span></b>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <select class="browser-default" id="delivery_cost_id" name="delivery_cost_id" onchange="getDeliveryNominal(this);">
+                                    <option value="">--Silahkan pilih broker--</option>
+                                </select>
+                                <label class="active" for="delivery_cost_id">Tonase & Harga</label>
+                            </div>
                             <div class="col m12 s12">
                                 <h6><b>GRPO / Inv.Transfer (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
@@ -271,7 +285,7 @@
                                                             {{ $row->name }}
                                                         </td>
                                                         <td class="center-align">
-                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
+                                                            <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;" {{ $row->id == 1 ? 'readonly' : '' }}>
                                                         </td>
                                                         <td class="center-align">
                                                             <div class="switch mb-1">
@@ -770,6 +784,9 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#delivery_cost_id').empty().append(`
+                    <option value="">--Silahkan pilih broker--</option>
+                `);
             }
         });
 
@@ -1000,7 +1017,7 @@
         });
 
         select2ServerSide('#vendor_id,#filter_vendor', '{{ url("admin/select2/supplier_vendor") }}');
-        select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}')
+        select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}');
     });
 
     function makeTreeOrg(data,link){
@@ -1304,6 +1321,11 @@
                                             </div>
                                         `);
 
+                                        $('#from_address').text(val.from_address);
+                                        $('#to_address').text(val.to_address);
+                                        $('#temp_from_address').val(val.subdistrict_from_id);
+                                        $('#temp_to_address').val(val.subdistrict_to_id);
+
                                         $.each(val.details, function(i, valdetail) {
                                             var count = makeid(10), rowproporsional = (valdetail.totalrow / totalall) * 100;
                                             totalproporsional += rowproporsional;
@@ -1378,6 +1400,7 @@
                                             <option value="` + val.account_id + `">` + val.account_name + `</option>
                                         `);
                                     }
+
                                 });
 
                                 $('#body-item').append(`
@@ -1404,6 +1427,7 @@
                                 $('.modal-content').scrollTop(0);
                                 M.updateTextFields();
                                 $('#modal4').modal('close');
+                                getDeliveryCost();
                             }else{
                                 $.each(errormessage, function(i, val) {
                                     M.toast({
@@ -1433,15 +1457,16 @@
         });
     }
 
-    function getAccountData(){
-        let val = $('#supplier_id').val();
-        /* f(val){ */
+    function getDeliveryCost(){
+        if($('#vendor_id').val() && $('#temp_from_address').val() && $('#temp_to_address').val()){
             $.ajax({
-                url: '{{ Request::url() }}/get_account_data',
+                url: '{{ Request::url() }}/get_delivery_cost',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: val
+                    vendor: $('#vendor_id').val(),
+                    subdistrict_from: $('#temp_from_address').val(),
+                    subdistrict_to: $('#temp_to_address').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1451,110 +1476,26 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    $('#modal4').modal('open');
-
-                    if(val){
-                        $('#account_name').text($('#supplier_id').select2('data')[0].text);
-                        if(response.goods_receipt.length > 0){
-                            $.each(response.goods_receipt, function(i, val) {
-                                $('#body-detail-goods-receipt').append(`
-                                    <tr data-id="` + val.id + `">
-                                        <td class="center">
-                                            ` + val.code + `
-                                        </td>
-                                        <td class="center">
-                                            ` + val.delivery_no + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.post_date + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.total + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.tax + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.wtax + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.grandtotal + `
-                                        </td>
-                                        <td class="">
-                                            ` + val.note + `
-                                        </td>
-                                        <td class="">
-                                            ` + val.landed_cost + `
-                                        </td>
-                                    </tr>
-                                `);
-                            });
-                        }
-
-                        if(response.landed_cost.length > 0){
-                            $.each(response.landed_cost, function(i, val) {
-                                var count = makeid(10);
-                                $('#body-detail-landed-cost').append(`
-                                    <tr data-id="` + val.id + `">
-                                        <td class="center">
-                                            ` + val.code + `
-                                        </td>
-                                        <td class="center">
-                                            ` + val.post_date + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.total + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.tax + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.wtax + `
-                                        </td>
-                                        <td class="right-align">
-                                            ` + val.grandtotal + `
-                                        </td>
-                                        <td class="">
-                                            ` + val.note + `
-                                        </td>
-                                        <td class="">
-                                            ` + val.landed_cost + `
-                                        </td>
-                                    </tr>
-                                `);
-                            });                        
-                        }
+                    if(response.length > 0){
+                        $('#delivery_cost_id').empty().append(`
+                            <option value="">--Silahkan pilih biaya pengiriman--</option>
+                        `);
+                        $.each(response, function(i, val) {
+                            $('#delivery_cost_id').append(`
+                                <option value="` + val.id + `" data-nominal="` + val.nominal + `">` + val.name + `</option>
+                            `);
+                        });
                     }else{
-
-                        if(response.inventory_transfer_in.length > 0){
-                            $.each(response.inventory_transfer_in, function(i, val) {
-                                var count = makeid(10);
-                                $('#body-detail-inventory-transfer-in').append(`
-                                    <tr data-id="` + val.id + `">
-                                        <td class="center-align">
-                                            ` + val.code_iti + `
-                                        </td>
-                                        <td class="center-align">
-                                            ` + val.code_ito + `
-                                        </td>
-                                        <td class="center-align">
-                                            ` + val.post_date + `
-                                        </td>
-                                        <td class="">
-                                            ` + val.note + `
-                                        </td>
-                                    </tr>
-                                `);
-                            });  
-                        }
-
-                        setTimeout(function() {
-                            $('ul.tabs').tabs("select", "inventorytransferin");
-                        }, 1000);
+                        /* $('#supplier_id,#vendor_id').empty(); */
+                        $('#delivery_cost_id').empty().append(`
+                            <option value="">--Silahkan pilih broker--</option>
+                        `);
+                        swal({
+                            title: 'Maaf! Biaya Pengiriman tidak ditemukan.',
+                            text: 'Broker, asal dan tujuan kecamatan belum memiliki data biaya pengiriman. Silahkan set di master data.',
+                            icon: 'error'
+                        });
                     }
-                    
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
@@ -1566,9 +1507,154 @@
                     });
                 }
             });
-        /* }else{
-            $('.row_item').remove();
-        } */
+        }else{
+            $('#delivery_cost_id').empty().append(`
+                <option value="">--Silahkan pilih broker--</option>
+            `);
+        }
+    }
+
+    function getDeliveryNominal(element){
+        if($(element).val()){
+            $('#arr_fee_nominal1').val($(element).find(':selected').data('nominal')).trigger('keyup');
+        }else{
+            $('#arr_fee_nominal1').val('0,00').trigger('keyup');
+        }
+    }
+
+    function getAccountData(){
+        let val = $('#supplier_id').val();
+        $.ajax({
+            url: '{{ Request::url() }}/get_account_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: val
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                $('#modal4').modal('open');
+
+                if(val){
+                    $('#account_name').text($('#supplier_id').select2('data')[0].text);
+                    if(response.goods_receipt.length > 0){
+                        $.each(response.goods_receipt, function(i, val) {
+                            $('#body-detail-goods-receipt').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.delivery_no + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.wtax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.landed_cost + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                    if(response.landed_cost.length > 0){
+                        $.each(response.landed_cost, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-detail-landed-cost').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.tax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.wtax + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.landed_cost + `
+                                    </td>
+                                </tr>
+                            `);
+                        });                        
+                    }
+                }else{
+
+                    if(response.inventory_transfer_in.length > 0){
+                        $.each(response.inventory_transfer_in, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-detail-inventory-transfer-in').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center-align">
+                                        ` + val.code_iti + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.code_ito + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                </tr>
+                            `);
+                        });  
+                    }
+
+                    setTimeout(function() {
+                        $('ul.tabs').tabs("select", "inventorytransferin");
+                    }, 1000);
+                }
+                
+                $('.modal-content').scrollTop(0);
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        
     }
     
     function countEach(val){
@@ -1672,7 +1758,9 @@
             "order": [[0, 'asc']],
             dom: 'Blfrtip',
             buttons: [
-                'selectNone'
+                'columnsToggle',
+                'selectAll',
+                'selectNone',
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -1743,10 +1831,6 @@
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
-            dom: 'Blfrtip',
-            buttons: [
-                'columnsToggle' 
-            ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
         
@@ -2007,6 +2091,11 @@
                 $('#tax').val(response.tax);
                 $('#grandtotal').val(response.grandtotal);
 
+                $('#from_address').text(response.from_address);
+                $('#to_address').text(response.to_address);
+                $('#temp_from_address').val(response.subdistrict_from_id);
+                $('#temp_to_address').val(response.subdistrict_to_id);
+
                 var totalproporsional = 0, totalall = 0;
                 
                 if(response.details.length > 0){
@@ -2130,6 +2219,7 @@
                 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
+                getDeliveryCost();
                 M.updateTextFields();
             },
             error: function() {
@@ -2248,31 +2338,6 @@
         });
     }
 
-    /* function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), vendor = $('#filter_vendor').val(), currency = $('#filter_currency').val();
-        
-        $.ajax({
-            type : "POST",
-            url  : '{{ Request::url() }}/print',
-            data : {
-                search : search,
-                status : status,
-                'vendor_id[]' : vendor,
-                'currency_id[]' : currency
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            cache: false,
-            success: function(data){
-                var w = window.open('about:blank');
-                w.document.open();
-                w.document.write(data);
-                w.document.close();
-            }
-        });
-    } */
-
     function exportExcel(){
         var search = window.table.search(), status = $('#filter_status').val(), vendor = $('#filter_vendor').val(), currency = $('#filter_currency').val();
         
@@ -2299,6 +2364,8 @@
                     $(this).remove();
                 });
                 if($('#last-row-item').length == 0){
+                    $('#from_address,#to_address').text('-');
+                    $('#temp_from_address,#temp_to_address').val('');
                     $('#body-item').append(`
                         <tr id="last-row-item">
                             <td colspan="13" class="center">
@@ -2306,6 +2373,8 @@
                             </td>
                         </tr>
                     `);
+                    $('#vendor_id').empty().trigger('change');
+                    $('#delivery_cost_id').val('').trigger('change');
                 }
             },
             error: function() {
@@ -2330,14 +2399,20 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal6').modal('open');
-                $('#title_data').html(data.title);
-                $('#code_data').html(data.message.code);
-                $('#body-journal-table').html(data.tbody);
-                $('#user_jurnal').html('Pengguna '+data.user);
-                $('#note_jurnal').html('Keterangan '+data.message.note);
-                $('#ref_jurnal').html( 'Referensi '+data.reference);
-                $('#post_date_jurnal').html('Tanggal '+data.message.post_date);
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal6').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna `+data.user);
+                    $('#note_jurnal').append(`Keterangan `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi `+data.reference);
+                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                }
             }
         });
     }

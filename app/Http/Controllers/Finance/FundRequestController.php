@@ -874,7 +874,7 @@ class FundRequestController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = FundRequest::create([
-                        'code'			=> FundRequest::generateCode(),
+                        'code'			=> FundRequest::generateCode($request->post_date),
                         'user_id'		=> session('bo_id'),
                         'place_id'      => $request->place_id,
                         'department_id'	=> $request->department_id,

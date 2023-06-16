@@ -515,14 +515,20 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal6').modal('open');
-                $('#title_data').html(data.title);
-                $('#code_data').html(data.message.code);
-                $('#body-journal-table').html(data.tbody);
-                $('#user_jurnal').html('Pengguna '+data.user);
-                $('#note_jurnal').html('Keterangan '+data.message.note);
-                $('#ref_jurnal').html( 'Referensi '+data.reference);
-                $('#post_date_jurnal').html('Tanggal '+data.message.post_date);
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal6').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna `+data.user);
+                    $('#note_jurnal').append(`Keterangan `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi `+data.reference);
+                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                }
             }
         });
     }

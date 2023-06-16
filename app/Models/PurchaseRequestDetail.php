@@ -19,6 +19,7 @@ class PurchaseRequestDetail extends Model
         'item_id',
         'qty',
         'note',
+        'note2',
         'required_date',
         'place_id',
         'line_id',

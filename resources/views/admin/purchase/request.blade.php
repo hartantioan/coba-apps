@@ -178,7 +178,8 @@
                                                 <th class="center">Item</th>
                                                 <th class="center">Qty</th>
                                                 <th class="center">Satuan</th>
-                                                <th class="center">Keterangan</th>
+                                                <th class="center">Keterangan 1</th>
+                                                <th class="center">Keterangan 2</th>
                                                 <th class="center">Tgl.Dipakai</th>
                                                 <th class="center">Plant</th>
                                                 <th class="center">Line</th>
@@ -200,7 +201,10 @@
                                                     <span id="arr_satuan0">-</span>
                                                 </td>
                                                 <td>
-                                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
+                                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
+                                                </td>
+                                                <td>
+                                                    <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
                                                 </td>
                                                 <td>
                                                     <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
@@ -248,7 +252,7 @@
                                                 </td>
                                             </tr>
                                             <tr id="last-row-item">
-                                                <td colspan="10" class="center">
+                                                <td colspan="11" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -740,9 +744,34 @@
             "destroy": true,
             "iDisplayInLength": 10,
             "order": [[0, 'asc']],
+            ajax: {
+                url: '{{ Request::url() }}/datatable',
+                type: 'GET',
+                data: {
+                    status : $('#filter_status').val(),
+                    start_date : $('#start_date').val(),
+                    finish_date : $('#finish_date').val(),
+                },
+                beforeSend: function() {
+                    loadingOpen('#datatable_serverside');
+                },
+                complete: function() {
+                    loadingClose('#datatable_serverside');
+                },
+                error: function() {
+                    loadingClose('#datatable_serverside');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            },
             dom: 'Blfrtip',
             buttons: [
-                'selectNone'
+                'columnsToggle',
+                'selectAll',
+                'selectNone',
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -768,29 +797,6 @@
             select: {
                 style: 'multi'
             },
-            ajax: {
-                url: '{{ Request::url() }}/datatable',
-                type: 'GET',
-                data: {
-                    status : $('#filter_status').val(),
-                    start_date : $('#start_date').val(),
-                    finish_date : $('#finish_date').val(),
-                },
-                beforeSend: function() {
-                    loadingOpen('#datatable_serverside');
-                },
-                complete: function() {
-                    loadingClose('#datatable_serverside');
-                },
-                error: function() {
-                    loadingClose('#datatable_serverside');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'name', className: 'center-align' },
@@ -804,10 +810,6 @@
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
-            dom: 'Blfrtip',
-            buttons: [
-                'columnsToggle' 
-            ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
 
@@ -1031,7 +1033,10 @@
                                     <span id="arr_satuan` + count + `">` + val.unit + `</span>
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `">
+                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                </td>
+                                <td>
+                                    <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                 </td>
                                 <td>
                                     <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
@@ -1186,7 +1191,10 @@
                     <span id="arr_satuan` + count + `">-</span>
                 </td>
                 <td>
-                    <input name="arr_note[]" type="text" placeholder="Keterangan barang...">
+                    <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
+                </td>
+                <td>
+                    <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
                 </td>
                 <td>
                     <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">

@@ -160,7 +160,7 @@ class RetirementController extends Controller
     }
 
     public function getCode(Request $request){
-        $code = Retirement::generateCode();
+        $code = Retirement::generateCode($request->post_date);
 
         return response()->json([
             'code'  => $code
@@ -259,7 +259,7 @@ class RetirementController extends Controller
                 }
 			}else{
                 $query = Retirement::create([
-                    'code'			=> Retirement::generateCode(),
+                    'code'			=> Retirement::generateCode($request->post_date),
                     'user_id'		=> session('bo_id'),
                     'company_id'    => $request->company_id,
                     'currency_id'   => $request->currency_id,

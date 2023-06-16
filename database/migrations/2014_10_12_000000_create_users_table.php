@@ -26,6 +26,7 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->bigInteger('province_id')->nullable();
             $table->bigInteger('city_id')->nullable();
+            $table->bigInteger('subdistrict_id')->nullable();
             $table->string('id_card')->nullable();
             $table->string('id_card_address')->nullable();
             $table->char('type', 2)->nullable();
@@ -55,6 +56,8 @@ return new class extends Migration
             $table->bigInteger('country_id')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['employee_no', 'phone', 'province_id', 'city_id','subdistrict_id','group_id','company_id','place_id','department_id','position_id','country_id'],'user_awkekwew_index');
         });
     }
 

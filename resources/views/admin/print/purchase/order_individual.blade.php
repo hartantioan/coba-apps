@@ -290,7 +290,7 @@
                             <tbody id="bodybros">
                                     @foreach($data->purchaseOrderDetail as $key => $row)
                                     <tr>
-                                        <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
+                                        <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
                                         <td class="center-align">{{ $row->item_id ? $row->item->name : $row->coa->name }}</td>
                                         <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                                         <td class="center-align">{{ $row->item_id ? $row->item->buyUnit->code : '-' }}</td>
@@ -301,7 +301,10 @@
                                         <td class="right-align">{{ number_format($row->subtotal,2,',','.') }}</td>
                                     </tr>
                                     <tr>
-                                        <td colspan="8">Keterangan : {{ $row->note }}</td>
+                                        <td colspan="8">Keterangan 1: {{ $row->note }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="8">Keterangan 2: {{ $row->note2 }}</td>
                                     </tr>
                                     @endforeach
                                     

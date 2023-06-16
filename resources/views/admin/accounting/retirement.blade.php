@@ -519,6 +519,7 @@
                 $('#body-asset').append(`
                     <tr class="row_asset">
                         <input type="hidden" name="arr_asset_id[]" value="` + $("#asset_id").select2('data')[0].id + `">
+                        <input type="hidden" name="arr_unit[]" value="` + $("#asset_id").select2('data')[0].unit_id + `">
                         <td class="center">
                             ` + no + `
                         </td>
@@ -529,10 +530,10 @@
                             ` + $("#asset_id").select2('data')[0].name + `
                         </td>
                         <td class="center">
-                            <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + $("#asset_id").select2('data')[0].qty_balance + `" onkeyup="formatRupiah(this);">
+                            <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + $("#asset_id").select2('data')[0].qty_balance + `" onkeyup="formatRupiah(this);" readonly>
                         </td>
                         <td class="center">
-                            <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
+                            ` + $("#asset_id").select2('data')[0].unit_name + `
                         </td>
                         <td class="right-align">
                             ` + $("#asset_id").select2('data')[0].nominal + `
@@ -553,12 +554,6 @@
                         </td>
                     </tr>
                 `);
-                if($("#asset_id").select2('data')[0].unit_id){
-                    $('#arr_unit' + count).append(`
-                        <option value="` + $("#asset_id").select2('data')[0].unit_id + `">` + $("#asset_id").select2('data')[0].unit_name + `</option>
-                    `);
-                }
-                select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
                 select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                 $('#asset_id').empty();
 
@@ -816,6 +811,7 @@
                     $('#body-asset').append(`
                         <tr class="row_asset">
                             <input type="hidden" name="arr_asset_id[]" value="` + val.asset_id + `">
+                            <input type="hidden" name="arr_unit[]" value="` + val.unit_name + `">
                             <td class="center">
                                 ` + no + `
                             </td>
@@ -826,10 +822,10 @@
                                 ` + val.asset_name + `
                             </td>
                             <td class="center">
-                                <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + val.qty + `" onkeyup="formatRupiah(this);">
+                                <input type="text" id="arr_qty` + count + `" name="arr_qty[]" value="` + val.qty + `" onkeyup="formatRupiah(this);" readonly>
                             </td>
                             <td class="center">
-                                <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
+                                ` + val.unit_name + `
                             </td>
                             <td class="right-align">
                                 ` + val.asset_nominal + `
@@ -850,10 +846,6 @@
                             </td>
                         </tr>
                     `);
-                    $('#arr_unit' + count).append(`
-                        <option value="` + val.unit_id + `">` + val.unit_name + `</option>
-                    `);
-                    select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
                     $('#arr_coa' + count).append(`
                         <option value="` + val.coa_id + `">` + val.coa_name + `</option>
                     `);
@@ -1151,14 +1143,20 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal6').modal('open');
-                $('#title_data').html(data.title);
-                $('#code_data').html(data.message.code);
-                $('#body-journal-table').html(data.tbody);
-                $('#user_jurnal').html('Pengguna '+data.user);
-                $('#note_jurnal').html('Keterangan '+data.message.note);
-                $('#ref_jurnal').html( 'Referensi '+data.reference);
-                $('#post_date_jurnal').html('Tanggal '+data.message.post_date);
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal6').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna `+data.user);
+                    $('#note_jurnal').append(`Keterangan `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi `+data.reference);
+                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                }
             }
         });
     }

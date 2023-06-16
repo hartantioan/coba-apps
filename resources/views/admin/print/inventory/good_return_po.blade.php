@@ -161,7 +161,8 @@
 											<th>Jum.Diterima</th>
                                             <th>Jum.Kembali</th>
 											<th>Sat.</th>
-											<th>Catatan</th>
+											<th>Catatan 1</th>
+											<th>Catatan 2</th>
 											<th>Plant</th>
 											<th>Departemen</th>
 											<th>Gudang</th>
@@ -176,6 +177,7 @@
                                             <td align="center">{{ $rowdetail->qty }}</td>
 											<td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
 											<td>{{ $rowdetail->note }}</td>
+											<td>{{ $rowdetail->note2 }}</td>
 											<td align="center">{{ $rowdetail->goodReceiptDetail->place->name.' - '.$rowdetail->goodReceiptDetail->place->company->name }}</td>
 											<td align="center">{{ $rowdetail->goodReceiptDetail->department->name }}</td>
 											<td align="center">{{ $rowdetail->goodReceiptDetail->warehouse->name }}</td>

@@ -266,8 +266,14 @@
                             <label class="active" for="province_id">Provinsi</label>
                         </div>
                         <div class="input-field col s3">
-                            <select class="browser-default" id="city_id" name="city_id"></select>
+                            <select class="browser-default" id="city_id" name="city_id" onchange="getSubdistrict();"></select>
                             <label class="active" for="city_id">Kota/Kabupaten</label>
+                        </div>
+                        <div class="input-field col s3">
+                            <select class="select2 browser-default" id="subdistrict_id" name="subdistrict_id">
+                                <option value="">--Pilih ya--</option>
+                            </select>
+                            <label class="active" for="subdistrict_id">Kecamatan</label>
                         </div>
                         <div class="input-field col s3">
                             <select class="browser-default" id="country_id" name="country_id"></select>
@@ -279,7 +285,7 @@
                         </div>
                         <div class="input-field col s3">
                             <div class="switch mb-1">
-                                <label for="order">Status</label>
+                                <label for="status">Status</label>
                                 <label>
                                     Non-Active
                                     <input checked type="checkbox" id="status" name="status" value="1">
@@ -428,7 +434,7 @@
     </div>
 </div>
 
-<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:80%;max-width:100%;">
+<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -450,14 +456,15 @@
                                     <table class="bordered" id="table-menu-access">
                                         <thead style="position:sticky;top: -25px !important;background-color:rgb(176, 212, 212) !important;">
                                             <tr>
-                                                <th width="40%" class="center" rowspan="3">Menu</th>
-                                                <th width="60%" class="center" colspan="4">Akses</th>
+                                                <th width="20%" class="center" rowspan="3">Menu</th>
+                                                <th width="80%" class="center" colspan="5">Akses</th>
                                             </tr>
                                             <tr>
-                                                <th width="15%" class="center">View</th>
-                                                <th width="15%" class="center">Create/Update</th>
-                                                <th width="15%" class="center">Delete</th>
-                                                <th width="15%" class="center">Void</th>
+                                                <th width="16%" class="center">View</th>
+                                                <th width="16%" class="center">Create/Update</th>
+                                                <th width="16%" class="center">Delete</th>
+                                                <th width="16%" class="center">Void</th>
+                                                <th width="16%" class="center">Journal</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-menu">
@@ -498,6 +505,14 @@
                                                         </label>
                                                         @endif
                                                     </td>
+                                                    <td>
+                                                        @if (!$m->childHasChild())
+                                                        <label>
+                                                            <input type="checkbox" class="checkboxJournal" onclick="checkAll(this,{{ $m->id }},'journal')"/>
+                                                            <span>Pilih</span>
+                                                        </label>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                                 @if($m->sub()->exists())
                                                     @foreach($m->sub()->where('status','1')->oldest('order')->get() as $msub)
@@ -527,6 +542,12 @@
                                                                 <td>
                                                                     <label>
                                                                         <input type="checkbox" class="checkboxVoid" onclick="checkAll(this,{{ $msub->id }},'void')"/>
+                                                                        <span>Pilih</span>
+                                                                    </label>
+                                                                </td>
+                                                                <td>
+                                                                    <label>
+                                                                        <input type="checkbox" class="checkboxJournal" onclick="checkAll(this,{{ $msub->id }},'journal')"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
@@ -563,6 +584,12 @@
                                                                                 <span>Pilih</span>
                                                                             </label>
                                                                         </td>
+                                                                        <td class="center">
+                                                                            <label>
+                                                                                <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
+                                                                                <span>Pilih</span>
+                                                                            </label>
+                                                                        </td>
                                                                     </tr>
                                                                 @endif
                                                             @endforeach
@@ -595,6 +622,12 @@
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
+                                                                <td class="center">
+                                                                    <label>
+                                                                        <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
+                                                                        <span>Pilih</span>
+                                                                    </label>
+                                                                </td>
                                                             </tr>
                                                         @endif
                                                     @endforeach
@@ -624,6 +657,12 @@
                                                         <td class="center">
                                                             <label>
                                                                 <input type="checkbox" name="checkboxVoid[]" id="checkboxVoid{{ $m->id }}" value="{{ $m->id }}" data-parent="{{ $m->parentsub->id }}"/>
+                                                                <span>Pilih</span>
+                                                            </label>
+                                                        </td>
+                                                        <td class="center">
+                                                            <label>
+                                                                <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $m->id }}" value="{{ $m->id }}" data-parent="{{ $m->parentsub->id }}"/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
@@ -777,6 +816,9 @@
                 $('.row_bank').remove();
                 $('.row_info').remove();
                 refreshGroup();
+                $('#subdistrict_id').empty().append(`
+                    <option value="">--Pilih ya--</option>
+                `);
             }
         });
 
@@ -1029,6 +1071,21 @@
                 });
 			 }
 		});
+    }
+
+    function getSubdistrict(){
+        if($('#city_id').val()){
+            $('#subdistrict_id').empty();
+            $.each($('#city_id').select2('data')[0].subdistrict, function(i, value) {
+                $('#subdistrict_id').append(`
+                    <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
+                `);
+            });
+        }else{
+            $('#subdistrict_id').empty().append(`
+                <option value="">--Pilih ya--</option>
+            `);
+        }
     }
 
     function saveAccess(){
@@ -1508,6 +1565,15 @@
                     <option value="` + response.city_id + `">` + response.city_name + `</option>
                 `);
 
+                $('#subdistrict_id').empty();
+                $.each(response.subdistrict_list, function(i, value) {
+                    $('#subdistrict_id').append(`
+                        <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
+                    `);
+                });
+
+                $('#subdistrict_id').val(response.subdistrict_id).trigger('change');
+
                 $('#country_id').append(`
                     <option value="` + response.country_id + `">` + response.country_name + `</option>
                 `);
@@ -1735,6 +1801,9 @@
         }
         if(mode == 'void'){
             param = 'checkboxVoid';
+        }
+        if(mode == 'journal'){
+            param = 'checkboxJournal';
         }
         
         if($(element).is(':checked')){

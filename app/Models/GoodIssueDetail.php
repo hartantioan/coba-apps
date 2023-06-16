@@ -41,7 +41,7 @@ class GoodIssueDetail extends Model
 
     public function qtyConvertToBuy()
     {
-        $qty = round($this->qty / $this->item->buy_convert,3);
+        $qty = round($this->qty / $this->itemStock->item->buy_convert,3);
 
         return $qty;
     }

@@ -27,6 +27,7 @@ return new class extends Migration
             $table->date('pay_date')->nullable();
             $table->bigInteger('currency_id')->nullable();
             $table->double('currency_rate')->nullable();
+            $table->bigInteger('cost_distribution_id')->nullable();
             $table->double('admin')->nullable();
             $table->double('grandtotal')->nullable();
             $table->string('document')->nullable();
@@ -46,6 +47,7 @@ return new class extends Migration
             $table->index(['company_id']);
             $table->index(['coa_source_id']);
             $table->index(['currency_id']);
+            $table->index(['cost_distribution_id']);
         });
     }
 

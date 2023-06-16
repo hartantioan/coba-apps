@@ -24,6 +24,7 @@ class GoodReceiptDetail extends Model
         'wtax',
         'grandtotal',
         'note',
+        'note2',
         'remark',
         'place_id',
         'line_id',

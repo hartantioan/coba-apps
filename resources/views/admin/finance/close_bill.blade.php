@@ -729,7 +729,7 @@
                                     ` + response.coa_list + `
                                 </td>
                                 <td class="center">
-                                    <input id="arr_total` + count + `" name="arr_total[]" class="browser-default" type="text" value="` + response.balance + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                    <input id="arr_total` + count + `" name="arr_total[]" class="browser-default" type="text" value="` + response.balance + `" onkeyup="cekRow(this);formatRupiah(this);countAll();" data-limit="` + response.balance + `" style="width:150px;text-align:right;">
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();" style="width:150px;">
@@ -839,6 +839,17 @@
         $('#balance').text(
             (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
         );
+    }
+
+    function cekRow(element){
+        if($(element).val()){
+            let val = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")), limit = parseFloat($(element).data('limit').replaceAll(".", "").replaceAll(",","."));
+            if(val > limit){
+                $(element).val(
+                    (limit >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(limit).toString().replace('.',','))
+                );
+            }
+        }
     }
 
     function removeUsedData(id){
@@ -960,7 +971,7 @@
                                         ` + val.coa_list + `
                                     </td>
                                     <td class="center">
-                                            <input id="arr_nominal` + count + `" name="arr_nominal[]" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;">
+                                            <input id="arr_nominal` + count + `" name="arr_nominal[]" class="browser-default" type="text" value="` + val.balance + `" onkeyup="cekRow(this);formatRupiah(this);" style="width:150px;text-align:right;">
                                         </td>
                                     <td>
                                         <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan..." value=" - " style="width:100%;">
@@ -1281,14 +1292,20 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal6').modal('open');
-                $('#title_data').html(data.title);
-                $('#code_data').html(data.message.code);
-                $('#body-journal-table').html(data.tbody);
-                $('#user_jurnal').html('Pengguna '+data.user);
-                $('#note_jurnal').html('Keterangan '+data.message.note);
-                $('#ref_jurnal').html( 'Referensi '+data.reference);
-                $('#post_date_jurnal').html('Tanggal '+data.message.post_date);
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal6').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna `+data.user);
+                    $('#note_jurnal').append(`Keterangan `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi `+data.reference);
+                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                }
             }
         });
     }

@@ -31,6 +31,7 @@ return new class extends Migration
             $table->double('wtax')->nullable();
             $table->double('grandtotal')->nullable();
             $table->string('note')->nullable();
+            $table->string('note2')->nullable();
             $table->bigInteger('place_id')->nullable();
             $table->bigInteger('line_id')->nullable();
             $table->bigInteger('machine_id')->nullable();

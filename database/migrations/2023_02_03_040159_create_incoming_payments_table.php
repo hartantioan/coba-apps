@@ -18,18 +18,23 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50)->unique();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('branch_id')->nullable();
-            $table->bigInteger('marketing_order_invoice_id')->nullable();
-            $table->date('posting_date')->nullable();
-            $table->date('due_date')->nullable();
-            $table->date('document_date')->nullable();
-            $table->double('nominal')->nullable();
+            $table->bigInteger('account_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
+            $table->bigInteger('project_id')->nullable();
+            $table->date('post_date')->nullable();
+            $table->bigInteger('wtax_id')->nullable();
+            $table->double('percent_wtax')->nullable();
+            $table->double('total')->nullable();
+            $table->double('wtax')->nullable();
+            $table->double('grandtotal')->nullable();
             $table->bigInteger('coa_id')->nullable();
             $table->string('document')->nullable();
             $table->text('note')->nullable();
             $table->char('status', 1)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
+
+            $table->index(['user_id','account_id','company_id','project_id'],'incoming_payment_index');
         });
     }
 

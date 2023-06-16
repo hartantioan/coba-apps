@@ -114,26 +114,6 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_is_tax" style="font-size:1rem;">Ber-PPN? :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_is_tax" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Ya</option>
-                                                        <option value="2">Tidak</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_is_include_ppn" style="font-size:1rem;">Termasuk PPN? :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_is_include_ppn" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Ya</option>
-                                                        <option value="0">Tidak</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
                                                 <label for="filter_supplier" style="font-size:1rem;">Supplier :</label>
                                                 <div class="input-field">
                                                     <select class="browser-default" id="filter_supplier" name="filter_supplier" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
@@ -170,7 +150,6 @@
                                                         <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Supplier</th>
                                                         <th rowspan="2">Perusahaan</th>
-                                                        <th colspan="3" class="center-align">Pajak</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
@@ -178,16 +157,11 @@
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Subtotal</th>
                                                         <th rowspan="2">Diskon</th>
-                                                        <th rowspan="2">Total</th>
-                                                        <th rowspan="2">Pajak</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>Ya/Tidak</th>
-                                                        <th>Termasuk</th>
-                                                        <th>Prosentase</th>
                                                         <th>Post</th>
                                                         <th>Tenggat</th>
                                                         <th>Kode</th>
@@ -270,26 +244,6 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="input-field col m3 s12">
-                                <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
-                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                    @foreach ($tax as $row)
-                                        <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="active" for="tax_id">Pajak PPN</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <div class="switch mb-1">
-                                    <label class="active" for="is_include_tax">Termasuk Pajak?</label>
-                                    <label>
-                                        Tidak
-                                        <input type="checkbox" id="is_include_tax" name="is_include_tax" value="1" onclick="countAll();">
-                                        <span class="lever"></span>
-                                        Ya
-                                    </label>
-                                </div>
-                            </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Purchase Order (Centang jika ada)</h4>
@@ -317,13 +271,6 @@
                                                         Pilih supplier untuk memulai...
                                                     </td>
                                                 </tr>
-                                                <!-- <tr id="last-row-purchase">
-                                                    <td colspan="8" class="center">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addPurchaseOrder()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Purchase Order
-                                                        </a>
-                                                    </td>
-                                                </tr> -->
                                             </tbody>
                                         </table>
                                     </div>
@@ -350,14 +297,6 @@
                                             <td class="right-align">
                                                 <input class="browser-default" id="discount" name="discount" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Total</td>
-                                            <td class="right-align"><span id="total">0,000</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pajak</td>
-                                            <td class="right-align"><span id="tax">0,000</span></td>
                                         </tr>
                                         <tr>
                                             <td><h6>Grandtotal</h6></td>
@@ -546,7 +485,6 @@
     </div>
 </div>
 
-
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -605,7 +543,7 @@
                     </tr>
                 `);
                 $('#supplier_id').empty();
-                $('#total,#tax,#grandtotal').text('0,000');
+                $('#grandtotal').text('0,000');
                 $('#subtotal').val('0,000');
             }
         });
@@ -651,34 +589,6 @@
                 $('#note_jurnal').empty();
                 $('#ref_jurnal').empty();
                 $('#post_date_jurnal').empty();
-
-               /*  $.each(data, function(i, val) {
-                    $('#body-journal-table').append(`
-                        <tr class="row_purchase">
-                            <td class="center-align">
-                                
-                            </td>
-                            <td>
-                                ` + val.po_no + `
-                            </td>
-                            <td class="center">
-                                ` + val.post_date + `
-                            </td>
-                            <td class="center">
-                                ` + val.delivery_date + `
-                            </td>
-                            <td class="center">
-                                <input name="arr_note[]" class="browser-default" type="text" value="-" style="width:100%;" id="rowNote` + count + `">
-                            </td>
-                            <td class="center">
-                                ` + val.grandtotal + `
-                            </td>
-                            <td class="center">
-                                <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
-                            </td>
-                        </tr>
-                    `);
-                }); */
             }
         });
 
@@ -709,7 +619,6 @@
                 
             }
         });
-        
 
         select2ServerSide('#supplier_id,#filter_supplier', '{{ url("admin/select2/supplier") }}');
     });
@@ -1022,7 +931,7 @@
 
     function countAll(){
 
-        let subtotal = 0, discount = 0, total = 0, tax = 0, grandtotal = 0, percent_tax = parseFloat($('#tax_id').val()), ada = false;
+        let subtotal = 0, discount = 0, total = 0, grandtotal = 0, ada = false;
 
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
@@ -1042,21 +951,8 @@
 
         total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
 
-        if($('#tax_id').val() !== '0'){
-            if($('#is_include_tax').is(':checked')){
-                total = total / (1 + (percent_tax / 100));
-            }
-            tax = total * (percent_tax / 100);
-        }
+        grandtotal = total;
 
-        grandtotal = total + tax;
-
-        $('#total').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
-        );
-        $('#tax').text(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
-        );
         $('#grandtotal').text(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );
@@ -1091,6 +987,8 @@
             "order": [[0, 'asc']],
             dom: 'Blfrtip',
             buttons: [
+                'columnsToggle',
+                'selectAll',
                 'selectNone'
             ],
             "language": {
@@ -1125,8 +1023,6 @@
                     type : $('#filter_type').val(),
                     'supplier_id[]' : $('#filter_supplier').val(),
                     company_id : $('#filter_company').val(),
-                    is_tax : $('#filter_is_tax').val(),
-                    is_include_tax : $('#filter_is_include_tax').val(),
                     'currency_id[]' : $('#filter_currency').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
@@ -1152,9 +1048,6 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'supplier_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
-                { name: 'is_tax', className: 'center-align' },
-                { name: 'is_include_tax', className: 'center-align' },
-                { name: 'percent_tax', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
                 { name: 'document', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
@@ -1164,16 +1057,10 @@
                 { name: 'note', className: 'center-align' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'discount', className: 'right-align' },
-                { name: 'total', className: 'right-align' },
-                { name: 'tax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
-            dom: 'Blfrtip',
-            buttons: [
-                'columnsToggle' 
-            ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
         
@@ -1576,19 +1463,20 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal4').modal('open');
-                $('#title_data').html(data.title);
-                $('#code_data').html(data.message.code);
-                $('#body-journal-table').html(data.tbody);
-                $('#user_jurnal').html('Pengguna '+data.user);
-                $('#note_jurnal').html('Keterangan '+data.message.note);
-                $('#ref_jurnal').html( 'Referensi '+data.reference);
-                $('#post_date_jurnal').html('Tanggal '+data.message.post_date);
-                
-                
-
-
-                console.log(data);
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal4').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna `+data.user);
+                    $('#note_jurnal').append(`Keterangan `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi `+data.reference);
+                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
+                }
             }
         });
     }

@@ -234,6 +234,8 @@ class GoodReceiptPOController extends Controller
                             'department_name'           => $row->department_id ? $row->department->name : '-',
                             'warehouse_id'              => $row->warehouse_id,
                             'warehouse_name'            => $row->warehouse->name,
+                            'note'                      => $row->note,
+                            'note2'                     => $row->note2,
                         ];
                     }
                 }
@@ -461,7 +463,7 @@ class GoodReceiptPOController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = GoodReceipt::create([
-                        'code'			        => GoodReceipt::generateCode(),
+                        'code'			        => GoodReceipt::generateCode($request->post_date),
                         'user_id'		        => session('bo_id'),
                         'account_id'            => $request->account_id,
                         'company_id'            => $request->company_id,
@@ -499,6 +501,7 @@ class GoodReceiptPOController extends Controller
                             'wtax'                      => $arrDetail[$key]['wtax'],
                             'grandtotal'                => $arrDetail[$key]['grandtotal'],
                             'note'                      => $request->arr_note[$key],
+                            'note2'                     => $request->arr_note2[$key],
                             'remark'                    => $request->arr_remark[$key],
                             'place_id'                  => $request->arr_place[$key],
                             'line_id'                   => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
@@ -546,14 +549,15 @@ class GoodReceiptPOController extends Controller
                             <table class="bordered" style="min-width:100%;max-width:100%;">
                                 <thead>
                                     <tr>
-                                        <th class="center-align" colspan="11">Daftar Item</th>
+                                        <th class="center-align" colspan="12">Daftar Item</th>
                                     </tr>
                                     <tr>
                                         <th class="center-align">No.</th>
                                         <th class="center-align">Item</th>
                                         <th class="center-align">Qty</th>
                                         <th class="center-align">Satuan</th>
-                                        <th class="center-align">Keterangan</th>
+                                        <th class="center-align">Keterangan 1</th>
+                                        <th class="center-align">Keterangan 2</th>
                                         <th class="center-align">Remark</th>
                                         <th class="center-align">Plant</th>
                                         <th class="center-align">Line</th>
@@ -571,6 +575,7 @@ class GoodReceiptPOController extends Controller
                 <td class="center-align">'.number_format($rowdetail->qty,3,',','.').'</td>
                 <td class="center-align">'.$rowdetail->item->buyUnit->code.'</td>
                 <td class="center-align">'.$rowdetail->note.'</td>
+                <td class="center-align">'.$rowdetail->note2.'</td>
                 <td class="center-align">'.$rowdetail->remark.'</td>
                 <td class="center-align">'.$rowdetail->place->name.'</td>
                 <td class="center-align">'.($rowdetail->line()->exists() ? $rowdetail->line->name : '-').'</td>
@@ -647,6 +652,7 @@ class GoodReceiptPOController extends Controller
                 'qty'                       => number_format($row->qty,3,',','.'),
                 'unit'                      => $row->item->buyUnit->code,
                 'note'                      => $row->note,
+                'note2'                     => $row->note2,
                 'remark'                    => $row->remark,
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->name,

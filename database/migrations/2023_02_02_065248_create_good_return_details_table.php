@@ -21,6 +21,7 @@ return new class extends Migration
             $table->bigInteger('item_id')->nullable();
             $table->double('qty')->nullable();
             $table->string('note')->nullable();
+            $table->string('note2')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
 

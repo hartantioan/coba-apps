@@ -414,7 +414,7 @@ class OutgoingPaymentController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = OutgoingPayment::create([
-                        'code'			            => OutgoingPayment::generateCode(),
+                        'code'			            => OutgoingPayment::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,

@@ -186,6 +186,8 @@ class PurchaseInvoiceController extends Controller
                             'wtax'          => number_format($arrTotal['wtax'],2,',','.'),
                             'grandtotal'    => number_format($arrTotal['grandtotal'],2,',','.'),
                             'info'          => $rowdetail->note,
+                            'note'          => $rowdetail->note,
+                            'note2'         => $rowdetail->note2,
                             'top'           => $datapo->payment_term,
                             'delivery_no'   => '-',
                             'purchase_no'   => 'NO PO - '.$datapo->code,
@@ -234,6 +236,8 @@ class PurchaseInvoiceController extends Controller
                             'wtax'          => number_format($rowdetail->wtax,2,',','.'),
                             'grandtotal'    => number_format($rowdetail->grandtotal,2,',','.'),
                             'info'          => $info,
+                            'note'          => $rowdetail->note,
+                            'note2'         => $rowdetail->note2,
                             'top'           => $top,
                             'delivery_no'   => 'NO SJ - '.$datagr->delivery_no,
                             'purchase_no'   => 'NO PO - '.$rowdetail->purchaseOrderDetail->purchaseOrder->code,
@@ -257,41 +261,44 @@ class PurchaseInvoiceController extends Controller
                 $datalc = LandedCost::find(intval($request->arr_id[$key]));
 
                 if($datalc->balanceInvoice() > 0){
-                    $arrInfo = $datalc->getArrayDetail();
-                    $details[] = [
-                        'type'          => 'landed_costs',
-                        'id'            => $datalc->id,
-                        'name'          => $datalc->code,
-                        'qty_received'  => 1,
-                        'qty_returned'  => 0,
-                        'qty_balance'   => 1,
-                        'price'         => number_format($datalc->total,2,',','.'),
-                        'buy_unit'      => '-',
-                        'rawcode'       => $datalc->code,
-                        'post_date'     => date('d/m/y',strtotime($datalc->post_date)),
-                        'due_date'      => date('d/m/y',strtotime($datalc->post_date)),
-                        'total'         => number_format($datalc->total,2,',','.'),
-                        'tax'           => number_format($datalc->tax,2,',','.'),
-                        'wtax'          => number_format($datalc->wtax,2,',','.'),
-                        'grandtotal'    => number_format($datalc->grandtotal,2,',','.'),
-                        'info'          => $datalc->note,
-                        'top'           => 0,
-                        'delivery_no'   => '-',
-                        'purchase_no'   => '-',
-                        'percent_tax'   => 0,
-                        'percent_wtax'  => 0,
-                        'include_tax'   => 0,
-                        'place_id'      => $arrInfo['place_id'],
-                        'line_id'       => $arrInfo['line_id'],
-                        'machine_id'    => $arrInfo['machine_id'],
-                        'department_id' => $arrInfo['department_id'],
-                        'warehouse_id'  => $arrInfo['warehouse_id'],
-                        'place_name'    => $arrInfo['place_name'],
-                        'line_name'     => $arrInfo['line_name'],
-                        'machine_name'  => $arrInfo['machine_name'],
-                        'department_name' => $arrInfo['department_name'],
-                        'warehouse_name'=> $arrInfo['warehouse_name'],
-                    ];
+                    foreach($datalc->landedCostDetail as $rowdetail){
+                        $details[] = [
+                            'type'          => 'landed_cost_details',
+                            'id'            => $rowdetail->id,
+                            'name'          => $rowdetail->item->code,
+                            'qty_received'  => 1,
+                            'qty_returned'  => 0,
+                            'qty_balance'   => 1,
+                            'price'         => number_format($rowdetail->nominal,2,',','.'),
+                            'buy_unit'      => $rowdetail->item->buyUnit->code,
+                            'rawcode'       => $rowdetail->item->code,
+                            'post_date'     => date('d/m/y',strtotime($datalc->post_date)),
+                            'due_date'      => date('d/m/y',strtotime($datalc->post_date)),
+                            'total'         => number_format($rowdetail->nominal,2,',','.'),
+                            'tax'           => number_format($rowdetail->getTax(),2,',','.'),
+                            'wtax'          => number_format($rowdetail->getWtax(),2,',','.'),
+                            'grandtotal'    => number_format($rowdetail->getGrandtotal(),2,',','.'),
+                            'info'          => $datalc->code,
+                            'note'          => $datalc->note,
+                            'note2'         => '',
+                            'top'           => 0,
+                            'delivery_no'   => '-',
+                            'purchase_no'   => '-',
+                            'percent_tax'   => 0,
+                            'percent_wtax'  => 0,
+                            'include_tax'   => 0,
+                            'place_id'      => $rowdetail->place_id ? $rowdetail->place_id : '',
+                            'line_id'       => $rowdetail->line_id ? $rowdetail->line_id : '',
+                            'machine_id'    => $rowdetail->machine_id ? $rowdetail->machine_id : '',
+                            'department_id' => $rowdetail->department_id ? $rowdetail->department_id : '',
+                            'warehouse_id'  => $rowdetail->warehouse_id ? $rowdetail->warehouse_id : '',
+                            'place_name'    => $rowdetail->place_id ? $rowdetail->place->name : '',
+                            'line_name'     => $rowdetail->line_id ? $rowdetail->line->name : '',
+                            'machine_name'  => $rowdetail->machine_id ? $rowdetail->machine->name : '',
+                            'department_name' => $rowdetail->department_id ? $rowdetail->department->name : '',
+                            'warehouse_name'=> $rowdetail->warehouse_id ? $rowdetail->warehouse->name : '',
+                        ];
+                    }
                 }
             }
         }
@@ -660,7 +667,7 @@ class PurchaseInvoiceController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseInvoice::create([
-                        'code'			            => PurchaseInvoice::generateCode(),
+                        'code'			            => PurchaseInvoice::generateCode($request->post_date),
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
@@ -714,6 +721,7 @@ class PurchaseInvoiceController extends Controller
                                 'wtax'                  => str_replace(',','.',str_replace('.','',$request->arr_wtax[$key])),
                                 'grandtotal'            => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
                                 'note'                  => $request->arr_note[$key],
+                                'note2'                 => $request->arr_note2[$key],
                                 'place_id'              => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
                                 'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                                 'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
@@ -771,11 +779,13 @@ class PurchaseInvoiceController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="6">Daftar Order Pembelian</th>
+                                <th class="center-align" colspan="8">Daftar Order Pembelian</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item / Biaya</th>
+                                <th class="center-align">Keterangan 1</th>
+                                <th class="center-align">Keterangan 2</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
                                 <th class="center-align">PPH</th>
@@ -788,6 +798,8 @@ class PurchaseInvoiceController extends Controller
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->getCode().'</td>
+                    <td class="">'.$row->note.'</td>
+                    <td class="">'.$row->note2.'</td>
                     <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
                     <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
@@ -964,6 +976,8 @@ class PurchaseInvoiceController extends Controller
                 'wtax'          => number_format($row->wtax,2,',','.'),
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                 'info'          => $row->note,
+                'note'          => $row->note,
+                'note2'         => $row->note2,
                 'top'           => $row->getTop(),
                 'delivery_no'   => 'NO SJ - '.$row->getDeliveryCode(),
                 'purchase_no'   => 'NO PO - '.$row->getPurchaseCode(),
@@ -972,8 +986,14 @@ class PurchaseInvoiceController extends Controller
                 'include_tax'   => $row->is_include_tax,
                 'place_id'      => $row->place_id ? $row->place_id : '',
                 'line_id'       => $row->line_id ? $row->line_id : '',
+                'machine_id'    => $row->machine_id ? $row->machine_id : '',
                 'department_id' => $row->department_id ? $row->department_id : '',
                 'warehouse_id'  => $row->warehouse_id ? $row->warehouse_id : '',
+                'place_name'    => $row->place_id ? $row->place->name : '-',
+                'line_name'     => $row->line_id ? $row->line->name : '-',
+                'machine_name'  => $row->machine_id ? $row->machine->name : '-',
+                'department_name'=> $row->department_id ? $row->department->name : '-',
+                'warehouse_name'=> $row->warehouse_id ? $row->warehouse->name : '-',
             ];
         }
 

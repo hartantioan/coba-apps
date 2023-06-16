@@ -38,7 +38,7 @@ class WorkOrder extends Model
         'actual_finish',
     ];
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = WorkOrder::withTrashed()
             ->selectRaw('RIGHT(code, 9) as code')
@@ -54,7 +54,7 @@ class WorkOrder extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'WO-'.date('y').date('m').date('d').'-';
+        $pre = 'WO-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

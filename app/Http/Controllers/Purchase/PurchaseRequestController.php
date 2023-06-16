@@ -213,7 +213,8 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Keterangan 1</th>
+                                <th class="center-align">Keterangan 2</th>
                                 <th class="center-align">Tgl.Dipakai</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
@@ -229,7 +230,8 @@ class PurchaseRequestController extends Controller
                 <td class="center-align">'.$row->item->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->buyUnit->code.'</td>
-                <td class="center-align">'.$row->note.'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="">'.$row->note2.'</td>
                 <td class="center-align">'.date('d/m/y',strtotime($row->required_date)).'</td>
                 <td class="center-align">'.$row->place->name.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
@@ -540,7 +542,7 @@ class PurchaseRequestController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseRequest::create([
-                        'code'			=> PurchaseRequest::generateCode(),
+                        'code'			=> PurchaseRequest::generateCode($request->post_date),
                         'user_id'		=> session('bo_id'),
                         'company_id'    => $request->company_id,
                         'status'        => '1',
@@ -568,6 +570,7 @@ class PurchaseRequestController extends Controller
                             'item_id'               => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
+                            'note2'                 => $request->arr_note2[$key],
                             'required_date'         => $request->arr_required_date[$key],
                             'place_id'              => $request->arr_place[$key],
                             'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
@@ -619,6 +622,7 @@ class PurchaseRequestController extends Controller
                 'qty'               => number_format($row->qty,3,',','.'),
                 'unit'              => $row->item->buyUnit->code,
                 'note'              => $row->note,
+                'note2'             => $row->note2,
                 'date'              => $row->required_date,
                 'warehouse_name'    => $row->warehouse->name,
                 'warehouse_id'      => $row->warehouse_id,

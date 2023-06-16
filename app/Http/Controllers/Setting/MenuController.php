@@ -288,14 +288,12 @@ class MenuController extends Controller
         $listItems = [];
 
         foreach(Menu::where('status','1')->get() as $row){
-            ///if(!$row->sub()->exists()){
-                $listItems[] = [
-                    'url'       => !$row->sub()->exists() ? url('admin').'/'.$row->fullUrl() : 'javascript:void(0);',
-                    'name'      => $row->name,
-                    'icon'      => $row->icon,
-                    'category'  => $row->parentsub()->exists() ? $row->parentsub->name : 'Parent Pages'
-                ];
-            //}
+            $listItems[] = [
+                'url'       => !$row->sub()->exists() ? url('admin').'/'.$row->fullUrl() : 'javascript:void(0);',
+                'name'      => $row->name,
+                'icon'      => $row->icon,
+                'category'  => $row->parentsub()->exists() ? $row->parentsub->name : 'Parent Pages'
+            ];
         }
 
         return response()->json([

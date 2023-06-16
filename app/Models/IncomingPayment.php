@@ -8,28 +8,30 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class InventoryTransferOut extends Model
+class IncomingPayment extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'inventory_transfer_outs';
+    protected $table = 'incoming_payments';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
+        'account_id',
         'company_id',
-        'place_from',
-        'warehouse_from',
-        'place_to',
-        'warehouse_to',
+        'project_id',
         'post_date',
+        'currency_id',
+        'currency_rate',
+        'wtax_id',
+        'percent_wtax',
+        'total',
+        'wtax',
+        'grandtotal',
+        'coa_id',
         'document',
         'note',
-        'receiver_id',
-        'received_date',
-        'document_received',
-        'note_received',
         'status',
         'void_id',
         'void_note',
@@ -40,36 +42,28 @@ class InventoryTransferOut extends Model
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
-    public function inventoryTransferIn(){
-        return $this->hasOne('App\Models\InventoryTransferIn','inventory_transfer_out_id','id');
-    }
-
-    public function placeFrom(){
-        return $this->belongsTo('App\Models\Place','place_from','id')->withTrashed();
-    }
-
-    public function warehouseFrom(){
-        return $this->belongsTo('App\Models\Warehouse','warehouse_from','id')->withTrashed();
-    }
-
-    public function placeTo(){
-        return $this->belongsTo('App\Models\Place','place_to','id')->withTrashed();
-    }
-
-    public function warehouseTo(){
-        return $this->belongsTo('App\Models\Warehouse','warehouse_to','id')->withTrashed();
+    public function currency(){
+        return $this->belongsTo('App\Models\Currency','currency_id','id')->withTrashed();
     }
 
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
 
-    public function receiver(){
-        return $this->belongsTo('App\Models\User','receiver_id','id')->withTrashed();
+    public function account(){
+        return $this->belongsTo('App\Models\Account','account_id','id')->withTrashed();
+    }
+
+    public function project(){
+        return $this->belongsTo('App\Models\Project','project_id','id')->withTrashed();
     }
 
     public function voidUser(){
         return $this->belongsTo('App\Models\User','void_id','id')->withTrashed();
+    }
+    
+    public function coa(){
+        return $this->belongsTo('App\Models\Coa','coa_id','id')->withTrashed();
     }
 
     public function company()
@@ -77,9 +71,14 @@ class InventoryTransferOut extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function inventoryTransferOutDetail()
+    public function wTaxMaster()
     {
-        return $this->hasMany('App\Models\InventoryTransferOutDetail');
+        return $this->belongsTo('App\Models\Tax', 'wtax_id', 'id')->withTrashed();
+    }
+
+    public function incomingPaymentDetail()
+    {
+        return $this->hasMany('App\Models\IncomingPaymentDetail');
     }
 
     public function status(){
@@ -129,7 +128,7 @@ class InventoryTransferOut extends Model
 
     public static function generateCode($post_date)
     {
-        $query = InventoryTransferOut::selectRaw('RIGHT(code, 9) as code')
+        $query = IncomingPayment::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
@@ -143,7 +142,7 @@ class InventoryTransferOut extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'ITO-'.date('ymd',strtotime($post_date)).'-';
+        $pre = 'IP-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }
@@ -168,30 +167,6 @@ class InventoryTransferOut extends Model
             return $html;
         }else{
             return '';
-        }
-    }
-
-    public function updateJournal(){
-        $journal = Journal::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
-        
-        if($journal){
-            foreach($this->inventoryTransferOutDetail as $row){
-                $priceout = $row->item->priceNow($row->itemStock->place_id,$this->post_date);
-				$nominal = round($row->qty * $priceout,2);
-
-                $row->update([
-                    'price'     => $priceout,
-                    'total'     => $nominal
-                ]);
-
-                if($journal){
-                    foreach($journal->journalDetail()->where('item_id',$row->item_id)->get() as $rowupdate){
-                        $rowupdate->update([
-                            'nominal'   => $nominal
-                        ]);
-                    }
-                }
-            }
         }
     }
 

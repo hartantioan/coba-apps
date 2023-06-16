@@ -52,7 +52,7 @@ class GoodReturnPO extends Model
         return $this->hasMany('App\Models\GoodReturnPODetail','good_return_id','id');
     }
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = GoodReturnPO::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
@@ -68,7 +68,7 @@ class GoodReturnPO extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'GRTP-'.date('y').date('m').date('d').'-';
+        $pre = 'GRTP-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

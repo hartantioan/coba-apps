@@ -363,7 +363,7 @@ class InventoryTransferOutController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = InventoryTransferOut::create([
-                        'code'			        => InventoryTransferOut::generateCode(),
+                        'code'			        => InventoryTransferOut::generateCode($request->post_date),
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'place_from'            => $request->place_from,

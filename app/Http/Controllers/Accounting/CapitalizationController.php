@@ -260,7 +260,7 @@ class CapitalizationController extends Controller
                 }
 			}else{
                 $query = Capitalization::create([
-                    'code'			=> Capitalization::generateCode(),
+                    'code'			=> Capitalization::generateCode($request->post_date),
                     'user_id'		=> session('bo_id'),
                     'company_id'    => $request->company_id,
                     'currency_id'   => $request->currency_id,

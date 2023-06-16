@@ -106,7 +106,7 @@ class PurchaseMemo extends Model
         }
 	}
 
-    public static function generateCode()
+    public static function generateCode($post_date)
     {
         $query = PurchaseMemo::selectRaw('RIGHT(code, 9) as code')
             ->withTrashed()
@@ -122,7 +122,7 @@ class PurchaseMemo extends Model
 
         $no = str_pad($code, 9, 0, STR_PAD_LEFT);
 
-        $pre = 'PM-'.date('y').date('m').date('d').'-';
+        $pre = 'PM-'.date('ymd',strtotime($post_date)).'-';
 
         return $pre.$no;
     }

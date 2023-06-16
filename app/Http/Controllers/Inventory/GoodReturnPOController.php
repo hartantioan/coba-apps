@@ -10,6 +10,7 @@ use App\Models\LandedCost;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
+use App\Models\PurchaseMemo;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetail;
 use App\Models\PurchaseRequest;
@@ -930,7 +931,8 @@ class GoodReturnPOController extends Controller
         $data_id_pyrs=[];
         $data_id_lc=[];
         $data_id_greturns=[];
-        $data_id_pr=[];  
+        $data_id_pr=[];
+        $data_id_memo=[];  
        
 
         if($query) {
@@ -1201,6 +1203,27 @@ class GoodReturnPOController extends Controller
                             ];
                             $data_id_lc[] = $row->lookable->id;
                             
+                        }
+
+                        if($row->purchaseMemoDetail()->exists()){
+                            foreach($row->purchaseMemoDetail as $purchase_memodetail){
+                                $data_memo = [
+                                    "name"=>$purchase_memodetail->purchaseMemo->code,
+                                    "key" => $purchase_memodetail->purchaseMemo->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
+                                     ],
+                                    'url'=>request()->root()."/admin/purchase/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
+                                ];
+                                $data_link[]=[
+                                    'from'=>$query_invoice->code,
+                                    'to'=>$purchase_memodetail->purchaseMemo->code,
+                                    'string_link'=>$query_invoice->code.$purchase_memodetail->purchaseMemo->code,
+                                ];
+                                $data_id_memo[]=$purchase_memodetail->purchaseMemo->id;
+                                $data_go_chart[]=$data_memo;
+                            }
                         }
                         
                     }
@@ -1623,6 +1646,76 @@ class GoodReturnPOController extends Controller
                         }
                     }
 
+                    foreach($query_dp->purchaseMemoDetail as $purchase_memodetail){
+                        $data_memo=[
+                            "name"=>$purchase_memodetail->purchaseMemo->code,
+                            "key" => $purchase_memodetail->purchaseMemo->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
+                                ['name'=> "Nominal : Rp.:".number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
+                                ],
+                            'url'=>request()->root()."/admin/purchase/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
+                        ];
+                        $data_go_chart[]=$data_memo;
+                        $data_link[]=[
+                            'from'=>$query_dp->code,
+                            'to'=>$purchase_memodetail->purchaseMemo->code,
+                            'string_link'=>$query_dp->code.$purchase_memodetail->purchaseMemo->code,
+                        ];
+                        
+
+                    }
+
+                }
+
+                foreach($data_id_memo as $memo_id){
+                    $query = PurchaseMemo::find($memo_id);
+                    foreach($query->purchaseMemoDetail as $row){
+                        if($row->lookable_type == 'purchase_invoice_details'){
+                            $data_invoices_tempura=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row->lookable->purchaseInvoice->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->purchaseInvoice->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row->lookable->purchaseInvoice->code,
+                                "name" => $row->lookable->purchaseInvoice->code,
+                                'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row->lookable->purchaseInvoice->code),
+                            ];
+        
+                            $data_go_chart[]=$data_invoices_tempura;
+                            $data_link[]=[
+                                'from'=>$data_invoices_tempura["key"],
+                                'to'=>$query->code,
+                                'string_link'=>$data_invoices_tempura["key"].$query->code,
+                            ];
+                            if(!in_array($row->lookable->purchaseInvoice->id, $data_id_invoice)){
+                                $data_id_invoice[] = $row->lookable->purchaseInvoice->id;
+                                $added=true;
+                            }
+                        }elseif($row->lookable_type == 'purchase_down_payments'){
+                            $data_downp_tempura=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row->lookable->code,
+                                "name" => $row->lookable->code,
+                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row->lookable->code),
+                            ];
+        
+                            $data_go_chart[]=$data_downp_tempura;
+                            $data_link[]=[
+                                'from'=>$data_downp_tempura["key"],
+                                'to'=>$query->code,
+                                'string_link'=>$data_downp_tempura["key"].$query->code,
+                            ];
+                            if(!in_array($row->lookable->id, $data_id_dp)){
+                                $data_id_dp[] = $row->lookable->id;
+                                $added=true;
+                            }
+                        }
+                        
+                    }
                 }
                 
                 foreach($data_id_lc as $landed_cost_id){
@@ -1767,7 +1860,7 @@ class GoodReturnPOController extends Controller
                         }
                     }
                 }
-            } 
+            }
             function unique_key($array,$keyname){
 
                 $new_array = array();

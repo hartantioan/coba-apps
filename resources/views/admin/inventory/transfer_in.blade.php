@@ -867,9 +867,135 @@
         });
     }
 
+    var printService = new WebSocketPrinter({
+        onConnect: function () {
+            
+        },
+        onDisconnect: function () {
+           
+        },
+        onUpdate: function (message) {
+            
+        },
+    });
+    
+    function printData(){
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
+        arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(2)').text().trim();
+            arr_id_temp.push(poin);
+           
+        });
+        
+        $.ajax({
+            url: '{{ Request::url() }}/print',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                arr_id: arr_id_temp,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': response.message
+                })
+                
+               
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function printMultiSelect(){
+        var formData = new FormData($('#form_data_print_multi')[0]);
+        console.log(formData);
+        $.ajax({
+            url: '{{ Request::url() }}/print_by_range',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert_multi').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    $('#modal5').modal('close');
+                   /*  printService.submit({
+                        'type': 'INVOICE',
+                        'url': response.message
+                    }) */
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alert_multi').show();
+                    $('.modal-content').scrollTop(0);
+                    console.log(response.error);
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+                    
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert_multi').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+            
+        });
+    }
+
     function printPreview(code){
         $.ajax({
-            url: '{{ Request::url() }}/approval/' + code,
+            url: '{{ Request::url() }}/print_individual/' + code,
             type:'GET',
             beforeSend: function() {
                 loadingOpen('.modal-content');
@@ -879,32 +1005,10 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal2').modal('open');
-                $('#show_print').html(data);
-            }
-        });
-    }
-
-    function printData(){
-        var search = window.table.search();
-        var status = $('#filter_status').val();
-        
-        $.ajax({
-            type : "POST",
-            url  : '{{ Request::url() }}/print',
-            data : {
-                search : search,
-                status : status,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            cache: false,
-            success: function(data){
-                var w = window.open('about:blank');
-                w.document.open();
-                w.document.write(data);
-                w.document.close();
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': data
+                })
             }
         });
     }

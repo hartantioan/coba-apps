@@ -9,20 +9,20 @@
             {
                 font-family: Tahoma, "Trebuchet MS", sans-serif;
             }
-        
+
             .break-row {
                 page-break-inside: avoid;
             }
-        
+
             .row {
-                margin-left:-5px;
-                margin-right:-5px;
+            margin-left:-5px;
+            margin-right:-5px;
             }
             
             .column1 {
-                float: left;
-                width: 50%;
-                padding: 5px;
+            float: left;
+            width: 50%;
+            padding: 5px;
             }
             .column2 {
                 margin-right: 60%;
@@ -30,15 +30,15 @@
                 width: 50%;
                 padding: 5px;
             }
-        
+
             .row::after {
-                content: "";
-                clear: both;
-                display: table;
+            content: "";
+            clear: both;
+            display: table;
             }
-        
+
             
-        
+
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
                     zoom:0.4;
@@ -50,7 +50,7 @@
                     zoom:0.6;
                     font-size:11px !important;
                 }
-        
+
                 table > thead > tr > th {
                     font-size:13px !important;
                     font-weight: 800 !important;
@@ -65,16 +65,16 @@
                     font-size:1em !important;
                 }
                 .table-data-item td{
-                    font-size:0.9em !important;
+                    font-size:0.8em !important;
                 }
                 .table-data-item th{
                     border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:1em !important;
+                    font-size:0.6em !important;
                 }
                 .table-bot1 td{
-                    font-size:1em !important;
+                    font-size:0.7em !important;
                 }
             }
         
@@ -152,9 +152,12 @@
                 border:1px solid black;
                 min-height: 23%;
             }
-        
+
             @page { margin: 5em 3em 6em 3em; }
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+                
+        
+           
         </style>
     </head>
     <body>
@@ -164,17 +167,18 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1" style="font-size:1em">NO # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1">Revaluation # {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
+                                <small>Diajukan:</small>
+                                <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">Purchase Memo</h5>
+                                <h5 class="indigo-text">Revaluation</h5>
                             </td>
                         </tr>
                                 
@@ -198,33 +202,41 @@
         </header>
         <main>
             <div class="card">
-                <div class="card-content invoice-print-area">
-                    <table border="0" width="100%" class="tbl-info">
+                <div class="card-content invoice-print-area ">
+                    <table border="0" width="100%">
                         <tr>
-                            <td width="33%" class="left-align" style="vertical-align: top !important;">
-                                <table border="0" width="100%">
+                            <td width="33%" class="left-align">
+                                <table border="0" width="50%" class="tbl-info">
                                     <tr>
-                                        <td width="40%">
-                                            Dari
+                                        <td width="25%">
+                                            Name
                                         </td>
-                                        <td width="60%">
+                                        <td width="50%">
                                             {{ $data->user->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="40%">
+                                        <td width="50%">
                                             Posisi
                                         </td>
-                                        <td width="60%">
+                                        <td width="50%">
                                             {{ $data->user->position->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="40%">
+                                        <td width="50%">
                                             Depart.
                                         </td>
-                                        <td width="60%">
+                                        <td width="50%">
                                             {{ $data->user->department->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="50%">
+                                            HP
+                                        </td>
+                                        <td width="50%">
+                                            {{ $data->user->phone }}
                                         </td>
                                     </tr>
                                 </table>
@@ -235,8 +247,8 @@
                             <td width="33%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td>
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:100%;" height="5%" />
+                                        <td align="right">
+                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -255,67 +267,55 @@
                             </td>
                         </tr>
                     </table>
-                    <div class="invoice-product-details mt-3  ">
-                        <table class="bordered table-data-item" border="1" style="border-collapse:collapse;" width="100%">
+                    <!-- product details table-->
+                    
+                    <div class="invoice-product-details mt-2">
+                        <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
-                                    <th class="center-align">No.</th>
-                                    <th class="center-align">PO Inv./PO DP</th>
-                                    <th class="center-align">Keterangan</th>
-                                    <th class="center-align">Total</th>
-                                    <th class="center-align">PPN</th>
-                                    <th class="center-align">PPH</th>
-                                    <th class="center-align">Grandtotal</th>
+                                    <th class="center">No</th>
+                                    <th class="center">Item</th>
+                                    <th class="center">Plant</th>
+                                    <th class="center">Gudang</th>
+                                    <th class="center">Qty</th>
+                                    <th class="center">Sat.</th>
+                                    <th class="center">Coa</th>
+                                    <th class="center">Nominal</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($data->purchaseMemoDetail as $key => $row)
+                                @foreach($data->inventoryRevaluationDetail as $keydetail => $rowdetail)
                                 <tr>
-                                    <td class="center-align">{{($key + 1)}}</td>
-                                    <td class="center-align">{{$row->getCode()}}</td>
-                                    <td class="center-align">{{$row->description}}</td>
-                                    <td class="right-align">{{number_format($row->total,2,',','.')}}</td>
-                                    <td class="right-align">{{number_format($row->tax,2,',','.')}}</td>
-                                    <td class="right-align">{{number_format($row->wtax,2,',','.')}}</td>
-                                    <td class="right-align">{{number_format($row->grandtotal,2,',','.')}}</td>
+                                    <td class="center">{{ ($keydetail + 1) }}</td>
+                                    <td>{{ $rowdetail->item->name }}</td>
+                                    <td class="center">{{ $rowdetail->place->name }}</td>
+                                    <td class="center">{{ $rowdetail->warehouse->name }}</td>
+                                    <td class="center">{{ $rowdetail->qty }}</td>
+                                    <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
+                                    <td>{{ $rowdetail->coa->name }}</td>
+                                    <td class="center">{{ $rowdetail->nominal }}</td>
                                 </tr>
                                 @endforeach
-                                
                             </tbody>
                         </table>
                     </div>
-
+                    <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
                         <div class="row">
                         <div class="column1">
-                            <table style="width:100%" class="table-bot">
+                            <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal) }}
+                                        {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
+                                        <div class="mt-3">
+                                            Catatan : {{ $data->note }}
+                                        </div>
                                     </td>
                                     
                                 </tr>
                             </table>
                         </div>
-                        <div class="column2" >
-                            <table class="table-bot" style="border-collapse:collapse;text-align: right; padding-right:6%;" width="100%">
-                                <tr>
-                                    <td class="right-align" style="padding-right:15px" >Total</td>
-                                    <td class="right-align" style="border:0.6px solid black;padding-left:20px;" width="25.5%">{{ number_format($data->total,2,',','.') }}</td>
-                                </tr class="break-row">
-                                <tr class="break-row">
-                                    <td class="right-align" style="padding-right:15px">PPN</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td class="right-align" style="padding-right:15px">PPH</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td class="right-align" style="padding-right:15px">Grandtotal</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
-                                </tr>
-                            </table>
+                        <div class="column2">
                         </div>
                         </div>
                         <table class="table-bot1" width="100%" border="0">
@@ -349,3 +349,4 @@
             </div>
         </main>
     </body>
+</html>

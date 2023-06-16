@@ -743,6 +743,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[PurchaseMemoController::class, 'printByRange']);
                     Route::post('get_details', [PurchaseMemoController::class, 'getDetails']);
                     Route::get('view_journal/{id}',[PurchaseMemoController::class, 'viewJournal'])->middleware('operation.access:purchase_memo,journal');
+                    Route::get('viewstructuretree',[PurchaseMemoController::class, 'viewStructureTree']);
                     Route::get('print_individual/{id}',[PurchaseMemoController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('remove_used_data', [PurchaseMemoController::class, 'removeUsedData']);
                     Route::post('create',[PurchaseMemoController::class, 'create'])->middleware('operation.access:purchase_memo,update');

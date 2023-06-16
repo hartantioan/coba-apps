@@ -1371,6 +1371,7 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
+                console.log(data);
                 printService.submit({
                     'type': 'INVOICE',
                     'url': data

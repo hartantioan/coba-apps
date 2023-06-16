@@ -10,6 +10,7 @@ use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
+use App\Models\PurchaseMemo;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
 use App\Models\User;
@@ -176,6 +177,11 @@ class OutgoingPaymentController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                if($val->journal()->exists()){
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
+                }else{
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -194,6 +200,7 @@ class OutgoingPaymentController extends Controller
                     $val->note,
                     $val->status(),
                     '
+                        '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 					'
@@ -837,6 +844,7 @@ class OutgoingPaymentController extends Controller
         $data_id_lc=[];
         $data_id_greturns=[];
         $data_id_pr=[];
+        $data_id_memo=[];
 
         if($query) {
 
@@ -1146,6 +1154,27 @@ class OutgoingPaymentController extends Controller
                             ];
                             $data_id_lc[] = $row->lookable->id;
                             
+                        }
+
+                        if($row->purchaseMemoDetail()->exists()){
+                            foreach($row->purchaseMemoDetail as $purchase_memodetail){
+                                $data_memo = [
+                                    "name"=>$purchase_memodetail->purchaseMemo->code,
+                                    "key" => $purchase_memodetail->purchaseMemo->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
+                                     ],
+                                    'url'=>request()->root()."/admin/purchase/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
+                                ];
+                                $data_link[]=[
+                                    'from'=>$query_invoice->code,
+                                    'to'=>$purchase_memodetail->purchaseMemo->code,
+                                    'string_link'=>$query_invoice->code.$purchase_memodetail->purchaseMemo->code,
+                                ];
+                                $data_id_memo[]=$purchase_memodetail->purchaseMemo->id;
+                                $data_go_chart[]=$data_memo;
+                            }
                         }
                         
                     }
@@ -1568,6 +1597,76 @@ class OutgoingPaymentController extends Controller
                         }
                     }
 
+                    foreach($query_dp->purchaseMemoDetail as $purchase_memodetail){
+                        $data_memo=[
+                            "name"=>$purchase_memodetail->purchaseMemo->code,
+                            "key" => $purchase_memodetail->purchaseMemo->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
+                                ['name'=> "Nominal : Rp.:".number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
+                                ],
+                            'url'=>request()->root()."/admin/purchase/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
+                        ];
+                        $data_go_chart[]=$data_memo;
+                        $data_link[]=[
+                            'from'=>$query_dp->code,
+                            'to'=>$purchase_memodetail->purchaseMemo->code,
+                            'string_link'=>$query_dp->code.$purchase_memodetail->purchaseMemo->code,
+                        ];
+                        
+
+                    }
+
+                }
+
+                foreach($data_id_memo as $memo_id){
+                    $query = PurchaseMemo::find($memo_id);
+                    foreach($query->purchaseMemoDetail as $row){
+                        if($row->lookable_type == 'purchase_invoice_details'){
+                            $data_invoices_tempura=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row->lookable->purchaseInvoice->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->purchaseInvoice->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row->lookable->purchaseInvoice->code,
+                                "name" => $row->lookable->purchaseInvoice->code,
+                                'url'=>request()->root()."/admin/purchase/purchase_invoice?code=".CustomHelper::encrypt($row->lookable->purchaseInvoice->code),
+                            ];
+        
+                            $data_go_chart[]=$data_invoices_tempura;
+                            $data_link[]=[
+                                'from'=>$data_invoices_tempura["key"],
+                                'to'=>$query->code,
+                                'string_link'=>$data_invoices_tempura["key"].$query->code,
+                            ];
+                            if(!in_array($row->lookable->purchaseInvoice->id, $data_id_invoice)){
+                                $data_id_invoice[] = $row->lookable->purchaseInvoice->id;
+                                $added=true;
+                            }
+                        }elseif($row->lookable_type == 'purchase_down_payments'){
+                            $data_downp_tempura=[
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row->lookable->code,
+                                "name" => $row->lookable->code,
+                                'url'=>request()->root()."/admin/purchase/purchase_down_payment?code=".CustomHelper::encrypt($row->lookable->code),
+                            ];
+        
+                            $data_go_chart[]=$data_downp_tempura;
+                            $data_link[]=[
+                                'from'=>$data_downp_tempura["key"],
+                                'to'=>$query->code,
+                                'string_link'=>$data_downp_tempura["key"].$query->code,
+                            ];
+                            if(!in_array($row->lookable->id, $data_id_dp)){
+                                $data_id_dp[] = $row->lookable->id;
+                                $added=true;
+                            }
+                        }
+                        
+                    }
                 }
                 
                 foreach($data_id_lc as $landed_cost_id){
@@ -1743,6 +1842,42 @@ class OutgoingPaymentController extends Controller
                 'status'  => 500,
                 'message' => 'Data failed to delete.'
             ];
+        }
+        return response()->json($response);
+    }
+
+    public function viewJournal(Request $request,$id){
+        $query = OutgoingPayment::where('code',CustomHelper::decrypt($id))->first();
+        if($query->journal()->exists()){
+            $response = [
+                'title'     => 'Journal',
+                'status'    => 200,
+                'message'   => $query->journal,
+                'user'      => $query->user->name,
+                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+            ];
+            $string='';
+            foreach($query->journal->journalDetail()->orderBy('id')->get() as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    <td class="center-align">'.$row->coa->company->name.'</td>
+                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                </tr>';
+            }
+            $response["tbody"] = $string; 
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data masih belum di approve.'
+            ]; 
         }
         return response()->json($response);
     }

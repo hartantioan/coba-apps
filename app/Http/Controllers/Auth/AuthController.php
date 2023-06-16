@@ -5,6 +5,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -41,7 +42,10 @@ class AuthController extends Controller
                     'bo_position_id'    => $user->position_id,
                     'bo_is_lock'        => 0,
                 ]);
-                
+                $token = md5(uniqid());
+
+                User::where('employee_no', $request->id_card)->where('type','1')->where('status','1')->update([ 'token' => $token ]);
+                Auth::login($user);
                 $response = [
                     'status' 	=> 200,
                     'message'	=> 'Successfull logged in. Please wait!'
@@ -65,6 +69,7 @@ class AuthController extends Controller
 
     public function logout(){
         session()->flush();
+        Auth::logout();
         return redirect('admin/login');
     }
     public function enable(){

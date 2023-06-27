@@ -176,6 +176,12 @@
                 <h6 class="invoice-from">Lain-lain</h6>
                 <div class="row">
                     <div class="col s3">
+                        Nomor S.J
+                    </div>
+                    <div class="col s9">
+                        {{ $data->delivery_no }}
+                    </div>
+                    <div class="col s3">
                         Plant
                     </div>
                     <div class="col s9">

@@ -59,6 +59,7 @@ class GoodScaleController extends Controller
             'account_id',
             'company_id',
             'post_date',
+            'delivery_no',
             'note',
         ];
 
@@ -75,6 +76,7 @@ class GoodScaleController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('delivery_no', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
@@ -111,6 +113,7 @@ class GoodScaleController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('delivery_no', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
@@ -143,6 +146,10 @@ class GoodScaleController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                $updateBtn = '';
+                if(!$val->alreadyHome()){
+                    $updateBtn = '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small disable" data-popup="tooltip" title="Update Timbangan" onclick="update(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">add_box</i></button>';
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -151,12 +158,13 @@ class GoodScaleController extends Controller
                     $val->account->name,
                     $val->company->name,
                     date('d M Y',strtotime($val->post_date)),
+                    $val->delivery_no,
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Update Timbangan" onclick="update(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">add_box</i></button>
+                        '.$updateBtn.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -270,6 +278,7 @@ class GoodScaleController extends Controller
             'place_id'                  => 'required',
 			'post_date'		            => 'required',
             'arr_item'                  => 'required|array',
+            'document'                  => 'required|mimes:jpg,jpeg,png,pdf',
 		], [
             'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -277,6 +286,8 @@ class GoodScaleController extends Controller
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong',
             'arr_item.array'                    => 'Item harus dalam bentuk array',
+            'document.required'                 => 'Bukti tidak boleh kosong',
+            'document.mimes'                    => 'Bukti harus dalam bentuk gambar JPG, JPEG, PNG atau dokumen PDF'
 		]);
 
         if($validation->fails()) {
@@ -285,10 +296,10 @@ class GoodScaleController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+            DB::beginTransaction();
+            try {
+                if($request->temp){
+                
                     $query = GoodScale::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -330,6 +341,7 @@ class GoodScaleController extends Controller
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
                         $query->post_date = $request->post_date;
+                        $query->delivery_no = $request->delivery_no;
                         $query->document = $document;
                         $query->note = $request->note;
                         $query->status = '1';
@@ -339,20 +351,16 @@ class GoodScaleController extends Controller
                         foreach($query->goodScaleDetail as $row){
                             $row->delete();
                         }
-
-                        DB::commit();
+                        
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status Timbangan Truk sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status Timbangan Truk sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                    
+                }else{
+                    
                     $query = GoodScale::create([
                         'code'			        => GoodScale::generateCode($request->post_date),
                         'user_id'		        => session('bo_id'),
@@ -360,20 +368,16 @@ class GoodScaleController extends Controller
                         'company_id'            => $request->company_id,
                         'place_id'              => $request->place_id,
                         'post_date'             => $request->post_date,
+                        'delivery_no'           => $request->delivery_no,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+                        
                 }
-			}
-			
-			if($query) {
-                DB::beginTransaction();
-                try {
+                
+                if($query) {
+
                     foreach($request->arr_purchase as $key => $row){
                         $balance = str_replace(',','.',str_replace('.','',$request->arr_qty_in[$key])) - str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
                         GoodScaleDetail::create([
@@ -392,28 +396,27 @@ class GoodScaleController extends Controller
 
                     CustomHelper::sendApproval('good_scales',$query->id,$query->note);
                     CustomHelper::sendNotification('good_scales',$query->id,'Pengajuan Timbangan Truk No. '.$query->code,$query->note,session('bo_id'));
-                    
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+
+                    activity()
+                        ->performedOn(new GoodScale())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit timbangan truk.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
-
-                activity()
-                    ->performedOn(new GoodScale())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit timbangan truk.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
+                DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            }
 		}
 		
 		return response()->json($response);
@@ -539,8 +542,9 @@ class GoodScaleController extends Controller
         foreach($data->goodScaleDetail as $row){
             $details[] = [
                 'id'                        => $row->id,
+                'purchase_order_detail_id'  => $row->purchase_order_detail_id ? $row->purchase_order_detail_id : '',
                 'item_name'                 => $row->item->code.' - '.$row->item->name,
-                'qty_po'                    => $row->purchase_order_detail_id ? number_format($row->purchaseOrderDetail->qty,3,',','.') : '-',
+                'qty_po'                    => $row->purchase_order_detail_id ? number_format($row->purchaseOrderDetail->getBalanceReceipt(),3,',','.') : '-',
                 'qty_in'                    => number_format($row->qty_in,3,',','.'),
                 'qty_out'                   => number_format($row->qty_out,3,',','.'),
                 'unit'                      => $row->item->buyUnit->code,
@@ -590,12 +594,25 @@ class GoodScaleController extends Controller
             ]);
         }
 
+        $adapo = false;
+        $idgs = 0;
+
         foreach($request->arr_good_scale_detail as $key => $row){
             $query = GoodScaleDetail::find($row);
             if($query->qty_out == 0){
                 $query->qty_out = str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
                 $query->qty_balance = $query->qty_in - str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
                 $query->save();
+            }
+            if($query->purchase_order_detail_id){
+                $adapo = true;
+                $idgs = $query->good_scale_id;
+            }
+        }
+
+        if($adapo){
+            if($idgs > 0){
+                GoodScale::find($idgs)->createGoodReceipt();
             }
         }
 

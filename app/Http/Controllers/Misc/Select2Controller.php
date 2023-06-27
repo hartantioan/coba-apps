@@ -15,6 +15,7 @@ use App\Models\Menu;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
+use App\Models\PurchaseOrderDetail;
 use App\Models\Region;
 use App\Models\Place;
 use App\Models\Warehouse;
@@ -1232,6 +1233,33 @@ class Select2Controller extends Controller {
                 'text' 			    => $d->place->code.' - '.$d->warehouse->code.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
                 'qty'               => $d->qty,
             ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function purchaseOrderDetail(Request $request){
+        $response   = [];
+        $search     = $request->search;
+
+        $data = PurchaseOrderDetail::where(function($query) use($search){
+                    $query->whereHas('item',function($query) use($search){
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name','like',"%$search%");
+                    });
+                })
+                ->whereIn('place_id',$this->dataplaces)
+                ->whereIn('warehouse_id',$this->datawarehouses)
+                ->get();
+
+        foreach($data as $d) {
+            if($d->getBalanceReceipt() > 0){
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->place->code.' - '.$d->warehouse->code.' Qty. '.number_format($d->getBalanceReceipt(),3,',','.').' '.$d->item->uomUnit->code,
+                    'qty'               => number_format($d->getBalanceReceipt(),3,',','.'),
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);

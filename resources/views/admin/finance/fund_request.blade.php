@@ -614,8 +614,7 @@
     });
     
     function printData(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
-        arr_id_temp=[];
+        var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(3)').text().trim();
             arr_id_temp.push(poin);
@@ -632,19 +631,14 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                loadingOpen('.modal-content');
             },
             success: function(response) {
                 printService.submit({
                     'type': 'INVOICE',
                     'url': response.message
-                })
-                
-               
+                });
             },
             error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

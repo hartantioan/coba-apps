@@ -106,6 +106,11 @@
                                                     <p>Info 2 : Timbangan truk bisa ditambahkan dengan 2 cara, cara yang pertama tarik data dari Purchase Order. Sedangkan cara yang kedua, dengan menambahkan secara manual item / barangnya, namun kemudian setelah tahap 2 penimbangan bisa di linkkan dengan PO agar dokumen bisa ditarik ke GRPO.</p>
                                                 </div>
                                             </div>
+                                            <div class="card-alert card blue">
+                                                <div class="card-content white-text">
+                                                    <p>Info 3 : Pada saat timbangan pulang, jika PO sudah ditentukan maka, GRPO akan otomatis terbuat berdasarkan informasi dokumen Timbangan.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
@@ -117,6 +122,7 @@
                                                         <th>Supplier</th>
                                                         <th>Perusahaan</th>
                                                         <th>Tanggal</th>
+                                                        <th>Nomor SJ</th>
                                                         <th>Keterangan</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
@@ -173,6 +179,10 @@
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Diterima</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Pengiriman">
+                                <label class="active" for="delivery_no">Nomor Pengiriman / SJ</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -296,6 +306,7 @@
                                         <table class="bordered" style="width:1800px;">
                                             <thead>
                                                 <tr>
+                                                    <th class="center">Link PO</th>
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty PO</th>
                                                     <th class="center">Timbang Datang</th>
@@ -497,7 +508,8 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
-            }
+            },
+            dismissible:false,
         });
 
         $('#modal6').modal({
@@ -511,7 +523,8 @@
                 $('#supplierUpdate').text('');
                 $('#codeUpdate').text('');
                 clearGetWeight();
-            }
+            },
+            dismissible:false,
         });
         
         $('#modal1').modal({
@@ -595,7 +608,8 @@
             onCloseEnd: function(modal, trigger){
                 $('#body-detail-purchase-order').empty();
                 $('#table_purchase_order').DataTable().clear().destroy();
-            }
+            },
+            dismissible:false,
         });
 
         $('#modal5').modal({
@@ -612,7 +626,8 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 
-            }
+            },
+            dismissible:false,
         });
 
         $('#modal3').modal({
@@ -627,7 +642,8 @@
                     `<div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;"></div>
                     `
                 );
-            }
+            },
+            dismissible:false,
         });
 
         select2ServerSide('#purchase_order_id', '{{ url("admin/select2/purchase_order") }}');
@@ -679,16 +695,12 @@
                 { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
+                { name: 'delivery_no', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
-            /* "createdRow": function( row, data, dataIndex){
-                if(data[10] == ''){
-                    $(row).addClass('yellow');
-                }
-            }, */
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
@@ -877,7 +889,6 @@
                                 $(this).val(response);
                                 countBalance(this);
                             });
-                            console.log(response);
                         }
                     }
                     if($('#modal6').hasClass('open')){
@@ -885,7 +896,6 @@
                             $(this).val(response);
                             countBalance(this);
                         });
-                        console.log(response);
                     }
                 }
             });
@@ -949,6 +959,10 @@
                         if(response.details.length > 0){
                             if($('.data-used').length > 0){
                                 $('.data-used').trigger('click');
+                            }
+
+                            if($('.row_item').length){
+                                $('.row_item').remove();
                             }
 
                             $('#account_id').empty().append(`
@@ -1087,6 +1101,10 @@
                                 if(response.details.length > 0){
                                     if($('.data-used').length > 0){
                                         $('.data-used').trigger('click');
+                                    }
+
+                                    if($('.row_item').length){
+                                        $('.row_item').remove();
                                     }
 
                                     $('#list-used-data').append(`
@@ -1392,6 +1410,10 @@
                                 <input type="hidden" name="arr_good_scale_detail[]" value="` + val.id + `">
                                 <input type="hidden" name="arr_qty_in[]" value="` + val.qty_in + `" id="arr_qty_in` + count + `">
                                 <td>
+                                    ` + (val.purchase_order_detail_id ? `-` 
+                                    : `<select class="browser-default" id="arr_pod` + count + `" name="arr_pod[]"></select>` ) + `
+                                </td>
+                                <td>
                                     ` + val.item_name + `
                                 </td>
                                 <td class="right-align">
@@ -1423,6 +1445,10 @@
                                 </td>
                             </tr>
                         `);
+
+                        if(!val.purchase_order_detail_id){
+                            select2ServerSide('#arr_pod' + count, '{{ url("admin/select2/purchase_order_detail") }}');
+                        }
                     });
                 }
                 
@@ -1495,6 +1521,7 @@
                 $('#modal1').modal('open');
                 $('#temp').val(id);
                 $('#note').val(response.note);
+                $('#delivery_no').val(response.delivery_no);
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
@@ -1768,17 +1795,14 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                loadingOpen('.modal-content');
             },
             success: function(response) {
                 printService.submit({
                     'type': 'INVOICE',
                     'url': response.message
-                })
+                });
             },
             error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',
@@ -1790,7 +1814,6 @@
 
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
-        console.log(formData);
         $.ajax({
             url: '{{ Request::url() }}/print_by_range',
             type: 'POST',
@@ -1820,7 +1843,6 @@
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);
-                    console.log(response.error);
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',

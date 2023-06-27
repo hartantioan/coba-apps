@@ -17,6 +17,7 @@ class GoodReceiptDetail extends Model
     protected $fillable = [
         'good_receipt_id',
         'purchase_order_detail_id',
+        'good_scale_detail_id',
         'item_id',
         'qty',
         'total',
@@ -70,6 +71,11 @@ class GoodReceiptDetail extends Model
     public function purchaseOrderDetail()
     {
         return $this->belongsTo('App\Models\PurchaseOrderDetail', 'purchase_order_detail_id', 'id')->withTrashed();
+    }
+
+    public function goodScaleDetail()
+    {
+        return $this->belongsTo('App\Models\GoodScaleDetail', 'good_scale_detail_id', 'id')->withTrashed();
     }
 
     public function goodReturnPODetail(){

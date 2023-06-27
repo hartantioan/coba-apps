@@ -260,10 +260,12 @@
                                          </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="2">
-                                            <br>
-                                        </td>
-                                        
+                                        <td>
+                                            Nomor S.J
+                                         </td>
+                                         <td>
+                                             {{ $data->delivery_no }}
+                                          </td>
                                     </tr>
                                 </table>
                             </td>
@@ -337,7 +339,6 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                         <div class="mt-3">
                                             Catatan : {{ $data->note }}
                                         </div>

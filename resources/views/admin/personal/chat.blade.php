@@ -1,6 +1,15 @@
 @php
     use Carbon\Carbon;
 @endphp
+<style>
+  .circle{
+    width:50px !important;
+  }
+  
+  .chat-application .app-chat .chat-content .chat-content-area .chat-area .chats .chat {
+    margin: 0.3rem 0.5rem;
+  }
+</style>
 <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/app-chat.css') }}">
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -10,7 +19,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col s8 m6 l6">
-                        <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }} (Coming soon...)</span></h5>
+                        <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
                         <ol class="breadcrumbs mb-0">
                             <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
                             </li>
@@ -47,7 +56,7 @@
                             <div class="sidebar-header">
                               <div class="row valign-wrapper">
                                 <div class="col s2 media-image pr-0">
-                                  <img src="{{$data_user->photo}}" alt="" class="circle z-depth-2 responsive-img">
+                                  <img src="{{$data_user->photo()}}" alt="" class="circle z-depth-2 responsive-img">
                                 </div>
                                 <div class="col s10">
                                   <p class="m-0 blue-grey-text text-darken-4 font-weight-700">{{$data_user->name}}</p>
@@ -133,7 +142,6 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
 
@@ -208,9 +216,9 @@
     display: flex;
     flex-direction: column;
   }
-  /* .chat-area-cover {
+  .chat-area-cover {
     background: url({{ url('app-assets/images/gallery/chat-bg.jpg') }}) repeat scroll 0 0;
-  } */
+  }
 </style>
 
 <!-- END: Page Main-->
@@ -218,7 +226,12 @@
 
 <script>
   $(function() {
-    
+    $('.chat-user').on( "click", function() {
+      $('.chat-user').each(function() {
+        $(this).removeClass('active');
+      });
+      $(this).addClass('active');
+    });
   });
   var chatArea = document.getElementById('chat_content_right');
 
@@ -246,8 +259,6 @@
   
   conn.onopen = function(e){
   
-    console.log("Connection established!");
-
     $('#modal1').modal({
         dismissible: true,
         onOpenStart: function(modal,trigger) {
@@ -285,9 +296,7 @@
     var data = JSON.parse(e.data);
   
     if(data.image_link)
-    {
-      //Display Code for uploaded Image
-  
+    {  
       document.getElementById('message_area').innerHTML = `<img src="{{ asset('images/`+data.image_link+`') }}" class="img-thumbnail img-fluid" />`;
     }
   
@@ -328,9 +337,9 @@
         html += `<table class="list-group">
                   <thead>
                     <tr>
-                      <th rowspan="2">#</th>
-                      <th rowspan="2">Nama</th>
-                      <th rowspan="2">Send</th>
+                      <th rowspan="2" class="center-align">#</th>
+                      <th rowspan="2" class="center-align">Nama</th>
+                      <th rowspan="2" class="center-align">Send</th>
                     </tr>
                   </thead>
                   <tbody>`;
@@ -341,41 +350,30 @@
           if(user_friend.includes(data.data[count].name)){
 
           }else{
-            if(data.data[count].user_image != '')
-          {
             user_image = `<div class="chat-avatar">
                         <a class="avatar">
-                          <img src="{{ asset('images/') }}/`+data.data[count].user_image+`" class="circle" alt="avatar">
+                          <img src="{{ url('/').'/' }}` + data.data[count].user_image + `" class="circle" alt="avatar">
                         </a>
                       </div>`;
-          }
-          else
-          {
-            user_image = `<div class="chat-avatar">
-                        <a class="avatar">
-                          <img src="{{ asset('images/no-image.jpg') }}" class="circle" alt="avatar">
-                        </a>
-                      </div>`;
-          }
-          if(data.data[count].status == 'Offline'){
-            var status = `<span class="task-cat red" style="margin-left: 1rem;top: -0.5rem !important; position:relative;">`+data.data[count].status+`</span>`
-          }else{
-            var status = `<span class="task-cat cyan" style="margin-left: 1rem;top: -0.5rem !important;position:relative;">`+data.data[count].status+`</span>`
-          }
-  
-          html += `
-          <tr id="last-row-item">
-              <td class="center">
-                  `+user_image+`
-              </td>
-              <td class="center" style='text-align:left !important'>
-                `+data.data[count].name+status+`
-              </td>
-              <td class="center">
-                <a class="mb-6 btn waves-effect waves-light green darken-1" onclick="send_request(this, `+from_user_id+`, `+data.data[count].id+`)">Request<i class="material-icons right">send</i></a>
-              </td>
-          </tr>
-          `;
+            if(data.data[count].status == 'Offline'){
+              var status = `<span class="task-cat red" style="margin-left: 1rem;top: -0.5rem !important; position:relative;">`+data.data[count].status+`</span>`
+            }else{
+              var status = `<span class="task-cat cyan" style="margin-left: 1rem;top: -0.5rem !important;position:relative;">`+data.data[count].status+`</span>`
+            }
+    
+            html += `
+            <tr id="last-row-item">
+                <td class="center">
+                    `+user_image+`
+                </td>
+                <td class="center" style='text-align:left !important'>
+                  `+data.data[count].name+status+`
+                </td>
+                <td class="center">
+                  <a class="mb-6 btn waves-effect waves-light green darken-1" onclick="send_request(this, ` + from_user_id + `, ` + data.data[count].id + `)">Request<i class="material-icons right">send</i></a>
+                </td>
+            </tr>
+            `;
           }
           
         }
@@ -385,7 +383,13 @@
       }
       else
       {
-        html = 'No User Found';
+        html += `<table class="list-group">
+                  <thead>
+                    <tr>
+                      <th class="center-align">Histori tidak ditemukan. Silahkan mulai percakapan</th>
+                    </tr>
+                  </thead>
+                  </table>`;
       }
   
       document.getElementById('search_people_area').innerHTML = html;
@@ -406,7 +410,6 @@
     if(data.response_load_notification)
     {
       var html = '';
-      console.log(data);
       var element = document.getElementById('notif_add_user');
       if(data.count_notification>0){
         element.classList.add('badge');
@@ -419,15 +422,8 @@
       for(var count = 0; count < data.data.length; count++)
       {
         var user_image = '';
-        
-        if(data.data[count].user_image != '')
-        {
-          user_image = `<img src="{{ asset('images/') }}/`+data.data[count].user_image+`" width="40" class="rounded-circle" />`;
-        }
-        else
-        {
-          user_image = `<img src="{{ asset('images/no-image.jpg') }}" width="40" class="rounded-circle" />`;
-        }
+ 
+        user_image = `<img src="{{ url('/').'/' }}`+data.data[count].user_image+`" width="40" class="rounded-circle" />`;
   
         html += `
         <li class="list-group-item">
@@ -489,35 +485,22 @@
         {
 
           html += `
-          <a class="chat-user active" onclick="make_chat_area(`+data.data[count].id+`, '`+data.data[count].name+`'); load_chat_data(`+from_user_id+`, `+data.data[count].id+`); ">
+          <a class="chat-user" onclick="make_chat_area(`+data.data[count].id+`, '`+data.data[count].name+`', '` + data.data[count].user_image + `'); load_chat_data(`+from_user_id+`, `+data.data[count].id+`); ">
           `;
           var last_seen = '';
           user_friend.push(data.data[count].name);
           if(data.data[count].user_status == 'Online')
           {
-          
-  
             last_seen = 'Online';
           }
           else
           {
-
-  
             last_seen = data.data[count].last_seen;
           }
   
           var user_image = '';
-  
-          if(data.data[count].user_image != '')
-          {
-            user_image = `<img src="{{ asset('images/') }}/`+data.data[count].user_image+`" class="circle z-depth-2 responsive-img" />`;
-          }
-          else
-          {
-            user_image = `<img src="{{ asset('images/no-image.jpg') }}" class="circle z-depth-2 responsive-img" />`;
-          }
-  
-  
+
+          user_image = `<img src="{{ url('/').'/' }}`+data.data[count].user_image+`" class="circle z-depth-2 responsive-img" />`;
           
           html += `
                 <div class="user-section">
@@ -545,7 +528,13 @@
       }
       else
       {
-        html += 'No User Found';
+        html += `<div class="user-section">
+                  <div class="row valign-wrapper">
+                    <div class="col s12 center-align pt-2 pb-2">
+                      Percakapan tidak ditemukan.
+                    </div>
+                  </div>
+                </div>`;
       }
   
       html += '</div>';
@@ -601,7 +590,6 @@
       var formattedTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       var html = '';
-      console.log(data);  
       if(data.from_user_id == from_user_id)
       {
   
@@ -624,15 +612,12 @@
         html += `
         <div class="chat chat-right">
           <div class="chat-body">
-            <div class="chat-text" style="margin: 0 -1.5rem 1rem;">
+            <div class="chat-text" style="margin: 0 -1.5rem 0rem;">
               <p>`+icon_style+`&nbsp`+data.message+`&nbsp<small class="text-muteds text-right">` + formattedTime + `</small></p>
             </div>
           </div>
         </div>
- 
         `;
-        
-       
       }
       else
       {
@@ -641,7 +626,7 @@
           html += `
           <div class="chat chat">
             <div class="chat-body">
-              <div class="chat-text" style="margin: 0 -1.5rem 1rem;">
+              <div class="chat-text" style="margin: 0 -1.5rem 0rem;">
                 <p>`+data.message+`&nbsp<small class="text-muteds text-right">` + formattedTime + `</small></p>
               </div>
             </div>
@@ -655,21 +640,21 @@
           
           var count_unread_message_element = document.getElementById('user_unread_message_'+data.from_user_id+'');
 
-                if(count_unread_message_element)
-                {
-                  var count_unread_message = count_unread_message_element.textContent;
-                  if(count_unread_message == '')
-                  {
-                    count_unread_message = parseInt(0) + 1;
-                  }
-                  else
-                  {
-                    count_unread_message = parseInt(count_unread_message) + 1;
-                  }
-                  count_unread_message_element.innerHTML = '<span class="badge badge pill red white-text">'+count_unread_message+'</span>';
-  
-                  update_message_status(data.chat_message_id, data.from_user_id, data.to_user_id, 'Send');
-                }
+          if(count_unread_message_element)
+          {
+            var count_unread_message = count_unread_message_element.textContent;
+            if(count_unread_message == '')
+            {
+              count_unread_message = parseInt(0) + 1;
+            }
+            else
+            {
+              count_unread_message = parseInt(count_unread_message) + 1;
+            }
+            count_unread_message_element.innerHTML = '<span class="badge badge pill red white-text">'+count_unread_message+'</span>';
+
+            update_message_status(data.chat_message_id, data.from_user_id, data.to_user_id, 'Send');
+          }
         }
         
       }
@@ -677,7 +662,6 @@
       if(html != '')
       {
         
-        console.log(data);
         if(from_user_id==data.to_user_id&&to_user_id==data.from_user_id){
           
           var previous_chat_element = document.querySelector('#chat_history');
@@ -697,7 +681,6 @@
         }
         var chat_last_chat = document.querySelector('#message_last'+data.id_request_chat);
         
-        console.log(chat_last_chat);
         chat_last_chat.innerHTML=data.message;
        
         scroll_top();
@@ -707,10 +690,27 @@
   
     if(data.chat_history)
     {
-      var html = '';
-  
-      for(var count = 0; count < data.chat_history.length; count++)
+      var html = '', date = '', today = '{{ date('Y-m-d') }}', adaToday = false;
+      var arrToday = today.split('-');
+
+      for(var count = data.chat_history.length - 1; count >= 0; count--)
       {
+        let arrDate = data.chat_history[count].created_at.split(' ');
+        if((arrDate[0] !== date && date !== '') || (date == '')){
+          let arrDateSplit = arrDate[0].split('-');
+          html +=`
+          <div class="chat" style="align-items: center !important;justify-content: center !important;">
+            <div class="chat-body">
+              <div class="center-align">
+                - ` + getDisplayDate(arrDateSplit[0],arrDateSplit[1],arrDateSplit[2]) + ` -
+              </div>
+            </div>
+          </div>
+          `;
+        }
+        if(today == arrDate[0]){
+          adaToday = true;
+        }
         if(data.chat_history[count].from_user_id == from_user_id)
         {
           var icon_style = '';
@@ -734,25 +734,12 @@
           html += `
             <div class="chat chat-right">
               <div class="chat-body">
-                <div class="chat-text" style="margin: 0 -1.5rem 1rem;">
+                <div class="chat-text" style="margin: 0 -1.5rem 0rem;">
                   <p>` + icon_style +`&nbsp`+ data.chat_history[count].chat_message + `&nbsp<small class="text-muteds text-right">` + (new Date(data.chat_history[count].created_at)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + `</small></p>
                 </div>
               </div>
             </div>
           `;
-
-  
-          /* html +=`
-          <div class="row">
-            <div class="col col-3">&nbsp;</div>
-            <div class="col col-9 alert alert-success text-dark shadow-sm">
-            `+data.chat_history[count].chat_message+ `
-            `+icon_style+`
-            </div>
-          </div>
-          `; */
-  
-          
         }
         else
         {
@@ -764,7 +751,7 @@
           html +=`
           <div class="chat">
             <div class="chat-body">
-              <div class="chat-text" style="margin: 0 -1.5rem 1rem;">
+              <div class="chat-text" style="margin: 0 -1.5rem 0rem;">
                 <p>`+data.chat_history[count].chat_message+`&nbsp<small class="text-muteds text-right">` + (new Date(data.chat_history[count].created_at)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + `</small></p>
               </div>
             </div>
@@ -778,14 +765,24 @@
                     count_unread_message_element.innerHTML = '';
                   }
         }
+        date = arrDate[0];
+      }
+      if(!adaToday){
+        html +=`
+          <div class="chat" style="align-items: center !important;justify-content: center !important;">
+            <div class="chat-body">
+              <div class="center-align">
+                - ` + getDisplayDate(arrToday[0],arrToday[1],arrToday[2]) + ` -
+              </div>
+            </div>
+          </div>
+        `;
       }
   
       document.querySelector('#chat_history').innerHTML = html;
   
       scroll_top();
-    }
-  
-    
+    }    
   };
 
   
@@ -852,7 +849,13 @@
       type : 'request_chat_user'
     };
   
-    element.disabled = true;
+    $(element).parent().parent().remove();
+
+    swal({
+        title: 'Sip!',
+        text: 'Permintaan chat telah dikirimkan, mohon tunggu konfirmasi.',
+        icon: 'success'
+    });
   
     conn.send(JSON.stringify(data));
   }
@@ -891,7 +894,7 @@
     conn.send(JSON.stringify(data));
   }
   
-  function make_chat_area(user_id, to_user_name)
+  function make_chat_area(user_id, to_user_name, user_image)
   {
     close_chat();
     var footer= `
@@ -912,11 +915,11 @@
     document.getElementById('chat_header').innerHTML = `
                 <div class=" valign-wrapper">
                   <div class="col media-image online pr-0">
-                    <img src="../../../app-assets/images/user/7.jpg" alt="" class="circle z-depth-2 responsive-img">
+                    <img src="{{ url('/').'/' }}` + user_image + `" class="circle z-depth-2 responsive-img" />
                   </div>
                   <div class="col">
                     <p class="m-0 blue-grey-text text-darken-4 font-weight-700">`+to_user_name+`</p>
-                    <p class="m-0 chat-text truncate">Apple pie bonbon cheesecake tiramisu</p>
+                    <p class="m-0 chat-text truncate">...</p>
                   </div>
                   
                 </div>
@@ -979,14 +982,13 @@
   function load_chat_data(from_user_id, to_user_id)
   {
     uncoverChatArea();
+
     var data = {
       from_user_id : from_user_id,
       to_user_id : to_user_id,
       type : 'request_chat_history'
     };
 
-
-  
     conn.send(JSON.stringify(data));
   }
   
@@ -1020,41 +1022,22 @@
       conn.send(JSON.stringify(data));
     }
   }
-  
-  function upload_image()
-  {
-    var file_element = document.getElementById('browse_image').files[0];
-  
-    var file_name = file_element.name;
-  
-    var file_extension = file_name.split('.').pop().toLowerCase();
-  
-    var allowed_extension = ['png', 'jpg'];
-  
-    if(allowed_extension.indexOf(file_extension) == -1)
-    {
-      alert("Invalid Image File");
-  
-      return false;
-    }
-  
-    var file_reader = new FileReader();
-  
-    var file_raw_data = new ArrayBuffer();
-  
-    file_reader.loadend = function()
-    {
-  
-    }
-  
-    file_reader.onload = function(event){
-  
-      file_raw_data = event.target.result;
-  
-      conn.send(file_raw_data);
-    }
-  
-    file_reader.readAsArrayBuffer(file_element);
+
+  function getDisplayDate(year, month, day) {
+      today = new Date();
+      today.setHours(0);
+      today.setMinutes(0);
+      today.setSeconds(0);
+      today.setMilliseconds(0);
+      compDate = new Date(year,month-1,day);
+      diff = today.getTime() - compDate.getTime();
+      if (compDate.getTime() == today.getTime()) {
+          return "Hari ini";
+      } else if (diff <= (24 * 60 * 60 *1000)) {
+          return "Kemarin";
+      } else { 
+          return compDate.toLocaleDateString('en-GB');
+      }
   }
   
 </script>

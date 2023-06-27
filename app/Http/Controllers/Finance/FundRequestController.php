@@ -36,11 +36,11 @@ use App\Exports\ExportFundRequest;
 
 class FundRequestController extends Controller
 {
-    protected $dataplaces;
+    protected $dataplaces, $datauser;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
-
+        $this->datauser = $user;
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
 
@@ -251,14 +251,33 @@ class FundRequestController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        if($data->approval()){                
-            foreach($data->approval()->approvalMatrix as $key => $row){
+        if($data->approval() && $data->hasDetailMatrix()){
+            foreach($data->approval() as $detail){
                 $string .= '<tr>
-                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
-                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
-                    <td class="center-align">'.$row->note.'</td>
+                    <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
                 </tr>';
+                foreach($detail->approvalMatrix as $key => $row){
+                    $icon = '';
+    
+                    if($row->status == '1' || $row->status == '0'){
+                        $icon = '<i class="material-icons">hourglass_empty</i>';
+                    }elseif($row->status == '2'){
+                        if($row->approved){
+                            $icon = '<i class="material-icons">thumb_up</i>';
+                        }elseif($row->rejected){
+                            $icon = '<i class="material-icons">thumb_down</i>';
+                        }elseif($row->revised){
+                            $icon = '<i class="material-icons">border_color</i>';
+                        }
+                    }
+    
+                    $string .= '<tr>
+                        <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                        <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                        <td class="center-align">'.$icon.'<br></td>
+                        <td class="center-align">'.$row->note.'</td>
+                    </tr>';
+                }
             }
         }else{
             $string .= '<tr>
@@ -583,8 +602,11 @@ class FundRequestController extends Controller
 		return Excel::download(new ExportFundRequest($search,$status,$document,$this->dataplaces), 'fund_request_'.uniqid().'.xlsx');
     }
 
-    public function userIndex()
+    public function userIndex(Request $request)
     {
+        $url = 'fund_request';
+        $cekDate = $this->datauser->cekMinMaxPostDate($url);
+
         $data = [
             'title'         => 'Pengajuan Permohonan Dana - Pengguna',
             'content'       => 'admin.personal.fund_request',
@@ -593,6 +615,8 @@ class FundRequestController extends Controller
             'currency'      => Currency::where('status','1')->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
+            'minDate'       => $cekDate ? date('Y-m-d', strtotime('-'.$cekDate->userDate->count_backdate.' days')) : date('Y-m-d'),
+            'maxDate'       => $cekDate ? date('Y-m-d', strtotime(date('Y-m-d'). ' + '.$cekDate->userDate->count_futuredate.' days')) : date('Y-m-d'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -806,13 +830,15 @@ class FundRequestController extends Controller
                     $revised = false;
 
                     if($query->approval()){
-                        foreach($query->approval()->approvalMatrix as $row){
-                            if($row->approved){
-                                $approved = true;
-                            }
+                        foreach ($query->approval() as $detail){
+                            foreach($detail->approvalMatrix as $row){
+                                if($row->approved){
+                                    $approved = true;
+                                }
 
-                            if($row->revised){
-                                $revised = true;
+                                if($row->revised){
+                                    $revised = true;
+                                }
                             }
                         }
                     }
@@ -948,7 +974,7 @@ class FundRequestController extends Controller
     }
 
     public function userRowDetail(Request $request){
-        $data   = FundRequest::find($request->id);
+        $data   = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
                     <table style="max-width:800px;">
@@ -992,14 +1018,33 @@ class FundRequestController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        if($data->approval()){                
-            foreach($data->approval()->approvalMatrix as $key => $row){
+        if($data->approval() && $data->hasDetailMatrix()){
+            foreach($data->approval() as $detail){
                 $string .= '<tr>
-                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
-                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
-                    <td class="center-align">'.$row->note.'</td>
+                    <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
                 </tr>';
+                foreach($detail->approvalMatrix as $key => $row){
+                    $icon = '';
+    
+                    if($row->status == '1' || $row->status == '0'){
+                        $icon = '<i class="material-icons">hourglass_empty</i>';
+                    }elseif($row->status == '2'){
+                        if($row->approved){
+                            $icon = '<i class="material-icons">thumb_up</i>';
+                        }elseif($row->rejected){
+                            $icon = '<i class="material-icons">thumb_down</i>';
+                        }elseif($row->revised){
+                            $icon = '<i class="material-icons">border_color</i>';
+                        }
+                    }
+    
+                    $string .= '<tr>
+                        <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                        <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                        <td class="center-align">'.$icon.'<br></td>
+                        <td class="center-align">'.$row->note.'</td>
+                    </tr>';
+                }
             }
         }else{
             $string .= '<tr>
@@ -1040,15 +1085,28 @@ class FundRequestController extends Controller
     public function userDestroy(Request $request){
         $query = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
 
+        $approved = false;
+        $revised = false;
+
         if($query->approval()){
-            foreach($query->approval()->approvalMatrix as $row){
-                if($row->status == '2'){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Permohonan Dana telah diapprove, anda tidak bisa melakukan perubahan.'
-                    ]);
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
                 }
             }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
         }
 
         if(in_array($query->status,['2','3','4','5'])){

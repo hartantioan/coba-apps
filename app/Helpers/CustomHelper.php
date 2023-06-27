@@ -188,15 +188,6 @@ class CustomHelper {
 
 		$data = DB::table($table_name)->where('id',$table_id)->first();
 
-		$source = ApprovalSource::create([
-			'code'			=> strtoupper(uniqid()),
-			'user_id'		=> session('bo_id'),
-			'date_request'	=> date('Y-m-d H:i:s'),
-			'lookable_type'	=> $table_name,
-			'lookable_id'	=> $table_id,
-			'note'			=> $note,
-		]);
-
 		$approvalTemplate = ApprovalTemplate::where('status','1')
 		->whereHas('approvalTemplateMenu',function($query) use($table_name){
 			$query->where('table_name',$table_name);
@@ -208,6 +199,16 @@ class CustomHelper {
 		$count = 0;
 
 		foreach($approvalTemplate as $row){
+
+			$source = ApprovalSource::create([
+				'code'			=> strtoupper(uniqid()),
+				'user_id'		=> session('bo_id'),
+				'date_request'	=> date('Y-m-d H:i:s'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'note'			=> $note,
+			]);
+
 			$passed = true;
 
 			if($row->is_check_nominal){
@@ -217,6 +218,8 @@ class CustomHelper {
 			}
 
 			if($passed == true){
+
+				$count = 0;
 
 				foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
 					$status = $count == 0 ? '1': '0';
@@ -236,13 +239,15 @@ class CustomHelper {
 		}
 
 		if($count == 0){
-			$data = $source->lookable;
-			
-			$data->update([
+			DB::table($table_name)->where('id',$table_id)->update([
 				'status'	=> '2'
 			]);
 
-			self::sendJournal($table_name,$table_id,$data->account_id);
+			if(isset($data->account_id)){
+				self::sendJournal($table_name,$table_id,$data->account_id);
+			}else{
+				self::sendJournal($table_name,$table_id,null);
+			}
 		}
 	}
 

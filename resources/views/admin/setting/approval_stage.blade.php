@@ -1,3 +1,8 @@
+<style>
+    .modal {
+        top:0px !important;
+    }
+</style>
 <!-- BEGIN: Page Main-->
 <div id="main">
     <div class="row">

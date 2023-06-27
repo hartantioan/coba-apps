@@ -38,7 +38,7 @@ class GoodReceiveController extends Controller
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             'title'     => 'Barang Masuk',
@@ -47,6 +47,8 @@ class GoodReceiveController extends Controller
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'currency'  => Currency::where('status','1')->get(),
             'department'=> Department::where('status','1')->get(),
+            'minDate'   => $request->get('minDate'),
+            'maxDate'   => $request->get('maxDate'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -256,13 +258,15 @@ class GoodReceiveController extends Controller
                     $revised = false;
 
                     if($query->approval()){
-                        foreach($query->approval()->approvalMatrix as $row){
-                            if($row->approved){
-                                $approved = true;
-                            }
+                        foreach ($query->approval() as $detail){
+                            foreach($detail->approvalMatrix as $row){
+                                if($row->approved){
+                                    $approved = true;
+                                }
 
-                            if($row->revised){
-                                $revised = true;
+                                if($row->revised){
+                                    $revised = true;
+                                }
                             }
                         }
                     }
@@ -532,15 +536,28 @@ class GoodReceiveController extends Controller
     public function destroy(Request $request){
         $query = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
 
+        $approved = false;
+        $revised = false;
+
         if($query->approval()){
-            foreach($query->approval()->approvalMatrix as $row){
-                if($row->status == '2'){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Purchase Order telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
-                    ]);
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
                 }
             }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
         }
 
         if(in_array($query->status,['2','3','4','5'])){

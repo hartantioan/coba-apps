@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Finance;
+use App\Exports\ExportIncomingPayment;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\CostDistribution;
@@ -15,6 +16,7 @@ use App\Exports\ExportCloseBill;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class IncomingPaymentController extends Controller
 {
@@ -36,6 +38,8 @@ class IncomingPaymentController extends Controller
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'distribution'  => CostDistribution::where('status','1')->get(),
             'currency'      => Currency::where('status','1')->get(),
+            'minDate'       => $request->get('minDate'),
+            'maxDate'       => $request->get('maxDate'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -190,10 +194,6 @@ class IncomingPaymentController extends Controller
                     date('d/m/y',strtotime($val->post_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
-                    number_format($val->total,2,',','.'),
-                    $val->wTaxMaster->code,
-                    number_format($val->percent_wtax,2,',','.'),
-                    number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->note,
@@ -233,8 +233,6 @@ class IncomingPaymentController extends Controller
             'post_date'             => 'required',
             'currency_rate'         => 'required',
             'currency_id'           => 'required',
-            'total'                 => 'required',
-            'wtax'                  => 'required',
             'grandtotal'            => 'required',
             'arr_coa'               => 'required|array',
             'arr_total'             => 'required|array',
@@ -246,8 +244,6 @@ class IncomingPaymentController extends Controller
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
             'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'total.required'                    => 'Total tidak boleh kosong.',
-            'wtax.required'                     => 'PPH tidak boleh kosong.',
             'grandtotal.required'               => 'Grandtotal tidak boleh kosong.',
             'arr_coa.required'                  => 'Coa tidak boleh kosong.',
             'arr_coa.array'                     => 'Coa harus array.',
@@ -275,13 +271,15 @@ class IncomingPaymentController extends Controller
                     $revised = false;
 
                     if($query->approval()){
-                        foreach($query->approval()->approvalMatrix as $row){
-                            if($row->approved){
-                                $approved = true;
-                            }
+                        foreach ($query->approval() as $detail){
+                            foreach($detail->approvalMatrix as $row){
+                                if($row->approved){
+                                    $approved = true;
+                                }
 
-                            if($row->revised){
-                                $revised = true;
+                                if($row->revised){
+                                    $revised = true;
+                                }
                             }
                         }
                     }
@@ -311,10 +309,8 @@ class IncomingPaymentController extends Controller
                         $query->post_date = $request->post_date;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->wtax_id = $request->wtax_id;
-                        $query->percent_wtax = str_replace(',','.',str_replace('.','',$request->percent_wtax));
-                        $query->total = str_replace(',','.',str_replace('.','',$request->total));
-                        $query->wtax = str_replace(',','.',str_replace('.','',$request->wtax));
+                        $query->total = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                        $query->wtax = 0;
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
                         $query->note = $request->note;
@@ -347,10 +343,8 @@ class IncomingPaymentController extends Controller
                         'post_date'                 => $request->post_date,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'wtax_id'                   => $request->wtax_id,
-                        'percent_wtax'              => str_replace(',','.',str_replace('.','',$request->percent_wtax)),
-                        'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
-                        'wtax'                      => str_replace(',','.',str_replace('.','',$request->wtax)),
+                        'total'                     => str_replace(',','.',str_replace('.','',$request->grandtotal)),
+                        'wtax'                      => 0,
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/incoming_payments') : NULL,
                         'note'                      => $request->note,
@@ -365,7 +359,6 @@ class IncomingPaymentController extends Controller
 			}
 			
 			if($query) {
-
                 DB::beginTransaction();
                 try {
                     foreach($request->arr_coa as $key => $row){
@@ -408,5 +401,225 @@ class IncomingPaymentController extends Controller
 		}
 		
 		return response()->json($response);
+    }
+
+    public function rowDetail(Request $request){
+        $data   = IncomingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
+                    <table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="8">Detail Rincian</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Referensi</th>
+                                <th class="center-align">Tipe</th>
+                                <th class="center-align">Dist.Biaya</th>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">Pembulatan</th>
+                                <th class="center-align">Subtotal</th>
+                                <th class="center-align">Keterangan</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        foreach($data->incomingPaymentDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->lookable->code.'</td>
+                <td class="center-align">'.class_basename($row->lookable).'</td>
+                <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code : '-').'</td>
+                <td class="right-align">'.number_format($row->total,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->rounding,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->subtotal,3,',','.').'</td>
+                <td class="">'.$row->note.'</td>
+            </tr>';
+        }
+        
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="4">Approval</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Level</th>
+                                <th class="center-align">Kepada</th>
+                                <th class="center-align">Status</th>
+                                <th class="center-align">Catatan</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
+            foreach($data->approval()->approvalMatrix as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
+                    <td class="center-align">'.$row->note.'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="4">Approval tidak ditemukan.</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div></div>';
+		
+        return response()->json($string);
+    }
+
+    public function approval(Request $request,$id){
+        
+        $pr = IncomingPayment::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($pr){
+            $data = [
+                'title'     => 'Print Kas / Bank Masuk',
+                'data'      => $pr
+            ];
+
+            return view('admin.approval.incoming_payment', $data);
+        }else{
+            abort(404);
+        }
+    }
+
+    public function show(Request $request){
+        $ip = IncomingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        $ip['grandtotal'] = number_format($ip->grandtotal,2,',','.');
+        $ip['account_name'] = $ip->account_id ? $ip->account->name : '';
+        $ip['coa_name'] = $ip->coa->code.' - '.$ip->coa->name;
+        $ip['currency_rate'] = number_format($ip->currency_rate,2,',','.');
+        $ip['project_name'] = $ip->project_id ? $ip->project->name : '';
+
+        $arr = [];
+
+        foreach($ip->incomingPaymentDetail as $row){
+            $arr[] = [
+                'type'                  => $row->lookable_type,
+                'id'                    => $row->lookable_id,
+                'name'                  => $row->getCode(),
+                'cost_distribution_id'  => $row->cost_distribution_id ? $row->cost_distribution_id : '',
+                'cost_distribution_name'=> $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
+                'total'                 => number_format($row->total,'2',',','.'),
+                'rounding'              => number_format($row->rounding,'2',',','.'),
+                'subtotal'              => number_format($row->subtotal,'2',',','.'),
+                'note'                  => $row->note,
+            ];
+        }
+
+        $ip['details'] = $arr;
+        				
+		return response()->json($ip);
+    }
+
+    public function voidStatus(Request $request){
+        $query = IncomingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+            if(in_array($query->status,['4','5'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+    
+                activity()
+                    ->performedOn(new IncomingPayment())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the incoming payment data');
+    
+                CustomHelper::sendNotification('incoming_payments',$query->id,'Kas / Bank Masuk No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('incoming_payments',$query->id);
+                CustomHelper::removeJournal('incoming_payments',$query->id);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function destroy(Request $request){
+        $query = IncomingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $approved = false;
+        $revised = false;
+
+        if($query->approval()){
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
+                }
+            }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+
+        if(in_array($query->status,['2','3','4','5'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Jurnal / dokumen sudah dalam progres, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+        
+        if($query->delete()) {
+
+            $query->incomingPaymentDetail()->delete();
+
+            CustomHelper::removeApproval('incoming_payments',$query->id);
+
+            activity()
+                ->performedOn(new IncomingPayment())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the incoming payment data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function export(Request $request){
+		return Excel::download(new ExportIncomingPayment($request->search,$request->status,$request->company,$request->account,$request->currency,$request->start_date,$request->finish_date,$this->dataplaces), 'incoming_payment_'.uniqid().'.xlsx');
     }
 }

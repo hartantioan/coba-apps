@@ -788,8 +788,6 @@
             width: '100%',
         });
 
-        
-
         loadDataTable();
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();

@@ -59,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
             'inventory_revaluations'        => 'App\Models\InventoryRevaluation',
             'incoming_payments'             => 'App\Models\IncomingPayment',
             'inventory_transfer_out_details'=> 'App\Models\InventoryTransferOutDetail',
+            'good_scales'                   => 'App\Models\GoodScale',
         ]);
     }
 }

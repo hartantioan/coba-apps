@@ -128,27 +128,28 @@ class PurchaseMemo extends Model
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
-        if($source && $source->approvalMatrix()->exists()){
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
+        if($source){
             return $source;
         }else{
             return '';
         }
     }
 
-    public function listApproval(){
-        $source = $this->approval();
-        if($source){
-            $html = '';
-            foreach($source->approvalMatrix()->whereHas('approvalTemplateStage',function($query){ $query->whereHas('approvalStage', function($query) { $query->orderBy('level'); }); })->get() as $row){
-                $html .= '<span style="top:-10px;">'.$row->user->name.'</span> '.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br>';
+    public function hasDetailMatrix(){
+        $ada = false;
+        if($this->approval()){
+            foreach($this->approval() as $row){
+                if($row->approvalMatrix()->exists()){
+                    $ada = true;
+                }
             }
-
-            return $html;
-        }else{
-            return '';
         }
+
+        return $ada;
     }
+
+    
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);

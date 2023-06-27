@@ -12,7 +12,7 @@ use Ratchet\WebSocket\WsServer;
 
 use React\EventLoop\Factory;
 
-use App\Http\Controllers\SocketController;
+use App\Http\Controllers\Misc\SocketController;
 
 class WebSocketServer extends Command
 {

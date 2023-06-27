@@ -54,6 +54,23 @@ class ApprovalMatrix extends Model
         return $status;
     }
 
+    public function checkOtherApproval(){
+        $otherSource = ApprovalSource::where('lookable_type',$this->approvalSource->lookable_type)->where('lookable_id',$this->approvalSource->lookable_id)->where('id','!=',$this->approval_source_id)->get();
+
+        $passed = true;
+
+        foreach($otherSource as $source){
+            foreach($source->approvalMatrix as $row){
+                $countApproved = $source->approvalMatrix()->where('approval_template_stage_id',$row->approval_template_stage_id)->whereNotNull('approved')->where('status','2')->count();
+                if($countApproved < $row->approvalTemplateStage->approvalStage->min_approve){
+                    $passed = false;
+                }
+            }
+        }
+
+        return $passed;
+    }
+
     public function updateNextLevelApproval(){
 
         $arrTemp = [];

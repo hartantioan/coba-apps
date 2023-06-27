@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Misc;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Ratchet\MessageComponentInterface;
 
 use Ratchet\ConnectionInterface;
@@ -13,6 +15,8 @@ use App\Models\User;
 use App\Models\Chat;
 
 use App\Models\Chat_request;
+
+use App\Http\Controllers\Controller;
 
 use Auth;
 use Symfony\Component\Mime\Message;
@@ -35,13 +39,12 @@ class SocketController extends Controller implements MessageComponentInterface
 
         parse_str($querystring, $queryarray);
        
-        info("kambing2");
         if(isset($queryarray['token']))
         {
             
             User::where('token', $queryarray['token'])->update([ 'connection_id' => $conn->resourceId, 'user_status' => 'Online' ]);
 
-            $user_id = User::select('id')->where('token', $queryarray['token'])->get();
+            $user_id = User::select('id')->where('token', $queryarray['token'])->where('type','1')->get();
 
             $data['id'] = $user_id[0]->id;
 
@@ -64,8 +67,6 @@ class SocketController extends Controller implements MessageComponentInterface
     {
         if(preg_match('~[^\x20-\x7E\t\r\n]~', $msg) > 0)
         {
-            //receiver image in binary string message
-
             $image_name = time() . '.jpg';
 
             file_put_contents(public_path('images/') . $image_name, $msg);
@@ -89,8 +90,9 @@ class SocketController extends Controller implements MessageComponentInterface
             $send_data=[];
             if($data->type == 'request_load_unconnected_user')
             {
-                $user_data = User::select('id', 'name', 'user_status', 'user_image')
+                $user_data = User::select('id', 'name', 'user_status', 'photo')
                                     ->where('id', '!=', $data->from_user_id)
+                                    ->where('type','1')
                                     ->orderBy('name', 'ASC')
                                     ->get();
 
@@ -98,15 +100,36 @@ class SocketController extends Controller implements MessageComponentInterface
 
                 foreach($user_data as $row)
                 {
-                    $sub_data[] = array(
-                        'name'      =>  $row['name'],
-                        'id'        =>   $row['id'],
-                        'status'    =>  $row['user_status'],
-                        'user_image'=>  $row['user_image']
-                    );
+
+                    $chat_request = Chat_request::select('id')
+                                    ->where(function($query) use ($data,$row){
+                                        $query->where(function($query) use ($data, $row){
+                                            $query->where('from_user_id', $data->from_user_id)->where('to_user_id', $row->id);
+                                        })
+                                        ->orWhere(function($query) use ($data, $row){
+                                            $query->where('from_user_id', $row->id)->where('to_user_id', $data->from_user_id);
+                                        });
+                                    })
+                                    ->whereIn('status',['Pending','Approve'])
+                                    ->get();
+                    
+                    if($chat_request->count() == 0){                
+                        if($row['photo'] !== NULL && Storage::exists($row['photo'])) {
+                            $arr = explode('/',$row['photo']);
+                            $pict = 'storage/'.$arr[1].'/'.$arr[2];
+                        } else {
+                            $pict = 'website/empty_profile.png';
+                        }
+                        $sub_data[] = array(
+                            'name'      =>  $row['name'],
+                            'id'        =>  $row['id'],
+                            'status'    =>  $row['user_status'],
+                            'user_image'=>  $pict
+                        );
+                    }
                 }
 
-                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get();
 
                 $send_data['data'] = $sub_data;
 
@@ -123,9 +146,10 @@ class SocketController extends Controller implements MessageComponentInterface
 
             if($data->type == 'request_search_user')
             {
-                $user_data = User::select('id', 'name', 'user_status', 'user_image')
+                $user_data = User::select('id', 'name', 'user_status', 'photo')
                                     ->where('id', '!=', $data->from_user_id)
                                     ->where('name', 'like', '%'.$data->search_query.'%')
+                                    ->where('type','1')
                                     ->orderBy('name', 'ASC')
                                     ->get();
 
@@ -135,33 +159,35 @@ class SocketController extends Controller implements MessageComponentInterface
                 {
 
                     $chat_request = Chat_request::select('id')
-                                    ->where(function($query) use ($data, $row){
-                                        $query->where('from_user_id', $data->from_user_id)->where('to_user_id', $row->id);
+                                    ->where(function($query) use ($data,$row){
+                                        $query->where(function($query) use ($data, $row){
+                                            $query->where('from_user_id', $data->from_user_id)->where('to_user_id', $row->id);
+                                        })
+                                        ->orWhere(function($query) use ($data, $row){
+                                            $query->where('from_user_id', $row->id)->where('to_user_id', $data->from_user_id);
+                                        });
                                     })
-                                    ->orWhere(function($query) use ($data, $row){
-                                        $query->where('from_user_id', $row->id)->where('to_user_id', $data->from_user_id);
-                                    })->get();
-
-                    /*
-                    SELECT id FROM chat_request 
-                    WHERE (from_user_id = $data->from_user_id AND to_user_id = $row->id) 
-                    OR (from_user_id = $row->id AND to_user_id = $data->from_user_id)
-                    */
+                                    ->whereIn('status',['Pending','Approve'])
+                                    ->get();
 
                     if($chat_request->count() == 0)
                     {
+                        if($row['photo'] !== NULL && Storage::exists($row['photo'])) {
+                            $arr = explode('/',$row['photo']);
+                            $pict = 'storage/'.$arr[1].'/'.$arr[2];
+                        } else {
+                            $pict = 'website/empty_profile.png';
+                        }
                         $sub_data[] = array(
-                            'name'  =>  $row['name'],
-                            'id'    =>  $row['id'],
-                            'status'=>  $row['user_status'],
-                            'user_image' => $row['user_image']
+                            'name'      =>  $row['name'],
+                            'id'        =>  $row['id'],
+                            'status'    =>  $row['user_status'],
+                            'user_image'=>  $pict
                         );
                     }
-
-                    
                 }
 
-                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get();
 
                 $send_data['data'] = $sub_data;
 
@@ -214,7 +240,8 @@ class SocketController extends Controller implements MessageComponentInterface
                     ->first();
                     
 
-                    $user_data = User::select('id', 'name', 'user_image', 'user_status', 'updated_at')
+                    $user_data = User::select('id', 'name', 'photo', 'user_status', 'updated_at')
+                                        ->where('type','1')
                                         ->where('name', 'like', '%'.$data->search_query.'%')                
                                         ->where('id', $user_id)->first();
                     if($user_data){
@@ -227,10 +254,17 @@ class SocketController extends Controller implements MessageComponentInterface
                             $last_seen = '' . date('d/m/Y H:i', strtotime($user_data->updated_at));
                         }
 
+                        if($user_data->photo !== NULL && Storage::exists($user_data->photo)) {
+                            $arr = explode('/',$user_data->photo);
+                            $pict = 'storage/'.$arr[1].'/'.$arr[2];
+                        } else {
+                            $pict = 'website/empty_profile.png';
+                        }
+
                         $sub_data[] = array(
                             'id'    =>  $user_data->id,
                             'name'  =>  $user_data->name,
-                            'user_image'    =>  $user_data->user_image,
+                            'user_image'    =>  $pict,
                             'user_status'   =>  $user_data->user_status,
                             'last_seen'     =>  $last_seen,
                             'last_chat'     =>  $last_chat->chat_message,
@@ -238,12 +272,9 @@ class SocketController extends Controller implements MessageComponentInterface
                         );
                     }
 
-                    
-
-
                 }
 
-                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get();
 
                 foreach($this->clients as $client)
                 {
@@ -260,36 +291,40 @@ class SocketController extends Controller implements MessageComponentInterface
 
             if($data->type == 'request_chat_user')
             {
-                $chat_request = new Chat_request;
+                $cek = Chat_request::where('from_user_id',$data->from_user_id)->where('to_user_id',$data->to_user_id)->whereIn('status',['Pending','Approve'])->count();
 
-                $chat_request->from_user_id = $data->from_user_id;
+                if($cek == 0){
+                    $chat_request = new Chat_request;
 
-                $chat_request->to_user_id = $data->to_user_id;
+                    $chat_request->from_user_id = $data->from_user_id;
 
-                $chat_request->status = 'Pending';
+                    $chat_request->to_user_id = $data->to_user_id;
 
-                $chat_request->save();
+                    $chat_request->status = 'Pending';
 
-                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+                    $chat_request->save();
 
-                $receiver_connection_id = User::select('connection_id')->where('id', $data->to_user_id)->get();
+                    $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get();
 
-                foreach($this->clients as $client)
-                {
-                    if($client->resourceId == $sender_connection_id[0]->connection_id)
+                    $receiver_connection_id = User::select('connection_id')->where('id', $data->to_user_id)->where('type','1')->get();
+
+                    foreach($this->clients as $client)
                     {
-                        $send_data['response_from_user_chat_request'] = true;
+                        if($client->resourceId == $sender_connection_id[0]->connection_id)
+                        {
+                            $send_data['response_from_user_chat_request'] = true;
 
-                        $client->send(json_encode($send_data));
-                    }
+                            $client->send(json_encode($send_data));
+                        }
 
-                    if($client->resourceId == $receiver_connection_id[0]->connection_id)
-                    {
-                        $send_data['user_id'] = $data->to_user_id;
+                        if($client->resourceId == $receiver_connection_id[0]->connection_id)
+                        {
+                            $send_data['user_id'] = $data->to_user_id;
 
-                        $send_data['response_to_user_chat_request'] = true;
+                            $send_data['response_to_user_chat_request'] = true;
 
-                        $client->send(json_encode($send_data));
+                            $client->send(json_encode($send_data));
+                        }
                     }
                 }
             }
@@ -301,13 +336,6 @@ class SocketController extends Controller implements MessageComponentInterface
                                         ->where(function($query) use ($data){
                                             $query->where('from_user_id', $data->user_id)->orWhere('to_user_id', $data->user_id);
                                         })->orderBy('id', 'ASC')->get();
-
-                /*
-                SELECT id, from_user_id, to_user_id, status FROM chat_requests
-                WHERE status != 'Approve'
-                AND (from_user_id = $data->user_id OR to_user_id = $data->user_id)
-                ORDER BY id ASC
-                */
 
                 $sub_data = array();
                 $count_notif_user=0;
@@ -333,7 +361,14 @@ class SocketController extends Controller implements MessageComponentInterface
                         $notification_type = 'Receive Request';
                     }
 
-                    $user_data = User::select('name', 'user_image')->where('id', $user_id)->first();
+                    $user_data = User::select('name', 'photo')->where('id', $user_id)->where('type','1')->first();
+
+                    if($user_data->photo !== NULL && Storage::exists($user_data->photo)) {
+                        $arr = explode('/',$user_data->photo);
+                        $pict = 'storage/'.$arr[1].'/'.$arr[2];
+                    } else {
+                        $pict = 'website/empty_profile.png';
+                    }
 
                     $sub_data[] = array(
                         'id'            =>  $row->id,
@@ -342,11 +377,11 @@ class SocketController extends Controller implements MessageComponentInterface
                         'name'          =>  $user_data->name,
                         'notification_type' =>  $notification_type,
                         'status'           =>   $row->status,
-                        'user_image'    =>  $user_data->user_image
+                        'user_image'    =>  $pict
                     );
                 }
 
-                $sender_connection_id = User::select('connection_id')->where('id', $data->user_id)->get();
+                $sender_connection_id = User::select('connection_id')->where('id', $data->user_id)->where('type','1')->get();
 
                 foreach($this->clients as $client)
                 {
@@ -367,9 +402,9 @@ class SocketController extends Controller implements MessageComponentInterface
             {
                 Chat_request::where('id', $data->chat_request_id)->update(['status' => $data->action]);
 
-                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get();
 
-                $receiver_connection_id = User::select('connection_id')->where('id', $data->to_user_id)->get();
+                $receiver_connection_id = User::select('connection_id')->where('id', $data->to_user_id)->where('type','1')->get();
                 //penerimaan request approve or reject chat
                 if($data->action == 'Approve'){
                     $chatRequestId = $data->chat_request_id;
@@ -416,16 +451,8 @@ class SocketController extends Controller implements MessageComponentInterface
                                             ->orWhere($condition_1)
                                             ->where('status', 'Approve')
                                             ->get();
-                
-                
-                /*  
-                SELECT from_user id, to_user_id FROM chat_requests 
-                WHERE (from_user_id = $data->from_user_id OR to_user_id = $data->from_user_id) 
-                AND status = 'Approve'
-                */
 
                 $sub_data = array();
-
 
                 foreach($user_id_data as $user_id_row)
                 {
@@ -453,7 +480,7 @@ class SocketController extends Controller implements MessageComponentInterface
                     ->first();
                     
 
-                    $user_data = User::select('id', 'name', 'user_image', 'user_status', 'updated_at')->where('id', $user_id)->first();
+                    $user_data = User::select('id', 'name', 'photo', 'user_status', 'updated_at')->where('id', $user_id)->where('type','1')->first();
 
                     if(date('Y-m-d') == date('Y-m-d', strtotime($user_data->updated_at)))
                     {
@@ -464,11 +491,18 @@ class SocketController extends Controller implements MessageComponentInterface
                         $last_seen = '' . date('d/m/Y H:i', strtotime($user_data->updated_at));
                     }
 
+                    if($user_data->photo !== NULL && Storage::exists($user_data->photo)) {
+                        $arr = explode('/',$user_data->photo);
+                        $pict = 'storage/'.$arr[1].'/'.$arr[2];
+                    } else {
+                        $pict = 'website/empty_profile.png';
+                    }
+
                     if($last_chat){
                         $sub_data[] = array(
                             'id'    =>  $user_data->id,
                             'name'  =>  $user_data->name,
-                            'user_image'    =>  $user_data->user_image,
+                            'user_image'    =>  $pict,
                             'user_status'   =>  $user_data->user_status,
                             'last_seen'     =>  $last_seen,
                             'last_chat'     =>  $last_chat->chat_message,
@@ -479,7 +513,7 @@ class SocketController extends Controller implements MessageComponentInterface
                         $sub_data[] = array(
                             'id'    =>  $user_data->id,
                             'name'  =>  $user_data->name,
-                            'user_image'    =>  $user_data->user_image,
+                            'user_image'    =>  $pict,
                             'user_status'   =>  $user_data->user_status,
                             'last_seen'     =>  $last_seen,
                             'last_chat'     =>  '',
@@ -497,20 +531,7 @@ class SocketController extends Controller implements MessageComponentInterface
                     return strtotime($b['time']) - strtotime($a['time']);
                 });
 
-
-                // foreach ($sub_data as $sub_data_key => $sub_data_row) {
-                //     foreach ($last_chat as $last_chat_row) {
-                //         if (
-                //             ($sub_data_row['from_user_id'] == $last_chat_row['from_user_id'] && $sub_data_row['to_user_id'] == $last_chat_row['to_user_id']) ||
-                //             ($sub_data_row['from_user_id'] == $last_chat_row['to_user_id ']&& $sub_data_row['to_user_id'] == $last_chat_row['from_user_id'])
-                //         ) {
-                //             $sub_data[$sub_data_key]['last_chat'] = $last_chat_row['chat_message'];
-                //             break; // Exit the inner loop once a match is found
-                //         }
-                //     }
-                // }
-
-                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get();
 
                 foreach($this->clients as $client)
                 {
@@ -527,8 +548,6 @@ class SocketController extends Controller implements MessageComponentInterface
 
             if($data->type == 'request_send_message')
             {
-                //save chat message in mysql
-
                 $chat = new Chat;
                 
                 $condition_1 = ['from_user_id' => $data->from_user_id, 'to_user_id' => $data->from_user_id];
@@ -537,8 +556,7 @@ class SocketController extends Controller implements MessageComponentInterface
                                             ->orWhere($condition_1)
                                             ->where('status', 'Approve')
                                             ->first();
-                info($user_id_data);
-
+                                            
                 $chat->from_user_id = $data->from_user_id;
 
                 $chat->to_user_id = $data->to_user_id;
@@ -551,9 +569,9 @@ class SocketController extends Controller implements MessageComponentInterface
 
                 $chat_message_id = $chat->id;
 
-                $receiver_connection_id = User::select('connection_id')->where('id', $data->to_user_id)->get();
+                $receiver_connection_id = User::select('connection_id')->where('id', $data->to_user_id)->where('type','1')->get();
 
-                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get();
 
                 foreach($this->clients as $client)
                 {
@@ -587,27 +605,21 @@ class SocketController extends Controller implements MessageComponentInterface
 
             if($data->type == 'request_chat_history')
             {
-                $chat_data = Chat::select('id', 'from_user_id', 'to_user_id', 'chat_message', 'message_status', 'created_at')
+                $chat_data = DB::table('chats')->select('id', 'from_user_id', 'to_user_id', 'chat_message', 'message_status', 'created_at')
                                     ->where(function($query) use ($data){
                                         $query->where('from_user_id', $data->from_user_id)->where('to_user_id', $data->to_user_id);
                                     })
                                     ->orWhere(function($query) use ($data){
                                         $query->where('from_user_id', $data->to_user_id)->where('to_user_id', $data->from_user_id);
-                                    })->orderBy('id', 'ASC')->get();
-                /*
-                SELECT id, from_user_id, to_user_id, chat_message, message status 
-                FROM chats 
-                WHERE (from_user_id = $data->from_user_id AND to_user_id = $data->to_user_id) 
-                OR (from_user_id = $data->to_user_id AND to_user_id = $data->from_user_id)
-                ORDER BY id ASC
-                */
+                                    })
+                                    ->orderBy('id', 'DESC')
+                                    ->limit(50)
+                                    ->get();
 
                 $send_data['chat_history'] = $chat_data;
                 $send_data['id_temp']=$data->from_user_id.$data->to_user_id;
 
-        
-
-                $receiver_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+                $receiver_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get();
 
                 foreach($this->clients as $client)
                 {
@@ -621,11 +633,9 @@ class SocketController extends Controller implements MessageComponentInterface
 
             if($data->type == 'update_chat_status')
             {
-                //update chat status
-
                 Chat::where('id', $data->chat_message_id)->update(['message_status' => $data->chat_message_status]);
 
-                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get();
 
                 foreach($this->clients as $client)
                 {
@@ -644,15 +654,9 @@ class SocketController extends Controller implements MessageComponentInterface
             {
                 $chat_data = Chat::select('id', 'from_user_id', 'to_user_id')->where('message_status', '!=', 'Read')->where('from_user_id', $data->to_user_id)->get();
 
-                /*
-                SELECT id, from_user_id, to_user_id FROM chats 
-                WHERE message_status != 'Read'
-                AND from_user_id = $data->to_user_id
-                */
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->where('type','1')->get(); //send number of unread message
 
-                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get(); //send number of unread message
-
-                $receiver_connection_id = User::select('connection_id')->where('id', $data->to_user_id)->get(); //send message read status
+                $receiver_connection_id = User::select('connection_id')->where('id', $data->to_user_id)->where('type','1')->get(); //send message read status
 
                 foreach($chat_data as $row)
                 {
@@ -689,7 +693,6 @@ class SocketController extends Controller implements MessageComponentInterface
 
     public function onClose(ConnectionInterface $conn)
     {
-        info("kambing23");
         $this->clients->detach($conn);
 
         $querystring = $conn->httpRequest->getUri()->getQuery();
@@ -700,7 +703,7 @@ class SocketController extends Controller implements MessageComponentInterface
         {
             User::where('token', $queryarray['token'])->update([ 'connection_id' => 0, 'user_status' => 'Offline' ]);
 
-            $user_id = User::select('id', 'updated_at')->where('token', $queryarray['token'])->get();
+            $user_id = User::select('id', 'updated_at')->where('token', $queryarray['token'])->where('type','1')->get();
 
             $data['id'] = $user_id[0]->id;
 

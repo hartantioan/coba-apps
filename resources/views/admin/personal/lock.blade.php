@@ -126,8 +126,15 @@
 						
 					 },
 					 success: function(response) {
-						window.location.href = response.url;
-						
+                        if(response.status == 200){
+                            window.location.href = response.url;
+                        }else{
+                            swal({
+								title: 'Ups!',
+								text: response.message,
+								icon: 'warning'
+							});
+                        }
 					 },
 					 error: function() {
 						

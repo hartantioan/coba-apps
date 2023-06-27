@@ -180,27 +180,28 @@ class PurchaseInvoice extends Model
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type','purchase_invoices')->where('lookable_id',$this->id)->first();
-        if($source && $source->approvalMatrix()->exists()){
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
+        if($source){
             return $source;
         }else{
             return '';
         }
     }
 
-    public function listApproval(){
-        $source = $this->approval();
-        if($source){
-            $html = '';
-            foreach($source->approvalMatrix()->whereHas('approvalTemplateStage',function($query){ $query->whereHas('approvalStage', function($query) { $query->orderBy('level'); }); })->get() as $row){
-                $html .= '<span style="top:-10px;">'.$row->user->name.'</span> '.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br>';
+    public function hasDetailMatrix(){
+        $ada = false;
+        if($this->approval()){
+            foreach($this->approval() as $row){
+                if($row->approvalMatrix()->exists()){
+                    $ada = true;
+                }
             }
-
-            return $html;
-        }else{
-            return '';
         }
+
+        return $ada;
     }
+
+    
 
     public function hasChildDocument(){
         $hasRelation = false;
@@ -252,5 +253,27 @@ class PurchaseInvoice extends Model
             }
         }
         return $total;
+    }
+
+    public function updateTotal(){
+        $total = 0;
+        $tax = 0;
+        $wtax = 0;
+        $grandtotal = 0;
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            $total += $row->total;
+            $tax += $row->tax;
+            $wtax += $row->wtax;
+            $grandtotal += $row->grandtotal;
+        }
+
+        PurchaseInvoice::find($this->id)->update([
+            'total'         => $total,
+            'tax'           => $tax,
+            'wtax'          => $wtax,
+            'grandtotal'    => $grandtotal,
+            'balance'       => $grandtotal,
+        ]);
     }
 }

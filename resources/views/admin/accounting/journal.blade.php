@@ -167,7 +167,7 @@
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -433,8 +433,6 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
-        
-        
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
@@ -471,6 +469,8 @@
                 $('.row_coa').remove();
                 $('#cost_distribution_id').empty();
                 countAll();
+                $('.row_coa_multi').remove();
+                countAllMulti();
             }
         });
 
@@ -808,7 +808,7 @@
         var count = 0;
         swal({
             title: "Input Jumlah Baris Yang Diinginkan!",
-            text: "Maksimal tambah multi adalah 100 baris.",
+            text: "Maksimal tambah multi adalah 50 baris.",
             buttons: true,
             content: {
                 element: "input",

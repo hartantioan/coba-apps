@@ -38,12 +38,14 @@ class InventoryTransferInController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             'title'     => 'Transfer Antar Gudang - Masuk',
             'content'   => 'admin.inventory.transfer_in',
             'company'   => Company::where('status','1')->get(),
+            'minDate'   => $request->get('minDate'),
+            'maxDate'   => $request->get('maxDate'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -259,6 +261,30 @@ class InventoryTransferInController extends Controller
                 if($request->temp){
                     
                     $query = InventoryTransferIn::where('code',CustomHelper::decrypt($request->temp))->first();
+
+                    $approved = false;
+                    $revised = false;
+
+                    if($query->approval()){
+                        foreach ($query->approval() as $detail){
+                            foreach($detail->approvalMatrix as $row){
+                                if($row->approved){
+                                    $approved = true;
+                                }
+
+                                if($row->revised){
+                                    $revised = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if($approved && !$revised){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Barang Transfer telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
 
                     if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
@@ -477,15 +503,28 @@ class InventoryTransferInController extends Controller
     public function destroy(Request $request){
         $query = InventoryTransferIn::where('code',CustomHelper::decrypt($request->id))->first();
 
+        $approved = false;
+        $revised = false;
+
         if($query->approval()){
-            foreach($query->approval()->approvalMatrix as $row){
-                if($row->status == '2'){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Barang transfer telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
-                    ]);
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
                 }
             }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
         }
 
         if(in_array($query->status,['2','3','4','5'])){
@@ -521,15 +560,15 @@ class InventoryTransferInController extends Controller
 
     public function approval(Request $request,$id){
         
-        $gr = InventoryTransferOut::where('code',CustomHelper::decrypt($id))->first();
+        $gr = InventoryTransferIn::where('code',CustomHelper::decrypt($id))->first();
                 
         if($gr){
             $data = [
-                'title'     => 'Print Inventory Transfer Keluar',
+                'title'     => 'Print Inventori Transfer Masuk',
                 'data'      => $gr
             ];
 
-            return view('admin.approval.inventory_transfer_out', $data);
+            return view('admin.approval.inventory_transfer_in', $data);
         }else{
             abort(404);
         }

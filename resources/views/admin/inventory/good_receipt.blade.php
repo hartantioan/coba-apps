@@ -164,7 +164,7 @@
                             </div>
                             
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Diterima</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -468,7 +468,8 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                $('#post_date').attr('min','{{ date("Y-m-d") }}');
+                $('#post_date').attr('min','{{ $minDate }}');
+                $('#post_date').attr('max','{{ $maxDate }}');
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
@@ -1250,7 +1251,6 @@
                 $('#due_date').val(response.due_date);
                 $('#document_date').val(response.document_date);
                 $('#delivery_no').val(response.delivery_no);
-                $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
                 $('#document_date').removeAttr('min');
                 

@@ -81,25 +81,46 @@ class AuthController extends Controller
         return redirect('admin/lock');
     }
 
-    public function disable(){
-        session([
-            'bo_is_lock' => 0,
-        ]);
-        $response = [
-            'status' => 200,
-            'url'  => session('bo_last_url')
-        ];
-        return $response;
+    public function disable(Request $request){
+        $user = User::where('employee_no', $request->id_card)->where('type','1')->where('status','1')->first();
+		if($user) {
+            if(Hash::check($request->password, $user->password)) {
+                session([
+                    'bo_is_lock' => 0,
+                ]);
+                $response = [
+                    'status'    => 200,
+                    'url'       => session('bo_last_url'),
+                    'message'	=> 'Sukses! Halaman akan dialihkan.'
+                ];
+            } else {
+                $response = [
+                    'status' 	=> 422,
+                    'message'	=> 'Password tidak sesuai.'
+                ];
+            }
+		} else {
+			$response = [
+				'status' 	=> 422,
+				'message'	=> 'Pengguna tidak ditemukan.'
+			];
+		}
+        
+        return response()->json($response);
     }
     
     public function lock(){
-        $data = [
-            'title'     => 'Profil Pengguna',
-            'content'   => 'admin.personal.profile',
-            'data'      => User::find(session('bo_id')),
-            
-        ];
-        return view('admin.personal.lock', ['data' => $data]);
+        if(session('bo_is_lock') == 1){
+            $data = [
+                'title'     => 'Profil Pengguna',
+                'content'   => 'admin.personal.profile',
+                'data'      => User::find(session('bo_id')),
+                
+            ];
+            return view('admin.personal.lock', ['data' => $data]);
+        }else{
+            return redirect(url()->previous());
+        }
     }
 
     public function index()

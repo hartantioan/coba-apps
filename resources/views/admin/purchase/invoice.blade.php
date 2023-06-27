@@ -204,202 +204,281 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
-                <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO, PO Jasa, LC, atau PO DP.</i>
-                <form class="row" id="form_data" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert" style="display:none;"></div>
-                    </div>
-                    <div class="col s12">
-                        <div class="row">
-                            <div class="input-field col m3 s12">
-                                <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="getAccountData(this.value);"></select>
-                                <label class="active" for="account_id">Supplier / Vendor</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="type" name="type">
-                                    <option value="1">Cash</option>
-                                    <option value="2">Credit</option>
-                                </select>
-                                <label class="" for="type">Tipe</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="company_id" name="company_id">
-                                    @foreach ($company as $rowcompany)
-                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="company_id">Perusahaan</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                                <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="received_date" name="received_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Terima" value="{{ date('Y-m-d') }}" onchange="addDays();">
-                                <label class="active" for="received_date">Tgl. Terima</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="top" name="top" min="0" type="number" value="0" onchange="addDays();">
-                                <label class="active" for="top">TOP (hari) Autofill dari GRPO</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                                <label class="active" for="due_date">Tgl. Kadaluarsa</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
-                                <label class="active" for="document_date">Tgl. Dokumen</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak...">
-                                <label class="active" for="tax_no">No. Faktur Pajak</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="tax_cut_no" name="tax_cut_no" type="text" placeholder="Nomor bukti potong...">
-                                <label class="active" for="tax_cut_no">No. Bukti Potong</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="cut_date" name="cut_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Bukti potong">
-                                <label class="active" for="cut_date">Tgl. Bukti Potong</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
-                                <label class="active" for="spk_no">No. SPK</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
-                                <label class="active" for="invoice_no">No. Invoice</label>
-                            </div>
-                            <div class="file-field input-field col m3 s12">
-                                <div class="btn">
-                                    <span>Lampiran</span>
-                                    <input type="file" name="document" id="document">
+                <ul class="tabs">
+                    <li class="tab col m6"><a class="active" href="#inputOne">Input Satu Data</a></li>
+                    <li class="tab col m6"><a href="#inputMulti">Input Multi Data</a></li>
+                </ul>
+                <div id="inputOne" class="col s12 active">
+                    <h4 class="mt-2">Tambah/Edit {{ $title }}</h4>
+                    <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO, PO Jasa, LC, atau PO DP.</i>
+                    <form class="row" id="form_data" onsubmit="return false;">
+                        <div class="col s12">
+                            <div id="validation_alert" style="display:none;"></div>
+                        </div>
+                        <div class="col s12">
+                            <div class="row">
+                                <div class="input-field col m3 s12">
+                                    <input type="hidden" id="temp" name="temp">
+                                    <select class="browser-default" id="account_id" name="account_id" onchange="getAccountData(this.value);"></select>
+                                    <label class="active" for="account_id">Supplier / Vendor</label>
                                 </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="type" name="type">
+                                        <option value="1">Cash</option>
+                                        <option value="2">Credit</option>
+                                    </select>
+                                    <label class="" for="type">Tipe</label>
                                 </div>
-                            </div>
-                            <div class="col m12 s12">
-                                <p class="mt-2 mb-2">
-                                    <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" style="width:2800px !important;">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">GR/LC/PO/Coa No.</th>
-                                                    <th class="center">NO.PO</th>
-                                                    <th class="center">No.SJ</th>
-                                                    <th class="center">Item / Coa Jasa</th>
-                                                    <th class="center">Satuan</th>
-                                                    <th class="center">Qty Diterima</th>
-                                                    <th class="center">Qty Kembali</th>
-                                                    <th class="center">Qty Sisa</th>
-                                                    <th class="center">Harga@</th>
-                                                    <th class="center">Tgl.Post</th>
-                                                    <th class="center">Tgl.Tenggat</th>
-                                                    <th class="center">Total</th>
-                                                    <th class="center">PPN (%)</th>
-                                                    <th class="center">Termasuk PPN</th>
-                                                    <th class="center">PPN (Rp)</th>
-                                                    <th class="center">PPH (%)</th>
-                                                    <th class="center">PPH (Rp)</th>
-                                                    <th class="center">Grandtotal</th>
-                                                    <th class="center">Keterangan 1</th>
-                                                    <th class="center">Keterangan 2</th>
-                                                    <th class="center">Plant</th>
-                                                    <th class="center">Line</th>
-                                                    <th class="center">Mesin</th>
-                                                    <th class="center">Departemen</th>
-                                                    <th class="center">Gudang</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-detail">
-                                                <tr id="last-row-detail">
-                                                    <td colspan="25">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Pembulatan Manual
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="company_id" name="company_id">
+                                        @foreach ($company as $rowcompany)
+                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="company_id">Perusahaan</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                    <label class="active" for="post_date">Tgl. Posting</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="received_date" name="received_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Terima" value="{{ date('Y-m-d') }}" onchange="addDays();">
+                                    <label class="active" for="received_date">Tgl. Terima</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="top" name="top" min="0" type="number" value="0" onchange="addDays();">
+                                    <label class="active" for="top">TOP (hari) Autofill dari GRPO</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
+                                    <label class="active" for="due_date">Tgl. Kadaluarsa</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
+                                    <label class="active" for="document_date">Tgl. Dokumen</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak...">
+                                    <label class="active" for="tax_no">No. Faktur Pajak</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="tax_cut_no" name="tax_cut_no" type="text" placeholder="Nomor bukti potong...">
+                                    <label class="active" for="tax_cut_no">No. Bukti Potong</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="cut_date" name="cut_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Bukti potong">
+                                    <label class="active" for="cut_date">Tgl. Bukti Potong</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
+                                    <label class="active" for="spk_no">No. SPK</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
+                                    <label class="active" for="invoice_no">No. Invoice</label>
+                                </div>
+                                <div class="file-field input-field col m3 s12">
+                                    <div class="btn">
+                                        <span>Lampiran</span>
+                                        <input type="file" name="document" id="document">
                                     </div>
-                                </p>
-                            </div>
-                            <div class="col m12 s12">
-                                <p class="mt-2 mb-2">
-                                    <h5>Detail Down Payment Bisnis Partner</h5>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">Purchase DP No.</th>
-                                                    <th class="center">Tgl.Post</th>
-                                                    <th class="center">Nominal</th>
-                                                    <th class="center">Sisa</th>
-                                                    <th class="center">Dipakai</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-detail-dp">
-                                                <tr id="empty-detail-dp">
-                                                    <td colspan="5" class="center">
-                                                        Pilih supplier/vendor untuk memulai...
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
                                     </div>
-                                </p>
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
-                            </div>
-                            <div class="input-field col m4 s12">
+                                </div>
+                                <div class="col m12 s12">
+                                    <p class="mt-2 mb-2">
+                                        <h6>Detail Goods Receipt PO / Landed Cost / Purchase Order Jasa / Coa</h6>
+                                        <div style="overflow:auto;">
+                                            <table class="bordered" style="width:2800px !important;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">GR/LC/PO/Coa No.</th>
+                                                        <th class="center">NO.PO</th>
+                                                        <th class="center">No.SJ</th>
+                                                        <th class="center">Item / Coa Jasa</th>
+                                                        <th class="center">Satuan</th>
+                                                        <th class="center">Qty Diterima</th>
+                                                        <th class="center">Qty Kembali</th>
+                                                        <th class="center">Qty Sisa</th>
+                                                        <th class="center">Harga@</th>
+                                                        <th class="center">Tgl.Post</th>
+                                                        <th class="center">Tgl.Tenggat</th>
+                                                        <th class="center">Total</th>
+                                                        <th class="center">PPN (%)</th>
+                                                        <th class="center">Termasuk PPN</th>
+                                                        <th class="center">PPN (Rp)</th>
+                                                        <th class="center">PPH (%)</th>
+                                                        <th class="center">PPH (Rp)</th>
+                                                        <th class="center">Grandtotal</th>
+                                                        <th class="center">Keterangan 1</th>
+                                                        <th class="center">Keterangan 2</th>
+                                                        <th class="center">Plant</th>
+                                                        <th class="center">Line</th>
+                                                        <th class="center">Mesin</th>
+                                                        <th class="center">Departemen</th>
+                                                        <th class="center">Gudang</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-detail">
+                                                    <tr id="last-row-detail">
+                                                        <td colspan="25">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Pembulatan Manual
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </p>
+                                </div>
+                                <div class="col m12 s12">
+                                    <p class="mt-2 mb-2">
+                                        <h5>Detail Down Payment Bisnis Partner</h5>
+                                        <div style="overflow:auto;">
+                                            <table class="bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Purchase DP No.</th>
+                                                        <th class="center">Tgl.Post</th>
+                                                        <th class="center">Nominal</th>
+                                                        <th class="center">Sisa</th>
+                                                        <th class="center">Dipakai</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-detail-dp">
+                                                    <tr id="empty-detail-dp">
+                                                        <td colspan="5" class="center">
+                                                            Pilih supplier/vendor untuk memulai...
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </p>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                    <label class="active" for="note">Keterangan</label>
+                                </div>
+                                <div class="input-field col m4 s12">
 
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <table width="100%" class="bordered">
-                                    <thead>
-                                        <tr>
-                                            <td>Total</td>
-                                            <td class="right-align"><span id="total">0,00</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PPN</td>
-                                            <td class="right-align"><span id="tax">0,00</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PPH</td>
-                                            <td class="right-align"><span id="wtax">0,00</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Uang Muka</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pembulatan</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Grandtotal</td>
-                                            <td class="right-align"><span id="balance">0,00</span></td>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <table width="100%" class="bordered">
+                                        <thead>
+                                            <tr>
+                                                <td>Total</td>
+                                                <td class="right-align"><span id="total">0,00</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>PPN</td>
+                                                <td class="right-align"><span id="tax">0,00</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>PPH</td>
+                                                <td class="right-align"><span id="wtax">0,00</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Uang Muka</td>
+                                                <td class="right-align">
+                                                    <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Pembulatan</td>
+                                                <td class="right-align">
+                                                    <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Grandtotal</td>
+                                                <td class="right-align"><span id="balance">0,00</span></td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div class="col s12 mt-3">
+                                    <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
+                <div id="inputMulti" class="col s12">
+                    <h4 class="mt-2">Tambah/Edit Multi {{ $title }}</h4>
+                    <form class="row" id="form_data_multi" onsubmit="return false;">
+                        <div class="col s12">
+                            <div id="validation_alert_multi" style="display:none;"></div>
+                        </div>
+                        <div class="col s12">
+                            <div class="col s12" style="overflow:auto;width:100% !important;">
+                                <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_copas_ap_invoice.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
+                                <h6>Fitur ini hanya untuk transaksi yang langsung menjadi biaya pada hutang usaha.</h6>
+                                <p class="mt-2 mb-2">
+                                    <table class="bordered" style="min-width:2700px;zoom:0.7;">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Kode A/P Invoice</th>
+                                                <th class="center">Supplier</th>
+                                                <th class="center">Perusahaan</th>
+                                                <th class="center">Tipe</th>
+                                                <th class="center">Keterangan</th>
+                                                <th class="center">Tgl.Post</th>
+                                                <th class="center">Tgl.Terima</th>
+                                                <th class="center">TOP</th>
+                                                <th class="center">Tgl.Tenggat</th>
+                                                <th class="center">Tgl.Dokumen</th>
+                                                <th class="center">No.Faktur Pajak</th>
+                                                <th class="center">No.Bukti Potong</th>
+                                                <th class="center">Tgl.Bukti Potong</th>
+                                                <th class="center">No.SPK</th>
+                                                <th class="center">No.Invoice</th>
+                                                <th class="center">Coa</th>
+                                                <th class="center">Qty</th>
+                                                <th class="center">Harga Satuan</th>
+                                                <th class="center">Total</th>
+                                                <th class="center">ID PPN</th>
+                                                <th class="center">PPN</th>
+                                                <th class="center">ID PPH</th>
+                                                <th class="center">PPH</th>
+                                                <th class="center">Grandtotal</th>
+                                                <th class="center">Ket.1</th>
+                                                <th class="center">Ket.2</th>
+                                                <th class="center">Plant</th>
+                                                <th class="center">Line</th>
+                                                <th class="center">Mesin</th>
+                                                <th class="center">Departemen</th>
+                                                <th class="center">Gudang</th>
+                                                <th class="center">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-multi">
+                                            <tr id="last-row-multi">
+                                                <td colspan="33">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah 1 Baris
+                                                    </a>
+                                                    <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addMulti()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Multi Baris
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+                            </div>
+                            <div class="col s3 mt-1"><h6>Total : <b id="totalMulti" class="right">0,00</b></h6></div>
+                            <div class="col s3 mt-1"><h6>PPN : <b id="ppnMulti" class="right">0,00</b></h6></div>
+                            <div class="col s3 mt-1"><h6>PPH : <b id="pphMulti" class="right">0,00</b></h6></div>
+                            <div class="col s3 mt-1"><h6>Grandtotal : <b id="grandtotalMulti" class="right">0,00</b></h6></div>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit" onclick="saveMulti();">Simpan <i class="material-icons right">send</i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -669,7 +748,8 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                $('#post_date').attr('min','{{ date("Y-m-d") }}');
+                $('#post_date').attr('min','{{ $minDate }}');
+                $('#post_date').attr('max','{{ $maxDate }}');
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
@@ -681,6 +761,7 @@
                 window.onbeforeunload = function() {
                     return 'You will lose all changes made since your last save';
                 };
+                $('.tabs').tabs();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -696,6 +777,8 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('.row_multi').remove();
+                countAllMulti();
             }
         });
 
@@ -806,8 +889,9 @@
                     }
                 });
                 $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
-                $('#table_multi_dp_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi_dp');
                 $('select[name="table_multi_length"]').addClass('browser-default');
+
+                $('#table_multi_dp_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi_dp');
                 $('select[name="table_multi_dp_length"]').addClass('browser-default');
             },
             onCloseEnd: function(modal, trigger){
@@ -862,8 +946,344 @@
             }
         });
 
+        $('#body-multi').on('click', '.delete-data-multi', function() {
+            $(this).closest('tr').remove();
+            countAllMulti();
+        });
+
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
     });
+
+    function addLine(){
+        $('#last-row-multi').before(`
+            <tr class="row_multi">
+                <td>
+                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_supplier[]" placeholder="ID Supplier">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_type[]" placeholder="Tipe Pembayaran">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_received_date[]" placeholder="Tgl.Terima format dd/mm/yy ex:15/12/23">
+                </td>
+                <td>
+                    <input type="number" name="arr_multi_top[]" placeholder="TOP dalam satuan hari">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_document_date[]" placeholder="Tgl.Dokumen format dd/mm/yy ex:15/12/23">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_tax_no[]" placeholder="Nomor Faktur Pajak">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_tax_cut_no[]" placeholder="Nomor Bukti Potong">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_cut_date[]" placeholder="Tgl.Bukti Potong format dd/mm/yy ex:15/12/23">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_spk_no[]" placeholder="Nomor SPK">    
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_invoice_no[]" placeholder="Nomor Invoice Penagihan">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_coa[]" placeholder="ID COA">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_qty[]" value="0" placeholder="Jumlah Qty Barang/Jasa" onkeyup="countAllMulti()">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_price[]" value="0" placeholder="Harga Satuan" onkeyup="countAllMulti()">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_total[]" value="0" placeholder="Harga Total" onkeyup="countAllMulti()">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_tax_id[]" placeholder="ID PPN">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_ppn[]" placeholder="Pajak PPN" value="0" onkeyup="countAllMulti()">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_wtax_id[]" placeholder="ID PPH">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_pph[]" placeholder="Pajak PPH" value="0" onkeyup="countAllMulti()">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_grandtotal[]" placeholder="Grandtotal" value="0" onkeyup="countAllMulti()">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_note_1[]" placeholder="Keterangan 1">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_note_2[]" placeholder="Keterangan 2">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_place[]" placeholder="ID Plant">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_line[]" placeholder="ID Line">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_machine[]" placeholder="ID Mesin">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
+                </td>
+                <td>
+                    <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-multi" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        $('#body-multi :input').off('paste');
+        $('#body-multi :input').on('paste', function (e) {
+            var $start = $(this);
+            var source;
+
+            if (window.clipboardData !== undefined) {
+                source = window.clipboardData;
+            } else {
+                source = e.originalEvent.clipboardData;
+            }
+            var data = source.getData("Text");
+            if (data.length > 0) {
+                if (data.indexOf("\t") > -1) {
+                    var columns = data.split("\n");
+                    $.each(columns, function () {
+                        var values = this.split("\t");
+                        $.each(values, function () {
+                            $start.val(this);
+                            if($start.closest('td').next('td').find('input')[0] != undefined) {
+                                $start = $start.closest('td').next('td').find('input');
+                            }else{
+                                return false;  
+                            }
+                        });
+                        $start = $start.closest('td').parent().next('tr').children('td:first').find('input');
+                    });
+                    e.preventDefault();
+                }
+                countAllMulti();
+                M.toast({
+                    html: 'Sukses ditempel.'
+                });
+            }
+        });
+    }
+
+    function addMulti(){
+        var count = 0;
+        swal({
+            title: "Input Jumlah Baris Yang Diinginkan!",
+            text: "Maksimal tambah multi adalah 50 baris.",
+            buttons: true,
+            content: {
+                element: "input",
+                attributes: {
+                    min: 1,
+                    max: 50,
+                    type: "number",
+                    value: 1,
+                }
+            },
+            closeOnClickOutside: false,
+        })
+        .then(() => {
+            if ($('.swal-content__input').val() != "" && $('.swal-content__input').val() != null) {
+                count = parseInt($('.swal-content__input').val());
+                if(parseInt(count) > 50){
+                    swal({
+                        title: 'Baris tidak boleh lebih dari 50.',
+                        icon: 'error'
+                    });
+                }else{
+                    for(var i = 0;i < count;i++){
+                        $('#last-row-multi').before(`
+                            <tr class="row_multi">
+                                <td>
+                                    <input type="text" name="arr_multi_code[]" placeholder="Kode Jurnal">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_supplier[]" placeholder="ID Supplier">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_company[]" placeholder="ID Perusahaan">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_type[]" placeholder="Tipe Pembayaran">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_note[]" placeholder="Keterangan">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_post_date[]" placeholder="Tgl.Post format dd/mm/yy ex:15/12/23">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_received_date[]" placeholder="Tgl.Terima format dd/mm/yy ex:15/12/23">
+                                </td>
+                                <td>
+                                    <input type="number" name="arr_multi_top[]" placeholder="TOP dalam satuan hari">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_due_date[]" placeholder="Tgl.Tenggat format dd/mm/yy ex:15/12/23">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_document_date[]" placeholder="Tgl.Dokumen format dd/mm/yy ex:15/12/23">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_tax_no[]" placeholder="Nomor Faktur Pajak">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_tax_cut_no[]" placeholder="Nomor Bukti Potong">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_cut_date[]" placeholder="Tgl.Bukti Potong format dd/mm/yy ex:15/12/23">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_spk_no[]" placeholder="Nomor SPK">    
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_invoice_no[]" placeholder="Nomor Invoice Penagihan">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_coa[]" placeholder="ID COA">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_qty[]" value="0" placeholder="Jumlah Qty Barang/Jasa" onkeyup="countAllMulti()">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_price[]" value="0" placeholder="Harga Satuan" onkeyup="countAllMulti()">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_total[]" value="0" placeholder="Harga Total" onkeyup="countAllMulti()">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_tax_id[]" placeholder="ID PPN">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_ppn[]" placeholder="Pajak PPN" value="0" onkeyup="countAllMulti()">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_wtax_id[]" placeholder="ID PPH">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_pph[]" placeholder="Pajak PPH" value="0" onkeyup="countAllMulti()">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_grandtotal[]" placeholder="Grandtotal" value="0" onkeyup="countAllMulti()">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_note_1[]" placeholder="Keterangan 1">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_note_2[]" placeholder="Keterangan 2">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_place[]" placeholder="ID Plant">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_line[]" placeholder="ID Line">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_machine[]" placeholder="ID Mesin">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_department[]" placeholder="ID Departemen">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_warehouse[]" placeholder="ID Gudang">
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-multi" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                    }
+
+                    $('#body-multi :input').off('paste');
+                    $('#body-multi :input').on('paste', function (e) {
+                        var $start = $(this);
+                        var source;
+
+                        if (window.clipboardData !== undefined) {
+                            source = window.clipboardData;
+                        } else {
+                            source = e.originalEvent.clipboardData;
+                        }
+                        var data = source.getData("Text");
+                        if (data.length > 0) {
+                            if (data.indexOf("\t") > -1) {
+                                var columns = data.split("\n");
+                                $.each(columns, function () {
+                                    var values = this.split("\t");
+                                    $.each(values, function () {
+                                        $start.val(this);
+                                        if($start.closest('td').next('td').find('input')[0] != undefined) {
+                                            $start = $start.closest('td').next('td').find('input');
+                                        }else{
+                                            return false;  
+                                        }
+                                    });
+                                    $start = $start.closest('td').parent().next('tr').children('td:first').find('input');
+                                });
+                                e.preventDefault();
+                            }
+                            countAllMulti();
+                            M.toast({
+                                html: 'Sukses ditempel.'
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function countAllMulti(){
+        let total = 0, ppn = 0, pph = 0, grandtotal = 0;
+
+        $('input[name^="arr_multi_total"]').each(function(index){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('input[name^="arr_multi_ppn"]').each(function(index){
+            ppn += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('input[name^="arr_multi_pph"]').each(function(index){
+            pph += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('input[name^="arr_multi_grandtotal"]').each(function(index){
+            grandtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+
+        $('#totalMulti').text(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
+        $('#ppnMulti').text(formatRupiahIni(ppn.toFixed(2).toString().replace('.',',')));
+        $('#pphMulti').text(formatRupiahIni(pph.toFixed(2).toString().replace('.',',')));
+        $('#grandtotalMulti').text(formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',',')));
+    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -1918,6 +2338,155 @@
                         html: 'Salah satu item melebihi jumlah qty dari yang seharusnya.'
                     });
                 }
+            }
+        });
+    }
+
+    function saveMulti(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data')[0]);
+
+                formData.delete("arr_multi_code[]");
+                formData.delete("arr_multi_supplier[]");
+                formData.delete("arr_multi_company[]");
+                formData.delete("arr_multi_type[]");
+                formData.delete("arr_multi_note[]");
+                formData.delete("arr_multi_post_date[]");
+                formData.delete("arr_multi_received_date[]");
+                formData.delete("arr_multi_top[]");
+                formData.delete("arr_multi_due_date[]");
+                formData.delete("arr_multi_document_date[]");
+                formData.delete("arr_multi_tax_no[]");
+                formData.delete("arr_multi_tax_cut_no[]");
+                formData.delete("arr_multi_cut_date[]");
+                formData.delete("arr_multi_spk_no[]");
+                formData.delete("arr_multi_invoice_no[]");
+                formData.delete("arr_multi_coa[]");
+                formData.delete("arr_multi_qty[]");
+                formData.delete("arr_multi_price[]");
+                formData.delete("arr_multi_total[]");
+                formData.delete("arr_multi_tax_id[]");
+                formData.delete("arr_multi_ppn[]");
+                formData.delete("arr_multi_wtax_id[]");
+                formData.delete("arr_multi_pph[]");
+                formData.delete("arr_multi_grandtotal[]");
+                formData.delete("arr_multi_note_1[]");
+                formData.delete("arr_multi_note_2[]");
+                formData.delete("arr_multi_place[]");
+                formData.delete("arr_multi_line[]");
+                formData.delete("arr_multi_machine[]");
+                formData.delete("arr_multi_department[]");
+                formData.delete("arr_multi_warehouse[]");
+
+                $('input[name^="arr_multi_code"]').each(function(index){
+                    if($(this).val()){
+                        formData.append('arr_multi_code[]',$(this).val());
+                        formData.append('arr_multi_supplier[]',($('input[name^="arr_multi_supplier"]').eq(index).val() ? $('input[name^="arr_multi_supplier"]').eq(index).val() : ''));
+                        formData.append('arr_multi_company[]',($('input[name^="arr_multi_company"]').eq(index).val() ? $('input[name^="arr_multi_company"]').eq(index).val() : ''));
+                        formData.append('arr_multi_type[]',($('input[name^="arr_multi_type"]').eq(index).val() ? $('input[name^="arr_multi_type"]').eq(index).val() : ''));
+                        formData.append('arr_multi_note[]',($('input[name^="arr_multi_note"]').eq(index).val() ? $('input[name^="arr_multi_note"]').eq(index).val() : ''));
+                        formData.append('arr_multi_post_date[]',($('input[name^="arr_multi_post_date"]').eq(index).val() ? $('input[name^="arr_multi_post_date"]').eq(index).val() : ''));
+                        formData.append('arr_multi_received_date[]',($('input[name^="arr_multi_received_date"]').eq(index).val() ? $('input[name^="arr_multi_received_date"]').eq(index).val() : ''));
+                        formData.append('arr_multi_top[]',($('input[name^="arr_multi_top"]').eq(index).val() ? $('input[name^="arr_multi_top"]').eq(index).val() : ''));
+                        formData.append('arr_multi_due_date[]',($('input[name^="arr_multi_due_date"]').eq(index).val() ? $('input[name^="arr_multi_due_date"]').eq(index).val() : ''));
+                        formData.append('arr_multi_document_date[]',($('input[name^="arr_multi_document_date"]').eq(index).val() ? $('input[name^="arr_multi_document_date"]').eq(index).val() : ''));
+                        formData.append('arr_multi_tax_no[]',($('input[name^="arr_multi_tax_no"]').eq(index).val() ? $('input[name^="arr_multi_tax_no"]').eq(index).val() : ''));
+                        formData.append('arr_multi_tax_cut_no[]',($('input[name^="arr_multi_tax_cut_no"]').eq(index).val() ? $('input[name^="arr_multi_tax_cut_no"]').eq(index).val() : ''));
+                        formData.append('arr_multi_cut_date[]',($('input[name^="arr_multi_cut_date"]').eq(index).val() ? $('input[name^="arr_multi_cut_date"]').eq(index).val() : ''));
+                        formData.append('arr_multi_spk_no[]',($('input[name^="arr_multi_spk_no"]').eq(index).val() ? $('input[name^="arr_multi_spk_no"]').eq(index).val() : ''));
+                        formData.append('arr_multi_invoice_no[]',($('input[name^="arr_multi_invoice_no"]').eq(index).val() ? $('input[name^="arr_multi_invoice_no"]').eq(index).val() : ''));
+                        formData.append('arr_multi_coa[]',($('input[name^="arr_multi_coa"]').eq(index).val() ? $('input[name^="arr_multi_coa"]').eq(index).val() : ''));
+                        formData.append('arr_multi_qty[]',($('input[name^="arr_multi_qty"]').eq(index).val() ? $('input[name^="arr_multi_qty"]').eq(index).val() : ''));
+                        formData.append('arr_multi_price[]',($('input[name^="arr_multi_price"]').eq(index).val() ? $('input[name^="arr_multi_price"]').eq(index).val() : ''));
+                        formData.append('arr_multi_total[]',($('input[name^="arr_multi_total"]').eq(index).val() ? $('input[name^="arr_multi_total"]').eq(index).val() : ''));
+                        formData.append('arr_multi_tax_id[]',($('input[name^="arr_multi_tax_id"]').eq(index).val() ? $('input[name^="arr_multi_tax_id"]').eq(index).val() : ''));
+                        formData.append('arr_multi_wtax_id[]',($('input[name^="arr_multi_wtax_id"]').eq(index).val() ? $('input[name^="arr_multi_wtax_id"]').eq(index).val() : ''));
+                        formData.append('arr_multi_ppn[]',($('input[name^="arr_multi_ppn"]').eq(index).val() ? $('input[name^="arr_multi_ppn"]').eq(index).val() : ''));
+                        formData.append('arr_multi_pph[]',($('input[name^="arr_multi_pph"]').eq(index).val() ? $('input[name^="arr_multi_pph"]').eq(index).val() : ''));
+                        formData.append('arr_multi_grandtotal[]',($('input[name^="arr_multi_grandtotal"]').eq(index).val() ? $('input[name^="arr_multi_grandtotal"]').eq(index).val() : ''));
+                        formData.append('arr_multi_note_1[]',($('input[name^="arr_multi_note_1"]').eq(index).val() ? $('input[name^="arr_multi_note_1"]').eq(index).val() : ''));
+                        formData.append('arr_multi_note_2[]',($('input[name^="arr_multi_note_2"]').eq(index).val() ? $('input[name^="arr_multi_note_2"]').eq(index).val() : ''));
+                        formData.append('arr_multi_place[]',($('input[name^="arr_multi_place"]').eq(index).val() ? $('input[name^="arr_multi_place"]').eq(index).val() : ''));
+                        formData.append('arr_multi_line[]',($('input[name^="arr_multi_line"]').eq(index).val() ? $('input[name^="arr_multi_line"]').eq(index).val() : ''));
+                        formData.append('arr_multi_machine[]',($('input[name^="arr_multi_machine"]').eq(index).val() ? $('input[name^="arr_multi_machine"]').eq(index).val() : ''));
+                        formData.append('arr_multi_department[]',($('input[name^="arr_multi_department"]').eq(index).val() ? $('input[name^="arr_multi_department"]').eq(index).val() : ''));
+                        formData.append('arr_multi_warehouse[]',($('input[name^="arr_multi_warehouse"]').eq(index).val() ? $('input[name^="arr_multi_warehouse"]').eq(index).val() : ''));
+                    }
+                });
+
+                $.ajax({
+                    url: '{{ Request::url() }}/create_multi',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert_multi').hide();
+                        $('#validation_alert_multi').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert_multi').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert_multi').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
             }
         });
     }

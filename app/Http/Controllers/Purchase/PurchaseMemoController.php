@@ -49,6 +49,8 @@ class PurchaseMemoController extends Controller
             'place'         => Place::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'minDate'       => $request->get('minDate'),
+            'maxDate'       => $request->get('maxDate'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -365,13 +367,15 @@ class PurchaseMemoController extends Controller
                     $revised = false;
 
                     if($query->approval()){
-                        foreach($query->approval()->approvalMatrix as $row){
-                            if($row->approved){
-                                $approved = true;
-                            }
+                        foreach ($query->approval() as $detail){
+                            foreach($detail->approvalMatrix as $row){
+                                if($row->approved){
+                                    $approved = true;
+                                }
 
-                            if($row->revised){
-                                $revised = true;
+                                if($row->revised){
+                                    $revised = true;
+                                }
                             }
                         }
                     }
@@ -550,14 +554,33 @@ class PurchaseMemoController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        if($data->approval() && $data->approval()->approvalMatrix()->exists()){    
-            foreach($data->approval()->approvalMatrix as $key => $row){
+        if($data->approval() && $data->hasDetailMatrix()){
+            foreach($data->approval() as $detail){
                 $string .= '<tr>
-                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
-                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
-                    <td class="center-align">'.$row->note.'</td>
+                    <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
                 </tr>';
+                foreach($detail->approvalMatrix as $key => $row){
+                    $icon = '';
+    
+                    if($row->status == '1' || $row->status == '0'){
+                        $icon = '<i class="material-icons">hourglass_empty</i>';
+                    }elseif($row->status == '2'){
+                        if($row->approved){
+                            $icon = '<i class="material-icons">thumb_up</i>';
+                        }elseif($row->rejected){
+                            $icon = '<i class="material-icons">thumb_down</i>';
+                        }elseif($row->revised){
+                            $icon = '<i class="material-icons">border_color</i>';
+                        }
+                    }
+    
+                    $string .= '<tr>
+                        <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                        <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                        <td class="center-align">'.$icon.'<br></td>
+                        <td class="center-align">'.$row->note.'</td>
+                    </tr>';
+                }
             }
         }else{
             $string .= '<tr>
@@ -685,15 +708,28 @@ class PurchaseMemoController extends Controller
     public function destroy(Request $request){
         $query = PurchaseMemo::where('code',CustomHelper::decrypt($request->id))->first();
 
+        $approved = false;
+        $revised = false;
+
         if($query->approval()){
-            foreach($query->approval()->approvalMatrix as $row){
-                if($row->status == '2'){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Purchase Memo telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
-                    ]);
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
                 }
             }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
         }
 
         if(in_array($query->status,['2','3','4','5'])){
@@ -1971,6 +2007,22 @@ class PurchaseMemoController extends Controller
             }
         }
         return response()->json($response);
+    }
+
+    public function approval(Request $request,$id){
+        
+        $pr = PurchaseMemo::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($pr){
+            $data = [
+                'title'     => 'Print Purchase Memo',
+                'data'      => $pr
+            ];
+
+            return view('admin.approval.purchase_memo', $data);
+        }else{
+            abort(404);
+        }
     }
 
     public function printIndividual(Request $request,$id){

@@ -14,6 +14,7 @@ use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
+use App\Models\UserDateUser;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
@@ -37,7 +38,7 @@ use App\Exports\ExportPurchaseRequest;
 
 class PurchaseRequestController extends Controller
 {
-    protected $dataplaces;
+    protected $dataplaces, $lasturl, $mindate, $maxdate;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
@@ -46,6 +47,7 @@ class PurchaseRequestController extends Controller
     }
     public function index(Request $request)
     {
+
         $data = [
             'title'     => 'Purchase Request',
             'content'   => 'admin.purchase.request',
@@ -55,9 +57,12 @@ class PurchaseRequestController extends Controller
             'line'      => Line::where('status','1')->get(),
             'machine'   => Machine::where('status','1')->get(),
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'minDate'   => $request->get('minDate'),
+            'maxDate'   => $request->get('maxDate'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+
     }
 
     public function datatable(Request $request){
@@ -244,7 +249,7 @@ class PurchaseRequestController extends Controller
         
         $string .= '</tbody></table></div>';
 
-        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+        $string .= '<div class="col s6 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>
@@ -257,28 +262,33 @@ class PurchaseRequestController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
-            foreach($data->approval()->approvalMatrix as $key => $row){
-                $icon = '';
-
-                if($row->status == '1' || $row->status == '0'){
-                    $icon = '<i class="material-icons">hourglass_empty</i>';
-                }elseif($row->status == '2'){
-                    if($row->approved){
-                        $icon = '<i class="material-icons">thumb_up</i>';
-                    }elseif($row->rejected){
-                        $icon = '<i class="material-icons">thumb_down</i>';
-                    }elseif($row->revised){
-                        $icon = '<i class="material-icons">border_color</i>';
-                    }
-                }
-
+        if($data->approval() && $data->hasDetailMatrix()){
+            foreach($data->approval() as $detail){
                 $string .= '<tr>
-                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
-                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                    <td class="center-align">'.$icon.'<br></td>
-                    <td class="center-align">'.$row->note.'</td>
+                    <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
                 </tr>';
+                foreach($detail->approvalMatrix as $key => $row){
+                    $icon = '';
+    
+                    if($row->status == '1' || $row->status == '0'){
+                        $icon = '<i class="material-icons">hourglass_empty</i>';
+                    }elseif($row->status == '2'){
+                        if($row->approved){
+                            $icon = '<i class="material-icons">thumb_up</i>';
+                        }elseif($row->rejected){
+                            $icon = '<i class="material-icons">thumb_down</i>';
+                        }elseif($row->revised){
+                            $icon = '<i class="material-icons">border_color</i>';
+                        }
+                    }
+    
+                    $string .= '<tr>
+                        <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                        <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                        <td class="center-align">'.$icon.'<br></td>
+                        <td class="center-align">'.$row->note.'</td>
+                    </tr>';
+                }
             }
         }else{
             $string .= '<tr>
@@ -487,13 +497,15 @@ class PurchaseRequestController extends Controller
                     $revised = false;
 
                     if($query->approval()){
-                        foreach($query->approval()->approvalMatrix as $row){
-                            if($row->approved){
-                                $approved = true;
-                            }
+                        foreach ($query->approval() as $detail){
+                            foreach($detail->approvalMatrix as $row){
+                                if($row->approved){
+                                    $approved = true;
+                                }
 
-                            if($row->revised){
-                                $revised = true;
+                                if($row->revised){
+                                    $revised = true;
+                                }
                             }
                         }
                     }
@@ -642,15 +654,28 @@ class PurchaseRequestController extends Controller
     public function destroy(Request $request){
         $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
 
+        $approved = false;
+        $revised = false;
+
         if($query->approval()){
-            foreach($query->approval()->approvalMatrix as $row){
-                if($row->status == '2'){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
-                    ]);
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
                 }
             }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
         }
 
         if(in_array($query->status,['2','3','4','5'])){

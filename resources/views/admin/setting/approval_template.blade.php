@@ -1,3 +1,8 @@
+<style>
+    .modal {
+        top:0px !important;
+    }
+</style>
 <!-- BEGIN: Page Main-->
 <div id="main">
     <div class="row">
@@ -290,6 +295,12 @@
                 $('.row_user').each(function(){
                     $(this).remove();
                 });
+                $('.row_stage').each(function(){
+                    $(this).remove();
+                });
+                $('.row_menu').each(function(){
+                    $(this).remove();
+                });
             }
         });
 
@@ -383,7 +394,7 @@
                     <select class="browser-default" id="arr_approval_menu` + count + `" name="arr_approval_menu[]" onchange="checkGrandtotal();"></select>
                 </td>
                 <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-stage" href="javascript:void(0);">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-menu" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>

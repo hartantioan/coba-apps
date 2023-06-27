@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('token');
             $table->integer('connection_id');
-            $table->enum('user_status', ['Offline', 'Online']);
+            $table->string('user_status',10);
             $table->string('user_image');
         });
     }

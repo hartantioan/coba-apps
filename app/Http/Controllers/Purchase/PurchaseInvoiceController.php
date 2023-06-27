@@ -60,6 +60,8 @@ class PurchaseInvoiceController extends Controller
             'warehouse'     => Warehouse::where('status','1')->get(),
             'line'          => Line::where('status','1')->get(),
             'machine'       => Machine::where('status','1')->get(),
+            'minDate'       => $request->get('minDate'),
+            'maxDate'       => $request->get('maxDate'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -591,13 +593,15 @@ class PurchaseInvoiceController extends Controller
                     $revised = false;
 
                     if($query->approval()){
-                        foreach($query->approval()->approvalMatrix as $row){
-                            if($row->approved){
-                                $approved = true;
-                            }
+                        foreach ($query->approval() as $detail){
+                            foreach($detail->approvalMatrix as $row){
+                                if($row->approved){
+                                    $approved = true;
+                                }
 
-                            if($row->revised){
-                                $revised = true;
+                                if($row->revised){
+                                    $revised = true;
+                                }
                             }
                         }
                     }
@@ -773,6 +777,131 @@ class PurchaseInvoiceController extends Controller
 		return response()->json($response);
     }
 
+    public function createMulti(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_multi_code'                          => 'required|array',
+		], [
+            'arr_multi_code.required'                 => 'Kode multi tidak boleh kosong.',
+            'arr_multi_code.array'                    => 'Kode multi harus dalam bentuk array.',
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+
+            $cekSameCode = PurchaseInvoice::whereIn('code',$request->arr_multi_code)->count();
+
+            if($cekSameCode > 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Kode AP INvoice telah terpakai, silahkan gunakan yang lainnya.'
+                ]);
+            }
+        
+            DB::beginTransaction();
+            try {
+
+                $temp = '';
+                foreach($request->arr_multi_code as $key => $row){
+
+                    if($temp !== $row){
+                        $query = PurchaseInvoice::create([
+                            'code'			            => $row,
+                            'user_id'		            => session('bo_id'),
+                            'account_id'                => $request->arr_multi_supplier[$key],
+                            'company_id'                => $request->arr_multi_company[$key],
+                            'post_date'                 => date('Y-m-d',strtotime($request->arr_multi_post_date[$key])),
+                            'received_date'             => date('Y-m-d',strtotime($request->arr_multi_received_date[$key])),
+                            'due_date'                  => date('Y-m-d',strtotime($request->arr_multi_due_date[$key])),
+                            'document_date'             => date('Y-m-d',strtotime($request->arr_multi_document_date[$key])),
+                            'type'                      => $request->arr_multi_type[$key],
+                            'total'                     => 0,
+                            'tax'                       => 0,
+                            'wtax'                      => 0,
+                            'grandtotal'                => 0,
+                            'downpayment'               => 0,
+                            'rounding'                  => 0,
+                            'balance'                   => 0,
+                            'note'                      => $request->arr_multi_note[$key],
+                            'document'                  => NULL,
+                            'status'                    => '1',
+                            'tax_no'                    => $request->arr_multi_tax_no[$key],
+                            'tax_cut_no'                => $request->arr_multi_tax_cut_no[$key],
+                            'cut_date'                  => date('Y-m-d',strtotime($request->arr_multi_cut_date[$key])),
+                            'spk_no'                    => $request->arr_multi_spk_no[$key],
+                            'invoice_no'                => $request->arr_multi_invoice_no[$key],
+                        ]);
+
+                        activity()
+                            ->performedOn(new PurchaseInvoice())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query)
+                            ->log('Add / edit AP Invoice multi.');
+                    }
+
+                    if($query) {
+
+                        if(floatval($request->arr_multi_total[$key]) > 0){
+                            PurchaseInvoiceDetail::create([
+                                'purchase_invoice_id'   => $query->id,
+                                'lookable_type'         => 'coas',
+                                'lookable_id'           => $request->arr_multi_coa[$key],
+                                'qty'                   => $request->arr_multi_qty[$key],
+                                'price'                 => $request->arr_multi_price[$key],
+                                'total'                 => $request->arr_multi_total[$key],
+                                'tax'                   => $request->arr_multi_ppn[$key],
+                                'tax_id'                => $request->arr_multi_tax_id[$key] ? $request->arr_multi_tax_id[$key] : NULL,
+                                'is_include_tax'        => '0',
+                                'wtax_id'               => $request->arr_multi_wtax_id[$key] ? $request->arr_multi_wtax_id[$key] : NULL,
+                                'wtax'                  => $request->arr_multi_pph[$key],
+                                'grandtotal'            => $request->arr_multi_grandtotal[$key],
+                                'note'                  => $request->arr_multi_note_1[$key],
+                                'note2'                 => $request->arr_multi_note_2[$key],
+                                'place_id'              => $request->arr_multi_place[$key] ? $request->arr_multi_place[$key] : NULL,
+                                'line_id'               => $request->arr_multi_line[$key] ? $request->arr_multi_line[$key] : NULL,
+                                'machine_id'            => $request->arr_multi_machine[$key] ? $request->arr_multi_machine[$key] : NULL,
+                                'department_id'         => $request->arr_multi_department[$key] ? $request->arr_multi_department[$key] : NULL,
+                                'warehouse_id'          => $request->arr_multi_warehouse[$key] ? $request->arr_multi_warehouse[$key] : NULL,
+                            ]);
+                        }
+                    }
+                    
+                    $temp = $row;
+                }
+
+                $temp = '';
+                foreach($request->arr_multi_code as $key => $row){
+
+                    if($temp !== $row){
+                        $pi = null;
+                        $pi = PurchaseInvoice::where('code',$row)->first();
+                        if($pi){
+                            $pi->updateTotal();
+                            CustomHelper::sendApproval('purchase_invoices',$pi->id,$pi->note);
+                            CustomHelper::sendNotification('purchase_invoices',$pi->id,'Pengajuan AP Invoice No. '.$pi->code,$pi->note,session('bo_id'));
+                        }
+                    }
+
+                    $temp = $row;
+                }
+
+                $response = [
+					'status'    => 200,
+					'message'   => 'Data successfully saved.',
+				];
+
+                DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            }
+        }
+
+        return response()->json($response);
+    }
+
     public function rowDetail(Request $request)
     {
         $data   = PurchaseInvoice::where('code',CustomHelper::decrypt($request->id))->first();
@@ -858,14 +987,33 @@ class PurchaseInvoiceController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        if($data->approval() && $data->approval()->approvalMatrix()->exists()){    
-            foreach($data->approval()->approvalMatrix as $key => $row){
+        if($data->approval() && $data->hasDetailMatrix()){
+            foreach($data->approval() as $detail){
                 $string .= '<tr>
-                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
-                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
-                    <td class="center-align">'.$row->note.'</td>
+                    <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
                 </tr>';
+                foreach($detail->approvalMatrix as $key => $row){
+                    $icon = '';
+    
+                    if($row->status == '1' || $row->status == '0'){
+                        $icon = '<i class="material-icons">hourglass_empty</i>';
+                    }elseif($row->status == '2'){
+                        if($row->approved){
+                            $icon = '<i class="material-icons">thumb_up</i>';
+                        }elseif($row->rejected){
+                            $icon = '<i class="material-icons">thumb_down</i>';
+                        }elseif($row->revised){
+                            $icon = '<i class="material-icons">border_color</i>';
+                        }
+                    }
+    
+                    $string .= '<tr>
+                        <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                        <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                        <td class="center-align">'.$icon.'<br></td>
+                        <td class="center-align">'.$row->note.'</td>
+                    </tr>';
+                }
             }
         }else{
             $string .= '<tr>
@@ -1056,15 +1204,28 @@ class PurchaseInvoiceController extends Controller
     public function destroy(Request $request){
         $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->id))->first();
 
+        $approved = false;
+        $revised = false;
+
         if($query->approval()){
-            foreach($query->approval()->approvalMatrix as $row){
-                if($row->status == '2'){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Landed coast telah diapprove / sudah dalam progres, anda tidak bisa melakukan perubahan.'
-                    ]);
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
                 }
             }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
         }
 
         if(in_array($query->status,['2','3','4','5'])){

@@ -126,14 +126,13 @@
                                         <th class="center">Line</th>
                                         <th class="center">Mesin</th>
                                         <th class="center">Departemen</th>
-                                        <th class="center">Gudang</th>
                                         <th class="center">Prosentase</th>
                                         <th class="center">Hapus</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-detail">
                                     <tr id="last-row-detail">
-                                        <td colspan="7" class="center">
+                                        <td colspan="6" class="center">
                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
                                                 <i class="material-icons left">add</i> Tambah Baris
                                             </a>
@@ -279,14 +278,6 @@
                         @endforeach
                     </select>
                 </td>
-                <td>
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                        <option value="">--Kosong--</option>
-                        @foreach ($warehouse as $rowwarehouse)
-                            <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
                 <td class="center">
                     <input id="arr_percentage` + count + `" name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="width:100%;text-align:right;">
                 </td>
@@ -379,7 +370,7 @@
 
     function save(){
 			
-        var formData = new FormData($('#form_data')[0]), passed = true, total = 0, passed_similar = true, arr_place = [], arr_line = [], arr_machine = [], arr_department = [], arr_warehouse = [], arr_temp = [];
+        var formData = new FormData($('#form_data')[0]), passed = true, total = 0, passed_similar = true, arr_place = [], arr_line = [], arr_machine = [], arr_department = [], arr_temp = [];
 
         $('input[name^="arr_percentage"]').each(function(){
             total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -393,23 +384,20 @@
             formData.delete("arr_line[]");
             formData.delete("arr_machine[]");
             formData.delete("arr_department[]");
-            formData.delete("arr_warehouse[]");
 
             $('select[name^="arr_place"]').each(function(index){
                 arr_place.push($(this).val());
                 arr_line.push($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : '');
                 arr_machine.push($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : ''); 
                 arr_department.push($('select[name^="arr_department"]').eq(index).val() ? $('select[name^="arr_department"]').eq(index).val() : '');
-                arr_warehouse.push($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : '');
 
                 formData.append('arr_line[]',($('select[name^="arr_line"]').eq(index).val() ? $('select[name^="arr_line"]').eq(index).val() : ''));
                 formData.append('arr_machine[]',($('select[name^="arr_machine"]').eq(index).val() ? $('select[name^="arr_machine"]').eq(index).val() : ''));
                 formData.append('arr_department[]',($('select[name^="arr_department"]').eq(index).val() ? $('select[name^="arr_department"]').eq(index).val() : ''));
-                formData.append('arr_warehouse[]',($('select[name^="arr_warehouse"]').eq(index).val() ? $('select[name^="arr_warehouse"]').eq(index).val() : ''));
             });
 
             for(let i=0;i<arr_place.length;i++){
-                arr_temp.push(arr_place[i] + '-' + arr_line[i] + '-' + arr_machine[i] + '-' + arr_department[i] + '-' + arr_warehouse[i]);
+                arr_temp.push(arr_place[i] + '-' + arr_line[i] + '-' + arr_machine[i] + '-' + arr_department[i]);
             }
 
             let newArr = findDuplicates(arr_temp);
@@ -573,14 +561,6 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td>
-                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($warehouse as $rowwarehouse)
-                                        <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->name }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
                             <td class="center">
                                 <input id="arr_percentage` + count + `" name="arr_percentage[]" class="browser-default" type="text" value="` + val.percentage + `" onkeyup="formatRupiah(this);" style="width:100%;text-align:right;">
                             </td>
@@ -594,7 +574,6 @@
                     $('#arr_place' + count).val(val.place_id);
                     $('#arr_line' + count).val(val.line_id);
                     $('#arr_department' + count).val(val.department_id);
-                    $('#arr_warehouse' + count).val(val.warehouse_id);
                 });
 
                 $('.modal-content').scrollTop(0);

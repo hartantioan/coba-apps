@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Barang Transfer # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Barang Transfer Keluar # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -246,17 +246,19 @@
                         <div class="mt-1">{{ $data->user->position->name.' '.$data->user->department->name }}</div>
                     </td>
                     @if($data->approval())
-                    @foreach ($data->approval()->approvalMatrix()->where('status','2')->get() as $row)
-                        <td class="center-align">
-                            {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                            @if($row->user->signature)
-                                <div>{!! $row->user->signature() !!}</div>
-                            @endif
-                            <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                            <div class="mt-1">{{ $row->user->position->name.' - '.$row->user->department->name }}</div>
-                        </td>
-                    @endforeach
-                @endif
+                        @foreach ($data->approval() as $detail)
+                            @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
+                                <td class="center-align">
+                                    {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
+                                    @if($row->user->signature)
+                                        <div>{!! $row->user->signature() !!}</div>
+                                    @endif
+                                    <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
+                                    <div class="mt-1">{{ $row->user->position->name.' - '.$row->user->department->name }}</div>
+                                </td>
+                            @endforeach
+                        @endforeach
+                    @endif
                 </tr>
             </table>   
         </div>

@@ -165,6 +165,20 @@ class Menu extends Model
         return $arrmenu;
     }
 
+    public function checkPostDate(){
+        $columns = Schema::getColumnListing($this->table_name);
+
+        $ada = false;
+
+        foreach($columns as $row){
+            if($row == 'post_date'){
+                $ada = true;
+            }
+        }
+
+        return $ada;
+    }
+
     public function journalable()
     {
         $columns = Schema::getColumnListing($this->table_name);

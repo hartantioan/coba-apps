@@ -172,6 +172,29 @@ class ApprovalTemplateController extends Controller
             ];
         } else {
 
+            /* $passedDoubleAssign = true;
+            $arrDoubleAssign = [];
+
+            foreach($request->arr_approval_menu as $key => $row){
+                $atm = ApprovalTemplateMenu::where('menu_id',intval($row))->whereHas('approvalTemplate',function($query){
+                    $query->where('status','1');
+                })->get();
+                if($atm->count() > 0){
+                    foreach($atm as $row){
+                        $arrDoubleAssign[] = $row->menu->name;
+                    }
+                    $passedDoubleAssign = false;
+                }
+            }
+            
+            if(!$passedDoubleAssign && !$request->temp){
+                $stringMenu = implode(', ',$arrDoubleAssign);
+                return response()->json([
+                    'status'  => 500,
+                    'message' => $stringMenu.' sudah memiliki template, silahkan non-aktifkan atau hapus template tersebut.'
+                ]);
+            } */
+
             if($request->temp){
                 DB::beginTransaction();
                 try {

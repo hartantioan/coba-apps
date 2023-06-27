@@ -27,6 +27,20 @@ class OperationAccess
             ->count();
 
         if($access > 0) {
+            $user = User::find(session('bo_id'));
+            $cekDate = $user->cekMinMaxPostDate($url);
+            $minDate = $cekDate ? date('Y-m-d', strtotime('-'.$cekDate->userDate->count_backdate.' days')) : date('Y-m-d');
+            $maxDate = $cekDate ? date('Y-m-d', strtotime(date('Y-m-d'). ' + '.$cekDate->userDate->count_futuredate.' days')) : date('Y-m-d');
+            $request->attributes->set('minDate', $minDate);
+            $request->attributes->set('maxDate', $maxDate);
+            if(isset($request->post_date)){
+                if($request->post_date < $minDate || $request->post_date > $maxDate){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Ups, Tanggal post anda tidak boleh kurang dari '.date('d/m/y',strtotime($minDate)).' atau lebih dari '.date('d/m/y',strtotime($maxDate)).'.',
+                    ]);
+                }
+            }
             return $next($request);
         } else {
             if($request->isMethod('get')){

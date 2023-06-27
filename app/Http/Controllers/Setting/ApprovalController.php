@@ -309,7 +309,7 @@ class ApprovalController extends Controller
             foreach($query_data as $val) {
                 $response['data'][] = [
                     $val->status == '1' ? '<span class="pick" data-id="'.CustomHelper::encrypt($val->code).'">'.$nomor.'</span>' : $nomor,
-                    $val->code.' - '.$val->updateNextLevelApproval(),
+                    $val->code,
                     date('d M Y H:i:s',strtotime($val->date_request)),
                     $val->approvalSource->user->name,
                     $val->approvalSource->lookable->code,
@@ -322,8 +322,6 @@ class ApprovalController extends Controller
                     $val->status == '1' ? 'pending' : ''
                 ];
                 $nomor++;
-
-                
             }
         }
 
@@ -427,13 +425,14 @@ class ApprovalController extends Controller
                                         }
                                     }
                                 }else{
-    
-                                    $pr = $query->approvalSource->lookable;
-                                    $pr->update([
-                                        'status'    => '2'
-                                    ]);
-                                    
-                                    CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+                                    if($query->checkOtherApproval()){
+                                        $pr = $query->approvalSource->lookable;
+                                        $pr->update([
+                                            'status'    => '2'
+                                        ]);
+                                        
+                                        CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+                                    }
                                 }
                             }
                         }elseif($request->approve_reject_revision == '2'){
@@ -577,12 +576,14 @@ class ApprovalController extends Controller
                                             }
                                         }
                                     }else{
-                                        $pr = $query->approvalSource->lookable;
-                                        $pr->update([
-                                            'status'    => '2'
-                                        ]);
-    
-                                        CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+                                        if($query->checkOtherApproval()){
+                                            $pr = $query->approvalSource->lookable;
+                                            $pr->update([
+                                                'status'    => '2'
+                                            ]);
+        
+                                            CustomHelper::sendJournal($query->approvalSource->lookable_type,$query->approvalSource->lookable_id,$query->approvalSource->lookable->account_id);
+                                        }
                                     }
                                 }
                             }elseif($request->approve_reject_revision_multi == '2'){

@@ -54,4 +54,14 @@ class ApprovalSource extends Model
     public function approvalMatrix(){
         return $this->hasMany('App\Models\ApprovalMatrix');
     }
+
+    public function getTemplateName(){
+        $text = '';
+
+        foreach($this->approvalMatrix as $row){
+            $text = $row->approvalTemplateStage->approvalTemplate->code.' - '.$row->approvalTemplateStage->approvalTemplate->name;
+        }
+
+        return $text;
+    }
 }

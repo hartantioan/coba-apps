@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Inventory\GoodScaleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\MasterData\TaxController;
 use App\Http\Controllers\MasterData\BenchmarkPriceController;
 use App\Http\Controllers\MasterData\CostDistributionController;
 use App\Http\Controllers\MasterData\DeliveryCostController;
+use App\Http\Controllers\MasterData\UserDateController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -544,6 +546,15 @@ Route::prefix('admin')->group(function () {
                         Route::post('create',[DeliveryCostController::class, 'create'])->middleware('operation.access:delivery_cost,update');
                         Route::post('destroy', [DeliveryCostController::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');
                     });
+
+                    Route::prefix('user_date')->middleware('operation.access:user_date,view')->group(function () {
+                        Route::get('/',[UserDateController::class, 'index']);
+                        Route::get('datatable',[UserDateController::class, 'datatable']);
+                        Route::post('show', [UserDateController::class, 'show']);
+                        Route::get('row_detail',[UserDateController::class, 'rowDetail']);
+                        Route::post('create',[UserDateController::class, 'create'])->middleware('operation.access:user_date,update');
+                        Route::post('destroy', [UserDateController::class, 'destroy'])->middleware('operation.access:user_date,delete');
+                    });
                 });
             });
 
@@ -728,6 +739,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('view_journal/{id}',[PurchaseInvoiceController::class, 'viewJournal'])->middleware('operation.access:purchase_invoice,journal');
                     Route::get('viewstructuretree',[PurchaseInvoiceController::class, 'viewStructureTree']);
                     Route::post('create',[PurchaseInvoiceController::class, 'create'])->middleware('operation.access:purchase_invoice,update');
+                    Route::post('create_multi',[PurchaseInvoiceController::class, 'createMulti'])->middleware('operation.access:purchase_invoice,update');
                     Route::post('void_status', [PurchaseInvoiceController::class, 'voidStatus'])->middleware('operation.access:purchase_invoice,void');
                     Route::get('approval/{id}',[PurchaseInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseInvoiceController::class, 'destroy'])->middleware('operation.access:purchase_invoice,delete');
@@ -754,6 +766,29 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('inventory')->middleware('direct.access')->group(function () {
+                Route::prefix('good_scale')->middleware('operation.access:good_scale,view')->group(function () {
+                    Route::get('/',[GoodScaleController::class, 'index']);
+                    Route::get('datatable',[GoodScaleController::class, 'datatable']);
+                    Route::get('row_detail',[GoodScaleController::class, 'rowDetail']);
+                    Route::post('show', [GoodScaleController::class, 'show']);
+                    Route::post('update', [GoodScaleController::class, 'update']);
+                    Route::post('print',[GoodScaleController::class, 'print']);
+                    Route::post('print_by_range',[GoodScaleController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[GoodScaleController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('export',[GoodScaleController::class, 'export']);
+                    Route::get('view_journal/{id}',[GoodScaleController::class, 'viewJournal'])->middleware('operation.access:good_scale,journal');
+                    Route::get('viewstructuretree',[GoodScaleController::class, 'viewStructureTree']);
+                    Route::post('get_purchase_order', [GoodScaleController::class, 'getPurchaseOrder']);
+                    Route::post('get_weight', [GoodScaleController::class, 'getWeight']);
+                    Route::post('get_purchase_order_ai', [GoodScaleController::class, 'getPurchaseOrderAi']);
+                    Route::post('remove_used_data', [GoodScaleController::class, 'removeUsedData']);
+                    Route::post('create',[GoodScaleController::class, 'create'])->middleware('operation.access:good_scale,update');
+                    Route::post('save_update',[GoodScaleController::class, 'saveUpdate'])->middleware('operation.access:good_scale,update');
+                    Route::get('approval/{id}',[GoodScaleController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [GoodScaleController::class, 'voidStatus'])->middleware('operation.access:good_scale,void');
+                    Route::post('destroy', [GoodScaleController::class, 'destroy'])->middleware('operation.access:good_scale,delete');
+                });
+
                 Route::prefix('good_receipt_po')->middleware('operation.access:good_receipt_po,view')->group(function () {
                     Route::get('/',[GoodReceiptPOController::class, 'index']);
                     Route::get('datatable',[GoodReceiptPOController::class, 'datatable']);

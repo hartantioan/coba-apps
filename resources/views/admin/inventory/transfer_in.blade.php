@@ -173,7 +173,7 @@
                             </div>
                             
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
@@ -341,7 +341,8 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                $('#post_date').attr('min','{{ date("Y-m-d") }}');
+                $('#post_date').attr('min','{{ $minDate }}');
+                $('#post_date').attr('max','{{ $maxDate }}');
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },

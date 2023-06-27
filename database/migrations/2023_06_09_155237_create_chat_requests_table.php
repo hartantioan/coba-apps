@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('from_user_id');
             $table->integer('to_user_id');
-            $table->enum('status', ['Pending', 'Approve', 'Reject']);
+            $table->string('status',10);
             $table->timestamps();
         });
     }

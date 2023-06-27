@@ -137,7 +137,7 @@
                         <div class="row">
                             
                             <div class="input-field col m4 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="input-field col m4 s12">
@@ -480,7 +480,8 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                $('#post_date').attr('min','{{ date("Y-m-d") }}');
+                $('#post_date').attr('min','{{ $minDate }}');
+                $('#post_date').attr('max','{{ $maxDate }}');
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#required_date').attr('min','{{ date("Y-m-d") }}');
             },
@@ -1002,7 +1003,6 @@
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
                 $('#required_date').val(response.required_date);
-                $('#post_date').removeAttr('min');
                 $('#due_date').removeAttr('min');
                 $('#required_date').removeAttr('min');
                 $('#company_id').val(response.company_id).formSelect();

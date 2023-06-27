@@ -262,17 +262,19 @@
                         <div class="mt-1">{{ $data->user->position->name.' '.$data->user->department->name }}</div>
                     </td>
                     @if($data->approval())
-                    @foreach ($data->approval()->approvalMatrix()->where('status','2')->get() as $row)
-                        <td class="center-align">
-                            {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                            @if($row->user->signature)
-                                <div>{!! $row->user->signature() !!}</div>
-                            @endif
-                            <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                            <div class="mt-1">{{ $row->user->position->name.' - '.$row->user->department->name }}</div>
-                        </td>
-                    @endforeach
-                @endif
+                        @foreach ($data->approval() as $detail)
+                            @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
+                                <td class="center-align">
+                                    {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
+                                    @if($row->user->signature)
+                                        <div>{!! $row->user->signature() !!}</div>
+                                    @endif
+                                    <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
+                                    <div class="mt-1">{{ $row->user->position->name.' - '.$row->user->department->name }}</div>
+                                </td>
+                            @endforeach
+                        @endforeach
+                    @endif
                 </tr>
             </table>   
         </div>

@@ -64,31 +64,7 @@
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
                                     <div class="collapsible-body">
                                         <div class="row">
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Menunggu</option>
-                                                        <option value="2">Dalam Proses</option>
-                                                        <option value="3">Selesai</option>
-                                                        <option value="4">Ditolak</option>
-                                                        <option value="5">Ditutup</option>
-                                                        <option value="6">Direvisi</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_company" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        @foreach ($company as $rowcompany)
-                                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
+                                            
                                             <div class="col m4 s6 ">
                                                 <label for="filter_account" style="font-size:1rem;">Partner Bisnis :</label>
                                                 <div class="input-field">
@@ -107,6 +83,17 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
+                                                <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_company" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        @foreach ($company as $rowcompany)
+                                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Start Date (Tanggal Mulai) :</label>
                                                 <div class="input-field col s12">
                                                 <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
@@ -116,6 +103,20 @@
                                                 <label for="finish_date" style="font-size:1rem;">End Date (Tanggal Berhenti) :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Menunggu</option>
+                                                        <option value="2">Dalam Proses</option>
+                                                        <option value="3">Selesai</option>
+                                                        <option value="4">Ditolak</option>
+                                                        <option value="5">Ditutup</option>
+                                                        <option value="6">Direvisi</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>  
@@ -141,8 +142,6 @@
                                                         <th rowspan="2" class="center-align">Kas/Bank</th>
                                                         <th rowspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
-                                                        <th rowspan="2" class="center-align">Total</th>
-                                                        <th colspan="3" class="center-align">PPH</th>
                                                         <th rowspan="2" class="center-align">Grandtotal</th>
                                                         <th rowspan="2" class="center-align">Dokumen</th>
                                                         <th rowspan="2" class="center-align">Keterangan</th>
@@ -153,9 +152,6 @@
                                                     <tr>
                                                         <th>Kode</th>
                                                         <th>Konversi</th>
-                                                        <th>Kode</th>
-                                                        <th>%</th>
-                                                        <th>Nominal</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -202,7 +198,7 @@
                                 <label class="active" for="coa_id">Kas / Bank</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Transfer</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
@@ -250,7 +246,7 @@
                                             </thead>
                                             <tbody id="body-detail">
                                                 <tr id="last-row-detail">
-                                                    <td colspan="8" class="center">
+                                                    <td colspan="9" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Baris
                                                         </a>
@@ -272,29 +268,9 @@
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
-                                            <td colspan="2">Total</td>
+                                            <td>Total</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td width="25%">PPH</td>
-                                            <td width="30%">
-                                                <select class="browser-default" id="wtax_id" name="wtax_id" onchange="countAll();">
-                                                    <option value="0" data-id="">-- Non-PPH --</option>
-                                                    @foreach ($wtax as $row2)
-                                                        <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}" {{ $row2->is_default_pph ? 'selected' : '' }}>{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td width="45%" class="right-align">
-                                                <input class="browser-default" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">Diterima</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" readonly>
                                             </td>
                                         </tr>
                                     </thead>
@@ -327,53 +303,6 @@
     </div>
 </div>
 
-<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12">
-                <h4>Tambah Kas / Bank Out</h4>
-                <form class="row" id="form_data_pay" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert_pay" style="display:none;"></div>
-                    </div>
-                    <div class="col s12">
-                        <div class="row">
-                            <div class="input-field col m3 s12">
-                                <input type="hidden" id="tempPay" name="tempPay">
-                                <input id="pay_date_pay" name="pay_date_pay" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar">
-                                <label class="active" for="pay_date_pay">Tgl. Bayar</label>
-                            </div>
-                            <div class="file-field input-field col m3 s12">
-                                <div class="btn">
-                                    <span>Lampiran</span>
-                                    <input type="file" name="documentPay" id="documentPay">
-                                </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
-                                </div>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <textarea class="materialize-textarea" id="notePay" name="notePay" placeholder="Catatan / Keterangan" rows="1"></textarea>
-                                <label class="active" for="notePay">Keterangan</label>
-                            </div>
-                            <div class="input-field col m12 s12">
-                                <h6><b>Data Terpakai</b> : <i id="list-used-data-pay"></i></h6>
-                            </div>
-                            <div class="col s12" id="displayDetail">
-                            </div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="savePay();">Simpan <i class="material-icons right">send</i></button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
-    </div>
-</div>
 <div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -464,7 +393,6 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
         });
 
         loadDataTable();
@@ -485,7 +413,8 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                $('#post_date').attr('min','{{ date("Y-m-d") }}');
+                $('#post_date').attr('min','{{ $minDate }}');
+                $('#post_date').attr('max','{{ $maxDate }}');
                 $('#document_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
@@ -526,30 +455,6 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_print').html('');
-            }
-        });
-
-        $('#modal3').modal({
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) {
-                window.onbeforeunload = function() {
-                    if($('.data-used-pay').length > 0){
-                        $('.data-used-pay').trigger('click');
-                    }
-                    return 'You will lose all changes made since your last save';
-                };
-            },
-            onCloseEnd: function(modal, trigger){
-                if($('.data-used-pay').length > 0){
-                    $('.data-used-pay').trigger('click');
-                }
-                $('#tempPay,#pay_date_pay').val('');
-                window.onbeforeunload = function() {
-                    return null;
-                };
-                $('#displayDetail').html('');
             }
         });
 
@@ -600,6 +505,11 @@
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
         select2ServerSide('#coa_id', '{{ url("admin/select2/coa_cash_bank") }}');
+
+        $('#body-detail').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
+            countAll();
+        });
     });
 
     function addItem(){
@@ -669,7 +579,7 @@
     }
 
     function countAll(){
-        var total = 0, wtax = 0, pph = parseFloat($('#wtax_id').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0;
+        var total = 0, grandtotal = 0;
         
         if($('input[name^="arr_total"]').length > 0){
             $('input[name^="arr_total"]').each(function(index){
@@ -681,17 +591,7 @@
             });
         }
 
-        wtax = parseFloat((total * (pph / 100))).toFixed(2);
-
-        grandtotal = total - wtax;
-
-        $('#total').val(
-            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
-        );
-
-        $('#wtax').val(
-            (wtax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(wtax).toString().replace('.',','))
-        );
+        grandtotal = total;
 
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
@@ -790,13 +690,9 @@
                 { name: 'post_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
-                { name: 'total', className: 'right-align' },
-                { name: 'wtax_id', className: 'center-align' },
-                { name: 'percent_wtax', className: 'right-align' },
-                { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'document', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
+                { name: 'note', className: '' },
                 { name: 'project_id', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -881,10 +777,6 @@
                 formData.delete("arr_rounding[]");
                 formData.delete("arr_subtotal[]");
                 formData.delete("arr_note[]");
-                formData.delete("wtax_id");
-
-                formData.append('wtax_id',($('#wtax_id').find(':selected').data('id') ? $('#wtax_id').find(':selected').data('id') : ''));
-                formData.append('percent_wtax',($('#wtax_id').val() ? $('#wtax_id').val() : ''));
 
                 let passed = true;
 
@@ -1021,113 +913,78 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#account_id').empty().append(`
-                    <option value="` + response.account_id + `">` + response.account_name + `</option>
-                `);
-                $('#coa_source_id').empty().append(`
-                    <option value="` + response.coa_source_id + `">` + response.coa_source_name + `</option>
+                if(response.account_name){
+                    $('#account_id').empty().append(`
+                        <option value="` + response.account_id + `">` + response.account_name + `</option>
+                    `);
+                }
+                if(response.project_name){
+                    $('#project_id').empty().append(`
+                        <option value="` + response.project_id + `">` + response.project_name + `</option>
+                    `);
+                }
+                $('#coa_id').empty().append(`
+                    <option value="` + response.coa_id + `">` + response.coa_name + `</option>
                 `);
                 $('#company_id').val(response.company_id).formSelect();
-                $('#payment_type').val(response.payment_type).formSelect();
-                $('#payment_no').val(response.payment_no);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
-                $('#pay_date').val(response.pay_date);                
                 $('#note').val(response.note);
-                $('#account_bank').val(response.account_bank);
-                $('#account_no').val(response.account_no);
-                $('#account_name').val(response.account_name);
-                $('#admin').val(response.admin);
                 $('#grandtotal').val(response.grandtotal);
                 
                 if(response.details.length > 0){
-                    $('#body-detail').empty();
+                    $('.row_detail').remove();
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        $('#body-detail').append(`
-                            <tr class="row_detail" data-code="` + val.rawcode + `">
-                                <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                ` + ( val.type !== 'fund_requests' ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
-                                <td class="center-align">
-                                    <label>
-                                        <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
-                                        <span>Pilih</span>
-                                    </label>
+                        $('#last-row-detail').before(`
+                            <tr class="row_detail">
+                                <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                <td>
+                                    ` + (val.type == 'coas' ? `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>` : `-`) + `
+                                </td>
+                                <td class="center">
+                                    -
+                                </td>
+                                <td class="center">
+                                    -
+                                </td>
+                                <td class="center">
+                                    <input id="arr_total` + count + `" name="arr_total[]" data-limit="0" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                </td>
+                                <td class="center">
+                                    <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                </td>
+                                <td class="center">
+                                    <input id="arr_subtotal` + count + `" name="arr_subtotal[]" data-limit="0" class="browser-default" type="text" value="` + val.subtotal + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>
                                 </td>
                                 <td>
-                                    ` + val.rawcode + `
+                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan ..." value="` + val.note + `">
                                 </td>
                                 <td class="center">
-                                    ` + val.post_date + `
-                                </td>
-                                <td class="center">
-                                    ` + val.due_date + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.total + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.tax + `
-                                </td>
-                                <td class="right-align" id="row_wtax` + count + `">
-                                    ` + val.wtax + `
-                                </td>
-                                <td class="right-align" id="row_grandtotal` + count + `">
-                                    ` + val.grandtotal + `
-                                </td>
-                                <td class="right-align" id="row_memo` + count + `">
-                                    ` + val.memo + `
-                                </td>
-                                <td class="center">
-                                    <input id="arr_pay` + count + `" name="arr_pay[]" class="browser-default" type="text" value=" `+ val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
-                                </td>
-                                <td class="center">
-                                    <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="` + val.note + `">
-                                </td>
-                                <td class="center">
-                                    ` + ( val.type !== 'fund_requests' ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
-                                </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
                                 </td>
                             </tr>
                         `);
-                        
-                        if(val.type == 'fund_requests'){
+                        if(val.type == 'coas'){
                             $('#arr_coa' + count).append(`
-                                <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                                <option value="` + val.id + `">` + val.name + `</option>
                             `);
-                            if(val.cost_distribution_id){
-                                $('#arr_cost_distribution' + count).append(`
-                                    <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
-                                `);
-                            }
-                            select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         }
-                        
+                        if(val.cost_distribution_name){
+                            $('#arr_cost_distribution' + count).append(`
+                                <option value="` + val.cost_distribution_id + `">` + val.cost_distribution_name + `</option>
+                            `);
+                        }
+                        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                     });
                 }
-
-                $('#user_bank_id').empty();
-                if(response.banks.length > 0){
-                    $('#user_bank_id').append(`
-                        <option value="">--Pilih dari daftar-</option>
-                    `);
-                    $.each(response.banks, function(i, val) {
-                        $('#user_bank_id').append(`
-                            <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bank="` + val.bank_name + `" data-no="` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
-                        `);
-                    });                        
-                }else{
-                    $('#user_bank_id').append(`
-                        <option value="">--Pilih Partner Bisnis-</option>
-                    `);
-                }
-                $('#user_bank_id').formSelect();
-
-                $('#top').val(response.top);
 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
@@ -1375,144 +1232,9 @@
     }
 
     function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val();
+        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), currency = $('#filter_currency').val(), start_date = $('#start_date').val(), finish_date = $('#finish_date').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&company=" + company + "&account=" + account + "&currency=" + currency;
-    }
-
-    function cashBankOut(code){
-        $.ajax({
-            url: '{{ Request::url() }}/get_payment_data',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                code: code
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('#main');
-            },
-            success: function(response) {
-                loadingClose('#main');
-                
-                if(response.status == '200'){
-                    $('#modal3').modal('open');
-                    $('#tempPay').val(code);
-                    $('#pay_date_pay').val(response.data.pay_date);
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
-                    $('#list-used-data-pay').append(`
-                        <div class="chip purple darken-4 gradient-shadow white-text">
-                            ` + response.data.code + `
-                            <i class="material-icons close data-used-pay" onclick="removeUsedData('payment_requests',` + response.data.id + `,'` + response.data.code + `')">close</i>
-                        </div>
-                    `);
-                    $('#displayDetail').html(response.html);
-                }else{
-                    M.toast({
-                        html: response.message
-                    });
-                }
-                
-            },
-            error: function() {
-                loadingClose('#main');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
-    function savePay(){
-		swal({
-            title: "Apakah anda yakin ingin simpan?",
-            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                var formData = new FormData($('#form_data_pay')[0]);
-
-                $.ajax({
-                    url: '{{ Request::url() }}/create_pay',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert_pay').hide();
-                        $('#validation_alert_pay').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-
-                        if(response.status == 200) {
-                            successPay();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert_pay').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
-
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert_pay').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
-                                });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        });
-    }
-
-    function successPay(){
-        loadDataTable();
-        $('#modal3').modal('close');
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&company=" + company + "&account=" + account + "&currency=" + currency + "&start_date" + start_date + "&finish_date" + finish_date;
     }
 
     function makeTreeOrg(data,link){

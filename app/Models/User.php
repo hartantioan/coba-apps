@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
@@ -55,7 +56,12 @@ class User extends Authenticatable
         'married_date',
         'children',
         'last_change_password',
-        'country_id'
+        'country_id',
+        'token',
+        'connection_id',
+        'user_status',
+        'user_image',
+        'api_token',
     ];
 
     protected $hidden = [
@@ -308,5 +314,28 @@ class User extends Authenticatable
     }
     public function workOrder(){
         return $this->hasMany('App\Models\WorkOrder')->whereIn('status',['2','3']);
+    }
+
+    public function cekMinMaxPostDate($url){
+        $cek = UserDateUser::where('user_id',$this->id)
+                ->whereHas('userDate',function($query)use($url){
+                    $query->whereHas('userDateMenu',function($query)use($url){
+                        $query->whereHas('menu',function($query)use($url){
+                            $query->where('url',$url);
+                        });
+                    })
+                    ->where('status','1');
+                })
+                ->first();
+
+        return $cek ? $cek : '';
+    }
+
+    public function createApiToken()
+    {
+        $token = Str::random(64);
+        $this->api_token = $token;
+        $this->save();
+        return $token;
     }
 }

@@ -36,25 +36,26 @@
                 <th>Qty.PO</th>
                 <th>Qty.Datang</th>
                 <th>Qty.Pulang</th>
+                <th>Qty.Netto</th>
                 <th>Satuan</th>
-                <th>Keterangan</th>
-                <th>Coa</th>
+                <th>Ket.1</th>
+                <th>Ket.2</th>
                 <th>Plant</th>
-                <th>Departemen</th>
                 <th>Gudang</th>
             </tr>
-            @foreach($row->goodReceiveDetail as $key1 => $rowdetail)
+            @foreach($row->goodScaleDetail as $key1 => $rowdetail)
             <tr align="center">
                 <td></td>
+                <td>{{ $rowdetail->purchase_order_detail_id ? $rowdetail->purchaseOrderDetail->purchaseOrder->code : '-' }}</td>
                 <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
-                <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
+                <td>{{ $rowdetail->purchase_order_detail_id ? number_format($rowdetail->purchaseOrderDetail->qty,3,',','.') : '-' }}</td>
+                <td>{{ number_format($rowdetail->qty_in,3,',','.') }}</td>
+                <td>{{ number_format($rowdetail->qty_out,3,',','.') }}</td>
+                <td>{{ number_format($rowdetail->qty_balance,3,',','.') }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
-                <td align="right">{{ number_format($rowdetail->price,3,',','.') }}</td>
-                <td align="right">{{ number_format($rowdetail->total,3,',','.') }}</td>
                 <td>{{ $rowdetail->note }}</td>
-                <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
-                <td>{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
-                <td>{{ $rowdetail->department->name }}</td>
+                <td>{{ $rowdetail->note2 }}</td>
+                <td>{{ $rowdetail->place->name }}</td>
                 <td>{{ $rowdetail->warehouse->name }}</td>
             </tr>
             @endforeach

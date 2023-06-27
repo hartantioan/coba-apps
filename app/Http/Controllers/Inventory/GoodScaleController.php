@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Inventory;
 
+use App\Exports\ExportGoodScale;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodScale;

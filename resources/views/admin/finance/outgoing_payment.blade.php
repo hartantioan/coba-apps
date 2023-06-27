@@ -783,7 +783,7 @@
 
     function printPreview(code){
         $.ajax({
-            url: '{{ Request::url() }}/approval/' + code,
+            url: '{{ Request::url() }}/print_individual/' + code,
             type:'GET',
             beforeSend: function() {
                 loadingOpen('.modal-content');
@@ -793,8 +793,10 @@
             },
             success: function(data){
                 loadingClose('.modal-content');
-                $('#modal2').modal('open');
-                $('#show_print').html(data);
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': data
+                })
             }
         });
     }

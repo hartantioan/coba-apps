@@ -260,7 +260,7 @@
                         <td class="right-align"></td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="7">PPH</td>
+                        <td class="right-align" colspan="7">PPh</td>
                         <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>

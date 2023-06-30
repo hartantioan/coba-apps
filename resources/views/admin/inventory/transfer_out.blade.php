@@ -595,7 +595,9 @@
                     <select class="browser-default" id="arr_itemkuy` + count + `" name="arr_itemkuy[]" data-code="` + count + `" onchange="getRowUnit('` + count + `')"></select>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]"></select>
+                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]">
+                        <option value="">--Silahkan pilih item--</option>
+                    </select>
                 </td>
                 <td>
                     <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);cekRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">

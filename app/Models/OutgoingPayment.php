@@ -27,6 +27,8 @@ class OutgoingPayment extends Model
         'post_date',
         'pay_date',
         'cost_distribution_id',
+        'total',
+        'rounding',
         'admin',
         'grandtotal',
         'document',
@@ -69,6 +71,20 @@ class OutgoingPayment extends Model
     public function paymentRequest()
     {
         return $this->belongsTo('App\Models\PaymentRequest', 'payment_request_id', 'id')->withTrashed();
+    }
+
+    public function paymentRequestCross(){
+        return $this->hasMany('App\Models\PaymentRequestCross','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balancePaymentCross(){
+        $total = $this->grandtotal - $this->admin;
+        foreach($this->paymentRequestCross as $row){
+            $total -= $row->nominal;
+        }
+        return $total;
     }
 
     public function coaSource()

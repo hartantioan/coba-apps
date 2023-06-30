@@ -142,7 +142,7 @@
                         <th rowspan="2">Status</th>
                         <th rowspan="2">Total</th>
                         <th rowspan="2">PPN</th>
-						<th rowspan="2">PPH</th>
+						<th rowspan="2">PPh</th>
                         <th rowspan="2">Grandtotal</th>
 					</tr>
                     <tr align="center">

@@ -207,7 +207,7 @@
                                                     <th class="center">Total</th>
                                                     <th class="center">PPN</th>
                                                     <th class="center">Termasuk PPN</th>
-                                                    <th class="center">PPH</th>
+                                                    <th class="center">PPh</th>
                                                     <th class="center">Grandtotal</th>
                                                     <th class="center">Dibayarkan</th>
                                                     <th class="center">Sisa</th>
@@ -242,7 +242,7 @@
                                             <td class="right-align"><span id="tax">0,00</span></td>
                                         </tr>
                                         <tr>
-                                            <td>PPH</td>
+                                            <td>PPh</td>
                                             <td class="right-align"><span id="wtax">0,00</span></td>
                                         </tr>
                                         <tr>
@@ -384,8 +384,6 @@
             width: '100%',
         });
 
-        
-
         loadDataTable();
 
         window.table.search('{{ $code }}').draw();
@@ -491,7 +489,7 @@
             $(this).closest('tr').remove();
         });
 
-        select2ServerSide('#fund_request_id', '{{ url("admin/select2/fund_request_bs") }}');
+        select2ServerSide('#fund_request_id', '{{ url("admin/select2/fund_request_bs_close") }}');
     });
 
     function voidStatus(id){
@@ -748,7 +746,7 @@
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();" style="width:150px;">
-                                        <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                                        <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
                                         @foreach ($wtax as $row)
                                             <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
                                         @endforeach
@@ -843,14 +841,14 @@
     }
 
     function cekRow(element){
-        if($(element).val()){
+        /* if($(element).val()){
             let val = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")), limit = parseFloat($(element).data('limit').replaceAll(".", "").replaceAll(",","."));
             if(val > limit){
                 $(element).val(
                     (limit >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(limit).toString().replace('.',','))
                 );
             }
-        }
+        } */
     }
 
     function removeUsedData(id){

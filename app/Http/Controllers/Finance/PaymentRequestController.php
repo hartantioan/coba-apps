@@ -259,7 +259,7 @@ class PaymentRequestController extends Controller
         return response()->json($response);
     }
 
-    public function getAccountData(Request $request){
+    public function getAccountInfo(Request $request){
         $data = User::find($request->id);
 
         $banks = [];
@@ -276,76 +276,157 @@ class PaymentRequestController extends Controller
             }
 
             foreach($data->fundRequest as $row){
-                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0 && $row->document_status !== NULL){
-                    CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
-                    $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$row->place->company_id)->first();
+                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0 && $row->document_status !== '1'){
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'fund_requests',
                         'code'          => CustomHelper::encrypt($row->code),
                         'rawcode'       => $row->code,
+                        'rawdate'       => $row->post_date,
                         'post_date'     => date('d/m/y',strtotime($row->post_date)),
                         'due_date'      => date('d/m/y',strtotime($row->required_date)),
                         'total'         => number_format($row->total,2,',','.'),
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
-                        'coa_id'        => $row->document_status == '2' ? ($coa ? $coa->id : '') : '',
-                        'coa_name'      => $row->document_status == '2' ? ($coa ? $coa->code.' - '.$coa->name : '') : '',
-                        'memo'          => number_format(0,2,',','.'),
+                        'note'          => $row->note,
                     ];
                 }
             }
 
             foreach($data->purchaseDownPayment as $row){
                 if(!$row->used()->exists() && $row->balancePaymentRequest() > 0){
-                    CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
-                    $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->company_id)->first();
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'purchase_down_payments',
                         'code'          => CustomHelper::encrypt($row->code),
                         'rawcode'       => $row->code,
+                        'rawdate'       => $row->post_date,
                         'post_date'     => date('d/m/y',strtotime($row->post_date)),
                         'due_date'      => date('d/m/y',strtotime($row->due_date)),
                         'total'         => number_format($row->total,2,',','.'),
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
-                        'coa_id'        => $coa ? $coa->id : '',
-                        'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
-                        'memo'          => number_format($row->totalMemo(),2,',','.'),
+                        'note'          => $row->note,
                     ];
                 }
             }
 
             foreach($data->purchaseInvoice as $row){
                 if(!$row->used()->exists() && $row->balance > 0){
-                    CustomHelper::sendUsedData($row->getTable(),$row->id,'Form Payment Request');
-                    $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$row->company_id)->first();
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'purchase_invoices',
                         'code'          => CustomHelper::encrypt($row->code),
                         'rawcode'       => $row->code,
+                        'rawdate'       => $row->post_date,
                         'post_date'     => date('d/m/y',strtotime($row->post_date)),
                         'due_date'      => date('d/m/y',strtotime($row->due_date)),
                         'total'         => number_format($row->total,2,',','.'),
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                        'balance'       => number_format($row->balancePaymentRequest(),2,',','.'),
-                        'coa_id'        => $coa ? $coa->id : '',
-                        'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
-                        'memo'          => number_format($row->totalMemo(),2,',','.'),
+                        'note'          => $row->note,
                     ];
                 }
             }
         }
 
         $data['banks'] = $banks;
+
+        $collection = collect($details)->sortByDesc('rawdate')->values()->all();
+
+        $data['details'] = $collection;
+
+        return response()->json($data);
+    }
+
+    public function getAccountData(Request $request){
+        $details = [];
+
+        foreach($request->arr_type as $key => $row){
+            if($row == 'fund_requests'){
+                $data = null;
+                $data = FundRequest::find(intval($request->arr_id[$key]));
+                if($data){
+                    if(!$data->used()->exists() && $data->balancePaymentRequest() > 0 && $data->document_status !== '1'){
+                        CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
+                        $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$data->place->company_id)->first();
+                        $details[] = [
+                            'id'            => $data->id,
+                            'type'          => 'fund_requests',
+                            'code'          => CustomHelper::encrypt($data->code),
+                            'rawcode'       => $data->code,
+                            'rawdate'       => $data->post_date,
+                            'post_date'     => date('d/m/y',strtotime($data->post_date)),
+                            'due_date'      => date('d/m/y',strtotime($data->required_date)),
+                            'total'         => number_format($data->total,2,',','.'),
+                            'tax'           => number_format($data->tax,2,',','.'),
+                            'wtax'          => number_format($data->wtax,2,',','.'),
+                            'grandtotal'    => number_format($data->grandtotal,2,',','.'),
+                            'balance'       => number_format($data->balancePaymentRequest(),2,',','.'),
+                            'coa_id'        => $data->document_status == '3' ? ($coa ? $coa->id : '') : '',
+                            'coa_name'      => $data->document_status == '3' ? ($coa ? $coa->code.' - '.$coa->name : '') : '',
+                            'memo'          => number_format(0,2,',','.'),
+                        ];
+                    }
+                }
+            }elseif($row == 'purchase_down_payments'){
+                $data = null;
+                $data = PurchaseDownPayment::find(intval($request->arr_id[$key]));
+                if($data){
+                    if(!$data->used()->exists() && $data->balancePaymentRequest() > 0){
+                        CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
+                        $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$data->company_id)->first();
+                        $details[] = [
+                            'id'            => $data->id,
+                            'type'          => 'purchase_down_payments',
+                            'code'          => CustomHelper::encrypt($data->code),
+                            'rawcode'       => $data->code,
+                            'rawdate'       => $data->post_date,
+                            'post_date'     => date('d/m/y',strtotime($data->post_date)),
+                            'due_date'      => date('d/m/y',strtotime($data->due_date)),
+                            'total'         => number_format($data->total,2,',','.'),
+                            'tax'           => number_format($data->tax,2,',','.'),
+                            'wtax'          => number_format($data->wtax,2,',','.'),
+                            'grandtotal'    => number_format($data->grandtotal,2,',','.'),
+                            'balance'       => number_format($data->balancePaymentRequest(),2,',','.'),
+                            'coa_id'        => $coa ? $coa->id : '',
+                            'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
+                            'memo'          => number_format($data->totalMemo(),2,',','.'),
+                        ];
+                    }
+                }
+            }elseif($row == 'purchase_invoices'){
+                $data = null;
+                $data = PurchaseInvoice::find(intval($request->arr_id[$key]));
+                if($data){
+                    if(!$data->used()->exists() && $data->balance > 0){
+                        CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
+                        $coa = Coa::where('code','200.01.03.01.01')->where('company_id',$data->company_id)->first();
+                        $details[] = [
+                            'id'            => $data->id,
+                            'type'          => 'purchase_invoices',
+                            'code'          => CustomHelper::encrypt($data->code),
+                            'rawcode'       => $data->code,
+                            'rawdate'       => $data->post_date,
+                            'post_date'     => date('d/m/y',strtotime($data->post_date)),
+                            'due_date'      => date('d/m/y',strtotime($data->due_date)),
+                            'total'         => number_format($data->total,2,',','.'),
+                            'tax'           => number_format($data->tax,2,',','.'),
+                            'wtax'          => number_format($data->wtax,2,',','.'),
+                            'grandtotal'    => number_format($data->grandtotal,2,',','.'),
+                            'balance'       => number_format($data->balancePaymentRequest(),2,',','.'),
+                            'coa_id'        => $coa ? $coa->id : '',
+                            'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
+                            'memo'          => number_format($data->totalMemo(),2,',','.'),
+                        ];
+                    }
+                }
+            }
+        }
+        
         $data['details'] = $details;
 
         return response()->json($data);
@@ -448,6 +529,8 @@ class PaymentRequestController extends Controller
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->cost_distribution_id = $request->cost_distribution_id ? $request->cost_distribution_id : NULL;
+                        $query->total = str_replace(',','.',str_replace('.','',$request->total));
+                        $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
                         $query->admin = str_replace(',','.',str_replace('.','',$request->admin));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
@@ -459,9 +542,8 @@ class PaymentRequestController extends Controller
 
                         $query->save();
 
-                        foreach($query->paymentRequestDetail as $row){
-                            $row->delete();
-                        }
+                        $query->paymentRequestDetail()->delete();
+                        $query->paymentRequestCross()->delete();
 
                         DB::commit();
                     }else{
@@ -489,6 +571,8 @@ class PaymentRequestController extends Controller
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'cost_distribution_id'      => $request->cost_distribution_id ? $request->cost_distribution_id : NULL,
+                        'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
+                        'rounding'                  => str_replace(',','.',str_replace('.','',$request->rounding)),
                         'admin'                     => str_replace(',','.',str_replace('.','',$request->admin)),
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/payment_requests') : NULL,
@@ -661,6 +745,8 @@ class PaymentRequestController extends Controller
         $pr['coa_source_name'] = $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name;
         $pr['currency_rate'] = number_format($pr->currency_rate,3,',','.');
         $pr['cost_distribution_name'] = $pr->cost_distribution_id ? $pr->costDistribution->code.' - '.$pr->costDistribution->name : '';
+        $pr['total'] = number_format($pr->total,3,',','.');
+        $pr['rounding'] = number_format($pr->rounding,3,',','.');
         $pr['admin'] = number_format($pr->admin,3,',','.');
         $pr['grandtotal'] = number_format($pr->grandtotal,3,',','.');
         $pr['top'] = $pr->account->top;
@@ -1130,6 +1216,18 @@ class PaymentRequestController extends Controller
                 }
 
                 $html .= '<tr>
+                    <td class="right-align" colspan="5">TOTAL</td>
+                    <td class=""></td>
+                    <td class="right-align">'.number_format($data->total,2,',','.').'</td>
+                </tr>';
+
+                $html .= '<tr>
+                    <td class="right-align" colspan="5">PEMBULATAN</td>
+                    <td class=""></td>
+                    <td class="right-align">'.number_format($data->rounding,2,',','.').'</td>
+                </tr>';
+
+                $html .= '<tr>
                     <td class="right-align" colspan="5">BIAYA ADMIN</td>
                     <td class="">DIST.BIAYA : '.($data->cost_distribution_id ? $data->costDistribution->code.' - '.$data->costDistribution->name : '-').'</td>
                     <td class="right-align">'.number_format($data->admin,2,',','.').'</td>
@@ -1156,14 +1254,33 @@ class PaymentRequestController extends Controller
                                     </tr>
                                 </thead><tbody>';
                 
-                if($data->approval() && $data->approval()->approvalMatrix()->exists()){                
-                    foreach($data->approval()->approvalMatrix as $key => $row){
+                if($data->approval() && $data->hasDetailMatrix()){
+                    foreach($data->approval() as $detail){
                         $html .= '<tr>
-                            <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
-                            <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                            <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
-                            <td class="center-align">'.$row->note.'</td>
+                            <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
                         </tr>';
+                        foreach($detail->approvalMatrix as $key => $row){
+                            $icon = '';
+            
+                            if($row->status == '1' || $row->status == '0'){
+                                $icon = '<i class="material-icons">hourglass_empty</i>';
+                            }elseif($row->status == '2'){
+                                if($row->approved){
+                                    $icon = '<i class="material-icons">thumb_up</i>';
+                                }elseif($row->rejected){
+                                    $icon = '<i class="material-icons">thumb_down</i>';
+                                }elseif($row->revised){
+                                    $icon = '<i class="material-icons">border_color</i>';
+                                }
+                            }
+            
+                            $html .= '<tr>
+                                <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                                <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                                <td class="center-align">'.$icon.'<br></td>
+                                <td class="center-align">'.$row->note.'</td>
+                            </tr>';
+                        }
                     }
                 }else{
                     $html .= '<tr>
@@ -1228,6 +1345,8 @@ class PaymentRequestController extends Controller
                         'currency_id'               => $cek->currency_id,
                         'currency_rate'             => $cek->currency_rate,
                         'cost_distribution_id'      => $cek->cost_distribution_id ? $cek->cost_distribution_id : NULL,
+                        'total'                     => $cek->total,
+                        'rounding'                  => $cek->rounding,
                         'admin'                     => $cek->admin,
                         'grandtotal'                => $cek->grandtotal,
                         'document'                  => $request->file('documentPay') ? $request->file('documentPay')->store('public/outgoing_payments') : NULL,
@@ -1319,7 +1438,7 @@ class PaymentRequestController extends Controller
                         ],
                         "key" => $row_pyr_detail->lookable->code,
                         "name" => $row_pyr_detail->lookable->code,
-                        'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                        'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                     ];
                     $data_go_chart[]=$data_fund_tempura;
                     $data_link[]=[
@@ -1684,7 +1803,7 @@ class PaymentRequestController extends Controller
                                             ],
                                             "key" => $row_pyr_detail->lookable->code,
                                             "name" => $row_pyr_detail->lookable->code,
-                                            'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                            'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                         ];
                                        
                                         $data_go_chart[]=$data_fund_tempura;
@@ -1774,7 +1893,7 @@ class PaymentRequestController extends Controller
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
-                                    'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                 ];
                              
                                 
@@ -1878,7 +1997,7 @@ class PaymentRequestController extends Controller
                                 ],
                                 "key" => $row_pyr_detail->lookable->code,
                                 "name" => $row_pyr_detail->lookable->code,
-                                'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                             ];
                            
                                

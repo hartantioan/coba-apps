@@ -287,6 +287,7 @@
                 <form class="row" id="form_data_update" onsubmit="return false;">
                     <div class="col s12">
                         <div class="row">
+                            <input type="hidden" id="tempPlace">
                             <div class="col m1 s12">
                                 Kode
                             </div>
@@ -306,7 +307,7 @@
                                         <table class="bordered" style="width:1800px;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center">Link PO</th>
+                                                    <th class="center" style="width:250px !important;">Link PO</th>
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty PO</th>
                                                     <th class="center">Timbang Datang</th>
@@ -522,6 +523,7 @@
                 $('#body-item-update').empty();
                 $('#supplierUpdate').text('');
                 $('#codeUpdate').text('');
+                $('#tempPlace').val('');
                 clearGetWeight();
             },
             dismissible:false,
@@ -872,12 +874,19 @@
             clearInterval(interval);
         }
         interval = setInterval(function () {
+            let place_id;
+            if($('#modal1').hasClass('open')){
+                place_id = $('#place_id').val();
+            }
+            if($('#modal6').hasClass('open')){
+                place_id = $('#tempPlace').val();
+            }
             $.ajax({
                 url: '{{ Request::url() }}/get_weight',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    place_id : $('#place_id').val(),
+                    place_id : place_id
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1338,6 +1347,12 @@
                 
                 var formData = new FormData($('#form_data_update')[0]);
 
+                formData.delete("arr_pod[]");
+
+                $('[name^="arr_pod"]').each(function(index){
+                    formData.append('arr_pod[]',($('[name^="arr_pod"]').eq(index).val() ? $('[name^="arr_pod"]').eq(index).val() : ''));
+                });
+
                 $.ajax({
                     url: '{{ Request::url() }}/save_update',
                     type: 'POST',
@@ -1396,7 +1411,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal6').modal('open');
-                $('#temp2').val(id);
+                $('#tempPlace').val(response.place_id);
                 $('#codeUpdate').text(response.code);
                 $('#supplierUpdate').text(response.supplier_name);
 
@@ -1407,6 +1422,7 @@
                         var count = makeid(10);
                         $('#body-item-update').append(`
                             <tr class="row_item_update">
+                                ` + (val.purchase_order_detail_id ? `<input type="hidden" name="arr_pod[]" value=` + val.purchase_order_detail_id + `>` : `` ) + `
                                 <input type="hidden" name="arr_good_scale_detail[]" value="` + val.id + `">
                                 <input type="hidden" name="arr_qty_in[]" value="` + val.qty_in + `" id="arr_qty_in` + count + `">
                                 <td>
@@ -1447,7 +1463,7 @@
                         `);
 
                         if(!val.purchase_order_detail_id){
-                            select2ServerSide('#arr_pod' + count, '{{ url("admin/select2/purchase_order_detail") }}');
+                            select2ServerSide('#arr_pod' + count, '{{ url("admin/select2/purchase_order_detail") }}?item_id=' + val.item_id + '&account_id=' + response.account_id);
                         }
                     });
                 }

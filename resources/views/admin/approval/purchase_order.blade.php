@@ -291,7 +291,7 @@
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">PPH</td>
+                        <td class="right-align" colspan="2">PPh</td>
                         <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                     </tr>
                     <tr>

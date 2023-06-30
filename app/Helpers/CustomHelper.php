@@ -595,6 +595,20 @@ class CustomHelper {
 				}
 			}
 
+			if($op->rounding){
+				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$op->company_id)->first()->id;
+				#start journal rounding
+				if($op->rounding > 0 || $op->rounding < 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coarounding,
+						'account_id'	=> $account_id,
+						'type'			=> $op->rounding > 0 ? '1' : '2',
+						'nominal'		=> abs($op->rounding),
+					]);
+				}
+			}
+
 			if($op->admin > 0){
 				$coa_admin = Coa::where('code','701.01.01.01.04')->where('company_id',$op->company_id)->first();
 				if($op->cost_distribution_id){

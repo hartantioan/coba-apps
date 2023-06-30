@@ -194,8 +194,8 @@ class OutgoingPaymentController extends Controller
                     date('d/m/y',strtotime($val->pay_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
-                    number_format($val->admin,3,',','.'),
-                    number_format($val->grandtotal,3,',','.'),
+                    number_format($val->admin,2,',','.'),
+                    number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->note,
                     $val->status(),
@@ -898,7 +898,7 @@ class OutgoingPaymentController extends Controller
                             ],
                             "key" => $row_pyr_detail->lookable->code,
                             "name" => $row_pyr_detail->lookable->code,
-                            'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                            'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                         ];
                         
                         $data_go_chart[]=$data_fund_tempura;
@@ -1244,7 +1244,7 @@ class OutgoingPaymentController extends Controller
                                             ],
                                             "key" => $row_pyr_detail->lookable->code,
                                             "name" => $row_pyr_detail->lookable->code,
-                                            'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                            'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                         ];
                                        
                                         $data_go_chart[]=$data_fund_tempura;
@@ -1334,7 +1334,7 @@ class OutgoingPaymentController extends Controller
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
-                                    'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                 ];
                              
                                 
@@ -1438,7 +1438,7 @@ class OutgoingPaymentController extends Controller
                                 ],
                                 "key" => $row_pyr_detail->lookable->code,
                                 "name" => $row_pyr_detail->lookable->code,
-                                'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                             ];
                            
                                

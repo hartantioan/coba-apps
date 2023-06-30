@@ -20,8 +20,34 @@ class FundRequestDetail extends Model
         'qty',
         'unit_id',
         'price',
+        'tax_id',
+        'percent_tax',
+        'is_include_tax',
+        'wtax_id',
+        'percent_wtax',
         'total',
+        'tax',
+        'wtax',
+        'grandtotal',
     ];
+
+    public function isIncludeTax(){
+        $type = match ($this->is_include_tax) {
+          '0' => 'Tidak',
+          '1' => 'Termasuk',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function taxMaster(){
+        return $this->belongsTo('App\Models\Tax','tax_id','id')->withTrashed();
+    }
+
+    public function wtaxMaster(){
+        return $this->belongsTo('App\Models\Tax','wtax_id','id')->withTrashed();
+    }
 
     public function fundRequest()
     {

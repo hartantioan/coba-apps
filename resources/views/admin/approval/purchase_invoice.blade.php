@@ -204,7 +204,7 @@
                         <th class="center-align">Keterangan 2</th>
                         <th class="center-align">Total</th>
                         <th class="center-align">PPN</th>
-                        <th class="center-align">PPH</th>
+                        <th class="center-align">PPh</th>
                         <th class="center-align">Grandtotal</th>
                     </tr>
                 </thead>

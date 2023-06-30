@@ -516,7 +516,7 @@ class PurchaseMemoController extends Controller
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
-                                <th class="center-align">PPH</th>
+                                <th class="center-align">PPh</th>
                                 <th class="center-align">Grandtotal</th>
                             </tr>
                         </thead><tbody>';
@@ -1141,7 +1141,7 @@ class PurchaseMemoController extends Controller
                                             ],
                                             "key" => $row_pyr_detail->lookable->code,
                                             "name" => $row_pyr_detail->lookable->code,
-                                            'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                            'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                         ];
                                        
                                         $data_go_chart[]=$data_fund_tempura;
@@ -1231,7 +1231,7 @@ class PurchaseMemoController extends Controller
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
-                                    'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                 ];
                              
                                 
@@ -1335,7 +1335,7 @@ class PurchaseMemoController extends Controller
                                 ],
                                 "key" => $row_pyr_detail->lookable->code,
                                 "name" => $row_pyr_detail->lookable->code,
-                                'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                             ];
                            
                                

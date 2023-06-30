@@ -60,7 +60,7 @@
                                                         <th>Type</th>
                                                         <th>Prosentase</th>
                                                         <th>Default PPN</th>
-                                                        <th>Default PPH</th>
+                                                        <th>Default PPh</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -131,7 +131,7 @@
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
-                                <label for="is_default_pph">Default PPH</label>
+                                <label for="is_default_pph">Default PPh</label>
                                 <label>
                                     Non-Active
                                     <input type="checkbox" id="is_default_pph" name="is_default_pph" value="1">

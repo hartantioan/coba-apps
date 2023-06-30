@@ -337,27 +337,27 @@
                             <table style="border-collapse:collapse;" width="74%">
                                 <tr class="break-row">
                                     <td class="right-align">Subtotal</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->subtotal,2,',','.') }}</td>
+                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->subtotal,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
                                     <td class="right-align">Diskon</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->discount,2,',','.') }}</td>
+                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->discount,2,',','.') }}</td>
                                 </tr class="break-row">
                                 <tr>
                                     <td class="right-align">Total</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
+                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
                                 </tr class="break-row">
                                 <tr class="break-row">
                                     <td class="right-align">PPN</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
+                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
-                                    <td class="right-align">PPH</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
+                                    <td class="right-align">PPh</td>
+                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
                                     <td class="right-align">Grandtotal</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
                                 </tr>
                             </table>
                         </div>

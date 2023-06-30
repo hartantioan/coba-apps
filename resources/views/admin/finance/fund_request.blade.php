@@ -32,6 +32,11 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="loadDataTable()">
+                            <i class="material-icons hide-on-med-and-up">refresh</i>
+                            <span class="hide-on-small-onl">Refresh</span>
+                            <i class="material-icons right">refresh</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -92,10 +97,6 @@
                                 <div class="card-content">
                                     <h4 class="card-title">
                                         List Data
-                                        <button class="btn waves-effect waves-light mr-1 float-right btn-small" onclick="loadDataTable()">
-                                            Refresh
-                                            <i class="material-icons left">refresh</i>
-                                        </button>
                                     </h4>
                                     <div class="row mt-2">
                                         <div class="col s12">
@@ -118,9 +119,9 @@
                                                         <th rowspan="2">Rekening Penerima</th>
                                                         <th rowspan="2">Bank & No.Rek</th>
                                                         <th rowspan="2">Total</th>
-                                                        {{-- <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPH</th>
-                                                        <th rowspan="2">Grandtotal</th> --}}
+                                                        <th rowspan="2">PPN</th>
+                                                        <th rowspan="2">PPh</th>
+                                                        <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
@@ -321,9 +322,9 @@
                 { name: 'name_account', className: 'center-align' },
                 { name: 'no_account', className: 'center-align' },
                 { name: 'total', className: 'center-align' },
-                /* { name: 'tax', className: 'center-align' },
+                { name: 'tax', className: 'center-align' },
                 { name: 'wtax', className: 'center-align' },
-                { name: 'grandtotal', className: 'center-align' }, */
+                { name: 'grandtotal', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -922,7 +923,7 @@
                 loadingClose('#datatable_serverside');
                 if(data.status == '200'){
                     M.toast({
-                        html: response.message
+                        html: data.message
                     });
                 }else{
                     if(data.status == '422'){

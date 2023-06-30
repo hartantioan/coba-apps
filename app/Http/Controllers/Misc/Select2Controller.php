@@ -979,6 +979,52 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function fundRequestBsClose(Request $request)
+    {
+
+        $response = [];
+        $search   = $request->search;
+        $data = FundRequest::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('post_date', 'like', "%$search%")
+                            ->orWhere('required_date', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('total', 'like', "%$search%")
+                            ->orWhere('tax', 'like', "%$search%")
+                            ->orWhere('wtax', 'like', "%$search%")
+                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhereHas('fundRequestDetail',function($query) use($search){
+                                $query->where('note', 'like', "%$search%");
+                            })
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                })
+                ->whereHas('hasPaymentRequestDetail',function($query){
+                    $query->whereHas('paymentRequest',function($query){
+                        $query->whereHas('outgoingPayment');
+                    });
+                })
+                ->where('type','1')
+                /* ->whereDoesntHave('used') */
+                ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            $balance = $d->balanceCloseBill();
+            if($balance > 0 && $d->document_status == '3'){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' - '.$d->note.' - Saldo '.number_format($balance,2,',','.'),
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function purchaseInvoice(Request $request)
     {
 
@@ -1242,10 +1288,10 @@ class Select2Controller extends Controller {
         $response   = [];
         $search     = $request->search;
 
-        $data = PurchaseOrderDetail::where(function($query) use($search){
-                    $query->whereHas('item',function($query) use($search){
-                        $query->where('code', 'like', "%$search%")
-                            ->orWhere('name','like',"%$search%");
+        $data = PurchaseOrderDetail::where(function($query) use($search,$request){
+                    $query->where('item_id',$request->item_id)
+                    ->whereHas('purchaseOrder',function($query) use($request){
+                        $query->where('account_id',$request->account_id);  
                     });
                 })
                 ->whereIn('place_id',$this->dataplaces)
@@ -1256,7 +1302,7 @@ class Select2Controller extends Controller {
             if($d->getBalanceReceipt() > 0){
                 $response[] = [
                     'id'   			    => $d->id,
-                    'text' 			    => $d->place->code.' - '.$d->warehouse->code.' Qty. '.number_format($d->getBalanceReceipt(),3,',','.').' '.$d->item->uomUnit->code,
+                    'text' 			    => $d->purchaseOrder->supplier->name.' - '.$d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->code.' Qty. '.number_format($d->getBalanceReceipt(),3,',','.').' '.$d->item->uomUnit->code,
                     'qty'               => number_format($d->getBalanceReceipt(),3,',','.'),
                 ];
             }

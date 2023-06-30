@@ -169,7 +169,7 @@
                                                         <th colspan="2" class="center-align">Diskon</th>
                                                         <th rowspan="2">Total</th>
                                                         <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPH</th>
+                                                        <th rowspan="2">PPh</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Downpayment</th>
                                                         <th rowspan="2">Balance</th>
@@ -308,8 +308,8 @@
                                                         <th class="center">PPN (%)</th>
                                                         <th class="center">Termasuk PPN</th>
                                                         <th class="center">PPN (Rp)</th>
-                                                        <th class="center">PPH (%)</th>
-                                                        <th class="center">PPH (Rp)</th>
+                                                        <th class="center">PPh (%)</th>
+                                                        <th class="center">PPh (Rp)</th>
                                                         <th class="center">Grandtotal</th>
                                                         <th class="center">Keterangan 1</th>
                                                         <th class="center">Keterangan 2</th>
@@ -377,7 +377,7 @@
                                                 <td class="right-align"><span id="tax">0,00</span></td>
                                             </tr>
                                             <tr>
-                                                <td>PPH</td>
+                                                <td>PPh</td>
                                                 <td class="right-align"><span id="wtax">0,00</span></td>
                                             </tr>
                                             <tr>
@@ -441,8 +441,8 @@
                                                 <th class="center">Total</th>
                                                 <th class="center">ID PPN</th>
                                                 <th class="center">PPN</th>
-                                                <th class="center">ID PPH</th>
-                                                <th class="center">PPH</th>
+                                                <th class="center">ID PPh</th>
+                                                <th class="center">PPh</th>
                                                 <th class="center">Grandtotal</th>
                                                 <th class="center">Ket.1</th>
                                                 <th class="center">Ket.2</th>
@@ -471,7 +471,7 @@
                             </div>
                             <div class="col s3 mt-1"><h6>Total : <b id="totalMulti" class="right">0,00</b></h6></div>
                             <div class="col s3 mt-1"><h6>PPN : <b id="ppnMulti" class="right">0,00</b></h6></div>
-                            <div class="col s3 mt-1"><h6>PPH : <b id="pphMulti" class="right">0,00</b></h6></div>
+                            <div class="col s3 mt-1"><h6>PPh : <b id="pphMulti" class="right">0,00</b></h6></div>
                             <div class="col s3 mt-1"><h6>Grandtotal : <b id="grandtotalMulti" class="right">0,00</b></h6></div>
                             <div class="col s12 mt-3">
                                 <button class="btn waves-effect waves-light right submit" onclick="saveMulti();">Simpan <i class="material-icons right">send</i></button>
@@ -1021,10 +1021,10 @@
                     <input type="text" name="arr_multi_ppn[]" placeholder="Pajak PPN" value="0" onkeyup="countAllMulti()">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_wtax_id[]" placeholder="ID PPH">
+                    <input type="text" name="arr_multi_wtax_id[]" placeholder="ID PPh">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_pph[]" placeholder="Pajak PPH" value="0" onkeyup="countAllMulti()">
+                    <input type="text" name="arr_multi_pph[]" placeholder="Pajak PPh" value="0" onkeyup="countAllMulti()">
                 </td>
                 <td>
                     <input type="text" name="arr_multi_grandtotal[]" placeholder="Grandtotal" value="0" onkeyup="countAllMulti()">
@@ -1186,10 +1186,10 @@
                                     <input type="text" name="arr_multi_ppn[]" placeholder="Pajak PPN" value="0" onkeyup="countAllMulti()">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_wtax_id[]" placeholder="ID PPH">
+                                    <input type="text" name="arr_multi_wtax_id[]" placeholder="ID PPh">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_pph[]" placeholder="Pajak PPH" value="0" onkeyup="countAllMulti()">
+                                    <input type="text" name="arr_multi_pph[]" placeholder="Pajak PPh" value="0" onkeyup="countAllMulti()">
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_grandtotal[]" placeholder="Grandtotal" value="0" onkeyup="countAllMulti()">
@@ -1610,7 +1610,7 @@
                                                 </td>
                                                 <td class="center">
                                                     <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                                        <option value="0" data-id="">-- Non-PPH --</option>
+                                                        <option value="0" data-id="">-- Non-PPh --</option>
                                                         @foreach ($wtax as $row2)
                                                             <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                                         @endforeach
@@ -1914,7 +1914,7 @@
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                        <option value="0" data-id="">-- Non-PPH --</option>
+                        <option value="0" data-id="">-- Non-PPh --</option>
                         @foreach ($wtax as $row2)
                             <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                         @endforeach
@@ -2551,6 +2551,7 @@
                 $('#spk_no').val(response.spk_no);
                 $('#invoice_no').val(response.invoice_no);
                 $('#downpayment').val(response.downpayment);
+                $('#rounding').val(response.rounding);
                 
                 if(response.details.length > 0){
                     $('.row_detail').remove();
@@ -2620,7 +2621,7 @@
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0" data-id="">-- Non-PPH --</option>
+                                            <option value="0" data-id="">-- Non-PPh --</option>
                                             @foreach ($wtax as $row2)
                                                 <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                             @endforeach
@@ -2761,7 +2762,7 @@
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0">-- Non-PPH --</option>
+                                            <option value="0">-- Non-PPh --</option>
                                             @foreach ($wtax as $row2)
                                                 <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                             @endforeach

@@ -149,7 +149,7 @@
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Total</th>
                                                         <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPH</th>
+                                                        <th rowspan="2">PPh</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
@@ -266,8 +266,8 @@
                                                     <th class="center">Termasuk PPN</th>
                                                     <th class="center">PPN(%)</th>
                                                     <th class="center">PPN(Rp)</th>
-                                                    <th class="center">PPH(%)</th>
-                                                    <th class="center">PPH(Rp)</th>
+                                                    <th class="center">PPh(%)</th>
+                                                    <th class="center">PPh(Rp)</th>
                                                     <th class="center" width="15%">Grandtotal</th>
                                                 </tr>
                                             </thead>
@@ -308,7 +308,7 @@
                                                         </td>
                                                         <td class="center-align">
                                                             <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
-                                                                <option value="0" data-id="0">-- Non-PPH --</option>
+                                                                <option value="0" data-id="0">-- Non-PPh --</option>
                                                                 @foreach ($wtax as $row2)
                                                                     <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code }}</option>
                                                                 @endforeach
@@ -358,7 +358,7 @@
                                                         </td>
                                                         <td class="center-align">
                                                             <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
-                                                                <option value="0" data-id="0">-- Non-PPH --</option>
+                                                                <option value="0" data-id="0">-- Non-PPh --</option>
                                                                 @foreach ($wtax as $row2)
                                                                     <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code }}</option>
                                                                 @endforeach
@@ -525,7 +525,7 @@
                                             <th class="center-align">Tgl.Post</th>
                                             <th class="center-align">Total</th>
                                             <th class="center-align">PPN</th>
-                                            <th class="center-align">PPH</th>
+                                            <th class="center-align">PPh</th>
                                             <th class="center-align">Grandtotal</th>
                                             <th class="center-align">Keterangan</th>
                                             <th class="center-align">Landed Cost</th>
@@ -546,7 +546,7 @@
                                             <th class="center-align">Tgl.Post</th>
                                             <th class="center-align">Total</th>
                                             <th class="center-align">PPN</th>
-                                            <th class="center-align">PPH</th>
+                                            <th class="center-align">PPh</th>
                                             <th class="center-align">Grandtotal</th>
                                             <th class="center-align">Keterangan</th>
                                             <th class="center-align">Landed Cost</th>

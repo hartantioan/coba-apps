@@ -92,9 +92,9 @@
                                                         <th rowspan="2">Rekening Penerima</th>
                                                         <th rowspan="2">Bank & No.Rek</th>
                                                         <th rowspan="2">Total</th>
-                                                        {{-- <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPH</th>
-                                                        <th rowspan="2">Grandtotal</th> --}}
+                                                        <th rowspan="2">PPN</th>
+                                                        <th rowspan="2">PPh</th>
+                                                        <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
@@ -237,13 +237,16 @@
                                                 <th class="center">Qty</th>
                                                 <th class="center">Satuan</th>
                                                 <th class="center">Harga Satuan</th>
-                                                <th class="center">Harga Total</th>
+                                                <th class="center">PPN</th>
+                                                <th class="center">Incl.PPN</th>
+                                                <th class="center">PPh</th>
+                                                <th class="center">Subtotal</th>
                                                 <th class="center">Hapus</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-item">
                                             <tr id="last-row-item">
-                                                <td colspan="6" class="center">
+                                                <td colspan="9" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> Tambah Detail
                                                     </a>
@@ -253,51 +256,36 @@
                                     </table>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m9 s12">
 
                             </div>
-                            <div class="input-field col m4 s12">
-
-                            </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m3 s12">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
                                             <td>Total</td>
-                                            <td class="right-align" colspan="2"><span id="total">0,00</span></td>
-                                        </tr>
-                                        {{-- <tr>
-                                            <td>PPN</td>
                                             <td class="right-align">
-                                                <select class="browser-default" id="percent_tax" name="percent_tax" onchange="count();">
-                                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                                    @foreach ($tax as $row)
-                                                        <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }}>{{ $row->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td class="right-align">
-                                                <input id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                <input class="browser-default" id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>PPH</td>
+                                            <td>PPN</td>
                                             <td class="right-align">
-                                                <select class="browser-default" id="percent_wtax" name="percent_wtax" onchange="count();">
-                                                    <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
-                                                    @foreach ($wtax as $row)
-                                                        <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }}>{{ $row->name }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <input class="browser-default" id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                             </td>
+                                        </tr>
+                                        <tr>
+                                            <td>PPh</td>
                                             <td class="right-align">
-                                                <input id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                <input class="browser-default" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
-                                            <td class="right-align" colspan="2"><span id="grandtotal">0,00</span></td>
-                                        </tr> --}}
+                                            <td class="right-align">
+                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                            </td>
+                                        </tr>
                                     </thead>
                                 </table>
                             </div>
@@ -396,34 +384,60 @@
 
     function getRekening(){
         if($('#user_bank_id').val()){
+            $('#name_account,#no_account').prop('readonly',true);
             $('#name_account').val($('#user_bank_id').find(':selected').data('name'));
             $('#no_account').val($('#user_bank_id').find(':selected').data('bankno'));
         }else{
+            $('#name_account,#no_account').prop('readonly',false);
             $('#name_account,#no_account').val('');
         }
     }
 
     function count(){
-        let totalall = 0, grandtotal = 0, tax = 0, wtax = 0/* , percent_tax = parseFloat($('#percent_tax').val().replaceAll(".", "").replaceAll(",",".")), percent_wtax = parseFloat($('#percent_wtax').val().replaceAll(".", "").replaceAll(",",".")) */;
+        let totalall = 0, grandtotalall = 0, taxall = 0, wtaxall = 0;
         $('input[name^="arr_qty"]').each(function(index){
-            let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), price = parseFloat($('input[name^="arr_price"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-            let total = qty * price;
-            $('input[name^="arr_total"]').eq(index).val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
-            totalall += total;
+            let row_percent_tax = 0, row_percent_wtax = 0, row_total = 0, row_tax = 0, row_wtax = 0, row_grandtotal = 0;
+            let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            let price = parseFloat($('input[name^="arr_price"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            row_total = qty * price;
+            row_percent_tax = $('select[name^="arr_tax_id"]').eq(index).find(':selected').data('value');
+            row_percent_wtax = $('select[name^="arr_wtax_id"]').eq(index).find(':selected').data('value');
+            if(row_percent_tax > 0){
+                if($('select[name^="arr_is_include_tax"]').eq(index).val() == '1'){
+                    row_total = row_total / (1 + (row_percent_tax / 100));
+                }
+                row_tax = Math.floor(row_total * (row_percent_tax / 100));
+            }
+            if(row_percent_wtax > 0){
+                row_wtax = Math.floor(row_total * (row_percent_wtax / 100));
+            }
+            row_grandtotal = row_total + row_tax - row_wtax;
+            $('input[name^="arr_percent_tax"]').eq(index).val(row_percent_tax);
+            $('input[name^="arr_percent_wtax"]').eq(index).val(row_percent_wtax);
+            $('input[name^="arr_tax"]').eq(index).val(row_tax);
+            $('input[name^="arr_wtax"]').eq(index).val(row_wtax);
+            $('input[name^="arr_total"]').eq(index).val(formatRupiahIni(row_total.toFixed(2).toString().replace('.',',')));
+            $('input[name^="arr_grandtotal"]').eq(index).val(row_grandtotal);
+            totalall += row_total;
+            taxall += row_tax;
+            wtaxall += row_wtax;
+            grandtotalall += row_grandtotal;
         });
-        /* tax = totalall * (percent_tax / 100);
-        wtax = totalall * (percent_wtax / 100);
-        grandtotal = totalall + tax - wtax;
-        $('#tax').val(formatRupiahIni(tax.toFixed(2).toString().replace('.',',')));
-        $('#wtax').val(formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))); */
-        $('#total').text(formatRupiahIni(totalall.toFixed(2).toString().replace('.',',')));
-        /* $('#grandtotal').text(formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))); */
+        $('#total').val(formatRupiahIni(totalall.toFixed(2).toString().replace('.',',')));
+        $('#tax').val(formatRupiahIni(taxall.toString().replace('.',',')));
+        $('#wtax').val(formatRupiahIni(wtaxall.toString().replace('.',',')));
+        $('#grandtotal').val(formatRupiahIni(grandtotalall.toFixed(2).toString().replace('.',',')));
     }
 
     function addItem(){
         var count = makeid(10);
         $('#last-row-item').before(`
             <tr class="row_item">
+                <input type="hidden" name="arr_percent_tax[]" value="0" id="arr_percent_tax` + count + `">
+                <input type="hidden" name="arr_percent_wtax[]" value="0" id="arr_percent_wtax` + count + `">
+                <input type="hidden" name="arr_tax[]" value="0" id="arr_tax` + count + `">
+                <input type="hidden" name="arr_wtax[]" value="0" id="arr_wtax` + count + `">
+                <input type="hidden" name="arr_grandtotal[]" value="0" id="arr_grandtotal` + count + `">
                 <td>
                     <textarea class="materialize-textarea" name="arr_item[]" type="text" placeholder="Keterangan Barang"></textarea>
                 </td>
@@ -435,6 +449,28 @@
                 </td>>
                 <td class="center">
                     <input type="text" id="arr_price` + count + `" name="arr_price[]" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_tax_id` + count + `" name="arr_tax_id[]" onchange="count();">
+                        <option value="0" data-value="0">-- Pilih ini jika non-PPN --</option>
+                        @foreach ($tax as $row)
+                            <option value="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" onchange="count();">
+                        <option value="0">--Tidak--</option>
+                        <option value="1">--Ya--</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_wtax_id` + count + `" name="arr_wtax_id[]" onchange="count();">
+                        <option value="0" data-value="0">-- Pilih ini jika non-PPh --</option>
+                        @foreach ($wtax as $row)
+                        <option value="{{ $row->id }}" {{ $row->is_default_pph ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                        @endforeach
+                    </select>
                 </td>
                 <td class="center">
                     <input type="text" id="arr_total` + count + `" name="arr_total[]" value="0,00" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
@@ -506,9 +542,9 @@
                 { name: 'name_account', className: 'center-align' },
                 { name: 'no_account', className: 'center-align' },
                 { name: 'total', className: 'center-align' },
-                /* { name: 'tax', className: 'center-align' },
+                { name: 'tax', className: 'center-align' },
                 { name: 'wtax', className: 'center-align' },
-                { name: 'grandtotal', className: 'center-align' }, */
+                { name: 'grandtotal', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },

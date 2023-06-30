@@ -38,7 +38,7 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, WithC
         'CATATAN',
         'TOTAL',
         'PPN',
-        'PPH',
+        'PPh',
         'GRANDTOTAL',
         'STATUS'
     ];

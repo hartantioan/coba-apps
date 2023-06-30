@@ -259,15 +259,15 @@
                                     <label class="" for="user_bank_id">Pilih Dari Daftar</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <input id="account_bank" name="account_bank" type="text" placeholder="Bank Tujuan" readonly>
+                                    <input id="account_bank" name="account_bank" type="text" placeholder="Bank Tujuan">
                                     <label class="active" for="account_bank">Bank Tujuan</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <input id="account_no" name="account_no" type="text" placeholder="No Rekening Tujuan" readonly>
+                                    <input id="account_no" name="account_no" type="text" placeholder="No Rekening Tujuan">
                                     <label class="active" for="account_no">No Rekening</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <input id="account_name" name="account_name" type="text" placeholder="Nama Pemilik Rekening" readonly>
+                                    <input id="account_name" name="account_name" type="text" placeholder="Nama Pemilik Rekening">
                                     <label class="active" for="account_name">Nama Pemilik Rekening</label>
                                 </div>
                             </div>
@@ -283,7 +283,7 @@
                                                 <tr>
                                                     <th class="center" width="10%">
                                                         <label>
-                                                            <input type="checkbox" onclick="chooseAll(this)">
+                                                            <input type="checkbox" onclick="chooseAllGas(this)" id="chooseAll">
                                                             <span>Semua</span>
                                                         </label>
                                                     </th>
@@ -292,7 +292,7 @@
                                                     <th class="center">Tgl.Tenggat</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">PPN</th>
-                                                    <th class="center">PPH</th>
+                                                    <th class="center">PPh</th>
                                                     <th class="center">Grandtotal</th>
                                                     <th class="center">Potongan/Memo</th>
                                                     <th class="center">Bayar</th>
@@ -304,7 +304,41 @@
                                             <tbody id="body-detail">
                                                 <tr id="empty-detail">
                                                     <td colspan="12" class="center">
-                                                        Pilih supplier/vendor untuk memulai...
+                                                        Pilih partner/bisnis untuk memulai...
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </p>
+                            </div>
+                            <div class="col m12 s12">
+                                <p class="mt-2 mb-2">
+                                    <h6>Dibayar dengan Outgoing Payment (Jika Ada)</h6>
+                                    <div style="overflow:auto;">
+                                        <table class="bordered" style="max-width:1650px !important;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center" width="10%">
+                                                        <label>
+                                                            <input type="checkbox" onclick="chooseAllOtherPayment(this)" id="chooseAllOtherPayment">
+                                                            <span>Semua</span>
+                                                        </label>
+                                                    </th>
+                                                    <th class="center">Kode Out. Payment</th>
+                                                    <th class="center">Kode Payment Req.</th>
+                                                    <th class="center">Tgl.Post</th>
+                                                    <th class="center">Coa Kas/Bank</th>
+                                                    <th class="center">Admin</th>
+                                                    <th class="center">Total</th>
+                                                    <th class="center">Diterima Karyawan</th>
+                                                    <th class="center">Digunakan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-detail-payment">
+                                                <tr id="empty-detail-payment">
+                                                    <td colspan="9" class="center">
+                                                        Pilih partner bisnis untuk memulai...
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -323,6 +357,18 @@
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
+                                            <td colspan="2">Total</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="total" name="total" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Pembulatan</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="rounding" name="rounding" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td width="33%">Biaya Admin</td>
                                             <td width="33%">
                                                 <select class="browser-default" id="cost_distribution_id" name="cost_distribution_id"></select>
@@ -332,7 +378,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="2">Total Bayar</td>
+                                            <td colspan="2">Bayar</td>
                                             <td class="right-align">
                                                 <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
@@ -443,6 +489,51 @@
     </div>
 </div>
 
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:100%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-header ml-2">
+        <h5>Daftar Tunggakan Dokumen <b id="account_name"></b></h5>
+    </div>
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <ul class="collapsible">
+                            <li class="active">
+                                <div class="collapsible-header purple lightrn-1 white-text">
+                                    <i class="material-icons">layers</i> Fund Requests / AP Down Payment / AP Invoice
+                                </div>
+                                <div class="collapsible-body">
+                                    <div id="datatable_buttons_multi"></div>
+                                    <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                                    <table id="table_multi" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="center-align">Kode Dokumen</th>
+                                                <th class="center-align">Tgl.Post</th>
+                                                <th class="center-align">Total</th>
+                                                <th class="center-align">PPN</th>
+                                                <th class="center-align">PPh</th>
+                                                <th class="center-align">Grandtotal</th>
+                                                <th class="center-align">Keterangan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-multi"></tbody>
+                                    </table>
+                                </div>
+                            </li>                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -512,7 +603,7 @@
                 $('#body-detail').empty().append(`
                     <tr id="empty-detail">
                         <td colspan="12" class="center">
-                            Pilih supplier/vendor untuk memulai...
+                            Pilih partner bisnis untuk memulai...
                         </td>
                     </tr>
                 `);
@@ -595,6 +686,60 @@
             }
         });
 
+        $('#modal6').modal({
+            onOpenStart: function(modal,trigger) {
+                $('.collapsible').collapsible({
+                    accordion:false
+                });
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_multi = $('#table_multi').DataTable({
+                    "responsive": true,
+                    "ordering": false,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('select[name="table_multi_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-multi').empty();
+                $('#account_name').text('');
+                $('#preview_data').html('');
+                $('#table_multi').DataTable().clear().destroy();
+            }
+        });
+
         $('#body-detail').on('click', '.delete-data-detail', function() {
             $(this).closest('tr').remove();
             countAll();
@@ -610,8 +755,10 @@
             $('#account_bank').val($('#user_bank_id').find(':selected').data('bank'));
             $('#account_no').val($('#user_bank_id').find(':selected').data('no'));
             $('#account_name').val($('#user_bank_id').find(':selected').data('name'));
+            $('#account_bank,#account_no,#account_name').prop('readonly',true);
         }else{
             $('#account_bank,#account_no,#account_name').val('');
+            $('#account_bank,#account_no,#account_name').prop('readonly',false);
         }
     }
 
@@ -628,11 +775,11 @@
     function getAccountInfo(){
         if($('#account_id').val()){
             $.ajax({
-                url: '{{ Request::url() }}/get_account_data',
+                url: '{{ Request::url() }}/get_account_info',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: $('#account_id').val()
+                    id: $('#account_id').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -642,35 +789,18 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
+                    $('#modal6').modal('open');
+                    $('#account_name').text($('#account_id').select2('data')[0].text);
 
-                    $('#body-detail').empty();
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
-                            var count = makeid(10);
-                            $('#list-used-data').append(`
-                                <div class="chip purple darken-4 gradient-shadow white-text">
-                                    ` + val.rawcode + `
-                                    <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
-                                </div>
-                            `);
-                            $('#body-detail').append(`
-                                <tr class="row_detail" data-code="` + val.rawcode + `">
-                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                    ` + ( val.coa_id ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
-                                    <td class="center-align">
-                                        <label>
-                                            <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `">
-                                            <span>Pilih</span>
-                                        </label>
-                                    </td>
-                                    <td>
+                            $('#body-detail-multi').append(`
+                                <tr data-type="` + val.type + `" data-id="` + val.id + `">
+                                    <td class="center">
                                         ` + val.rawcode + `
                                     </td>
                                     <td class="center">
                                         ` + val.post_date + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.due_date + `
                                     </td>
                                     <td class="right-align">
                                         ` + val.total + `
@@ -678,48 +808,20 @@
                                     <td class="right-align">
                                         ` + val.tax + `
                                     </td>
-                                    <td class="right-align" id="row_wtax` + count + `">
+                                    <td class="right-align">
                                         ` + val.wtax + `
                                     </td>
-                                    <td class="right-align" id="row_grandtotal` + count + `">
+                                    <td class="right-align">
                                         ` + val.grandtotal + `
                                     </td>
-                                    <td class="right-align" id="row_memo` + count + `">
-                                        ` + val.memo + `
-                                    </td>
-                                    <td class="center">
-                                        <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.grandtotal + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
-                                    </td>
-                                    <td class="center">
-                                        <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="-">
-                                    </td>
-                                    <td class="center">
-                                        ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
-                                    </td>
-                                    <td class="center">
-                                        ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>` ) + `
+                                    <td class="center-align">
+                                        ` + val.note + `
                                     </td>
                                 </tr>
                             `);
-                            
-                            if(!val.coa_id){
-                                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
-                                select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
-                            }
-                            
-                        });                        
-                    }else{
-                        $('#body-detail').empty().append(`
-                            <tr id="empty-detail">
-                                <td colspan="12" class="center">
-                                    Pilih supplier/vendor untuk memulai...
-                                </td>
-                            </tr>
-                        `);
-
-                        $('#grandtotal,#admin').val('0,000');
+                        });
                     }
-                    
+
                     $('#user_bank_id').empty();
                     if(response.banks.length > 0){
                         $('#user_bank_id').append(`
@@ -737,8 +839,6 @@
                     }
                     $('#user_bank_id').formSelect();
 
-                    $('#top').val(response.top);
-                    
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
@@ -753,20 +853,159 @@
                 }
             });
         }else{
+            $('#user_bank_id').empty().append(`
+                <option value="">--Pilih Partner Bisnis-</option>
+            `);
             if($('.data-used').length > 0){
                 $('.data-used').trigger('click');
             }
-            $('#body-detail').empty().append(`
-                <tr id="empty-detail">
-                    <td colspan="12" class="center">
-                        Pilih supplier/vendor untuk memulai...
-                    </td>
-                </tr>
-            `);
-            $('#deposit').val('0,000');
-            $('#top').val('0');
-            $('#total,#tax,#wtax,#grandtotal,#balance').text('0,000');
+            countAll();
         }
+    }
+
+    function applyDocuments(){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let passed = false, arr_id = [], arr_type = [], sametype = true;
+                $.map(table_multi.rows('.selected').nodes(), function (item) {
+                    passed = true;
+                    arr_id.push($(item).data('id'));
+                    arr_type.push($(item).data('type'));
+                });
+
+                if(passed == true){
+                    $.ajax({
+                        url: '{{ Request::url() }}/get_account_data',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            arr_id: arr_id,
+                            arr_type: arr_type,
+                            account_id: $('#account_id').val(),
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+
+                            $('#body-detail').empty();
+                            if(response.details.length > 0){
+                                $.each(response.details, function(i, val) {
+                                    var count = makeid(10);
+                                    $('#list-used-data').append(`
+                                        <div class="chip purple darken-4 gradient-shadow white-text">
+                                            ` + val.rawcode + `
+                                            <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
+                                        </div>
+                                    `);
+                                    $('#body-detail').append(`
+                                        <tr class="row_detail" data-code="` + val.rawcode + `">
+                                            <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                            ` + ( val.coa_id ? `<input type="hidden" id="arr_coa` + count + `" name="arr_coa[]" value="` + val.coa_id + `" data-id="` + count + `">` : `` ) + `
+                                            <td class="center-align">
+                                                <label>
+                                                    <input type="checkbox" id="check` + count + `" name="arr_code[]" value="` + val.code + `" onclick="countAll();" data-id="` + count + `" checked>
+                                                    <span>Pilih</span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                ` + val.rawcode + `
+                                            </td>
+                                            <td class="center">
+                                                ` + val.post_date + `
+                                            </td>
+                                            <td class="center">
+                                                ` + val.due_date + `
+                                            </td>
+                                            <td class="right-align">
+                                                ` + val.total + `
+                                            </td>
+                                            <td class="right-align">
+                                                ` + val.tax + `
+                                            </td>
+                                            <td class="right-align" id="row_wtax` + count + `">
+                                                ` + val.wtax + `
+                                            </td>
+                                            <td class="right-align" id="row_grandtotal` + count + `">
+                                                ` + val.grandtotal + `
+                                            </td>
+                                            <td class="right-align" id="row_memo` + count + `">
+                                                ` + val.memo + `
+                                            </td>
+                                            <td class="center">
+                                                <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.grandtotal + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
+                                            </td>
+                                            <td class="center">
+                                                <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="-">
+                                            </td>
+                                            <td class="center">
+                                                ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` ) + `
+                                            </td>
+                                            <td class="center">
+                                                ` + ( val.coa_id ? `-` : `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" required style="width: 100%"></select>` ) + `
+                                            </td>
+                                        </tr>
+                                    `);
+                                    
+                                    if(!val.coa_id){
+                                        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                                        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                                    }
+                                    
+                                });
+                                
+                            }else{
+                                $('#body-detail').empty().append(`
+                                    <tr id="empty-detail">
+                                        <td colspan="12" class="center">
+                                            Pilih supplier/vendor untuk memulai...
+                                        </td>
+                                    </tr>
+                                `);
+
+                                $('#grandtotal,#admin').val('0,000');
+                            }
+
+                            $('#top').val(response.top);
+                            
+                            $('.modal-content').scrollTop(0);
+                            M.updateTextFields();
+
+                            $('#modal6').modal('close');
+                            countAll();
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Silahkan, pilih Fund Request, A/P Down Payment, atau A/P Invoice yang ingin anda masukkan.',
+                        icon: 'warning'
+                    });
+                }
+            }
+        });
     }
 
     function applyCoa(code){
@@ -789,21 +1028,23 @@
     }
 
     function countAll(){
-        var pay = 0, admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",","."));
+        var total = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0;
         
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
                 if($(element).is(':checked')){
-                    pay += parseFloat($('#arr_pay' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
+                    total += parseFloat($('#arr_pay' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
                 }
             });
         }
-        pay += admin;
-        $('#grandtotal').val(formatRupiahIni(pay.toFixed(2).toString().replace('.',',')));
+
+        grandtotal = total + admin + rounding;
+        $('#total').val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
+        $('#grandtotal').val(formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',',')));
     }
 
-    function chooseAll(element){
+    function chooseAllGas(element){
         if($(element).is(':checked')){
             $('input[name^="arr_code"]').each(function(){
                 if(!$(this).is(':checked')){
@@ -812,6 +1053,23 @@
             });
         }else{
             $('input[name^="arr_code"]').each(function(){
+                if($(this).is(':checked')){
+                    $(this).prop( "checked", false);
+                }
+            });
+        }
+        countAll();
+    }
+
+    function chooseAllOtherPayment(element){
+        if($(element).is(':checked')){
+            $('input[name^="arr_code_op"]').each(function(){
+                if(!$(this).is(':checked')){
+                    $(this).prop( "checked", true);
+                }
+            });
+        }else{
+            $('input[name^="arr_code_op"]').each(function(){
                 if($(this).is(':checked')){
                     $(this).prop( "checked", false);
                 }
@@ -1150,6 +1408,8 @@
                 $('#account_bank').val(response.account_bank);
                 $('#account_no').val(response.account_no);
                 $('#account_name').val(response.account_name);
+                $('#total').val(response.total);
+                $('#rounding').val(response.rounding);
                 $('#admin').val(response.admin);
                 $('#grandtotal').val(response.grandtotal);
                 

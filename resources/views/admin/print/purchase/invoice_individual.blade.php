@@ -290,7 +290,7 @@
                                 <th class="center-align">Ket.2</th>
                                 <th class="center-align" width="10%" style="max-width:10%">Total</th>
                                 <th class="center-align" width="10%" style="max-width:10%">PPN</th>
-                                <th class="center-align" width="10%" style="max-width:10%">PPH</th>
+                                <th class="center-align" width="10%" style="max-width:10%">PPh</th>
                                 <th class="center-align" width="15%" style="max-width:15%">Grandtotal</th>
                             </tr>
                         </thead>
@@ -342,7 +342,7 @@
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
-                                <td class="right-align" style="padding-right:15px">PPH</td>
+                                <td class="right-align" style="padding-right:15px">PPh</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">

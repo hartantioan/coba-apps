@@ -918,7 +918,7 @@ class PurchaseInvoiceController extends Controller
                                 <th class="center-align">Keterangan 2</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
-                                <th class="center-align">PPH</th>
+                                <th class="center-align">PPh</th>
                                 <th class="center-align">Grandtotal</th>
                             </tr>
                         </thead><tbody>';
@@ -1092,6 +1092,7 @@ class PurchaseInvoiceController extends Controller
         $pi['wtax'] = number_format($pi->wtax,2,',','.');
         $pi['grandtotal'] = number_format($pi->grandtotal,2,',','.');
         $pi['downpayment'] = number_format($pi->downpayment,2,',','.');
+        $pi['rounding'] = number_format($pi->rounding,2,',','.');
 
         $downpayments = [];
         
@@ -2105,7 +2106,7 @@ class PurchaseInvoiceController extends Controller
                                             ],
                                             "key" => $row_pyr_detail->lookable->code,
                                             "name" => $row_pyr_detail->lookable->code,
-                                            'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                            'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                         ];
                                        
                                         $data_go_chart[]=$data_fund_tempura;
@@ -2195,7 +2196,7 @@ class PurchaseInvoiceController extends Controller
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
-                                    'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                 ];
                              
                                 
@@ -2299,7 +2300,7 @@ class PurchaseInvoiceController extends Controller
                                 ],
                                 "key" => $row_pyr_detail->lookable->code,
                                 "name" => $row_pyr_detail->lookable->code,
-                                'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                             ];
                            
                                

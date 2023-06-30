@@ -215,8 +215,8 @@
                                     <table class="bordered" style="min-width:1500px;">
                                         <thead>
                                             <tr>
-                                                <th class="center">Coa</th>
                                                 <th class="center">BP</th>
+                                                <th class="center">Coa</th>
                                                 <th class="center">Plant</th>
                                                 <th class="center">Line</th>
                                                 <th class="center">Mesin</th>
@@ -270,8 +270,8 @@
                                                 <th class="center">Tgl.Tenggat</th>
                                                 <th class="center">Mata Uang</th>
                                                 <th class="center" style="width:75px;">Konversi</th>
-                                                <th class="center" style="width:75px;">Coa</th>
                                                 <th class="center" style="width:75px;">BP</th>
+                                                <th class="center" style="width:75px;">Coa</th>
                                                 <th class="center" style="width:75px;">Plant</th>
                                                 <th class="center" style="width:75px;">Line</th>
                                                 <th class="center" style="width:75px;">Mesin</th>
@@ -541,10 +541,10 @@
                         <input type="hidden" name="arr_type[]" value="` + type + `">
                         <input type="hidden" name="arr_cost_distribution_detail[]" value="` + val.id + `">
                         <td>
-                            <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                            <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
                         </td>
                         <td>
-                            <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
+                            <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                         </td>
                         <td>
                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
@@ -632,10 +632,10 @@
                 <input type="hidden" name="arr_type[]" value="` + type + `">
                 <input type="hidden" name="arr_cost_distribution_detail[]" value="">
                 <td>
-                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                    <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
+                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
@@ -735,10 +735,10 @@
                     <input type="text" name="arr_multi_conversion[]" placeholder="Konversi">
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa">
+                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis">    
                 </td>
                 <td>
-                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis">    
+                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa">
                 </td>
                 <td>
                     <input type="text" name="arr_multi_place[]" placeholder="ID Plant">
@@ -855,10 +855,10 @@
                                     <input type="text" name="arr_multi_conversion[]" placeholder="Konversi">
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa">
+                                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis">    
                                 </td>
                                 <td>
-                                    <input type="text" name="arr_multi_bp[]" placeholder="ID Partner Bisnis">    
+                                    <input type="text" name="arr_multi_coa[]" placeholder="ID Coa">
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_place[]" placeholder="ID Plant">
@@ -1361,10 +1361,10 @@
                             <input type="hidden" name="arr_type[]" value="` + val.type + `">
                             <input type="hidden" name="arr_cost_distribution_detail[]" value="` + val.cost_distribution_detail_id + `">
                             <td>
-                                <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_account` + count + `" name="arr_account[]"></select>    
+                                <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
                             </td>
                             <td>
                                 <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">

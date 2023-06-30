@@ -37,7 +37,13 @@
             display: table;
             }
 
-            
+            .center-align {
+                text-align: center !important;
+            }
+
+            .right-align {
+                text-align: right !important;
+            }
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
@@ -306,7 +312,10 @@
                                     <th class="center">Jum.</th>
                                     <th class="center">Sat.</th>
                                     <th class="center">Harga @</th>
-                                    <th class="center">Harga Total.</th>
+                                    <th class="center">Subtotal</th>
+                                    <th class="center">PPN</th>
+                                    <th class="center">PPh</th>
+                                    <th class="center">Grandtotal</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -315,8 +324,11 @@
                                     <td>{{ $row->note }}</td>
                                     <td class="center-align">{{ $row->qty }}</td>
                                     <td class="center-align">{{ $row->unit->code }}</td>
-                                    <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
-                                    <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->wtax,2,',','.') }}</td>
+                                    <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

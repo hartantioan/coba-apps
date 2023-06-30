@@ -50,6 +50,8 @@ class FundRequestController extends Controller
             'title'     => 'Permohonan Dana',
             'content'   => 'admin.finance.fund_request',
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'tax'       => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
+            'wtax'      => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -73,10 +75,10 @@ class FundRequestController extends Controller
             'payment_type',
             'name_account',
             'no_account',
-            'grandtotal',
-            /* 'tax',
+            'total',
+            'tax',
             'wtax',
-            'grandtotal' */
+            'grandtotal'
         ];
 
         $start  = $request->start;
@@ -169,9 +171,9 @@ class FundRequestController extends Controller
                     $val->paymentType(),
                     $val->name_account,
                     $val->no_account,
-                    /* number_format($val->total,2,',','.'),
+                    number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
-                    number_format($val->wtax,2,',','.'), */
+                    number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     '
@@ -221,7 +223,10 @@ class FundRequestController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="right-align">Harga Satuan</th>
-                                <th class="right-align">Harga Total</th>
+                                <th class="right-align">Subtotal</th>
+                                <th class="right-align">PPN</th>
+                                <th class="right-align">PPh</th>
+                                <th class="right-align">Grandtotal</th>
                             </tr>
                         </thead><tbody>';
         
@@ -231,8 +236,11 @@ class FundRequestController extends Controller
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
-                <td class="center-align">'.number_format($row->price,3,',','.').'</td>
-                <td class="center-align">'.number_format($row->total,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->price,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->wtax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
             </tr>';
         }
         
@@ -639,9 +647,9 @@ class FundRequestController extends Controller
             'payment_type',
             'name_account',
             'no_account',
-            /* 'total',
+            'total',
             'tax',
-            'wtax', */
+            'wtax',
             'grandtotal'
         ];
 
@@ -711,9 +719,9 @@ class FundRequestController extends Controller
                     $val->name_account,
                     $val->no_account,
                     number_format($val->grandtotal,2,',','.'),
-                    /* number_format($val->tax,2,',','.'),
+                    number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
-                    number_format($val->grandtotal,2,',','.'), */
+                    number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->documentStatus(),
                     $val->status(),
@@ -807,19 +815,6 @@ class FundRequestController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
-
-            $total = 0; 
-            $grandtotal = 0;
-            /* $tax = str_replace(',','.',str_replace('.','',$request->tax));
-            $wtax = str_replace(',','.',str_replace('.','',$request->wtax)); */
-
-            foreach($request->arr_total as $key => $row){
-                $total += str_replace(',','.',str_replace('.','',$row));
-            }
-
-            /* $grandtotal = $total + $tax - $wtax; */
-            $grandtotal = $total;
                     
 			if($request->temp){
                 DB::beginTransaction();
@@ -875,10 +870,11 @@ class FundRequestController extends Controller
                         $query->name_account = $request->name_account;
                         $query->no_account = $request->no_account;
                         $query->document = $document;
-                        $query->total = $total;
-                        /* $query->tax = $tax;
-                        $query->wtax = $wtax; */
-                        $query->grandtotal = $grandtotal;
+                        $query->total = str_replace(',','.',str_replace('.','',$request->total));
+                        $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
+                        $query->wtax = str_replace(',','.',str_replace('.','',$request->wtax));
+                        $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                        $query->document_status = '1';
                         $query->status = '1';
                         
                         $query->save();
@@ -917,10 +913,10 @@ class FundRequestController extends Controller
                         'name_account'  => $request->name_account,
                         'no_account'    => $request->no_account,
                         'document'      => $request->file('file') ? $request->file('file')->store('public/fund_requests') : NULL,
-                        'total'         => $total,
-                        'tax'           => 0,
-                        'wtax'          => 0,
-                        'grandtotal'    => $grandtotal,
+                        'total'         => str_replace(',','.',str_replace('.','',$request->total)),
+                        'tax'           => str_replace(',','.',str_replace('.','',$request->tax)),
+                        'wtax'          => str_replace(',','.',str_replace('.','',$request->wtax)),
+                        'grandtotal'    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document_status'   => '1',
                         'status'        => '1',
                     ]);
@@ -941,7 +937,15 @@ class FundRequestController extends Controller
                             'qty'                   => $request->arr_qty[$key],
                             'unit_id'               => $request->arr_unit[$key],
                             'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                            'tax_id'                => $request->arr_tax_id[$key],
+                            'percent_tax'           => $request->arr_percent_tax[$key],
+                            'is_include_tax'        => $request->arr_is_include_tax[$key],
+                            'wtax_id'               => $request->arr_wtax_id[$key],
+                            'percent_wtax'          => $request->arr_percent_wtax[$key],
                             'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                            'tax'                   => $request->arr_tax[$key],
+                            'wtax'                  => $request->arr_wtax[$key],
+                            'grandtotal'            => $request->arr_grandtotal[$key],
                         ]);
                     }
                     DB::commit();
@@ -988,7 +992,10 @@ class FundRequestController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="right-align">Harga Satuan</th>
-                                <th class="right-align">Harga Total</th>
+                                <th class="right-align">Subtotal</th>
+                                <th class="right-align">PPN</th>
+                                <th class="right-align">PPh</th>
+                                <th class="right-align">Grandtotal</th>
                             </tr>
                         </thead><tbody>';
         
@@ -998,8 +1005,11 @@ class FundRequestController extends Controller
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->unit->code.'</td>
-                <td class="center-align">'.number_format($row->price,3,',','.').'</td>
-                <td class="center-align">'.number_format($row->total,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->price,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->total,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->wtax,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,3,',','.').'</td>
             </tr>';
         }
         
@@ -1215,7 +1225,7 @@ class FundRequestController extends Controller
                             ],
                             "key" => $row_pyr_detail->lookable->code,
                             "name" => $row_pyr_detail->lookable->code,
-                            'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                            'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                         ];
                         
                         $data_go_chart[]=$data_fund_tempura;
@@ -1563,7 +1573,7 @@ class FundRequestController extends Controller
                                             ],
                                             "key" => $row_pyr_detail->lookable->code,
                                             "name" => $row_pyr_detail->lookable->code,
-                                            'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                            'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                         ];
                                        
                                         $data_go_chart[]=$data_fund_tempura;
@@ -1653,7 +1663,7 @@ class FundRequestController extends Controller
                                     ],
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
-                                    'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                    'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                                 ];
                              
                                 
@@ -1757,7 +1767,7 @@ class FundRequestController extends Controller
                                 ],
                                 "key" => $row_pyr_detail->lookable->code,
                                 "name" => $row_pyr_detail->lookable->code,
-                                'url'=>request()->root()."/admin/finace/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
+                                'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
                             ];
                            
                                

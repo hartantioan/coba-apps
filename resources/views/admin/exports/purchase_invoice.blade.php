@@ -13,7 +13,7 @@
             <th>Tipe</th>
             <th>Total</th>
             <th>PPN</th>
-            <th>PPH</th>
+            <th>PPh</th>
             <th>Grandtotal</th>
             <th>DP</th>
             <th>Sisa</th>

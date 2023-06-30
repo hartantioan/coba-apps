@@ -9,7 +9,7 @@
             <th>Tgl.Post</th>
             <th>Total</th>
             <th>PPN</th>
-            <th>PPH</th>
+            <th>PPh</th>
             <th>Grandtotal</th>
             <th>Dok.</th>
             <th>Ket.</th>

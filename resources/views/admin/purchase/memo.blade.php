@@ -131,7 +131,7 @@
                                                         <th>Keterangan</th>
                                                         <th>Total</th>
                                                         <th>PPN</th>
-                                                        <th>PPH</th>
+                                                        <th>PPh</th>
                                                         <th>Grandtotal</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
@@ -240,7 +240,7 @@
                                                     <th class="center">Edit Nominal</th>
                                                     <th class="center">Total</th>
                                                     <th class="center">PPN</th>
-                                                    <th class="center">PPH</th>
+                                                    <th class="center">PPh</th>
                                                     <th class="center">Grandtotal</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
@@ -275,7 +275,7 @@
                                             <td class="right-align"><span id="tax">0,000</span></td>
                                         </tr>
                                         <tr>
-                                            <td>PPH</td>
+                                            <td>PPh</td>
                                             <td class="right-align"><span id="wtax">0,000</span></td>
                                         </tr>
                                         <tr>

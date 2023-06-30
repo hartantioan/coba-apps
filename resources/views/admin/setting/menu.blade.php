@@ -101,13 +101,13 @@
                             <select class="select2 browser-default" id="parent_id" name="parent_id">
                                 <option value="">Parent (Utama)</option>
                                 @foreach($menus as $m)
-                                    <option value="{{ $m->id }}">{{ $m->name }}</option>
+                                    <option value="{{ $m->id }}">{{ $m->name.' '.$m->url }}</option>
                                     @foreach($m->sub as $m2)
-                                        <option value="{{ $m2->id }}"> - {{ $m2->name }}</option>
+                                        <option value="{{ $m2->id }}"> - {{ $m2->name.' '.$m2->url }}</option>
                                         @foreach($m2->sub as $m3)
-                                            <option value="{{ $m3->id }}"> - - {{ $m3->name }}</option>
+                                            <option value="{{ $m3->id }}"> - - {{ $m3->name.' '.$m3->url }}</option>
                                             @foreach($m3->sub as $m4)
-                                                <option value="{{ $m4->id }}"> - - - {{ $m4->name }}</option>
+                                                <option value="{{ $m4->id }}"> - - - {{ $m4->name.' '.$m4->url }}</option>
                                             @endforeach
                                         @endforeach
                                     @endforeach

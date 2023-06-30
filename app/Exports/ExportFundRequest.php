@@ -42,7 +42,7 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
         'NO REKENING',
         'TOTAL',
         'PPN',
-        'PPH',
+        'PPh',
         'GRANDTOTAL',
         'STATUS',
     ];

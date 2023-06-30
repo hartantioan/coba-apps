@@ -261,25 +261,25 @@
                     <td>{{ $row->note }}</td>
                     <td class="center-align">{{ $row->qty }}</td>
                     <td class="center-align">{{ $row->unit->code }}</td>
-                    <td class="right-align">{{ number_format($row->price,3,',','.') }}</td>
-                    <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
+                    <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                 </tr>
                 @endforeach
                 <tr>
                     <td colspan="4" class="right-align">Total</td>
-                    <td class="right-align">{{ number_format($data->total,3,',','.') }}</td>
+                    <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                 </tr>
                 <tr>
                     <td colspan="4" class="right-align">PPN</td>
-                    <td class="right-align">{{ number_format($data->tax,3,',','.') }}</td>
+                    <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                 </tr>
                 <tr>
-                    <td colspan="4" class="right-align">PPH</td>
-                    <td class="right-align">{{ number_format($data->wtax,3,',','.') }}</td>
+                    <td colspan="4" class="right-align">PPh</td>
+                    <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                 </tr>
                 <tr>
                     <td colspan="4" class="right-align">Grandtotal</td>
-                    <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
+                    <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
                 </tr>
             </tbody>
         </table>

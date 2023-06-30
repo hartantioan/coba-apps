@@ -230,7 +230,7 @@ class PurchaseOrderSheet implements FromCollection, WithTitle, WithHeadings, Wit
             'DISKON',
             'TOTAL',
             'PPN',
-            'PPH',
+            'PPh',
             'GRANDTOTAL'
         ];
     }

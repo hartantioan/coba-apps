@@ -279,6 +279,8 @@
             }
         });
         
+        select2ServerSide('#item_id', '{{ url("admin/select2/item") }}');
+
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
             $('#name').val('');

@@ -155,6 +155,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('approval_stage', [Select2Controller::class, 'approvalStage']);
                 Route::get('menu', [Select2Controller::class, 'menu']);
                 Route::get('fund_request_bs', [Select2Controller::class, 'fundRequestBs']);
+                Route::get('fund_request_bs_close', [Select2Controller::class, 'fundRequestBsClose']);
                 Route::get('purchase_invoice', [Select2Controller::class, 'purchaseInvoice']);
                 Route::get('purchase_down_payment', [Select2Controller::class, 'purchaseDownPayment']);
                 Route::get('cost_distribution', [Select2Controller::class, 'costDistribution']);
@@ -933,6 +934,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('payment_request')->middleware('operation.access:payment_request,view')->group(function () {
                     Route::get('/',[PaymentRequestController::class, 'index']);
                     Route::post('get_account_data', [PaymentRequestController::class, 'getAccountData']);
+                    Route::post('get_account_info', [PaymentRequestController::class, 'getAccountInfo']);
                     Route::post('get_payment_data', [PaymentRequestController::class, 'getPaymentData']);
                     Route::get('datatable',[PaymentRequestController::class, 'datatable']);
                     Route::get('row_detail',[PaymentRequestController::class, 'rowDetail']);

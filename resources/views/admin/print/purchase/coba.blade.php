@@ -260,7 +260,7 @@
                         <th class="center-align">Penerimaan Barang / Landed Cost / Purchase Order</th>
                         <th class="center-align">Total</th>
                         <th class="center-align">PPN</th>
-                        <th class="center-align">PPH</th>
+                        <th class="center-align">PPh</th>
                         <th class="center-align">Grandtotal</th>
                     </tr>
                 </thead>

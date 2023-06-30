@@ -188,7 +188,7 @@
                         <th class="center-align">Keterangan</th>
                         <th class="center-align">Total</th>
                         <th class="center-align">PPN</th>
-                        <th class="center-align">PPH</th>
+                        <th class="center-align">PPh</th>
                         <th class="center-align">Grandtotal</th>
                     </tr>
                 </thead>
@@ -224,7 +224,7 @@
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="5">PPH</td>
+                        <td class="right-align" colspan="5">PPh</td>
                         <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                     </tr>
                     <tr>

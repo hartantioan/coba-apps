@@ -189,7 +189,7 @@
                                                         <th rowspan="2">Diskon</th>
                                                         <th rowspan="2">Total</th>
                                                         <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPH</th>
+                                                        <th rowspan="2">PPh</th>
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Status</th>
                                                         <th rowspan="2">Action</th>
@@ -389,7 +389,7 @@
                                                 </th>
                                                 <th class="center">Termasuk PPN</th>
                                                 <th class="center">
-                                                    PPH
+                                                    PPh
                                                     <label class="pl-2">
                                                         <input type="checkbox" onclick="chooseAllPph(this)">
                                                         <span style="padding-left: 25px;">Semua</span>
@@ -450,7 +450,7 @@
                                             <td class="right-align"><span id="tax">0,00</span></td>
                                         </tr>
                                         <tr>
-                                            <td>PPH</td>
+                                            <td>PPh</td>
                                             <td class="right-align"><span id="wtax">0,00</span></td>
                                         </tr>
                                         <tr>
@@ -1121,7 +1121,7 @@
                                         </td>
                                         <td>
                                             <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
-                                                <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                                                <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
                                                 @foreach ($wtax as $row)
                                                     <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                                 @endforeach
@@ -1273,7 +1273,7 @@
                     </td>
                     <td>
                         <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
-                            <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                            <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
                             @foreach ($wtax as $row)
                                 <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
                             @endforeach
@@ -1376,7 +1376,7 @@
                     </td>
                     <td>
                         <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
-                            <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                            <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
                             @foreach ($wtax as $row)
                                 <option value="{{ $row->percentage }}" {{ $row->is_default_pph ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name }}</option>
                             @endforeach
@@ -1865,7 +1865,7 @@
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
-                                            <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
                                             @foreach ($wtax as $row)
                                                 <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                             @endforeach
@@ -1981,7 +1981,7 @@
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_wtax` + count + `" name="arr_wtax[]" onchange="countAll();">
-                                            <option value="0" data-id="0">-- Pilih ini jika non-PPH --</option>
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPh --</option>
                                             @foreach ($wtax as $row)
                                                 <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                             @endforeach

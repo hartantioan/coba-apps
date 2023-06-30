@@ -28,6 +28,8 @@ class PaymentRequest extends Model
         'currency_id',
         'currency_rate',
         'cost_distribution_id',
+        'total',
+        'rounding',
         'admin',
         'grandtotal',
         'document',
@@ -82,6 +84,11 @@ class PaymentRequest extends Model
     public function paymentRequestDetail()
     {
         return $this->hasMany('App\Models\PaymentRequestDetail');
+    }
+
+    public function paymentRequestCross()
+    {
+        return $this->hasMany('App\Models\PaymentRequestCross');
     }
 
     public function outgoingPayment()

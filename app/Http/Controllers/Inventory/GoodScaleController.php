@@ -437,9 +437,9 @@ class GoodScaleController extends Controller
                                         <th class="center-align">No.</th>
                                         <th class="center-align">Ref.PO</th>
                                         <th class="center-align">Item</th>
-                                        <th class="center-align">Qty Masuk</th>
-                                        <th class="center-align">Qty Keluar</th>
-                                        <th class="center-align">Qty Selisih</th>
+                                        <th class="center-align">Timbang Masuk</th>
+                                        <th class="center-align">Timbang Keluar</th>
+                                        <th class="center-align">Qty Netto</th>
                                         <th class="center-align">Satuan</th>
                                         <th class="center-align">Keterangan 1</th>
                                         <th class="center-align">Keterangan 2</th>
@@ -543,13 +543,14 @@ class GoodScaleController extends Controller
             $details[] = [
                 'id'                        => $row->id,
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id ? $row->purchase_order_detail_id : '',
+                'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->code.' - '.$row->item->name,
                 'qty_po'                    => $row->purchase_order_detail_id ? number_format($row->purchaseOrderDetail->getBalanceReceipt(),3,',','.') : '-',
                 'qty_in'                    => number_format($row->qty_in,3,',','.'),
                 'qty_out'                   => number_format($row->qty_out,3,',','.'),
                 'unit'                      => $row->item->buyUnit->code,
                 'place_id'                  => $row->place_id,
-                'place_name'                => $row->place->name,
+                'place_name'                => $row->place->code.' - '.$row->place->name,
                 'warehouse_id'              => $row->warehouse_id,
                 'warehouse_name'            => $row->warehouse->name,
                 'note'                      => $row->note,
@@ -602,9 +603,10 @@ class GoodScaleController extends Controller
             if($query->qty_out == 0){
                 $query->qty_out = str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
                 $query->qty_balance = $query->qty_in - str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
+                $query->purchase_order_detail_id = $request->arr_pod[$key] ? $request->arr_pod[$key] : NULL;
                 $query->save();
             }
-            if($query->purchase_order_detail_id){
+            if($request->arr_pod[$key]){
                 $adapo = true;
                 $idgs = $query->good_scale_id;
             }

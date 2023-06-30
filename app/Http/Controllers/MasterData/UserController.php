@@ -74,6 +74,7 @@ class UserController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('name', 'like', "%$search%")
                             ->orWhere('username', 'like', "%$search%")
+                            ->orWhere('employee_no', 'like', "%$search%")
                             ->orWhere('address', 'like', "%$search%")
                             ->orWhere('id_card', 'like', "%$search%");
                     });
@@ -97,6 +98,7 @@ class UserController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('name', 'like', "%$search%")
                             ->orWhere('username', 'like', "%$search%")
+                            ->orWhere('employee_no', 'like', "%$search%")
                             ->orWhere('address', 'like', "%$search%")
                             ->orWhere('id_card', 'like', "%$search%");
                     });

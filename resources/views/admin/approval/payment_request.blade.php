@@ -245,15 +245,19 @@
                     @endforeach
                     <tr>
                         <td colspan="4" class="right-align">Total</td>
-                        <td class="right-align">{{ number_format($total,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="right-align">Pembulatan</td>
+                        <td class="right-align">{{ number_format($data->rounding,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="4" class="right-align">Admin</td>
-                        <td class="right-align">{{ number_format($data->admin,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->admin,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="4" class="right-align">Grandtotal</td>
-                        <td class="right-align">{{ number_format($data->grandtotal,3,',','.') }}</td>
+                        <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
                     </tr>
                 </tbody>
                 <tfoot>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -73,6 +74,16 @@ class OutgoingPayment extends Model
         return $this->belongsTo('App\Models\PaymentRequest', 'payment_request_id', 'id')->withTrashed();
     }
 
+    public function getTotalPiutangKaryawan(){
+        $total = 0;
+        foreach($this->paymentRequest->paymentRequestDetail()->whereHasMorph('lookable',[FundRequest::class],function (Builder $query){
+            $query->where('document_status','3');
+        })->get() as $row){
+            $total += $row->nominal;
+        }
+        return $total;
+    }
+
     public function paymentRequestCross(){
         return $this->hasMany('App\Models\PaymentRequestCross','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
             $query->whereIn('status',['2','3']);
@@ -80,7 +91,7 @@ class OutgoingPayment extends Model
     }
 
     public function balancePaymentCross(){
-        $total = $this->grandtotal - $this->admin;
+        $total = $this->getTotalPiutangKaryawan();
         foreach($this->paymentRequestCross as $row){
             $total -= $row->nominal;
         }

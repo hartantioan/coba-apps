@@ -746,7 +746,6 @@
                 $('#post_date').val(response.post_date);
                 $('#required_date').val(response.required_date);
                 $('#required_date').removeAttr('min');
-                $('#type').val(response.type).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
                 $('#department_id').val(response.department_id).formSelect();
                 $('#termin_note').val(response.termin_note);
@@ -755,6 +754,10 @@
                 $('#no_account').val(response.no_account);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
+                $('#total').val(response.total);
+                $('#tax').val(response.tax);
+                $('#wtax').val(response.wtax);
+                $('#grandtotal').val(response.grandtotal);
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `).trigger('change');
@@ -768,6 +771,11 @@
                         var count = makeid(10);
                         $('#last-row-item').before(`
                             <tr class="row_item">
+                                <input type="hidden" name="arr_percent_tax[]" value="` + val.percent_tax + `" id="arr_percent_tax` + count + `">
+                                <input type="hidden" name="arr_percent_wtax[]" value="` + val.percent_wtax + `" id="arr_percent_wtax` + count + `">
+                                <input type="hidden" name="arr_tax[]" value="` + val.tax + `" id="arr_tax` + count + `">
+                                <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" id="arr_wtax` + count + `">
+                                <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" id="arr_grandtotal` + count + `">
                                 <td>
                                     <textarea class="materialize-textarea" name="arr_item[]" type="text" placeholder="Keterangan Barang">` + val.item + `</textarea>
                                 </td>
@@ -779,6 +787,28 @@
                                 </td>>
                                 <td class="center">
                                     <input type="text" id="arr_price` + count + `" name="arr_price[]" value="` + val.price + `" onkeyup="formatRupiah(this);count();" style="text-align:right;">
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_tax_id` + count + `" name="arr_tax_id[]" onchange="count();">
+                                        <option value="0" data-value="0">-- Pilih ini jika non-PPN --</option>
+                                        @foreach ($tax as $row)
+                                            <option value="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" onchange="count();">
+                                        <option value="0">--Tidak--</option>
+                                        <option value="1">--Ya--</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_wtax_id` + count + `" name="arr_wtax_id[]" onchange="count();">
+                                        <option value="0" data-value="0">-- Pilih ini jika non-PPh --</option>
+                                        @foreach ($wtax as $row)
+                                        <option value="{{ $row->id }}" {{ $row->is_default_pph ? 'selected' : '' }} data-value="{{ $row->percentage }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                        @endforeach
+                                    </select>
                                 </td>
                                 <td class="center">
                                     <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.total + `" onkeyup="formatRupiah(this);" readonly style="text-align:right;">
@@ -794,13 +824,16 @@
                             <option value="` + val.unit_id + `">` + val.unit_name + `</option>
                         `);
                         select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
+                        $('#arr_tax_id' + count).val(val.tax_id);
+                        $('#arr_wtax_id' + count).val(val.wtax_id);
+                        $('#arr_is_include_tax' + count).val(val.is_include_tax);
                     });
                 }
                 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
-                count();
+                /* count(); */
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

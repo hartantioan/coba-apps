@@ -327,17 +327,18 @@
                                                     </th>
                                                     <th class="center">Kode Out. Payment</th>
                                                     <th class="center">Kode Payment Req.</th>
+                                                    <th class="center">Bisnis Partner</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Coa Kas/Bank</th>
                                                     <th class="center">Admin</th>
                                                     <th class="center">Total</th>
-                                                    <th class="center">Diterima Karyawan</th>
+                                                    <th class="center">Grandtotal</th>
                                                     <th class="center">Digunakan</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail-payment">
                                                 <tr id="empty-detail-payment">
-                                                    <td colspan="9" class="center">
+                                                    <td colspan="10" class="center">
                                                         Pilih partner bisnis untuk memulai...
                                                     </td>
                                                 </tr>
@@ -378,9 +379,21 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td colspan="2">Grandtotal</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td colspan="2">Bayar</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <input class="browser-default" id="payment" name="payment" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Sisa</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="balance" name="balance" type="text" value="0,000" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;" readonly>
                                             </td>
                                         </tr>
                                     </thead>
@@ -534,6 +547,81 @@
     </div>
 </div>
 
+<div id="modal5" class="modal modal-fixed-footer" style="height: 70% !important;width:50%">
+    <div class="modal-header ml-6 mt-2">
+        <h6>Range Printing</h6>
+    </div>
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <form class="row" id="form_data_print_multi" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_multi" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <ul class="tabs">
+                            <li class="tab">
+                                <a href="#range-tabs" class="" id="part-tabs-btn">
+                                <span>By No</span>
+                                </a>
+                            </li>
+                            <li class="tab">
+                                <a href="#date-tabs" class="">
+                                <span>By Date</span>
+                                </a>
+                            </li>
+                            <li class="indicator" style="left: 0px; right: 0px;"></li>
+                        </ul>
+                        <div id="range-tabs" style="display: block;" class="">                           
+                            <div class="row ml-2 mt-2">
+                                <div class="row">
+                                    <div class="input-field col m4 s12">
+                                        <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
+                                        <label class="" for="range_end">No Awal</label>
+                                    </div>
+                                    
+                                    <div class="input-field col m4 s12">
+                                        <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
+                                        <label class="active" for="range_end">No akhir</label>
+                                    </div>
+                                    <div class="input-field col m4 s12">
+                                        <label>
+                                            <input name="type_date" type="radio" checked value="1"/>
+                                            <span>Dengan range biasa</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                <div class="input-field col m8 s12">
+                                    <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
+                                    <label class="" for="range_end">Masukkan angka dengan koma</label>
+                                </div>
+                               
+                                <div class="input-field col m4 s12">
+                                    <label>
+                                        <input name="type_date" type="radio" value="2"/>
+                                        <span>Dengan Range koma</span>
+                                    </label>
+                                </div>
+                                </div>
+                                <div class="col s12 mt-3">
+                                    <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
+                                </div>
+                            </div>                         
+                        </div>
+                        <div id="date-tabs" style="display: none;" class="">
+                            
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -589,6 +677,13 @@
                 window.onbeforeunload = function() {
                     if($('.data-used').length > 0){
                         $('.data-used').trigger('click');
+                        $('#body-detail-payment').empty().append(`
+                            <tr id="empty-detail-payment">
+                                <td colspan="10" class="center">
+                                    Pilih partner bisnis untuk memulai...
+                                </td>
+                            </tr>
+                        `);
                     }
                     return 'You will lose all changes made since your last save';
                 };
@@ -979,6 +1074,58 @@
                                 $('#grandtotal,#admin').val('0,000');
                             }
 
+                            $('#body-detail-payment').empty();
+                            if(response.payments.length > 0){
+                                $.each(response.payments, function(i, val) {
+                                    var count = makeid(10);
+                                    $('#body-detail-payment').append(`
+                                        <tr data-id="` + val.id + `">
+                                            <td class="center-align">
+                                                <label>
+                                                    <input type="checkbox" id="arr_check_payment` + count + `" name="arr_check_payment[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `">
+                                                    <span>Pilih</span>
+                                                </label>
+                                            </td>
+                                            <td class="center">
+                                                ` + val.code + `
+                                            </td>
+                                            <td class="center">
+                                                ` + val.payment_request_code + `
+                                            </td>
+                                            <td>
+                                                ` + val.name + `
+                                            </td>
+                                            <td>
+                                                ` + val.post_date + `
+                                            </td>
+                                            <td>
+                                                ` + val.coa_name + `
+                                            </td>
+                                            <td class="right-align">
+                                                ` + val.admin + `
+                                            </td>
+                                            <td class="right-align">
+                                                ` + val.total + `
+                                            </td>
+                                            <td class="right-align">
+                                                ` + val.grandtotal + `
+                                            </td>
+                                            <td class="center-align">
+                                                <input id="arr_payment` + count + `" name="arr_payment[]" data-balance="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
+                                            </td>
+                                        </tr>
+                                    `);
+                                });
+                            }else{
+                                $('#body-detail-payment').append(`
+                                    <tr id="empty-detail-payment">
+                                        <td colspan="10" class="center">
+                                            Pilih partner bisnis untuk memulai...
+                                        </td>
+                                    </tr>
+                                `);
+                            }
+
                             $('#top').val(response.top);
                             
                             $('.modal-content').scrollTop(0);
@@ -1028,8 +1175,14 @@
     }
 
     function countAll(){
-        var total = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0;
+        var total = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, payment = 0;
         
+        $('input[name^="arr_check_payment"]').each(function(){
+            if($(this).is(':checked')){
+                payment += parseFloat($('#arr_payment' + $(this).data('id')).val().replaceAll(".", "").replaceAll(",","."));
+            }
+        });
+
         if($('input[name^="arr_code"]').length > 0){
             $('input[name^="arr_code"]').each(function(){
                 let element = $(this);
@@ -1039,9 +1192,11 @@
             });
         }
 
-        grandtotal = total + admin + rounding;
+        grandtotal = total + admin + rounding - payment;
         $('#total').val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
-        $('#grandtotal').val(formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',',')));
+        $('#grandtotal').val(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        );
     }
 
     function chooseAllGas(element){
@@ -1650,7 +1805,6 @@
 
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
-        console.log(formData);
         $.ajax({
             url: '{{ Request::url() }}/print_by_range',
             type: 'POST',

@@ -1070,9 +1070,11 @@ class FundRequestController extends Controller
     public function userShow(Request $request){
         $fr = FundRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $fr['account_name'] = $fr->account->name;
-        $fr['currency_rate'] = number_format($fr->currency_rate,3,',','.');
-        $fr['tax'] = number_format($fr->tax,3,',','.');
-        $fr['wtax'] = number_format($fr->wtax,3,',','.');
+        $fr['currency_rate'] = number_format($fr->currency_rate,2,',','.');
+        $fr['total'] = number_format($fr->total,2,',','.');
+        $fr['tax'] = number_format($fr->tax,2,',','.');
+        $fr['wtax'] = number_format($fr->wtax,2,',','.');
+        $fr['grandtotal'] = number_format($fr->grandtotal,2,',','.');
 
         $arr = [];
 
@@ -1082,8 +1084,16 @@ class FundRequestController extends Controller
                 'qty'               => number_format($row->qty,3,',','.'),
                 'unit_id'           => $row->unit_id,
                 'unit_name'         => $row->unit->code.' - '.$row->unit->name,
-                'price'             => number_format($row->price,3,',','.'),
-                'total'             => number_format($row->total,3,',','.'),
+                'price'             => number_format($row->price,2,',','.'),
+                'total'             => number_format($row->total,2,',','.'),
+                'percent_tax'       => $row->percent_tax,
+                'percent_wtax'      => $row->percent_wtax,
+                'tax'               => $row->tax,
+                'wtax'              => $row->wtax,
+                'grandtotal'        => $row->grandtotal,
+                'tax_id'            => $row->tax_id,
+                'wtax_id'           => $row->wtax_id,
+                'is_include_tax'    => $row->is_include_tax,
             ];
         }
 

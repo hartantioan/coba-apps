@@ -338,36 +338,40 @@
                     <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
                         <div class="row">
-                        <div class="column1">
-                            <table style="width:100%" class="table-bot">
-                                <tr class="break-row">
-                                    <td>
-                                        {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
-                                        <div class="mt-3">
-                                            Catatan : {{ $data->note }}
-                                        </div>
-                                        Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
-                                    </td>
-                                    
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="column2">
-                            <table style="border-collapse:collapse;text-align:right" width="74%" class="table-bot">
-                                <tr class="break-row">
-                                    <td class="right-align">Total</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($total,3,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td class="right-align">Admin</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->admin,3,',','.') }}</td>
-                                </tr class="break-row">
-                                <tr>
-                                    <td class="right-align">Grandtotal</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,3,',','.') }}</td>
-                                </tr class="break-row">                              
-                            </table>
-                        </div>
+                            <div class="column1">
+                                <table style="width:100%" class="table-bot">
+                                    <tr class="break-row">
+                                        <td>
+                                            {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
+                                            <div class="mt-3">
+                                                Catatan : {{ $data->note }}
+                                            </div>
+                                            Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
+                                        </td>
+                                        
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="column2">
+                                <table style="border-collapse:collapse;text-align:right" width="74%" class="table-bot">
+                                    <tr class="break-row">
+                                        <td class="right-align">Total</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->total,3,',','.') }}</td>
+                                    </tr>
+                                    <tr class="break-row">
+                                        <td class="right-align">Pembulatan</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->rounding,3,',','.') }}</td>
+                                    </tr>
+                                    <tr class="break-row">
+                                        <td class="right-align">Admin</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->admin,3,',','.') }}</td>
+                                    </tr class="break-row">
+                                    <tr>
+                                        <td class="right-align">Grandtotal</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,3,',','.') }}</td>
+                                    </tr class="break-row">                              
+                                </table>
+                            </div>
                         </div>
                         <table class="table-bot1" width="100%" border="0">
                             <tr>
@@ -398,7 +402,6 @@
                             </tr>
                         </table>  
                     </div>
-                    
                 </div>
             </div>
         </main>

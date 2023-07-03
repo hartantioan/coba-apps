@@ -174,11 +174,13 @@
                             <td>{{ $row->account_name }}</td>
                             <td>{{ $row->note }}</td>
                             <td>{!! $row->status() !!}</td>
+							<td>{{ number_format($row->total,3,',','.') }}</td>
+							<td>{{ number_format($row->rounding,3,',','.') }}</td>
                             <td>{{ number_format($row->admin,3,',','.') }}</td>
                             <td>{{ number_format($row->grandtotal,3,',','.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan="20" style="border-right-style: none !important;">
+                            <td colspan="22" style="border-right-style: none !important;">
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">

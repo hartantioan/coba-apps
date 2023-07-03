@@ -344,6 +344,59 @@ class PaymentRequestController extends Controller
 
     public function getAccountData(Request $request){
         $details = [];
+        $payments = [];
+
+        $user = User::find($request->account_id);
+
+        if($user){
+            if($user->type == '1'){
+                $op = OutgoingPayment::where('account_id',$user->id)
+                ->whereIn('status',['2','3'])
+                ->whereHas('paymentRequest',function($query){
+                    $query->whereHas('paymentRequestDetail',function($query){
+                        $query->whereHasMorph('lookable',
+                        [FundRequest::class],
+                        function (Builder $query){
+                            $query->where('document_status','3');
+                        });
+                    });
+                })->get();
+            }else{
+                $op = OutgoingPayment::whereIn('status',['2','3'])->whereHas('account',function($query){
+                    $query->where('type','1');
+                })->whereHas('paymentRequest',function($query){
+                    $query->whereHas('paymentRequestDetail',function($query){
+                        $query->whereHasMorph('lookable',
+                        [FundRequest::class],
+                        function (Builder $query){
+                            $query->where('document_status',"3");
+                        });
+                    });
+                })->get();
+            }
+            
+            if(isset($op)){
+                foreach($op as $row){
+                    $balance = $row->balancePaymentCross();
+                    if($balance > 0){
+                        $payments[] = [
+                            'id'                    => $row->id,
+                            'code'                  => $row->code,
+                            'name'                  => $row->account->name,
+                            'payment_request_code'  => $row->paymentRequest->code,
+                            'post_date'             => date('d/m/y',strtotime($row->post_date)),
+                            'coa_name'              => $row->coaSource->name,
+                            'admin'                 => number_format($row->admin,2,',','.'),
+                            'total'                 => number_format($row->total,2,',','.'),
+                            'grandtotal'            => number_format($row->grandtotal,2,',','.'),
+                            'balance'               => number_format($balance,2,',','.'),
+                        ];
+                    }
+                }
+            }
+        }
+
+        $user['payments'] = $payments;
 
         foreach($request->arr_type as $key => $row){
             if($row == 'fund_requests'){
@@ -427,9 +480,9 @@ class PaymentRequestController extends Controller
             }
         }
         
-        $data['details'] = $details;
+        $user['details'] = $details;
 
-        return response()->json($data);
+        return response()->json($user);
     }
 
     public function create(Request $request){
@@ -745,10 +798,10 @@ class PaymentRequestController extends Controller
         $pr['coa_source_name'] = $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name;
         $pr['currency_rate'] = number_format($pr->currency_rate,3,',','.');
         $pr['cost_distribution_name'] = $pr->cost_distribution_id ? $pr->costDistribution->code.' - '.$pr->costDistribution->name : '';
-        $pr['total'] = number_format($pr->total,3,',','.');
-        $pr['rounding'] = number_format($pr->rounding,3,',','.');
-        $pr['admin'] = number_format($pr->admin,3,',','.');
-        $pr['grandtotal'] = number_format($pr->grandtotal,3,',','.');
+        $pr['total'] = number_format($pr->total,2,',','.');
+        $pr['rounding'] = number_format($pr->rounding,2,',','.');
+        $pr['admin'] = number_format($pr->admin,2,',','.');
+        $pr['grandtotal'] = number_format($pr->grandtotal,2,',','.');
         $pr['top'] = $pr->account->top;
 
         $arr = [];
@@ -1065,7 +1118,7 @@ class PaymentRequestController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = OutgoingPayment::where('Code', 'LIKE', '%'.$code)->first();
+                        $query = PaymentRequest::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
                                 'title'     => 'Payment Request',

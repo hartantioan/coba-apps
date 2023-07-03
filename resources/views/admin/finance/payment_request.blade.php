@@ -321,7 +321,7 @@
                                                 <tr>
                                                     <th class="center" width="10%">
                                                         <label>
-                                                            <input type="checkbox" onclick="chooseAllOtherPayment(this)" id="chooseAllOtherPayment">
+                                                            <input type="checkbox" onclick="chooseAllOtherPayment(this)">
                                                             <span>Semua</span>
                                                         </label>
                                                     </th>
@@ -1082,7 +1082,7 @@
                                         <tr data-id="` + val.id + `">
                                             <td class="center-align">
                                                 <label>
-                                                    <input type="checkbox" id="arr_check_payment` + count + `" name="arr_check_payment[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `">
+                                                    <input type="checkbox" id="arr_cd_payment` + count + `" name="arr_cd_payment[]" value="` + val.id + `" onclick="countAll();" data-id="` + count + `">
                                                     <span>Pilih</span>
                                                 </label>
                                             </td>
@@ -1175,27 +1175,31 @@
     }
 
     function countAll(){
-        var total = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, payment = 0;
+        var total = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), admin = parseFloat($('#admin').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, payment = 0, balance = 0;
         
-        $('input[name^="arr_check_payment"]').each(function(){
+        $('input[name^="arr_cd_payment"]').each(function(){
             if($(this).is(':checked')){
                 payment += parseFloat($('#arr_payment' + $(this).data('id')).val().replaceAll(".", "").replaceAll(",","."));
             }
         });
 
-        if($('input[name^="arr_code"]').length > 0){
-            $('input[name^="arr_code"]').each(function(){
-                let element = $(this);
-                if($(element).is(':checked')){
-                    total += parseFloat($('#arr_pay' + element.data('id')).val().replaceAll(".", "").replaceAll(",","."));
-                }
-            });
-        }
+        $('input[name^="arr_code"]').each(function(){
+            if($(this).is(':checked')){
+                total += parseFloat($('#arr_pay' + $(this).data('id')).val().replaceAll(".", "").replaceAll(",","."));
+            }
+        });
 
-        grandtotal = total + admin + rounding - payment;
+        grandtotal = total + admin + rounding;
+        balance = grandtotal - payment;
         $('#total').val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        );
+        $('#payment').val(
+            (payment >= 0 ? '' : '-') + formatRupiahIni(payment.toFixed(2).toString().replace('.',','))
+        );
+        $('#balance').val(
+            (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
         );
     }
 
@@ -1218,13 +1222,13 @@
 
     function chooseAllOtherPayment(element){
         if($(element).is(':checked')){
-            $('input[name^="arr_code_op"]').each(function(){
+            $('input[name^="arr_cd_payment"]').each(function(){
                 if(!$(this).is(':checked')){
                     $(this).prop( "checked", true);
                 }
             });
         }else{
-            $('input[name^="arr_code_op"]').each(function(){
+            $('input[name^="arr_cd_payment"]').each(function(){
                 if($(this).is(':checked')){
                     $(this).prop( "checked", false);
                 }
@@ -1383,6 +1387,15 @@
         });
 	}
 
+    function checkTotal(element){
+        let balance = parseFloat($(element).data('balance').replaceAll(".", "").replaceAll(",",".")), val = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
+        if(val > balance){
+            $(element).val(
+                formatRupiahIni(balance.toFixed(2).toString().replace('.',','))
+            );
+        }
+    }
+
     function save(){
 		swal({
             title: "Apakah anda yakin ingin simpan?",
@@ -1398,13 +1411,15 @@
                 var formData = new FormData($('#form_data')[0]);
 
                 formData.delete("arr_code[]");
+                formData.delete("arr_cd_payment[]");
+                formData.delete("arr_payment[]");
                 formData.delete("arr_type[]");
                 formData.delete("arr_pay[]");
                 formData.delete("arr_note[]");
                 formData.delete("arr_cost_distribution[]");
                 formData.delete("arr_coa[]");
 
-                let passed = true;
+                let passed = true, passedGrandtotal = true;
 
                 $('input[name^="arr_code"]').each(function(){
                     if($(this).is(':checked')){
@@ -1424,7 +1439,18 @@
                     }
                 });
 
-                if(passed){
+                $('input[name^="arr_cd_payment"]').each(function(){
+                    if($(this).is(':checked')){
+                        formData.append('arr_cd_payment[]',$(this).val());
+                        formData.append('arr_payment[]',$('#arr_payment' + $(this).data('id')).val());
+                    }
+                });
+
+                if(parseFloat($('#balance').val().replaceAll(".", "").replaceAll(",",".")) < 0){
+                    passedGrandtotal = false;
+                }
+
+                if(passed && passedGrandtotal){
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',
@@ -1492,7 +1518,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Coa atau nominal bayar tidak boleh kosong.',
+                        text: 'Coa atau nominal bayar tidak boleh kosong. Sisa tidak boleh minus.',
                         icon: 'warning',
                     });
                 }

@@ -81,6 +81,15 @@ class LandedCostDetail extends Model
         }
     }
 
+    public function inventoryTransferOutDetail()
+    {
+        if($this->lookable_type == 'inventory_transfer_out_details'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function landedCostDetail()
     {
         if($this->lookable_type == 'landed_cost_details'){

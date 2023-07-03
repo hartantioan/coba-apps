@@ -32,6 +32,8 @@ class PaymentRequest extends Model
         'rounding',
         'admin',
         'grandtotal',
+        'payment',
+        'balance',
         'document',
         'account_bank',
         'account_no',

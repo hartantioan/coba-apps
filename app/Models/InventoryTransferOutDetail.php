@@ -38,4 +38,11 @@ class InventoryTransferOutDetail extends Model
     {
         return $this->belongsTo('App\Models\ItemStock', 'item_stock_id', 'id');
     }
+
+    public function landedCostDetail()
+    {
+        return $this->hasMany('App\Models\LandedCostDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('landedCost',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
 }

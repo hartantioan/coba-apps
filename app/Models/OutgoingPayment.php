@@ -129,7 +129,7 @@ class OutgoingPayment extends Model
             '4' => 'Ditolak',
             '5' => 'Ditutup',
             '6' => 'Direvisi',
-            default => 'Invalid',
+            default => 'Invalid', 
         };
 
         return $status;

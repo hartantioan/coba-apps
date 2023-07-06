@@ -279,15 +279,6 @@
                                 <input id="document_no" name="document_no" type="text" placeholder="No. Dokumen">
                                 <label class="active" for="document_no">No. Dokumen</label>
                             </div>
-                            <div class="file-field input-field col m3 s12">
-                                <div class="btn">
-                                    <span>Dokumen PO</span>
-                                    <input type="file" name="document_po" id="document_po">
-                                </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
-                                </div>
-                            </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="payment_type" name="payment_type" onchange="resetTerm()">
                                     <option value="1">Cash</option>
@@ -332,6 +323,15 @@
                             <div class="input-field col m3 s12">
                                 <input id="receiver_phone" name="receiver_phone" type="text" placeholder="Kontak Penerima">
                                 <label class="active" for="receiver_phone">Kontak Penerima</label>
+                            </div>
+                            <div class="file-field input-field col m3 s12">
+                                <div class="btn">
+                                    <span>Dokumen PO</span>
+                                    <input type="file" name="document_po" id="document_po">
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path validate" type="text">
+                                </div>
                             </div>
                             <div class="col m12 s12">
                                 <div class="col m3 s3">

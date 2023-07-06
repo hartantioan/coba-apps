@@ -1181,7 +1181,7 @@
         }else{
             swal({
                 title: 'Ups! Error di detail.',
-                text: 'Salah satu coa harus memiliki bisnis partner.',
+                text: 'Salah satu coa harus memiliki Partner Bisnis.',
                 icon: 'error'
             });
         }

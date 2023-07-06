@@ -26,6 +26,7 @@ use App\Models\InventoryTransferOut;
 use App\Models\Item;
 use App\Models\ItemGroupWarehouse;
 use App\Models\OutgoingPayment;
+use App\Models\PaymentRequest;
 use App\Models\Place;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
@@ -541,6 +542,72 @@ class CustomHelper {
 				}
 			}
 
+		}elseif($table_name == 'payment_requests'){
+			
+			$pr = PaymentRequest::find($table_id);
+			
+			if($pr->paymentRequestCross()->exists() && $pr->balance == 0){
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'code'			=> Journal::generateCode($data->post_date),
+					'lookable_type'	=> 'payment_requests',
+					'lookable_id'	=> $pr->id,
+					'currency_id'	=> $pr->currency_id,
+					'currency_rate'	=> $pr->currency_rate,
+					'post_date'		=> $pr->post_date,
+					'note'			=> $pr->code,
+					'status'		=> '3'
+				]);
+	
+				foreach($pr->paymentRequestDetail as $row){
+					if($row->cost_distribution_id){
+						$total = $row->nominal;
+						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+						$accumulation = 0;
+						foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+							if($key == $lastIndex){
+								$nominal = $total - $accumulation;
+							}else{
+								$nominal = round(($rowcost->percentage / 100) * $total);
+								$accumulation += $nominal;
+							}
+							JournalDetail::create([
+								'journal_id'                    => $query->id,
+								'cost_distribution_detail_id'   => $rowcost->id,
+								'coa_id'                        => $row->coa_id,
+								'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+								'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+								'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+								'account_id'                    => $pr->account_id,
+								'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+								'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+								'type'                          => '1',
+								'nominal'                       => $nominal * $pr->currency_rate
+							]);
+						}
+					}else{
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->coa_id,
+							'account_id'	=> $pr->account_id,
+							'type'			=> '1',
+							'nominal'		=> $row->nominal * $pr->currency_rate,
+						]);
+					}
+				}
+	
+				foreach($pr->paymentRequestCross as $row){
+					$coa = Coa::where('code','100.01.03.03.02')->where('company_id',$pr->company_id)->first();
+					JournalDetail::create([
+						'journal_id'                    => $query->id,
+						'coa_id'                        => $coa->id,
+						'account_id'                    => $row->lookable->account_id,
+						'type'                          => '2',
+						'nominal'                       => $row->nominal * $pr->currency_rate
+					]);
+				}
+			}
+			
 		}elseif($table_name == 'outgoing_payments'){
 			$op = OutgoingPayment::find($table_id);
 			
@@ -647,12 +714,23 @@ class CustomHelper {
 				}
 			}
 
+			foreach($op->paymentRequest->paymentRequestCross as $row){
+				$coa = Coa::where('code','100.01.03.03.02')->where('company_id',$op->company_id)->first();
+				JournalDetail::create([
+					'journal_id'                    => $query->id,
+					'coa_id'                        => $coa->id,
+					'account_id'                    => $row->lookable->account_id,
+					'type'                          => '2',
+					'nominal'                       => $row->nominal * $op->currency_rate
+				]);
+			}
+
 			JournalDetail::create([
 				'journal_id'	=> $query->id,
 				'coa_id'		=> $op->coa_source_id,
 				'account_id'	=> $op->account_id,
 				'type'			=> '2',
-				'nominal'		=> $op->grandtotal * $op->currency_rate,
+				'nominal'		=> $op->balance * $op->currency_rate,
 			]);
 
 		}elseif($table_name == 'good_receives'){
@@ -877,6 +955,7 @@ class CustomHelper {
 								'account_id'	=> $lc->account_id,
 								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'item_id'		=> $rowdetail->item_id,
 								'type'			=> '1',
 								'nominal'		=> $rowdetail->nominal
 							]);
@@ -890,6 +969,7 @@ class CustomHelper {
 								'account_id'	=> $lc->account_id,
 								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
 								'warehouse_id'	=> $rowdetail->warehouse_id,
+								'item_id'		=> $rowdetail->item_id,
 								'type'			=> '1',
 								'nominal'		=> $rowdetail->nominal
 							]);

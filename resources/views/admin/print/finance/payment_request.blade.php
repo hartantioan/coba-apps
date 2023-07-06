@@ -142,8 +142,12 @@
                         <th rowspan="2">Pemilik Rekening</th>
                         <th rowspan="2">Keterangan</th>
                         <th rowspan="2">Status</th>
+						<th rowspan="2">Total</th>
+						<th rowspan="2">Pembulatan</th>
                         <th rowspan="2">Admin</th>
+						<th rowspan="2">Grandtotal</th>
                         <th rowspan="2">Bayar</th>
+						<th rowspan="2">Sisa</th>
 					</tr>
                     <tr align="center">
 						<th>Post</th>
@@ -178,9 +182,11 @@
 							<td>{{ number_format($row->rounding,3,',','.') }}</td>
                             <td>{{ number_format($row->admin,3,',','.') }}</td>
                             <td>{{ number_format($row->grandtotal,3,',','.') }}</td>
+							<td>{{ number_format($row->payment,3,',','.') }}</td>
+							<td>{{ number_format($row->balance,3,',','.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan="22" style="border-right-style: none !important;">
+                            <td colspan="26" style="border-right-style: none !important;">
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">

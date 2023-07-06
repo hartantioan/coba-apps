@@ -184,7 +184,7 @@ class JournalController extends Controller
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Perusahaan</th>
-                                <th class="center-align">Bisnis Partner</th>
+                                <th class="center-align">Partner Bisnis</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>

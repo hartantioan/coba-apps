@@ -4,7 +4,7 @@
             <th>No</th>
             <th>Good Return No.</th>
             <th>Pengguna</th>
-            <th>Bisnis Partner</th>
+            <th>Partner Bisnis</th>
             <th>Tgl.Post</th>
             <th>Dokumen</th>
             <th>Catatan</th>

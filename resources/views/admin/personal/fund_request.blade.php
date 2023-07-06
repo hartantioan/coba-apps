@@ -561,50 +561,63 @@
 
     function getAccountInfo(){
         if($('#account_id').val()){
-            $.ajax({
-                url: '{{ Request::url() }}/get_account_info',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    id: $('#account_id').val()
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    $('#user_bank_id').empty();
-                    if(response.banks.length > 0){
-                        $('#user_bank_id').append(`
-                            <option value="">--Pilih dari daftar-</option>
-                        `);
-                        $.each(response.banks, function(i, val) {
+            if(parseFloat($('#account_id').select2('data')[0].balance_limit) > 0){
+                $.ajax({
+                    url: '{{ Request::url() }}/get_account_info',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        id: $('#account_id').val()
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#user_bank_id').empty();
+                        if(response.banks.length > 0){
                             $('#user_bank_id').append(`
-                                <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bankno="` + val.bank_name + ` - ` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
+                                <option value="">--Pilih dari daftar-</option>
                             `);
-                        });                        
-                    }else{
-                        $('#user_bank_id').append(`
-                            <option value="">--Pilih Partner Bisnis-</option>
-                        `);
+                            $.each(response.banks, function(i, val) {
+                                $('#user_bank_id').append(`
+                                    <option value="` + val.bank_id + `" data-name="` + val.name + `" data-bankno="` + val.bank_name + ` - ` + val.no + `">` + val.bank_name + ` - ` + val.no + ` - ` + val.name + `</option>
+                                `);
+                            });                        
+                        }else{
+                            $('#user_bank_id').append(`
+                                <option value="">--Pilih Partner Bisnis-</option>
+                            `);
+                        }
+                        $('#user_bank_id').formSelect();
+                        $('.modal-content').scrollTop(0);
+                        M.updateTextFields();
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
                     }
-                    $('#user_bank_id').formSelect();
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
+                });
+            }else{
+                swal({
+                    title: 'Ups! Sisa limit BS adalah ' + $('#account_id').select2('data')[0].balance_limit,
+                    text: 'Maaf Partner Bisnis tidak bisa ditambahkan.',
+                    icon: 'warning'
+                });
+                $('#account_id').empty();
+                $('.row_item').remove();
+                $('#user_bank_id').empty().append(`
+                    <option value="">--Pilih Partner Bisnis-</option>
+                `);
+            }
         }else{
             $('.row_item').remove();
             $('#user_bank_id').empty().append(`

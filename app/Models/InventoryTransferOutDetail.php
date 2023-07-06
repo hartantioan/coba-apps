@@ -26,7 +26,7 @@ class InventoryTransferOutDetail extends Model
 
     public function inventoryTransferOut()
     {
-        return $this->belongsTo('App\Models\InventoryTransfer', 'inventory_transfer_out_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\InventoryTransferOut', 'inventory_transfer_out_id', 'id')->withTrashed();
     }
 
     public function item()

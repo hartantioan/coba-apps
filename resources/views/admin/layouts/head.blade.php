@@ -30,10 +30,10 @@
 	<link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/quill/quill.snow.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/quill/quill.bubble.css') }}">
 	<link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2.min.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2-materialize.css?v=14') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2-materialize.css?v=19') }}" type="text/css">
     <!-- END: VENDOR CSS-->
     <!-- BEGIN: Page Level CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=6') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=7') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=3') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/dashboard-modern.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/intro.css?v=7') }}">
@@ -41,7 +41,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
     <!-- END: Page Level CSS-->
     <!-- BEGIN: Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css?v=43') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css?v=44') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/waitMe.min.css') }}">
     <!-- END: Custom CSS-->
 	<script src="{{ url('app-assets/js/vendors.min.js') }}"></script>

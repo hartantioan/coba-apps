@@ -4,7 +4,7 @@
             <th rowspan="2">No</th>
             <th rowspan="2">GR NO.</th>
             <th rowspan="2">Pengguna</th>
-            <th rowspan="2">Bisnis Partner</th>
+            <th rowspan="2">Partner Bisnis</th>
             <th colspan="3">Tanggal</th>
             <th rowspan="2">Penerima</th>
             <th rowspan="2">Perusahaan</th>

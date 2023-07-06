@@ -349,7 +349,7 @@
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
                             <th class="center-align">Perusahaan</th>
-                            <th class="center-align">Bisnis Partner</th>
+                            <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
                             <th class="center-align">Mesin</th>
@@ -487,6 +487,16 @@
 
         $('#body-detail').on('click', '.delete-data-detail', function() {
             $(this).closest('tr').remove();
+            countAll();
+            if($('.row_detail').length == 0){
+                $('#body-detail').append(`
+                    <tr id="empty-detail">
+                        <td colspan="17" class="center">
+                            Pilih Fund Request / Permohonan Dana untuk memulai...
+                        </td>
+                    </tr>
+                `);
+            }
         });
 
         select2ServerSide('#fund_request_id', '{{ url("admin/select2/fund_request_bs_close") }}');

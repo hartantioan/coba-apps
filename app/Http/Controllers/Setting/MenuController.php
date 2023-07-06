@@ -162,10 +162,11 @@ class MenuController extends Controller
                 $parent = Menu::find($request->parent_id);
 
                 if($parent->menuUser()->exists()){
-                    return response()->json([
+                    $parent->menuUser()->delete();
+                    /* return response()->json([
                         'status'  => 500,
                         'message' => 'The parent menu already have(s) operation access rules, please delete it to continue add this menu as parent.'
-                    ]);
+                    ]); */
                 }
             }
 

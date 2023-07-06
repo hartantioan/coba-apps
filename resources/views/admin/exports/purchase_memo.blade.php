@@ -4,7 +4,7 @@
             <th>No</th>
             <th>Dok.No.</th>
             <th>Pengguna</th>
-            <th>Bisnis Partner</th>
+            <th>Partner Bisnis</th>
             <th>Perusahaan</th>
             <th>Tgl.Post</th>
             <th>Total</th>

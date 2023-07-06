@@ -255,7 +255,7 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
-                                            Bisnis Partner
+                                            Partner Bisnis
                                         </td>
                                         <td width="60%">
                                             {{ $data->account->name }}
@@ -275,6 +275,14 @@
                                         </td>
                                         <td width="60%">
                                             {{ $data->paymentType() }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                           Kas / Bank
+                                        </td>
+                                        <td width="60%">
+                                            {{ $data->coa_source_id ? $data->coaSource->name : '-' }}
                                         </td>
                                     </tr>
                                 </table>
@@ -325,7 +333,7 @@
                                     <td class="center-align">{{ $row->type() }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
-                                    <td class="right-align">{{ number_format($row->nominal,3,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->nominal,3,',','.') }}</td>
                                 </tr>
                                 @php
                                     $total += $row->nominal;
@@ -369,6 +377,14 @@
                                     <tr>
                                         <td class="right-align">Grandtotal</td>
                                         <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,3,',','.') }}</td>
+                                    </tr class="break-row">
+                                    <tr>
+                                        <td class="right-align">Bayar (Piutang)</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->payment,3,',','.') }}</td>
+                                    </tr class="break-row">
+                                    <tr>
+                                        <td class="right-align">Sisa</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->balance,3,',','.') }}</td>
                                     </tr class="break-row">                              
                                 </table>
                             </div>

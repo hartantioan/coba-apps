@@ -49,6 +49,7 @@ class User extends Authenticatable
         'email',
         'deposit',
         'limit_credit',
+        'count_limit_credit',
         'top',
         'top_internal',
         'gender',

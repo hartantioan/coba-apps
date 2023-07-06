@@ -190,7 +190,7 @@
                     <tr>
                         <th class="center">Coa</th>
                         <th class="center">Perusahaan</th>
-                        <th class="center">Bisnis Partner</th>
+                        <th class="center">Partner Bisnis</th>
                         <th class="center">Plant</th>
                         <th class="center">Line</th>
                         <th class="center">Departemen</th>

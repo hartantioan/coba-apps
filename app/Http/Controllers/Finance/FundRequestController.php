@@ -603,11 +603,10 @@ class FundRequestController extends Controller
     }
 
     public function export(Request $request){
-        $search = $request->search ? $request->search : '';
-        $status = $request->status ? $request->status : '';
-        $document = $request->document ? $request->document : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
 		
-		return Excel::download(new ExportFundRequest($search,$status,$document,$this->dataplaces), 'fund_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportFundRequest($post_date,$end_date), 'fund_request_'.uniqid().'.xlsx');
     }
 
     public function userIndex(Request $request)

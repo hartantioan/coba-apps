@@ -744,7 +744,9 @@ class RetirementController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportRetirement($request->search,$request->status,$this->dataplaces), 'retirement_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportRetirement($post_date,$end_date), 'retirement_'.uniqid().'.xlsx');
     }
 
     public function approval(Request $request,$id){

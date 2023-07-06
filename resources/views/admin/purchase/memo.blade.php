@@ -44,11 +44,7 @@
                             <span class="hide-on-small-onl">Print</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                            <span class="hide-on-small-onl">Excel</span>
-                            <i class="material-icons right">view_list</i>
-                        </a>
+                        
                     </div>
                 </div>
             </div>
@@ -583,6 +579,23 @@
             }
         });
 
+        $('#modal5').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert_multi').hide();
+                $('#validation_alert_multi').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#temp').val('');
+                
+            }
+        });
+
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
                 
@@ -1012,10 +1025,10 @@
                 loadingClose('.modal-content');
                 if(response.status == 200) {
                     $('#modal5').modal('close');
-                   /*  printService.submit({
+                    printService.submit({
                         'type': 'INVOICE',
                         'url': response.message
-                    }) */
+                    })
                     M.toast({
                         html: response.message
                     });
@@ -1550,11 +1563,7 @@
         });
     }
 
-    function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), company = $('#filter_company').val(), account = $('#filter_account').val(), start_date = $('#start_date').val(), finish_date = $('#finish_date').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&company=" + company + "&account=" + account + "&start_date=" + start_date + "&finish_date=" + finish_date;
-    }
+    
 
     function viewJournal(id){
         $.ajax({

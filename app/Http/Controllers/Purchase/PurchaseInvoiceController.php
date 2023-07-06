@@ -1646,7 +1646,9 @@ class PurchaseInvoiceController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPurchaseInvoice($request->search,$request->status,$request->type,$request->company,$request->account,$this->dataplaces), 'purchase_invoice'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportPurchaseInvoice($post_date,$end_date), 'purchase_invoice'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

@@ -914,7 +914,9 @@ class JournalController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportJournal($request->search,$request->status,$request->currency,$this->dataplaces), 'journal_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportJournal($post_date,$end_date), 'journal_'.uniqid().'.xlsx');
     }
 
     public function printIndividual(Request $request,$id){

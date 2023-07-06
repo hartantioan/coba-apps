@@ -54,7 +54,7 @@
                 <td align="center">{{ $rowdetail->item->buyUnit->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td align="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
-                <td align="center">{{ $rowdetail->department->name }}</td>
+                <td align="center">{{ $rowdetail->department->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->warehouse->name }}</td>
             </tr>
             @endforeach

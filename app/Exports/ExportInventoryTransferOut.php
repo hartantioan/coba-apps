@@ -6,54 +6,25 @@ use App\Models\InventoryTransferOut;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportInventoryTransferOut implements FromView
+class ExportInventoryTransferOut implements FromView , ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, array $dataplaces = null, array $datawarehouses = null)
+    public function __construct(string $start_date, string $end_date)
     {
-        $this->search = $search ? $search : '';
-		$this->status = $status ? $status : '';
-        $this->dataplaces = $dataplaces ? $dataplaces : [];
-        $this->datawarehouses = $datawarehouses ? $datawarehouses : [];
+        $this->start_date = $start_date ? $start_date : '';
+		$this->end_date = $end_date ? $end_date : '';
     }
 
     public function view(): View
     {
         return view('admin.exports.inventory_transfer_out', [
             'data' => InventoryTransferOut::where(function($query) {
-                if($this->search) {
-                    $query->where(function($query) {
-                        $query->where('code', 'like', "%$this->search%")
-                            ->orWhere('note', 'like', "%$this->search%")
-                            ->orWhereHas('inventoryTransferOutDetail', function($query){
-                                $query->whereHas('item',function($query){
-                                    $query->where('code', 'like', "%$this->search%")
-                                        ->orWhere('name','like',"%$this->search%");
-                                });
-                            })
-                            ->orWhereHas('user',function($query){
-                                $query->where('name','like',"%$this->search%")
-                                    ->orWhere('employee_no','like',"%$this->search%");
-                            });
-                    });
-                }
-
-                if($this->status){
-                    $query->where('status', $this->status);
-                }
-            })
-            ->where(function($query){
-                $query->where(function($query){
-                    $query->whereIn('place_from',$this->dataplaces)
-                        ->whereIn('warehouse_from',$this->datawarehouses);
-                })->orWhere(function($query){
-                    $query->whereIn('place_to',$this->dataplaces)
-                        ->whereIn('warehouse_to',$this->datawarehouses);
-                });
+                
             })
             ->get()
         ]);

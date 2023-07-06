@@ -758,7 +758,9 @@ class CapitalizationController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportCapitalization($request->search,$request->status,$this->dataplaces), 'capitalization_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportCapitalization($post_date,$end_date), 'capitalization_'.uniqid().'.xlsx');
     }
 
     public function approval(Request $request,$id){

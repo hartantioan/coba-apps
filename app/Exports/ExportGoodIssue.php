@@ -13,38 +13,17 @@ class ExportGoodIssue implements FromView
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search = null, string $status = null, array $dataplaces = null)
+    public function __construct(string $start_date, string $end_date)
     {
-        $this->search = $search ? $search : '';
-		$this->status = $status ? $status : '';
-        $this->dataplaces = $dataplaces ? $dataplaces : [];
+        $this->start_date = $start_date ? $start_date : '';
+		$this->end_date = $end_date ? $end_date : '';
     }
-
     public function view(): View
     {
         return view('admin.exports.good_issue', [
             'data' => GoodIssue::where(function($query) {
-                if($this->search) {
-                    $query->where(function($query) {
-                        $query->where('code', 'like', "%$this->search%")
-                            ->orWhere('post_date', 'like', "%$this->search%")
-                            ->orWhere('note', 'like', "%$this->search%")
-                            ->orWhereHas('goodReceiveDetail', function($query){
-                                $query->whereHas('item',function($query){
-                                    $query->where('code', 'like', "%$this->search%")
-                                        ->orWhere('name','like',"%$this->search%");
-                                });
-                            })
-                            ->orWhereHas('user',function($query){
-                                $query->where('name','like',"%$this->search%")
-                                    ->orWhere('employee_no','like',"%$this->search%");
-                            });
-                    });
-                }
-
-                if($this->status){
-                    $query->where('status', $this->status);
-                }
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
             })
             ->get()
         ]);

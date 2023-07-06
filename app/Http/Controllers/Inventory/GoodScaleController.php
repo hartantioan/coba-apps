@@ -1031,6 +1031,8 @@ class GoodScaleController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportGoodScale($request->search,$request->status,$request->start_date,$request->finish_date,$this->dataplaces,$this->datawarehouses), 'good_scale_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportGoodScale($post_date,$end_date), 'good_scale_'.uniqid().'.xlsx');
     }
 }

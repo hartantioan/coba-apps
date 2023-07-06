@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\DocumentTax;
 use App\Models\DocumentTaxDetail;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Illuminate\Support\Collection;
 
-class ExportDocumentTax implements WithMultipleSheets
+class ExportDocumentTax implements WithMultipleSheets,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -21,7 +22,6 @@ class ExportDocumentTax implements WithMultipleSheets
 
     public function __construct(string $search, string $start_date = null , string $finish_date = null)
     {
-        $this->search = $search ? $search : '';
         $this->start_date = $start_date ? new \DateTime($start_date) : null;
         $this->finish_date = $finish_date ? new \DateTime($finish_date) : null;
     }
@@ -30,16 +30,6 @@ class ExportDocumentTax implements WithMultipleSheets
     {
         
         $taxes = DocumentTax::where(function($query) {
-            $query->where(function($query) {
-                $query->where('code', 'like', "%{$this->search}%")
-                    ->orWhere('date', 'like', "%{$this->search}%")
-                    ->orWhere('npwp_number', 'like', "%{$this->search}%")
-                    ->orWhere('npwp_name', 'like', "%{$this->search}%")
-                    ->orWhere('npwp_target', 'like', "%{$this->search}%")
-                    ->orWhere('npwp_target_name', 'like', "%{$this->search}%")
-                    ->orWhere('total', 'like', "%{$this->search}%")
-                    ->orWhere('tax', 'like', "%{$this->search}%");
-            });
             if($this->start_date && $this->finish_date) {
                 $query->whereDate('date', '>=', $this->start_date)
                     ->whereDate('date', '<=', $this->finish_date);

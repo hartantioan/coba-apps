@@ -834,6 +834,8 @@ class InventoryTransferInController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportInventoryTransferIn($request->search,$request->status,$this->dataplaces,$this->datawarehouses), 'inventory_transfer_in_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportInventoryTransferIn($post_date,$end_date), 'inventory_transfer_in_'.uniqid().'.xlsx');
     }
 }

@@ -848,7 +848,9 @@ class CloseBillController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportCloseBill($request->search,$request->status,$request->company,$request->start_date,$request->finish_date,$this->dataplaces), 'close_bill_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportCloseBill($post_date,$end_date), 'close_bill_'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

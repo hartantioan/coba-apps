@@ -200,7 +200,7 @@ class CustomHelper {
 		$count = 0;
 
 		foreach($approvalTemplate as $row){
-
+			
 			$source = ApprovalSource::create([
 				'code'			=> strtoupper(uniqid()),
 				'user_id'		=> session('bo_id'),
@@ -219,7 +219,7 @@ class CustomHelper {
 			}
 
 			if($passed == true){
-
+				
 				$count = 0;
 
 				foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
@@ -235,11 +235,14 @@ class CustomHelper {
 						]);
 					}
 					$count++;
+					
 				}
+				
 			}
 		}
-
+		
 		if($count == 0){
+			info($count);
 			DB::table($table_name)->where('id',$table_id)->update([
 				'status'	=> '2'
 			]);

@@ -44,11 +44,7 @@
                             <span class="hide-on-small-onl">Print</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                            <span class="hide-on-small-onl">Excel</span>
-                            <i class="material-icons right">view_list</i>
-                        </a>
+                        
                         
                     </div>
                 </div>
@@ -1438,12 +1434,6 @@
             }
         });
         
-    }
-
-    function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), supplier = $('#filter_supplier').val(), currency = $('#filter_currency').val(), is_tax = $('#filter_is_tax').val(), is_include_tax = $('#filter_is_include_ppn').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type + "&company=" + company + "&is_tax=" + is_tax + "&is_include_tax=" + is_include_tax + "&supplier=" + supplier + "&currency=" + currency;
     }
 
     function viewJournal(id){

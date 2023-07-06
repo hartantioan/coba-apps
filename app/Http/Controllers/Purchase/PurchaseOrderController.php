@@ -2399,7 +2399,10 @@ class PurchaseOrderController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPurchaseOrder($request->search,$request->status,$request->inventory,$request->type,$request->shipping,$request->company,$request->is_tax,$request->is_include_tax,$request->payment,$request->supplier,$request->currency,$this->dataplaces), 'purchase_order_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		
+		return Excel::download(new ExportPurchaseOrder($post_date,$end_date), 'purchase_order_'.uniqid().'.xlsx');
     }
 
     public function removeUsedData(Request $request){

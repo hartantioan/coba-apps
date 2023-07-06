@@ -174,13 +174,19 @@
                     <div class="col s9">
                         {{ $data->user->phone }}
                     </div>
+                    <div class="col s3">
+                        Kas / Bank
+                    </div>
+                    <div class="col s9">
+                        {{ $data->coa_source_id ? $data->coaSource->name : '-' }}
+                    </div>
                 </div>
             </div>
             <div class="col m6 s6">
                 <h6 class="invoice-from">Lain-lain</h6>
                 <div class="row">
                     <div class="col s3">
-                        Bisnis Partner
+                        Partner Bisnis
                     </div>
                     <div class="col s9">
                         {{ $data->account->name }}

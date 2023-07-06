@@ -5,6 +5,7 @@
     position: relative;
     vertical-align: middle;
     min-width: 250px !important;
+    height: 3rem !important;
 }
 .select2 {
     /*width: calc(100% - 45px) !important;*/

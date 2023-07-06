@@ -137,11 +137,7 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4">
-                            <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Auto generate" readonly>
-                            <label class="active" for="code">Kode</label>
-                        </div>
+                        
                         <div class="input-field col s4">
                             <select class="form-control" id="company_id" name="company_id">
                                 @foreach($company as $b)
@@ -157,6 +153,11 @@
                                 @endforeach
                             </select>
                             <label class="" for="currency_id">Mata Uang</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <input type="hidden" id="temp" name="temp">
+                            <input id="code" name="code" type="text" placeholder="Auto generate" readonly>
+                            <label class="active" for="code">Kode</label>
                         </div>
                         <div class="input-field col s4">
                             <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
@@ -362,7 +363,7 @@
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
                             <th class="center-align">Perusahaan</th>
-                            <th class="center-align">Bisnis Partner</th>
+                            <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
                             <th class="center-align">Mesin</th>

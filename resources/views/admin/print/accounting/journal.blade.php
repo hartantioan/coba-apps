@@ -161,7 +161,7 @@
                                         <tr align="center">
                                             <th>Coa</th>
                                             <th>Plant</th>
-											<th>Bisnis Partner</th>
+											<th>Partner Bisnis</th>
                                             <th>Item</th>
                                             <th>Departemen</th>
                                             <th>Gudang</th>

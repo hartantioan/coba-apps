@@ -504,6 +504,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $("select").prop("selectedIndex", 0).trigger('change');
                 M.updateTextFields();
             }
         });

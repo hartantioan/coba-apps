@@ -89,6 +89,7 @@ class PaymentRequestDetail extends Model
             'fund_requests'             => 'Permohonan Dana',
             'purchase_invoices'         => 'A/P Invoice',
             'purchase_down_payments'    => 'AP Down Payment',
+            'coas'                      => 'Coa Biaya',
             default                     => 'Belum ditentukan',
           };
   

@@ -128,10 +128,11 @@ class PaymentRequest extends Model
 
     public function paymentType(){
         $payment_type = match ($this->payment_type) {
-          '1' => 'Tunai',
-          '2' => 'Transfer',
-          '3' => 'Cek',
-          '4' => 'BG',
+          '1'   => 'Tunai',
+          '2'   => 'Transfer',
+          '3'   => 'Cek',
+          '4'   => 'BG',
+          '5'   => 'Rekonsiliasi',
           default => 'Invalid',
         };
 

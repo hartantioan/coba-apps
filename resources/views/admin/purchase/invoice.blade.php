@@ -331,7 +331,7 @@
                                 </div>
                                 <div class="col m12 s12">
                                     <p class="mt-2 mb-2">
-                                        <h5>Detail Down Payment Bisnis Partner</h5>
+                                        <h5>Detail Down Payment Partner Bisnis</h5>
                                         <div style="overflow:auto;">
                                             <table class="bordered">
                                                 <thead>
@@ -692,7 +692,7 @@
                             <th class="center-align">No</th>
                             <th class="center-align">Coa</th>
                             <th class="center-align">Perusahaan</th>
-                            <th class="center-align">Bisnis Partner</th>
+                            <th class="center-align">Partner Bisnis</th>
                             <th class="center-align">Plant</th>
                             <th class="center-align">Line</th>
                             <th class="center-align">Mesin</th>

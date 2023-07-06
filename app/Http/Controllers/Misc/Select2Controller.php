@@ -265,6 +265,9 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->name.' - '.$d->phone.' Pos. '.$d->position->name.' Dep. '.$d->department->name,
+                'limit_credit'  => $d->limit_credit,
+                'count_limit'   => $d->count_limit_credit,
+                'balance_limit' => $d->limit_credit - $d->count_limit_credit,
             ];
         }
 

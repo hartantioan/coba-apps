@@ -668,7 +668,7 @@ class PurchaseOrderController extends Controller
                                 $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
                                 $finalpricedisc3 = $finalpricedisc2 - $disc3;
                 
-                                $rowsubtotal = round($finalpricedisc3 * $qty,3);
+                                $rowsubtotal = round($finalpricedisc3 * $qty,2);
         
                                 $querydetail = PurchaseOrderDetail::create([
                                     'purchase_order_id'             => $query->id,

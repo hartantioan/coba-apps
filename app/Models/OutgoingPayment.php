@@ -32,6 +32,8 @@ class OutgoingPayment extends Model
         'rounding',
         'admin',
         'grandtotal',
+        'payment',
+        'balance',
         'document',
         'note',
         'status',
@@ -94,6 +96,14 @@ class OutgoingPayment extends Model
         $total = $this->getTotalPiutangKaryawan();
         foreach($this->paymentRequestCross as $row){
             $total -= $row->nominal;
+        }
+        return $total;
+    }
+
+    public function totalUsedCross(){
+        $total = 0;
+        foreach($this->paymentRequestCross as $row){
+            $total += $row->nominal;
         }
         return $total;
     }

@@ -122,3 +122,21 @@ td {
 ul.select2-selection__rendered{  
 	white-space: nowrap;
 }
+
+fieldset {
+	border-radius: 25px;
+	padding: 10px !important;
+}
+
+legend {
+	display: table; 
+	min-width: 0px;
+	max-width: 70%;
+	position: relative;
+	margin: auto;
+	padding: 5px 20px;
+	color: #fa1d00;
+	font-size: 20px;
+	text-align: center;
+	font-weight: 800;
+}

@@ -247,7 +247,7 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
-                                            Bisnis Partner
+                                            Partner Bisnis
                                         </td>
                                         <td width="60%">
                                             {{ $data->account->name }}

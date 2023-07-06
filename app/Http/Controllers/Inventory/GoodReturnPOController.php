@@ -950,7 +950,9 @@ class GoodReturnPOController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportGoodReturnPO($request->search,$request->status,$this->dataplaces), 'good_return_po_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportGoodReturnPO($post_date,$end_date), 'good_return_po_'.uniqid().'.xlsx');
     }
     
     public function viewStructureTree(Request $request){

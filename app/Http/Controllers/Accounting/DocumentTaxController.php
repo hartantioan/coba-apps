@@ -269,7 +269,6 @@ class DocumentTaxController extends Controller
     }
 
     public function export(Request $request){
-        $search = $request->search ? $request->search : ''   ;
 		$start_date = $request->start_date ? $request->start_date : ''   ;
         $finish_date = $request->finish_date ? $request->finish_date : ''   ;
         if($start_date!=''){
@@ -281,7 +280,7 @@ class DocumentTaxController extends Controller
         }if($finish_date ==''&&$start_date ==''){
             $filename = 'faktur_masukan_';
         }
-		return Excel::download(new ExportDocumentTax($search,$request->start_date,$request->finish_date),$filename.uniqid().'.xlsx');
+		return Excel::download(new ExportDocumentTax($request->start_date,$request->finish_date),$filename.uniqid().'.xlsx');
     }
 
     public function store_w_barcode(Request $request){

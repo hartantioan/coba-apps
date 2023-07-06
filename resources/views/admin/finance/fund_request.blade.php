@@ -27,11 +27,7 @@
                             <span class="hide-on-small-onl">Print</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                            <span class="hide-on-small-onl">Excel</span>
-                            <i class="material-icons right">view_list</i>
-                        </a>
+                       
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="loadDataTable()">
                             <i class="material-icons hide-on-med-and-up">refresh</i>
                             <span class="hide-on-small-onl">Refresh</span>
@@ -739,14 +735,6 @@
                 })
             }
         });
-    }
-
-    function exportExcel(){
-        var search = window.table.search();
-        var status = $('#filter_status').val();
-        var document = $('#filter_document').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&document=" + document;
     }
 
     function makeTreeOrg(data,link){

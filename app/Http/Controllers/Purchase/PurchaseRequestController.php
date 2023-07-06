@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Purchase;
+use App\Exports\ReportPurchaseRequest;
 use App\Http\Controllers\Controller;
 use App\Models\ApprovalMatrix;
 use App\Models\ApprovalSource;
@@ -447,11 +448,17 @@ class PurchaseRequestController extends Controller
     }
 
     public function export(Request $request){
-        $search = $request->search ? $request->search : '';
-        $status = $request->status ? $request->status : '';
-
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
 		
-		return Excel::download(new ExportPurchaseRequest($search,$status,$this->dataplaces), 'purchase_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseRequest($post_date,$end_date,$this->dataplaces), 'purchase_request_'.uniqid().'.xlsx');
+    }
+
+    public function report(Request $request){
+        $post_date = $request->post_date ? $request->post_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		
+		return Excel::download(new ReportPurchaseRequest($post_date,$end_date,$this->dataplaces), 'purchase_request_'.uniqid().'.xlsx');
     }
 
     public function create(Request $request){

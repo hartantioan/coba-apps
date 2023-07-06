@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Misc;
 use App\Helpers\CustomHelper;
 use App\Models\ApprovalStage;
 use App\Models\CostDistribution;
+use App\Models\Department;
 use App\Models\FundRequest;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
+use App\Models\HardwareItem;
+use App\Models\HardwareItemGroup;
 use App\Models\InventoryTransferOut;
 use App\Models\ItemStock;
 use App\Models\Line;
@@ -16,6 +19,7 @@ use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrderDetail;
+use App\Models\ReceptionHardwareItemsUsage;
 use App\Models\Region;
 use App\Models\Place;
 use App\Models\Warehouse;
@@ -822,7 +826,7 @@ class Select2Controller extends Controller {
 
         return response()->json(['items' => $response]);
     }
-
+ 
     public function equipment(Request $request)
     {
         $response = [];
@@ -904,6 +908,116 @@ class Select2Controller extends Controller {
                 'hasGrandtotal' => $d->hasGrandtotal() ? '1' : '0',
             ];
         }
+        return response()->json(['items' => $response]);
+    }
+
+    public function department(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Department::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.'-'.$d->name,
+            ];
+        }
+        return response()->json(['items' => $response]);
+    }
+
+    public function groupHardwareItem(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = HardwareItemGroup::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.'-'.$d->name,
+            ];
+        }
+        return response()->json(['items' => $response]);
+    }
+
+    public function hardwareItem(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = HardwareItem::where(function($query) use($search){
+                    $query->orWhere('code','like',"%$search%");
+                })
+                ->whereHas('item', function ($query) use ($search) {
+                    $query->where('name','like',"%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.'-'.$d->item->name,
+            ];
+        }
+        return response()->json(['items' => $response]);
+    }
+
+    public function hardwareItemForReception(Request $request)
+    {
+        $response = [];
+        
+        $search   = $request->search;
+        $excludedIds = ReceptionHardwareItemsUsage::pluck('hardware_item_id')->toArray();
+        $data = HardwareItem::where(function ($query) use ($search) {
+                    $query->orWhere('code', 'like', "%$search%");
+                })
+                ->whereHas('item', function ($query) use ($search) {
+                    $query->where('name', 'like', "%$search%");
+                })
+                ->where('status', '1')
+                ->doesntHave('receptionHardwareItemsUsage')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.'-'.$d->item->name,
+            ];
+        }
+        return response()->json(['items' => $response]);
+    }
+
+    public function itemForHardware(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $itemIdsWithConnection = HardwareItem::pluck('item_id')->toArray();
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')
+                ->whereNotIn('id', $itemIdsWithConnection)
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'price_list'        => $d->currentCogs($this->dataplaces),
+                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'list_warehouse'    => $d->warehouseList(),
+            ];
+        }
+
         return response()->json(['items' => $response]);
     }
 

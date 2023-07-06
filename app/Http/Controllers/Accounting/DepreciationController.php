@@ -713,7 +713,9 @@ class DepreciationController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportDepreciation($request->search,$request->status,$this->dataplaces), 'depreciation_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportDepreciation($post_date,$end_date), 'depreciation_'.uniqid().'.xlsx');
     }
     
     public function approval(Request $request,$id){

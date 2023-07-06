@@ -916,7 +916,9 @@ class InventoryTransferOutController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportInventoryTransferOut($request->search,$request->status,$this->dataplaces,$this->datawarehouses), 'inventory_transfer_out_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportInventoryTransferOut($post_date,$end_date), 'inventory_transfer_out_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

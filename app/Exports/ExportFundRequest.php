@@ -5,22 +5,21 @@ namespace App\Exports;
 use App\Models\FundRequest;
 use App\Models\FundRequestDetail;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
-class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search, string $status, string $document, array $dataplaces)
+    public function __construct(string $start_date, string $end_date)
     {
-        $this->search = $search ? $search : '';
-		$this->status = $status ? $status : '';
-        $this->document = $document ? $document : '';
-        $this->dataplaces = $dataplaces ? $dataplaces : [];
+        $this->start_date = $start_date ? $start_date : '';
+		$this->end_date = $end_date ? $end_date : '';
     }
 
     private $headings = [
@@ -50,24 +49,9 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
     public function collection()
     {
         $data = FundRequest::where(function($query) {
-            if($this->search) {
-                $query->where(function($query) {
-                    $query->where('code', 'like', "%$this->search%")
-                        ->orWhere('post_date', 'like', "%$this->search%")
-                        ->orWhere('required_date', 'like', "%$this->search%")
-                        ->orWhere('note', 'like', "%$this->search%");
-                });
-            }
-
-            if($this->status){
-                $query->where('status', $this->status);
-            }
-
-            if($this->document){
-                $query->where('document_status', $this->document);
-            }
+            $query->where('post_date', '>=',$this->start_date)
+            ->where('post_date', '<=', $this->end_date); 
         })
-        ->whereIn('place_id',$this->dataplaces)
         ->get();
 
         $arr = [];

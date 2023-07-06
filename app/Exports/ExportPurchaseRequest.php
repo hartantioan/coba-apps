@@ -5,85 +5,58 @@ namespace App\Exports;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestDetail;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
-class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
+class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection
     */
 
-    public function __construct(string $search, string $status, array $dataplaces)
+    public function __construct(string $start_date, string $end_date, array $dataplaces)
     {
-        $this->search = $search ? $search : '';
-		$this->status = $status ? $status : '';
+        $this->start_date = $start_date ? $start_date : '';
+		$this->end_date = $end_date ? $end_date : '';
         $this->dataplaces = $dataplaces ? $dataplaces : [];
     }
 
     private $headings = [
-        'ID',
-        'PENGGUNA',
-        'KODE',
-        'PENGAJUAN',
-        'KADALUARSA',
-        'DIPAKAI',
-        'KETERANGAN',
-        'STATUS',
-        'ITEM',
-        'QTY',
-        'SATUAN',
-        'CATATAN',
-        'TGL.PAKAI'
+        'No',
+        'Document Number',
+        'WareHouse Code',
+        'Posting Date',
+        'Item Code',
+        'Item Description',
+        'Quantity',
+        'Unit',
+        'Note 1',
+        'Note 2',
     ];
 
     public function collection()
     {
-        $data = PurchaseRequestDetail::whereHas('purchaseRequest', function($query){
-            if ($this->search) {
-                $query->where(function ($query) {
-                    $query->where('code', 'like', "%$this->search%")
-                        ->orWhere('post_date', 'like', "%$this->search%")
-                        ->orWhere('due_date', 'like', "%$this->search%")
-                        ->orWhere('required_date', 'like', "%$this->search%")
-                        ->orWhere('note', 'like', "%$this->search%")
-                        ->orWhereHas('user',function($query){
-                            $query->where('name','like',"%$this->search%")
-                                ->orWhere('employee_no','like',"%$this->search%");
-                        });
-                });
-            }
-            if($this->status){
-                $query->where('status', $this->status);
-            }
-        })->where(function($query){
-            if($this->search){
-                $query->whereHas('item',function($query){
-                    $query->where('code', 'like', "%$this->search%")
-                        ->orWhere('name','like',"%$this->search%");
-                });
-            }
-        })
-        ->get();
+        $data = PurchaseRequestDetail::whereHas('purchaseRequest', function($query) {
+            $query->where('post_date', '>=',$this->start_date)
+                  ->where('post_date', '<=', $this->end_date);
+        })->get();
 
         $arr = [];
 
         foreach($data as $key => $row){
             $arr[] = [
-                'id'            => ($key + 1),
-                'name'          => $row->purchaseRequest->user->name,
-                'code'          => $row->purchaseRequest->code,
-                'post_date'     => $row->purchaseRequest->post_date,
-                'due_date'      => $row->purchaseRequest->due_date,
-                'required_date' => $row->purchaseRequest->required_date,
-                'note'          => $row->purchaseRequest->note,
-                'status'        => $row->purchaseRequest->statusRaw(),
-                'item'          => $row->item->name,
-                'qty'           => $row->qty,
-                'unit'          => $row->item->buyUnit->code,
-                'note_item'     => $row->note,
-                'used_date'     => $row->required_date  
+                'no'                => ($key + 1),
+                'code'              => $row->purchaseRequest->code,
+                'warehouse_code'    => $row->place->code,
+                'post_date'         => $row->purchaseRequest->post_date,
+                'item_code'         => $row->item->code,
+                'item'              => $row->item->name,
+                'qty'               => $row->qty,
+                'unit'              => $row->item->buyUnit->code,
+                'remarks'           => $row->note,
+                'free_text'         => $row->note2,
             ];
         }
 
@@ -92,7 +65,7 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
 
     public function title(): string
     {
-        return 'Laporan Purchase Request';
+        return 'Rekap Purchase Request';
     }
 
     public function startCell(): string

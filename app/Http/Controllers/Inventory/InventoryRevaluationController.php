@@ -712,7 +712,9 @@ class InventoryRevaluationController extends Controller
 
 
     public function export(Request $request){
-		return Excel::download(new ExportInventoryRevaluation($request->search,$request->status,$request->start_date,$request->finish_date,$this->dataplaces,$this->datawarehouses), 'inventory_revaluation_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportInventoryRevaluation($post_date,$end_date), 'inventory_revaluation_'.uniqid().'.xlsx');
     }
 
     public function voidStatus(Request $request){

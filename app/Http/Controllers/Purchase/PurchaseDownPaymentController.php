@@ -1072,7 +1072,9 @@ class PurchaseDownPaymentController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPurchaseDownPayment($request->search,$request->status,$request->type,$request->company,$request->is_tax,$request->is_include_tax,$request->supplier,$request->currency,$this->dataplaces), 'purchase_down_payment_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportPurchaseDownPayment($post_date,$end_date), 'purchase_down_payment_'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

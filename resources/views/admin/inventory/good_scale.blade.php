@@ -39,11 +39,7 @@
                             <span class="hide-on-small-onl">Print</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                            <span class="hide-on-small-onl">Excel</span>
-                            <i class="material-icons right">view_list</i>
-                        </a>
+                       
                     </div>
                 </div>
             </div>
@@ -1898,9 +1894,4 @@
         });
     }
 
-    function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), start_date = $('#start_date').val(), finish_date = $('#finish_date').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&start_date" + start_date + "&finish_date" + finish_date;
-    }
 </script>

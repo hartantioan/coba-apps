@@ -58,11 +58,7 @@
                             <span class="hide-on-small-onl">Print</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                            <span class="hide-on-small-onl">Excel</span>
-                            <i class="material-icons right">view_list</i>
-                        </a>
+                        
                     </div>
                 </div>
             </div>
@@ -2331,12 +2327,6 @@
                 });
             }
         });
-    }
-
-    function exportExcel(){
-        var search = window.table.search(), status = $('#filter_status').val(), vendor = $('#filter_vendor').val(), currency = $('#filter_currency').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&vendor=" + vendor + "&currency=" + currency;
     }
 
     function removeUsedData(type,id){

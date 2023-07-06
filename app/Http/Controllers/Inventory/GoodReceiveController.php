@@ -868,7 +868,9 @@ class GoodReceiveController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportGoodReceive($request->search,$request->status,$this->dataplaces), 'good_receive_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportGoodReceive($post_date,$end_date), 'good_receive_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

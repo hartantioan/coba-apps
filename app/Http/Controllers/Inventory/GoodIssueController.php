@@ -832,7 +832,9 @@ class GoodIssueController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportGoodIssue($request->search,$request->status,$this->dataplaces), 'good_issue_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportGoodIssue($post_date,$end_date), 'good_issue_'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

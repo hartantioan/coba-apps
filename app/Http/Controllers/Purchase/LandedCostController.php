@@ -1335,7 +1335,10 @@ class LandedCostController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportLandedCost($request->search,$request->status,$request->vendor,$request->currency,$this->dataplaces), 'landed_cost'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		
+		return Excel::download(new ExportLandedCost($post_date,$end_date), 'landed_cost'.uniqid().'.xlsx');
     }
     
     public function removeUsedData(Request $request){

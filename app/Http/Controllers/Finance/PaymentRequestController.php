@@ -1210,7 +1210,9 @@ class PaymentRequestController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportPaymentRequest($request->search,$request->status,$request->company,$request->account,$request->currency,$this->dataplaces), 'payment_request'.uniqid().'.xlsx');
+        $post_date = $request->start_date ? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportPaymentRequest($post_date,$end_date), 'payment_request'.uniqid().'.xlsx');
     }
     
     public function approval(Request $request,$id){
@@ -1459,6 +1461,7 @@ class PaymentRequestController extends Controller
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$fr;
+       
         $data_id_dp=[];
         $data_id_po = [];
         $data_id_gr = [];
@@ -1468,6 +1471,8 @@ class PaymentRequestController extends Controller
         $data_id_greturns=[];
         $data_id_pr=[];
         $data_id_memo=[];
+
+        $data_id_pyrs[]=$query->id;
         
         if($query) {
 

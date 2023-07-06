@@ -835,7 +835,9 @@ class OutgoingPaymentController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportOutgoingPayment($request->search,$request->status,$request->company,$request->account,$request->currency,$this->dataplaces), 'outgoing_payment'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportOutgoingPayment($post_date,$end_date), 'outgoing_payment'.uniqid().'.xlsx');
     }
 
     public function viewStructureTree(Request $request){

@@ -1062,7 +1062,9 @@ class GoodReceiptPOController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportGoodReceipt($request->search,$request->status,$this->dataplaces), 'good_receipt_'.uniqid().'.xlsx');
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportGoodReceipt($post_date,$end_date), 'good_receipt_'.uniqid().'.xlsx');
     }
     
     public function viewStructureTree(Request $request){

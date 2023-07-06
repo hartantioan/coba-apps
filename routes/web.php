@@ -1,12 +1,23 @@
 <?php
 
+use App\Http\Controllers\Accounting\AccountingReportController;
+use App\Http\Controllers\Finance\FinanceReportController;
 use App\Http\Controllers\Inventory\GoodScaleController;
+
+use App\Http\Controllers\Inventory\InventoryReportController;
+use App\Http\Controllers\MasterData\HardwareItemDetailController;
+use App\Http\Controllers\MasterData\HardwareItemGroupController;
+use App\Http\Controllers\Purchase\PurchaseReportController;
+use App\Http\Controllers\Usage\ReceptionHardwareItemUsageController;
+use App\Http\Controllers\Usage\ReturnHardwareItemUsageController;
+use App\Http\Controllers\Usage\RequestRepairHardwareItemUsageController;
+use App\Http\Controllers\Usage\MaintenanceHardwareItemUsageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
 
 use App\Http\Controllers\Personal\ChatController;
-
+use App\Http\Controllers\MasterData\HardwareItemController;
 use App\Http\Controllers\MasterData\ItemController;
 use App\Http\Controllers\MasterData\ItemGroupController;
 use App\Http\Controllers\MasterData\UserController;
@@ -161,8 +172,13 @@ Route::prefix('admin')->group(function () {
                 Route::get('cost_distribution', [Select2Controller::class, 'costDistribution']);
                 Route::get('line', [Select2Controller::class, 'line']);
                 Route::get('item_transfer', [Select2Controller::class, 'itemTransfer']);
+                Route::get('hardware_item_group', [Select2Controller::class, 'groupHardwareItem']);
+                Route::get('hardware_item', [Select2Controller::class, 'hardwareItem']);
+                Route::get('hardware_item_for_reception', [Select2Controller::class, 'hardwareItemForReception']);
+                Route::get('item_for_hardware_item', [Select2Controller::class, 'itemForHardware']);
                 Route::get('inventory_transfer_out', [Select2Controller::class, 'inventoryTransferOut']);
                 Route::get('item_stock', [Select2Controller::class, 'itemStock']);
+                Route::get('department', [Select2Controller::class, 'department']);
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
             });
@@ -452,6 +468,38 @@ Route::prefix('admin')->group(function () {
                     });
                 });
 
+                Route::prefix('master_hardware')->group(function () {
+                    Route::prefix('hardware_item')->middleware('operation.access:hardware_item,view')->group(function () {
+                        Route::get('/',[HardwareItemController::class, 'index']);
+                        Route::get('datatable',[HardwareItemController::class, 'datatable']);
+                        Route::get('row_detail',[HardwareItemController::class, 'rowDetail']);
+                        Route::post('show', [HardwareItemController::class, 'show']);
+                        Route::post('print_barcode',[HardwareItemController::class, 'printBarcode']);
+                        Route::post('history_usage',[HardwareItemController::class, 'historyUsage']);
+                        Route::get('export',[HardwareItemController::class, 'export']);
+                        Route::post('create',[HardwareItemController::class, 'create'])->middleware('operation.access:hardware_item,update');
+                        Route::post('destroy', [HardwareItemController::class, 'destroy'])->middleware('operation.access:hardware_item,delete');
+                    });
+                    
+                    Route::prefix('hardware_item_detail')->middleware('operation.access:hardware_item_detail,view')->group(function () {
+                        Route::get('/',[HardwareItemDetailController::class, 'index']);
+                        Route::get('datatable',[HardwareItemDetailController::class, 'datatable']);
+                        Route::post('show', [HardwareItemDetailController::class, 'show']);
+                        Route::post('create',[HardwareItemDetailController::class, 'create'])->middleware('operation.access:allowance,update');
+                        Route::post('destroy', [HardwareItemDetailController::class, 'destroy'])->middleware('operation.access:allowance,delete');
+                    });
+
+                    Route::prefix('hardware_item_group')->middleware('operation.access:hardware_item_group,view')->group(function () {
+                        Route::get('/',[HardwareItemGroupController::class, 'index']);
+                        Route::get('datatable',[HardwareItemGroupController::class, 'datatable']);
+                        Route::post('show', [HardwareItemGroupController::class, 'show']);
+                        Route::post('create',[HardwareItemGroupController::class, 'create'])->middleware('operation.access:allowance,update');
+                        Route::post('destroy', [HardwareItemGroupController::class, 'destroy'])->middleware('operation.access:allowance,delete');
+                    });
+
+
+                });
+
                 Route::prefix('master_accounting')->group(function () {
                     Route::prefix('coa')->middleware('operation.access:coa,view')->group(function () {
                         Route::get('/',[CoaController::class, 'index']);
@@ -652,6 +700,78 @@ Route::prefix('admin')->group(function () {
                 });
             });
 
+            Route::prefix('usage')->middleware('direct.access')->group(function () {
+                Route::prefix('reception_hardware_items_usages')->middleware('operation.access:reception_hardware_items_usages,view')->group(function () {
+                    Route::get('/',[ReceptionHardwareItemUsageController::class, 'index']);
+                    Route::get('datatable',[ReceptionHardwareItemUsageController::class, 'datatable']);
+                    Route::post('create',[ReceptionHardwareItemUsageController::class, 'create'])->middleware('operation.access:reception_hardware_items_usages,update');
+                    Route::post('show', [ReceptionHardwareItemUsageController::class, 'show']);
+                    Route::get('row_detail',[ReceptionHardwareItemUsageController::class, 'rowDetail']);
+                    Route::get('export',[ReceptionHardwareItemUsageController::class, 'export']);
+                    Route::get('viewstructuretree',[ReceptionHardwareItemUsageController::class, 'viewStructureTree']);
+                    Route::get('fetch_storage',[ReceptionHardwareItemUsageController::class, 'fetchStorage']);
+                    Route::post('save_targeted',[ReceptionHardwareItemUsageController::class, 'saveTargeted']);
+                    Route::post('diversion',[ReceptionHardwareItemUsageController::class, 'diversion']);
+                    Route::post('delete_attachment',[ReceptionHardwareItemUsageController::class, 'deleteAttachment']);
+                    Route::post('print',[ReceptionHardwareItemUsageController::class, 'print']);
+                    Route::post('save_user',[ReceptionHardwareItemUsageController::class, 'saveUser']);
+                    Route::post('get_pic',[ReceptionHardwareItemUsageController::class, 'getPIC']);
+                    Route::get('approval/{id}',[ReceptionHardwareItemUsageController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ReceptionHardwareItemUsageController::class, 'voidStatus'])->middleware('operation.access:reception_hardware_items_usages,void');
+                    Route::post('destroy', [ReceptionHardwareItemUsageController::class, 'destroy'])->middleware('operation.access:reception_hardware_items_usages,delete');
+                });
+
+                Route::prefix('return_hardware_items_usages')->middleware('operation.access:return_hardware_items_usages,view')->group(function () {
+                    Route::get('/',[ReturnHardwareItemUsageController::class, 'index']);
+                    Route::post('store_w_barcode', [ReturnHardwareItemUsageController::class, 'store_w_barcode'])->middleware('operation.access:return_hardware_items_usages,update');
+                    Route::get('datatable',[ReturnHardwareItemUsageController::class, 'datatable']);
+                    Route::post('diversion', [ReturnHardwareItemUsageController::class, 'diversion']);
+                    Route::post('create',[ReturnHardwareItemUsageController::class, 'create'])->middleware('operation.access:return_hardware_items_usages,update');
+                    Route::post('show', [ReturnHardwareItemUsageController::class, 'show']);
+                    Route::get('row_detail',[ReturnHardwareItemUsageController::class, 'rowDetail']);
+                    Route::get('viewstructuretree',[ReturnHardwareItemUsageController::class, 'viewStructureTree']);
+                    Route::get('export',[ReturnHardwareItemUsageController::class, 'export']);
+                    Route::post('print',[ReturnHardwareItemUsageController::class, 'print']);
+                    Route::get('approval/{id}',[ReturnHardwareItemUsageController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ReturnHardwareItemUsageController::class, 'voidStatus'])->middleware('operation.access:return_hardware_items_usages,void');
+                    Route::post('destroy', [ReturnHardwareItemUsageController::class, 'destroy'])->middleware('operation.access:return_hardware_items_usages,delete');
+                });
+
+                Route::prefix('maintenance_hardware_items_usages')->middleware('operation.access:maintenance_hardware_items_usages,view')->group(function () {
+                    Route::get('/',[MaintenanceHardwareItemUsageController::class, 'index']);
+                    Route::get('datatable',[MaintenanceHardwareItemUsageController::class, 'datatable']);
+                    Route::get('datatable_request',[MaintenanceHardwareItemUsageController::class, 'datatableRequest']);
+                    Route::get('row_detail',[MaintenanceHardwareItemUsageController::class, 'rowDetail']);
+                    Route::post('show', [MaintenanceHardwareItemUsageController::class, 'show']);
+                    Route::post('show_request', [MaintenanceHardwareItemUsageController::class, 'showRequest']);
+                    Route::post('print',[MaintenanceHardwareItemUsageController::class, 'print']);
+                    Route::post('history_usage',[MaintenanceHardwareItemUsageController::class, 'historyUsage']);
+                    Route::get('export',[MaintenanceHardwareItemUsageController::class, 'export']);
+                    Route::post('get_decode',[MaintenanceHardwareItemUsageController::class, 'getDecode']);
+                    Route::post('delete_attachment',[MaintenanceHardwareItemUsageController::class, 'deleteAttachment']);
+                    Route::post('create',[MaintenanceHardwareItemUsageController::class, 'create'])->middleware('operation.access:maintenance_hardware_items_usages,update');
+                    Route::post('destroy', [MaintenanceHardwareItemUsageController::class, 'destroy'])->middleware('operation.access:maintenance_hardware_items_usages,delete');
+                    Route::get('approval/{id}',[MaintenanceHardwareItemUsageController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MaintenanceHardwareItemUsageController::class, 'voidStatus'])->middleware('operation.access:request_repair_hardware_items_usages,void');
+                });
+
+                Route::prefix('request_repair_hardware_items_usages')->middleware('operation.access:request_repair_hardware_items_usages,view')->group(function () {
+                    Route::get('/',[RequestRepairHardwareItemUsageController::class, 'index']);
+                    Route::get('datatable',[RequestRepairHardwareItemUsageController::class, 'datatable']);
+                    Route::get('row_detail',[RequestRepairHardwareItemUsageController::class, 'rowDetail']);
+                    Route::post('show', [RequestRepairHardwareItemUsageController::class, 'show']);
+                    Route::post('print',[RequestRepairHardwareItemUsageController::class, 'print']);
+                    Route::post('history_usage',[RequestRepairHardwareItemUsageController::class, 'historyUsage']);
+                    Route::get('export',[RequestRepairHardwareItemUsageController::class, 'export']);
+                    Route::post('get_decode',[RequestRepairHardwareItemUsageController::class, 'getDecode']);
+                    Route::post('delete_attachment',[RequestRepairHardwareItemUsageController::class, 'deleteAttachment']);
+                    Route::post('create',[RequestRepairHardwareItemUsageController::class, 'create'])->middleware('operation.access:request_repair_hardware_items_usages,update');
+                    Route::post('destroy', [RequestRepairHardwareItemUsageController::class, 'destroy'])->middleware('operation.access:request_repair_hardware_items_usages,delete');
+                    Route::get('approval/{id}',[RequestRepairHardwareItemUsageController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [RequestRepairHardwareItemUsageController::class, 'voidStatus'])->middleware('operation.access:request_repair_hardware_items_usages,void');
+                });
+            });
+
             Route::prefix('purchase')->middleware('direct.access')->group(function () {
                 Route::prefix('purchase_request')->middleware('operation.access:purchase_request,view')->group(function () {
                     Route::get('/',[PurchaseRequestController::class, 'index']);
@@ -667,6 +787,12 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [PurchaseRequestController::class, 'voidStatus'])->middleware('operation.access:purchase_request,void');
                     Route::get('approval/{id}',[PurchaseRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseRequestController::class, 'destroy'])->middleware('operation.access:purchase_request,delete');
+                });
+
+                Route::prefix('purchase_report')->middleware('direct.access')->group(function () {
+                    Route::prefix('purchase_recap')->middleware('operation.access:purchase_recap,view')->group(function () {
+                    Route::get('/',[PurchaseReportController::class, 'index']);
+                    });
                 });
 
                 Route::prefix('purchase_order')->middleware('operation.access:purchase_order,view')->group(function () {
@@ -768,6 +894,8 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('inventory')->middleware('direct.access')->group(function () {
+
+
                 Route::prefix('good_scale')->middleware('operation.access:good_scale,view')->group(function () {
                     Route::get('/',[GoodScaleController::class, 'index']);
                     Route::get('datatable',[GoodScaleController::class, 'datatable']);
@@ -912,6 +1040,12 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [InventoryRevaluationController::class, 'voidStatus'])->middleware('operation.access:revaluation,void');
                     Route::post('destroy', [InventoryRevaluationController::class, 'destroy'])->middleware('operation.access:revaluation,delete');
                 });
+
+                Route::prefix('inventory_report')->middleware('direct.access')->group(function () {
+                    Route::prefix('inventory_recap')->middleware('operation.access:inventory_recap,view')->group(function () {
+                    Route::get('/',[InventoryReportController::class, 'index']);
+                    });
+                });
             });
 
             Route::prefix('finance')->middleware('direct.access')->group(function () {
@@ -929,6 +1063,12 @@ Route::prefix('admin')->group(function () {
                     Route::post('update_document_status',[FundRequestController::class, 'updateDocumentStatus'])->middleware('operation.access:fund_request,update');
                     Route::post('void_status', [FundRequestController::class, 'voidStatus'])->middleware('operation.access:fund_request,void');
                     Route::get('approval/{id}',[FundRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                });
+
+                Route::prefix('finance_report')->middleware('direct.access')->group(function () {
+                    Route::prefix('finance_recap')->middleware('operation.access:finance_recap,view')->group(function () {
+                    Route::get('/',[FinanceReportController::class, 'index']);
+                    });
                 });
 
                 Route::prefix('payment_request')->middleware('operation.access:payment_request,view')->group(function () {
@@ -1089,6 +1229,12 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[JournalController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [JournalController::class, 'voidStatus'])->middleware('operation.access:journal,void');
                     Route::post('destroy', [JournalController::class, 'destroy'])->middleware('operation.access:journal,delete');
+                });
+
+                Route::prefix('accounting_report')->middleware('direct.access')->group(function () {
+                    Route::prefix('accounting_recap')->middleware('operation.access:accounting_recap,view')->group(function () {
+                    Route::get('/',[AccountingReportController::class, 'index']);
+                    });
                 });
             });
         });

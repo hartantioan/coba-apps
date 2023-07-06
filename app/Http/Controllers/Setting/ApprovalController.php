@@ -355,7 +355,7 @@ class ApprovalController extends Controller
         } else {
             $work_orders_rp = 0;
             $query = ApprovalMatrix::where('code',CustomHelper::decrypt($request->temp))->where('status','1')->first();
-			
+			info($query);
             if($query->approvalSource->lookable_type == 'work_orders'){
                 if($query->approvalSource->lookable->requestSparepartALL()->exists()){
                     foreach($query->approvalSource->lookable->requestSparepartALL as $row){
@@ -427,6 +427,12 @@ class ApprovalController extends Controller
                                 }else{
                                     if($query->checkOtherApproval()){
                                         $pr = $query->approvalSource->lookable;
+                                        if($query->lookable_type == 'maintenance_hardware_items_usages'){
+                                            $requestRepair = $query->approvalSource->lookable->requestRepairHardwareItemUsage;
+                                            $requestRepair->update([
+                                                'status'    => '7'
+                                            ]);
+                                        }
                                         $pr->update([
                                             'status'    => '2'
                                         ]);

@@ -60,6 +60,8 @@ class AppServiceProvider extends ServiceProvider
             'incoming_payments'             => 'App\Models\IncomingPayment',
             'inventory_transfer_out_details'=> 'App\Models\InventoryTransferOutDetail',
             'good_scales'                   => 'App\Models\GoodScale',
+            'request_repair_hardware_items_usages' => 'App\Models\RequestRepairHardwareItemsUsage',
+            'maintenance_hardware_items_usages'=> 'App\Models\MaintenanceHardwareItemsUsage',
         ]);
     }
 }

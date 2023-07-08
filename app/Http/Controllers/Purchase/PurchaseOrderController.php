@@ -669,6 +669,9 @@ class PurchaseOrderController extends Controller
                                 $finalpricedisc3 = $finalpricedisc2 - $disc3;
                 
                                 $rowsubtotal = round($finalpricedisc3 * $qty,2);
+
+                                $tax = round(($request->arr_tax[$key] / 100) * $rowsubtotal,2);
+                                $wtax = round(($request->arr_wtax[$key] / 100) * $rowsubtotal,2);
         
                                 $querydetail = PurchaseOrderDetail::create([
                                     'purchase_order_id'             => $query->id,
@@ -681,6 +684,9 @@ class PurchaseOrderController extends Controller
                                     'percent_discount_2'            => $disc2,
                                     'discount_3'                    => $disc3,
                                     'subtotal'                      => $rowsubtotal,
+                                    'tax'                           => $tax,
+                                    'wtax'                          => $wtax,
+                                    'grandtotal'                    => $rowsubtotal + $tax - $wtax,
                                     'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                                     'note2'                         => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
                                     'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
@@ -720,7 +726,10 @@ class PurchaseOrderController extends Controller
                                 $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
                                 $finalpricedisc3 = $finalpricedisc2 - $disc3;
                 
-                                $rowsubtotal = round($finalpricedisc3 * $qty,3);
+                                $rowsubtotal = round($finalpricedisc3 * $qty,2);
+
+                                $tax = round(($request->arr_tax[$key] / 100) * $rowsubtotal,2);
+                                $wtax = round(($request->arr_wtax[$key] / 100) * $rowsubtotal,2);
         
                                 $querydetail = PurchaseOrderDetail::create([
                                     'purchase_order_id'             => $query->id,
@@ -731,6 +740,9 @@ class PurchaseOrderController extends Controller
                                     'percent_discount_2'            => $disc2,
                                     'discount_3'                    => $disc3,
                                     'subtotal'                      => $rowsubtotal,
+                                    'tax'                           => $tax,
+                                    'wtax'                          => $wtax,
+                                    'grandtotal'                    => $rowsubtotal + $tax - $wtax,
                                     'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                                     'note2'                         => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
                                     'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,

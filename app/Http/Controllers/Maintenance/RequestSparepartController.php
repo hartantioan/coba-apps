@@ -288,16 +288,9 @@ class RequestSparepartController extends Controller
                     
                     try {
                         foreach($request->arr_code as $key => $row){
-                            $code = CustomHelper::decrypt($request->arr_code[$key]);
-                            
-                           
-                                
+                            $code = CustomHelper::decrypt($request->arr_code[$key]); 
                                 
                                 $idDetail = EquipmentSparepart::where('code',$code)->first()->id;
-                                info($request->arr_stock[$key]);
-                            
-                                
-                            
                                 
                                 RequestSparepartDetail::create([
                                     'request_sparepart_id'          => $query->id,

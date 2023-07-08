@@ -81,10 +81,19 @@ class PurchaseInvoiceDetail extends Model
     {
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
-    
-    public function landedCost()
+
+    public function coa()
     {
-        if($this->lookable_type == 'landed_costs'){
+        if($this->lookable_type == 'coas'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    public function landedCostDetail()
+    {
+        if($this->lookable_type == 'landed_cost_details'){
             return true;
         }else{
             return false;
@@ -100,7 +109,7 @@ class PurchaseInvoiceDetail extends Model
     }
 
     public function purchaseOrderDetail(){
-        if($this->lookable_type == 'purchase_orders_details'){
+        if($this->lookable_type == 'purchase_order_details'){
             return true;
         }else{
             return false;

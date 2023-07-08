@@ -295,7 +295,7 @@
                                                             <select class="browser-default" id="arr_fee_tax{{ $row->id }}" name="arr_fee_tax[]" onchange="countEach({{ $row->id }});">
                                                                 <option value="0" data-id="0">-- Non-PPN --</option>
                                                                 @foreach ($tax as $row1)
-                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code }}</option>
+                                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->code.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </td>
@@ -306,7 +306,7 @@
                                                             <select class="browser-default" id="arr_fee_wtax{{ $row->id }}" name="arr_fee_wtax[]" onchange="countEach({{ $row->id }});">
                                                                 <option value="0" data-id="0">-- Non-PPh --</option>
                                                                 @foreach ($wtax as $row2)
-                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code }}</option>
+                                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->code.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </td>
@@ -1673,11 +1673,11 @@
                     );
                 }
             }
-            rowtax = rowtotal * (rowpercenttax / 100);
+            rowtax = Math.floor(rowtotal * (rowpercenttax / 100));
         }
 
         if(rowpercentwtax !== 0){
-            rowwtax = rowtotal * (rowpercentwtax / 100);
+            rowwtax = Math.floor(rowtotal * (rowpercentwtax / 100));
         }
 
         rowgrandtotal = rowtotal + rowtax - rowwtax;

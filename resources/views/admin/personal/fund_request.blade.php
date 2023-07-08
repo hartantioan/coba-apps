@@ -135,6 +135,7 @@
                         <div class="row">
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
+                                <input type="hidden" id="tempLimit" value="0">
                                 <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
                                 <label class="active" for="account_id">Partner Bisnis</label>
                             </div>
@@ -194,6 +195,9 @@
                                     <option value="4">BG</option>
                                 </select>
                                 <label class="" for="payment_type">Tipe Pembayaran</label>
+                            </div>
+                            <div class="input-field col m3 s12 right-align">
+                                <h6>Limit BS : <b><span id="limit">0,00</span></b></h6>
                             </div>
                             <div class="col m12">
                                 <h6>Rekening (Jika transfer)</h6>
@@ -325,7 +329,6 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
-        
 
         loadDataTable();
 
@@ -362,6 +365,8 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#tempLimit').val('0');
+                $('#limit').text('0,00');
                 M.updateTextFields();
                 $('#project_id,#warehouse_id').empty();
                 $('.row_item').remove();
@@ -578,6 +583,10 @@
                     success: function(response) {
                         loadingClose('.modal-content');
                         $('#user_bank_id').empty();
+                        $('#tempLimit').val($('#account_id').select2('data')[0].balance_limit);
+                        $('#limit').text(
+                            formatRupiahIni($('#account_id').select2('data')[0].balance_limit.toString().replace('.',','))
+                        );
                         if(response.banks.length > 0){
                             $('#user_bank_id').append(`
                                 <option value="">--Pilih dari daftar-</option>
@@ -607,6 +616,8 @@
                     }
                 });
             }else{
+                $('#limit').text('0,00');
+                $('#tempLimit').val('0');
                 swal({
                     title: 'Ups! Sisa limit BS adalah ' + $('#account_id').select2('data')[0].balance_limit,
                     text: 'Maaf Partner Bisnis tidak bisa ditambahkan.',
@@ -619,6 +630,8 @@
                 `);
             }
         }else{
+            $('#limit').text('0,00');
+            $('#tempLimit').val('0');
             $('.row_item').remove();
             $('#user_bank_id').empty().append(`
                 <option value="">--Pilih Partner Bisnis-</option>
@@ -664,70 +677,83 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]);
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
+                var formData = new FormData($('#form_data')[0]), passedLimit = true, limit = parseFloat($('#tempLimit').val()), grandtotal = parseFloat($('#grandtotal').val().replaceAll(".", "").replaceAll(",","."));
 
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
+                if(grandtotal > limit){
+                    passedLimit = false;
+                }
+
+                if(passedLimit){
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
                                 });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
                             });
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+                    });
+                }else{
+                    swal({
+                        title: 'Ups! Maaf.',
+                        text: 'Nominal grandtotal melebihi batas nominal pengajuan BS.',
+                        icon: 'warning'
+                    });
+                }
             }
         });
     }

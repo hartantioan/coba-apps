@@ -95,7 +95,7 @@ class PaymentRequest extends Model
 
     public function outgoingPayment()
     {
-        return $this->hasOne('App\Models\OutgoingPayment', 'payment_request_id', 'id');
+        return $this->hasOne('App\Models\OutgoingPayment', 'payment_request_id', 'id')->whereIn('status',['2','3']);
     }
 
     public function status(){

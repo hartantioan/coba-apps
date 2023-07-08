@@ -944,7 +944,7 @@ class FundRequestController extends Controller
                             'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                             'tax'                   => $request->arr_tax[$key],
                             'wtax'                  => $request->arr_wtax[$key],
-                            'grandtotal'            => $request->arr_grandtotal[$key],
+                            'grandtotal'            => round($request->arr_grandtotal[$key],2),
                         ]);
                     }
                     DB::commit();

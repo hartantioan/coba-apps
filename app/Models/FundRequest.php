@@ -265,4 +265,15 @@ class FundRequest extends Model
 
         return $hasRelation;
     }
+
+    public function addLimitCreditEmployee($nominal){
+        $user = User::find($this->account_id);
+        $user->count_limit_credit = $user->count_limit_credit + $nominal;
+        $user->save();
+    }
+    public function removeLimitCreditEmployee($nominal){
+        $user = User::find($this->account_id);
+        $user->count_limit_credit = $user->count_limit_credit - $nominal;
+        $user->save();
+    }
 }

@@ -242,7 +242,6 @@ class CustomHelper {
 		}
 		
 		if($count == 0){
-			info($count);
 			DB::table($table_name)->where('id',$table_id)->update([
 				'status'	=> '2'
 			]);

@@ -174,7 +174,7 @@
                                     <h6>Plant & Gudang Asal</h6>
                                 </p>
                                 <div class="input-field col m6 s12">
-                                    <select class="browser-default" id="place_from" name="place_from" onchange="resetItem()">
+                                    <select class="browser-default" id="place_from" name="place_from" onchange="resetItem();">
                                         @foreach ($place as $rowplace)
                                             <option value="{{ $rowplace->id }}">{{ $rowplace->code.' - '.$rowplace->name }}</option>
                                         @endforeach
@@ -182,7 +182,8 @@
                                     <label class="active" for="place_from">Plant</label>
                                 </div>
                                 <div class="input-field col m6 s12">
-                                    <select class="browser-default" id="warehouse_from" name="warehouse_from" onchange="resetItem()">
+                                    <select class="browser-default" id="warehouse_from" name="warehouse_from" onchange="resetItem();">
+                                        <option value="">--Pilih gudang--</option>
                                         @foreach ($warehouse as $rowwarehouse)
                                             <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->code.' - '.$rowwarehouse->name }}</option>
                                         @endforeach
@@ -204,8 +205,9 @@
                                 </div>
                                 <div class="input-field col m6 s12">
                                     <select class="browser-default" id="warehouse_to" name="warehouse_to">
+                                        <option value="">--Pilih gudang--</option>
                                         @foreach ($warehouse as $rowwarehouse)
-                                            <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->code.' - '.$rowwarehouse->name }}</option>
+                                            <option value="{{ $rowwarehouse->id }}" disabled>{{ $rowwarehouse->code.' - '.$rowwarehouse->name }}</option>
                                         @endforeach
                                     </select>
                                     <label class="active" for="warehouse_to">Gudang</label>
@@ -220,7 +222,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
-                                                    <th class="center">Ambil Dari</th>
+                                                    <th class="center">Ambil Dari (Stok saat ini)</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
                                                     <th class="center">Keterangan</th>
@@ -433,8 +435,6 @@
             width: '100%',
         });
 
-        
-
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
             
@@ -562,7 +562,7 @@
     }
 
     function cekRow(val){
-        var qtystock = 0, balance = 0, stockinput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
+        /* var qtystock = 0, balance = 0, stockinput = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
         if($('#arr_item_stock' + val).val()){
             qtystock = parseFloat($('#arr_item_stock' + val).find(':selected').data('qty').replaceAll(".", "").replaceAll(",","."));
         }
@@ -574,10 +574,23 @@
                 html: 'Maaf, stock yang anda masukkan lebih dari stok yang ada pada gudang.'
             });
             $('#rowQty' + val).val(formatRupiahIni(qtystock.toFixed(2).toString().replace('.',',')));
+        } */
+    }
+
+    function resetWarehouseTo(){
+        $("#warehouse_to > option").each(function(){
+            if($(this).attr('value') !== ''){
+                $(this).prop("disabled",true);
+            }
+        });
+        if($('#warehouse_from').val()){
+            $("#warehouse_to option:contains('" + $('#warehouse_from').val() + "')").prop("disabled",false);
+            $('#warehouse_to').val($('#warehouse_from').val());
         }
     }
 
     function resetItem(){
+        resetWarehouseTo();
         $('select[name^="arr_itemkuy"]').each(function(){
             $(this).empty().trigger('change');
         });
@@ -887,6 +900,7 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_from').val(response.place_from);
                 $('#warehouse_from').val(response.warehouse_from);
+                resetWarehouseTo();
                 $('#place_to').val(response.place_to);
                 $('#warehouse_to').val(response.warehouse_to);
                 $('#note').val(response.note);

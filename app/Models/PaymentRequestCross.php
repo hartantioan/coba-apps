@@ -46,4 +46,38 @@ class PaymentRequestCross extends Model
   
           return $type;
     }
+
+    public function addLimitCreditEmployee(){
+        $op = $this->lookable;
+        $totalused = $this->nominal;
+        $totaloutgoing = $op->getTotalPiutangKaryawan();
+        foreach($op->paymentRequest->paymentRequestDetail as $row){
+            if($row->fundRequest()){
+                $bobot = $row->nominal / $totaloutgoing;
+                $total = $bobot * $totalused;
+                if($bobot > 0 && $total > 0){
+                    $user = User::find($row->lookable->account_id);
+                    $user->count_limit_credit = $user->count_limit_credit + $total;
+                    $user->save();
+                }
+            }
+        }
+    }
+
+    public function removeLimitCreditEmployee(){
+        $op = $this->lookable;
+        $totalused = $this->nominal;
+        $totaloutgoing = $op->getTotalPiutangKaryawan();
+        foreach($op->paymentRequest->paymentRequestDetail as $row){
+            if($row->fundRequest()){
+                $bobot = $row->nominal / $totaloutgoing;
+                $total = $bobot * $totalused;
+                if($bobot > 0 && $total > 0){
+                    $user = User::find($row->lookable->account_id);
+                    $user->count_limit_credit = $user->count_limit_credit - $total;
+                    $user->save();
+                }
+            }
+        }
+    }
 }

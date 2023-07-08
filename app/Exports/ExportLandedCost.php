@@ -53,8 +53,6 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
 
         foreach($data as $key => $row){
 
-            info($row->landedCost->supplier);
-
             if($row->landedCost->supplier()->exists()){
                 $arr[] = [
                     'id'            => ($key + 1),

@@ -1312,7 +1312,7 @@ class Select2Controller extends Controller {
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'price_list'        => $d->currentCogs($this->dataplaces),
-                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'stock_list'        => $d->currentStockPlaceWarehouse($place,$warehouse),
                 'list_warehouse'    => $d->warehouseList(),
             ];
         }
@@ -1393,7 +1393,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
-                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
+                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' Item '.$d->item->name.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
                 'qty'               => $d->qty,
             ];
         }

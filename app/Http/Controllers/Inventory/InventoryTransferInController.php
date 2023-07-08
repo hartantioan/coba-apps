@@ -795,7 +795,6 @@ class InventoryTransferInController extends Controller
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
 
-            info($pr);
             $data = [
                 'title'     => 'Inventory Transfer Out',
                 'data'      => $pr

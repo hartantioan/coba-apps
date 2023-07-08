@@ -169,7 +169,7 @@
                                         <table class="bordered" style="width:100%;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center">Stok Item</th>
+                                                    <th class="center">Stok Item (Stok saat ini)</th>
                                                     <th class="center">Qty</th>
                                                     <th class="center">Keterangan</th>
                                                     <th class="center">Coa Debit</th>
@@ -636,14 +636,14 @@
                     $('#tempQty' + val).val(
                         $('#arr_item_stock' + val).select2('data')[0].qty ? $('#arr_item_stock' + val).select2('data')[0].qty : $('#tempQty' + val).val()
                     );
-                    let max = parseFloat($('#tempQty' + val).val());
+                    /* let max = parseFloat($('#tempQty' + val).val());
                     let qty = parseFloat($('#rowQty' + val).val().replaceAll(".", "").replaceAll(",","."));
 
                     if(qty > max){
                         $('#rowQty' + val).val(
                             formatRupiahIni(max.toString().replace('.',','))
                         );
-                    }
+                    } */
                 }
             }else{
                 $('#tempQty' + val).val('0');

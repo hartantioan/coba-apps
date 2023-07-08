@@ -8,6 +8,11 @@
                         <ul class="search-list collection display-none"></ul>
                     </div>
                     <ul class="navbar-list right">
+                        <li class="tooltipped" data-position="bottom" data-tooltip="Menu">
+                            <a class="waves-effect waves-block waves-light" href="{{ url('admin/menu') }}" style="line-height: 1;">
+                                <i class="material-icons approve-icon">dashboard</i>
+                            </a>
+                        </li>
                         <li class="hide-on-med-and-down tooltipped" data-position="bottom" data-tooltip="Full screen">
                             <a class="waves-effect waves-block waves-light toggle-fullscreen" href="javascript:void(0);"><i class="material-icons">settings_overscan</i>
                             </a>

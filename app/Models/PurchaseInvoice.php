@@ -276,4 +276,15 @@ class PurchaseInvoice extends Model
             'balance'       => $grandtotal,
         ]);
     }
+
+    public function getTotalPaid(){
+        $total = $this->balance;
+        $totalAfterMemo = $total - $this->totalMemo();
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        return $totalAfterMemo;
+    }
 }

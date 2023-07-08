@@ -41,7 +41,6 @@ class ExportPaymentRequest implements FromCollection, WithTitle, WithHeadings, S
 
     public function collection()
     {
-        info($this->start_date);
         $data = PaymentRequest::where(function ($query) {
             $query->where('post_date', '>=',$this->start_date)
             ->where('post_date', '<=', $this->end_date);

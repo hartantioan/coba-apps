@@ -154,6 +154,24 @@ class Item extends Model
         return $arrData;
     }
 
+    public function currentStockPlaceWarehouse($place,$warehouse){
+        $arrData = [];
+
+        $data = ItemStock::where('item_id',$this->id)->where('place_id',$place)->where('warehouse_id',$warehouse)->get();
+        foreach($data as $detail){
+            $arrData[] = [
+                'id'            => $detail->id,
+                'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
+                'warehouse_id'  => $detail->warehouse_id,
+                'place_id'      => $detail->place_id,
+                'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
+                'qty_raw'       => number_format($detail->qty,3,',','.'),
+            ];
+        }
+        
+        return $arrData;
+    }
+
     public function currentStockPerPlace($place_id){
         $arrData = [];
 

@@ -341,10 +341,12 @@
                                 <td class="right-align" style="padding-right:15px">PPN</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
                             </tr>
+                            @if($data->wtax > 0)
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">PPh</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
                             </tr>
+                            @endif
                             <tr class="break-row">
                                 <td class="right-align" style="padding-right:15px">Grandtotal</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>

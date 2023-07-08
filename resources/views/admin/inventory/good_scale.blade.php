@@ -118,7 +118,9 @@
                                                         <th>Supplier</th>
                                                         <th>Perusahaan</th>
                                                         <th>Tanggal</th>
-                                                        <th>Nomor SJ</th>
+                                                        <th>No.SJ</th>
+                                                        <th>No.Kendaraan</th>
+                                                        <th>Supir</th>
                                                         <th>Keterangan</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
@@ -179,6 +181,14 @@
                             <div class="input-field col m3 s12">
                                 <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Pengiriman">
                                 <label class="active" for="delivery_no">Nomor Pengiriman / SJ</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="vehicle_no" name="vehicle_no" type="text" placeholder="No. Kendaraan">
+                                <label class="active" for="vehicle_no">Nomor Kendaraan</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="driver" name="driver" type="text" placeholder="Nama Supir">
+                                <label class="active" for="driver">Nama Supir</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
                                 <div class="btn">
@@ -694,6 +704,8 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'delivery_no', className: 'center-align' },
+                { name: 'vehicle_no', className: 'center-align' },
+                { name: 'driver', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -1534,6 +1546,8 @@
                 $('#temp').val(id);
                 $('#note').val(response.note);
                 $('#delivery_no').val(response.delivery_no);
+                $('#vehicle_no').val(response.vehicle_no);
+                $('#driver').val(response.driver);
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();

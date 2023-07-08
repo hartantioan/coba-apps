@@ -170,6 +170,18 @@
                     <div class="col s9">
                         {{ $data->user->phone }}
                     </div>
+                    <div class="col s3">
+                        No. Kendaraan
+                    </div>
+                    <div class="col s9">
+                        {{ $data->vehicle_no }}
+                    </div>
+                    <div class="col s3">
+                        Nama Supir
+                    </div>
+                    <div class="col s9">
+                        {{ $data->driver }}
+                    </div>
                 </div>
             </div>
             <div class="col m6 s6">

@@ -806,8 +806,8 @@
                         (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
                     );
                 }
-                rowtax = (percent_tax / 100) * rowtotal;
-                rowwtax = (percent_wtax / 100) * rowtotal;
+                rowtax = Math.floor((percent_tax / 100) * rowtotal);
+                rowwtax = Math.floor((percent_wtax / 100) * rowtotal);
                 rowgrandtotal = rowtotal + rowtax - rowwtax;
                 total += rowtotal;
                 tax += rowtax;
@@ -1028,7 +1028,7 @@
                     printService.submit({
                         'type': 'INVOICE',
                         'url': response.message
-                    })
+                    });
                     M.toast({
                         html: response.message
                     });

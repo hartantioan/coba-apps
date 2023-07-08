@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\InventoryRevaluation;
 use App\Models\InventoryRevaluationDetail;
 use App\Models\Item;
+use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\Place;
 use App\Models\Warehouse;
@@ -213,11 +214,44 @@ class InventoryRevaluationController extends Controller
             DB::beginTransaction();
             try {
                 $total = 0;
+                $passed = true;
+                $passedQtyMinus = true;
+                $arrItemNotPassed = [];
+
                 foreach($request->arr_nominal as $row){
                     $total += str_replace(',','.',str_replace('.','',$row));
                 }
+
+                foreach($request->arr_item_stock as $key => $row){
+                    $item_stock = ItemStock::find(intval($row));
+                    if($item_stock){
+                        $itemCogsBefore = ItemCogs::where('place_id',$item_stock->place_id)->where('warehouse_id',$item_stock->warehouse_id)->where('item_id',$item_stock->item_id)->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+                        if($itemCogsBefore){
+                            if($itemCogsBefore->qty_final <= 0){
+                                $passed = false;
+                                $arrItemNotPassed[] = $item_stock->item->name;
+                            }
+                        }else{
+                            $passed = false;
+                        }
+                    }
+                }
+
+                if($passedQtyMinus == false){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
+                    ]);
+                }
+    
+                if($passed == false){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Maaf, pada tanggal '.date('d/m/y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
+                    ]);
+                }
                 
-                if($request->temp){
+                /* if($request->temp){
                     
                     $query = InventoryRevaluation::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -311,7 +345,7 @@ class InventoryRevaluationController extends Controller
                         'status'  => 500,
                         'message' => 'Data failed to save.'
                     ];
-                }
+                } */
 
                 DB::commit();
             }catch(\Exception $e){

@@ -216,12 +216,58 @@ class GoodIssueController extends Controller
             try {
 
                 $grandtotal = 0;
+                $passed = true;
+                $passedQtyMinus = true;
+                $arrItemNotPassed = [];
 
                 foreach($request->arr_item_stock as $key => $row){
                     $rowprice = NULL;
                     $item_stock = ItemStock::find(intval($row));
                     $rowprice = $item_stock->priceNow();
                     $grandtotal += $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                    if($item_stock){
+
+                        $qtyout = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+
+                        $itemCogsBefore = ItemCogs::where('place_id',$item_stock->place_id)->where('warehouse_id',$item_stock->warehouse_id)->where('item_id',$item_stock->item_id)->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+                        $itemCogsAfter = ItemCogs::where('place_id',$item_stock->place_id)->where('warehouse_id',$item_stock->warehouse_id)->where('item_id',$item_stock->item_id)->whereDate('date','>',$request->post_date)->orderBy('date')->orderBy('id')->get();
+
+                        if($itemCogsBefore){
+                            if($itemCogsBefore->qty_final < $qtyout){
+                                $passed = false;
+                                $arrItemNotPassed[] = $item_stock->item->name;
+                            }else{
+                                $startqty = $itemCogsBefore->qty_final - $qtyout;
+                                foreach($itemCogsAfter as $row){
+                                    if($row->type == 'IN'){
+                                        $startqty += $row->qty_in;
+                                    }elseif($row->type == 'OUT'){
+                                        $startqty -= $row->qty_out;
+                                    }
+                                    if($startqty < 0){
+                                        $passedQtyMinus = false;
+                                    }
+                                }
+                            }
+                        }else{
+                            $passed = false;
+                        }
+
+                    }
+                }
+
+                if($passedQtyMinus == false){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
+                    ]);
+                }
+    
+                if($passed == false){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Maaf, pada tanggal '.date('d/m/y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
+                    ]);
                 }
 
                 if($request->temp){

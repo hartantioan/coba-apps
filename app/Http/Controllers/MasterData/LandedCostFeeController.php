@@ -4,10 +4,8 @@ namespace App\Http\Controllers\MasterData;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
-use App\Models\Line;
-use App\Models\Machine;
-use App\Models\Place;
-use App\Models\Warehouse;
+use App\Models\Company;
+use App\Models\LandedCostFee;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
@@ -15,17 +13,14 @@ use App\Models\CostDistribution;
 use App\Models\CostDistributionDetail;
 use Illuminate\Support\Facades\DB;
 
-class CostDistributionController extends Controller
+class LandedCostFeeController extends Controller
 {
     public function index()
     {
         $data = [
             'title'         => 'Distribusi Biaya',
-            'content'       => 'admin.master_data.cost_distribution',
-            'place'         => Place::where('status','1')->get(),
-            'line'          => Line::where('status','1')->get(),
-            'department'    => Department::where('status','1')->get(),
-            'machine'       => Machine::where('status','1')->get(),
+            'content'       => 'admin.master_data.landed_cost_fee',
+            'company'       => Company::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -37,7 +32,7 @@ class CostDistributionController extends Controller
             'code',
             'name',
             'coa_id',
-            'note',
+            'type',
         ];
 
         $start  = $request->start;
@@ -46,9 +41,9 @@ class CostDistributionController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = CostDistribution::count();
+        $total_data = LandedCostFee::count();
         
-        $query_data = CostDistribution::where(function($query) use ($search, $request) {
+        $query_data = LandedCostFee::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -65,7 +60,7 @@ class CostDistributionController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = CostDistribution::where(function($query) use ($search, $request) {
+        $total_filtered = LandedCostFee::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -85,10 +80,12 @@ class CostDistributionController extends Controller
             foreach($query_data as $val) {
 				
                 $response['data'][] = [
-                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    $nomor,
                     $val->code,
                     $val->name,
                     $val->coa_id ? $val->coa->name : '-',
+                    $val->coa->company->name,
+                    $val->type(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -146,16 +143,14 @@ class CostDistributionController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('cost_distributions', 'code')->ignore($request->temp)] : 'required|unique:cost_distributions,code',
+            'code' 				=> $request->temp ? ['required', Rule::unique('landed_cost_fees', 'code')->ignore($request->temp)] : 'required|unique:landed_cost_fees,code',
             'name'              => 'required',
-            'arr_place.*'       => 'required',
-            'arr_percentage.*'  => 'required',
+            'coa_id'            => 'required',
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah terpakai.',
             'name.required'                 => 'Nama tidak boleh kosong.',
-            'arr_place.*.required'          => 'Plant tidak boleh kosong',
-            'arr_percentage.*.required'     => 'Prosentase distribusi tidak boleh kosong',
+            'coa_id.required'               => 'Coa tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -168,42 +163,31 @@ class CostDistributionController extends Controller
             try {
 
                 if($request->temp){
-                    $query = CostDistribution::find($request->temp);
+                    $query = LandedCostFee::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
                     $query->coa_id          = $request->coa_id ? $request->coa_id : NULL;
+                    $query->type            = $request->type;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
-
-                    $query->costDistributionDetail()->delete();
                 }else{
-                    $query = CostDistribution::create([
+                    $query = LandedCostFee::create([
                         'code'          => $request->code,
                         'place_id'      => $request->place_id,
                         'name'			=> $request->name,
                         'coa_id'        => $request->coa_id ? $request->coa_id : NULL,
+                        'type'          => $request->type,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                 }
                 
                 if($query) {
 
-                    foreach($request->arr_place as $key => $row){
-                        CostDistributionDetail::create([
-                            'cost_distribution_id'  => $query->id,
-                            'place_id'              => $row,
-                            'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
-                            'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
-                            'department_id'         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
-                            'percentage'            => str_replace(',','.',str_replace('.','',$request->arr_percentage[$key])),
-                        ]);
-                    }
-
                     activity()
-                        ->performedOn(new CostDistribution())
+                        ->performedOn(new LandedCostFee())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
-                        ->log('Add / edit cost distribution.');
+                        ->log('Add / edit landed cost fee.');
 
                     $response = [
                         'status'  => 200,
@@ -226,36 +210,22 @@ class CostDistributionController extends Controller
     }
 
     public function show(Request $request){
-        $cd = CostDistribution::find($request->id);
-        $cd['coa_name'] = $cd->coa_id ? $cd->coa->code.' - '.$cd->coa->name : '';
-        
-        $details = [];
-        foreach($cd->costDistributionDetail as $cdd){
-            $details[] = [
-                'place_id'      => $cdd->place_id,
-                'line_id'       => $cdd->line_id ? $cdd->line_id : '',
-                'machine_id'    => $cdd->machine_id ? $cdd->machine_id : '',
-                'department_id' => $cdd->department_id ? $cdd->department_id : '',
-                'percentage'    => number_format($cdd->percentage,2,',','.'),
-            ];
-        }
+        $cd = LandedCostFee::find($request->id);
+        $cd['coa_name'] = $cd->coa->code.' - '.$cd->coa->name;
 
-        $cd['details'] = $details;
-        				
 		return response()->json($cd);
     }
 
     public function destroy(Request $request){
-        $query = CostDistribution::find($request->id);
+        $query = LandedCostFee::find($request->id);
 		
         if($query->delete()) {
-            $query->costDistributionDetail()->delete();
 
             activity()
-                ->performedOn(new CostDistribution())
+                ->performedOn(new LandedCostFee())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the cost distribution data');
+                ->log('Delete the landed cost data');
 
             $response = [
                 'status'  => 200,

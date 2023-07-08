@@ -27,6 +27,8 @@ class GoodScale extends Model
         'place_id',
         'post_date',
         'delivery_no',
+        'vehicle_no',
+        'driver',
         'document',
         'note',
         'status',

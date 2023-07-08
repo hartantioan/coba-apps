@@ -870,6 +870,7 @@
         });
 
         $('#modal6').modal({
+            dismissible: false,
             onOpenStart: function(modal,trigger) {
                 $('.collapsible').collapsible({
                     accordion:false

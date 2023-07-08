@@ -52,30 +52,6 @@ class PaymentRequestController extends Controller
     }
     public function index(Request $request)
     {
-        /* $op = OutgoingPayment::whereHas('account',function($query){
-            $query->where('type','1');
-        })
-        ->whereIn('status',['2','3'])
-        ->whereHas('paymentRequest',function($query){
-            $query->whereHas('paymentRequestDetail',function($query){
-                $query->whereHasMorph('lookable',
-                [FundRequest::class],
-                function (Builder $query){
-                    $query->where('document_status','3');
-                });
-            });
-        })->get();
-
-        foreach($op as $row){
-            $total = $row->getTotalPiutangKaryawan();
-            foreach($row->paymentRequestCross as $rowdetail){
-                $total -= $rowdetail->nominal;
-            }
-            $user = User::find($row->account_id);
-            $user->update([
-                'count_limit_credit'    => $user->count_limit_credit + $total,
-            ]);
-        } */
 
         $data = [
             'title'         => 'Permintaan Pembayaran',
@@ -745,7 +721,7 @@ class PaymentRequestController extends Controller
                                 $idDetail = PurchaseInvoice::where('code',$code)->first()->id;
                             }
                             
-                            PaymentRequestDetail::create([
+                            $prd = PaymentRequestDetail::create([
                                 'payment_request_id'            => $query->id,
                                 'lookable_type'                 => $row,
                                 'lookable_id'                   => $idDetail,
@@ -754,17 +730,25 @@ class PaymentRequestController extends Controller
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
                                 'note'                          => $request->arr_note[$key]
                             ]);
+
+                            if($row == 'fund_requests'){
+                                if($prd->lookable->document_status == '3'){
+                                    $prd->lookable->addLimitCreditEmployee($prd->nominal);
+                                }
+                            }
                         }
                     }
 
                     if($request->arr_cd_payment){
                         foreach($request->arr_cd_payment as $key => $row){
-                            PaymentRequestCross::create([
+                            $prc = PaymentRequestCross::create([
                                 'payment_request_id'            => $query->id,
                                 'lookable_type'                 => 'outgoing_payments',
                                 'lookable_id'                   => intval($row),
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_payment[$key])),
                             ]);
+
+                            $prc->removeLimitCreditEmployee();
                         }
                     }
 
@@ -1025,6 +1009,18 @@ class PaymentRequestController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                foreach($query->paymentRequestDetail as $row){
+                    if($row->lookable_type == 'fund_requests'){
+                        if($row->lookable->document_status == '3'){
+                            $row->lookable->removeLimitCreditEmployee($row->nominal);
+                        }
+                    }
+                }
+
+                foreach($query->paymentRequestCross as $row){
+                    $row->addLimitCreditEmployee();
+                }
     
                 activity()
                     ->performedOn(new PaymentRequest())
@@ -1086,8 +1082,19 @@ class PaymentRequestController extends Controller
         
         if($query->delete()) {
 
-            $query->paymentRequestDetail()->delete();
-            $query->paymentRequestCross()->delete();
+            foreach($query->paymentRequestDetail as $row){
+                if($row->lookable_type == 'fund_requests'){
+                    if($row->lookable->document_status == '3'){
+                        $row->lookable->removeLimitCreditEmployee($row->nominal);
+                    }
+                }
+                $row->delete();
+            }
+            
+            foreach($query->paymentRequestCross as $row){
+                $row->addLimitCreditEmployee();
+                $row->delete();
+            }
 
             CustomHelper::removeApproval('payment_requests',$query->id);
 
@@ -1370,9 +1377,7 @@ class PaymentRequestController extends Controller
     }
 
     public function export(Request $request){
-        $post_date = $request->start_date ? $request->start_date : '';
-        $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportPaymentRequest($post_date,$end_date), 'payment_request'.uniqid().'.xlsx');
+		return Excel::download(new ExportPaymentRequest($request->search,$request->status,$request->company,$request->account,$request->currency,$this->dataplaces), 'payment_request'.uniqid().'.xlsx');
     }
     
     public function approval(Request $request,$id){
@@ -1635,7 +1640,6 @@ class PaymentRequestController extends Controller
                 "title" =>$query->code,
             ];
         $data_go_chart[]=$fr;
-       
         $data_id_dp=[];
         $data_id_po = [];
         $data_id_gr = [];
@@ -1645,8 +1649,6 @@ class PaymentRequestController extends Controller
         $data_id_greturns=[];
         $data_id_pr=[];
         $data_id_memo=[];
-
-        $data_id_pyrs[]=$query->id;
         
         if($query) {
 

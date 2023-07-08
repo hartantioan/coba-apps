@@ -60,6 +60,8 @@ class GoodScaleController extends Controller
             'company_id',
             'post_date',
             'delivery_no',
+            'vehicle_no',
+            'driver',
             'note',
         ];
 
@@ -77,6 +79,8 @@ class GoodScaleController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('delivery_no', 'like', "%$search%")
+                            ->orWhere('vehicle_no', 'like', "%$search%")
+                            ->orWhere('driver', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
@@ -114,6 +118,8 @@ class GoodScaleController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('delivery_no', 'like', "%$search%")
+                            ->orWhere('vehicle_no', 'like', "%$search%")
+                            ->orWhere('driver', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
                                 $query->whereHas('item',function($query) use($search, $request){
@@ -159,6 +165,8 @@ class GoodScaleController extends Controller
                     $val->company->name,
                     date('d M Y',strtotime($val->post_date)),
                     $val->delivery_no,
+                    $val->vehicle_no,
+                    $val->driver,
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -275,6 +283,8 @@ class GoodScaleController extends Controller
         $validation = Validator::make($request->all(), [
             'account_id'                => 'required',
             'company_id'                => 'required',
+            'vehicle_no'                => 'required',
+            'driver'                    => 'required',
             'place_id'                  => 'required',
 			'post_date'		            => 'required',
             'arr_item'                  => 'required|array',
@@ -282,6 +292,8 @@ class GoodScaleController extends Controller
 		], [
             'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+            'vehicle_no.required'               => 'Nomor kendaraan tidak boleh kosong.',
+            'driver.required'                   => 'Nama supir tidak boleh kosong.',
             'place_id.required'                 => 'Plant tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong',

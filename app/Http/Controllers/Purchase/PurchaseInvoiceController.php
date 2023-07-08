@@ -501,7 +501,7 @@ class PurchaseInvoiceController extends Controller
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     number_format($val->downpayment,2,',','.'),
-                    number_format($val->balance,2,',','.'),
+                    number_format($val->balance,2,',','.').' - '.$val->getTotalPaid(),
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Item;
+use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\Place;
 use App\Models\Warehouse;
@@ -245,31 +246,54 @@ class InventoryTransferOutController extends Controller
         } else {
 
             $passed = true;
+            $passedQtyMinus = true;
             $passedWarehouse = true;
             $passedQty = true;
-
+            $arrItemNotPassed = [];
+            
             foreach($request->arr_item as $key => $row){
                 $qtyout = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-                $itemstock = ItemStock::find(intval($request->arr_item_stock[$key]));
-                if($itemstock){
-                    if($itemstock->qty < $qtyout){
+                $item = Item::find(intval($row));
+                $itemCogsBefore = ItemCogs::where('place_id',$request->place_from)->where('warehouse_id',$request->warehouse_from)->where('item_id',$row)->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+                $itemCogsAfter = ItemCogs::where('place_id',$request->place_from)->where('warehouse_id',$request->warehouse_from)->where('item_id',$row)->whereDate('date','>',$request->post_date)->orderBy('date')->orderBy('id')->get();
+
+                if($itemCogsBefore){
+                    if($itemCogsBefore->qty_final < $qtyout){
                         $passed = false;
+                        $arrItemNotPassed[] = $item->name;
+                    }else{
+                        $startqty = $itemCogsBefore->qty_final - $qtyout;
+                        foreach($itemCogsAfter as $row){
+                            if($row->type == 'IN'){
+                                $startqty += $row->qty_in;
+                            }elseif($row->type == 'OUT'){
+                                $startqty -= $row->qty_out;
+                            }
+                            if($startqty < 0){
+                                $passedQtyMinus = false;
+                            }
+                        }
                     }
                 }else{
                     $passed = false;
                 }
-
-                $item = Item::find(intval($row));
 
                 if(!in_array(intval($request->warehouse_to),$item->arrWarehouse())){
                     $passedWarehouse = false;
                 }
             }
 
+            if($passedQtyMinus == false){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Maaf, pada tanggal setelah tanggal posting terdapat qty minus pada stok.',
+                ]);
+            }
+
             if($passed == false){
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'Maaf, beberapa stok keluar yang anda masukkan melebihi stok tersedia.'.count($request->arr_item)
+                    'message' => 'Maaf, pada tanggal '.date('d/m/y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
                 ]);
             }
 
@@ -877,7 +901,6 @@ class InventoryTransferOutController extends Controller
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
 
-            info($pr);
             $data = [
                 'title'     => 'Inventory Transfer Out',
                 'data'      => $pr

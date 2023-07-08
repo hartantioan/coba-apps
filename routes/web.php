@@ -50,6 +50,7 @@ use App\Http\Controllers\MasterData\BenchmarkPriceController;
 use App\Http\Controllers\MasterData\CostDistributionController;
 use App\Http\Controllers\MasterData\DeliveryCostController;
 use App\Http\Controllers\MasterData\UserDateController;
+use App\Http\Controllers\MasterData\LandedCostFeeController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -604,6 +605,15 @@ Route::prefix('admin')->group(function () {
                         Route::get('row_detail',[UserDateController::class, 'rowDetail']);
                         Route::post('create',[UserDateController::class, 'create'])->middleware('operation.access:user_date,update');
                         Route::post('destroy', [UserDateController::class, 'destroy'])->middleware('operation.access:user_date,delete');
+                    });
+
+                    Route::prefix('landed_cost_fee')->middleware('operation.access:landed_cost_fee,view')->group(function () {
+                        Route::get('/',[LandedCostFeeController::class, 'index']);
+                        Route::get('datatable',[LandedCostFeeController::class, 'datatable']);
+                        Route::get('row_detail',[LandedCostFeeController::class, 'rowDetail']);
+                        Route::post('show', [LandedCostFeeController::class, 'show']);
+                        Route::post('create',[LandedCostFeeController::class, 'create'])->middleware('operation.access:landed_cost_fee,update');
+                        Route::post('destroy', [LandedCostFeeController::class, 'destroy'])->middleware('operation.access:landed_cost_fee,delete');
                     });
                 });
             });

@@ -261,10 +261,26 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            Nomor S.J
+                                            NO.SJ
                                          </td>
                                          <td>
                                              {{ $data->delivery_no }}
+                                          </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            No.Kendaraan
+                                         </td>
+                                         <td>
+                                             {{ $data->vehicle_no }}
+                                          </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Nama Supir
+                                         </td>
+                                         <td>
+                                             {{ $data->driver }}
                                           </td>
                                     </tr>
                                 </table>

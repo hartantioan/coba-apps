@@ -163,7 +163,7 @@ function cekNotif(url){
 						if(!$('.row-notification[data-notif="' + val.code + '"]').length > 0){
 							$('#notifications-divider').after(`
 								<li class="` + (val.status == '1' ? 'grey lighten-3' : '' ) + ` row-notification" data-notif="` + val.code + `">
-									<a class="black-text" href="#!">
+									<a class="black-text" href="`+response.link_list[i]+`">
 										<div class="row">
 											<div class="col s1 pl-1 pt-2" style="top: 10px;">
 												<span class="material-icons icon-bg-circle cyan small">` + val.icon +  `</span>

@@ -7,6 +7,7 @@ use App\Http\Controllers\Inventory\GoodScaleController;
 use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
 use App\Http\Controllers\MasterData\HardwareItemGroupController;
+use App\Http\Controllers\Purchase\OutStandingAPController;
 use App\Http\Controllers\Purchase\PurchaseReportController;
 use App\Http\Controllers\Usage\ReceptionHardwareItemUsageController;
 use App\Http\Controllers\Usage\ReturnHardwareItemUsageController;
@@ -198,6 +199,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('notification')->group(function () {
                     Route::get('/',[NotificationController::class, 'index']);
+                    Route::get('datatable',[NotificationController::class, 'datatable']);
                     Route::post('refresh', [NotificationController::class, 'refresh'])->withoutMiddleware('lock');
                     Route::post('update_notification', [NotificationController::class, 'updateNotification']);
                 });
@@ -802,7 +804,13 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('purchase_report')->middleware('direct.access')->group(function () {
                     Route::prefix('purchase_recap')->middleware('operation.access:purchase_recap,view')->group(function () {
-                    Route::get('/',[PurchaseReportController::class, 'index']);
+                        Route::get('/',[PurchaseReportController::class, 'index']);
+                    });
+
+                    Route::prefix('outstanding_ap')->middleware('operation.access:outstanding_ap,view')->group(function () {
+                        Route::get('/',[OutStandingAPController::class, 'index']);
+                        Route::post('filter_by_date',[OutStandingAPController::class, 'filterByDate']);
+                        Route::get('export',[OutStandingAPController::class, 'export']);
                     });
                 });
 

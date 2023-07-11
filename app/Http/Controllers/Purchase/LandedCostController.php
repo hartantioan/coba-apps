@@ -528,6 +528,8 @@ class LandedCostController extends Controller
             'arr_price'                 => 'required|array',
             'arr_qty'                   => 'required|array'
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
 			'vendor_id.required'                => 'Vendor/ekspedisi tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
@@ -595,6 +597,7 @@ class LandedCostController extends Controller
                             $document = $query->document;
                         }
 
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->supplier_id = $request->supplier_id ? $request->supplier_id : NULL;
                         $query->account_id = $request->vendor_id;
@@ -632,7 +635,7 @@ class LandedCostController extends Controller
                 try {
 
                     $query = LandedCost::create([
-                        'code'			            => LandedCost::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'supplier_id'               => $request->supplier_id ? $request->supplier_id : NULL,
                         'account_id'                => $request->vendor_id,
@@ -868,14 +871,14 @@ class LandedCostController extends Controller
     public function show(Request $request){
         $lc = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
         $lc['vendor_name'] = $lc->vendor->name;
-        $lc['supplier_name'] = $lc->supplier->name;
+        $lc['supplier_name'] = $lc->supplier()->exists() ? $lc->supplier->name : '';
         $lc['total'] = number_format($lc->total,2,',','.');
         $lc['tax'] = number_format($lc->tax,2,',','.');
         $lc['wtax'] = number_format($lc->wtax,2,',','.');
         $lc['grandtotal'] = number_format($lc->grandtotal,2,',','.');
         $lc['currency_rate'] = number_format($lc->currency_rate,2,',','.');
-        $lc['from_address'] = $lc->supplier->city->name.' - '.$lc->supplier->subdistrict->name;
-        $lc['subdistrict_from_id'] = $lc->supplier->subdistrict_id;
+        $lc['from_address'] = $lc->supplier()->exists() ? $lc->supplier->city->name.' - '.$lc->supplier->subdistrict->name : '';
+        $lc['subdistrict_from_id'] = $lc->supplier()->exists() ? $lc->supplier->subdistrict_id : '';
 
         $arr = [];
         $fees = [];

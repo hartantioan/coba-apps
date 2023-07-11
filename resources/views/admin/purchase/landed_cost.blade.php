@@ -28,6 +28,10 @@
             width:100%;
         }
     }
+    
+    .select-wrapper, .select2-container {
+        height:3.7rem !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -237,18 +241,20 @@
                                 <label class="active" for="reference">No. Referensi</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input type="hidden" id="temp_from_address" name="temp_from_address">
-                                Dari : <b><span id="from_address">-</span></b>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input type="hidden" id="temp_to_address" name="temp_to_address">
-                                Tujuan : <b><span id="to_address">-</span></b>
-                            </div>
-                            <div class="input-field col m3 s12">
                                 <select class="browser-default" id="delivery_cost_id" name="delivery_cost_id" onchange="getDeliveryNominal(this);">
                                     <option value="">--Silahkan pilih broker--</option>
                                 </select>
                                 <label class="active" for="delivery_cost_id">Tonase & Harga</label>
+                            </div>
+                            <div class="col m12 s12">
+                                <div class="input-field col m3 s12">
+                                    <input type="hidden" id="temp_from_address" name="temp_from_address">
+                                    Dari : <b><span id="from_address">-</span></b>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input type="hidden" id="temp_to_address" name="temp_to_address">
+                                    Tujuan : <b><span id="to_address">-</span></b>
+                                </div>
                             </div>
                             <div class="col m12 s12">
                                 <h6><b>GRPO / Inv.Transfer (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
@@ -2113,6 +2119,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code').val(response.code);
                 $('#vendor_id').empty();
                 $('#vendor_id').append(`
                     <option value="` + response.account_id + `">` + response.vendor_name + `</option>

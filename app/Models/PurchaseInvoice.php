@@ -255,6 +255,18 @@ class PurchaseInvoice extends Model
         return $total;
     }
 
+    public function totalMemoByDate($date){
+        $total = 0;
+        foreach($this->purchaseInvoiceDetail as $row){
+            foreach($row->purchaseMemoDetail()->whereHas('purchaseMemo',function ($query) use ($date){
+                $query->whereDate('post_date','<=',$date);
+            })->get() as $rowdetail){
+                $total += $rowdetail->grandtotal;
+            }
+        }
+        return $total;
+    }
+
     public function updateTotal(){
         $total = 0;
         $tax = 0;
@@ -282,6 +294,19 @@ class PurchaseInvoice extends Model
         $totalAfterMemo = $total - $this->totalMemo();
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
             $query->whereHas('outgoingPayment');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        return $totalAfterMemo;
+    }
+    public function getTotalPaidByDate($date){
+        $total = $this->balance;
+        $totalAfterMemo = $total - $this->totalMemoByDate($date);
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use ($date){
+            $query->whereHas('outgoingPayment',function ($query) use ($date){
+                $query->whereDate('post_date','<=',$date);
+            });
+
         })->get() as $rowpayment){
             $totalAfterMemo -= $rowpayment->nominal;
         }

@@ -81,7 +81,7 @@ class PurchaseInvoiceDetail extends Model
     {
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
-
+    
     public function coa()
     {
         if($this->lookable_type == 'coas'){

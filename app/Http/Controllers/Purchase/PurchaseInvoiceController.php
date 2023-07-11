@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\PaymentRequest;
+use App\Models\PaymentRequestCross;
 use App\Models\Place;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoiceDp;
@@ -1663,7 +1664,8 @@ class PurchaseInvoiceController extends Controller
         $data_id_greturns=[];
         $data_id_pr=[];
         $data_id_memo=[];    
-
+        $data_id_pyrcs=[];
+        
         $data_id_lc=[];
 
         $data_go_chart=[];
@@ -2018,24 +2020,24 @@ class PurchaseInvoiceController extends Controller
                             } 
                         }
                         /* melihat apakah ada hubungan lc */
-                        if($row->landedCost()){
+                        if($row->landedCostDetail()){
                             $data_lc=[
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row->lookable->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row->lookable->landedCost->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row->lookable->landedCost->grandtotal,2,',','.')]
                                 ],
-                                "key" => $row->lookable->code,
-                                "name" => $row->lookable->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->code),
+                                "key" => $row->lookable->landedCost->code,
+                                "name" => $row->lookable->landedCost->code,
+                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->landedCost->code),
                             ];
 
                             $data_go_chart[]=$data_lc;
                             $data_link[]=[
                                 'from'=>$query_invoice->code,
-                                'to'=>$row->lookable->code,
-                                'string_link'=>$query_invoice->code.$row->lookable->code,
+                                'to'=>$row->lookable->landedCost->code,
+                                'string_link'=>$query_invoice->code.$row->lookable->landedCost->code,
                             ];
-                            $data_id_lc[] = $row->lookable->id;
+                            $data_id_lc[] = $row->lookable->landedCost->id;
                             
                         }
 
@@ -2362,8 +2364,74 @@ class PurchaseInvoiceController extends Controller
                                 $added=true;
                             }
                         }
+
+                        if($row_pyr_detail->paymentRequestCross()){
+                            $data_pyrc_tempura = [
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                ],
+                                "key" => $row_pyr_detail->lookable->code,
+                                "name" => $row_pyr_detail->lookable->code,
+                                'url'=>request()->root()."/admin/purchase/payment_request_cross?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
+                            ];
+        
+                            $data_go_chart[]=$data_pyrc_tempura;
+                            $data_link[]=[
+                                'from'=>$row_pyr_detail->lookable->code,
+                                'to'=>$row_pyr_detail->paymentRequest->code,
+                                'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
+                            ];
+                            
+                            if(!in_array($row_pyr_detail->lookable->id, $data_id_pyrcs)){
+                                $data_id_pyrcs[] = $row_pyr_detail->lookable->id;
+                            }
+                        }
                     }
                     
+                }
+                foreach($data_id_pyrcs as $payment_request_cross_id){
+                    $query_pyrc = PaymentRequestCross::find($payment_request_cross_id);
+                    if($query_pyrc->paymentRequest->exists()){
+                        $data_pyr_tempura = [
+                            'key'   => $query_pyrc->paymentRequest->code,
+                            "name"  => $query_pyrc->paymentRequest->code,
+                            'properties'=> [
+                                 ['name'=> "Tanggal: ".date('d/m/y',strtotime($query_pyrc->paymentRequest->post_date))],
+                              ],
+                            'url'   =>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
+                            "title" =>$query_pyrc->paymentRequest->code,
+                        ];
+                        $data_go_chart[]=$data_pyr_tempura;
+                        $data_link[]=[
+                            'from'=>$query_pyrc->code,
+                            'to'=>$query_pyrc->paymentRequest->code,
+                            'string_link'=>$query_pyrc->code.$query_pyrc->paymentRequest->code,
+                        ];
+                        
+                        if(!in_array($query_pyrc->id, $data_id_pyrs)){
+                            $data_id_pyrs[] = $query_pyrc->id;
+                            $added=true;
+                        }
+                    }
+                    if($query_pyrc->outgoingPayment()){
+                        $outgoing_tempura = [
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_pyrc->lookable->post_date],
+                                ['name'=> "Nominal : Rp.".number_format($query_pyrc->lookable->grandtotal,2,',','.')]
+                            ],
+                            "key" => $query_pyrc->lookable->code,
+                            "name" => $query_pyrc->lookable->code,
+                            'url'=>request()->root()."/admin/purchase/payment_request_cross?code=".CustomHelper::encrypt($query_pyrc->lookable->code),  
+                        ];
+    
+                        $data_go_chart[]=$outgoing_tempura;
+                        $data_link[]=[
+                            'from'=>$query_pyrc->lookable->code,
+                            'to'=>$query_pyrc->paymentRequest->code,
+                            'string_link'=>$query_pyrc->lookable->code.$query_pyrc->paymentRequest->code,
+                        ];
+                    }
                 }
                 foreach($data_id_dp as $downpayment_id){
                     $query_dp = PurchaseDownPayment::find($downpayment_id);
@@ -2694,7 +2762,7 @@ class PurchaseInvoiceController extends Controller
                         }
                     }
                 }
-            }
+            } 
             function unique_key($array,$keyname){
 
                 $new_array = array();

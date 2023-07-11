@@ -30,6 +30,15 @@ class Notification extends Model
         return $this->belongsTo('App\Models\User', 'from_user_id', 'id')->withTrashed();
     }
 
+    public function lookable(){
+        return $this->morphTo();
+    }
+
+    public function getURL(){
+        $menu = Menu::where('table_name',$this->lookable_type)->first();
+        return $menu->fullUrl();
+    }
+
     public function toUser()
     {
         return $this->belongsTo('App\Models\User', 'to_user_id', 'id')->withTrashed();

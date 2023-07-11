@@ -37,11 +37,13 @@
                         </li>
                     </ul>
                     <!-- notifications-dropdown-->
-                    <ul class="dropdown-content" id="notifications-dropdown" style="max-height:500px !important;">
+                    <ul class="dropdown-content" id="notifications-dropdown" style="max-height:550px !important;">
                         <li>
                             <h6>NOTIFIKASI<span class="new badge notif-count">0</span></h6>
                         </li>
-                        <li class="divider" id="notifications-divider"></li>
+                        <li class="divider" id="notifications-divider">
+                        </li>
+                        <li><a href="{{ URL::to('/') }}/admin/personal/notification" style="color: black;text-align:center">VIEW ALL</a></li>
                         <li id="notification-none">
                             <h6><b>Anda belum memiliki notifikasi.</b></h6>
                         </li>

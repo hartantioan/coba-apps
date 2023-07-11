@@ -30,6 +30,8 @@ class GoodScale extends Model
         'vehicle_no',
         'driver',
         'document',
+        'image_in',
+        'image_out',
         'note',
         'status',
         'void_id',
@@ -113,6 +115,28 @@ class GoodScale extends Model
         }
 
         return $document;
+    }
+
+    public function imageIn() 
+    {
+        if($this->image_in !== NULL && Storage::exists($this->image_in)) {
+            $image = asset(Storage::url($this->image_in));
+        } else {
+            $image = asset('website/empty.png');
+        }
+
+        return $image;
+    }
+
+    public function imageOut() 
+    {
+        if($this->image_out !== NULL && Storage::exists($this->image_out)) {
+            $image = asset(Storage::url($this->image_out));
+        } else {
+            $image = asset('website/empty.png');
+        }
+
+        return $image;
     }
 
     public function deleteFile(){

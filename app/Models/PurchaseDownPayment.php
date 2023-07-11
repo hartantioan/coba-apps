@@ -190,9 +190,11 @@ class PurchaseDownPayment extends Model
         }
 	}
 
-    public static function generateCode($post_date)
+    public static function generateCode($prefix)
     {
-        $query = PurchaseDownPayment::selectRaw('RIGHT(code, 9) as code')
+        $cek = substr($prefix,0,7);
+        $query = PurchaseDownPayment::selectRaw('RIGHT(code, 8) as code')
+            ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
@@ -201,14 +203,12 @@ class PurchaseDownPayment extends Model
         if($query->count() > 0) {
             $code = (int)$query[0]->code + 1;
         } else {
-            $code = '000000001';
+            $code = '00000001';
         }
 
-        $no = str_pad($code, 9, 0, STR_PAD_LEFT);
+        $no = str_pad($code, 8, 0, STR_PAD_LEFT);
 
-        $pre = 'PODP-'.date('ymd',strtotime($post_date)).'-';
-
-        return $pre.$no;
+        return substr($prefix,0,9).'-'.$no;
     }
 
     public function approval(){

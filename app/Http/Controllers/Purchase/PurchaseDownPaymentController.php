@@ -53,9 +53,16 @@ class PurchaseDownPaymentController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'PODP-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = PurchaseDownPayment::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function getPurchaseOrder(Request $request){
@@ -295,6 +302,7 @@ class PurchaseDownPaymentController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('purchase_down_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_down_payments,code',
 			'supplier_id' 				=> 'required',
 			'type'                      => 'required',
             'company_id'                => 'required',
@@ -304,6 +312,8 @@ class PurchaseDownPaymentController extends Controller
             'currency_rate'             => 'required',
             'subtotal'                  => 'required',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai',
 			'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
 			'type.required'                     => 'Tipe tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -373,6 +383,7 @@ class PurchaseDownPaymentController extends Controller
                             $document = $query->document;
                         }
 
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->supplier_id;
                         $query->type = $request->type;
@@ -414,7 +425,7 @@ class PurchaseDownPaymentController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseDownPayment::create([
-                        'code'			            => PurchaseDownPayment::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
                         'type'	                    => $request->type,

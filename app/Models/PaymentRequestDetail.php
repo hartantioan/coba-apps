@@ -95,4 +95,16 @@ class PaymentRequestDetail extends Model
   
           return $type;
     }
+
+    public function totalOutgoingUsedWeight(){
+        $nominal = $this->nominal;
+        $totalUsed = 0;
+        foreach($this->paymentRequest->outgoingPayment->paymentRequestCross as $rowcross){
+            $totalUsed += $rowcross->nominal;
+        }
+
+        $result = round(($nominal / $this->paymentRequest->balance) * $totalUsed,2);
+
+        return $result;
+    }
 }

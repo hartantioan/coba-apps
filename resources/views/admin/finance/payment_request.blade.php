@@ -584,6 +584,11 @@
                                                 <th class="center-align">PPN</th>
                                                 <th class="center-align">PPh</th>
                                                 <th class="center-align">Grandtotal</th>
+                                                <th class="center-align">Downpayment</th>
+                                                <th class="center-align">Rounding</th>
+                                                <th class="center-align">Sisa</th>
+                                                <th class="center-align">Memo</th>
+                                                <th class="center-align">Final</th>
                                                 <th class="center-align">Keterangan</th>
                                             </tr>
                                         </thead>
@@ -1107,6 +1112,21 @@
                                     <td class="right-align">
                                         ` + val.grandtotal + `
                                     </td>
+                                    <td class="right-align">
+                                        ` + val.downpayment + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.rounding + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.balance + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.memo + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.final + `
+                                    </td>
                                     <td class="center-align">
                                         ` + val.note + `
                                     </td>
@@ -1284,7 +1304,7 @@
                                                 ` + val.memo + `
                                             </td>
                                             <td class="center">
-                                                <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.grandtotal + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
+                                                <input id="arr_pay` + count + `" name="arr_pay[]" data-grandtotal="` + val.balance + `" class="browser-default" type="text" value="`+ val.balance + `" onkeyup="formatRupiah(this);countAll();checkTotal(this);" style="width:150px;text-align:right;">
                                             </td>
                                             <td class="center">
                                                 <input id="arr_note` + count + `" name="arr_note[]" class="browser-default" type="text" style="width:150px;" value="-">

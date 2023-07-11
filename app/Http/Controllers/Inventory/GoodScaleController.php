@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class GoodScaleController extends Controller
@@ -169,6 +170,8 @@ class GoodScaleController extends Controller
                     $val->driver,
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
+                    $val->image_in ? '<a href="'.$val->imageIn().'" target="_blank"><i class="material-icons">camera_front</i></a>' : '<i class="material-icons">hourglass_empty</i>',
+                    $val->image_out ? '<a href="'.$val->imageOut().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -288,7 +291,7 @@ class GoodScaleController extends Controller
             'place_id'                  => 'required',
 			'post_date'		            => 'required',
             'arr_item'                  => 'required|array',
-            'document'                  => 'required|mimes:jpg,jpeg,png,pdf',
+            /* 'document'                  => 'required|mimes:jpg,jpeg,png,pdf', */
 		], [
             'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -297,9 +300,9 @@ class GoodScaleController extends Controller
             'place_id.required'                 => 'Plant tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong',
-            'arr_item.array'                    => 'Item harus dalam bentuk array',
-            'document.required'                 => 'Bukti tidak boleh kosong',
-            'document.mimes'                    => 'Bukti harus dalam bentuk gambar JPG, JPEG, PNG atau dokumen PDF'
+            'arr_item.array'                    => 'Item harus dalam bentuk array.',
+            /* 'document.required'                 => 'Bukti tidak boleh kosong.',
+            'document.mimes'                    => 'Bukti harus dalam bentuk gambar JPG, JPEG, PNG atau dokumen PDF.', */
 		]);
 
         if($validation->fails()) {
@@ -310,6 +313,18 @@ class GoodScaleController extends Controller
         } else {
             DB::beginTransaction();
             try {
+
+                $imageName = '';
+                $newFile = '';
+                if($request->image_in){
+                    $image = $request->image_in;  // your base64 encoded
+                    $image = str_replace('data:image/png;base64,', '', $image);
+                    $image = str_replace(' ', '+', $image);
+                    $imageName = Str::random(35).'.'.'png';
+                    $newFile = 'public/good_scales/'.$imageName;
+                    Storage::put($newFile,base64_decode($image));
+                }
+
                 if($request->temp){
                 
                     $query = GoodScale::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -347,6 +362,10 @@ class GoodScaleController extends Controller
                         } else {
                             $document = $query->document;
                         }
+
+                        if(Storage::exists($query->image_in)){
+                            Storage::delete($query->image_in);
+                        }
                         
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
@@ -355,6 +374,7 @@ class GoodScaleController extends Controller
                         $query->post_date = $request->post_date;
                         $query->delivery_no = $request->delivery_no;
                         $query->document = $document;
+                        $query->image_in = $newFile ? $newFile : NULL;
                         $query->note = $request->note;
                         $query->status = '1';
 
@@ -382,6 +402,7 @@ class GoodScaleController extends Controller
                         'post_date'             => $request->post_date,
                         'delivery_no'           => $request->delivery_no,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
+                        'image_in'              => $newFile ? $newFile : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
                     ]);
@@ -549,6 +570,7 @@ class GoodScaleController extends Controller
     public function update(Request $request){
         $data = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
         $data['supplier_name'] = $data->account->employee_no.' - '.$data->account->name;
+        $data['image_in'] = $data->imageIn();
 
         $details = [];
         foreach($data->goodScaleDetail as $row){
@@ -609,6 +631,23 @@ class GoodScaleController extends Controller
 
         $adapo = false;
         $idgs = 0;
+
+        $gs = GoodScale::find($request->tempGoodScale);
+
+        if($gs){
+            $imageName = '';
+            $newFile = '';
+            if($request->image_out){
+                $image = $request->image_out;  // your base64 encoded
+                $image = str_replace('data:image/png;base64,', '', $image);
+                $image = str_replace(' ', '+', $image);
+                $imageName = Str::random(35).'.'.'png';
+                $newFile = 'public/good_scales/'.$imageName;
+                Storage::put($newFile,base64_decode($image));
+            }
+            $gs->image_out = $newFile ? $newFile : NULL;
+            $gs->save();
+        }
 
         foreach($request->arr_good_scale_detail as $key => $row){
             $query = GoodScaleDetail::find($row);

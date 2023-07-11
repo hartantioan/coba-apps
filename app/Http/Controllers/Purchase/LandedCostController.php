@@ -62,9 +62,16 @@ class LandedCostController extends Controller
             'landedcostfee' => LandedCostFee::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'LNDC-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = LandedCost::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function getAccountData(Request $request){
@@ -508,6 +515,7 @@ class LandedCostController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('landed_costs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:landed_costs,code',
             'company_id' 			    => 'required',
 			'vendor_id'                 => 'required',
             'post_date'                 => 'required',

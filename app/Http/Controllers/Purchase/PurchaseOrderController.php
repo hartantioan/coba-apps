@@ -63,9 +63,16 @@ class PurchaseOrderController extends Controller
             'machine'       => Machine::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'PORD-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = PurchaseOrder::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -407,6 +414,7 @@ class PurchaseOrderController extends Controller
     public function create(Request $request){
         if($request->inventory_type == '1'){
             $validation = Validator::make($request->all(), [
+                'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_orders,code',
                 'supplier_id' 				=> 'required',
                 'inventory_type'			=> 'required',
                 'purchasing_type'			=> 'required',
@@ -430,6 +438,8 @@ class PurchaseOrderController extends Controller
                 'arr_warehouse'             => 'required|array',
                 'discount'                  => 'required',
             ], [
+                'code.required' 	                => 'Kode tidak boleh kosong.',
+                'code.unique'                       => 'Kode telah dipakai',
                 'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
                 'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
                 'purchasing_type.required' 			=> 'Tipe PO tidak boleh kosong.',
@@ -460,6 +470,7 @@ class PurchaseOrderController extends Controller
             ]);
         }elseif($request->inventory_type == '2'){
             $validation = Validator::make($request->all(), [
+                'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_orders,code',
                 'supplier_id' 				=> 'required',
                 'inventory_type'			=> 'required',
                 'purchasing_type'			=> 'required',
@@ -481,6 +492,8 @@ class PurchaseOrderController extends Controller
                 'arr_disc3'                 => 'required|array',
                 'discount'                  => 'required',
             ], [
+                'code.required' 	                => 'Kode tidak boleh kosong.',
+                'code.unique'                       => 'Kode telah dipakai',
                 'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
                 'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
                 'purchasing_type.required' 			=> 'Tipe PO tidak boleh kosong.',
@@ -570,6 +583,7 @@ class PurchaseOrderController extends Controller
                         }
 
                         $query->user_id = session('bo_id');
+                        $query->code = $request->code;
                         $query->account_id = $request->supplier_id;
                         $query->inventory_type = $request->inventory_type;
                         $query->purchasing_type = $request->purchasing_type;
@@ -615,7 +629,7 @@ class PurchaseOrderController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseOrder::create([
-                        'code'			            => PurchaseOrder::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->supplier_id,
                         'inventory_type'	        => $request->inventory_type,

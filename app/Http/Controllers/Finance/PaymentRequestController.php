@@ -334,6 +334,8 @@ class PaymentRequestController extends Controller
 
             foreach($data->fundRequest as $row){
                 if(!$row->used()->exists() && $row->balancePaymentRequest() > 0 && $row->document_status !== '1'){
+                    $memo = 0;
+                    $final = $row->grandtotal - $memo;
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'fund_requests',
@@ -346,6 +348,11 @@ class PaymentRequestController extends Controller
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                        'downpayment'   => number_format(0,2,',','.'),
+                        'rounding'      => number_format(0,2,',','.'),
+                        'balance'       => number_format($row->grandtotal,2,',','.'),
+                        'memo'          => number_format($memo,2,',','.'),
+                        'final'         => number_format($final,2,',','.'),
                         'note'          => $row->note,
                     ];
                 }
@@ -353,6 +360,8 @@ class PaymentRequestController extends Controller
 
             foreach($data->purchaseDownPayment as $row){
                 if(!$row->used()->exists() && $row->balancePaymentRequest() > 0){
+                    $memo = 0;
+                    $final = $row->grandtotal - $memo;
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'purchase_down_payments',
@@ -365,13 +374,20 @@ class PaymentRequestController extends Controller
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                        'downpayment'   => number_format(0,2,',','.'),
+                        'rounding'      => number_format(0,2,',','.'),
+                        'balance'       => number_format($row->grandtotal,2,',','.'),
+                        'memo'          => number_format($memo,2,',','.'),
+                        'final'         => number_format($final,2,',','.'),
                         'note'          => $row->note,
                     ];
                 }
             }
 
             foreach($data->purchaseInvoice as $row){
-                if(!$row->used()->exists() && $row->balance > 0){
+                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0){
+                    $memo = $row->totalMemo();
+                    $final = $row->balance - $memo;
                     $details[] = [
                         'id'            => $row->id,
                         'type'          => 'purchase_invoices',
@@ -384,6 +400,11 @@ class PaymentRequestController extends Controller
                         'tax'           => number_format($row->tax,2,',','.'),
                         'wtax'          => number_format($row->wtax,2,',','.'),
                         'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                        'downpayment'   => number_format($row->downpayment,2,',','.'),
+                        'rounding'      => number_format($row->rounding,2,',','.'),
+                        'balance'       => number_format($row->balance,2,',','.'),
+                        'memo'          => number_format($memo,2,',','.'),
+                        'final'         => number_format($final,2,',','.'),
                         'note'          => $row->note,
                     ];
                 }

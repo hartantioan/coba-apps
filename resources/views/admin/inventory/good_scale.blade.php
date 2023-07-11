@@ -9,6 +9,14 @@
     table.bordered th {
         padding: 5px !important;
     }
+
+    video {
+        width:100%;
+    }
+
+    #previewImage, #previewImage1, #previewImageIn {
+        width:100%;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -123,6 +131,8 @@
                                                         <th>Supir</th>
                                                         <th>Keterangan</th>
                                                         <th>Dokumen</th>
+                                                        <th>Foto Masuk</th>
+                                                        <th>Foto Keluar</th>
                                                         <th>Status</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -232,6 +242,23 @@
                                 </div>                                
                             </div>
                             <div class="col m12 s12">
+                                <div class="input-field col m4 s12 select">
+                                    <select id="videoSource" name="videoSource" class="browser-default"></select>
+                                    <label for="videoSource" class="active">Sumber Kamera: </label>
+                                    <div class="mt-3 center">
+                                        <a class="btn waves-effect waves-light" href="javascript:void(0)" id="takePhoto">Ambil Gambar <i class="material-icons right">add_a_photo</i></a>
+                                    </div>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <h6>Layar Kamera :</h6>
+                                    <video id="video" autoplay muted playsinline></video>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <h6>Hasil Foto :</h6>
+                                    <img id="previewImage" src="">
+                                </div>
+                            </div>
+                            <div class="col m12 s12">
                                 <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
                             <div class="col m12 s12">
@@ -294,6 +321,7 @@
                     <div class="col s12">
                         <div class="row">
                             <input type="hidden" id="tempPlace">
+                            <input type="hidden" id="tempGoodScale" name="tempGoodScale">
                             <div class="col m1 s12">
                                 Kode
                             </div>
@@ -305,6 +333,27 @@
                             </div>
                             <div class="col m3 s12" id="supplierUpdate">
 
+                            </div>
+                            <div class="col m1 s12">
+                                Kamera:
+                            </div>
+                            <div class="col m3 s12">
+                                <select id="videoSource1" name="videoSource1" class="browser-default"></select>
+                            </div>
+                            <div class="col m12 s12">
+                                <div class="input-field col m4 s12">
+                                    <h6>Foto Masuk :</h6>
+                                    <img id="previewImageIn" src="">
+                                </div>
+                                <div class="input-field col m4 s12 center">
+                                    <h6>Layar Kamera :</h6>
+                                    <video id="video1" autoplay muted playsinline></video>
+                                    <a class="btn waves-effect waves-light mt-3" href="javascript:void(0)" id="takePhoto1">Ambil Gambar <i class="material-icons right">add_a_photo</i></a>
+                                </div>
+                                <div class="input-field col m4 s12">
+                                    <h6>Hasil Foto :</h6>
+                                    <img id="previewImage1" src="">
+                                </div>
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
@@ -494,6 +543,7 @@
 </div>
 
 <!-- END: Page Main-->
+<script src="{{ url('app-assets/js/custom/timbangan.js') }}"></script>
 <script>
     let interval;
 
@@ -524,13 +574,23 @@
             },
             onOpenEnd: function(modal, trigger) { 
                 getWeight();
+                getStream().then(getDevices).then(gotDevices);
             },
             onCloseEnd: function(modal, trigger){
                 $('#body-item-update').empty();
                 $('#supplierUpdate').text('');
                 $('#codeUpdate').text('');
                 $('#tempPlace').val('');
+                $('#tempGoodScale').val('');
+                $('#previewImageIn').attr('src','');
                 clearGetWeight();
+                $('#videoSource1').empty();
+                $('#previewImage1').attr('src','');
+                if (window.stream) {
+                    window.stream.getTracks().forEach(track => {
+                        track.stop();
+                    });
+                }
             },
             dismissible:false,
         });
@@ -552,6 +612,7 @@
                     return 'You will lose all changes made since your last save';
                 };
                 getWeight();
+                getStream().then(getDevices).then(gotDevices);
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -566,6 +627,13 @@
                 };
                 clearGetWeight();
                 $('.row_item').remove();
+                $('#videoSource').empty();
+                $('#previewImage').attr('src','');
+                if (window.stream) {
+                    window.stream.getTracks().forEach(track => {
+                        track.stop();
+                    });
+                }
             }
         });
 
@@ -708,6 +776,8 @@
                 { name: 'driver', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'image_in', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'image_out', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1257,85 +1327,97 @@
                 
                 var formData = new FormData($('#form_data')[0]);
 
-                formData.delete("arr_item[]");
-                formData.delete("arr_purchase[]");
-                formData.delete("arr_qty_in[]");
-                formData.delete("arr_qty_out[]");
-                formData.delete("arr_note[]");
-                formData.delete("arr_note2[]");
+                var s = $('#previewImage').attr('src') ? $('#previewImage').attr('src') : '';
 
-                $('[name^="arr_item"]').each(function(index){
-                    formData.append('arr_item[]',($(this).val() ? $(this).val() : ''));
-                    formData.append('arr_purchase[]',($('[name^="arr_purchase"]').eq(index).val() ? $('[name^="arr_purchase"]').eq(index).val() : ''));
-                    formData.append('arr_qty_in[]',($('[name^="arr_qty_in"]').eq(index).val() ? $('[name^="arr_qty_in"]').eq(index).val() : ''));
-                    formData.append('arr_qty_out[]',($('[name^="arr_qty_out"]').eq(index).val() ? $('[name^="arr_qty_out"]').eq(index).val() : ''));
-                    formData.append('arr_note[]',($('[name^="arr_note"]').eq(index).val() ? $('[name^="arr_note"]').eq(index).val() : ''));
-                    formData.append('arr_note2[]',($('[name^="arr_note2"]').eq(index).val() ? $('[name^="arr_note2"]').eq(index).val() : ''));
-                });
+                if(s){
+                    formData.delete("arr_item[]");
+                    formData.delete("arr_purchase[]");
+                    formData.delete("arr_qty_in[]");
+                    formData.delete("arr_qty_out[]");
+                    formData.delete("arr_note[]");
+                    formData.delete("arr_note2[]");
 
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
+                    formData.append('image_in', s);
 
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
+                    $('[name^="arr_item"]').each(function(index){
+                        formData.append('arr_item[]',($(this).val() ? $(this).val() : ''));
+                        formData.append('arr_purchase[]',($('[name^="arr_purchase"]').eq(index).val() ? $('[name^="arr_purchase"]').eq(index).val() : ''));
+                        formData.append('arr_qty_in[]',($('[name^="arr_qty_in"]').eq(index).val() ? $('[name^="arr_qty_in"]').eq(index).val() : ''));
+                        formData.append('arr_qty_out[]',($('[name^="arr_qty_out"]').eq(index).val() ? $('[name^="arr_qty_out"]').eq(index).val() : ''));
+                        formData.append('arr_note[]',($('[name^="arr_note"]').eq(index).val() ? $('[name^="arr_note"]').eq(index).val() : ''));
+                        formData.append('arr_note2[]',($('[name^="arr_note2"]').eq(index).val() ? $('[name^="arr_note2"]').eq(index).val() : ''));
+                    });
+
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: false,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
                                 });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
                             });
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Foto cctv timbang masuk tidak boleh kosong.',
+                        icon: 'warning'
+                    });
+                }
             }
         });
     }
@@ -1355,49 +1437,62 @@
                 
                 var formData = new FormData($('#form_data_update')[0]);
 
-                formData.delete("arr_pod[]");
+                var s = $('#previewImage1').attr('src') ? $('#previewImage1').attr('src') : '';
 
-                $('[name^="arr_pod"]').each(function(index){
-                    formData.append('arr_pod[]',($('[name^="arr_pod"]').eq(index).val() ? $('[name^="arr_pod"]').eq(index).val() : ''));
-                });
+                if(s){
 
-                $.ajax({
-                    url: '{{ Request::url() }}/save_update',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            successUpdate();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
+                    formData.delete("arr_pod[]");
+
+                    formData.append('image_out', s);
+
+                    $('[name^="arr_pod"]').each(function(index){
+                        formData.append('arr_pod[]',($('[name^="arr_pod"]').eq(index).val() ? $('[name^="arr_pod"]').eq(index).val() : ''));
+                    });
+
+                    $.ajax({
+                        url: '{{ Request::url() }}/save_update',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: false,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                successUpdate();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
                             });
                         }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Foto cctv timbang keluar tidak boleh kosong.',
+                        icon: 'warning'
+                    });
+                }
             }
         });
     }
@@ -1420,6 +1515,8 @@
                 loadingClose('#main');
                 $('#modal6').modal('open');
                 $('#tempPlace').val(response.place_id);
+                $('#tempGoodScale').val(response.id);
+                $('#previewImageIn').attr('src',response.image_in);
                 $('#codeUpdate').text(response.code);
                 $('#supplierUpdate').text(response.supplier_name);
 

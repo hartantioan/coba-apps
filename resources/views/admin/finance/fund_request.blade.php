@@ -118,6 +118,9 @@
                                                         <th rowspan="2">PPN</th>
                                                         <th rowspan="2">PPh</th>
                                                         <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">Diterima</th>
+                                                        <th rowspan="2">Dipakai</th>
+                                                        <th rowspan="2">Sisa</th>
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Status</th>
@@ -317,10 +320,13 @@
                 { name: 'payment_type', className: 'center-align' },
                 { name: 'name_account', className: 'center-align' },
                 { name: 'no_account', className: 'center-align' },
-                { name: 'total', className: 'center-align' },
-                { name: 'tax', className: 'center-align' },
-                { name: 'wtax', className: 'center-align' },
-                { name: 'grandtotal', className: 'center-align' },
+                { name: 'total', className: 'right-align' },
+                { name: 'tax', className: 'right-align' },
+                { name: 'wtax', className: 'right-align' },
+                { name: 'grandtotal', className: 'right-align' },
+                { name: 'received', searchable: false, orderable: false, className: 'right-align' },
+                { name: 'used', searchable: false, orderable: false, className: 'right-align' },
+                { name: 'balance', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document_status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },

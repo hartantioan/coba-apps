@@ -183,6 +183,10 @@
                         <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO & LC. Untuk Inventori Transfer, supplier / vendor kosong dan tekan tombol Tampilkan Data.</i>
                         <div class="row">
                             <div class="input-field col m3 s12">
+                                <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                                <label class="active" for="code">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="supplier_id" name="supplier_id"></select>
                                 <label class="active" for="supplier_id">Supplier/Vendor</label>
@@ -204,7 +208,7 @@
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
@@ -1016,6 +1020,52 @@
         select2ServerSide('#vendor_id,#filter_vendor', '{{ url("admin/select2/supplier_vendor") }}');
         select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}');
     });
+
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+    };
+
+    function getCode(val){
+        if(val.length == 9){
+            $.ajax({
+                url: '{{ Request::url() }}/get_code',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    val: val,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#code').val(response);
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
+    function changeDateMinimum(val){
+        if(val){
+            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                if(newcode.length > 9){
+                    newcode = newcode.substring(0, 9);
+                }
+            }
+            $('#code').val(newcode).trigger('keyup');
+        }
+    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;

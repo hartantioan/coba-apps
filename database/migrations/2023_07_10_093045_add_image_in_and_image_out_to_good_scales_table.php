@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('good_scales', function (Blueprint $table) {
+            $table->string('image_in')->after('document')->nullable();
+            $table->string('image_out')->after('image_in')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('good_scales', function (Blueprint $table) {
+            $table->dropColumn('image_in','image_out');
+        });
+    }
+};

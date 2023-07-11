@@ -60,6 +60,7 @@ class PurchaseRequestController extends Controller
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'PRQS-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -463,6 +464,7 @@ class PurchaseRequestController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('purchase_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_requests,code',
 			'post_date' 				=> 'required',
 			'due_date'			        => 'required',
 			'required_date'		        => 'required',
@@ -473,6 +475,8 @@ class PurchaseRequestController extends Controller
             'arr_place'                 => 'required|array',
             'arr_department'            => 'required|array'
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
 			'required_date.required' 			=> 'Tanggal dipakai tidak boleh kosong.',
@@ -534,6 +538,7 @@ class PurchaseRequestController extends Controller
                             $document = $query->document;
                         }
                         
+                        $query->code = $request->code;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->required_date = $request->required_date;
@@ -562,7 +567,7 @@ class PurchaseRequestController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseRequest::create([
-                        'code'			=> PurchaseRequest::generateCode($request->post_date),
+                        'code'			=> $request->code,
                         'user_id'		=> session('bo_id'),
                         'company_id'    => $request->company_id,
                         'status'        => '1',
@@ -656,6 +661,12 @@ class PurchaseRequestController extends Controller
         $pr['details'] = $arr;
         				
 		return response()->json($pr);
+    }
+
+    public function getCode(Request $request){
+        $code = PurchaseRequest::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function destroy(Request $request){

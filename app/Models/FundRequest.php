@@ -87,6 +87,30 @@ class FundRequest extends Model
         });
     }
 
+    public function totalReceivable(){
+        $total = 0;
+        if($this->document_status == '3'){
+            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment');
+            })->get() as $row){
+                $total += $row->nominal;
+            }
+        }
+        return $total;
+    }
+
+    public function totalReceivableUsed(){
+        $total = 0;
+        if($this->document_status == '3'){
+            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment');
+            })->get() as $row){
+                $total += $row->totalOutgoingUsedWeight();
+            }
+        }
+        return $total;
+    }
+
     public function closeBillDetail(){
         return $this->hasMany('App\Models\CloseBillDetail','fund_request_id','id')->whereHas('closeBill',function($query){
             $query->whereIn('status',['2','3']);

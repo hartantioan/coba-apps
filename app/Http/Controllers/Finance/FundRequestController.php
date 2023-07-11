@@ -7,6 +7,7 @@ use App\Models\ApprovalSource;
 use App\Models\Currency;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
+use App\Models\JournalDetail;
 use App\Models\LandedCost;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
@@ -46,7 +47,7 @@ class FundRequestController extends Controller
 
     public function index(Request $request)
     {
-        $data = [
+        /* $data = [
             'title'     => 'Permohonan Dana',
             'content'   => 'admin.finance.fund_request',
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
@@ -54,7 +55,26 @@ class FundRequestController extends Controller
             'wtax'      => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+        
+        $dataDebit = JournalDetail::where('account_id',14)->where('coa_id',122)->where('type','1')->get();
+        $dataCredit = JournalDetail::where('account_id',14)->where('coa_id',122)->where('type','2')->get();
+        /* echo number_format($dataDebit,2,',','.').' - '.number_format($dataCredit,2,',','.'); */
+        echo '<table><tr><td>KODE</td><td>Nominal</td></tr>';
+
+        foreach($dataDebit as $row){
+            echo '<tr><td>'.$row->journal->code.'</td><td>'.$row->nominal.'</td></tr>';
+        }
+
+        echo '</table>';
+
+        echo '<table><tr><td>KODE</td><td>Nominal</td></tr>';
+
+        foreach($dataCredit as $row){
+            echo '<tr><td>'.$row->journal->code.'</td><td>'.$row->nominal.'</td></tr>';
+        }
+
+        echo '</table>';
     }
 
     public function datatable(Request $request){
@@ -154,6 +174,9 @@ class FundRequestController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                $totalReceivable = $val->totalReceivable();
+                $totalReceivableUsed = $val->totalReceivableUsed();
+                $totalReceivableBalance = $totalReceivable - $totalReceivableUsed;
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->user->name,
@@ -175,6 +198,9 @@ class FundRequestController extends Controller
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
+                    number_format($totalReceivable,2,',','.'),
+                    number_format($totalReceivableUsed,2,',','.'),
+                    number_format($totalReceivableBalance,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     '
                         <select class="browser-default" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
@@ -701,6 +727,9 @@ class FundRequestController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                $totalReceivable = $val->totalReceivable();
+                $totalReceivableUsed = $val->totalReceivableUsed();
+                $totalReceivableBalance = $totalReceivable - $totalReceivableUsed;
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -721,6 +750,9 @@ class FundRequestController extends Controller
                     number_format($val->tax,2,',','.'),
                     number_format($val->wtax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
+                    number_format($totalReceivable,2,',','.'),
+                    number_format($totalReceivableUsed,2,',','.'),
+                    number_format($totalReceivableBalance,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->documentStatus(),
                     $val->status(),

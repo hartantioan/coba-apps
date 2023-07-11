@@ -788,6 +788,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[PurchaseRequestController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseRequestController::class, 'rowDetail']);
                     Route::post('show', [PurchaseRequestController::class, 'show']);
+                    Route::post('get_code', [PurchaseRequestController::class, 'getCode']);
                     Route::post('print',[PurchaseRequestController::class, 'print']);
                     Route::get('export',[PurchaseRequestController::class, 'export']);
                     Route::post('print_by_range',[PurchaseRequestController::class, 'printByRange']);
@@ -810,6 +811,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[PurchaseOrderController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseOrderController::class, 'rowDetail']);
                     Route::post('show', [PurchaseOrderController::class, 'show']);
+                    Route::post('get_code', [PurchaseOrderController::class, 'getCode']);
                     Route::post('print',[PurchaseOrderController::class, 'print']);
                     Route::post('print_by_range',[PurchaseOrderController::class, 'printByRange']);
                     Route::get('export',[PurchaseOrderController::class, 'export']);
@@ -829,6 +831,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[PurchaseDownPaymentController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseDownPaymentController::class, 'rowDetail']);
                     Route::post('show', [PurchaseDownPaymentController::class, 'show']);
+                    Route::post('get_code', [PurchaseDownPaymentController::class, 'getCode']);
                     Route::post('print',[PurchaseDownPaymentController::class, 'print']);
                     Route::post('print_by_range',[PurchaseDownPaymentController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[PurchaseDownPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
@@ -849,6 +852,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[LandedCostController::class, 'datatable']);
                     Route::get('row_detail',[LandedCostController::class, 'rowDetail']);
                     Route::post('show', [LandedCostController::class, 'show']);
+                    Route::post('get_code', [LandedCostController::class, 'getCode']);
                     Route::post('print',[LandedCostController::class, 'print']);
                     Route::post('print_by_range',[LandedCostController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[LandedCostController::class, 'printIndividual'])->withoutMiddleware('direct.access');

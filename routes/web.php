@@ -8,6 +8,7 @@ use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
 use App\Http\Controllers\MasterData\HardwareItemGroupController;
 use App\Http\Controllers\Purchase\OutStandingAPController;
+use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
 use App\Http\Controllers\Purchase\PurchaseReportController;
 use App\Http\Controllers\Usage\ReceptionHardwareItemUsageController;
 use App\Http\Controllers\Usage\ReturnHardwareItemUsageController;
@@ -810,6 +811,21 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[PurchaseReportController::class, 'index']);
                     });
 
+                    Route::prefix('purchase_payment_history')->middleware('operation.access:purchase_payment_history,view')->group(function () {
+                        Route::get('/',[PurchasePaymentHistoryController::class, 'index']);
+                        Route::get('datatable',[PurchasePaymentHistoryController::class, 'datatable']);
+                        Route::get('row_detail',[PurchasePaymentHistoryController::class, 'rowDetail']);
+                        Route::post('show', [PurchasePaymentHistoryController::class, 'show']);
+                        Route::post('print',[PurchasePaymentHistoryController::class, 'print']);
+                        Route::get('export',[PurchasePaymentHistoryController::class, 'export']);
+                        Route::post('print_by_range',[PurchasePaymentHistoryController::class, 'printByRange']);
+                        Route::post('get_details', [PurchasePaymentHistoryController::class, 'getDetails']);
+                        Route::get('view_journal/{id}',[PurchasePaymentHistoryController::class, 'viewJournal'])->middleware('operation.access:purchase_payment_history,journal');
+                        Route::get('viewstructuretree',[PurchasePaymentHistoryController::class, 'viewStructureTree']);
+                        Route::get('print_individual/{id}',[PurchasePaymentHistoryController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                        Route::post('view_history_payment', [PurchasePaymentHistoryController::class, 'viewHistoryPayment']);
+                    });
+
                     Route::prefix('outstanding_ap')->middleware('operation.access:outstanding_ap,view')->group(function () {
                         Route::get('/',[OutStandingAPController::class, 'index']);
                         Route::post('filter_by_date',[OutStandingAPController::class, 'filterByDate']);
@@ -918,6 +934,9 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[PurchaseMemoController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseMemoController::class, 'destroy'])->middleware('operation.access:purchase_memo,delete');
                 });
+
+                
+
             });
 
             Route::prefix('inventory')->middleware('direct.access')->group(function () {

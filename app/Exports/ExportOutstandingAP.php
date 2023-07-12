@@ -21,6 +21,7 @@ class ExportOutstandingAP implements FromView , WithEvents
     }
     public function view(): View
     {
+        $totalAll=0;
         $request='kas';
         $array_filter = [];
         $query_data = PurchaseInvoice::where(function($query) use ( $request) {
@@ -41,6 +42,7 @@ class ExportOutstandingAP implements FromView , WithEvents
                     'sisa'=>$row_invoice->getTotalPaidByDate($this->date)
                 ];
                 $detail=[];
+                $totalAll+=$row_invoice->balance;
                 foreach($row_invoice->purchaseInvoiceDetail as $row){
                     
                     if($row->purchaseOrderDetail()){
@@ -116,7 +118,8 @@ class ExportOutstandingAP implements FromView , WithEvents
                 
             }  
         return view('admin.exports.outstanding', [
-            'data' => $array_filter
+            'data' => $array_filter,
+            'totalall' =>number_format($totalAll,2,',','.')
         ]);
     }
 

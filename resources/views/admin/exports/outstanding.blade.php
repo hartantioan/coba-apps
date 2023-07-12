@@ -75,5 +75,29 @@
                 </td>
             </tr>
         @endif
+        
     </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>GrandTotal</td>
+            <td>{{$totalall}}</td>
+        </tr>
+    </tfoot>
 </table>

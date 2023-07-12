@@ -34,7 +34,7 @@ class OutStandingAPController extends Controller
                 }
             })
             ->get();    
-    
+        $totalAll = 0;
         if($query_data){
             foreach($query_data as $row_invoice){
                 $data_tempura = [
@@ -48,6 +48,7 @@ class OutStandingAPController extends Controller
                     'sisa'=>number_format($row_invoice->getTotalPaidByDate($request->date),2,',','.'),
                 ];
                 $detail=[];
+                $totalAll+=$row_invoice->balance;
                 foreach($row_invoice->purchaseInvoiceDetail as $row){
                     
                     if($row->purchaseOrderDetail()){
@@ -113,19 +114,21 @@ class OutStandingAPController extends Controller
                         
                         ];
                     }
-
+                    
                    
                 }
                 info($data_tempura['sisa']);
                 if($data_tempura['sisa'] != number_format(0,2,',','.')){
                     $data_tempura['details']=$detail;
                     $array_filter[]=$data_tempura;
+                    
                 }
                 
             }
             $response =[
                 'status'=>200,
-                'message'  =>$array_filter
+                'message'  =>$array_filter,
+                'totalall' =>number_format($totalAll,2,',','.')
             ];
         }else{
             $response =[

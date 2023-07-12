@@ -145,8 +145,9 @@
                 loadingClose('.modal-content');
                 if(response.status == 200) {
                     $('#detail_invoice').empty();
+                    var gtall=0;
                     $.each(response.message, function(i, val) {
-                        console.log(val);
+                        gtall+=val.grandtotal;
                         $('#detail_invoice').append(`
                             <tr>
                                 <td class="center-align" rowspan="`+val.details.length+`">`+(i+1)+`</td>
@@ -190,7 +191,11 @@
                             }
                         });
                     });
-                    
+                    $('#detail_invoice').append(`
+                        <tr>
+                            <td colspan="20" class="right-align">Grandtotal:`+response.totalall+`</td>
+                        </tr>
+                    `);
            
                     M.toast({
                         html: 'filtered'

@@ -52,9 +52,16 @@ class PurchaseMemoController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'PMMO-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = PurchaseMemo::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function getDetails(Request $request){
@@ -308,6 +315,7 @@ class PurchaseMemoController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			        => $request->temp ? ['required', Rule::unique('purchase_memos', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_memos,code',
 			'account_id' 			=> 'required',
             'company_id'            => 'required',
             'post_date'             => 'required',
@@ -319,6 +327,8 @@ class PurchaseMemoController extends Controller
             'arr_wtax'                  => 'required|array',
             'arr_grandtotal'            => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai',
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
@@ -399,6 +409,7 @@ class PurchaseMemoController extends Controller
                             $document = $query->document;
                         }
 
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
@@ -431,7 +442,7 @@ class PurchaseMemoController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseMemo::create([
-                        'code'			            => PurchaseMemo::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,

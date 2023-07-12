@@ -1,14 +1,33 @@
 <!-- BEGIN: Page Main-->
 <div id="main">
     <div class="row">
-        <div class="content-wrapper-before blue-grey lighten-5"></div>
+        <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
+            <!-- Search for small screen-->
+            <div class="container">
+                <div class="row">
+                    <div class="col s8 m6 l6">
+                        <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
+                        <ol class="breadcrumbs mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(2))) }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(3))) }}
+                            </li>
+                        </ol>
+                    </div>
+                    <div class="col s4 m6 l6">
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col s12">
             <div class="container">
                 <div class="section">
                     
                     <div class="row">
                         <div class="col s12 m12 l12">
-                            <div class="card padding-4 animate fadeLeft">
+                            <div class="card padding-4">
                                 <div class="row">
                                     <form class="row" id="form_data_filter" onsubmit="return false;">
                                         <div class="col s12">
@@ -18,20 +37,15 @@
                                             <div class="row">
                                                 <div class="col m4 s6 ">
                                                     <label for="date" style="font-size:1rem;">Tanggal Posting :</label>
-                                                    <div class="input-field col s12">
                                                     <input type="date" id="date" name="date">
-                                                    </div>
                                                 </div>
-                                                <div class="col m4 s6 ">
-                                                    
-                                                </div>
-                                                <div class="col m4 s6 ">
-                                                    <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="filterByDate();">
+                                                <div class="col m4 s6 pt-2">
+                                                    <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
                                                         <i class="material-icons hide-on-med-and-up">search</i>
                                                         <span class="hide-on-small-onl">Filter</span>
                                                         <i class="material-icons right">search</i>
                                                     </a>
-                                                    <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                                    <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                         <i class="material-icons hide-on-med-and-up">view_list</i>
                                                         <span class="hide-on-small-onl">Excel</span>
                                                         <i class="material-icons right">view_list</i>

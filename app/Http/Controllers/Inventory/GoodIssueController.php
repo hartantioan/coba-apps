@@ -49,9 +49,16 @@ class GoodIssueController extends Controller
             'department'=> Department::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'GISS-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = GoodIssue::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -188,12 +195,15 @@ class GoodIssueController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('good_issues', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:good_issues,code',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
             'arr_item_stock'            => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_coa'                   => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'warehouse_id.required'				=> 'Gudang tujuan tidak boleh kosong',
@@ -307,6 +317,7 @@ class GoodIssueController extends Controller
                             $document = $query->document;
                         }
                         
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
@@ -328,7 +339,7 @@ class GoodIssueController extends Controller
                     }
                 }else{
                     $query = GoodIssue::create([
-                        'code'			        => GoodIssue::generateCode($request->post_date),
+                        'code'			        => $request->code,
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,

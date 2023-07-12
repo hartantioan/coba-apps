@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\GoodReturnPO;
 use App\Models\User;
@@ -48,6 +49,7 @@ class GoodReturnPOController extends Controller
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'GRRT-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -235,8 +237,15 @@ class GoodReturnPOController extends Controller
         return response()->json($data);
     }
 
+    public function getCode(Request $request){
+        $code = GoodReturnPO::generateCode($request->val);
+        				
+		return response()->json($code);
+    }
+
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('good_returns', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:good_returns,code',
             'account_id'                => 'required',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
@@ -244,6 +253,8 @@ class GoodReturnPOController extends Controller
             'arr_qty'                   => 'required|array',
             'arr_good_receipt_detail'   => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai.',
             'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -347,6 +358,7 @@ class GoodReturnPOController extends Controller
                             $document = $query->document;
                         }
                         
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
@@ -379,7 +391,7 @@ class GoodReturnPOController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = GoodReturnPO::create([
-                        'code'			        => GoodReturnPO::generateCode($request->post_date),
+                        'code'			        => $request->code,
                         'user_id'		        => session('bo_id'),
                         'account_id'            => $request->account_id,
                         'company_id'            => $request->company_id,

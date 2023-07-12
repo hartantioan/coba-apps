@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\InventoryTransferOut;
 use App\Models\inventoryTransferOutDetail;
@@ -44,9 +45,16 @@ class InventoryTransferOutController extends Controller
             'warehouse' => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'ITOU-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = InventoryTransferOut::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -214,6 +222,7 @@ class InventoryTransferOutController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_outs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:inventory_transfer_outs,code',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
             'place_from'                => 'required',
@@ -224,6 +233,8 @@ class InventoryTransferOutController extends Controller
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
             'place_from.required' 				=> 'Plant asal tidak boleh kosong.',
@@ -360,6 +371,7 @@ class InventoryTransferOutController extends Controller
                             $document = $query->document;
                         }
                         
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->place_from = $request->place_from;
@@ -391,7 +403,7 @@ class InventoryTransferOutController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = InventoryTransferOut::create([
-                        'code'			        => InventoryTransferOut::generateCode($request->post_date),
+                        'code'			        => $request->code,
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'place_from'            => $request->place_from,

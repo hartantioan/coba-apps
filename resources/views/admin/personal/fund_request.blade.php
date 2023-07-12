@@ -14,9 +14,9 @@
     .browser-default {
         height: 2rem !important;
     }
-    /* .select-wrapper {
-        height: 60px !important;
-    } */
+    .select-wrapper, .select2-container {
+        height:3.6rem !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -136,6 +136,10 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
+                            <div class="input-field col m3 s12">
+                                <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                                <label class="active" for="code">No. Dokumen</label>
+                            </div>
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
                                 <input type="hidden" id="tempLimit" value="0">
@@ -493,12 +497,54 @@
         select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
     }
 
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+    };
+
+    function getCode(val){
+        if(val.length == 9){
+            $.ajax({
+                url: '{{ Request::url() }}/get_code',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    val: val,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#code').val(response);
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
     function changeDateMinimum(val){
         if(val){
             $('#required_date').attr("min",val);
             $('input[name^="arr_required_date"]').each(function(){
                 $(this).attr("min",val);
             });
+
+            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                if(newcode.length > 9){
+                    newcode = newcode.substring(0, 9);
+                }
+            }
+            $('#code').val(newcode).trigger('keyup');
         }
     }
 
@@ -787,6 +833,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code').val(response.code);
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
                 $('#required_date').val(response.required_date);

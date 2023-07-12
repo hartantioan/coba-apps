@@ -46,9 +46,16 @@ class InventoryTransferInController extends Controller
             'company'   => Company::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'ITIN-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = InventoryTransferIn::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function sendUsedData(Request $request){
@@ -241,10 +248,13 @@ class InventoryTransferInController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_ins', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:inventory_transfer_ins,code',
             'company_id'                => 'required',
             'inventory_transfer_out_id' => 'required',
 			'post_date'		            => 'required',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'inventory_transfer_out_id.required'=> 'Inventori Transfer Asal tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -296,6 +306,7 @@ class InventoryTransferInController extends Controller
                             $document = $query->document;
                         }
                         
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->inventory_transfer_out_id = $request->inventory_transfer_out_id;
@@ -319,7 +330,7 @@ class InventoryTransferInController extends Controller
                     }
                 }else{
                     $query = InventoryTransferIn::create([
-                        'code'			            => InventoryTransferIn::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'company_id'		        => $request->company_id,
                         'inventory_transfer_out_id' => $request->inventory_transfer_out_id,

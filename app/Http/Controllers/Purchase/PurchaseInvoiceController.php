@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\LandedCost;
 use App\Models\PurchaseInvoice;
@@ -63,9 +64,16 @@ class PurchaseInvoiceController extends Controller
             'machine'       => Machine::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'PINV-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = PurchaseInvoice::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function getAccountData(Request $request){
@@ -533,18 +541,21 @@ class PurchaseInvoiceController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'account_id' 			=> 'required',
-			'type'                  => 'required',
-            'company_id'            => 'required',
-            'post_date'             => 'required',
-            'received_date'         => 'required',
-            'due_date'              => 'required',
-            'document_date'         => 'required',
+            'code'			            => $request->temp ? ['required', Rule::unique('purchase_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_invoices,code',
+			'account_id' 			    => 'required',
+			'type'                      => 'required',
+            'company_id'                => 'required',
+            'post_date'                 => 'required',
+            'received_date'             => 'required',
+            'due_date'                  => 'required',
+            'document_date'             => 'required',
             'arr_type'                  => 'required|array',
             'arr_total'                 => 'required|array',
             'arr_tax'                   => 'required|array',
             'arr_grandtotal'            => 'required|array'
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai',
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
 			'type.required'                     => 'Tipe invoice tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -625,6 +636,7 @@ class PurchaseInvoiceController extends Controller
                             $document = $query->document;
                         }
 
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
@@ -673,7 +685,7 @@ class PurchaseInvoiceController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PurchaseInvoice::create([
-                        'code'			            => PurchaseInvoice::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,

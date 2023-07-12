@@ -48,9 +48,16 @@ class JournalController extends Controller
             'machine'   => Machine::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'JOEN-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = Journal::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -268,61 +275,64 @@ class JournalController extends Controller
     }
 
     public function create(Request $request){
-        $validation = Validator::make($request->all(), [
-            'company_id'                => 'required',
-			'note'                      => 'required',
-            'post_date'                 => 'required',
-            'due_date'                  => 'required',
-            'currency_id'               => 'required',
-            'currency_rate'             => 'required',
-            'arr_type'                  => 'required|array',
-            'arr_place'                 => 'required|array',
-            'arr_department'            => 'required|array',
-            'arr_nominal'               => 'required|array',
-		], [
-            'company_id.required'               => 'Perusahaan tidak boleh kosong',
-			'note.required'                     => 'Catatan tidak boleh kosong',
-            'post_date.required'                => 'Tgl post tidak boleh kosong.',
-            'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
-            'currency_rate.required'            => 'Konversi tidak boleh kosong.',
-            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'arr_type.required'                 => 'Tipe tidak boleh kosong.',
-            'arr_type.array'                    => 'Tipe harus dalam bentuk array.',
-            'arr_place.required'                => 'Penempatan tidak boleh kosong.',
-            'arr_place.array'                   => 'Penempatan harus dalam bentuk array.',
-            'arr_department.required'           => 'Departemen tidak boleh kosong.',
-            'arr_department.array'              => 'Departemen harus dalam bentuk array.',
-            'arr_nominal.required'              => 'Nominal tidak boleh kosong.',
-            'arr_nominal.array'                 => 'Nominal harus dalam bentuk array.',
-		]);
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'code' 				        => $request->temp ? ['required', Rule::unique('journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:journals,code',
+                'company_id'                => 'required',
+                'note'                      => 'required',
+                'post_date'                 => 'required',
+                'due_date'                  => 'required',
+                'currency_id'               => 'required',
+                'currency_rate'             => 'required',
+                'arr_type'                  => 'required|array',
+                'arr_place'                 => 'required|array',
+                'arr_department'            => 'required|array',
+                'arr_nominal'               => 'required|array',
+            ], [
+                'code.required' 				    => 'Kode/No tidak boleh kosong.',
+                'code.unique' 				        => 'Kode/No telah dipakai.',
+                'company_id.required'               => 'Perusahaan tidak boleh kosong',
+                'note.required'                     => 'Catatan tidak boleh kosong',
+                'post_date.required'                => 'Tgl post tidak boleh kosong.',
+                'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
+                'currency_rate.required'            => 'Konversi tidak boleh kosong.',
+                'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+                'arr_type.required'                 => 'Tipe tidak boleh kosong.',
+                'arr_type.array'                    => 'Tipe harus dalam bentuk array.',
+                'arr_place.required'                => 'Penempatan tidak boleh kosong.',
+                'arr_place.array'                   => 'Penempatan harus dalam bentuk array.',
+                'arr_department.required'           => 'Departemen tidak boleh kosong.',
+                'arr_department.array'              => 'Departemen harus dalam bentuk array.',
+                'arr_nominal.required'              => 'Nominal tidak boleh kosong.',
+                'arr_nominal.array'                 => 'Nominal harus dalam bentuk array.',
+            ]);
 
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
-            
-            $totalDebit = 0; 
-            $totalCredit = 0;
-            foreach($request->arr_nominal as $key => $row){
-                if($request->arr_type[$key] == '1'){
-                    $totalDebit += str_replace(',','.',str_replace('.','',$row));
-                }elseif($request->arr_type[$key] == '2'){
-                    $totalCredit += str_replace(',','.',str_replace('.','',$row));
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
+                
+                $totalDebit = 0; 
+                $totalCredit = 0;
+                foreach($request->arr_nominal as $key => $row){
+                    if($request->arr_type[$key] == '1'){
+                        $totalDebit += str_replace(',','.',str_replace('.','',$row));
+                    }elseif($request->arr_type[$key] == '2'){
+                        $totalCredit += str_replace(',','.',str_replace('.','',$row));
+                    }
                 }
-            }
 
-            if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Total debit dan kredit selisih '.(number_format($totalDebit - $totalCredit,2,',','.'))
-                ]);
-            }
+                if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Total debit dan kredit selisih '.(number_format($totalDebit - $totalCredit,2,',','.'))
+                    ]);
+                }
 
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+                if($request->temp){
                     $query = Journal::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -351,6 +361,7 @@ class JournalController extends Controller
 
                     if(in_array($query->status,['1','6'])){
 
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->currency_id = $request->currency_id;
@@ -369,19 +380,12 @@ class JournalController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status jurnal sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status jurnal sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
-                    
+                }else{
                     $query = Journal::create([
-                        'code'			            => Journal::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'currency_id'               => $request->currency_id,
                         'company_id'                => $request->company_id,
@@ -391,18 +395,11 @@ class JournalController extends Controller
                         'note'                      => $request->note,
                         'status'                    => '1'
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
                 
-                if($request->arr_type){
-                    DB::beginTransaction();
-                    try {
+                if($query) {
+                    
+                    if($request->arr_type){
                         foreach($request->arr_type as $key => $row){
                             JournalDetail::create([
                                 'journal_id'                    => $query->id,
@@ -418,34 +415,35 @@ class JournalController extends Controller
                                 'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
                             ]);
                         }
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
                     }
+
+                    CustomHelper::sendApproval('journals',$query->id,$query->note);
+                    CustomHelper::sendNotification('journals',$query->id,'Pengajuan Jurnal No. '.$query->code,$query->note,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new Journal())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit journal.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
+            }
+            
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        }
 
-                CustomHelper::sendApproval('journals',$query->id,$query->note);
-                CustomHelper::sendNotification('journals',$query->id,'Pengajuan Jurnal No. '.$query->code,$query->note,session('bo_id'));
-
-                activity()
-                    ->performedOn(new Journal())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit journal.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
-		
-		return response()->json($response);
+        return response()->json($response);
     }
 
     public function createMulti(Request $request){

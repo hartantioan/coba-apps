@@ -159,6 +159,10 @@
                     <div class="col s12">
                         <div class="row">
                             <div class="input-field col m3 s12">
+                                <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                                <label class="active" for="code">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
@@ -169,7 +173,7 @@
                             </div>
                             
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
@@ -503,6 +507,52 @@
 
         select2ServerSide('#inventory_transfer_out_id', '{{ url("admin/select2/inventory_transfer_out") }}');
     });
+
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+    };
+
+    function getCode(val){
+        if(val.length == 9){
+            $.ajax({
+                url: '{{ Request::url() }}/get_code',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    val: val,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#code').val(response);
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
+    function changeDateMinimum(val){
+        if(val){
+            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                if(newcode.length > 9){
+                    newcode = newcode.substring(0, 9);
+                }
+            }
+            $('#code').val(newcode).trigger('keyup');
+        }
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -868,6 +918,7 @@
                 $('#modal1').modal('open');
                 
                 $('#temp').val(id);
+                $('#code').val(response.code);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);

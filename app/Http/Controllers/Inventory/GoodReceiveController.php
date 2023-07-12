@@ -49,9 +49,16 @@ class GoodReceiveController extends Controller
             'department'=> Department::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'GRCV-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = GoodReceive::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -190,6 +197,7 @@ class GoodReceiveController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('good_receives', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:good_receives,code',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
 			'currency_id'		        => 'required',
@@ -200,6 +208,8 @@ class GoodReceiveController extends Controller
             'arr_coa'                   => 'required|array',
             'arr_warehouse'             => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'currency_id.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
@@ -288,6 +298,7 @@ class GoodReceiveController extends Controller
                             $document = $query->document;
                         }
                         
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
@@ -318,7 +329,7 @@ class GoodReceiveController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = GoodReceive::create([
-                        'code'			        => GoodReceive::generateCode($request->post_date),
+                        'code'			        => $request->code,
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,
@@ -351,7 +362,7 @@ class GoodReceiveController extends Controller
                             'coa_id'                => $request->arr_coa[$key],
                             'warehouse_id'          => $request->arr_warehouse[$key],
                             'place_id'              => $request->arr_place[$key],
-                            'department_id'         => $request->arr_department[$key]
+                            'department_id'         => isset($request->arr_department[$key]) ? $request->arr_department[$key] : NULL,
                         ]);
 
                     }
@@ -420,7 +431,7 @@ class GoodReceiveController extends Controller
                 <td class="center-align">'.$row->note.'</td>
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
                 <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
-                <td class="center-align">'.$row->department->name.'</td>
+                <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
             </tr>';
         }
@@ -428,26 +439,45 @@ class GoodReceiveController extends Controller
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
-                        <thead>
-                            <tr>
-                                <th class="center-align" colspan="4">Approval</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">Level</th>
-                                <th class="center-align">Kepada</th>
-                                <th class="center-align">Status</th>
-                                <th class="center-align">Catatan</th>
-                            </tr>
-                        </thead><tbody>';
-        
-        if($data->approval()){                
-            foreach($data->approval()->approvalMatrix as $key => $row){
+        <thead>
+            <tr>
+                <th class="center-align" colspan="4">Approval</th>
+            </tr>
+            <tr>
+                <th class="center-align">Level</th>
+                <th class="center-align">Kepada</th>
+                <th class="center-align">Status</th>
+                <th class="center-align">Catatan</th>
+            </tr>
+        </thead><tbody>';
+
+        if($data->approval() && $data->hasDetailMatrix()){
+            foreach($data->approval() as $detail){
                 $string .= '<tr>
-                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
-                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
-                    <td class="center-align">'.$row->note.'</td>
+                    <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
                 </tr>';
+                foreach($detail->approvalMatrix as $key => $row){
+                    $icon = '';
+    
+                    if($row->status == '1' || $row->status == '0'){
+                        $icon = '<i class="material-icons">hourglass_empty</i>';
+                    }elseif($row->status == '2'){
+                        if($row->approved){
+                            $icon = '<i class="material-icons">thumb_up</i>';
+                        }elseif($row->rejected){
+                            $icon = '<i class="material-icons">thumb_down</i>';
+                        }elseif($row->revised){
+                            $icon = '<i class="material-icons">border_color</i>';
+                        }
+                    }
+    
+                    $string .= '<tr>
+                        <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                        <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                        <td class="center-align">'.$icon.'<br></td>
+                        <td class="center-align">'.$row->note.'</td>
+                    </tr>';
+                }
             }
         }else{
             $string .= '<tr>

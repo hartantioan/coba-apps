@@ -44,9 +44,16 @@ class CapitalizationController extends Controller
             'currency'  => Currency::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'CAPT-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = Capitalization::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -170,6 +177,7 @@ class CapitalizationController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			        => $request->temp ? ['required', Rule::unique('capitalizations', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:capitalizations,code',
 			'post_date'			    => 'required',
 			'company_id'		    => 'required',
             'currency_id'		    => 'required',
@@ -181,6 +189,8 @@ class CapitalizationController extends Controller
             'arr_unit'              => 'required|array',
             'arr_total'             => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai.',
 			'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
 			'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'currency_id.required' 			    => 'Mata uang tidak boleh kosong.',
@@ -240,6 +250,8 @@ class CapitalizationController extends Controller
                 }
 
                 if(in_array($query->status,['1','6'])){
+
+                    $query->code = $request->code;
                     $query->user_id = session('bo_id');
                     $query->company_id = $request->company_id;
                     $query->currency_id = $request->currency_id;
@@ -264,7 +276,7 @@ class CapitalizationController extends Controller
                 }
 			}else{
                 $query = Capitalization::create([
-                    'code'			=> Capitalization::generateCode($request->post_date),
+                    'code'			=> $request->code,
                     'user_id'		=> session('bo_id'),
                     'company_id'    => $request->company_id,
                     'currency_id'   => $request->currency_id,

@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\InventoryTransferOut;
 use App\Models\inventoryTransferOutDetail;
@@ -47,9 +48,16 @@ class InventoryRevaluationController extends Controller
             'warehouse' => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'INRV-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = InventoryRevaluation::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -183,6 +191,7 @@ class InventoryRevaluationController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('inventory_revaluations', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:inventory_revaluations,code',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
             'arr_item_stock'            => 'required|array',
@@ -191,6 +200,8 @@ class InventoryRevaluationController extends Controller
             'arr_place'                 => 'required|array',
             'arr_warehouse'             => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
             'arr_item_stock.required'           => 'Item stock tidak boleh kosong',
@@ -251,7 +262,7 @@ class InventoryRevaluationController extends Controller
                     ]);
                 }
                 
-                /* if($request->temp){
+                if($request->temp){
                     
                     $query = InventoryRevaluation::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -281,6 +292,7 @@ class InventoryRevaluationController extends Controller
 
                     if(in_array($query->status,['1','6'])){
 
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
@@ -302,7 +314,7 @@ class InventoryRevaluationController extends Controller
                     }
                 }else{
                     $query = InventoryRevaluation::create([
-                        'code'			        => InventoryRevaluation::generateCode($request->post_date),
+                        'code'			        => $request->code,
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,
@@ -345,7 +357,7 @@ class InventoryRevaluationController extends Controller
                         'status'  => 500,
                         'message' => 'Data failed to save.'
                     ];
-                } */
+                }
 
                 DB::commit();
             }catch(\Exception $e){

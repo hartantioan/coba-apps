@@ -14,6 +14,10 @@
     .browser-default {
         height: 2rem !important;
     }
+
+    .select-wrapper, .select2-container {
+        height:3.6rem !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -190,17 +194,13 @@
                             <legend>1</legend>
                             <div class="row">
                                 <div class="input-field col m3 s12">
+                                    <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                                    <label class="active" for="code">No. Dokumen</label>
+                                </div>
+                                <div class="input-field col m3 s12">
                                     <input type="hidden" id="temp" name="temp">
                                     <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
                                     <label class="active" for="account_id">Partner Bisnis</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <select class="form-control" id="company_id" name="company_id">
-                                        @foreach ($company as $rowcompany)
-                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="" for="company_id">Perusahaan</label>
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <select class="form-control" id="payment_type" name="payment_type" onchange="showRekening();">
@@ -217,12 +217,20 @@
                                     <label class="active" for="coa_source_id">Kas / Bank</label>
                                     <span class="helper-text" data-error="wrong" data-success="right">Pilih kosong jika rekonsiliasi dengan piutang karyawan dan sisa bayar = 0.</span>
                                 </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="company_id" name="company_id">
+                                        @foreach ($company as $rowcompany)
+                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="company_id">Perusahaan</label>
+                                </div>
                                 <div class="input-field col m3 s12 op-element">
                                     <input id="payment_no" name="payment_no" type="text" value="-">
                                     <label class="active" for="payment_no">No. CEK/BG</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
                                 <div class="input-field col m3 s12 op-element">
@@ -494,8 +502,12 @@
                     <div class="col s12">
                         <div class="row">
                             <div class="input-field col m3 s12">
+                                <input id="codePay" name="codePay" type="text" value="{{ $newcodePay }}" onkeyup="getCodePay(this.value);">
+                                <label class="active" for="codePay">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <input type="hidden" id="tempPay" name="tempPay">
-                                <input id="pay_date_pay" name="pay_date_pay" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar">
+                                <input id="pay_date_pay" name="pay_date_pay" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar" onchange="changeDateMinimumPay(this.value);">
                                 <label class="active" for="pay_date_pay">Tgl. Bayar</label>
                             </div>
                             <div class="file-field input-field col m3 s12">
@@ -795,7 +807,7 @@
                         </td>
                     </tr>
                 `);
-                $('#account_id,#cost_distribution_id').empty();
+                $('#account_id,#cost_distribution_id,#coa_source_id').empty();
                 $('#admin,#grandtotal').val('0,00');
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -1005,6 +1017,94 @@
         });
         select2ServerSide('#cost_distribution_id', '{{ url("admin/select2/cost_distribution") }}');
     });
+
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+    };
+
+    function getCode(val){
+        if(val.length == 9){
+            $.ajax({
+                url: '{{ Request::url() }}/get_code',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    val: val,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#code').val(response);
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
+    function getCodePay(val){
+        if(val.length == 9){
+            $.ajax({
+                url: '{{ Request::url() }}/get_code_pay',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    val: val,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#codePay').val(response);
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
+    function changeDateMinimum(val){
+        if(val){
+            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                if(newcode.length > 9){
+                    newcode = newcode.substring(0, 9);
+                }
+            }
+            $('#code').val(newcode).trigger('keyup');
+        }
+    }
+
+    function changeDateMinimumPay(val){
+        if(val){
+            let newcode = $('#codePay').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+            if($('#codePay').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                if(newcode.length > 9){
+                    newcode = newcode.substring(0, 9);
+                }
+            }
+            $('#codePay').val(newcode).trigger('keyup');
+        }
+    }
 
     function resetBp(){
         $('#account_id').empty();
@@ -1892,6 +1992,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code').val(response.code);
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);

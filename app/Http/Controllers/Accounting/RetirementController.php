@@ -43,9 +43,16 @@ class RetirementController extends Controller
             'currency'  => Currency::where('status','1')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'RTRM-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = Retirement::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -161,14 +168,6 @@ class RetirementController extends Controller
         return response()->json($response);
     }
 
-    public function getCode(Request $request){
-        $code = Retirement::generateCode($request->post_date);
-
-        return response()->json([
-            'code'  => $code
-        ]);
-    }
-
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
 			'code' 				    => $request->temp ? ['required', Rule::unique('retirements', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:retirements,code',
@@ -241,6 +240,7 @@ class RetirementController extends Controller
                 }
 
                 if(in_array($query->status,['1','6'])){
+                    $query->code = $request->code;
                     $query->user_id = session('bo_id');
                     $query->company_id = $request->company_id;
                     $query->currency_id = $request->currency_id;
@@ -263,7 +263,7 @@ class RetirementController extends Controller
                 }
 			}else{
                 $query = Retirement::create([
-                    'code'			=> Retirement::generateCode($request->post_date),
+                    'code'			=> $request->code,
                     'user_id'		=> session('bo_id'),
                     'company_id'    => $request->company_id,
                     'currency_id'   => $request->currency_id,

@@ -9,6 +9,10 @@
     table.bordered th {
         padding: 5px !important;
     }
+
+    .select-wrapper, .select2-container {
+        height:3.6rem !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -142,7 +146,11 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4">
+                        <div class="input-field col s3">
+                            <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                            <label class="active" for="code">No. Dokumen</label>
+                        </div>
+                        <div class="input-field col s3">
                             <input type="hidden" id="temp" name="temp">
                             <select class="form-control" id="company_id" name="company_id">
                                 @foreach($company as $rowcompany)
@@ -151,7 +159,7 @@
                             </select>
                             <label class="" for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s3">
                             <select class="form-control" id="currency_id" name="currency_id">
                                 @foreach ($currency as $row)
                                     <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
@@ -159,15 +167,15 @@
                             </select>
                             <label class="" for="currency_id">Mata Uang</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s3">
                             <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                             <label class="active" for="currency_rate">Konversi</label>
                         </div>
-                        <div class="input-field col s4">
-                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                        <div class="input-field col s3">
+                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
-                        <div class="input-field col m4">
+                        <div class="input-field col m3">
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">Keterangan</label>
                         </div>
@@ -414,13 +422,18 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
-                $('ul.tabs').tabs();
+                window.onbeforeunload = function() {
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
                 resetDetailForm();
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -492,6 +505,52 @@
             $(this).closest('tr').remove();
         });
     });
+
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+    };
+
+    function getCode(val){
+        if(val.length == 9){
+            $.ajax({
+                url: '{{ Request::url() }}/get_code',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    val: val,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#code').val(response);
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
+    function changeDateMinimum(val){
+        if(val){
+            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                if(newcode.length > 9){
+                    newcode = newcode.substring(0, 9);
+                }
+            }
+            $('#code').val(newcode).trigger('keyup');
+        }
+    }
 
     function count(){
         $('input[name^="arr_price"]').each(function(index){

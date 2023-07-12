@@ -48,7 +48,7 @@ class FundRequestController extends Controller
 
     public function index(Request $request)
     {
-        /* $data = [
+        $data = [
             'title'     => 'Permohonan Dana',
             'content'   => 'admin.finance.fund_request',
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
@@ -56,26 +56,13 @@ class FundRequestController extends Controller
             'wtax'      => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
-        
-        $dataDebit = JournalDetail::where('account_id',14)->where('coa_id',122)->where('type','1')->get();
-        $dataCredit = JournalDetail::where('account_id',14)->where('coa_id',122)->where('type','2')->get();
-        /* echo number_format($dataDebit,2,',','.').' - '.number_format($dataCredit,2,',','.'); */
-        echo '<table><tr><td>KODE</td><td>Nominal</td></tr>';
+        return view('admin.layouts.index', ['data' => $data]);
+    }
 
-        foreach($dataDebit as $row){
-            echo '<tr><td>'.$row->journal->code.'</td><td>'.$row->nominal.'</td></tr>';
-        }
-
-        echo '</table>';
-
-        echo '<table><tr><td>KODE</td><td>Nominal</td></tr>';
-
-        foreach($dataCredit as $row){
-            echo '<tr><td>'.$row->journal->code.'</td><td>'.$row->nominal.'</td></tr>';
-        }
-
-        echo '</table>';
+    public function getCode(Request $request){
+        $code = FundRequest::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -651,6 +638,7 @@ class FundRequestController extends Controller
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'minDate'       => $cekDate ? date('Y-m-d', strtotime('-'.$cekDate->userDate->count_backdate.' days')) : date('Y-m-d'),
             'maxDate'       => $cekDate ? date('Y-m-d', strtotime(date('Y-m-d'). ' + '.$cekDate->userDate->count_futuredate.' days')) : date('Y-m-d'),
+            'newcode'       => 'FREQ-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -803,6 +791,7 @@ class FundRequestController extends Controller
 
     public function userCreate(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('fund_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:fund_requests,code',
             'account_id'                => 'required',
             'type'                      => 'required',
 			'post_date' 				=> 'required',
@@ -819,6 +808,8 @@ class FundRequestController extends Controller
             'arr_price'                 => 'required|array',
             'arr_total'                 => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai.',
             'account_id.required'               => 'Target Partner Bisnis tidak boleh kosong',
             'type.required'                     => 'Tipe tidak boleh kosong',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -887,6 +878,7 @@ class FundRequestController extends Controller
                             $document = $query->document;
                         }
                         
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->place_id = $request->place_id;
                         $query->department_id = $request->department_id;
@@ -929,7 +921,7 @@ class FundRequestController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = FundRequest::create([
-                        'code'			=> FundRequest::generateCode($request->post_date),
+                        'code'			=> $request->code,
                         'user_id'		=> session('bo_id'),
                         'place_id'      => $request->place_id,
                         'department_id'	=> $request->department_id,

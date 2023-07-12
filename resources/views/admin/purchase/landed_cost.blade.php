@@ -2125,9 +2125,11 @@
                     <option value="` + response.account_id + `">` + response.vendor_name + `</option>
                 `);
                 $('#supplier_id').empty();
-                $('#supplier_id').append(`
-                    <option value="` + response.supplier_id + `">` + response.supplier_name + `</option>
-                `);
+                if(response.supplier_name){
+                    $('#supplier_id').append(`
+                        <option value="` + response.supplier_id + `">` + response.supplier_name + `</option>
+                    `);
+                }
                 $('#reference').val(response.reference);
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);

@@ -121,7 +121,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
+{{-- <div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -155,7 +155,7 @@
     <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
-</div>
+</div> --}}
 
 <div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
@@ -170,18 +170,15 @@
     </div>
 </div>
 
-<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+{{-- <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
     </a>
-</div>
+</div> --}}
 
 <!-- END: Page Main-->
 <script>
     $(function() {
-
-
-        
 
         loadDataTable();
 

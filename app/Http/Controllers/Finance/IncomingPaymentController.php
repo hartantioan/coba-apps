@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
 class IncomingPaymentController extends Controller
@@ -43,9 +44,16 @@ class IncomingPaymentController extends Controller
             'currency'      => Currency::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'IPYM-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = IncomingPayment::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -231,6 +239,7 @@ class IncomingPaymentController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			        => $request->temp ? ['required', Rule::unique('incoming_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:incoming_payments,code',
             'company_id'            => 'required',
             'coa_id'                => 'required',
             'post_date'             => 'required',
@@ -305,6 +314,7 @@ class IncomingPaymentController extends Controller
                             $document = $query->document;
                         }
 
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->account_id = $request->account_id ? $request->account_id : NULL;
@@ -338,7 +348,7 @@ class IncomingPaymentController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = IncomingPayment::create([
-                        'code'			            => IncomingPayment::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'account_id'                => $request->account_id ? $request->account_id : NULL,

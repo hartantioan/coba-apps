@@ -218,7 +218,7 @@
                     <td class="right-align">{{ number_format($row->total,3,',','.') }}</td>
                     <td class="center-align">{{ $row->coa->code.' - '.$row->coa->name }}</td>
                     <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
-                    <td class="center-align">{{ $row->department->name }}</td>
+                    <td class="center-align">{{ $row->department_id ? $row->department->name : '-' }}</td>
                     <td class="center-align">{{ $row->warehouse->name }}</td>
                     <td>{{ $row->note }}</td>
                 </tr>

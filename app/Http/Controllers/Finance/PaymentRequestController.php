@@ -61,9 +61,23 @@ class PaymentRequestController extends Controller
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'PREQ-'.date('y'),
+            'newcodePay'    => 'OPYM-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = PaymentRequest::generateCode($request->val);
+        				
+		return response()->json($code);
+    }
+
+    public function getCodePay(Request $request){
+        $code = OutgoingPayment::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -544,6 +558,7 @@ class PaymentRequestController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			        => $request->temp ? ['required', Rule::unique('payment_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:payment_requests,code',
 			'account_id' 			=> 'required',
             'company_id'            => 'required',
             'coa_source_id'         => $request->payment_type == '5' ? '' : 'required',
@@ -563,6 +578,8 @@ class PaymentRequestController extends Controller
             'arr_cost_distribution_cost' => $request->arr_coa_cost ? 'required|array' : '',
             'arr_note_cost'         => $request->arr_coa_cost ? 'required|array' : '',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai.',
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'coa_source_id.required'            => 'Kas/Bank tidak boleh kosong.',
@@ -637,6 +654,7 @@ class PaymentRequestController extends Controller
                             $document = $query->document;
                         }
 
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
@@ -680,7 +698,7 @@ class PaymentRequestController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = PaymentRequest::create([
-                        'code'			            => PaymentRequest::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
@@ -1569,8 +1587,11 @@ class PaymentRequestController extends Controller
 
     public function createPay(Request $request){
         $validation = Validator::make($request->all(), [
+            'codePay'			        => 'required|unique:outgoing_payments,code',
             'pay_date_pay'              => 'required',
 		], [
+            'codePay.required' 	        => 'Kode tidak boleh kosong.',
+            'codePay.unique'            => 'Kode telah dipakai.',
             'pay_date_pay.required'     => 'Tanggal bayar tidak boleh kosong.',
 		]);
 
@@ -1587,7 +1608,7 @@ class PaymentRequestController extends Controller
                     $cek = PaymentRequest::where('code',CustomHelper::decrypt($request->tempPay))->first();
 
                     $query = OutgoingPayment::create([
-                        'code'			            => OutgoingPayment::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $cek->company_id,
                         'account_id'                => $cek->account_id,

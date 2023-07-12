@@ -44,10 +44,20 @@ class WorkOrderController extends Controller
             'area'          => Area::where('status','1')->get(),
             'activity'      => Activity::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'minDate'       => $request->get('minDate'),
+            'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'WORD-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
     }
+
+    public function getCode(Request $request){
+        $code = WorkOrder::generateCode($request->val);
+        				
+		return response()->json($code);
+    }
+
     public function datatable(Request $request){
         $column = [
             'id',
@@ -200,6 +210,7 @@ class WorkOrderController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('work_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:work_orders,code',
 			'place_id'                  => 'required',
             'equipment_id'              => 'required',
             'activity_id'               => 'required',
@@ -212,16 +223,18 @@ class WorkOrderController extends Controller
             'request_date'              => 'required',
             
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai',
 			'place_id.required' 			    => 'Penempatan Plant tidak boleh kosong.',
-            'equipment_id.required'                 => 'Peralatan tidak boleh kosong.',
-            'activity_id.required'            => 'Aktivitas tidak boleh kosong.',
-            'area_id.required'                => 'Area tidak boleh kosong.',
-            'user_id.required'                 => 'Login tidak boleh kosong.',
-            'maintenance_type.required'                 => 'Tanggal bayar tidak boleh kosong.',
-            'priority.required'              => 'Prioritas tidak boleh kosong.',
-            'work_order_type.required'            => 'Tipe WO tidak boleh kosong.',
-            'suggested_completion_date.required'    => 'Tanggal penyelesaian tidak boleh kosong.',
-            'request_date.required'               => 'Tanggal permintaan tidak boleh kosong.',
+            'equipment_id.required'             => 'Peralatan tidak boleh kosong.',
+            'activity_id.required'              => 'Aktivitas tidak boleh kosong.',
+            'area_id.required'                  => 'Area tidak boleh kosong.',
+            'user_id.required'                  => 'Login tidak boleh kosong.',
+            'maintenance_type.required'         => 'Tanggal bayar tidak boleh kosong.',
+            'priority.required'                 => 'Prioritas tidak boleh kosong.',
+            'work_order_type.required'          => 'Tipe WO tidak boleh kosong.',
+            'suggested_completion_date.required'=> 'Tanggal penyelesaian tidak boleh kosong.',
+            'request_date.required'             => 'Tanggal permintaan tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {
@@ -240,6 +253,8 @@ class WorkOrderController extends Controller
                     
 
                     if($query->status == '1'){
+
+                        $query->code = $request->code;
 
                         $query->user_id = $request->user_id;
                        
@@ -292,7 +307,7 @@ class WorkOrderController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = WorkOrder::create([
-                        'code'			            => WorkOrder::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'place_id'                  => $request->place_id,
                         'equipment_id'              => $request->equipment_id,

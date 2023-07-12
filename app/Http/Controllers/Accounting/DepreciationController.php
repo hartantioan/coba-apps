@@ -33,15 +33,24 @@ class DepreciationController extends Controller
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $data = [
             'title'     => 'Depresiasi Aset',
             'content'   => 'admin.accounting.depreciation',
             'company'   => Company::where('status','1')->get(),
+            'minDate'   => $request->get('minDate'),
+            'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'DPCT-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = Depreciation::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -180,13 +189,18 @@ class DepreciationController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			        => $request->temp ? ['required', Rule::unique('depreciations', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:depreciations,code',
 			'company_id'		    => 'required',
+            'post_date'             => 'required',
             'period'		        => 'required',
             'note'		            => 'required',
             'arr_asset_id'          => 'required|array',
             'arr_total'             => 'required|array',
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.unique'                       => 'Kode telah dipakai.',
 			'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
+            'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
             'period.required' 			        => 'Periode tidak boleh kosong.',
 			'note.required'				        => 'Keterangan tidak boleh kosong',
             'arr_asset_id.required'             => 'Aset tidak boleh kosong',
@@ -232,9 +246,11 @@ class DepreciationController extends Controller
                 }
 
                 if(in_array($query->status,['1','6'])){
+
+                    $query->code = $request->code;
                     $query->user_id = session('bo_id');
                     $query->company_id = $request->company_id;
-                    $query->post_date = date('Y-m-d');
+                    $query->post_date = $request->post_date;
                     $query->period = $request->period;
                     $query->note = $request->note;
                     $query->status = '1';
@@ -252,10 +268,10 @@ class DepreciationController extends Controller
                 }
 			}else{
                 $query = Depreciation::create([
-                    'code'			=> Depreciation::generateCode($request->post_date),
+                    'code'			=> $request->code,
                     'user_id'		=> session('bo_id'),
                     'company_id'    => $request->company_id,
-                    'post_date'	    => date('Y-m-d'),
+                    'post_date'	    => $request->post_date,
                     'period'        => $request->period,
                     'status'        => '1',
                     'note'          => $request->note,

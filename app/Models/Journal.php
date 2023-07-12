@@ -108,9 +108,11 @@ class Journal extends Model
         return $status;
     }
 
-    public static function generateCode($post_date)
+    public static function generateCode($prefix)
     {
-        $query = Journal::selectRaw('RIGHT(code, 11) as code')
+        $cek = substr($prefix,0,7);
+        $query = Journal::selectRaw('RIGHT(code, 8) as code')
+            ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
@@ -119,13 +121,11 @@ class Journal extends Model
         if($query->count() > 0) {
             $code = (int)$query[0]->code + 1;
         } else {
-            $code = '00000000001';
+            $code = '00000001';
         }
 
-        $no = str_pad($code, 11, 0, STR_PAD_LEFT);
+        $no = str_pad($code, 8, 0, STR_PAD_LEFT);
 
-        $pre = 'JR-'.date('ymd',strtotime($post_date)).'-';
-
-        return $pre.$no;
+        return substr($prefix,0,9).'-'.$no;
     }
 }

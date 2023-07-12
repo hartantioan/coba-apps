@@ -41,11 +41,19 @@ class RequestSparepartController extends Controller
             'place'         => Place::where('status','1')->get(),
             'area'          => Area::where('status','1')->get(),
             'activity'      => Activity::where('status','1')->get(),
-            'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'newcode'       => 'RSPR-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
     }
+
+    public function getCode(Request $request){
+        $code = RequestSparepart::generateCode($request->val);
+        				
+		return response()->json($code);
+    }
+
     public function datatable(Request $request){
         $column = [
             'id',

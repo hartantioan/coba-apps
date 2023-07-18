@@ -2260,7 +2260,7 @@ class PaymentRequestController extends Controller
 
                 foreach($data_id_pyrs as $payment_request_id){
                     $query_pyr = PaymentRequest::find($payment_request_id);
-
+                    
                     if($query_pyr->outgoingPayment()->exists()){
                         $outgoing_payment = [
                             'properties'=> [
@@ -2292,6 +2292,7 @@ class PaymentRequestController extends Controller
                             "name" => $row_pyr_detail->paymentRequest->code,
                             'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
                         ];
+                    
                         if($row_pyr_detail->fundRequest()){
                             
                             $data_fund_tempura=[
@@ -2361,28 +2362,34 @@ class PaymentRequestController extends Controller
                                 $added=true;
                             }
                         }
-
-                        if($row_pyr_detail->paymentRequestCross()){
-                            $data_pyrc_tempura = [
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                    ['name'=> "Nominal : Rp.".number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                ],
-                                "key" => $row_pyr_detail->lookable->code,
-                                "name" => $row_pyr_detail->lookable->code,
-                                'url'=>request()->root()."/admin/purchase/payment_request_cross?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
-                            ];
-        
-                            $data_go_chart[]=$data_pyrc_tempura;
-                            $data_link[]=[
-                                'from'=>$row_pyr_detail->lookable->code,
-                                'to'=>$row_pyr_detail->paymentRequest->code,
-                                'string_link'=>$row_pyr_detail->lookable->code.$row_pyr_detail->paymentRequest->code,
-                            ];
-                            
-                            if(!in_array($row_pyr_detail->lookable->id, $data_id_pyrcs)){
-                                $data_id_pyrcs[] = $row_pyr_detail->lookable->id;
+                        
+                        if($row_pyr_detail->paymentRequest->paymentRequestCross()->exists()){
+           
+                           
+                            foreach($row_pyr_detail->paymentRequest->paymentRequestCross as $row_pyr_cross){
+                                
+                                $data_pyrc_tempura = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_cross->lookable->post_date],
+                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_cross->lookable->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pyr_cross->lookable->code,
+                                    "name" => $row_pyr_cross->lookable->code,
+                                    'url'=>request()->root()."/admin/purchase/payment_request_cross?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
+                                ];
+                       
+                                $data_go_chart[]=$data_pyrc_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_cross->lookable->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_cross->lookable->code.$row_pyr_detail->paymentRequest->code,
+                                ];
+                                if(!in_array($row_pyr_cross->lookable->id, $data_id_pyrcs)){
+                                    $data_id_pyrcs[] = $row_pyr_cross->lookable->id;
+                                }
                             }
+
+                            
                         }
                     }
                     
@@ -2401,7 +2408,7 @@ class PaymentRequestController extends Controller
                         ];
                         $data_go_chart[]=$data_pyr_tempura;
                         $data_link[]=[
-                            'from'=>$query_pyrc->code,
+                            'from'=>$query_pyrc->lookable->code,
                             'to'=>$query_pyrc->paymentRequest->code,
                             'string_link'=>$query_pyrc->code.$query_pyrc->paymentRequest->code,
                         ];
@@ -2759,7 +2766,7 @@ class PaymentRequestController extends Controller
                         }
                     }
                 }
-            } 
+            }  
             function unique_key($array,$keyname){
 
                 $new_array = array();

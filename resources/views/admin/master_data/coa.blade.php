@@ -332,7 +332,7 @@
                         $('.modal-content').scrollTop(0);
 
                         $.each(response.error, function(i, val) {
-                            console.log(response.error);
+                            
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
@@ -807,7 +807,7 @@
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
-            console.log(poin);
+           
         });
         
         $.ajax({

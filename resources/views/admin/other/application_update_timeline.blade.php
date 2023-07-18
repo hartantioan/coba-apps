@@ -1,0 +1,78 @@
+<!-- BEGIN: Page Main-->
+<style>
+    #modal6 {
+        top:0px !important;
+    }
+</style>
+<link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/page-timeline.css') }}">
+<div id="main">
+    <div class="row">
+        
+        <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col s8 m6 l6">
+                        <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
+                        <ol class="breadcrumbs mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(2))) }}</a>
+                            </li>
+                        </ol>
+                    </div>
+                    <div class="col s4 m6 l6">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="loadDataTable();">
+                            <i class="material-icons hide-on-med-and-up">refresh</i>
+                            <span class="hide-on-small-onl">Refresh</span>
+                            <i class="material-icons right">refresh</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12">
+            <div class="container">
+                <div class="section section-data-tables">
+                    <!-- DataTables example -->
+                    <div class="row">
+                        <div class="col s12">
+                            <ul class="timeline" id="body-history-goods" style="padding-left: 4rem; padding-right:4rem;">
+                                @foreach($change_log as $log)
+                                    <li>
+                                        <div class="timeline-badge blue">
+                                            <a class="tooltipped" data-position="top" data-tooltip="{{date('d/m/y',strtotime($log->release_date))}}"><i class="material-icons white-text">disc_full</i></a>
+                                        </div>
+                                        <div class="timeline-panel">
+                                            <div class="card m-0 hoverable" id="profile-card" style="overflow: visible;">
+                                                <div class="card-content">
+                                                    <div style="display:-webkit-box;">
+                                                        {!!$log->user->profilePicture()!!}
+                                                        <h5 class="card-title activator grey-text text-darken-4 mt-1 ml-3">{{$log->user->name}}</h5>
+                                                    </div>
+                                                    <p><i class="material-icons profile-card-i">restore</i>{{$log->version}}</p>
+                                                    <p>Judul : {{$log->title}}</p>
+                                                    <p>Description</p>
+                                                    <div style="padding: 1rem">{!! $log->description !!}</div>
+                                                    
+                                                    <p><i class="material-icons profile-card-i">date_range</i>{{$log->release_date}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                @endforeach
+                                <li class="clearfix" style="float: none;background:red;"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="content-overlay"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+

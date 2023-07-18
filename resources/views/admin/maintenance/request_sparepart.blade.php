@@ -458,6 +458,7 @@
 
     function add_sparepart(){
         if($('#work_order_id').val()){
+           
             $('#empty-detail').remove();
             var count = makeid(10);
             
@@ -536,10 +537,12 @@
     function getRowUnit(val){
         var temp_val = $('#equipmentpart'+val).val();
         var temp_sparepart = list_sparepart[temp_val].sparepart;
+        
         if($("#arr_item" + val).val()){
             $("#arr_code" + val).val(temp_sparepart[$("#arr_item" + val).val()].code);
             var temp_stock=temp_sparepart[$("#arr_item" + val).val()].stock;
             $('#arr_stock' + val).empty();
+            
             $.each(temp_stock, function(index, value) {
                 $('#arr_stock' + val).append(`
                     <option value="` + value.id + `">` + value.qty + ` - ` + value.warehouse + `</option>
@@ -1409,6 +1412,7 @@
             var part = e.subject.part;
             if (part instanceof go.Link) {
                 
+                
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1469,6 +1473,7 @@
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
+            
             var rootKey = data[0].key; 
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {

@@ -355,7 +355,7 @@ class ApprovalController extends Controller
         } else {
             $work_orders_rp = 0;
             $query = ApprovalMatrix::where('code',CustomHelper::decrypt($request->temp))->where('status','1')->first();
-			info($query);
+		
             if($query->approvalSource->lookable_type == 'work_orders'){
                 if($query->approvalSource->lookable->requestSparepartALL()->exists()){
                     foreach($query->approvalSource->lookable->requestSparepartALL as $row){

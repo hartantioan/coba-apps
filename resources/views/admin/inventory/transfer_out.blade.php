@@ -1198,7 +1198,7 @@
 
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
-        console.log(formData);
+        
         $.ajax({
             url: '{{ Request::url() }}/print_by_range',
             type: 'POST',
@@ -1228,7 +1228,7 @@
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);
-                    console.log(response.error);
+                    
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',

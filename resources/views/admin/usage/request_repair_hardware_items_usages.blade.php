@@ -712,7 +712,7 @@
 
                 if(response.length > 0){
                     $('#empty-attachment-detail1').remove();
-                    console.log(response);
+                    
                     $.each(response, function(i, val_file) {
                         
                        

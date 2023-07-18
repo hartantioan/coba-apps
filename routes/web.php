@@ -2,14 +2,19 @@
 
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Finance\FinanceReportController;
+use App\Http\Controllers\Inventory\DeadStockController;
 use App\Http\Controllers\Inventory\GoodScaleController;
 
 use App\Http\Controllers\Inventory\InventoryReportController;
+use App\Http\Controllers\Inventory\StockInRupiahController;
+use App\Http\Controllers\Inventory\StockInQtyController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
 use App\Http\Controllers\MasterData\HardwareItemGroupController;
 use App\Http\Controllers\Purchase\OutStandingAPController;
+use App\Http\Controllers\Purchase\PriceHistoryPOController;
 use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
 use App\Http\Controllers\Purchase\PurchaseReportController;
+use App\Http\Controllers\Setting\ChangeLogController;
 use App\Http\Controllers\Usage\ReceptionHardwareItemUsageController;
 use App\Http\Controllers\Usage\ReturnHardwareItemUsageController;
 use App\Http\Controllers\Usage\RequestRepairHardwareItemUsageController;
@@ -75,6 +80,7 @@ use App\Http\Controllers\Inventory\InventoryTransferInController;
 use App\Http\Controllers\Inventory\GoodReceiveController;
 use App\Http\Controllers\Inventory\GoodIssueController;
 use App\Http\Controllers\Inventory\InventoryRevaluationController;
+use App\Http\Controllers\Inventory\StockMovementController;
 
 use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
@@ -131,6 +137,8 @@ Route::prefix('admin')->group(function () {
 
         Route::middleware('lock')->group(function () {
             Route::get('dashboard', [DashboardController::class, 'index']);
+
+            Route::get('application_update', [ChangeLogController::class, 'index_log_update']);
 
             Route::post('pages', [MenuController::class, 'getMenus']);
 
@@ -681,6 +689,15 @@ Route::prefix('admin')->group(function () {
                     Route::post('refresh', [DataAccessController::class, 'refresh']);
                     Route::post('create',[DataAccessController::class, 'create'])->middleware('operation.access:data_access,update');
                 });
+
+                Route::prefix('change_log')->middleware('operation.access:change_log,view')->group(function () {
+                    Route::get('/',[ChangeLogController::class, 'index']);
+                    Route::get('datatable', [ChangeLogController::class, 'datatable']);
+                    Route::post('timeline',[ChangeLogController::class, 'timeline']);
+                    Route::post('create',[ChangeLogController::class, 'create']);
+                    Route::post('show',[ChangeLogController::class, 'show']);
+                    Route::post('destroy', [ChangeLogController::class, 'destroy'])->middleware('operation.access:change_log,delete');
+                });
             });
 
             Route::prefix('maintenance')->middleware('direct.access')->group(function () {
@@ -829,6 +846,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('viewstructuretree',[PurchasePaymentHistoryController::class, 'viewStructureTree']);
                         Route::get('print_individual/{id}',[PurchasePaymentHistoryController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                         Route::post('view_history_payment', [PurchasePaymentHistoryController::class, 'viewHistoryPayment']);
+                    });
+                    Route::prefix('price_history_po')->middleware('operation.access:price_history_po,view')->group(function () {
+                        Route::get('/',[PriceHistoryPOController::class, 'index']);
+                        Route::get('datatable',[PriceHistoryPOController::class, 'datatable']);
+                        Route::post('print',[PriceHistoryPOController::class, 'print']);
+                        Route::get('export',[PriceHistoryPOController::class, 'export']);
                     });
 
                     Route::prefix('outstanding_ap')->middleware('operation.access:outstanding_ap,view')->group(function () {
@@ -1108,7 +1131,27 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('inventory_report')->middleware('direct.access')->group(function () {
                     Route::prefix('inventory_recap')->middleware('operation.access:inventory_recap,view')->group(function () {
-                    Route::get('/',[InventoryReportController::class, 'index']);
+                        Route::get('/',[InventoryReportController::class, 'index']);
+                    });
+                    Route::prefix('stock_movement')->middleware('operation.access:stock_movement,view')->group(function () {
+                        Route::get('/',[StockMovementController::class, 'index']);
+                        Route::post('filter',[StockMovementController::class, 'filter']);
+                        Route::get('export',[StockMovementController::class, 'export']);
+                    });
+                    Route::prefix('stock_in_qty')->middleware('operation.access:stock_in_qty,view')->group(function () {
+                        Route::get('/',[StockInQtyController::class, 'index']);
+                        Route::post('filter',[StockInQtyController::class, 'filter']);
+                        Route::get('export',[StockInQtyController::class, 'export']);
+                    });
+                    Route::prefix('stock_in_rupiah')->middleware('operation.access:stock_in_rupiah,view')->group(function () {
+                        Route::get('/',[StockInRupiahController::class, 'index']);
+                        Route::post('filter',[StockInRupiahController::class, 'filter']);
+                        Route::get('export',[StockInRupiahController::class, 'export']);
+                    });
+                    Route::prefix('dead_stock')->middleware('operation.access:dead_stock,view')->group(function () {
+                        Route::get('/',[DeadStockController::class, 'index']);
+                        Route::post('filter',[DeadStockController::class, 'filter']);
+                        Route::get('export',[DeadStockController::class, 'export']);
                     });
                 });
             });

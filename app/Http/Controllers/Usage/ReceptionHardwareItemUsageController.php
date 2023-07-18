@@ -32,7 +32,7 @@ class ReceptionHardwareItemUsageController extends Controller
         $item_ready=[];
         foreach ($InStorage as $item) {
             $itemName = $item->item->name;
-            info($item->receptionHardwareItemsUsage);
+         
             $itemData = [
                 'item_id' => $item->id,
                 'itemName' => $itemName,

@@ -126,7 +126,7 @@ class RequestRepairHardwareItemUsageController extends Controller
             try {
                 $query = RequestRepairHardwareItemsUsage::where('id',$request->temp)->first();
                 
-                info($query);
+             
 
                 if($query->status == '1'){
                     

@@ -51,12 +51,12 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
         foreach($data as $key => $row){
             $arr[] = [
                 '1'                => ($key + 1),
-                '2'              => $row->post_date,
+                '2'              => date('d/m/y',strtotime($row->post_date)),
                 '3'                 => $row->code,
                 '4'         => $row->supplier->employee_no??'',
                 '5'          => $row->supplier->name??'',
-                '6'              => $row->post_date,
-                '8'              => $row->due_date,
+                '6'              => date('d/m/y',strtotime($row->post_date)),
+                '8'              => date('d/m/y',strtotime($row->due_date)),
                 '11'            => $row->tax->code ?? '',
                 '12'            => $row->tax->name ?? '',
                 '7'              => $row->type,

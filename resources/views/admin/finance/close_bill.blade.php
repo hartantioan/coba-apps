@@ -1163,7 +1163,7 @@
             var part = e.subject.part;
             if (part instanceof go.Link) {
                 
-                console.log("");
+              
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1171,7 +1171,7 @@
                 } else {
                     part.expandTree();
                 }
-                console.log("Node clicked: " + part.data.key);
+              
             }
         });
         myDiagram.nodeTemplate =
@@ -1220,11 +1220,11 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        console.log(data[0].key);
+        
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            console.log(data[0].key);
+        
             var rootKey = data[0].key; 
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {

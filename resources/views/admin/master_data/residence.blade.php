@@ -574,7 +574,7 @@
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(3)').text().trim();
             arr_id_temp.push(poin);
-            console.log(poin);
+           
            
         });
         

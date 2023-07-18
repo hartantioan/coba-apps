@@ -681,7 +681,7 @@
                 $('#modal1').modal('open');
                 $('#temp_request').val(id);
                 $('#item_name').val(response.item);
-                console.log(response);
+                
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();
             },

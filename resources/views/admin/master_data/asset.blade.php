@@ -304,7 +304,7 @@
                         $('.modal-content').scrollTop(0);
 
                         $.each(response.error, function(i, val) {
-                            console.log(response.error);
+                            
                             $('#validation_alertImport').append(`
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
@@ -376,7 +376,7 @@
 
                     }
                     
-                    console.log(errors);
+                   
                 }
             });
 

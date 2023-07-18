@@ -136,9 +136,17 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m3 s12">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                            <div class="input-field col m2 s12">
+                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m1 s12">
+                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                    <option value="">--Pilih--</option>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
@@ -502,32 +510,40 @@
     };
 
     function getCode(val){
-        if(val.length == 9){
-            $.ajax({
-                url: '{{ Request::url() }}/get_code',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    val: val,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    $('#code').val(response);
-                },
-                error: function() {
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
                 }
-            });
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
         }
     }
 
@@ -544,12 +560,15 @@
                     newcode = newcode.substring(0, 9);
                 }
             }
-            $('#code').val(newcode).trigger('keyup');
+            $('#code').val(newcode);
+            $('#code_place_id').trigger('change');
         }
     }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,
@@ -810,6 +829,58 @@
         });
     }
 
+    function finish(id){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Status akan dirubah menjadi SELESAI!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/finish',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        code : id,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.container');
+                    },
+                    success: function(response) {
+                        loadingClose('.container');
+                        if(response.status == 200) {
+                            loadDataTable();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.container').scrollTop(0);
+                        loadingClose('.container');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
@@ -833,6 +904,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code_place_id').val(response.code_place_id).attr('readonly',true).formSelect();
                 $('#code').val(response.code);
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
@@ -852,7 +924,8 @@
                 $('#grandtotal').val(response.grandtotal);
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
-                `).trigger('change');
+                `);
+                $('#limit').text(response.limit_credit);
 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){

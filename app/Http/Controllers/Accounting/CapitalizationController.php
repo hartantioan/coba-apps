@@ -38,13 +38,14 @@ class CapitalizationController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'     => 'Kapitalisasi Aset',
-            'content'   => 'admin.accounting.capitalization',
-            'company'   => Company::where('status','1')->get(),
-            'currency'  => Currency::where('status','1')->get(),
-            'minDate'   => $request->get('minDate'),
-            'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'CAPT-'.date('y'),
+            'title'         => 'Kapitalisasi Aset',
+            'content'       => 'admin.accounting.capitalization',
+            'company'       => Company::where('status','1')->get(),
+            'currency'      => Currency::where('status','1')->get(),
+            'minDate'       => $request->get('minDate'),
+            'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'CAPT-'.date('y'),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -416,6 +417,7 @@ class CapitalizationController extends Controller
     public function show(Request $request){
         $cap = Capitalization::where('code',CustomHelper::decrypt($request->id))->first();
         $cap['currency_rate'] = number_format($cap->currency_rate,3,',','.');
+        $cap['code_place_id'] = substr($cap->code,7,2);
 
         $arr = [];
         

@@ -47,9 +47,16 @@ class GoodScaleController extends Controller
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
+            'newcode'   => 'TMBG-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = GoodScale::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -284,6 +291,7 @@ class GoodScaleController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('good_scales', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_scales,code',
             'account_id'                => 'required',
             'company_id'                => 'required',
             'vehicle_no'                => 'required',
@@ -293,6 +301,10 @@ class GoodScaleController extends Controller
             'arr_item'                  => 'required|array',
             /* 'document'                  => 'required|mimes:jpg,jpeg,png,pdf', */
 		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
+            'code.unique'                       => 'Kode telah dipakai.',
             'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'vehicle_no.required'               => 'Nomor kendaraan tidak boleh kosong.',
@@ -320,7 +332,7 @@ class GoodScaleController extends Controller
                     $image = $request->image_in;  // your base64 encoded
                     $image = str_replace('data:image/png;base64,', '', $image);
                     $image = str_replace(' ', '+', $image);
-                    $imageName = Str::random(35).'.'.'png';
+                    $imageName = Str::random(35).'.png';
                     $newFile = 'public/good_scales/'.$imageName;
                     Storage::put($newFile,base64_decode($image));
                 }
@@ -367,12 +379,15 @@ class GoodScaleController extends Controller
                             Storage::delete($query->image_in);
                         }
                         
+                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
                         $query->post_date = $request->post_date;
                         $query->delivery_no = $request->delivery_no;
+                        $query->vehicle_no = $request->vehicle_no;
+                        $query->driver = $request->driver;
                         $query->document = $document;
                         $query->image_in = $newFile ? $newFile : NULL;
                         $query->note = $request->note;
@@ -394,13 +409,15 @@ class GoodScaleController extends Controller
                 }else{
                     
                     $query = GoodScale::create([
-                        'code'			        => GoodScale::generateCode($request->post_date),
+                        'code'			        => $request->code,
                         'user_id'		        => session('bo_id'),
                         'account_id'            => $request->account_id,
                         'company_id'            => $request->company_id,
                         'place_id'              => $request->place_id,
                         'post_date'             => $request->post_date,
                         'delivery_no'           => $request->delivery_no,
+                        'vehicle_no'            => $request->vehicle_no,
+                        'driver'                => $request->driver,
                         'document'              => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
                         'image_in'              => $newFile ? $newFile : NULL,
                         'note'                  => $request->note,
@@ -680,6 +697,7 @@ class GoodScaleController extends Controller
     public function show(Request $request){
         $data = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
         $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
+        $data['code_place_id'] = substr($data->code,7,2);
 
         $details = [];
         foreach($data->goodScaleDetail as $row){

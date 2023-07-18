@@ -141,20 +141,20 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4">
-                            <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                        <div class="input-field col s2">
+                            <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                             <label class="active" for="code">No. Dokumen</label>
                         </div>
-                        <div class="input-field col s4">
-                            <select class="form-control" id="company_id" name="company_id">
-                                @foreach($company as $b)
-                                    <option value="{{ $b->id }}">{{ $b->code.' - '.$b->name }}</option>
+                        <div class="input-field col s1">
+                            <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                <option value="">--Pilih--</option>
+                                @foreach ($place as $rowplace)
+                                    <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s3">
+                            <input type="hidden" id="temp" name="temp">
                             <select class="form-control" id="currency_id" name="currency_id">
                                 @foreach ($currency as $row)
                                     <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
@@ -162,15 +162,15 @@
                             </select>
                             <label class="" for="currency_id">Mata Uang</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s3">
                             <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                             <label class="active" for="currency_rate">Konversi</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s3">
                             <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
-                        <div class="input-field col m4">
+                        <div class="input-field col s3">
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">Keterangan</label>
                         </div>
@@ -507,32 +507,40 @@
     };
 
     function getCode(val){
-        if(val.length == 9){
-            $.ajax({
-                url: '{{ Request::url() }}/get_code',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    val: val,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    $('#code').val(response);
-                },
-                error: function() {
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
                 }
-            });
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
         }
     }
 
@@ -544,7 +552,8 @@
                     newcode = newcode.substring(0, 9);
                 }
             }
-            $('#code').val(newcode).trigger('keyup');
+            $('#code').val(newcode);
+            $('#code_place_id').trigger('change');
         }
     }
 
@@ -645,6 +654,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,
@@ -845,6 +856,7 @@
                 $('#modal1').modal('open');
                 
                 $('#temp').val(id);
+                $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();

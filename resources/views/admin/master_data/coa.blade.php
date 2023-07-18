@@ -1,5 +1,4 @@
 <!-- BEGIN: Page Main-->
-
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
@@ -488,6 +487,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,

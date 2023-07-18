@@ -55,6 +55,10 @@
                                                 <div class="col s4">Posisi</div><div class="col s8">: {{ $data->position->name }}</div>
                                                 <div class="col s12"><hr></div>
                                                 <div class="col s4">Update Pass</div><div class="col s8">: <span class="{{ $data->needChangePassword() ? 'badge red' : 'badge gradient-45deg-light-blue-cyan' }}">{{ $data->last_change_password }}</span></div>
+                                                <div class="col s12"><hr></div>
+                                                <div class="col s4">Limit Kredit BS</div><div class="col s8">: {{ number_format($data->limit_credit,2,',','.') }}</div>
+                                                <div class="col s4">BS Terpakai</div><div class="col s8">: {{ number_format($data->count_limit_credit,2,',','.') }}</div>
+                                                <div class="col s4">BS Sisa</div><div class="col s8">: {{ number_format($data->limit_credit - $data->count_limit_credit,2,',','.') }}</div>
                                             </div>
                                         </div>
                                     </div>

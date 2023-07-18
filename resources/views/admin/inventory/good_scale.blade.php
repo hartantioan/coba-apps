@@ -17,6 +17,10 @@
     #previewImage, #previewImage1, #previewImageIn {
         width:100%;
     }
+
+    .select-wrapper, .select2-container {
+        height:3.7rem !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -102,10 +106,10 @@
                                         <div class="col s12">
                                             <div class="card-alert card green">
                                                 <div class="card-content white-text">
-                                                    <p>Info 1 : Ada 2 tahapan penimbangan, yakni ketika truk timbang datang, dan truk timbang pulang.</p>
+                                                    <p>Info : Ada 2 tahapan penimbangan, yakni ketika truk timbang datang, dan truk timbang pulang.</p>
                                                 </div>
                                             </div>
-                                            <div class="card-alert card purple">
+                                            {{-- <div class="card-alert card purple">
                                                 <div class="card-content white-text">
                                                     <p>Info 2 : Timbangan truk bisa ditambahkan dengan 2 cara, cara yang pertama tarik data dari Purchase Order. Sedangkan cara yang kedua, dengan menambahkan secara manual item / barangnya, namun kemudian setelah tahap 2 penimbangan bisa di linkkan dengan PO agar dokumen bisa ditarik ke GRPO.</p>
                                                 </div>
@@ -114,7 +118,7 @@
                                                 <div class="card-content white-text">
                                                     <p>Info 3 : Pada saat timbangan pulang, jika PO sudah ditentukan maka, GRPO akan otomatis terbuat berdasarkan informasi dokumen Timbangan.</p>
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
@@ -163,6 +167,18 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
+                            <div class="input-field col m2 s12">
+                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                <label class="active" for="code">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m1 s12">
+                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                    <option value="">--Pilih--</option>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="account_id" name="account_id"></select>
@@ -185,7 +201,7 @@
                                 <label class="" for="place_id">Plant</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}">
+                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Diterima</label>
                             </div>
                             <div class="input-field col m3 s12">
@@ -209,7 +225,7 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="col m12 s12">
+                            {{-- <div class="col m12 s12">
                                 <div class="col m6 s6">
                                     <p class="mt-2 mb-2">
                                         <h6>Dari Purchase Order (Jika ada informasi)</h6>
@@ -240,7 +256,7 @@
                                         </div>
                                     </p>
                                 </div>                                
-                            </div>
+                            </div> --}}
                             <div class="col m12 s12">
                                 <div class="input-field col m4 s12 select">
                                     <select id="videoSource" name="videoSource" class="browser-default"></select>
@@ -362,7 +378,7 @@
                                         <table class="bordered" style="width:1800px;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center" style="width:250px !important;">Link PO</th>
+                                                    {{-- <th class="center" style="width:250px !important;">Link PO</th> --}}
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty PO</th>
                                                     <th class="center">Timbang Datang</th>
@@ -612,7 +628,7 @@
                     return 'You will lose all changes made since your last save';
                 };
                 getWeight();
-                getStream().then(getDevices).then(gotDevices);
+                /* getStream().then(getDevices).then(gotDevices); */
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -629,11 +645,11 @@
                 $('.row_item').remove();
                 $('#videoSource').empty();
                 $('#previewImage').attr('src','');
-                if (window.stream) {
+                /* if (window.stream) {
                     window.stream.getTracks().forEach(track => {
                         track.stop();
                     });
-                }
+                } */
             }
         });
 
@@ -730,8 +746,65 @@
         });
     });
 
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+    };
+
+    function getCode(val){
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
+                }
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    function changeDateMinimum(val){
+        if(val){
+            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                if(newcode.length > 9){
+                    newcode = newcode.substring(0, 9);
+                }
+            }
+            $('#code').val(newcode);
+            $('#code_place_id').trigger('change');
+        }
+    }
+
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,
@@ -1530,10 +1603,7 @@
                                 ` + (val.purchase_order_detail_id ? `<input type="hidden" name="arr_pod[]" value=` + val.purchase_order_detail_id + `>` : `` ) + `
                                 <input type="hidden" name="arr_good_scale_detail[]" value="` + val.id + `">
                                 <input type="hidden" name="arr_qty_in[]" value="` + val.qty_in + `" id="arr_qty_in` + count + `">
-                                <td>
-                                    ` + (val.purchase_order_detail_id ? `-` 
-                                    : `<select class="browser-default" id="arr_pod` + count + `" name="arr_pod[]"></select>` ) + `
-                                </td>
+                                <input type="hidden" name="arr_pod[]" value="" id="arr_pod` + count + `">
                                 <td>
                                     ` + val.item_name + `
                                 </td>
@@ -1566,10 +1636,6 @@
                                 </td>
                             </tr>
                         `);
-
-                        if(!val.purchase_order_detail_id){
-                            select2ServerSide('#arr_pod' + count, '{{ url("admin/select2/purchase_order_detail") }}?item_id=' + val.item_id + '&account_id=' + response.account_id);
-                        }
                     });
                 }
                 
@@ -1641,6 +1707,8 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code_place_id').val(response.code_place_id).formSelect();
+                $('#code').val(response.code);
                 $('#note').val(response.note);
                 $('#delivery_no').val(response.delivery_no);
                 $('#vehicle_no').val(response.vehicle_no);

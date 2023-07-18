@@ -117,7 +117,7 @@ class ExportOutstandingAP implements FromView , WithEvents
                 }
                 
             }  
-        return view('admin.exports.outstanding', [
+        return view('admin.exports.outstanding_ap', [
             'data' => $array_filter,
             'totalall' =>number_format($totalAll,2,',','.')
         ]);

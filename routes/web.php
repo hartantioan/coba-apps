@@ -66,6 +66,7 @@ use App\Http\Controllers\Purchase\PurchaseDownPaymentController;
 use App\Http\Controllers\Purchase\LandedCostController;
 use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 use App\Http\Controllers\Purchase\PurchaseMemoController;
+use App\Http\Controllers\Purchase\AgingAPController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -80,6 +81,7 @@ use App\Http\Controllers\Accounting\CapitalizationController;
 use App\Http\Controllers\Accounting\RetirementController;
 use App\Http\Controllers\Accounting\DocumentTaxController;
 use App\Http\Controllers\Accounting\DepreciationController;
+use App\Http\Controllers\Accounting\LedgerController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -184,6 +186,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('department', [Select2Controller::class, 'department']);
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
+                Route::get('good_scale_item', [Select2Controller::class, 'goodScaleItem']);
             });
 
             Route::prefix('personal')->middleware('direct.access')->group(function () {
@@ -212,6 +215,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [FundRequestController::class, 'userShow']);
                     Route::post('get_code', [FundRequestController::class, 'getCode']);
                     Route::post('create',[FundRequestController::class, 'userCreate']);
+                    Route::post('finish',[FundRequestController::class, 'userFinish']);
                     Route::post('get_account_info', [FundRequestController::class, 'getAccountInfo']);
                     Route::post('destroy', [FundRequestController::class, 'userDestroy']);
                 });
@@ -352,6 +356,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('row_detail',[ItemController::class, 'rowDetail']);
                         Route::post('show', [ItemController::class, 'show']);
                         Route::post('print',[ItemController::class, 'print']);
+                        Route::post('print_barcode',[ItemController::class, 'printBarcode']);
                         Route::get('export',[ItemController::class, 'export']);
                         Route::post('import',[ItemController::class, 'import'])->middleware('operation.access:item,update');
                         Route::post('create',[ItemController::class, 'create'])->middleware('operation.access:item,update');
@@ -831,6 +836,13 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter_by_date',[OutStandingAPController::class, 'filterByDate']);
                         Route::get('export',[OutStandingAPController::class, 'export']);
                     });
+
+                    Route::prefix('aging_ap')->middleware('operation.access:aging_ap,view')->group(function () {
+                        Route::get('/',[AgingAPController::class, 'index']);
+                        Route::post('filter',[AgingAPController::class, 'filter']);
+                        Route::post('show_detail',[AgingAPController::class, 'showDetail']);
+                        Route::get('export',[AgingAPController::class, 'export']);
+                    });
                 });
 
                 Route::prefix('purchase_order')->middleware('operation.access:purchase_order,view')->group(function () {
@@ -941,12 +953,12 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('inventory')->middleware('direct.access')->group(function () {
 
-
                 Route::prefix('good_scale')->middleware('operation.access:good_scale,view')->group(function () {
                     Route::get('/',[GoodScaleController::class, 'index']);
                     Route::get('datatable',[GoodScaleController::class, 'datatable']);
                     Route::get('row_detail',[GoodScaleController::class, 'rowDetail']);
                     Route::post('show', [GoodScaleController::class, 'show']);
+                    Route::post('get_code', [GoodScaleController::class, 'getCode']);
                     Route::post('update', [GoodScaleController::class, 'update']);
                     Route::post('print',[GoodScaleController::class, 'print']);
                     Route::post('print_by_range',[GoodScaleController::class, 'printByRange']);
@@ -1170,6 +1182,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('/',[IncomingPaymentController::class, 'index']);
                     Route::get('datatable',[IncomingPaymentController::class, 'datatable']);
                     Route::get('row_detail',[IncomingPaymentController::class, 'rowDetail']);
+                    Route::post('get_account_info', [IncomingPaymentController::class, 'getAccountInfo']);
+                    Route::post('get_account_data', [IncomingPaymentController::class, 'getAccountData']);
                     Route::get('view_journal/{id}',[IncomingPaymentController::class, 'viewJournal'])->middleware('operation.access:incoming_payment,journal');
                     Route::post('show', [IncomingPaymentController::class, 'show']);
                     Route::post('get_code', [IncomingPaymentController::class, 'getCode']);
@@ -1292,7 +1306,12 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('accounting_report')->middleware('direct.access')->group(function () {
                     Route::prefix('accounting_recap')->middleware('operation.access:accounting_recap,view')->group(function () {
-                    Route::get('/',[AccountingReportController::class, 'index']);
+                        Route::get('/',[AccountingReportController::class, 'index']);
+                    });
+                    Route::prefix('ledger')->middleware('operation.access:ledger,view')->group(function () {
+                        Route::get('/',[LedgerController::class, 'index']);
+                        Route::get('datatable',[LedgerController::class, 'datatable']);
+                        Route::get('row_detail',[LedgerController::class, 'rowDetail']);
                     });
                 });
             });

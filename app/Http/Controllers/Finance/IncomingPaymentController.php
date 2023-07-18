@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Finance;
 use App\Exports\ExportIncomingPayment;
 use App\Http\Controllers\Controller;
+use App\Models\Coa;
 use App\Models\Company;
 use App\Models\CostDistribution;
 use App\Models\Currency;
 use App\Models\IncomingPayment;
 use App\Models\IncomingPaymentDetail;
+use App\Models\OutgoingPayment;
+use App\Models\Place;
 use App\Models\Tax;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -21,6 +24,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\FundRequest;
 
 class IncomingPaymentController extends Controller
 {
@@ -45,6 +50,7 @@ class IncomingPaymentController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => 'IPYM-'.date('y'),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -54,6 +60,89 @@ class IncomingPaymentController extends Controller
         $code = IncomingPayment::generateCode($request->val);
         				
 		return response()->json($code);
+    }
+
+    public function getAccountInfo(Request $request){
+        $data = User::find($request->id);
+
+        $details = [];
+
+        $op = OutgoingPayment::where('account_id',$data->id)
+        ->whereIn('status',['2','3'])
+        ->whereHas('paymentRequest',function($query){
+            $query->whereHas('paymentRequestDetail',function($query){
+                $query->whereHasMorph('lookable',
+                [FundRequest::class],
+                function (Builder $query){
+                    $query->where('document_status','3');
+                });
+            });
+        })->get();
+        
+        if(isset($op)){
+            foreach($op as $row){
+                $balance = $row->balancePaymentIncoming();
+                if(!$row->used()->exists() && $balance > 0){
+                    $details[] = [
+                        'id'                    => $row->id,
+                        'type'                  => 'outgoing_payments',
+                        'code'                  => $row->code,
+                        'name'                  => $row->account->name,
+                        'payment_request_code'  => $row->paymentRequest->code,
+                        'post_date'             => date('d/m/y',strtotime($row->post_date)),
+                        'coa_name'              => $row->coaSource->name,
+                        'admin'                 => number_format($row->admin,2,',','.'),
+                        'total'                 => number_format($row->total,2,',','.'),
+                        'grandtotal'            => number_format($row->grandtotal,2,',','.'),
+                        'used'                  => number_format($row->totalUsedCross(),2,',','.'),
+                        'balance'               => number_format($balance,2,',','.'),
+                    ];
+                }
+            }
+        }
+
+        $data['details'] = $details;
+
+        return response()->json($data);
+    }
+
+    public function getAccountData(Request $request){
+        $details = [];
+
+        if($request->arr_id){
+            foreach($request->arr_id as $key => $row){
+                if($request->arr_type[$key] == 'outgoing_payments'){
+                    $op = OutgoingPayment::find(intval($row));
+                    if($op){
+                        $balance = $op->balancePaymentIncoming();
+                        if(!$op->used()->exists() && $balance > 0){
+                            CustomHelper::sendUsedData($op->getTable(),$op->id,'Form Payment Request');
+                            $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$op->company_id)->first();
+                            $details[] = [
+                                'id'                    => $op->id,
+                                'code'                  => $op->code,
+                                'rawcode'               => $op->code,
+                                'type'                  => $op->getTable(),
+                                'name'                  => $op->account->name,
+                                'payment_request_code'  => $op->paymentRequest->code,
+                                'post_date'             => date('d/m/y',strtotime($op->post_date)),
+                                'coa_name'              => $op->coaSource->name,
+                                'admin'                 => number_format($op->admin,2,',','.'),
+                                'total'                 => number_format($op->total,2,',','.'),
+                                'grandtotal'            => number_format($op->grandtotal,2,',','.'),
+                                'used'                  => number_format($op->totalUsedCross(),2,',','.'),
+                                'balance'               => number_format($balance,2,',','.'),
+                                'coa_id'                => $coa->id,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        $user['details'] = $details;
+
+        return response()->json($user);
     }
 
     public function datatable(Request $request){
@@ -239,7 +328,7 @@ class IncomingPaymentController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			        => $request->temp ? ['required', Rule::unique('incoming_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:incoming_payments,code',
+            'code'			        => $request->temp ? ['required', Rule::unique('incoming_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:incoming_payments,code',
             'company_id'            => 'required',
             'coa_id'                => 'required',
             'post_date'             => 'required',
@@ -251,6 +340,10 @@ class IncomingPaymentController extends Controller
             'arr_rounding'          => 'required|array',
             'arr_subtotal'          => 'required|array',
 		], [
+            'code.required' 				    => 'Kode/No tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
+            'code.unique' 				        => 'Kode/No telah dipakai.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'coa_id.required'                   => 'Coa Kas / Bank masuk tidak boleh kosong.',
             'post_date.required'                => 'Tanggal posting tidak boleh kosong.',
@@ -378,13 +471,17 @@ class IncomingPaymentController extends Controller
                         IncomingPaymentDetail::create([
                             'incoming_payment_id'   => $query->id,
                             'lookable_type'         => $request->arr_type[$key],
-                            'lookable_id'           => $request->arr_coa[$key],
+                            'lookable_id'           => $request->arr_type[$key] == 'coas' ? $request->arr_coa[$key] : $request->arr_id[$key],
                             'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
                             'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                             'rounding'              => str_replace(',','.',str_replace('.','',$request->arr_rounding[$key])),
                             'subtotal'              => str_replace(',','.',str_replace('.','',$request->arr_subtotal[$key])),
                             'note'                  => $request->arr_note[$key],
                         ]);
+
+                        if($request->arr_type[$key] == 'outgoing_payments'){
+                            CustomHelper::removeCountLimitCredit($query->account_id,str_replace(',','.',str_replace('.','',$request->arr_total[$key])));
+                        }
                     }
                     DB::commit();
                 }catch(\Exception $e){
@@ -503,18 +600,22 @@ class IncomingPaymentController extends Controller
 
     public function show(Request $request){
         $ip = IncomingPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        $ip['code_place_id'] = substr($ip->code,7,2);
         $ip['grandtotal'] = number_format($ip->grandtotal,2,',','.');
         $ip['account_name'] = $ip->account_id ? $ip->account->name : '';
         $ip['coa_name'] = $ip->coa->code.' - '.$ip->coa->name;
         $ip['currency_rate'] = number_format($ip->currency_rate,2,',','.');
         $ip['project_name'] = $ip->project_id ? $ip->project->name : '';
+        $coareceivable = Coa::where('code','100.01.03.03.02')->where('company_id',$ip->company_id)->first()->id;
 
         $arr = [];
 
         foreach($ip->incomingPaymentDetail as $row){
             $arr[] = [
                 'type'                  => $row->lookable_type,
+                'coa_id'                => $row->lookable_type == 'coas' ? $row->lookable_id : $coareceivable,
                 'id'                    => $row->lookable_id,
+                'post_date'             => $row->lookable_type == 'coas' ? '-' : date('d/m/y',strtotime($row->lookable->post_date)),
                 'name'                  => $row->getCode(),
                 'cost_distribution_id'  => $row->cost_distribution_id ? $row->cost_distribution_id : '',
                 'cost_distribution_name'=> $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
@@ -546,6 +647,12 @@ class IncomingPaymentController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                foreach($query->incomingPaymentDetail as $row){
+                    if($row->lookable_type == 'outgoing_payments'){
+                        CustomHelper::addCountLimitCredit($query->account_id,$row->total);
+                    }
+                }
     
                 activity()
                     ->performedOn(new IncomingPayment())
@@ -570,6 +677,14 @@ class IncomingPaymentController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->table,$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 
     public function destroy(Request $request){
@@ -608,7 +723,12 @@ class IncomingPaymentController extends Controller
         
         if($query->delete()) {
 
-            $query->incomingPaymentDetail()->delete();
+            foreach($query->incomingPaymentDetail as $row){
+                if($row->lookable_type == 'outgoing_payments'){
+                    CustomHelper::addCountLimitCredit($query->account_id,$row->total);
+                }
+                $row->delete();
+            }
 
             CustomHelper::removeApproval('incoming_payments',$query->id);
 

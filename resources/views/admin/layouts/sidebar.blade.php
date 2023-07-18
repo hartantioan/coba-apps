@@ -31,6 +31,11 @@
                                     <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
                                 </span>
                             @endif
+                            @if($m->is_new)
+                                <span class="badge badge pill green float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Baru!" style="height:30px !important;margin-top: 7px;{{ $m->is_maintenance ? 'right: 40px;' : '' }}">
+                                    <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">flag</i>
+                                </span>
+                            @endif
                         </a>
                         <div class="collapsible-body">
                             <ul class="collapsible collapsible-sub" data-collapsible="accordion">
@@ -43,6 +48,11 @@
                                                 @if($msub->is_maintenance)
                                                     <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height:30px !important;margin-top: 7px;">
                                                         <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
+                                                    </span>
+                                                @endif
+                                                @if($msub->is_new)
+                                                    <span class="badge badge pill green float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Baru!" style="height:30px !important;margin-top: 7px;{{ $msub->is_maintenance ? 'right: 40px;' : '' }}">
+                                                        <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">flag</i>
                                                     </span>
                                                 @endif
                                             </a>
@@ -59,6 +69,11 @@
                                                                     @if($msub2->is_maintenance)
                                                                         <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height:30px !important;margin-top: 7px;">
                                                                             <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
+                                                                        </span>
+                                                                    @endif
+                                                                    @if($msub2->is_new)
+                                                                        <span class="badge badge pill green float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Baru!" style="height:30px !important;margin-top: 7px;{{ $msub2->is_maintenance ? 'right: 40px;' : '' }}">
+                                                                            <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">flag</i>
                                                                         </span>
                                                                     @endif
                                                                 </a>
@@ -78,6 +93,11 @@
                                                         <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
                                                     </span>
                                                 @endif
+                                                @if($msub->is_new)
+                                                    <span class="badge badge pill green float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Baru!" style="height:30px !important;margin-top: 7px;{{ $msub->is_maintenance ? 'right: 40px;' : '' }}">
+                                                        <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">flag</i>
+                                                    </span>
+                                                @endif
                                             </a>
                                         </li>
                                     @endif
@@ -93,6 +113,11 @@
                             @if($m->is_maintenance)
                                 <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height:30px !important;margin-top: 7px;">
                                     <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>
+                                </span>
+                            @endif
+                            @if($m->is_new)
+                                <span class="badge badge pill green float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Baru!" style="height:30px !important;margin-top: 7px;{{ $m->is_maintenance ? 'right: 40px;' : '' }}">
+                                    <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">flag</i>
                                 </span>
                             @endif
                         </a>

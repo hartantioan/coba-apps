@@ -47,6 +47,12 @@ class GoodScaleDetail extends Model
         return $this->belongsTo('App\Models\PurchaseOrderDetail', 'purchase_order_detail_id', 'id')->withTrashed();
     }
 
+    public function goodReceiptDetail(){
+        return $this->hasMany('App\Models\GoodReceiptDetail','good_scale_detail_id','id')->whereHas('goodReceipt',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();

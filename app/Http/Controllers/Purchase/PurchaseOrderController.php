@@ -471,7 +471,7 @@ class PurchaseOrderController extends Controller
             ]);
         }elseif($request->inventory_type == '2'){
             $validation = Validator::make($request->all(), [
-                'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_orders,code',
+                'code'			            => $request->temp ? ['required', Rule::unique('purchase_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_orders,code',
                 'supplier_id' 				=> 'required',
                 'inventory_type'			=> 'required',
                 'purchasing_type'			=> 'required',
@@ -494,6 +494,8 @@ class PurchaseOrderController extends Controller
                 'discount'                  => 'required',
             ], [
                 'code.required' 	                => 'Kode tidak boleh kosong.',
+                'code.string'                       => 'Kode harus dalam bentuk string.',
+                'code.min'                          => 'Kode harus minimal 18 karakter.',
                 'code.unique'                       => 'Kode telah dipakai',
                 'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
                 'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
@@ -913,6 +915,7 @@ class PurchaseOrderController extends Controller
 
     public function show(Request $request){
         $po = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $po['code_place_id'] = substr($po->code,7,2);
         $po['supplier_name'] = $po->supplier->name;
         $po['subtotal'] = number_format($po->subtotal,2,',','.');
         $po['discount'] = number_format($po->discount,2,',','.');

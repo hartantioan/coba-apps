@@ -146,7 +146,7 @@
                                 
                             </div>
                             <div class="input-field col m5 s12">
-                                <input id="request_date" name="request_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen" value="{{ date('Y-m-d') }}">
+                                <input id="request_date" name="request_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. dokumen" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="request_date">Tgl. Request</label>
                             </div>
                             <div class="input-field col m5 s12">
@@ -155,6 +155,18 @@
                             </div>
                             <div class="input-field col m2 s12">
                                 
+                            </div>
+                            <div class="input-field col m4 s12">
+                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                <label class="active" for="code">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m1 s12">
+                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                    <option value="">--Pilih--</option>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col m12 s12">
                                 <div style="overflow:auto;">
@@ -288,7 +300,9 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
-            
+                window.onbeforeunload = function() {
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#btn_add_sparepart').prop('disabled', false);
@@ -300,7 +314,9 @@
                 $('.row_detail').each(function(){
                     $(this).remove();
                 });
-                
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -358,6 +374,61 @@
         });
     });
 
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+    };
+
+    function getCode(val){
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
+                }
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    function changeDateMinimum(val){
+        if(val){
+            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
+            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
+                if(newcode.length > 9){
+                    newcode = newcode.substring(0, 9);
+                }
+            }
+            $('#code').val(newcode);
+            $('#code_place_id').trigger('change');
+        }
+    }
+
     list_sparepart=[];
     temp_spareparts=[];
     function removeBodydetail(){
@@ -387,7 +458,6 @@
 
     function add_sparepart(){
         if($('#work_order_id').val()){
-            console.log(list_sparepart);
             $('#empty-detail').remove();
             var count = makeid(10);
             
@@ -466,12 +536,10 @@
     function getRowUnit(val){
         var temp_val = $('#equipmentpart'+val).val();
         var temp_sparepart = list_sparepart[temp_val].sparepart;
-        console.log(temp_sparepart);
         if($("#arr_item" + val).val()){
             $("#arr_code" + val).val(temp_sparepart[$("#arr_item" + val).val()].code);
             var temp_stock=temp_sparepart[$("#arr_item" + val).val()].stock;
             $('#arr_stock' + val).empty();
-            console.log(temp_stock);
             $.each(temp_stock, function(index, value) {
                 $('#arr_stock' + val).append(`
                     <option value="` + value.id + `">` + value.qty + ` - ` + value.warehouse + `</option>
@@ -712,6 +780,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,
@@ -944,7 +1014,6 @@
 
     function show(id){
         
-        console.log(list_sparepart);
         $.ajax({
             url: '{{ Request::url() }}/show',
             type: 'POST',
@@ -962,6 +1031,8 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code_place_id').val(response.code_place_id).formSelect();
+                $('#code').val(response.code);
                 $('#user_name').val(response.user_name);
                 $('#equipment_id').val(response.equipment_name);
                 $('#work_order_id').empty().append(`
@@ -1338,7 +1409,6 @@
             var part = e.subject.part;
             if (part instanceof go.Link) {
                 
-                console.log("");
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1399,7 +1469,6 @@
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            console.log(data[0].key);
             var rootKey = data[0].key; 
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {

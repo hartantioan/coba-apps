@@ -81,6 +81,37 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
+                                        <h5>HPP REALTIME</h5>
+                                        <table class="bordered" style="font-size:10px;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align">No.</th>
+                                                    <th class="center-align">Referensi</th>
+                                                    <th class="center-align">Item</th>
+                                                    <th class="center-align">Plant</th>
+                                                    <th class="center-align">Gudang</th>
+                                                    <th class="center-align">Date</th>
+                                                    <th class="center-align">Nominal Masuk</th>
+                                                    <th class="center-align">Nominal Keluar</th>
+                                                    <th class="center-align">Nominal Akhir</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($itemcogs as $key => $row)
+                                                    <tr>
+                                                        <td class="center-align">{{ ($key + 1) }}</td>
+                                                        <td class="center-align">{{ $row->lookable->code }}</td>
+                                                        <td class="center-align">{{ $row->item->name }}</td>
+                                                        <td class="center-align">{{ $row->place->name }}</td>
+                                                        <td class="center-align">{{ $row->warehouse->name }}</td>
+                                                        <td class="center-align">{{ date('d/m/y',strtotime($row->date)) }}</td>
+                                                        <td class="right-align">{{ number_format($row->total_in,2,',','.') }}</td>
+                                                        <td class="right-align">{{ number_format($row->total_out,2,',','.') }}</td>
+                                                        <td class="right-align">{{ number_format($row->total_final,2,',','.') }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>

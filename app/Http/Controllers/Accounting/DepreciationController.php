@@ -36,12 +36,13 @@ class DepreciationController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'     => 'Depresiasi Aset',
-            'content'   => 'admin.accounting.depreciation',
-            'company'   => Company::where('status','1')->get(),
-            'minDate'   => $request->get('minDate'),
-            'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'DPCT-'.date('y'),
+            'title'         => 'Depresiasi Aset',
+            'content'       => 'admin.accounting.depreciation',
+            'company'       => Company::where('status','1')->get(),
+            'minDate'       => $request->get('minDate'),
+            'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'DPCT-'.date('y'),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -390,6 +391,7 @@ class DepreciationController extends Controller
 
     public function show(Request $request){
         $dpr = Depreciation::where('code',CustomHelper::decrypt($request->id))->first();
+        $dpr['code_place_id'] = substr($dpr->code,7,2);
 
         $arr = [];
         

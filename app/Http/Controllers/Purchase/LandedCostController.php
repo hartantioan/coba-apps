@@ -12,6 +12,7 @@ use App\Models\GoodReturnPO;
 use App\Models\InventoryTransferIn;
 use App\Models\LandedCostFee;
 use App\Models\PaymentRequest;
+use App\Models\Place;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
@@ -63,6 +64,7 @@ class LandedCostController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => 'LNDC-'.date('y'),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -514,7 +516,7 @@ class LandedCostController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('landed_costs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:landed_costs,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('landed_costs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:landed_costs,code',
             'company_id' 			    => 'required',
 			'vendor_id'                 => 'required',
             'post_date'                 => 'required',
@@ -528,6 +530,8 @@ class LandedCostController extends Controller
             'arr_qty'                   => 'required|array'
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
 			'vendor_id.required'                => 'Vendor/ekspedisi tidak boleh kosong',
@@ -869,6 +873,7 @@ class LandedCostController extends Controller
 
     public function show(Request $request){
         $lc = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
+        $lc['code_place_id'] = substr($lc->code,7,2);
         $lc['vendor_name'] = $lc->vendor->name;
         $lc['supplier_name'] = $lc->supplier()->exists() ? $lc->supplier->name : '';
         $lc['total'] = number_format($lc->total,2,',','.');

@@ -569,6 +569,7 @@ class JournalController extends Controller
     public function show(Request $request){
         $jou = Journal::where('code',CustomHelper::decrypt($request->id))->first();
         $jou['currency_rate'] = number_format($jou->currency_rate,2,',','.');
+        $jou['code_place_id'] = substr($jou->code,7,2);
 
         $arr = [];
         

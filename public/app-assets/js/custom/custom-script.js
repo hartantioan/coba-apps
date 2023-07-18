@@ -194,6 +194,12 @@ function cekNotif(url){
 						html: 'Anda harus merubah password, karena sudah lebih dari 2 bulan.'
 					});
 				}
+
+				if(response.unread_chats){
+					M.toast({
+						html: response.unread_chats
+					});
+				}
 			}
 		},
 		error: function() {

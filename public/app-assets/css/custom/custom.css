@@ -140,3 +140,7 @@ legend {
 	text-align: center;
 	font-weight: 800;
 }
+
+.dataTables_scrollBody::-webkit-scrollbar{
+	width:10px !important;
+}

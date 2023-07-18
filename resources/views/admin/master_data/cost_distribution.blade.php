@@ -103,10 +103,10 @@
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s6">
+                        {{-- <div class="input-field col s6">
                             <select class="browser-default" id="coa_id" name="coa_id"></select>
                             <label class="active" for="coa_id">Coa (Opsional)</label>
-                        </div>
+                        </div> --}}
                         <div class="input-field col s6">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
@@ -308,6 +308,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,

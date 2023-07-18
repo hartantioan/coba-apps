@@ -145,6 +145,32 @@ class PurchaseDownPayment extends Model
         return $total;
     }
 
+    public function balancePaymentRequestByDate($date){
+        $total = $this->grandtotal - $this->totalMemoByDate($date);
+
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use ($date){
+            $query->whereHas('outgoingPayment',function ($query) use ($date){
+                $query->whereDate('post_date','<=',$date);
+            });
+        })->get() as $rowpayment){
+            $total -= $rowpayment->nominal;
+        }
+
+        return $total;
+    }
+
+    public function totalPaidByDate($date){
+        $total = 0;
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use ($date){
+            $query->whereHas('outgoingPayment',function ($query) use ($date){
+                $query->whereDate('post_date','<=',$date);
+            });
+        })->get() as $rowpayment){
+            $total += $rowpayment->nominal;
+        }
+        return $total;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
@@ -287,6 +313,16 @@ class PurchaseDownPayment extends Model
         $total = 0;
         foreach($this->purchaseMemoDetail as $row){
             $total += $row->grandtotal;
+        }
+        return $total;
+    }
+
+    public function totalMemoByDate($date){
+        $total = 0;
+        foreach($this->purchaseMemoDetail()->whereHas('purchaseMemo',function ($query) use ($date){
+            $query->whereDate('post_date','<=',$date);
+        })->get() as $rowdetail){
+            $total += $rowdetail->grandtotal;
         }
         return $total;
     }

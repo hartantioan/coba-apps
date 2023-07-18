@@ -191,7 +191,7 @@ class InventoryRevaluationController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('inventory_revaluations', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:inventory_revaluations,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('inventory_revaluations', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:inventory_revaluations,code',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
             'arr_item_stock'            => 'required|array',
@@ -201,6 +201,8 @@ class InventoryRevaluationController extends Controller
             'arr_warehouse'             => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -474,6 +476,7 @@ class InventoryRevaluationController extends Controller
 
     public function show(Request $request){
         $ir = InventoryRevaluation::where('code',CustomHelper::decrypt($request->id))->first();
+        $ir['code_place_id'] = substr($ir->code,7,2);
 
         $arr = [];
         

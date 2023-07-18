@@ -32,10 +32,14 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printBarcode();">
+                            <i class="material-icons hide-on-med-and-up">graphic_eq</i>
+                            <span class="hide-on-small-onl">Barcode</span>
+                            <i class="material-icons right">graphic_eq</i>
+                        </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">Rekap</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
@@ -58,31 +62,37 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <div class="card-panel">
-                                <div class="row">
-                                    <div class="col s12 ">
-                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
-                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
-                                            <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Non-Aktif</option>
-                                            </select>
-                                        </div>
-
-                                        <label for="filter_type" style="font-size:1.2rem;">Filter Tipe :</label>
-                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;min-width:35% !important;max-width:100%;">
-                                            <select class="select2 browser-default" multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
-                                                <option value="" disabled>Semua</option>
-                                                <option value="1">Item Stok</option>
-                                                <option value="2">Item Penjualan</option>
-                                                <option value="3">Item Pembelian</option>
-                                                <option value="4">Item Service</option>
-                                            </select>
+                            <ul class="collapsible collapsible-accordion">
+                                <li>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-body">
+                                        <div class="row">
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
+                                                <div class="input-field col s12">
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Aktif</option>
+                                                        <option value="2">Non-Aktif</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_type" style="font-size:1rem;">Filter Tipe :</label>
+                                                <div class="input-field col s12">
+                                                    <select class="select2 browser-default" multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
+                                                        <option value="" disabled>Semua</option>
+                                                        <option value="1">Item Stok</option>
+                                                        <option value="2">Item Penjualan</option>
+                                                        <option value="3">Item Pembelian</option>
+                                                        <option value="4">Item Service</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                </li>
+                            </ul>
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">List Data</h4>
@@ -548,6 +558,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,
@@ -590,6 +602,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
+                'selectAll', 
                 'selectNone' 
             ],
             "language": {
@@ -839,45 +852,102 @@
     });
 
     function print(){
+
         var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         arr_id_temp=[];
+
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
-           
         });
         
-        $.ajax({
-            url: '{{ Request::url() }}/print',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                arr_id: arr_id_temp,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                printService.submit({
-                    'type': 'INVOICE',
-                    'url': response.message
-                })
+        if(arr_id_temp.length > 0){
+            $.ajax({
+                url: '{{ Request::url() }}/print',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    arr_id: arr_id_temp,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    printService.submit({
+                        'type': 'INVOICE',
+                        'url': response.message
+                    })
+                    
                 
-               
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih item untuk cetak rekap.',
+                icon: 'warning'
+            });
+        }
+    }
+
+    function printBarcode(){
+        
+        var arr_id_temp = [];
+
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(2)').text().trim();
+            arr_id_temp.push(poin);
         });
+
+        if(arr_id_temp.length > 0){
+            $.ajax({
+                url: '{{ Request::url() }}/print_barcode',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    arr_id: arr_id_temp,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    printService.submit({
+                        'type': 'INVOICE',
+                        'url': response.message
+                    })
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih item untuk cetak barcode.',
+                icon: 'warning'
+            });
+        }
     }
 
     function exportExcel(){

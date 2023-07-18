@@ -210,7 +210,7 @@ class WorkOrderController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('work_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:work_orders,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('work_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:work_orders,code',
 			'place_id'                  => 'required',
             'equipment_id'              => 'required',
             'activity_id'               => 'required',
@@ -224,6 +224,8 @@ class WorkOrderController extends Controller
             
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
 			'place_id.required' 			    => 'Penempatan Plant tidak boleh kosong.',
             'equipment_id.required'             => 'Peralatan tidak boleh kosong.',
@@ -431,6 +433,7 @@ class WorkOrderController extends Controller
         Storage::makeDirectory('public/temp');
         //menghapus temp dan membuat direktori temp
         $wo = WorkOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $wo['code_place_id'] = substr($wo->code,7,2);
         $wo['user_name'] = $wo->user->name;
         $wo['equipment_name'] = $wo->equipment->name;
         $equipment_part=[];

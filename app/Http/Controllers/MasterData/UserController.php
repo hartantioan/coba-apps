@@ -573,6 +573,8 @@ class UserController extends Controller
                         'married_date'          => $request->type == '1' ? $request->married_date :NULL,
                         'children'              => $request->type == '1' ? $request->children :NULL,
                         'country_id'            => $request->country_id,
+                        'connection_id'         => 0,
+                        'user_status'           => 'Offline'
                     ]);
                     DB::commit();
                 }catch(\Exception $e){

@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $data = [
             'title'         => 'Dashboard',
             'content'       => 'admin.dashboard.main',
-            'itemcogs'      => ItemCogs::all(),
+            'itemcogs'      => ItemCogs::orderByDesc('date')->orderByDesc('id')->get(),
             'itemstocks'    => ItemStock::all(),
             /* 'pr'        => PurchaseRequest::all(),
             'pr1'       => PurchaseRequest::find(5),

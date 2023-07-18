@@ -92,10 +92,24 @@ class OutgoingPayment extends Model
         });
     }
 
+    public function incomingPaymentDetail(){
+        return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function balancePaymentCross(){
         $total = $this->getTotalPiutangKaryawan();
         foreach($this->paymentRequestCross as $row){
             $total -= $row->nominal;
+        }
+        return $total;
+    }
+
+    public function balancePaymentIncoming(){
+        $total = $this->balancePaymentCross();
+        foreach($this->incomingPaymentDetail as $row){
+            $total -= $row->total;
         }
         return $total;
     }

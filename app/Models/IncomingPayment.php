@@ -51,7 +51,7 @@ class IncomingPayment extends Model
     }
 
     public function account(){
-        return $this->belongsTo('App\Models\Account','account_id','id')->withTrashed();
+        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }
 
     public function project(){

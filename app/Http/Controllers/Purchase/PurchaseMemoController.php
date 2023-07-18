@@ -47,7 +47,7 @@ class PurchaseMemoController extends Controller
             'title'         => 'Purchase Memo',
             'content'       => 'admin.purchase.memo',
             'company'       => Company::where('status','1')->get(),
-            'place'         => Place::where('status','1')->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'    => Department::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
@@ -315,7 +315,7 @@ class PurchaseMemoController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			        => $request->temp ? ['required', Rule::unique('purchase_memos', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_memos,code',
+            'code'			        => $request->temp ? ['required', Rule::unique('purchase_memos', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_memos,code',
 			'account_id' 			=> 'required',
             'company_id'            => 'required',
             'post_date'             => 'required',
@@ -328,6 +328,8 @@ class PurchaseMemoController extends Controller
             'arr_grandtotal'            => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -616,6 +618,7 @@ class PurchaseMemoController extends Controller
 
     public function show(Request $request){
         $data = PurchaseMemo::where('code',CustomHelper::decrypt($request->id))->first();
+        $data['code_place_id'] = substr($data->code,7,2);
         $data['account_name'] = $data->account->name;
         $details = [];
         foreach($data->purchaseMemoDetail as $row){

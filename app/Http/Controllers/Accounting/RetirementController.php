@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use App\Models\Department;
 use App\Models\Company;
+use App\Models\Place;
 use App\Models\User;
 use App\Models\Asset;
 use App\Models\Retirement;
@@ -37,13 +38,14 @@ class RetirementController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'     => 'Purna Operasi Aset',
-            'content'   => 'admin.accounting.retirement',
-            'company'   => Company::where('status','1')->get(),
-            'currency'  => Currency::where('status','1')->get(),
-            'minDate'   => $request->get('minDate'),
-            'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'RTRM-'.date('y'),
+            'title'         => 'Purna Operasi Aset',
+            'content'       => 'admin.accounting.retirement',
+            'company'       => Company::where('status','1')->get(),
+            'currency'      => Currency::where('status','1')->get(),
+            'minDate'       => $request->get('minDate'),
+            'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'RTRM-'.date('y'),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -170,7 +172,7 @@ class RetirementController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-			'code' 				    => $request->temp ? ['required', Rule::unique('retirements', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:retirements,code',
+			'code' 				    => $request->temp ? ['required', Rule::unique('retirements', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:retirements,code',
 			'post_date'			    => 'required',
 			'company_id'		    => 'required',
             'currency_id'		    => 'required',
@@ -182,6 +184,8 @@ class RetirementController extends Controller
             'arr_total'             => 'required|array',
 		], [
 			'code.required' 				    => 'Kode/No tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique' 				        => 'Kode/No telah dipakai.',
 			'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
 			'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
@@ -398,6 +402,7 @@ class RetirementController extends Controller
     public function show(Request $request){
         $ret = Retirement::where('code',CustomHelper::decrypt($request->id))->first();
         $ret['currency_rate'] = number_format($ret->currency_rate,3,',','.');
+        $ret['code_place_id'] = substr($ret->code,7,2);
 
         $arr = [];
         

@@ -42,6 +42,8 @@ class RequestSparepartController extends Controller
             'area'          => Area::where('status','1')->get(),
             'activity'      => Activity::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'minDate'       => $request->get('minDate'),
+            'maxDate'       => $request->get('maxDate'),
             'newcode'       => 'RSPR-'.date('y'),
         ];
 
@@ -199,14 +201,19 @@ class RequestSparepartController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
+            'code'			            => $request->temp ? ['required', Rule::unique('request_spareparts', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:request_spareparts,code',
 			'work_order_id'             =>  'required',
             'request_date'              =>  'required',
             'arr_code'                  =>  'required',
             
 		], [
-			'work_order_id.required' 			    => 'Work Order tidak boleh kosong.',
-            'request_date.required'                 => 'Tanggal Request tidak boleh kosong.',
-            'arr_code'                              => 'Request harus memiliki sparepart yang dipilih',
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
+            'code.unique'                       => 'Kode telah dipakai',
+			'work_order_id.required' 			=> 'Work Order tidak boleh kosong.',
+            'request_date.required'             => 'Tanggal Request tidak boleh kosong.',
+            'arr_code'                          => 'Request harus memiliki sparepart yang dipilih',
 		]);
         if($validation->fails()) {
             $response = [
@@ -222,6 +229,8 @@ class RequestSparepartController extends Controller
                     $query = RequestSparepart::where('code',CustomHelper::decrypt($request->temp))->first();
                     
                     if($query->workOrder->status == 1){
+                        $query->code = $request->code;
+
                         if($query->status == '1'){
                        
                             $query->work_order_id = $request->work_order_id;
@@ -275,7 +284,7 @@ class RequestSparepartController extends Controller
                 try {
                     
                     $query = RequestSparepart::create([
-                        'code'			            => RequestSparepart::generateCode($request->post_date),
+                        'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'work_order_id'             => $request->work_order_id,
                         'request_date'              => $request->request_date,
@@ -341,6 +350,7 @@ class RequestSparepartController extends Controller
 
     public function show(Request $request){
         $request_sp = RequestSparepart::where('code',CustomHelper::decrypt($request->id))->first();
+        $request_sp['code_place_id'] = substr($request_sp->code,7,2);
         $request_sp['user_name'] = $request_sp->user->name;
         $request_sp['equipment_name'] = $request_sp->workOrder->equipment->name;
         $request_sp['work_order_code'] = $request_sp->workOrder->code;

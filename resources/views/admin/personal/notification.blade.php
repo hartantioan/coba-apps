@@ -71,9 +71,10 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>From</th>
-                                                        <th>Title</th>
-                                                        <th>Action</th>
+                                                        <th>Dari</th>
+                                                        <th>Judul</th>
+                                                        <th>Waktu</th>
+                                                        <th>Aksi</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -97,6 +98,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX":true,
             "stateSave": true,
@@ -131,6 +134,7 @@
                         { name: 'id', searchable: false, className: 'center-align details-control' },
                         { name: 'from', className: 'center-align' },
                         { name: 'title', className: 'center-align' },
+                        { name: 'timestamp', className: 'center-align' },
                         { name: 'action', searchable: false, orderable: false, className: 'center-align' }
                     ],
             dom: 'Blfrtip',

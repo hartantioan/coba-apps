@@ -59,6 +59,7 @@
                                                         <th>Urutan</th>
                                                         <th>Status</th>
                                                         <th>Maintenance</th>
+                                                        <th>Baru</th>
                                                         <th>Hak Akses</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -142,6 +143,17 @@
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
+                                <label for="new">Menu Baru?</label>
+                                <label>
+                                    Tidak
+                                    <input checked type="checkbox" id="new" name="new" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
                                     Non-Active
@@ -200,6 +212,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,
@@ -239,6 +253,7 @@
                 { name: 'order', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'maintenance', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'new', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'crud', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -370,6 +385,11 @@
                     $('#maintenance').prop( "checked", true);
                 }else{
                     $('#maintenance').prop( "checked", false);
+                }
+                if(response.is_new == '1'){
+                    $('#new').prop( "checked", true);
+                }else{
+                    $('#new').prop( "checked", false);
                 }
                 $('.modal-content').scrollTop(0);
                 $('#name').focus();

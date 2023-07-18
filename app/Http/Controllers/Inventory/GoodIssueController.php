@@ -195,7 +195,7 @@ class GoodIssueController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('good_issues', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:good_issues,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('good_issues', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_issues,code',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
             'arr_item_stock'            => 'required|array',
@@ -203,6 +203,8 @@ class GoodIssueController extends Controller
             'arr_coa'                   => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -486,6 +488,7 @@ class GoodIssueController extends Controller
 
     public function show(Request $request){
         $gr = GoodIssue::where('code',CustomHelper::decrypt($request->id))->first();
+        $gr['code_place_id'] = substr($gr->code,7,2);
 
         $arr = [];
         

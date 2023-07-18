@@ -410,6 +410,56 @@ class ItemController extends Controller
 
     }
 
+    public function printBarcode(Request $request){
+
+        $validation = Validator::make($request->all(), [
+            'arr_id'                => 'required',
+        ], [
+            'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
+        ]);
+        
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $pr=[];
+            $currentDateTime = Date::now();
+            $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+            foreach($request->arr_id as $key =>$row){
+                $pr[]= Item::where('code',$row)->first();
+            }
+            $data = [
+                'title'     => 'Master Item',
+                'data'      => $pr
+            ];  
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path);
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+            $pdf = Pdf::loadView('admin.print.master_data.item_barcode', $data);
+            $pdf->render();
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+            $content = $pdf->download()->getOriginalContent();
+
+            Storage::put('public/pdf/bubla.pdf',$content);
+            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $var_link=$document_po;
+
+            $response =[
+                'status'=>200,
+                'message'  =>$var_link
+            ];
+        }
+		
+		return response()->json($response);
+    }
+
     public function export(Request $request){
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';

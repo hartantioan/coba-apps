@@ -9,6 +9,7 @@ use App\Models\GoodReturnPO;
 use App\Models\LandedCost;
 use App\Models\PaymentRequest;
 use App\Models\PaymentRequestCross;
+use App\Models\Place;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
 use App\Models\PurchaseRequest;
@@ -55,6 +56,7 @@ class PurchaseDownPaymentController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => 'PODP-'.date('y'),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -303,7 +305,7 @@ class PurchaseDownPaymentController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('purchase_down_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_down_payments,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('purchase_down_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_down_payments,code',
 			'supplier_id' 				=> 'required',
 			'type'                      => 'required',
             'company_id'                => 'required',
@@ -314,6 +316,8 @@ class PurchaseDownPaymentController extends Controller
             'subtotal'                  => 'required',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
 			'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
 			'type.required'                     => 'Tipe tidak boleh kosong',
@@ -611,6 +615,7 @@ class PurchaseDownPaymentController extends Controller
 
     public function show(Request $request){
         $pdp = PurchaseDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        $pdp['code_place_id'] = substr($pdp->code,7,2);
         $pdp['supplier_name'] = $pdp->supplier->name;
         $pdp['subtotal'] = number_format($pdp->subtotal,2,',','.');
         $pdp['discount'] = number_format($pdp->discount,2,',','.');

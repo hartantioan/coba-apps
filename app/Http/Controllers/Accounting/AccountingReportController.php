@@ -17,7 +17,7 @@ class AccountingReportController extends Controller
     {
         
         $data = [
-            'title'     => 'Finance Report',
+            'title'     => 'Laporan Rekapitulasi Akunting',
             'content'   => 'admin.accounting.report',
             'menus'     => Menu::whereIn('parent_id', [17, 87])
                             ->whereHas('menuUser', function ($query) {

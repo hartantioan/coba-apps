@@ -47,6 +47,7 @@ class InventoryTransferInController extends Controller
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => 'ITIN-'.date('y'),
+            'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -248,12 +249,14 @@ class InventoryTransferInController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_ins', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:inventory_transfer_ins,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_ins', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:inventory_transfer_ins,code',
             'company_id'                => 'required',
             'inventory_transfer_out_id' => 'required',
 			'post_date'		            => 'required',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'inventory_transfer_out_id.required'=> 'Inventori Transfer Asal tidak boleh kosong.',
@@ -410,6 +413,7 @@ class InventoryTransferInController extends Controller
 
     public function show(Request $request){
         $iti = InventoryTransferIn::where('code',CustomHelper::decrypt($request->id))->first();
+        $iti['code_place_id'] = substr($iti->code,7,2);
         $iti['inventory_transfer_out_name'] = $iti->inventoryTransferOut->code.' - '.$iti->inventoryTransferOut->user->name;
 
         $details = [];

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Misc;
 
 use App\Http\Controllers\Controller;
+use App\Models\Chat;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -96,6 +97,7 @@ class NotificationController extends Controller
                     $nomor,
                     $val->fromUser->name,
                     $val->title,
+                    date('d/m/y H:i:s',strtotime($val->created_at)),
                     '
                         <a type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Kunjungi Halaman" href="'.$rootUrl.'/admin/'.$val->getURL().'?code='.CustomHelper::encrypt($val->lookable->code ?? '').'"><i class="material-icons dp48">keyboard_tab</i></a>
                     '
@@ -127,6 +129,7 @@ class NotificationController extends Controller
         $user = User::find(session('bo_id'));
 
         $approvals = ApprovalMatrix::where('user_id',session('bo_id'))->where('status','1')->count();
+        $unreadchat = Chat::where('to_user_id',session('bo_id'))->where('message_status','Not Send')->count();
 
         $arrnotif = [];
         $arrlink = [];
@@ -146,7 +149,8 @@ class NotificationController extends Controller
             'link_list'         => $arrlink,
             'notif_count'       => $notifnew,
             'approval_count'    => $approvals,
-            'need_change_pass'  => $user->needChangePassword() ? '1' : ''
+            'need_change_pass'  => $user->needChangePassword() ? '1' : '',
+            'unread_chats'      => $unreadchat > 0 ? 'Anda memiliki '.$unreadchat.' percakapan yang baru dan belum dibaca.' : '',
         ];
         
         return response()->json($response);

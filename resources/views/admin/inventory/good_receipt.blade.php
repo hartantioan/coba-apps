@@ -134,16 +134,24 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h5>Tambah/Edit {{ $title }}</h5>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m3 s12">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                            <div class="input-field col m2 s12">
+                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m1 s12">
+                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                    <option value="">--Pilih--</option>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
@@ -191,7 +199,7 @@
                             <div class="col m12 s12">
                                 <div class="col m6 s6">
                                     <p class="mt-2 mb-2">
-                                        <h4>Purchase Order</h4>
+                                        <h5>Purchase Order</h5>
                                         <div class="row">
                                             <div class="input-field col m6 s7">
                                                 <select class="browser-default" id="purchase_order_id" name="purchase_order_id">&nbsp;</select>
@@ -210,9 +218,9 @@
                             </div>
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h4>Detail Produk</h4>
+                                    <h5>Detail Produk</h5>
                                     <div style="overflow:auto;">
-                                        <table class="bordered">
+                                        <table class="bordered" style="width:1800px;">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -226,12 +234,13 @@
                                                     <th class="center">Mesin</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
+                                                    <th class="center">Timbangan</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="12" class="center">
+                                                    <td colspan="13" class="center">
                                                         Pilih purchase order untuk memulai...
                                                     </td>
                                                 </tr>
@@ -493,7 +502,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="12" class="center">
+                            <td colspan="13" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -581,7 +590,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="12" class="center">
+                        <td colspan="13" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -596,32 +605,40 @@
     };
 
     function getCode(val){
-        if(val.length == 9){
-            $.ajax({
-                url: '{{ Request::url() }}/get_code',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    val: val,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    $('#code').val(response);
-                },
-                error: function() {
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
                 }
-            });
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
         }
     }
 
@@ -633,7 +650,8 @@
                     newcode = newcode.substring(0, 9);
                 }
             }
-            $('#code').val(newcode).trigger('keyup');
+            $('#code').val(newcode);
+            $('#code_place_id').trigger('change');
         }
     }
 
@@ -669,11 +687,11 @@
                                 var count = makeid(10);
                                 $('#body-item').append(`
                                     <tr class="row_item" data-po="` + valmain.id + `">
-                                        <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
-                                        <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                        <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
-                                        <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
+                                        <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                         <td>
                                             ` + val.item_name + `
                                         </td>
@@ -699,12 +717,42 @@
                                             <span>` + val.warehouse_name + `</span>
                                         </td>
                                         <td class="center">
+                                            <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
+                                        </td>
+                                        <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
                                             </a>
                                         </td>
                                     </tr>
                                 `);
+
+                                $('#arr_scale' + count).select2({
+                                    placeholder: '-- Pilih ya --',
+                                    minimumInputLength: 1,
+                                    allowClear: true,
+                                    cache: true,
+                                    width: 'resolve',
+                                    dropdownParent: $('body').parent(),
+                                    ajax: {
+                                        url: '{{ url("admin/select2/good_scale_item") }}',
+                                        type: 'GET',
+                                        dataType: 'JSON',
+                                        data: function(params) {
+                                            return {
+                                                search: params.term,
+                                                item: $('#arr_item' + count).val(),
+                                                place: $('#arr_place' + count).val(),
+                                                warehouse: $('#arr_warehouse' + count).val(),
+                                            };
+                                        },
+                                        processResults: function(data) {
+                                            return {
+                                                results: data.items
+                                            }
+                                        }
+                                    }
+                                });
                             });
                         });
                     }
@@ -732,7 +780,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="12" class="center">
+                        <td colspan="13" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -895,6 +943,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,
@@ -1019,6 +1069,7 @@
                 formData.delete("arr_department[]");
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
+                formData.delete("arr_scale[]");
 
                 $('input[name^="arr_department"]').each(function(index){
                     formData.append('arr_department[]',($(this).val() ? $(this).val() : ''));
@@ -1030,6 +1081,10 @@
 
                 $('input[name^="arr_machine"]').each(function(index){
                     formData.append('arr_machine[]',($(this).val() ? $(this).val() : ''));
+                });
+
+                $('select[name^="arr_scale"]').each(function(index){
+                    formData.append('arr_scale[]',($(this).val() ? $(this).val() : ''));
                 });
         
                 $.ajax({
@@ -1149,13 +1204,13 @@
                                 var count = makeid(10);
                                 $('#body-item').append(`
                                     <tr class="row_item" data-po="` + response.id + `">
-                                        <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_item[]" id="arr_item` + count + `"  value="` + val.item_id + `">
                                         <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
-                                        <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                        <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                         <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
                                         <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
-                                        <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
+                                        <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                         <td>
                                             ` + val.item_name + `
                                         </td>
@@ -1190,12 +1245,42 @@
                                             <span>` + val.warehouse_name + `</span>
                                         </td>
                                         <td class="center">
+                                            <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
+                                        </td>
+                                        <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
                                             </a>
                                         </td>
                                     </tr>
                                 `);
+
+                                $('#arr_scale' + count).select2({
+                                    placeholder: '-- Pilih ya --',
+                                    minimumInputLength: 1,
+                                    allowClear: true,
+                                    cache: true,
+                                    width: 'resolve',
+                                    dropdownParent: $('body').parent(),
+                                    ajax: {
+                                        url: '{{ url("admin/select2/good_scale_item") }}',
+                                        type: 'GET',
+                                        dataType: 'JSON',
+                                        data: function(params) {
+                                            return {
+                                                search: params.term,
+                                                item: $('#arr_item' + count).val(),
+                                                place: $('#arr_place' + count).val(),
+                                                warehouse: $('#arr_warehouse' + count).val(),
+                                            };
+                                        },
+                                        processResults: function(data) {
+                                            return {
+                                                results: data.items
+                                            }
+                                        }
+                                    }
+                                });
                             });
                         }
                         $('#purchase_order_id').empty();
@@ -1221,7 +1306,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="12" class="center">
+                        <td colspan="13" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -1249,7 +1334,7 @@
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="12" class="center">
+                            <td colspan="13" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -1287,6 +1372,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
@@ -1306,13 +1392,13 @@
                         var count = makeid(10);
                         $('#body-item').append(`
                             <tr class="row_item">
-                                <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
-                                <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                 <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
                                 <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
-                                <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
+                                <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                 <td>
                                     ` + val.item_name + `
                                 </td>
@@ -1347,12 +1433,46 @@
                                     <span>` + val.warehouse_name + `</span>
                                 </td>
                                 <td class="center">
+                                    <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
+                                </td>
+                                <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>
                             </tr>
                         `);
+                        if(val.good_scale_detail_id){
+                            $('#arr_scale' + count).append(`
+                                <option value="` + val.good_scale_detail_id + `">` + val.good_scale_detail_name + `</option>
+                            `);
+                        }
+                        $('#arr_scale' + count).select2({
+                            placeholder: '-- Pilih ya --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/good_scale_item") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        item: $('#arr_item' + count).val(),
+                                        place: $('#arr_place' + count).val(),
+                                        warehouse: $('#arr_warehouse' + count).val(),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
                     });
                 }
 

@@ -99,13 +99,13 @@ class FundRequest extends Model
         return $total;
     }
 
-    public function totalReceivableUsed(){
+    public function totalReceivableUsedPaid(){
         $total = 0;
         if($this->document_status == '3'){
             foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
                 $query->whereHas('outgoingPayment');
             })->get() as $row){
-                $total += $row->totalOutgoingUsedWeight();
+                $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
             }
         }
         return $total;

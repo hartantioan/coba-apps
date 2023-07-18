@@ -3,8 +3,8 @@
         top:0px !important;
     }
 
-    .select-wrapper {
-        height: 3.7rem !important;
+    .select-wrapper, .select2-container {
+        height:3.6rem !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -135,9 +135,17 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m4 s12">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                            <div class="input-field col m3 s12">
+                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m1 s12">
+                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                    <option value="">--Pilih--</option>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="input-field col m4 s12">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
@@ -740,6 +748,8 @@
 
      function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,
@@ -771,6 +781,19 @@
                     });
                 }
             },
+            columns: [
+                { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'name', className: 'center-align' },
+                { name: 'code', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
+                { name: 'date_post', className: 'center-align' },
+                { name: 'date_due', className: 'center-align' },
+                { name: 'date_use', className: 'center-align' },
+                { name: 'note', className: '' },
+                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
+            ],
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
@@ -801,19 +824,6 @@
             select: {
                 style: 'multi'
             },
-            columns: [
-                { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'name', className: 'center-align' },
-                { name: 'code', className: 'center-align' },
-                { name: 'company_id', className: 'center-align' },
-                { name: 'date_post', className: 'center-align' },
-                { name: 'date_due', className: 'center-align' },
-                { name: 'date_use', className: 'center-align' },
-                { name: 'note', className: '' },
-                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
-            ],
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
 
@@ -996,6 +1006,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
@@ -1264,48 +1275,53 @@
     };
 
     function getCode(val){
-        if(val.length == 9){
-            $.ajax({
-                url: '{{ Request::url() }}/get_code',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    val: val,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    $('#code').val(response);
-                },
-                error: function() {
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
                 }
-            });
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
         }
     }
 
     function changeDateMinimum(val){
         if(val){
-            $('#due_date,#required_date').attr("min",val);
-            $('input[name^="arr_required_date"]').each(function(){
-                $(this).attr("min",val);
-            });
             let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
             if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
                 if(newcode.length > 9){
                     newcode = newcode.substring(0, 9);
                 }
             }
-            $('#code').val(newcode).trigger('keyup');
+            $('#code').val(newcode);
+            $('#code_place_id').trigger('change');
         }
     }
 

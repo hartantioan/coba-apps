@@ -9,6 +9,7 @@ use App\Models\GoodReceiptDetail;
 use App\Models\LandedCost;
 use App\Models\PaymentRequest;
 use App\Models\PaymentRequestCross;
+use App\Models\Place;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
@@ -50,6 +51,7 @@ class GoodReturnPOController extends Controller
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => 'GRRT-'.date('y'),
+            'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -245,7 +247,7 @@ class GoodReturnPOController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('good_returns', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:good_returns,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('good_returns', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_returns,code',
             'account_id'                => 'required',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
@@ -254,6 +256,8 @@ class GoodReturnPOController extends Controller
             'arr_good_receipt_detail'   => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai.',
             'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -574,6 +578,7 @@ class GoodReturnPOController extends Controller
 
     public function show(Request $request){
         $grm = GoodReturnPO::where('code',CustomHelper::decrypt($request->id))->first();
+        $grm['code_place_id'] = substr($grm->code,7,2);
         $grm['account_name'] = $grm->account->name;
 
         $arr = [];

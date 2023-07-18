@@ -23,7 +23,8 @@ class Menu extends Model
         'parent_id',
         'order',
         'status',
-        'is_maintenance'
+        'is_maintenance',
+        'is_new',
     ];
 
     public function sub()
@@ -121,10 +122,10 @@ class Menu extends Model
     public function status(){
         switch($this->status) {
             case '1':
-                $status = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>';
+                $status = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Aktif</span>';
                 break;
             case '2':
-                $status = '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>';
+                $status = '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Non-Aktif</span>';
                 break;
             default:
                 $status = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>';
@@ -137,14 +138,27 @@ class Menu extends Model
     public function isMaintenance(){
         switch($this->is_maintenance) {
             case '1':
-                $maintenance = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>';
+                $maintenance = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Aktif</span>';
                 break;
             default:
-                $maintenance = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">In-Active</span>';
+                $maintenance = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Non-Aktif</span>';
                 break;
         }
 
         return $maintenance;
+    }
+
+    public function isNew(){
+        switch($this->is_new) {
+            case '1':
+                $new = '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Aktif</span>';
+                break;
+            default:
+                $new = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Non-Aktif</span>';
+                break;
+        }
+
+        return $new;
     }
 
     public function getColumnTypes(){

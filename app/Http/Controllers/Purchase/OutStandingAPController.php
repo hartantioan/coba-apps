@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Purchase;
 
 use App\Exports\ExportOutstandingAP;
 use App\Http\Controllers\Controller;
+use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
@@ -33,24 +34,32 @@ class OutStandingAPController extends Controller
                     $query->whereDate('post_date', '<=', $request->date);
                 }
             })
-            ->get();    
+            ->whereIn('status',['2','3'])
+            ->get();
+        $query_data2 = PurchaseDownPayment::where(function($query) use ( $request) {
+                if($request->date) {
+                    $query->whereDate('post_date', '<=', $request->date);
+                }
+            })
+            ->whereIn('status',['2','3'])
+            ->get();
         $totalAll = 0;
-        if($query_data){
+        if($query_data && $query_data2){
             foreach($query_data as $row_invoice){
                 $data_tempura = [
                     'code' => $row_invoice->code,
                     'vendor' => $row_invoice->account->name,
-                    'post_date'=>date('d M Y',strtotime($row_invoice->post_date)),
-                    'rec_date'=>date('d M Y',strtotime($row_invoice->received_date)),
-                    'due_date'=>date('d M Y',strtotime($row_invoice->due_date)),
+                    'post_date'=>date('d/m/y',strtotime($row_invoice->post_date)),
+                    'rec_date'=>date('d/m/y',strtotime($row_invoice->received_date)),
+                    'due_date'=>date('d/m/y',strtotime($row_invoice->due_date)),
                     'grandtotal'=>number_format($row_invoice->balance,2,',','.'),
                     'payed'=>number_format($row_invoice->totalMemoByDate($request->date),2,',','.'),
                     'sisa'=>number_format($row_invoice->getTotalPaidByDate($request->date),2,',','.'),
                 ];
+
                 $detail=[];
-                $totalAll+=$row_invoice->balance;
+                
                 foreach($row_invoice->purchaseInvoiceDetail as $row){
-                    
                     if($row->purchaseOrderDetail()){
                         $detail[] = [
                             'po'=> $row->lookable->purchaseOrder->code,
@@ -114,17 +123,57 @@ class OutStandingAPController extends Controller
                         
                         ];
                     }
-                    
-                   
                 }
-                info($data_tempura['sisa']);
+
                 if($data_tempura['sisa'] != number_format(0,2,',','.')){
-                    $data_tempura['details']=$detail;
-                    $array_filter[]=$data_tempura;
-                    
+                    $totalAll += str_replace(',','.',str_replace('.','',$data_tempura['sisa']));
+                    $data_tempura['details'] = $detail;
+                    $array_filter[] = $data_tempura;
                 }
                 
             }
+
+            foreach($query_data2 as $row_dp){
+                $total = $row_dp->balancePaymentRequestByDate($request->date);
+                $data_tempura = [
+                    'code' => $row_dp->code,
+                    'vendor' => $row_dp->supplier->name,
+                    'post_date'=>date('d/m/y',strtotime($row_dp->post_date)),
+                    'rec_date'=>'',
+                    'due_date'=>date('d/m/y',strtotime($row_dp->due_date)),
+                    'grandtotal'=>number_format($row_dp->grandtotal,2,',','.'),
+                    'payed'=>number_format($row_dp->totalMemoByDate($request->date),2,',','.'),
+                    'sisa'=>number_format($total,2,',','.'),
+                ];
+
+                $detail=[];
+                
+                foreach($row_dp->purchaseDownPaymentDetail as $row){
+                    if($row->purchaseOrder()->exists()){
+                        $detail[] = [
+                            'po'=> $row->purchaseOrder->code,
+                            'top'=>$row->purchaseOrder->payment_term,
+                            'item_name'=>'-',
+                            'note1'=>$row->note,
+                            'note2'=>'-',
+                            'qty'=>1,
+                            'unit'=>'-',
+                            'price_o'=>number_format(0,2,',','.'),
+                            'total' =>number_format($row->nominal,2,',','.'),
+                            'ppn'=>number_format(0,2,',','.'),
+                            'pph'=>number_format(0,2,',','.'),
+                        ];
+                    }
+                }
+
+                if($total > 0){
+                    $totalAll += $total;
+                    $data_tempura['details'] = $detail;
+                    $array_filter[] = $data_tempura;
+                }
+                
+            }
+
             $response =[
                 'status'=>200,
                 'message'  =>$array_filter,

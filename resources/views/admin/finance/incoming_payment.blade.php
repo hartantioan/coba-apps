@@ -64,7 +64,6 @@
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
                                     <div class="collapsible-body">
                                         <div class="row">
-                                            
                                             <div class="col m4 s6 ">
                                                 <label for="filter_account" style="font-size:1rem;">Partner Bisnis :</label>
                                                 <div class="input-field">
@@ -180,9 +179,17 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m3 s12">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" onkeyup="getCode(this.value);">
+                            <div class="input-field col m2 s12">
+                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
+                            </div>
+                            <div class="input-field col m1 s12">
+                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                    <option value="">--Pilih--</option>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input type="hidden" id="temp" name="temp">
@@ -231,13 +238,16 @@
                                 <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                             </div>
                             <div class="col m12 s12">
+                                <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
+                            </div>
+                            <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
-                                    <h6>Detail MO.Invoice / Coa</h6>
+                                    <h6>Detail MO.Invoice / BS.Karyawan / Coa</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered" style="max-width:1650px !important;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center">MO.Invoice/Coa</th>
+                                                    <th class="center">Referensi</th>
                                                     <th class="center">Tgl.Post</th>
                                                     <th class="center">Tgl.Tenggat</th>
                                                     <th class="center">Total</th>
@@ -266,7 +276,7 @@
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m4 s12">
-                                <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
+
                             </div>
                             <div class="input-field col m4 s12">
                                 <table width="100%" class="bordered">
@@ -335,7 +345,7 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
-<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-header ml-2">
         <h5>Daftar Tunggakan Dokumen <b id="account_name"></b></h5>
     </div>
@@ -344,33 +354,41 @@
             <div class="col s12">
                 <div class="row">
                     <div class="col s12 mt-2">
-                        <div class="collapsible-header purple lightrn-1 white-text">
-                            <i class="material-icons">layers</i> MO Invoice (COMING SOON...)
-                        </div>
-                        <div class="collapsible-body">
-                            <div id="datatable_buttons_multi"></div>
-                            <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
-                            <table id="table_multi" class="display" width="100%">
-                                <thead>
-                                    <tr>
-                                        <th class="center-align">GR/LC/PO No.</th>
-                                        <th class="center-align">Tgl.Post</th>
-                                        <th class="center-align">Grandtotal</th>
-                                        <th class="center-align">Ter-Invoice</th>
-                                        <th class="center-align">Sisa</th>
-                                        <th class="center-align">Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body-detail-multi"></tbody>
-                            </table>
-                        </div>
+                        <ul class="collapsible">
+                            <li class="active">
+                                <div class="collapsible-header purple lightrn-1 white-text">
+                                    <i class="material-icons">layers</i> MO Invoice (COMING SOON...)
+                                </div>
+                                <div class="collapsible-body">
+                                    <div id="datatable_buttons_multi"></div>
+                                    <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                                    <table id="table_multi" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Kode Out. Payment</th>
+                                                <th class="center">Kode Payment Req.</th>
+                                                <th class="center">Bisnis Partner</th>
+                                                <th class="center">Tgl.Post</th>
+                                                <th class="center">Coa Kas/Bank</th>
+                                                <th class="center">Admin</th>
+                                                <th class="center">Total</th>
+                                                <th class="center">Grandtotal</th>
+                                                <th class="center">Terpakai</th>
+                                                <th class="center">Sisa</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-multi"></tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1" onclick="resetBp();">Close</a>
         <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
     </div>
 </div>
@@ -583,7 +601,7 @@
                 $('#temp').val('');
                 M.updateTextFields();
                 $('.row_detail').remove();
-                $('#account_id,#project_id').empty();
+                $('#account_id,#project_id,#coa_id').empty();
                 $('#total,#wtax,#grandtotal').text('0,00');
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -640,13 +658,52 @@
         $('#modal6').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+                $('.collapsible').collapsible({
+                    accordion:false
+                });
             },
             onOpenEnd: function(modal, trigger) {
-
+                table_multi = $('#table_multi').DataTable({
+                    "responsive": true,
+                    "ordering": false,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('select[name="table_multi_length"]').addClass('browser-default');
             },
             onCloseEnd: function(modal, trigger){
-                
+                $('#table_multi').DataTable().clear().destroy();
             }
         });
 
@@ -657,40 +714,57 @@
         $('#body-detail').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             countAll();
+            if($('.row_detail').length == 0){
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+            }
         });
     });
+
+    function resetBp(){
+        $('#account_id').empty();
+    }
 
     String.prototype.replaceAt = function(index, replacement) {
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);
     };
 
     function getCode(val){
-        if(val.length == 9){
-            $.ajax({
-                url: '{{ Request::url() }}/get_code',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    val: val,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    $('#code').val(response);
-                },
-                error: function() {
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
                 }
-            });
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
         }
     }
 
@@ -702,13 +776,17 @@
                     newcode = newcode.substring(0, 9);
                 }
             }
-            $('#code').val(newcode).trigger('keyup');
+            $('#code').val(newcode);
+            $('#code_place_id').trigger('change');
         }
     }
 
     function addItem(){
         var count = makeid(10);
-
+        if($('.data-used').length > 0){
+            $('.data-used').trigger('click');
+            $('#account_id').empty();
+        }
         $('#last-row-detail').before(`
             <tr class="row_detail">
                 <input type="hidden" name="arr_type[]" value="coas">
@@ -745,6 +823,7 @@
         `);
         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+        countAll();
     }
 
     function applyCoa(code){
@@ -761,8 +840,203 @@
 
     function getAccountInfo(){
         if($('#account_id').val()){
-            $('#modal6').modal('open');
+            $.ajax({
+                url: '{{ Request::url() }}/get_account_info',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#account_id').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#modal6').modal('open');
+                    $('#account_name').text($('#account_id').select2('data')[0].text);
+                    $('#body-detail-multi').empty();
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-detail-multi').append(`
+                                <tr data-id="` + val.id + `" data-type="` + val.type + `">
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.payment_request_code + `
+                                    </td>
+                                    <td>
+                                        ` + val.name + `
+                                    </td>
+                                    <td>
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td>
+                                        ` + val.coa_name + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.admin + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.grandtotal + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.used + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.balance + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }
         }
+    }
+
+    function applyDocuments(){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let passed = false, arr_id = [], arr_type = [];
+                
+                $.map(table_multi.rows('.selected').nodes(), function (item) {
+                    passed = true;
+                    arr_id.push($(item).data('id'));
+                    arr_type.push($(item).data('type'));
+                });
+
+                if(passed == true){
+                    $.ajax({
+                        url: '{{ Request::url() }}/get_account_data',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            arr_id: arr_id,
+                            arr_type: arr_type,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.details.length > 0){
+                                if($('.data-used').length > 0){
+                                    $('.data-used').trigger('click');
+                                }
+
+                                $.each(response.details, function(i, val) {
+                                    var count = makeid(10);
+                                    $('#list-used-data').append(`
+                                        <div class="chip purple darken-4 gradient-shadow white-text">
+                                            ` + val.rawcode + `
+                                            <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
+                                        </div>
+                                    `);
+                                    $('#last-row-detail').before(`
+                                        <tr class="row_detail" data-id="` + val.id + `" data-code="` + val.rawcode + `">
+                                            <input type="hidden" name="arr_id[]" value="` + val.id + `">
+                                            <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                            <input type="hidden" name="arr_coa[]" value="` + val.coa_id + `">
+                                            <td>
+                                                ` + val.code + `
+                                            </td>
+                                            <td>
+                                                ` + val.post_date + `
+                                            </td>
+                                            <td class="center-align">
+                                                -
+                                            </td>
+                                            <td class="center">
+                                                <input id="arr_total` + count + `" name="arr_total[]" data-limit="` + val.balance + `" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" readonly>
+                                            </td>
+                                            <td class="center">
+                                                <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                            </td>
+                                            <td class="center">
+                                                <input id="arr_subtotal` + count + `" name="arr_subtotal[]" data-limit="0" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                                            </td>
+                                            <td class="center">
+                                                -
+                                            </td>
+                                            <td>
+                                                <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan ...">
+                                            </td>
+                                            <td class="center">
+                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    `);
+                                });
+                                
+                            }else{
+                                $('#grandtotal').val('0,00');
+                            }
+
+                            $('#top').val(response.top);
+                            
+                            $('.modal-content').scrollTop(0);
+                            M.updateTextFields();
+
+                            $('#modal6').modal('close');
+                            countAll();
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Silahkan, pilih data.',
+                        icon: 'warning'
+                    });
+                }
+            }
+        });
     }
 
     function checkTotal(element){
@@ -840,6 +1114,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
             "stateSave": true,
@@ -971,24 +1247,47 @@
                 formData.delete("arr_rounding[]");
                 formData.delete("arr_subtotal[]");
                 formData.delete("arr_note[]");
+                formData.delete("arr_type[]");
+                formData.delete("arr_id[]");
 
                 let passed = true;
 
-                $('select[name^="arr_coa"]').each(function(index){
-                    formData.append('arr_coa[]',$(this).val());
-                    formData.append('arr_cost_distribution[]',(
-                        $('select[name^="arr_cost_distribution"]').eq(index).val() ? $('select[name^="arr_cost_distribution"]').eq(index).val() : ''
-                    ));
-                    formData.append('arr_total[]',$('input[name^="arr_total"]').eq(index).val());
-                    formData.append('arr_rounding[]',$('input[name^="arr_rounding"]').eq(index).val());
-                    formData.append('arr_subtotal[]',$('input[name^="arr_subtotal"]').eq(index).val());
-                    formData.append('arr_note[]',(
-                        $('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''
-                    ));
-                    if(!$(this).val() || !$('input[name^="arr_total"]').eq(index).val() || !$('input[name^="arr_rounding"]').eq(index).val() || !$('input[name^="arr_subtotal"]').eq(index).val()){
-                        passed = false;
-                    }
-                });
+                if($('select[name^="arr_coa"]').length > 0){
+                    $('select[name^="arr_coa"]').each(function(index){
+                        formData.append('arr_coa[]',$(this).val());
+                        formData.append('arr_cost_distribution[]',(
+                            $('select[name^="arr_cost_distribution"]').eq(index).val() ? $('select[name^="arr_cost_distribution"]').eq(index).val() : ''
+                        ));
+                        formData.append('arr_total[]',$('input[name^="arr_total"]').eq(index).val());
+                        formData.append('arr_rounding[]',$('input[name^="arr_rounding"]').eq(index).val());
+                        formData.append('arr_subtotal[]',$('input[name^="arr_subtotal"]').eq(index).val());
+                        formData.append('arr_type[]',$('input[name^="arr_type"]').eq(index).val());
+                        formData.append('arr_note[]',(
+                            $('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''
+                        ));
+                        if(!$(this).val() || !$('input[name^="arr_total"]').eq(index).val() || !$('input[name^="arr_rounding"]').eq(index).val() || !$('input[name^="arr_subtotal"]').eq(index).val()){
+                            passed = false;
+                        }
+                    });
+                }
+
+                if($('input[name^="arr_coa"]').length > 0){
+                    $('input[name^="arr_coa"]').each(function(index){
+                        formData.append('arr_coa[]',$(this).val());
+                        formData.append('arr_id[]',$('input[name^="arr_id"]').eq(index).val());
+                        formData.append('arr_cost_distribution[]','');
+                        formData.append('arr_total[]',$('input[name^="arr_total"]').eq(index).val());
+                        formData.append('arr_rounding[]',$('input[name^="arr_rounding"]').eq(index).val());
+                        formData.append('arr_subtotal[]',$('input[name^="arr_subtotal"]').eq(index).val());
+                        formData.append('arr_type[]',$('input[name^="arr_type"]').eq(index).val());
+                        formData.append('arr_note[]',(
+                            $('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''
+                        ));
+                        if(!$(this).val() || !$('input[name^="arr_total"]').eq(index).val() || !$('input[name^="arr_rounding"]').eq(index).val() || !$('input[name^="arr_subtotal"]').eq(index).val()){
+                            passed = false;
+                        }
+                    });
+                }
 
                 if(passed){
                     $.ajax({
@@ -1107,6 +1406,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 if(response.account_name){
                     $('#account_id').empty().append(`
@@ -1135,11 +1435,18 @@
                         $('#last-row-detail').before(`
                             <tr class="row_detail">
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                ` + 
+                                (val.type == 'coas' ? `` : 
+                                `
+                                <input type="hidden" name="arr_id[]" value="` + val.id + `">
+                                <input type="hidden" name="arr_coa[]" value="` + val.coa_id + `">
+                                `)
+                                + `
                                 <td>
-                                    ` + (val.type == 'coas' ? `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>` : `-`) + `
+                                    ` + (val.type == 'coas' ? `<select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>` : val.name) + `
                                 </td>
                                 <td class="center">
-                                    -
+                                    ` + val.post_date + `
                                 </td>
                                 <td class="center">
                                     -
@@ -1148,13 +1455,13 @@
                                     <input id="arr_total` + count + `" name="arr_total[]" data-limit="0" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
                                 </td>
                                 <td class="center">
-                                    <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                    <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="` + val.rounding + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
                                 </td>
                                 <td class="center">
                                     <input id="arr_subtotal` + count + `" name="arr_subtotal[]" data-limit="0" class="browser-default" type="text" value="` + val.subtotal + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
                                 </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>
+                                    ` + (val.type == 'coas' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` : `-`) + `
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan ..." value="` + val.note + `">
@@ -1168,7 +1475,7 @@
                         `);
                         if(val.type == 'coas'){
                             $('#arr_coa' + count).append(`
-                                <option value="` + val.id + `">` + val.name + `</option>
+                                <option value="` + val.coa_id + `">` + val.name + `</option>
                             `);
                             select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         }

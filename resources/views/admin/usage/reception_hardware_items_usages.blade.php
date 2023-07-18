@@ -356,6 +356,8 @@
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
             "responsive": true,
             "stateSave": true,
             "serverSide": true,
@@ -503,7 +505,7 @@
                     loadingClose('.modal-content');
                     if(response.status == 200) {
                         $('#modal3').modal('close');
-                        loadDataTable()
+                        loadDataTable();
                         M.toast({
                             html: response.message
                         });

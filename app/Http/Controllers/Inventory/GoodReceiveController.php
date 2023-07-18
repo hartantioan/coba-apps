@@ -5,17 +5,12 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use App\Models\Place;
-use App\Models\PurchaseOrder;
-use App\Models\ApprovalMatrix;
-use App\Models\ApprovalSource;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -24,7 +19,6 @@ use App\Models\GoodReceiveDetail;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Department;
-use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
 use App\Exports\ExportGoodReceive;
 
@@ -197,7 +191,7 @@ class GoodReceiveController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('good_receives', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:good_receives,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('good_receives', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_receives,code',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
 			'currency_id'		        => 'required',
@@ -209,6 +203,8 @@ class GoodReceiveController extends Controller
             'arr_warehouse'             => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -492,6 +488,7 @@ class GoodReceiveController extends Controller
 
     public function show(Request $request){
         $gr = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $gr['code_place_id'] = substr($gr->code,7,2);
         $gr['currency_rate'] = number_format($gr->currency_rate,3,',','.');
 
         $arr = [];

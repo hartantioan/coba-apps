@@ -320,7 +320,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('GRPO-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> 'good_receipts',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $data->post_date,
@@ -389,7 +389,7 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('RTRM-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> 'retirements',
 				'lookable_id'	=> $ret->id,
 				'currency_id'	=> $ret->currency_id,
@@ -471,7 +471,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('IPYM-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> 'incoming_payments',
 				'lookable_id'	=> $ip->id,
 				'currency_id'	=> $ip->currency_id,
@@ -500,10 +500,13 @@ class CustomHelper {
 					'nominal'		=> $ip->grandtotal * $ip->currency_rate,
 				]);
 
+				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$ip->company_id)->first()->id;
+				$coareceivable = Coa::where('code','100.01.03.03.02')->where('company_id',$ip->company_id)->first()->id;
+
 				foreach($ip->incomingPaymentDetail as $row){
 					if($row->lookable_type == 'coas'){
 						if($row->cost_distribution_id){
-							$total = $row->subtotal;
+							$total = $row->total;
 							$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
 							$accumulation = 0;
 							foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
@@ -534,12 +537,32 @@ class CustomHelper {
 								'coa_id'		=> $row->lookable_id,
 								'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
 								'type'			=> '2',
-								'nominal'		=> $row->subtotal * $ip->currency_rate,
+								'nominal'		=> $row->total * $ip->currency_rate,
 								'note'			=> $row->note,
 							]);
 						}
+						
+					}elseif($row->lookable_type == 'outgoing_payments'){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coareceivable,
+							'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> $row->total * $ip->currency_rate,
+							'note'			=> $row->note,
+						]);
 					}else{
 
+					}
+
+					if($row->rounding > 0 || $row->rounding < 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coarounding,
+							'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
+							'type'			=> $row->rounding > 0 ? '2' : '1',
+							'nominal'		=> abs($row->rounding),
+						]);
 					}
 				}
 			}
@@ -551,7 +574,7 @@ class CustomHelper {
 			if($pr->paymentRequestCross()->exists() && $pr->balance == 0){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
-					'code'			=> Journal::generateCode('PREQ-'.date('y',strtotime($data->post_date))),
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 					'lookable_type'	=> 'payment_requests',
 					'lookable_id'	=> $pr->id,
 					'currency_id'	=> $pr->currency_id,
@@ -615,7 +638,7 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('OPYM-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> 'outgoing_payments',
 				'lookable_id'	=> $op->id,
 				'currency_id'	=> $op->currency_id,
@@ -741,7 +764,7 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('GRCV-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> 'good_receives',
 				'lookable_id'	=> $gr->id,
 				'currency_id'	=> $gr->currency_id,
@@ -799,7 +822,7 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('GRRT-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> 'good_returns',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $gr->post_date,
@@ -865,7 +888,7 @@ class CustomHelper {
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('GISS-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> 'good_issues',
 				'lookable_id'	=> $gr->id,
 				'post_date'		=> $gr->post_date,
@@ -923,7 +946,7 @@ class CustomHelper {
 			if($lc){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
-					'code'			=> Journal::generateCode('LNDC-'.date('y',strtotime($data->post_date))),
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 					'lookable_type'	=> 'landed_costs',
 					'lookable_id'	=> $lc->id,
 					'post_date'		=> $data->post_date,
@@ -1018,7 +1041,7 @@ class CustomHelper {
 			if($ir){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
-					'code'			=> Journal::generateCode('INRV-'.date('y',strtotime($data->post_date))),
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 					'lookable_type'	=> $ir->getTable(),
 					'lookable_id'	=> $ir->id,
 					'post_date'		=> $data->post_date,
@@ -1088,7 +1111,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('CAPT-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'currency_id'	=> $data->currency_id,
@@ -1124,7 +1147,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('ITOU-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -1189,7 +1212,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('ITIN-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -1248,7 +1271,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('DPCT-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -1287,7 +1310,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('PMMO-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -1393,7 +1416,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('CLBI-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
@@ -1430,7 +1453,7 @@ class CustomHelper {
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('PINV-'.date('y',strtotime($data->post_date))),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'currency_id'	=> isset($data->currency_id) ? $data->currency_id : NULL,
@@ -1625,7 +1648,7 @@ class CustomHelper {
 
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
-					'code'			=> Journal::generateCode('PODP-'.date('y',strtotime($data->post_date))),
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 					'currency_id'	=> isset($data->currency_id) ? $data->currency_id : NULL,
@@ -1835,6 +1858,18 @@ class CustomHelper {
 			$query->deposit = 0 - $nominal;
 		}
 
+		$query->save();
+	}
+
+	public static function addCountLimitCredit($account_id = null, $nominal = null){
+		$query = User::find($account_id);
+		$query->count_limit_credit = $query->count_limit_credit + $nominal;
+		$query->save();
+	}
+
+	public static function removeCountLimitCredit($account_id = null, $nominal = null){
+		$query = User::find($account_id);
+		$query->count_limit_credit = $query->count_limit_credit - $nominal;
 		$query->save();
 	}
 

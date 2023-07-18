@@ -33,23 +33,26 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <div class="card-panel">
-                                <div class="row">
-                                    <div class="col s12">
-                                        <div id="datatable_buttons_request"></div>
-                                        <table id="datatable_serverside_request" class="display responsive-table wrap">
-                                            <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Code</th>
-                                                    <th>Item</th>
-                                                    <th>Keluhan</th>
-                                                    <th>Tanggal</th>
-                                                    <th>Status</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4 class="card-title">List Antrian Request Repair</h4>
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <div id="datatable_buttons_request"></div>
+                                            <table id="datatable_serverside_request" class="display responsive-table wrap">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Code</th>
+                                                        <th>Item</th>
+                                                        <th>Keluhan</th>
+                                                        <th>Tanggal</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

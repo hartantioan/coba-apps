@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\FundRequest;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
+use App\Models\GoodScaleDetail;
 use App\Models\HardwareItem;
 use App\Models\HardwareItemGroup;
 use App\Models\InventoryTransferOut;
@@ -1423,6 +1424,39 @@ class Select2Controller extends Controller {
                     'qty'               => number_format($d->getBalanceReceipt(),3,',','.'),
                 ];
             }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function goodScaleItem(Request $request){
+        $response   = [];
+
+        $data = GoodScaleDetail::where(function($query) use($request){
+                    $query->where(function($query)use($request){
+                        $query->whereHas('item',function($query) use($request){
+                            $query->where('code', 'like', "%$request->search%")
+                                ->orWhere('name','like',"%$request->search%");
+                        })
+                        ->where('item_id',$request->item)
+                        ->where('place_id',$request->place)
+                        ->where('warehouse_id',$request->warehouse);
+                    })
+                    ->orWhereHas('goodScale',function($query)use($request){
+                        $query->where('code','like',"%$request->search%");
+                    });
+                })
+                ->whereHas('goodScale',function($query){
+                    $query->whereIn('status',['2','3']);
+                })
+                ->whereDoesntHave('goodReceiptDetail')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->goodScale->code.' '.$d->item->name.' '.$d->qty_balance.' '.$d->item->uomUnit->code,
+            ];
         }
 
         return response()->json(['items' => $response]);

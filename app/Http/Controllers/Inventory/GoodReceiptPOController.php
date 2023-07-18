@@ -299,7 +299,7 @@ class GoodReceiptPOController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('good_receipts', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:good_receipts,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('good_receipts', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_receipts,code',
             'account_id'                => 'required',
             'company_id'                => 'required',
 			'receiver_name'			    => 'required',
@@ -311,6 +311,8 @@ class GoodReceiptPOController extends Controller
             'arr_qty'                   => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
             'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -509,6 +511,7 @@ class GoodReceiptPOController extends Controller
                         GoodReceiptDetail::create([
                             'good_receipt_id'           => $query->id,
                             'purchase_order_detail_id'  => $row,
+                            'good_scale_detail_id'      => $request->arr_scale[$key] ? $request->arr_scale[$key] : NULL,
                             'item_id'                   => $request->arr_item[$key],
                             'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'total'                     => $arrDetail[$key]['total'],
@@ -564,7 +567,7 @@ class GoodReceiptPOController extends Controller
                             <table class="bordered" style="min-width:100%;max-width:100%;">
                                 <thead>
                                     <tr>
-                                        <th class="center-align" colspan="12">Daftar Item</th>
+                                        <th class="center-align" colspan="13">Daftar Item</th>
                                     </tr>
                                     <tr>
                                         <th class="center-align">No.</th>
@@ -579,6 +582,7 @@ class GoodReceiptPOController extends Controller
                                         <th class="center-align">Mesin</th>
                                         <th class="center-align">Departemen</th>
                                         <th class="center-align">Gudang</th>
+                                        <th class="center-align">Timbangan</th>
                                     </tr>
                                 </thead>
                                 <tbody>';
@@ -597,6 +601,7 @@ class GoodReceiptPOController extends Controller
                 <td class="center-align">'.($rowdetail->machine()->exists() ? $rowdetail->machine->name : '-').'</td>
                 <td class="center-align">'.($rowdetail->department_id ? $rowdetail->department->name : '-').'</td>
                 <td class="center-align">'.$rowdetail->warehouse->name.'</td>
+                <td class="center-align">'.($rowdetail->good_scale_detail_id ? $rowdetail->goodScaleDetail->goodScale->code : '-').'</td>
             </tr>';
         }
         
@@ -675,12 +680,15 @@ class GoodReceiptPOController extends Controller
     public function show(Request $request){
         $grm = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
         $grm['account_name'] = $grm->account->name;
+        $grm['code_place_id'] = substr($grm->code,7,2);
 
         $arr = [];
         
         foreach($grm->goodReceiptDetail as $row){
             $arr[] = [
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
+                'good_scale_detail_id'      => $row->good_scale_detail_id ? $row->good_scale_detail_id : '',
+                'good_scale_detail_name'    => $row->good_scale_detail_id ? $row->goodScaleDetail->goodScale->code.' '.$row->goodScaleDetail->item->name.' '.$row->goodScaleDetail->qty_balance.' '.$row->goodScaleDetail->item->uomUnit->code : '',
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->name,
                 'qty'                       => number_format($row->qty,3,',','.'),

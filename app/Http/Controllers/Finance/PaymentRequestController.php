@@ -63,6 +63,7 @@ class PaymentRequestController extends Controller
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => 'PREQ-'.date('y'),
             'newcodePay'    => 'OPYM-'.date('y'),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -259,7 +260,7 @@ class PaymentRequestController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					',
                     $val->balance == 0 ? 'Terbayar' : ($val->status == '2' && !$val->outgoingPayment()->exists() ?
-                    '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="cashBankOut(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">screen_share</i></button>' : ($val->outgoingPayment()->exists() ? $val->outgoingPayment->code : $val->statusRaw() ))
+                    '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Bayar" onclick="cashBankOut(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">screen_share</i></button>' : ($val->outgoingPayment()->exists() ? $val->outgoingPayment->code : $val->statusRaw() ))
                 ];
 
                 $nomor++;
@@ -315,8 +316,8 @@ class PaymentRequestController extends Controller
         
         if(isset($op)){
             foreach($op as $row){
-                $balance = $row->balancePaymentCross();
-                if($balance > 0){
+                $balance = $row->balancePaymentIncoming();
+                if(!$row->used()->exists() && $balance > 0){
                     $payments[] = [
                         'id'                    => $row->id,
                         'code'                  => $row->code,
@@ -442,7 +443,7 @@ class PaymentRequestController extends Controller
             foreach($request->arr_op_id as $key => $row){
                 $op = OutgoingPayment::find(intval($row));
                 if($op){
-                    $balance = $op->balancePaymentCross();
+                    $balance = $op->balancePaymentIncoming();
                     if(!$op->used()->exists() && $balance > 0){
                         CustomHelper::sendUsedData($op->getTable(),$op->id,'Form Payment Request');
                         $payments[] = [
@@ -951,6 +952,7 @@ class PaymentRequestController extends Controller
     public function show(Request $request){
         $pr = PaymentRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $pr['account_name'] = $pr->account->name;
+        $pr['code_place_id'] = substr($pr->code,7,2);
         $pr['coa_source_name'] = $pr->coaSource()->exists() ? $pr->coaSource->code.' - '.$pr->coaSource->name.' - '.$pr->coaSource->company->name : '';
         $pr['currency_rate'] = number_format($pr->currency_rate,3,',','.');
         $pr['cost_distribution_name'] = $pr->cost_distribution_id ? $pr->costDistribution->code.' - '.$pr->costDistribution->name : '';

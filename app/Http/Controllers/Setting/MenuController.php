@@ -110,6 +110,7 @@ class MenuController extends Controller
                     $val->order,
                     $val->status(),
                     $val->isMaintenance(),
+                    $val->isNew(),
                     !$val->sub()->exists() ?
                     '
                         <a href="'.url('admin/setting/menu/operation_access').'/'.$val->id.'" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text" data-popup="tooltip" title="Edit hak akses operasional halaman"><i class="material-icons dp48">folder_shared</i></a>
@@ -185,6 +186,47 @@ class MenuController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Menu::find($request->temp);
+
+                    if($query->is_maintenance){
+                        if(!$request->maintenance){
+                            if($query->parentsub()->exists()){
+                                $query->parentSub->update([
+                                    'is_maintenance' => NULL
+                                ]);
+                                if($query->parentSub->parentSub()->exists()){
+                                    $query->parentSub->parentSub->update([
+                                        'is_maintenance' => NULL
+                                    ]);
+                                    if($query->parentSub->parentSub->parentSub()->exists()){
+                                        $query->parentSub->parentSub->parentSub->update([
+                                            'is_maintenance' => NULL
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if($query->is_new){
+                        if(!$request->new){
+                            if($query->parentsub()->exists()){
+                                $query->parentSub->update([
+                                    'is_new' => NULL
+                                ]);
+                                if($query->parentSub->parentSub()->exists()){
+                                    $query->parentSub->parentSub->update([
+                                        'is_new' => NULL
+                                    ]);
+                                    if($query->parentSub->parentSub->parentSub()->exists()){
+                                        $query->parentSub->parentSub->parentSub->update([
+                                            'is_new' => NULL
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     $query->name = $request->name;
                     $query->url = $request->url;
                     $query->icon = $request->icon;
@@ -193,6 +235,7 @@ class MenuController extends Controller
                     $query->order = $request->order;
                     $query->status = $request->status ? $request->status : '2';
                     $query->is_maintenance = $request->maintenance ? $request->maintenance : NULL;
+                    $query->is_new = $request->new ? $request->new : NULL;
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -222,7 +265,8 @@ class MenuController extends Controller
                         'parent_id'	        => $request->parent_id ? $request->parent_id : NULL,
                         'order'             => $request->order,
                         'status'            => $request->status ? $request->status : '2',
-                        'is_maintenance'    => $request->maintenance ? $request->maintenance : NULL
+                        'is_maintenance'    => $request->maintenance ? $request->maintenance : NULL,
+                        'is_new'            => $request->new ? $request->new : NULL
                     ]);
                     
                     DB::commit();
@@ -245,6 +289,42 @@ class MenuController extends Controller
                     ApprovalTemplateMenu::where('menu_id',$query->id)->update([
                         'table_name'    => $query->table_name
                     ]);
+                }
+
+                if($request->maintenance){
+                    if($query->parentsub()->exists()){
+                        $query->parentSub->update([
+                            'is_maintenance' => $request->maintenance
+                        ]);
+                        if($query->parentSub->parentSub()->exists()){
+                            $query->parentSub->parentSub->update([
+                                'is_maintenance' => $request->maintenance
+                            ]);
+                            if($query->parentSub->parentSub->parentSub()->exists()){
+                                $query->parentSub->parentSub->parentSub->update([
+                                    'is_maintenance' => $request->maintenance
+                                ]);
+                            }
+                        }
+                    }
+                }
+
+                if($request->new){
+                    if($query->parentsub()->exists()){
+                        $query->parentSub->update([
+                            'is_new' => $request->new
+                        ]);
+                        if($query->parentSub->parentSub()->exists()){
+                            $query->parentSub->parentSub->update([
+                                'is_new' => $request->new
+                            ]);
+                            if($query->parentSub->parentSub->parentSub()->exists()){
+                                $query->parentSub->parentSub->parentSub->update([
+                                    'is_new' => $request->new
+                                ]);
+                            }
+                        }
+                    }
                 }
                 
                 $newdata[] = '<option value="">Parent (Utama)</option>';

@@ -222,7 +222,7 @@ class InventoryTransferOutController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_outs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:inventory_transfer_outs,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('inventory_transfer_outs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:inventory_transfer_outs,code',
             'company_id'                => 'required',
 			'post_date'		            => 'required',
             'place_from'                => 'required',
@@ -234,6 +234,8 @@ class InventoryTransferOutController extends Controller
             'arr_qty'                   => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -550,6 +552,7 @@ class InventoryTransferOutController extends Controller
 
     public function show(Request $request){
         $gr = InventoryTransferOut::where('code',CustomHelper::decrypt($request->id))->first();
+        $gr['code_place_id'] = substr($gr->code,7,2);
 
         $arr = [];
         

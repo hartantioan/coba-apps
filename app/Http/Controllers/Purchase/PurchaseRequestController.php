@@ -458,7 +458,7 @@ class PurchaseRequestController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('purchase_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_requests,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('purchase_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_requests,code',
 			'post_date' 				=> 'required',
 			'due_date'			        => 'required',
 			'required_date'		        => 'required',
@@ -470,6 +470,8 @@ class PurchaseRequestController extends Controller
             'arr_department'            => 'required|array'
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
 			'due_date.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
@@ -631,6 +633,7 @@ class PurchaseRequestController extends Controller
         $pr = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
         $pr['project_id'] = $pr->project_id ? $pr->project_id : '';
         $pr['project_name'] = $pr->project()->exists() ? $pr->project->code.' - '.$pr->project->name : '';
+        $pr['code_place_id'] = substr($pr->code,7,2);
 
         $arr = [];
 

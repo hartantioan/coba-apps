@@ -37,6 +37,7 @@ class IncomingPaymentDetail extends Model
     public function getCode(){
         $code = match ($this->lookable_type) {
             'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
+            'outgoing_payments'         => $this->lookable->code,
             default                     => '-',
         };
 

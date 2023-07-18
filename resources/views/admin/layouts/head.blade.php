@@ -10,6 +10,9 @@
     <meta name="keywords" content="Superior Porcelain Sukses.">
     <meta name="author" content="ThemeSelect">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- <!-- hilangkan ini bahaya -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <!-- end hilangkan -->  --}}
     <title>{{ env('APP_NAME') }} | {{ $title }}</title>
     <link rel="apple-touch-icon" href="{{ url('website/logo_web_small.png') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small.png') }}">
@@ -41,7 +44,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
     <!-- END: Page Level CSS-->
     <!-- BEGIN: Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css?v=44') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css?v=45') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/waitMe.min.css') }}">
     <!-- END: Custom CSS-->
 	<script src="{{ url('app-assets/js/vendors.min.js') }}"></script>

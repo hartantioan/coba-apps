@@ -57,7 +57,7 @@ class PurchaseInvoiceController extends Controller
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
-            'place'         => Place::where('status','1')->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'    => Department::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->get(),
             'line'          => Line::where('status','1')->get(),
@@ -541,7 +541,7 @@ class PurchaseInvoiceController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('purchase_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_invoices,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('purchase_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:purchase_invoices,code',
 			'account_id' 			    => 'required',
 			'type'                      => 'required',
             'company_id'                => 'required',
@@ -555,6 +555,8 @@ class PurchaseInvoiceController extends Controller
             'arr_grandtotal'            => 'required|array'
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
 			'type.required'                     => 'Tipe invoice tidak boleh kosong',
@@ -1099,6 +1101,7 @@ class PurchaseInvoiceController extends Controller
 
     public function show(Request $request){
         $pi = PurchaseInvoice::where('code',CustomHelper::decrypt($request->id))->first();
+        $pi['code_place_id'] = substr($pi->code,7,2);
         $pi['account_name'] = $pi->account->name;
         $pi['total'] = number_format($pi->total,2,',','.');
         $pi['tax'] = number_format($pi->tax,2,',','.');

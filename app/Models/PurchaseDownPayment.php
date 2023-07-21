@@ -103,6 +103,17 @@ class PurchaseDownPayment extends Model
         return $type;
     }
 
+    public static function typeStatic($original){
+        $type = match ($original) {
+            '1' => 'Cash',
+            '2' => 'Transfer',
+            '3' => 'Giro/Check',
+            default => 'Invalid',
+        };
+
+        return $type;
+    }
+
     public function currency()
     {
         return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();

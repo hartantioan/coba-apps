@@ -41,13 +41,14 @@ use App\Models\User;
 
 class LandedCostController extends Controller
 {
-    protected $dataplaces, $datawarehouses;
+    protected $dataplaces, $datawarehouses, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
     
     public function index(Request $request)
@@ -365,7 +366,7 @@ class LandedCostController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = LandedCost::count();
+        $total_data = LandedCost::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = LandedCost::where(function($query) use ($search, $request) {
                 if($search) {
@@ -410,6 +411,7 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -458,6 +460,7 @@ class LandedCostController extends Controller
                     $query->whereIn('currency_id',$request->currency_id);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
         $response['data'] = [];

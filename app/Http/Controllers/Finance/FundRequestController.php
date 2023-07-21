@@ -38,12 +38,13 @@ use App\Exports\ExportFundRequest;
 
 class FundRequestController extends Controller
 {
-    protected $dataplaces, $datauser;
+    protected $dataplaces, $datauser, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
         $this->datauser = $user;
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
 
     public function index(Request $request)
@@ -95,7 +96,7 @@ class FundRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = FundRequest::whereIn('place_id',$this->dataplaces)->count();
+        $total_data = FundRequest::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = FundRequest::where(function($query) use ($search, $request) {
                 if($search) {
@@ -123,7 +124,7 @@ class FundRequestController extends Controller
                     $query->where('document_status', $request->document);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -155,7 +156,7 @@ class FundRequestController extends Controller
                     $query->where('document_status', $request->document);
                 }
             })
-            ->whereIn('place_id',$this->dataplaces)
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
         $response['data'] = [];

@@ -23,7 +23,7 @@ class PurchasePaymentHistoryController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'History Pembayaran',
+            'title'         => 'Laporan Histori Pembayaran',
             'content'       => 'admin.purchase.purchase_payment_history',
             'company'       => Company::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',

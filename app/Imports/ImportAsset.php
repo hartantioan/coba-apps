@@ -1,16 +1,11 @@
 <?php
 
 namespace App\Imports;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
 
 use App\Models\Asset;
 
-use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\ValidationException;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -30,21 +25,6 @@ class ImportAsset implements ToModel, WithHeadingRow, WithValidation,WithBatchIn
             'status' => $row['status']
         ]);
     }
-    /* public function transformDate($value, $format = 'Y-m-d')
-    {
-        if(!is_numeric($value)){
-            return $value;
-        }else{
-            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value)->format('Y-m-d');
-        }
-    }
-
-    public function prepareForValidation($data, $index)
-    {
-        $data['date_start'] = $this->transformDate($data['date_start']);
-        $data['date_end'] = $this->transformDate($data['date_end']);
-        return $data;
-    } */
 
     public function rules(): array
     {

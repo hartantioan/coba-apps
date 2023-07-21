@@ -31,6 +31,63 @@ class MenuController extends Controller
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+
+        /* $start_time = microtime(true);
+        
+        $menu = Menu::where('status','1')->get();
+
+        $arrResult = [];
+
+        foreach($menu as $row){
+            $arrResult[] = [
+                'id'        => $row->id,
+                'order'     => $row->order,
+                'name'      => $row->name,
+                'parent_id' => $row->parent_id ? $row->parent_id : 0,
+            ];
+        }
+
+        $res = [];
+ 
+        foreach($arrResult as $e){
+            $this->addToArr($res, $e);
+        }
+
+        $key_values = array_column($res, 'order'); 
+        array_multisort($key_values, SORT_ASC, $res);
+
+        $end_time = microtime(true);
+        
+        $execution_time = ($end_time - $start_time);
+            
+        echo json_encode($res).' - '.$execution_time; */
+    }
+
+    function addToArr(&$arr, $data){
+        if ($data['parent_id'] == 0){
+            return $arr[] =  [
+                'id'        => $data['id'], 
+                'order'     => $data['order'], 
+                'name'      => $data['name'], 
+                'parent_id' => $data['parent_id'],
+                'children'  => []
+            ];
+        }
+        foreach($arr as &$e) {
+            if ($e['id'] == $data['parent_id']) {
+                $e['children'][] = [
+                    'id'        => $data['id'], 
+                    'order'     => $data['order'],
+                    'name'      => $data['name'],
+                    'parent_id' => $data['parent_id'], 
+                    'children'  => []
+                ];
+                break;
+            }
+            $key_values = array_column($e['children'], 'order'); 
+            array_multisort($key_values, SORT_ASC, $e['children']);
+            $this->addToArr($e['children'], $data);
+        }
     }
 
     public function datatable(Request $request){

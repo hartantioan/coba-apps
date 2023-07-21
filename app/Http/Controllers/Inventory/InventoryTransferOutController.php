@@ -26,13 +26,14 @@ use App\Exports\ExportInventoryTransferOut;
 
 class InventoryTransferOutController extends Controller
 {
-    protected $dataplaces, $datawarehouses;
+    protected $dataplaces, $datawarehouses, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
 
     public function index(Request $request)

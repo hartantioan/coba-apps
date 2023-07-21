@@ -23,7 +23,7 @@ class Login
             return $next($request);
         } else {
             session()->flush();
-            return redirect('/admin/login');
+            return redirect('/admin/login?url='.url()->previous());
         }
     }
 }

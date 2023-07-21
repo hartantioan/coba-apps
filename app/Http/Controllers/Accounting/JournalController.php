@@ -28,12 +28,13 @@ use App\Helpers\CustomHelper;
 
 class JournalController extends Controller
 {
-    protected $dataplaces;
+    protected $dataplaces, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
     public function index(Request $request)
     {

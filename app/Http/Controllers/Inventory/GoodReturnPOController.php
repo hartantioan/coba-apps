@@ -33,12 +33,13 @@ use App\Exports\ExportGoodReturnPO;
 
 class GoodReturnPOController extends Controller
 {
-    protected $dataplaces;
+    protected $dataplaces, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
 
     public function index(Request $request)
@@ -74,7 +75,7 @@ class GoodReturnPOController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReturnPO::count();
+        $total_data = GoodReturnPO::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = GoodReturnPO::where(function($query) use ($search, $request) {
                 if($search) {
@@ -107,6 +108,7 @@ class GoodReturnPOController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -143,6 +145,7 @@ class GoodReturnPOController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
         $response['data'] = [];

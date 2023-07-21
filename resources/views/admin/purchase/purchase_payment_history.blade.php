@@ -376,6 +376,7 @@
 <!-- END: Page Main-->
 <script>
     var table_multi, table_multi_dp;
+
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
@@ -437,7 +438,7 @@
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
                 "zeroRecords": "Data tidak ditemukan / kosong",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
                 "infoEmpty": "Data tidak ditemukan / kosong",
                 "infoFiltered": "(disaring dari _MAX_ total data)",
                 "search": "Cari",
@@ -565,7 +566,7 @@
                     $('#title_data').append(``+data.title+``);
                     $('#body_history').append(data.tbody);
                     $('#grandtotal').append(data.grandtotal);
-                    $('#downpayment').append(data.downpayment)
+                    $('#downpayment').append(data.downpayment);
                     $('#tagihan').append(data.tagihan);
                     $('#memo').append(data.memo);
                     $('#dibayarkan').append(data.dibayar);
@@ -584,5 +585,4 @@
         $('#modal1').modal('close');
     }
 
-    
 </script>

@@ -545,7 +545,7 @@
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
                 "zeroRecords": "Data tidak ditemukan / kosong",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
                 "infoEmpty": "Data tidak ditemukan / kosong",
                 "infoFiltered": "(disaring dari _MAX_ total data)",
                 "search": "Cari",

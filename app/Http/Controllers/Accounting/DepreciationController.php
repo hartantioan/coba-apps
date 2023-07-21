@@ -25,12 +25,13 @@ use App\Helpers\CustomHelper;
 
 class DepreciationController extends Controller
 {
-    protected $dataplaces;
+    protected $dataplaces,$dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
 
     public function index(Request $request)
@@ -71,7 +72,7 @@ class DepreciationController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Depreciation::count();
+        $total_data = Depreciation::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = Depreciation::where(function($query) use ($search, $request) {
                 if($search) {
@@ -93,6 +94,7 @@ class DepreciationController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -118,6 +120,7 @@ class DepreciationController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
         $response['data'] = [];

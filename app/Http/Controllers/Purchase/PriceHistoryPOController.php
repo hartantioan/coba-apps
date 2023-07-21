@@ -28,8 +28,7 @@ class PriceHistoryPOController extends Controller
             'purchase_request_detail_id',
             'good_issue_detail_id',
             'item_id',
-            'coa_id',
-            'qty',
+            'post_date',
             'price',
             'percent_discount_1',
             'percent_discount_2',
@@ -85,9 +84,9 @@ class PriceHistoryPOController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-                $disc1 = $val->price * ($val->percent_discount_1 / 100);
-                $disc2 = $val->price * ($val->percent_discount_2 / 100);
-                $total_final= $val->price-$disc1-$disc2-$val->discount_3;
+                $finalpricedisc1 = $val->price * ($val->percent_discount_1 / 100);
+                $finalpricedisc2 = ($val->price - $finalpricedisc1) * ($val->percent_discount_2 / 100);
+                $total_final = $val->price - $finalpricedisc1 - $finalpricedisc2 - $val->discount_3;
                 $isi='';
                 if($val->item()->exists()){
                     $isi = $val->item->code.' - '.$val->item->name;
@@ -102,8 +101,8 @@ class PriceHistoryPOController extends Controller
                     $isi,
                     date('d/m/y',strtotime($val->purchaseOrder->post_date)),
                     number_format($val->price,2,',','.'),
-                    number_format($disc1,2,',','.'),
-                    number_format($disc2,2,',','.'),
+                    number_format($finalpricedisc1,2,',','.'),
+                    number_format($finalpricedisc2,2,',','.'),
                     number_format($val->discount_3,2,',','.'),
                     number_format($total_final,2,',','.'),
                 ];

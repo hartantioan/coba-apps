@@ -37,16 +37,6 @@
                             <span class="hide-on-small-onl">Refresh</span>
                             <i class="material-icons right">refresh</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
-                            <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
-                            <i class="material-icons right">local_printshop</i>
-                        </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                            <span class="hide-on-small-onl">Excel</span>
-                            <i class="material-icons right">view_list</i>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -67,12 +57,8 @@
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
                                                         <option value="">Semua</option>
-                                                        <option value="1">Menunggu</option>
-                                                        <option value="2">Dalam Proses</option>
-                                                        <option value="3">Selesai</option>
-                                                        <option value="4">Ditolak</option>
-                                                        <option value="5">Ditutup</option>
-                                                        <option value="6">Direvisi</option>
+                                                        <option value="1">Aktif</option>
+                                                        <option value="2">Non-Aktif</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -91,14 +77,14 @@
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
-                                                        <th >#</th>
-                                                        <th >Version</th>
-                                                        <th >User</th>
-                                                        <th >Release Date</th>
-                                                        <th >Title</th>
-                                                        <th >Description</th>
-                                                        <th> Status  </th>
-                                                        <th> Action  </th>
+                                                        <th>#</th>
+                                                        <th>Versi</th>
+                                                        <th>Pengguna</th>
+                                                        <th>Tgl.Rilis</th>
+                                                        <th>Judul</th>
+                                                        <th>Deskripsi</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -154,11 +140,7 @@
                                 </div>
                             </div>
                             <div class="input-field col m12 s12">
-                                <div id="full-container" style="height:400px;">
-                                    <div class="editor">
-                                        
-                                    </div>
-                                </div>
+                                <textarea class="browser-default" id="description" name="description" rows="10"></textarea>
                             </div>
                             <div class="col s12 mt-3">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -181,65 +163,14 @@
 </div>
 
 <script>
-    var fullEditor;
     $(function() {
-        var Font = Quill.import('formats/font');
-        Font.whitelist = ['sofia', 'slabo', 'roboto', 'inconsolata', 'ubuntu'];
-        Quill.register(Font, true);
-
-        fullEditor = new Quill('#full-container .editor', {
-            bounds: '#full-container .editor',
-            modules: {
-            'formula': true,
-            'syntax': true,
-            'toolbar': [
-                [{
-                'size': []
-                }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{
-                'color': []
-                }, {
-                'background': []
-                }],
-                [{
-                'script': 'super'
-                }, {
-                'script': 'sub'
-                }],
-                [{
-                'header': '1'
-                }, {
-                'header': '2'
-                }, 'blockquote', 'code-block'],
-                [{
-                'list': 'ordered'
-                }, {
-                'list': 'bullet'
-                }, {
-                'indent': '-1'
-                }, {
-                'indent': '+1'
-                }],
-                ['direction', {
-                'align': []
-                }],
-                ['link', 'image', 'video', 'formula'],
-                ['clean']
-            ],
-            },
-            theme: 'snow'
-        });
-
-        var quillSelect = $("select[class^='ql-'], input[data-link]" );
-        quillSelect.addClass("browser-default");
-
-        var editors = [fullEditor];
-
+        CKEDITOR.replace('description');
+        
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',
         });
+
         loadDataTable();
 
         $('#modal1').modal({
@@ -252,6 +183,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                CKEDITOR.instances.description.setData('');
             }
         });
 
@@ -281,7 +213,7 @@
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
                 "zeroRecords": "Data tidak ditemukan / kosong",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
                 "infoEmpty": "Data tidak ditemukan / kosong",
                 "infoFiltered": "(disaring dari _MAX_ total data)",
                 "search": "Cari",
@@ -320,11 +252,11 @@
             columns: [
                 { name: 'id', className: 'center-align ' },
                 { name: 'version', className: 'center-align ' },
+                { name: 'user_id', className: 'center-align' },
                 { name: 'release_date', className: 'center-align' },
                 { name: 'title', className: 'center-align' },
-                { name: 'description', className: 'center-align' },
+                { name: 'description', className: '' },
                 { name: 'status', className: 'center-align' },
-                { name: 'user_id', className: 'center-align' },
                 { name: 'action', className: 'center-align' },
             ],
         });
@@ -339,71 +271,85 @@
     }
 
     function save(){
-        var formData = new FormData($('#form_data')[0]);
-        var editor_content = fullEditor.root.innerHTML;
-        formData.append('description',editor_content);
-        
-        $.ajax({
-            url: '{{ Request::url() }}/create',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
+        swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
 
-                if(response.status == 200) {
-                    success();
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
-                    
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
+                var formData = new FormData($('#form_data')[0]);
+                var editor_content = CKEDITOR.instances.description.getData();
+                formData.append('description',editor_content);
+                
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
 
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
                         });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+                    }
                 });
             }
         });
@@ -430,7 +376,7 @@
                 $('#title').val(response.title);
                 $('#release_date').val(response.release_date);
                 $('#version').val(response.version);
-                fullEditor.root.innerHTML = response.description;
+                CKEDITOR.instances.description.setData(response.description);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

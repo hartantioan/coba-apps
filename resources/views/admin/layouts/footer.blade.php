@@ -2,7 +2,7 @@
 
     <footer class="page-footer footer footer-static footer-light navbar-border navbar-shadow">
         <div class="footer-copyright">
-            <div class="container"><span>&copy; 2023 <a href="https://blessconbataringan.com" target="_blank">BLESSCON</a> All rights reserved.</span><span class="right hide-on-small-only">Design and Developed by <a href="https://blessconbataringan.com">BLESSCON</a></span></div>
+            <div class="container"><span>&copy; 2023 <a href="https://blessconbataringan.com" target="_blank">EDP - BLESSCON</a> All rights reserved.</span><span class="right hide-on-small-only">Design and Developed by <a href="https://blessconbataringan.com">BLESSCON</a></span></div>
         </div>
     </footer>
 
@@ -22,6 +22,7 @@
     <script src="{{ url('app-assets/js/custom/waitMe.min.js') }}"></script>
     <script src="{{ url('app-assets/js/plugins.js?v=7') }}"></script>
     <script src="{{ url('app-assets/js/search.js?v=11') }}"></script>
+    <script src="{{ url('app-assets/vendors/ckeditor/ckeditor.js') }}"></script>
     <script src="{{ url('app-assets/js/custom/custom-script.js?v=98') }}"></script>
     
     <script src="{{ url('app-assets/js/custom/go-chart.js') }}"></script>

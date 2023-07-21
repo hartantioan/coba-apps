@@ -43,12 +43,13 @@ use Illuminate\Database\Eloquent\Builder;
 class PaymentRequestController extends Controller
 {
 
-    protected $dataplaces;
+    protected $dataplaces, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
     public function index(Request $request)
     {
@@ -110,7 +111,7 @@ class PaymentRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = PaymentRequest::count();
+        $total_data = PaymentRequest::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = PaymentRequest::where(function($query) use ($search, $request) {
                 if($search) {
@@ -164,6 +165,7 @@ class PaymentRequestController extends Controller
                     $query->where('company_id',$request->company_id);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -221,6 +223,7 @@ class PaymentRequestController extends Controller
                     $query->where('company_id',$request->company_id);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
         $response['data'] = [];

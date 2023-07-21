@@ -18,6 +18,7 @@
                 <a class="waves-effect waves-cyan {{ Request::segment(2) == 'dashboard' ? 'active' : '' }}" href="{{ url('admin/dashboard') }}">
                     <i class="material-icons">settings_input_svideo</i><span class="menu-title" data-i18n="Dashboard">Dashboard</span>
                 </a>
+            </li>
             @php $menu = App\Models\Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(); @endphp
 
             @foreach($menu as $m)
@@ -106,10 +107,10 @@
                         </div>
                     </li>
                 @else
-                    <li class="{{ Request::segment(2) == $m->url ? 'active' : '' }}">
-                        <a class="{{ Request::segment(2) == $m->url ? 'active' : '' }}" href="{{ url('admin').'/'.$m->url }}">
+                    <li class="{{ Request::segment(2) == $m->url ? 'active' : '' }} bold">
+                        <a class="waves-effect waves-cyan {{ Request::segment(2) == $m->url ? 'active' : '' }}" href="{{ url('admin').'/'.$m->url }}">
                             <i class="material-icons">{{ $m->icon }}</i>
-                            <span data-i18n="{{ $m->name }}">{{ $m->name }}</span>
+                            <span class="menu-title" data-i18n="{{ $m->name }}">{{ $m->name }}</span>
                             @if($m->is_maintenance)
                                 <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height:30px !important;margin-top: 7px;">
                                     <i class="material-icons" style="margin-right: 0rem !important;width: auto !important;padding:2px 0px 2px 0px !important;margin-top: 4px;">build</i>

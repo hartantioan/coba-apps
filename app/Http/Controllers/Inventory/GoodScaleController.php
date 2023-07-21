@@ -27,13 +27,14 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class GoodScaleController extends Controller
 {
-    protected $dataplaces, $datawarehouses;
+    protected $dataplaces, $datawarehouses, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
 
     public function index(Request $request)
@@ -79,7 +80,7 @@ class GoodScaleController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodScale::count();
+        $total_data = GoodScale::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = GoodScale::where(function($query) use ($search, $request) {
                 if($search) {
@@ -115,6 +116,7 @@ class GoodScaleController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -154,6 +156,7 @@ class GoodScaleController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
         $response['data'] = [];

@@ -165,19 +165,6 @@
             event.stopPropagation();
         });
 
-        $('#modal1').modal({
-            opacity: .25,
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) {
-                
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#show_detail').empty();
-            }
-        });
-
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
                 
@@ -204,73 +191,6 @@
                 text: 'Silahkan filter laporan terlebih dahulu ges.',
                 icon: 'warning'
             });
-        }
-    }
-
-    function detailShow(element){
-        if($(element).data('invoice')){
-            let invoice = $(element).data('invoice'), date = $('#date').val();
-            $.ajax({
-                url: '{{ Request::url() }}/show_detail',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    invoice: invoice,
-                    date: date,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('#main-display');
-                },
-                success: function(response) {
-                    loadingClose('#main-display');
-                    $('#show_detail').empty();
-                    if(response.status == 200) {
-                        if(response.result.length > 0){
-                            $.each(response.result, function(i, val) {
-                                $('#show_detail').append(`
-                                    <tr>
-                                        <td class="center-align">` + (i+1) + `</td>
-                                        <td>` + val.code + `</td>
-                                        <td>` + val.vendor + `</td>
-                                        <td class="center-align">` + val.post_date + `</td>
-                                        <td class="center-align">` + val.rec_date + `</td>
-                                        <td class="center-align">` + val.due_date + `</td>
-                                        <td class="center-align">` + val.due_days + `</td>
-                                        <td class="right-align">` + val.grandtotal + `</td>
-                                        <td class="right-align">` + val.memo + `</td>
-                                        <td class="right-align">` + val.paid + `</td>
-                                        <td class="right-align">` + val.balance + `</td>
-                                    </tr>
-                                `);
-                            });
-                            $('#show_detail').append(`
-                                <tr id="text-grandtotal">
-                                    <td class="right-align" colspan="10">Total</td>
-                                    <td class="right-align">` + response.grandtotal + `</td>
-                                </tr>
-                            `);
-                            $('#modal1').modal('open');
-                        }                  
-                    }else{
-                        M.toast({
-                            html: response.message
-                        });
-                    }
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('#main-display');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-            $('#modal1').modal('open');
         }
     }
 
@@ -320,7 +240,7 @@
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
                 "zeroRecords": "Data tidak ditemukan / kosong",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
                 "infoEmpty": "Data tidak ditemukan / kosong",
                 "infoFiltered": "(disaring dari _MAX_ total data)",
                 "search": "Cari",

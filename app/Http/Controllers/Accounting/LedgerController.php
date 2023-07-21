@@ -157,7 +157,8 @@ class LedgerController extends Controller
                                 <th class="center-align">Jurnal</th>
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Tanggal</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Ket.Header</th>
+                                <th class="center-align">Ket.Detail</th>
                                 <th class="center-align">Partner Bisnis</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
@@ -191,7 +192,7 @@ class LedgerController extends Controller
 
         $string .= '<tr>
             <td class="center-align">1</td>
-            <td class="center-align red-text text-darken-2" colspan="12">Saldo Periode Sebelumnya</td>
+            <td class="center-align red-text text-darken-2" colspan="13">Saldo Periode Sebelumnya</td>
             <td class="right-align blue-text text-darken-2"><b>'.number_format($beginning_total,2,',','.').'</b></td>
         </tr>';
         
@@ -221,6 +222,7 @@ class LedgerController extends Controller
                 <td>'.$row->coa->name.'</td>
                 <td class="center-align">'.date('d/m/y',strtotime($row->journal->post_date)).'</td>
                 <td>'.$row->journal->note.'</td>
+                <td>'.$row->note.'</td>
                 <td>'.($row->account_id ? $row->account->name : '-').'</td>
                 <td>'.($row->place_id ? $row->place->name : '-').'</td>
                 <td>'.($row->line_id ? $row->line->name : '-').'</td>

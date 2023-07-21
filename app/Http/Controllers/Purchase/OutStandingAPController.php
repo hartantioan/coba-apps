@@ -19,7 +19,7 @@ class OutStandingAPController extends Controller
     {
         
         $data = [
-            'title'     => 'Outstanding AP',
+            'title'     => 'Laporan Outstanding AP',
             'content'   => 'admin.purchase.outstanding_ap',
         ];
 
@@ -147,31 +147,25 @@ class OutStandingAPController extends Controller
                 ];
 
                 $detail=[];
-                
-                foreach($row_dp->purchaseDownPaymentDetail as $row){
-                    if($row->purchaseOrder()->exists()){
-                        $detail[] = [
-                            'po'=> $row->purchaseOrder->code,
-                            'top'=>$row->purchaseOrder->payment_term,
-                            'item_name'=>'-',
-                            'note1'=>$row->note,
-                            'note2'=>'-',
-                            'qty'=>1,
-                            'unit'=>'-',
-                            'price_o'=>number_format(0,2,',','.'),
-                            'total' =>number_format($row->nominal,2,',','.'),
-                            'ppn'=>number_format(0,2,',','.'),
-                            'pph'=>number_format(0,2,',','.'),
-                        ];
-                    }
-                }
+                $detail[] = [
+                    'po'=> $row_dp->code,
+                    'top'=>0,
+                    'item_name'=>'-',
+                    'note1'=>$row_dp->note,
+                    'note2'=>'-',
+                    'qty'=>1,
+                    'unit'=>'-',
+                    'price_o'=>number_format(0,2,',','.'),
+                    'total' =>number_format($row_dp->nominal,2,',','.'),
+                    'ppn'=>number_format(0,2,',','.'),
+                    'pph'=>number_format(0,2,',','.'),
+                ];
 
                 if($total > 0){
                     $totalAll += $total;
                     $data_tempura['details'] = $detail;
                     $array_filter[] = $data_tempura;
                 }
-                
             }
 
             $response =[

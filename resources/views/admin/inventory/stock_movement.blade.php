@@ -1,14 +1,36 @@
+<style>
+    .select-wrapper, .select2-container {
+        height:3.7rem !important;
+    }
+</style>
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
             <!-- Search for small screen-->
             <div class="container">
                 <div class="row">
-                    <div class="card blue lighten-3">
+                    <div class="col s8 m6 l6">
+                        <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
+                        <ol class="breadcrumbs mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(2))) }}</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(3))) }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(4))) }}
+                            </li>
+                        </ol>
+                    </div>
+                    <div class="col s4 m6 l6">
+                       
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="card">
                         <div class="card-content">
-                            <h4 class="card-title">
-                                Pergerakan Inventory 
-                            </h4>
                             <form class="row" id="form_data" onsubmit="return false;">
                                 <div class="col s12">
                                     <div id="validation_alert" style="display:none;"></div>
@@ -39,8 +61,8 @@
                                             </select>
                                             <label class="" for="item">ITEM</label>
                                         </div>
-                                        <div class="col s12 mt-3">
-                                            <button class="btn waves-effect waves-light right submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
+                                        <div class="col m3">
+                                            <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -99,8 +121,6 @@
                     $('#movement_body').empty();
                     $('.uomunit').empty();
                     var gtall=0;
-                    
-                    
                     
                     if(response.uomunit!=null){
                         $('.uomunit').append(`

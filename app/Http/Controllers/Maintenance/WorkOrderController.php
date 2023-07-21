@@ -27,12 +27,13 @@ use App\Models\EquipmentPart;
 
 class WorkOrderController extends Controller
 {
-    protected $dataplaces;
+    protected $dataplaces, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
 
     public function index(Request $request)
@@ -84,7 +85,7 @@ class WorkOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = WorkOrder::count();
+        $total_data = WorkOrder::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = WorkOrder::where(function($query) use ($search, $request) {
                 if($search) {
@@ -108,6 +109,7 @@ class WorkOrderController extends Controller
                 }
 
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -134,9 +136,8 @@ class WorkOrderController extends Controller
             if($request->status){
                 $query->where('status', $request->status);
             }
-            
-
         })
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->count();
 
         $response['data'] = [];

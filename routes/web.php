@@ -64,6 +64,7 @@ use App\Http\Controllers\Finance\PaymentRequestController;
 use App\Http\Controllers\Finance\OutgoingPaymentController;
 use App\Http\Controllers\Finance\CloseBillController;
 use App\Http\Controllers\Finance\IncomingPaymentController;
+use App\Http\Controllers\Finance\EmployeeReceivableController;
 
 use App\Http\Controllers\Purchase\PurchaseRequestController;
 use App\Http\Controllers\Purchase\PurchaseOrderController;
@@ -72,6 +73,7 @@ use App\Http\Controllers\Purchase\LandedCostController;
 use App\Http\Controllers\Purchase\PurchaseInvoiceController;
 use App\Http\Controllers\Purchase\PurchaseMemoController;
 use App\Http\Controllers\Purchase\AgingAPController;
+use App\Http\Controllers\Purchase\DownPaymentController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -88,6 +90,7 @@ use App\Http\Controllers\Accounting\RetirementController;
 use App\Http\Controllers\Accounting\DocumentTaxController;
 use App\Http\Controllers\Accounting\DepreciationController;
 use App\Http\Controllers\Accounting\LedgerController;
+use App\Http\Controllers\Accounting\CashBankController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -235,6 +238,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('row_detail',[ApprovalController::class, 'approvalRowDetail']);
                 Route::post('approve',[ApprovalController::class, 'approve']);
                 Route::post('approve_multi',[ApprovalController::class, 'approveMulti']);
+                Route::get('direct_approval',[ApprovalController::class, 'directApproval'])->withoutMiddleware('direct.access');
             });
 
             Route::prefix('master_data')->middleware('direct.access')->group(function () {
@@ -866,6 +870,12 @@ Route::prefix('admin')->group(function () {
                         Route::post('show_detail',[AgingAPController::class, 'showDetail']);
                         Route::get('export',[AgingAPController::class, 'export']);
                     });
+
+                    Route::prefix('down_payment')->middleware('operation.access:down_payment,view')->group(function () {
+                        Route::get('/',[DownPaymentController::class, 'index']);
+                        Route::post('filter',[DownPaymentController::class, 'filter']);
+                        Route::get('export',[DownPaymentController::class, 'export']);
+                    });
                 });
 
                 Route::prefix('purchase_order')->middleware('operation.access:purchase_order,view')->group(function () {
@@ -1175,7 +1185,12 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('finance_report')->middleware('direct.access')->group(function () {
                     Route::prefix('finance_recap')->middleware('operation.access:finance_recap,view')->group(function () {
-                    Route::get('/',[FinanceReportController::class, 'index']);
+                        Route::get('/',[FinanceReportController::class, 'index']);
+                    });
+                    Route::prefix('employee_receivable')->middleware('operation.access:employee_receivable,view')->group(function () {
+                        Route::get('/',[EmployeeReceivableController::class, 'index']);
+                        Route::post('filter',[EmployeeReceivableController::class, 'filter']);
+                        Route::get('export',[EmployeeReceivableController::class, 'export']);
                     });
                 });
 
@@ -1355,6 +1370,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[LedgerController::class, 'index']);
                         Route::get('datatable',[LedgerController::class, 'datatable']);
                         Route::get('row_detail',[LedgerController::class, 'rowDetail']);
+                    });
+                    Route::prefix('cash_bank')->middleware('operation.access:cash_bank,view')->group(function () {
+                        Route::get('/',[CashBankController::class, 'index']);
+                        Route::get('datatable',[CashBankController::class, 'datatable']);
+                        Route::get('row_detail',[CashBankController::class, 'rowDetail']);
+                        Route::post('import', [CashBankController::class, 'import'])->middleware('operation.access:asset,update');
                     });
                 });
             });

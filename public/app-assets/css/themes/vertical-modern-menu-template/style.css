@@ -2801,7 +2801,7 @@ select
 {
     #main
     {
-        padding-left: 260px;
+        padding-left: 300px;
     }
     #main.main-full
     {
@@ -8378,8 +8378,8 @@ span.badge.pill
 
 .navbar .sideNav-lock .header-search-wrapper
 {
-    width: calc(100% - 560px);
-    margin: 10px auto 0 270px;
+    width: calc(100% - 600px);
+    margin: 10px auto 0 300px;
 }
 
 .navbar input.header-search-input
@@ -8949,7 +8949,7 @@ nav.display-none.search-sm .nav-wrapper form .input-field i
     z-index: 999;
     top: 0;
 
-    width: 260px;
+    width: 300px;
     height: 100%;
 
     -webkit-transition: .3s ease all;

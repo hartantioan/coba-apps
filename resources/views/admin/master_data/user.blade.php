@@ -477,52 +477,52 @@
                                         </thead>
                                         <tbody id="body-menu">
                                             @foreach($menu as $m)
-                                                <tr>
-                                                    <td>
-                                                        {{ $m->name }}
-                                                    </td>
-                                                    <td>
-                                                        @if (!$m->childHasChild())
+                                                @if($m->sub()->exists())
+                                                    <tr>
+                                                        <td>
+                                                            {{ $m->name }}
+                                                        </td>
+                                                        <td>
+                                                            @if (!$m->childHasChild())
+                                                                <label>
+                                                                    <input type="checkbox" class="checkboxView" onclick="checkAll(this,{{ $m->id }},'view')"/>
+                                                                    <span>Pilih</span>
+                                                                </label>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if (!$m->childHasChild())
                                                             <label>
-                                                                <input type="checkbox" class="checkboxView" onclick="checkAll(this,{{ $m->id }},'view')"/>
+                                                                <input type="checkbox" class="checkboxUpdate" onclick="checkAll(this,{{ $m->id }},'update')"/>
                                                                 <span>Pilih</span>
                                                             </label>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if (!$m->childHasChild())
-                                                        <label>
-                                                            <input type="checkbox" class="checkboxUpdate" onclick="checkAll(this,{{ $m->id }},'update')"/>
-                                                            <span>Pilih</span>
-                                                        </label>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if (!$m->childHasChild())
-                                                        <label>
-                                                            <input type="checkbox" class="checkboxDelete" onclick="checkAll(this,{{ $m->id }},'delete')"/>
-                                                            <span>Pilih</span>
-                                                        </label>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if (!$m->childHasChild())
-                                                        <label>
-                                                            <input type="checkbox" class="checkboxVoid" onclick="checkAll(this,{{ $m->id }},'void')"/>
-                                                            <span>Pilih</span>
-                                                        </label>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if (!$m->childHasChild())
-                                                        <label>
-                                                            <input type="checkbox" class="checkboxJournal" onclick="checkAll(this,{{ $m->id }},'journal')"/>
-                                                            <span>Pilih</span>
-                                                        </label>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                @if($m->sub()->exists())
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if (!$m->childHasChild())
+                                                            <label>
+                                                                <input type="checkbox" class="checkboxDelete" onclick="checkAll(this,{{ $m->id }},'delete')"/>
+                                                                <span>Pilih</span>
+                                                            </label>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if (!$m->childHasChild())
+                                                            <label>
+                                                                <input type="checkbox" class="checkboxVoid" onclick="checkAll(this,{{ $m->id }},'void')"/>
+                                                                <span>Pilih</span>
+                                                            </label>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if (!$m->childHasChild())
+                                                            <label>
+                                                                <input type="checkbox" class="checkboxJournal" onclick="checkAll(this,{{ $m->id }},'journal')"/>
+                                                                <span>Pilih</span>
+                                                            </label>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
                                                     @foreach($m->sub()->where('status','1')->oldest('order')->get() as $msub)
                                                         @if($msub->sub()->exists())
                                                             <tr>
@@ -646,31 +646,31 @@
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $m->id }}" value="{{ $m->id }}" data-parent="{{ $m->parentsub->id }}"/>
+                                                                <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxUpdate[]" id="checkboxUpdate{{ $m->id }}" value="{{ $m->id }}" data-parent="{{ $m->parentsub->id }}"/>
+                                                                <input type="checkbox" name="checkboxUpdate[]" id="checkboxUpdate{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxDelete[]" id="checkboxDelete{{ $m->id }}" value="{{ $m->id }}" data-parent="{{ $m->parentsub->id }}"/>
+                                                                <input type="checkbox" name="checkboxDelete[]" id="checkboxDelete{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxVoid[]" id="checkboxVoid{{ $m->id }}" value="{{ $m->id }}" data-parent="{{ $m->parentsub->id }}"/>
+                                                                <input type="checkbox" name="checkboxVoid[]" id="checkboxVoid{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $m->id }}" value="{{ $m->id }}" data-parent="{{ $m->parentsub->id }}"/>
+                                                                <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
@@ -1425,7 +1425,7 @@
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
                 "zeroRecords": "Data tidak ditemukan / kosong",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
                 "infoEmpty": "Data tidak ditemukan / kosong",
                 "infoFiltered": "(disaring dari _MAX_ total data)",
                 "search": "Cari",

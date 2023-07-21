@@ -21,7 +21,7 @@ class AgingAPController extends Controller
     {
         
         $data = [
-            'title'     => 'Aging AP',
+            'title'     => 'Laporan Aging AP',
             'content'   => 'admin.purchase.aging_ap',
         ];
 
@@ -95,10 +95,8 @@ class AgingAPController extends Controller
                         FROM purchase_memo_details pmd
                         JOIN purchase_memos pm
                             ON pm.id = pmd.purchase_memo_id
-                        JOIN purchase_invoice_details pid
-                            ON pid.purchase_invoice_id = pi.id
-                            AND pid.id = pmd.lookable_id
                         WHERE pmd.lookable_type = 'purchase_down_payments'
+                        AND pmd.lookable_id = pi.id
                         AND pm.post_date <= :date2
                 ),0) AS total_memo,
                 u.name AS account_name,

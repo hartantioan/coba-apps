@@ -99,6 +99,20 @@ class FundRequest extends Model
         return $total;
     }
 
+    public function totalReceivableByDate($date){
+        $total = 0;
+        if($this->document_status == '3'){
+            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query)use($date){
+                $query->whereHas('outgoingPayment',function($query)use($date){
+                    $query->whereDate('pay_date','<=',$date);
+                });
+            })->get() as $row){
+                $total += $row->nominal;
+            }
+        }
+        return $total;
+    }
+
     public function totalReceivableUsedPaid(){
         $total = 0;
         if($this->document_status == '3'){
@@ -106,6 +120,20 @@ class FundRequest extends Model
                 $query->whereHas('outgoingPayment');
             })->get() as $row){
                 $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+            }
+        }
+        return $total;
+    }
+
+    public function totalReceivableUsedPaidByDate($date){
+        $total = 0;
+        if($this->document_status == '3'){
+            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query)use($date){
+                $query->whereHas('outgoingPayment',function($query)use($date){
+                    $query->whereDate('pay_date','<=',$date);
+                });
+            })->get() as $row){
+                $total += $row->totalOutgoingUsedWeightByDate($date) + $row->totalIncomingUsedWeightByDate($date);
             }
         }
         return $total;

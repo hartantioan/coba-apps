@@ -228,6 +228,14 @@ class User extends Authenticatable
         return $arr;
     }
 
+    public function userPlaceCodeArray(){
+        $arr = [];
+        foreach($this->userPlace as $row){
+            $arr[] = $row->place->code;
+        }
+        return $arr;
+    }
+
     public function userWarehouse(){
         return $this->hasMany('App\Models\UserWarehouse');
     }

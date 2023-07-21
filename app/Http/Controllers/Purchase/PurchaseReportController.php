@@ -17,7 +17,7 @@ class PurchaseReportController extends Controller
     {
         
         $data = [
-            'title'     => 'Purchase Request',
+            'title'     => 'Laporan Purchase Request',
             'content'   => 'admin.purchase.report',
             'menus'     => Menu::where('parent_id','13')
                             ->whereHas('menuUser', function ($query) {

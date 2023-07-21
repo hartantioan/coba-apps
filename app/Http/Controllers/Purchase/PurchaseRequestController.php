@@ -40,12 +40,13 @@ use App\Exports\ExportPurchaseRequest;
 
 class PurchaseRequestController extends Controller
 {
-    protected $dataplaces, $lasturl, $mindate, $maxdate;
+    protected $dataplaces, $lasturl, $mindate, $maxdate, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
     public function index(Request $request)
     {
@@ -86,13 +87,9 @@ class PurchaseRequestController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $user = User::find(session('bo_id'));
-
-        $dataplaces = $user->userPlaceArray();
-
-        $total_data = PurchaseRequest::count();
+        $total_data = PurchaseRequest::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
-        $query_data = PurchaseRequest::where(function($query) use ($search, $request, $dataplaces) {
+        $query_data = PurchaseRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -126,12 +123,13 @@ class PurchaseRequestController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = PurchaseRequest::where(function($query) use ($search, $request, $dataplaces) {
+        $total_filtered = PurchaseRequest::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -165,6 +163,7 @@ class PurchaseRequestController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
         $response['data'] = [];

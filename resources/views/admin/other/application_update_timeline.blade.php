@@ -3,6 +3,14 @@
     #modal6 {
         top:0px !important;
     }
+    
+    #description-text ul > li {
+        list-style-type: initial !important;
+    }
+
+    #description-text ul:not(.browser-default) {
+        padding-left: 20px !important;
+    }
 </style>
 <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/page-timeline.css') }}">
 <div id="main">
@@ -52,9 +60,9 @@
                                                     <p><i class="material-icons profile-card-i">restore</i>{{$log->version}}</p>
                                                     <p>Judul : {{$log->title}}</p>
                                                     <p>Description</p>
-                                                    <div style="padding: 1rem">{!! $log->description !!}</div>
+                                                    <div style="padding: 1rem" id="description-text">{!! $log->description !!}</div>
                                                     
-                                                    <p><i class="material-icons profile-card-i">date_range</i>{{$log->release_date}}</p>
+                                                    <p><i class="material-icons profile-card-i">date_range</i>{{date('d/m/y',strtotime($log->release_date))}}</p>
                                                 </div>
                                             </div>
                                         </div>

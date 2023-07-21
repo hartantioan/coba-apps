@@ -29,13 +29,14 @@ use App\Exports\ExportInventoryTransferOut;
 
 class InventoryRevaluationController extends Controller
 {
-    protected $dataplaces, $datawarehouses;
+    protected $dataplaces, $datawarehouses, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
 
     public function index(Request $request)
@@ -76,10 +77,7 @@ class InventoryRevaluationController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = InventoryRevaluation::whereHas('inventoryRevaluationDetail', function($query){
-            $query->whereIn('place_id',$this->dataplaces)
-                ->whereIn('warehouse_id',$this->datawarehouses);
-        })->count();
+        $total_data = InventoryRevaluation::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = InventoryRevaluation::where(function($query) use ($search, $request) {
                 if($search) {
@@ -90,9 +88,6 @@ class InventoryRevaluationController extends Controller
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
                                         ->orWhere('name','like',"%$search%");
-                                })->where(function($query){
-                                    $query->whereIn('place_id',$this->dataplaces)
-                                        ->whereIn('warehouse_id',$this->datawarehouses);
                                 });
                             });
                     });
@@ -110,6 +105,7 @@ class InventoryRevaluationController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -124,9 +120,6 @@ class InventoryRevaluationController extends Controller
                                 $query->whereHas('item',function($query) use($search, $request){
                                     $query->where('code', 'like', "%$search%")
                                         ->orWhere('name','like',"%$search%");
-                                })->where(function($query){
-                                    $query->whereIn('place_id',$this->dataplaces)
-                                        ->whereIn('warehouse_id',$this->datawarehouses);
                                 });
                             });
                     });
@@ -144,6 +137,7 @@ class InventoryRevaluationController extends Controller
                     $query->where('status', $request->status);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
         $response['data'] = [];

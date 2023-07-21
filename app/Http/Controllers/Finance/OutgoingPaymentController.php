@@ -30,12 +30,13 @@ use App\Exports\ExportOutgoingPayment;
 class OutgoingPaymentController extends Controller
 {
 
-    protected $dataplaces;
+    protected $dataplaces, $dataplacecode;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
     public function index(Request $request)
     {
@@ -44,7 +45,7 @@ class OutgoingPaymentController extends Controller
             'content'       => 'admin.finance.outgoing_payment',
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
-            'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -75,7 +76,7 @@ class OutgoingPaymentController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = OutgoingPayment::count();
+        $total_data = OutgoingPayment::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = OutgoingPayment::where(function($query) use ($search, $request) {
                 if($search) {
@@ -122,6 +123,7 @@ class OutgoingPaymentController extends Controller
                     $query->where('company_id',$request->company_id);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -172,6 +174,7 @@ class OutgoingPaymentController extends Controller
                     $query->where('company_id',$request->company_id);
                 }
             })
+            ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
         $response['data'] = [];

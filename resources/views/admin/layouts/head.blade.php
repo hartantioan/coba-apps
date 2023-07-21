@@ -25,26 +25,22 @@
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/chartist-js/chartist.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/chartist-js/chartist-plugin-tooltip.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/flag-icon/css/flag-icon.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/quill/katex.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/quill/monokai-sublime.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/data-tables/css/jquery.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/data-tables/extensions/responsive/css/responsive.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/data-tables/css/select.dataTables.min.css') }}">
-	<link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/quill/quill.snow.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/quill/quill.bubble.css') }}">
 	<link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url('app-assets/vendors/select2/select2-materialize.css?v=19') }}" type="text/css">
     <!-- END: VENDOR CSS-->
     <!-- BEGIN: Page Level CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=7') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=3') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=7') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/dashboard-modern.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/intro.css?v=7') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/data-tables.css?v=2') }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
     <!-- END: Page Level CSS-->
     <!-- BEGIN: Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css?v=45') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css?v=53') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/waitMe.min.css') }}">
     <!-- END: Custom CSS-->
 	<script src="{{ url('app-assets/js/vendors.min.js') }}"></script>

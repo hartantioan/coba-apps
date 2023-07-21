@@ -141,7 +141,7 @@
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
                 "zeroRecords": "Data tidak ditemukan / kosong",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
                 "infoEmpty": "Data tidak ditemukan / kosong",
                 "infoFiltered": "(disaring dari _MAX_ total data)",
                 "search": "Cari",
@@ -185,16 +185,16 @@
                 }
             },
             columns: [
-                { name: 'purchase_order_id', className: 'center-align ' },
-                { name: 'purchase_request_detail_id', className: 'center-align' },
-                { name: 'good_issue_detail_id', className: 'center-align' },
-                { name: 'item_id', className: 'center-align' },
-                { name: 'price', className: 'center-align' },
-                { name: 'coa', className: 'center-align' },
-                { name: 'qty', className: 'center-align' },
-                { name: 'percent_discount_1', className: 'center-align' },
-                { name: 'percent_discount_2', className: 'center-align' },
-                { name: 'percent_discount_3', className: 'center-align' },
+                { name: 'purchase_order_id', className: '', searchable: false, orderable: false },
+                { name: 'purchase_request_detail_id', className: '', searchable: false, orderable: false },
+                { name: 'good_issue_detail_id', className: '', searchable: false, orderable: false },
+                { name: 'item_id', className: '', searchable: false, orderable: false },
+                { name: 'date', className: 'center-align', searchable: false, orderable: false },
+                { name: 'price', className: 'right-align' },
+                { name: 'percent_discount_1', className: 'right-align', searchable: false, orderable: false },
+                { name: 'percent_discount_2', className: 'right-align', searchable: false, orderable: false },
+                { name: 'percent_discount_3', className: 'right-align', searchable: false, orderable: false },
+                { name: 'final_price', className: 'center-align', searchable: false, orderable: false },
             ],
         });
         $('.dt-buttons').appendTo('#datatable_buttons');

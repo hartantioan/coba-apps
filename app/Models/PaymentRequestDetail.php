@@ -108,10 +108,38 @@ class PaymentRequestDetail extends Model
         return $result;
     }
 
+    public function totalOutgoingUsedWeightByDate($date){
+        $nominal = $this->nominal;
+        $totalUsed = 0;
+        foreach($this->paymentRequest->outgoingPayment->paymentRequestCross()->whereHas('paymentRequest',function($query)use($date){
+            $query->whereDate('post_date','<=',$date);
+        })->get() as $rowcross){
+            $totalUsed += $rowcross->nominal;
+        }
+
+        $result = round(($nominal / $this->paymentRequest->total) * $totalUsed,2);
+
+        return $result;
+    }
+
     public function totalIncomingUsedWeight(){
         $nominal = $this->nominal;
         $totalUsed = 0;
         foreach($this->paymentRequest->outgoingPayment->incomingPaymentDetail as $rowincoming){
+            $totalUsed += $rowincoming->total;
+        }
+
+        $result = round(($nominal / $this->paymentRequest->total) * $totalUsed,2);
+
+        return $result;
+    }
+
+    public function totalIncomingUsedWeightByDate($date){
+        $nominal = $this->nominal;
+        $totalUsed = 0;
+        foreach($this->paymentRequest->outgoingPayment->incomingPaymentDetail()->whereHas('incomingPayment',function($query)use($date){
+            $query->whereDate('post_date','<=',$date);
+        })->get() as $rowincoming){
             $totalUsed += $rowincoming->total;
         }
 

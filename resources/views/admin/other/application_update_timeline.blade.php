@@ -15,7 +15,6 @@
 <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/page-timeline.css') }}">
 <div id="main">
     <div class="row">
-        
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
             <div class="container">
                 <div class="row">
@@ -51,13 +50,13 @@
                                             <a class="tooltipped" data-position="top" data-tooltip="{{date('d/m/y',strtotime($log->release_date))}}"><i class="material-icons white-text">disc_full</i></a>
                                         </div>
                                         <div class="timeline-panel">
-                                            <div class="card m-0 hoverable" id="profile-card" style="overflow: visible;">
+                                            <div class="card m-0 hoverable gradient-45deg-orange-deep-orange" id="profile-card" style="overflow: visible;">
                                                 <div class="card-content">
                                                     <div style="display:-webkit-box;">
                                                         {!!$log->user->profilePicture()!!}
                                                         <h5 class="card-title activator grey-text text-darken-4 mt-1 ml-3">{{$log->user->name}}</h5>
                                                     </div>
-                                                    <p><i class="material-icons profile-card-i">restore</i>{{$log->version}}</p>
+                                                    <p><i class="material-icons profile-card-i">restore</i><b>Version:</b> {{$log->version}}</p>
                                                     <p>Judul : {{$log->title}}</p>
                                                     <p>Description</p>
                                                     <div style="padding: 1rem" id="description-text">{!! $log->description !!}</div>

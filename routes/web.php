@@ -10,6 +10,7 @@ use App\Http\Controllers\Inventory\StockInRupiahController;
 use App\Http\Controllers\Inventory\StockInQtyController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
 use App\Http\Controllers\MasterData\HardwareItemGroupController;
+use App\Http\Controllers\Other\MenuIndexController;
 use App\Http\Controllers\Purchase\OutStandingAPController;
 use App\Http\Controllers\Purchase\PriceHistoryPOController;
 use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
@@ -198,6 +199,10 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
                 Route::get('good_scale_item', [Select2Controller::class, 'goodScaleItem']);
+            });
+
+            Route::prefix('menu')->group(function () {
+                Route::get('/',[MenuIndexController::class, 'index']);
             });
 
             Route::prefix('personal')->middleware('direct.access')->group(function () {

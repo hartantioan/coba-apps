@@ -40,7 +40,7 @@
                         <div class="col s12">
                             <ul class="timeline" id="body-history-goods" style="padding-left: 4rem; padding-right:4rem;">
                                 @foreach($change_log as $log)
-                                    <li>
+                                    <li class="update-card" data-update-id="{{$log->id}}">
                                         <div class="timeline-badge blue">
                                             <a class="tooltipped" data-position="top" data-tooltip="{{date('d/m/y',strtotime($log->release_date))}}"><i class="material-icons white-text">disc_full</i></a>
                                         </div>
@@ -52,11 +52,18 @@
                                                         <h5 class="card-title activator grey-text text-darken-4 mt-1 ml-3">{{$log->user->name}}</h5>
                                                     </div>
                                                     <p><i class="material-icons profile-card-i">restore</i><b>Version:</b> {{$log->version}}</p>
+                                                    <p><i class="material-icons profile-card-i">date_range</i>{{date('d/m/y',strtotime($log->release_date))}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="timeline-inverted" data-update-id="{{$log->id}}" style="display: none">
+                                        <div class="timeline-panel">
+                                            <div class="card m-0 hoverable gradient-45deg-orange-deep-orange" id="profile-card" style="overflow: visible;">
+                                                <div class="card-content">
                                                     <p>Judul : {{$log->title}}</p>
                                                     <p>Description</p>
                                                     <div style="padding: 1rem" id="description-text">{!! $log->description !!}</div>
-                                                    
-                                                    <p><i class="material-icons profile-card-i">date_range</i>{{date('d/m/y',strtotime($log->release_date))}}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -73,6 +80,26 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('.update-card').click(function () {
+            const updateId = $(this).data('update-id');
+
+            // Toggle the visibility of elements with the same data-update-id attribute
+            $('.timeline-inverted[data-update-id="' + updateId + '"]').toggle();
+
+            // Hide other elements with different data-update-id attribute
+            $('.timeline-inverted[data-update-id!="' + updateId + '"]').hide();
+        });
+    });
+</script>
+
+
+
+
+
+
 
 
 

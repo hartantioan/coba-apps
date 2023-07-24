@@ -35,30 +35,28 @@
                 @foreach($menu as $index =>$row)
                 
                 <div class="col s12 m6 l4 parent-null" style="margin:0">
-                    <div class="card  border-radius-3 fadeLeft parent-card" data-parent-id="{{ $row["id"] }}" >
-                        <div class="row" style="display: flex; justify-content: space-between;">
-                            @if ($row["is_new"]=="1")
+                    <div class="card  border-radius-3 fadeLeft parent-card" data-parent-id="{{ $row["id"] }}" style="min-height: 13rem;max-height: 13rem;" >
+                        <div class="row" style="display: flex; justify-content: space-between;min-height:2rem;max-height: 2rem;">
+                            
                                 <div class="col s12 m6 l6" style="display: flex">
+                                    @if ($row["is_new"]=="1")
                                     <span class="badge badge pill green float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Baru!" style="height: 30px !important; margin-top: 7px;">
                                         <i class="material-icons" style="margin-right: 0rem !important; width: auto !important; padding: 2px 0px 2px 0px !important; margin-top: 4px;">flag</i>
                                     </span>
+                                    @endif
                                 </div>
-                            @endif
-                            @if ($row["is_maintenance"]=="1")
                                 <div class="col s12 m6 l6" >
+                                    @if ($row["is_maintenance"]=="1")
                                     <span class="badge badge pill red float-right mr-7 tooltipped" data-position="bottom" data-tooltip="Sedang Dalam Perbaikan" style="height: 30px !important; margin-top: 7px;">
                                         <i class="material-icons" style="margin-right: 0rem !important; width: auto !important; padding: 2px 0px 2px 0px !important; margin-top: 4px;">build</i>
                                     </span>
+                                    @endif
                                 </div>
-                            @endif
-                            
                             
                         </div>
                         <div class="card-content center">
                             <i class="material-icons background-round mt-5 mb-5 gradient-shadow gradient-45deg-amber-amber white-text">{{$row["icon"]}}</i>
                             <h6 class="mb-0">{{$row["name"]}}</h6>
-                                
-                            
                         </div>
                     </div>
      

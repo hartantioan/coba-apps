@@ -28,7 +28,9 @@ class ChangeLogController extends Controller
         $data = [
             'title'     => 'Log Update Aplikasi',
             'content'   => 'admin.other.application_update_timeline',
-            'change_log'=>  ChangeLog::where('status','1')->get(),
+            'change_log'=>  ChangeLog::where('status', '1')
+            ->orderBy('release_date', 'desc')
+            ->get(),
         ];
         return view('admin.layouts.index', ['data' => $data]);
     }

@@ -106,6 +106,7 @@
     <!-- BEGIN PAGE LEVEL JS-->
 	<script>
 		$(function() {
+
 			$('#showPassword').click(function(){
 				if($(this).is(':checked')){
 					$('#password').attr('type', 'text');
@@ -135,7 +136,11 @@
 						
 						if(response.status == 200) {
 							setTimeout(function() {
-								location.reload();
+                                @if(Request::get('url'))
+                                    window.location.href = "{!! base64_decode(Request::get('url')) !!}";
+                                @else
+                                    location.reload();
+                                @endif
 							}, 1500);							
 							swal({
 								title: 'Success',

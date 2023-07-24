@@ -316,7 +316,7 @@ class ApprovalController extends Controller
                     $val->approvalSource->note,
                     $val->status == '1' ? '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small btn-approve" data-popup="tooltip" title="show" onclick="show(`' . url('admin/'.$val->approvalSource->fullUrl() . '/approval/' . CustomHelper::encrypt($val->approvalSource->lookable->code)) . '`,`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons dp48">pageview</i></button>
-                        <a href="'.url('admin/approval/direct_approval?c=' . CustomHelper::encrypt($val->approvalSource->lookable->code)).'&u='.CustomHelper::encrypt($val->user->employee_no).'&d='.CustomHelper::encrypt(url('admin/'.$val->approvalSource->fullUrl() . '/approval/' . CustomHelper::encrypt($val->approvalSource->lookable->code))).'" class="btn-floating btn-small mb-1 btn-flat waves-effect waves-light purple accent-2 white-text" data-popup="tooltip" title="Approve tampilan sederhana..." target="_blank"><i class="material-icons dp48">folder_shared</i></a>
+                        <a href="'.url('admin/approval/direct_approval?c=' . CustomHelper::encrypt($val->code)).'&u='.CustomHelper::encrypt($val->user->employee_no).'&d='.CustomHelper::encrypt(url('admin/'.$val->approvalSource->fullUrl() . '/approval/' . CustomHelper::encrypt($val->approvalSource->lookable->code))).'" class="btn-floating btn-small mb-1 btn-flat waves-effect waves-light purple accent-2 white-text" data-popup="tooltip" title="Approve tampilan sederhana..." target="_blank"><i class="material-icons dp48">folder_shared</i></a>
                     ' : ($val->approved ? 'Disetujui' : ($val->rejected ? 'Ditolak' : ($val->revised ? 'Direvisi' : 'Invalid'))),
                     $val->status(),
                     $val->note,
@@ -650,13 +650,20 @@ class ApprovalController extends Controller
     }
 
     public function directApproval(Request $request){
-        /* echo CustomHelper::decrypt($request->d); */
-        $data = [
-            'title'     => 'Direct Approval',
-            'content'   => 'admin.approval.direct',
-            'url'       => CustomHelper::decrypt($request->d),
-        ];
+        $am = ApprovalMatrix::where('code',CustomHelper::decrypt($request->c))->first();
+        
+        if($am){
+            $data = [
+                'title'     => 'Direct Approval',
+                'content'   => 'admin.approval.direct',
+                'url'       => CustomHelper::decrypt($request->d),
+                'status'    => $am->status,
+                'approval'  => $am,
+            ];
 
-        return view('admin.layouts.no_header_sidebar', ['data' => $data]);
+            return view('admin.layouts.no_header_sidebar', ['data' => $data]);
+        }else{
+            abort(404);
+        }
     }
 }

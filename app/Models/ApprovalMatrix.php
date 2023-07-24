@@ -42,6 +42,18 @@ class ApprovalMatrix extends Model
         return $this->belongsTo('App\Models\ApprovalSource', 'approval_source_id', 'id')->withTrashed();
     }
 
+    public function statusApproval(){
+        $status = '';
+        if($this->approved){
+            $status = 'setujui';
+        }elseif($this->rejected){
+            $status = 'tolak';
+        }elseif($this->revised){
+            $status = 'revisi';
+        }
+        return $status;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '0' => 'Menunggu',

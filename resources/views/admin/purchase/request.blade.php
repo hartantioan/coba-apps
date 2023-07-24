@@ -135,11 +135,11 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12" data-intro="Hello step one!" data-step="1">
                                 <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
                             </div>
-                            <div class="input-field col m1 s12">
+                            <div class="input-field col m1 s12" data-intro="Hello step two!" data-step="2">
                                 <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                     <option value="">--Pilih--</option>
                                     @foreach ($place as $rowplace)
@@ -263,7 +263,7 @@
                                                 </td>
                                             </tr>
                                             <tr id="last-row-item">
-                                                <td colspan="11" class="center">
+                                                <td colspan="12" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -279,7 +279,7 @@
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit" onclick="save();" data-intro="Hello step three!" data-step="3">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -288,7 +288,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <button class="btn waves-effect waves-light cyan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
     </div>
 </div>
 
@@ -1398,4 +1399,7 @@
         },
     });
 
+    function startIntro(){
+        introJs().start();
+    }
 </script>

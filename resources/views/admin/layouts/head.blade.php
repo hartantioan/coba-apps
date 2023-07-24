@@ -45,6 +45,8 @@
     <!-- END: Custom CSS-->
 	<script src="{{ url('app-assets/js/vendors.min.js') }}"></script>
     <script src="{{ url('app-assets/js/custom/websocket-printer.js') }}"></script>
+    <script src="{{ url('app-assets/vendors/introjs/intro.js?v=1') }}"></script>
+    <link href="{{ url('app-assets/vendors/introjs/intro.css') }}" rel="stylesheet">
 </head>
 <!-- END: Head-->
 

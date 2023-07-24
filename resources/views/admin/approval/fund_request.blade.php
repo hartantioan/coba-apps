@@ -141,14 +141,14 @@
                 <h5 class="indigo-text">Permohonan Dana</h5>
             </div>
             <div class="col m6 s12">
-                <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
+                <img src="{{ url('website/logo_web_fix.png') }}" width="40%">
             </div>
         </div>
         <div class="divider mb-3 mt-3"></div>
         <!-- invoice address and contact -->
         <table border="0" width="100%">
             <tr>
-                <td width="33%" class="left-align">
+                <td width="50%" class="left-align">
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
@@ -174,9 +174,25 @@
                                 {{ $data->user->department->name }}
                             </td>
                         </tr>
+                        <tr>
+                            <td width="40%">
+                                Lampiran
+                            </td>
+                            <td width="60%">
+                                <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%">
+                                Status
+                            </td>
+                            <td width="60%">
+                                {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                            </td>
+                        </tr>
                     </table>
                 </td>
-                <td width="33%" class="left-align">
+                <td width="50%" class="left-align">
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
@@ -208,34 +224,6 @@
                             </td>
                             <td width="60%">
                                 {{ $data->type() }}
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                <td width="33%" class="left-align">
-                    <table border="0" width="100%">
-                        <tr>
-                            <td width="40%">
-                                Lampiran
-                            </td>
-                            <td width="60%">
-                                <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="40%">
-                                Status
-                            </td>
-                            <td width="60%">
-                                {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="40%">
-                                
-                            </td>
-                            <td width="60%">
-                                
                             </td>
                         </tr>
                     </table>

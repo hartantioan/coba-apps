@@ -825,7 +825,7 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">Item/Coa Biaya</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
-                                <th class="center-align">Price</th>
+                                <th class="center-align">Harga</th>
                                 <th class="center-align">Discount 1 (%)</th>
                                 <th class="center-align">Discount 2 (%)</th>
                                 <th class="center-align">Discount 3 (Rp)</th>
@@ -2463,7 +2463,7 @@ class PurchaseOrderController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print A/P Invoice',
+                        'title'     => 'Print Purchase Order',
                         'data'      => $pr,
                       
                     ];

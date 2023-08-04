@@ -144,3 +144,20 @@ legend {
 .dataTables_scrollBody::-webkit-scrollbar{
 	width:10px !important;
 }
+
+.sidenav li a.active {
+	background: linear-gradient(45deg, #e19e4b, #6d2b17d8) !important;
+}
+
+.introjs-tooltip {
+	min-width: 400px !important;
+	max-width: 600px !important;
+}
+
+/* .brand-sidebar {
+	height: 80px !important;
+}
+
+.sidenav {
+	top: 80px !important;
+} */

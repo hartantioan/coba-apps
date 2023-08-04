@@ -128,7 +128,7 @@
                             <label class="active" for="ip_address">IP Address(bila ada)</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="nominal" name="nominal" type="text" placeholder="Keterangan">
+                            <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this);">
                             <label class="active" for="nominal">Nominal</label>
                         </div>
                         <div class="input-field col s6">

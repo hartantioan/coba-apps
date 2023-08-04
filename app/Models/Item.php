@@ -126,6 +126,27 @@ class Item extends Model
         return $arrPrice;
     }
 
+    public function oldSalePrices($dataplaces){
+        $arrPrice = [];
+        $po = MarketingOrder::whereHas('marketingOrderDetail', function($query) use ($dataplaces){
+                $query->where('item_id',$this->id)->whereIn('place_id',$dataplaces);
+            })->whereIn('status',['2','3'])->orderByDesc('post_date')->get();
+        
+        foreach($po as $row){
+            foreach($row->marketingOrderDetail as $rowdetail){
+                $arrPrice[] = [
+                    'purchase_code' => $row->code,
+                    'customer_id'   => $row->account_id,
+                    'customer_name' => $row->account->name,
+                    'price'         => number_format($rowdetail->price,2,',','.'),
+                    'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                ];
+            }
+        }
+        
+        return $arrPrice;
+    }
+
     public function priceNow($place_id,$date){
         $pricenow = 0;
         $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();

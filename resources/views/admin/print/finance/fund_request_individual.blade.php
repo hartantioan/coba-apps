@@ -156,7 +156,7 @@
             
             .invoice-product-details{
                 border:1px solid black;
-                min-height: 23%;
+                min-height: auto;
             }
 
             @page { margin: 5em 3em 6em 3em; }

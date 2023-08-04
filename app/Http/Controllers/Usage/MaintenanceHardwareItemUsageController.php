@@ -383,21 +383,23 @@ class MaintenanceHardwareItemUsageController extends Controller
         $Attachments=[];
 
         $mt = MaintenanceHardwareItemsUsage::where('id',CustomHelper::decrypt($request->id))->first();
-        $mt['user_name'] = $mt->user->name;
-        $mt['request'] = $mt->requestRepairHardwareItemUsage->hardwareItem->item->name;
-        // mengambil attachment pada req
-        $attachment_request = AttachmentMaintenanceHardwareItemsUsage::where('maintenance_hardware_item_usage_id',CustomHelper::decrypt($request->id))->get();
-        foreach($attachment_request as $row){
-            $file = [
-                'id'=>$row->id,
-                'created_at'=> date('d/m/y',strtotime($row->created_at)),
-                'file_name'=>$row->file_name,
-                'attachment'=>$row->attachment()
-            ];
-            $Attachments[]=$file;
+        if($mt){
+            $mt['user_name'] = $mt->user->name;
+            $mt['request'] = $mt->requestRepairHardwareItemUsage->hardwareItem->item->name;
+            // mengambil attachment pada req
+            $attachment_request = AttachmentMaintenanceHardwareItemsUsage::where('maintenance_hardware_item_usage_id',CustomHelper::decrypt($request->id))->get();
+            foreach($attachment_request as $row){
+                $file = [
+                    'id'=>$row->id,
+                    'created_at'=> date('d/m/y',strtotime($row->created_at)),
+                    'file_name'=>$row->file_name,
+                    'attachment'=>$row->attachment()
+                ];
+                $Attachments[]=$file;
+            }
+            $mt['attachments']=$Attachments;			
+            return response()->json($mt);
         }
-        $mt['attachments']=$Attachments;			
-		return response()->json($mt);
     }
 
     public function showRequest(Request $request){

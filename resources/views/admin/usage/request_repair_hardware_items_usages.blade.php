@@ -774,7 +774,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                $.ajax({
+                /* $.ajax({
                     url: '{{ Request::url() }}/destroy',
                     type: 'POST',
                     dataType: 'JSON',
@@ -800,7 +800,8 @@
                             icon: 'error'
                         });
                     }
-                });
+                }); */
+                alert('coming soon');
             }
         });
     }

@@ -18,9 +18,9 @@ class RequestRepairHardwareItemUsageController extends Controller
     public function index()
     {
         $data = [
-            'title' => 'Request Repair Hardware Item',
-            'content' => 'admin.usage.request_repair_hardware_items_usages',
-            'company'       => Company::where('status','1')->get(),
+            'title'     => 'Permintaan Perbaikan Hardware Item',
+            'content'   => 'admin.usage.request_repair_hardware_items_usages',
+            'company'   => Company::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -89,8 +89,8 @@ class RequestRepairHardwareItemUsageController extends Controller
                     $val->status(),
                     '
                     <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Attachment" onclick="show(`' . $val->id  . '`)"><i class="material-icons dp48">photo</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' .  CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">close</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
+                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' .  CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">close</i></button>
+                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
 

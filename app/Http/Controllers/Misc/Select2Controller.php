@@ -109,7 +109,8 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name
+                'text' 			=> $d->code.' - '.$d->name,
+                'cities'        => $d->getCity(),
             ];
         }
 
@@ -304,6 +305,35 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function salesItem(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->where(function($query) use($search){
+                    $query->whereNotNull('is_sales_item');
+                })->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'sell_unit'         => $d->sellUnit->code,
+                'old_prices'        => $d->oldPrices($this->dataplaces),
+                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function assetItem(Request $request)
     {
         $response = [];
@@ -451,6 +481,35 @@ class Select2Controller extends Controller {
                 'id'   			=> $d->id,
                 'text' 			=> $d->employee_no.' - '.$d->name,
                 'top'           => $d->top,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function customer(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = User::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('employee_no', 'like', "%$search%")
+                    ->orWhere('username', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('address', 'like', "%$search%")
+                    ->orWhere('pic', 'like', "%$search%")
+                    ->orWhere('pic_no', 'like', "%$search%")
+                    ->orWhere('office_no', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->where('type','2')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->employee_no.' - '.$d->name,
+                'top_customer'  => $d->top,
+                'top_internal'  => $d->top_internal,
             ];
         }
 

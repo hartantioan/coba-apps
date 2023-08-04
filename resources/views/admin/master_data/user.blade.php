@@ -106,6 +106,7 @@
                                                         <th>Username</th>
                                                         <th>NIK/Code</th>
                                                         <th>Tipe</th>
+                                                        <th>Grup</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -1414,6 +1415,7 @@
                 { name: 'username', className: 'center-align' },
                 { name: 'id_card', className: 'center-align' },
                 { name: 'type', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'group_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'right-align' },
             ],

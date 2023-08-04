@@ -78,8 +78,6 @@ class Journal extends Model
         return $ada;
     }
 
-    
-
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',

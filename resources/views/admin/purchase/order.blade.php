@@ -234,11 +234,11 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m2 s12 step1">
                                 <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
                             </div>
-                            <div class="input-field col m1 s12">
+                            <div class="input-field col m1 s12 step2">
                                 <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                     <option value="">--Pilih--</option>
                                     @foreach ($place as $rowplace)
@@ -246,7 +246,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
                                 <input type="hidden" id="savesubtotal" name="savesubtotal" value="0,00">
                                 <input type="hidden" id="savetotal" name="savetotal" value="0,00">
@@ -256,14 +256,14 @@
                                 <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getTopSupplier();"></select>
                                 <label class="active" for="supplier_id">Supplier</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step4">
                                 <select class="form-control" id="inventory_type" name="inventory_type">
                                     <option value="1">Persediaan Barang</option>
                                     <option value="2">Jasa</option>
                                 </select>
                                 <label class="" for="inventory_type">Tipe Pembelian</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step5">
                                 <select class="form-control" id="purchasing_type" name="purchasing_type">
                                     <option value="1">Standart PO</option>
                                     <option value="2">Planned PO</option>
@@ -272,14 +272,14 @@
                                 </select>
                                 <label class="" for="purchasing_type">Kategori PO</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step6">
                                 <select class="form-control" id="shipping_type" name="shipping_type">
                                     <option value="1">Franco</option>
                                     <option value="2">Loco</option>
                                 </select>
                                 <label class="" for="shipping_type">Tipe Pengiriman</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step7">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
                                         <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -287,11 +287,11 @@
                                 </select>
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step8">
                                 <input id="document_no" name="document_no" type="text" placeholder="No. Dokumen">
                                 <label class="active" for="document_no">No. Dokumen</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step9">
                                 <select class="form-control" id="payment_type" name="payment_type" onchange="resetTerm()">
                                     <option value="1">Cash</option>
                                     <option value="2">Credit</option>
@@ -300,11 +300,11 @@
                                 </select>
                                 <label class="" for="payment_type">Tipe Pembayaran</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step10">
                                 <input id="payment_term" name="payment_term" type="number" value="0" min="0" step="1">
                                 <label class="active" for="payment_term">Termin Pembayaran (hari)</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step11">
                                 <select class="form-control" id="currency_id" name="currency_id">
                                     @foreach ($currency as $row)
                                         <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
@@ -312,31 +312,31 @@
                                 </select>
                                 <label class="" for="currency_id">Mata Uang</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step12">
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step13">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step14">
                                 <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. kirim">
                                 <label class="active" for="delivery_date">Tgl. Kirim</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step15">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
                                 <label class="active" for="receiver_name">Nama Penerima</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step16">
                                 <input id="receiver_address" name="receiver_address" type="text" placeholder="Alamat Penerima">
                                 <label class="active" for="receiver_address">Alamat Penerima</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step17">
                                 <input id="receiver_phone" name="receiver_phone" type="text" placeholder="Kontak Penerima">
                                 <label class="active" for="receiver_phone">Kontak Penerima</label>
                             </div>
-                            <div class="file-field input-field col m3 s12">
+                            <div class="file-field input-field col m3 s12 step18">
                                 <div class="btn">
                                     <span>Dokumen PO</span>
                                     <input type="file" name="document_po" id="document_po">
@@ -346,7 +346,7 @@
                                 </div>
                             </div>
                             <div class="col m12 s12">
-                                <div class="col m3 s3">
+                                <div class="col m3 s3 step19">
                                     <p class="mt-2 mb-2">
                                         <h5>Purchase Request</h5>
                                         <div class="row">
@@ -362,7 +362,7 @@
                                         </div> 
                                     </p>
                                 </div>
-                                <div class="col m3 s3">
+                                <div class="col m3 s3 step20">
                                     <p class="mt-2 mb-2">
                                         <h5>Goods Issue / Barang Keluar</h5>
                                         <div class="row">
@@ -378,11 +378,11 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="col m6 s6">
+                                <div class="col m6 s6 step21">
                                     <h6><b>PR/GI Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
-                            <div class="col m12 s12" style="overflow:auto;width:100% !important;">
+                            <div class="col m12 s12 step22" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     <table class="bordered" style="width:2500px;">
@@ -433,14 +433,14 @@
                                     </table>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step23">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m4 s12">
 
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step24">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -448,7 +448,7 @@
                                             <td width="50%" class="right-align"><span id="subtotal">0,00</span></td>
                                         </tr>
                                         <tr>
-                                            <td>Discount</td>
+                                            <td>Diskon</td>
                                             <td class="right-align">
                                                 <input class="browser-default" id="discount" name="discount" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
@@ -473,7 +473,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step25" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -482,6 +482,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -2356,4 +2357,140 @@
         },
     });
 
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Purchase Order',
+                    intro : 'Form ini digunakan untuk menambahkan pembelian barang dan jasa berdasarkan Purchase Request ataupun Good Issue / Barang Keluar. Silahkan ikuti panduan ini untuk penjelasan mengenai isian form.'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Supplier',
+                    element : document.querySelector('.step3'),
+                    intro : 'Supplier adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
+                },
+                {
+                    title : 'Tipe Pembelian',
+                    element : document.querySelector('.step4'),
+                    intro : 'Tipe Pembelian berisi barang atau jasa, silahkan pilih barang jika pembelian adalah untuk barang yang ada wujudnya, dan pilih jasa, jika tipe pembelian adalah jasa. Hati-hati karena tipe pembelian barang maka, detail produk di tabel akan otomatis mengambil data dari master data item, sedangkan tipe pembelian jasa akan otomatis ke biaya / COA.' 
+                },
+                {
+                    title : 'Kategori PO',
+                    element : document.querySelector('.step5'),
+                    intro : 'Standar PO adalah yang paling umum digunakan. Dalam PO standar merupakan dokumen pemesanan reguler atau standart yang berisikan informasi, barang yang dipesan, jumlah setiap item yang mereka beli, lokasi pengiriman dan tanggal, dan syarat pembayaran. Planned PO, merupakan PO yang diterbitkan untuk mengantisipasi kebutuhan masa depan akan suatu barang. Blanked PO, adalah komitmen dari customer untuk membeli produk atau layanan dari supplier secara berkelanjutan hingga nilai pesanan tertentu tercapai. Contract PO, baik pembeli dan supplier menandatangani kontrak yang menentukan persyaratan pembelian sebelum pesanan pembelian terkait dengan kontrak dikeluarkan. Sementara ada denda untuk melanggar pesanan pembelian kontrak bervariasi, baik supplier dan pembeli memiliki kemampuan untuk mengambil tindakan hukum jika pihak lain tidak memenuhi akhir kontrak mereka.'
+                },
+                {
+                    title : 'Tipe Pengiriman',
+                    element : document.querySelector('.step6'),
+                    intro : 'Franco, merupakan kegiatan jual beli barang di mana biaya pengiriman ditanggung oleh penjual. Sedangkan dalam Loco pembeli yang mendatangi gudang barang dan menanggung semua biaya.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step7'),
+                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                },
+                {
+                    title : 'No. Dokumen',
+                    element : document.querySelector('.step8'),
+                    intro : 'No dokumen bisa diisikan dengan no dokumen penawaran dari supplier.' 
+                },
+                {
+                    title : 'Tipe Pembayaran',
+                    element : document.querySelector('.step9'),
+                    intro : 'Tipe pembayaran PO, silahkan pilih sesuai keadaan.' 
+                },
+                {
+                    title : 'Termin Pembayaran',
+                    element : document.querySelector('.step10'),
+                    intro : 'Berapa hari termin pembayaran sejak dokumen diterima. Otomatis terisi, ketika anda memilih supplier dan tipe pembayaran Credit.' 
+                },
+                {
+                    title : 'Mata Uang',
+                    element : document.querySelector('.step11'),
+                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
+                },
+                {
+                    title : 'Konversi',
+                    element : document.querySelector('.step12'),
+                    intro : 'Nilai konversi rupiah pada saat Purchase Order dibuat.'
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step13'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'Tgl. Kirim',
+                    element : document.querySelector('.step14'),
+                    intro : 'Tanggal perkiraan kirim barang dari Supplier.' 
+                },
+                {
+                    title : 'Nama Penerima',
+                    element : document.querySelector('.step15'),
+                    intro : 'Nama penerima di gudang atau atas nama pembeli.' 
+                },
+                {
+                    title : 'Alamat Penerima',
+                    element : document.querySelector('.step16'),
+                    intro : 'Bisa diisikan dengan alamat gudang atau drop point barang.' 
+                },
+                {
+                    title : 'Kontak Penerima',
+                    element : document.querySelector('.step17'),
+                    intro : 'Nomor telepon atau hp dari yang menerima barang di gudang, atau drop point barang.' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step18'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
+                {
+                    title : 'Purchase Request',
+                    element : document.querySelector('.step19'),
+                    intro : 'Pilih ini jika ingin menarik data dari Purchase Request aktif yang masih memiliki tunggakan.' 
+                },
+                {
+                    title : 'Good Issue / Barang Keluar',
+                    element : document.querySelector('.step20'),
+                    intro : 'Pilih ini jika ingin menarik data dari Good Issue / Barang Keluar aktif yang ingin menerbitkan barang baru dengan status REPAIR. Gunakan untuk produk yang keluar karena diperbaiki.' 
+                },
+                {
+                    title : 'PR/GI Terpakai',
+                    element : document.querySelector('.step21'),
+                    intro : 'Daftar dokumen referensi yang terpakai akan muncul disini jika anda menggunakan Purchase Request ataupun Good Issue. Anda bisa menghapus dengan cara menekan tombol x pada masing-masing tombol. Fungsi lain dari fitur ini adalah, agar PR/GI tidak bisa dipakai di form selain form aktif saat ini.' 
+                },
+                {
+                    title : 'Detail produk',
+                    element : document.querySelector('.step22'),
+                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, dan Gudang Tujuan, karena itu nantinya akan menentukan dimana barang ketika diterima.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step23'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Diskon',
+                    element : document.querySelector('.step24'),
+                    intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step25'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
+    }
 </script>

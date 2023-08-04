@@ -1500,39 +1500,37 @@ class CustomHelper {
 						'nominal'		=> $pod->getArrayTotal()['total'],
 					]);
 
-				}elseif($row->lookable_type == 'landed_costs'){
-					foreach($row->lookable->landedCostDetail as $rowdetail){
-						$arrCost = $rowdetail->getLocalImportCost();
+				}elseif($row->lookable_type == 'landed_cost_details'){
+					$arrCost = $row->lookable->getLocalImportCost();
+				
+					if($arrCost['total_local'] > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $arrCost['coa_local'],
+							'place_id'		=> $row->lookable->place_id,
+							'line_id'		=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
+							'machine_id'	=> $row->lookable->machine_id ? $row->lookable->machine_id : NULL,
+							'account_id'	=> $row->lookable->landedCost->account_id,
+							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
+							'warehouse_id'	=> $row->lookable->warehouse_id,
+							'type'			=> '1',
+							'nominal'		=> $arrCost['total_local'],
+						]);
+					}
 					
-						if($arrCost['total_local'] > 0){
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $arrCost['coa_local'],
-								'place_id'		=> $rowdetail->place_id,
-								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
-								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-								'account_id'	=> $row->lookable->account_id,
-								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
-								'warehouse_id'	=> $rowdetail->warehouse_id,
-								'type'			=> '1',
-								'nominal'		=> $arrCost['total_local'],
-							]);
-						}
-						
-						if($arrCost['total_import'] > 0){
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $arrCost['coa_import'],
-								'place_id'		=> $rowdetail->place_id,
-								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
-								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-								'account_id'	=> $row->lookable->account_id,
-								'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
-								'warehouse_id'	=> $rowdetail->warehouse_id,
-								'type'			=> '1',
-								'nominal'		=> $arrCost['total_import'],
-							]);
-						}
+					if($arrCost['total_import'] > 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $arrCost['coa_import'],
+							'place_id'		=> $row->lookable->place_id,
+							'line_id'		=> $row->lookable->line_id ? $row->lookable->line_id : NULL,
+							'machine_id'	=> $row->lookable->machine_id ? $row->lookable->machine_id : NULL,
+							'account_id'	=> $row->lookable->lookable->account_id,
+							'department_id'	=> $row->lookable->department_id ? $row->lookable->department_id : NULL,
+							'warehouse_id'	=> $row->lookable->warehouse_id,
+							'type'			=> '1',
+							'nominal'		=> $arrCost['total_import'],
+						]);
 					}
 				}else{
 					JournalDetail::create([

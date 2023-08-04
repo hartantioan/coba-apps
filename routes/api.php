@@ -22,3 +22,5 @@ use Illuminate\Support\Facades\Route;
 Route::post('login',[HomeController::class, 'login']);
 Route::get('users', [HomeController::class, 'index'])->middleware('auth:api');
 Route::post('update_weight',[HomeController::class, 'updateWeight']);
+Route::post('update_attendance',[HomeController::class, 'updateAttendance']);
+Route::get('get_attendance', [HomeController::class, 'getAttendance']);

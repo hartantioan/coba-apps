@@ -76,6 +76,8 @@ use App\Http\Controllers\Purchase\PurchaseMemoController;
 use App\Http\Controllers\Purchase\AgingAPController;
 use App\Http\Controllers\Purchase\DownPaymentController;
 
+use App\Http\Controllers\Sales\MarketingOrderController;
+
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
 use App\Http\Controllers\Inventory\InventoryTransferOutController;
@@ -154,11 +156,13 @@ Route::prefix('admin')->group(function () {
                 Route::get('country', [Select2Controller::class, 'country']);
                 Route::get('item', [Select2Controller::class, 'item']);
                 Route::get('purchase_item', [Select2Controller::class, 'purchaseItem']);
+                Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
                 Route::get('coa_journal', [Select2Controller::class, 'coaJournal']);
                 Route::get('raw_coa', [Select2Controller::class, 'rawCoa']);
                 Route::get('employee', [Select2Controller::class, 'employee']);
                 Route::get('supplier', [Select2Controller::class, 'supplier']);
+                Route::get('customer', [Select2Controller::class, 'customer']);
                 Route::get('warehouse', [Select2Controller::class, 'warehouse']);
                 Route::get('asset_item', [Select2Controller::class, 'assetItem']);
                 Route::get('purchase_request', [Select2Controller::class, 'purchaseRequest']);
@@ -1168,6 +1172,27 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter',[DeadStockController::class, 'filter']);
                         Route::get('export',[DeadStockController::class, 'export']);
                     });
+                });
+            });
+
+            Route::prefix('sales')->middleware('direct.access')->group(function () {
+                Route::prefix('marketing_order')->middleware('operation.access:marketing_order,view')->group(function () {
+                    Route::get('/',[MarketingOrderController::class, 'index']);
+                    Route::get('datatable',[MarketingOrderController::class, 'datatable']);
+                    Route::get('row_detail',[MarketingOrderController::class, 'rowDetail']);
+                    Route::post('show', [MarketingOrderController::class, 'show']);
+                    Route::post('get_code', [MarketingOrderController::class, 'getCode']);
+                    Route::post('print',[MarketingOrderController::class, 'print']);
+                    Route::post('print_by_range',[MarketingOrderController::class, 'printByRange']);
+                    Route::get('export',[MarketingOrderController::class, 'export']);
+                    Route::get('viewstructuretree',[MarketingOrderController::class, 'viewStructureTree']);
+                    Route::post('get_details', [MarketingOrderController::class, 'getDetails']);
+                    Route::post('remove_used_data', [MarketingOrderController::class, 'removeUsedData']);
+                    Route::post('create',[MarketingOrderController::class, 'create'])->middleware('operation.access:marketing_order,update');
+                    Route::get('approval/{id}',[MarketingOrderController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[MarketingOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MarketingOrderController::class, 'voidStatus'])->middleware('operation.access:marketing_order,void');
+                    Route::post('destroy', [MarketingOrderController::class, 'destroy'])->middleware('operation.access:marketing_order,delete');
                 });
             });
 

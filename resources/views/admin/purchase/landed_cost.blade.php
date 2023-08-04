@@ -186,11 +186,11 @@
                     <div class="col s12">
                         <i>Silahkan pilih supplier / vendor untuk mengambil data dokumen GRPO & LC. Untuk Inventori Transfer, supplier / vendor kosong dan tekan tombol Tampilkan Data.</i>
                         <div class="row">
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m2 s12 step1">
                                 <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
                             </div>
-                            <div class="input-field col m1 s12">
+                            <div class="input-field col m1 s12 step2">
                                 <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                     <option value="">--Pilih--</option>
                                     @foreach ($place as $rowplace)
@@ -198,20 +198,20 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="supplier_id" name="supplier_id"></select>
                                 <label class="active" for="supplier_id">Supplier/Vendor</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step4">
                                 <a href="javascript:void(0);" class="btn waves-effect waves-light cyan" onclick="getAccountData();" id="btn-show">Tampilkan Data<i class="material-icons right">assignment</i></a>
                                 <label class="active">&nbsp;</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step5">
                                 <select class="browser-default" id="vendor_id" name="vendor_id" onchange="getDeliveryCost();"></select>
                                 <label class="active" for="vendor_id">Broker</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step6">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $row)
                                         <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -219,11 +219,11 @@
                                 </select>
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step7">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
-                            <div class="file-field input-field col m3 s12">
+                            <div class="file-field input-field col m3 s12 step8">
                                 <div class="btn">
                                     <span>Lampiran</span>
                                     <input type="file" name="document" id="document">
@@ -232,7 +232,7 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step9">
                                 <select class="form-control" id="currency_id" name="currency_id">
                                     @foreach ($currency as $row)
                                         <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
@@ -240,21 +240,21 @@
                                 </select>
                                 <label class="" for="currency_id">Mata Uang</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step10">
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step11">
                                 <input id="reference" name="reference" type="text" placeholder="No. Referensi">
                                 <label class="active" for="reference">No. Referensi</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step12">
                                 <select class="browser-default" id="delivery_cost_id" name="delivery_cost_id" onchange="getDeliveryNominal(this);">
                                     <option value="">--Silahkan pilih broker--</option>
                                 </select>
                                 <label class="active" for="delivery_cost_id">Tonase & Harga</label>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step13">
                                 <div class="input-field col m3 s12">
                                     <input type="hidden" id="temp_from_address" name="temp_from_address">
                                     Dari : <b><span id="from_address">-</span></b>
@@ -264,10 +264,10 @@
                                     Tujuan : <b><span id="to_address">-</span></b>
                                 </div>
                             </div>
-                            <div class="col m12 s12">
-                                <h6><b>GRPO / Inv.Transfer (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
+                            <div class="col m12 s12 step14">
+                                <h6><b>GRPO / Inv.Transfer / Landed Cost (Masuk) Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step15">
                                 <p class="mt-2 mb-2">
                                     <h5>Rincian Biaya</h5>
                                     <div style="overflow:auto;">
@@ -418,6 +418,8 @@
                                         </table>
                                     </div>
                                 </p>
+                            </div>
+                            <div class="col m12 s12 step16">
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Harga per Produk</h5>
                                     <div style="overflow:auto;">
@@ -450,7 +452,7 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step17">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
@@ -461,7 +463,7 @@
                                 
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step18" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -470,6 +472,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -523,69 +526,71 @@
                 <div class="row">
                     <div class="col s12 mt-2">
                         <ul class="tabs">
-                            <li class="tab col m4"><a class="active" href="#goodsreceipt">Goods Receipt PO</a></li>
-                            <li class="tab col m4"><a href="#landedcost">Landed Cost</a></li>
-                            <li class="tab col m4"><a href="#inventorytransferin">Inventori Transfer Masuk</a></li>
+                            <li class="tab col m4"><a class="active step19" href="#goodsreceipt">Goods Receipt PO</a></li>
+                            <li class="tab col m4"><a class="step20" href="#landedcost">Landed Cost</a></li>
+                            <li class="tab col m4"><a class="step21" href="#inventorytransferin">Inventori Transfer Masuk</a></li>
                         </ul>
-                        <div id="goodsreceipt" class="col s12 active">
-                            <p class="mt-2 mb-2">
-                                <div id="datatable_buttons_goods_receipt"></div>
-                                <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
-                                <table id="table_goods_receipt" class="display" width="100%">
-                                    <thead>
-                                        <tr>
-                                            <th class="center-align">No. GRPO</th>
-                                            <th class="center-align">No. SJ</th>
-                                            <th class="center-align">Tgl.Post</th>
-                                            <th class="center-align">Total</th>
-                                            <th class="center-align">PPN</th>
-                                            <th class="center-align">PPh</th>
-                                            <th class="center-align">Grandtotal</th>
-                                            <th class="center-align">Keterangan</th>
-                                            <th class="center-align">Landed Cost</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="body-detail-goods-receipt"></tbody>
-                                </table>
-                            </p>
-                        </div>
-                        <div id="landedcost" class="col s12">
-                            <p class="mt-2 mb-2">
-                                <div id="datatable_buttons_landed_cost"></div>
-                                <i class="right">Khusus untuk Landed Cost, hanya bisa diperbolehkan memilih 1 data saja.</i>
-                                <table id="table_landed_cost" class="display" width="100%">
-                                    <thead>
-                                        <tr>
-                                            <th class="center-align">No. LC</th>
-                                            <th class="center-align">Tgl.Post</th>
-                                            <th class="center-align">Total</th>
-                                            <th class="center-align">PPN</th>
-                                            <th class="center-align">PPh</th>
-                                            <th class="center-align">Grandtotal</th>
-                                            <th class="center-align">Keterangan</th>
-                                            <th class="center-align">Landed Cost</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="body-detail-landed-cost"></tbody>
-                                </table>
-                            </p>
-                        </div>
-                        <div id="inventorytransferin" class="col s12">
-                            <p class="mt-2 mb-2">
-                                <div id="datatable_buttons_inventory_transfer_in"></div>
-                                <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan. ITI = Inventori Transfer Masuk, ITO = Inventori Transfer Keluar</i>
-                                <table id="table_inventory_transfer_in" class="display" width="100%">
-                                    <thead>
-                                        <tr>
-                                            <th class="center-align">No. ITI</th>
-                                            <th class="center-align">No. ITO</th>
-                                            <th class="center-align">Tgl.Post</th>
-                                            <th class="center-align">Keterangan</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="body-detail-inventory-transfer-in"></tbody>
-                                </table>
-                            </p>
+                        <div class="row step22">
+                            <div id="goodsreceipt" class="col s12 active">
+                                <p class="mt-2 mb-2">
+                                    <div id="datatable_buttons_goods_receipt"></div>
+                                    <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                                    <table id="table_goods_receipt" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="center-align">No. GRPO</th>
+                                                <th class="center-align">No. SJ</th>
+                                                <th class="center-align">Tgl.Post</th>
+                                                <th class="center-align">Total</th>
+                                                <th class="center-align">PPN</th>
+                                                <th class="center-align">PPh</th>
+                                                <th class="center-align">Grandtotal</th>
+                                                <th class="center-align">Keterangan</th>
+                                                <th class="center-align">Landed Cost</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-goods-receipt"></tbody>
+                                    </table>
+                                </p>
+                            </div>
+                            <div id="landedcost" class="col s12">
+                                <p class="mt-2 mb-2">
+                                    <div id="datatable_buttons_landed_cost"></div>
+                                    <i class="right">Khusus untuk Landed Cost, hanya bisa diperbolehkan memilih 1 data saja.</i>
+                                    <table id="table_landed_cost" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="center-align">No. LC</th>
+                                                <th class="center-align">Tgl.Post</th>
+                                                <th class="center-align">Total</th>
+                                                <th class="center-align">PPN</th>
+                                                <th class="center-align">PPh</th>
+                                                <th class="center-align">Grandtotal</th>
+                                                <th class="center-align">Keterangan</th>
+                                                <th class="center-align">Landed Cost</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-landed-cost"></tbody>
+                                    </table>
+                                </p>
+                            </div>
+                            <div id="inventorytransferin" class="col s12">
+                                <p class="mt-2 mb-2">
+                                    <div id="datatable_buttons_inventory_transfer_in"></div>
+                                    <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan. ITI = Inventori Transfer Masuk, ITO = Inventori Transfer Keluar</i>
+                                    <table id="table_inventory_transfer_in" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="center-align">No. ITI</th>
+                                                <th class="center-align">No. ITO</th>
+                                                <th class="center-align">Tgl.Post</th>
+                                                <th class="center-align">Keterangan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-inventory-transfer-in"></tbody>
+                                    </table>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -593,8 +598,9 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light amber" onclick="startIntro2();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
-        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
+        <button class="btn waves-effect waves-light purple right submit step23" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
     </div>
 </div>
 
@@ -1562,7 +1568,7 @@
                         `);
                         swal({
                             title: 'Maaf! Biaya Pengiriman tidak ditemukan.',
-                            text: 'Broker, asal dan tujuan kecamatan belum memiliki data biaya pengiriman. Silahkan set di master data.',
+                            text: 'Broker, asal dan tujuan kecamatan belum memiliki data biaya pengiriman. Silahkan set di Master data - Administrasi - Biaya Kirim.',
                             icon: 'error'
                         });
                     }
@@ -2479,5 +2485,144 @@
                 }
             }
         });
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Landed Cost',
+                    intro : 'Form ini digunakan untuk menerbitkan persediaan barang pada hutang usaha belum ditagihkan kepada vendor pengiriman ataupun pihak jasa yang akan mempengaruhi nilai suatu persediaan barang. Contoh kasus untuk memasukkan biaya jasa pengiriman yang ditagihkan oleh pihak ketiga (berbeda dari supplier). Disini anda bisa menarik data dari GRPO, sesama Landed Cost, dan Inventori Transfer Masuk (kasus berbeda Plant).'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Supplier/Vendor',
+                    element : document.querySelector('.step3'),
+                    intro : 'Supplier / vendor adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
+                },
+                {
+                    title : 'Tampilkan Data',
+                    element : document.querySelector('.step4'),
+                    intro : 'Ada 2 mode pengambilan data, yang pertama silahkan pilih supplier / vendor lalu tekan tombol ini, untuk menampilkan data GRPO atau Landed Cost dari supplier / vendor terpilih. Yang kedua, langsung tekan tombol ini tanpa memilih supplier / vendor (biarkan pada opsi <b>--Pilih ya--</b>), maka akan muncul tunggakan data Inventori Transfer Masuk.' 
+                },
+                {
+                    title : 'Broker',
+                    element : document.querySelector('.step5'),
+                    intro : 'Broker adalah perusahaan penyedia layanan ketiga, yang nantinya tagihan invoice akan dikirimkan ke broker ini.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step6'),
+                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step7'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step8'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
+                {
+                    title : 'Mata Uang',
+                    element : document.querySelector('.step9'),
+                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
+                },
+                {
+                    title : 'Konversi',
+                    element : document.querySelector('.step10'),
+                    intro : 'Nilai konversi rupiah pada saat Purchase Order dibuat.'
+                },
+                {
+                    title : 'Nomor Referensi',
+                    element : document.querySelector('.step11'),
+                    intro : 'Nomor referensi surat jalan atau dokumen terkait lampiran.'
+                },
+                {
+                    title : 'Tonase & Harga',
+                    element : document.querySelector('.step12'),
+                    intro : 'Tonase dan Harga akan muncul otomatis ketika anda memilih data Landed Cost lalu memilih broker terkait. Tonase dan Harga per broker tujuan dan asal, bisa diatur dari form <b>Master Data - Administrasi - Biaya Kirim</b>. Di form tersebut anda harus mengatur broker, kecamatan asal, kecamatan tujuan, dan harga tonase.'
+                },
+                {
+                    title : 'Dari & Tujuan Pengiriman',
+                    element : document.querySelector('.step13'),
+                    intro : 'Data ini akan otomatis terisi ketika anda memilih dokumen yang ingin diproses disini berdasarkan supplier / vendor terpilih.'
+                },
+                {
+                    title : 'GRPO/Inv.Transfer/Landed Cost Terpakai',
+                    element : document.querySelector('.step14'),
+                    intro : 'Daftar dokumen refernsi yang terpakai akan muncul disini jika anda menggunakan GRPO ataupun . Anda bisa menghapus dengan cara menekan tombol x pada masing-masing tombol. Fungsi lain dari fitur ini adalah, agar PR/GI tidak bisa dipakai di form selain form aktif saat ini.' 
+                },
+                {
+                    title : 'Rincian Biaya',
+                    element : document.querySelector('.step15'),
+                    intro : 'Disini rincian biaya bisa dimasukkan sesuai dokumen yang ada. Fitur ini juga mengakomodir PPN dan PPh.' 
+                },
+                {
+                    title : 'Detail Harga per Produk',
+                    element : document.querySelector('.step16'),
+                    intro : 'Tabel ini berisi informasi pembagian nominal biaya-biaya LC ke produk yang ada berdasarkan harga pro-rata dikalikan qty barang pada waktu Purchase Order (jika GRPO).' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step17'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step18'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
+    }
+
+    function startIntro2(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Daftar GRPO / Landed Cost / Inventori Transfer - Masuk',
+                    intro : 'Form ini digunakan untuk menarik data dari supplier / vendor terpilih, mulai dari GRPO, Landed Cost, maupun Inventori Transfer - Masuk, yang ingin ditambahkan biaya pengiriman disana.'
+                },
+                {
+                    title : 'Good Receipt PO',
+                    element : document.querySelector('.step19'),
+                    intro : 'Pilih tab ini untuk menampilkan data GRPO dari Supplier / Vendor terpilih.'
+                },
+                {
+                    title : 'Landed Cost',
+                    element : document.querySelector('.step20'),
+                    intro : 'Pilih tab ini untuk menampilkan data Landed Cost dari Supplier / Vendor terpilih.'
+                },
+                {
+                    title : 'Inventori Transfer - Masuk',
+                    element : document.querySelector('.step21'),
+                    intro : 'Pilih tab ini untuk menampilkan data Inventori Transfer Masuk.'
+                },
+                {
+                    title : 'Tabel data',
+                    element : document.querySelector('.step22'),
+                    intro : 'Anda bisa memilih lebih dari satu data disini.'
+                },
+                {
+                    title : 'Tombol Gunakan',
+                    element : document.querySelector('.step23'),
+                    intro : 'Untuk menggunakan data, setelah anda memilih data di tabel data, silahkan tekan tombol ini untuk memindahkannya ke tabel Landed Cost sebelumnya.'
+                },
+            ]
+        }).start();
     }
 </script>

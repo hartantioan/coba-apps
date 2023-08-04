@@ -32,6 +32,20 @@ class Region extends Model
         return $arr;
     }
 
+    public function getCity(){
+        $arr = [];
+        $data = Region::where('code', 'like', "$this->code%")->whereRaw("CHAR_LENGTH(code) = 5")->get();
+        foreach($data as $row){
+            $arr[] = [
+                'id'            => $row->id,
+                'code'          => $row->code,
+                'name'          => $row->name,
+                'subdistrict'   => $row->getSubdistrict(),
+            ];
+        }
+        return $arr;
+    }
+
     public function parentRegion(){
         $arr = explode('.', $this->code);
         $count = count($arr);

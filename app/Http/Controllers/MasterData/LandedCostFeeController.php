@@ -18,7 +18,7 @@ class LandedCostFeeController extends Controller
     public function index()
     {
         $data = [
-            'title'         => 'Distribusi Biaya',
+            'title'         => 'Biaya Landed Cost',
             'content'       => 'admin.master_data.landed_cost_fee',
             'company'       => Company::where('status','1')->get(),
         ];

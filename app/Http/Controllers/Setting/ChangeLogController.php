@@ -107,7 +107,7 @@ class ChangeLogController extends Controller
                     $val->user->name,
                     date('d/m/y',strtotime($val->release_date)),
                     $val->title,
-                    substr($val->description, 0, 50),
+                    substr(strip_tags($val->description), 0, 50),
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">create</i></button>

@@ -37,7 +37,7 @@ class RequestSparepartController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'Sparepart',
+            'title'         => 'Pengajuan Sparepart',
             'content'       => 'admin.maintenance.request_sparepart',
             'place'         => Place::where('status','1')->get(),
             'area'          => Area::where('status','1')->get(),

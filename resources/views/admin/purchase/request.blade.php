@@ -135,11 +135,11 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m3 s12" data-intro="Hello step one!" data-step="1">
+                            <div class="input-field col m3 s12 step1">
                                 <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
                             </div>
-                            <div class="input-field col m1 s12" data-intro="Hello step two!" data-step="2">
+                            <div class="input-field col m1 s12 step2">
                                 <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                     <option value="">--Pilih--</option>
                                     @foreach ($place as $rowplace)
@@ -147,19 +147,19 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step3">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step4">
                                 <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
                                 <label class="active" for="due_date">Tgl. Kadaluwarsa</label>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step5">
                                 <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
                                 <label class="active" for="required_date">Tgl. Dipakai</label>
                             </div>
-                            <div class="file-field input-field col m4 s12">
+                            <div class="file-field input-field col m4 s12 step6">
                                 <div class="btn">
                                     <span>File</span>
                                     <input type="file" name="file" id="file">
@@ -168,7 +168,7 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step7">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $row)
                                         <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -176,11 +176,11 @@
                                 </select>
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step8">
                                 <select class="browser-default" id="project_id" name="project_id"></select>
                                 <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                             </div>
-                            <div class="col m12 s12" style="overflow:auto;width:100% !important;">
+                            <div class="col m12 s12 step9" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     <table class="bordered" style="width:1800px;">
@@ -273,13 +273,13 @@
                                     </table>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step10">
                                 <input type="hidden" id="temp" name="temp">
                                 <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();" data-intro="Hello step three!" data-step="3">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step11" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -288,7 +288,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light cyan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
     </div>
 </div>
@@ -1400,6 +1400,69 @@
     });
 
     function startIntro(){
-        introJs().start();
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Purchase Request',
+                    intro : 'Form ini digunakan untuk menambahkan permintaan pembelian barang sebelum purchase order. Silahkan ikuti panduan ini untuk penjelasan mengenai isian form.'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step3'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'Tgl. Kadaluarsa',
+                    element : document.querySelector('.step4'),
+                    intro : 'Tanggal kadaluarsa digunakan untuk menentukan masa berlaku dokumen hingga tanggal ini ditentukan.' 
+                },
+                {
+                    title : 'Tgl. Dipakai',
+                    element : document.querySelector('.step5'),
+                    intro : 'Tanggal dipakai untuk menentukan perkiraan tanggal pakai barang yang ingin dibeli.' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step7'),
+                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                },
+                {
+                    title : 'Link Proyek',
+                    element : document.querySelector('.step8'),
+                    intro : 'Jika Purchase Request memiliki hubungan dengan proyek, maka silahkan tentukan disini.' 
+                },
+                {
+                    title : 'Detail produk',
+                    element : document.querySelector('.step9'),
+                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, dan Gudang Tujuan, karena itu nantinya akan menentukan dimana barang ketika diterima.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step10'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step11'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
     }
 </script>

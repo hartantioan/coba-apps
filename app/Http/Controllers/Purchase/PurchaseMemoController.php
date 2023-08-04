@@ -45,7 +45,7 @@ class PurchaseMemoController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'Purchase Memo',
+            'title'         => 'AP Memo',
             'content'       => 'admin.purchase.memo',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),

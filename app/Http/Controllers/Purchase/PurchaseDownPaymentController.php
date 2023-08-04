@@ -48,7 +48,7 @@ class PurchaseDownPaymentController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'Purchase Down Payment',
+            'title'         => 'AP Down Payment',
             'content'       => 'admin.purchase.down_payment',
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),

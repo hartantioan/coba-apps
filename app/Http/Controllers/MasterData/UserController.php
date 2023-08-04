@@ -399,9 +399,8 @@ class UserController extends Controller
                 'id_card'           => 'required',
                 'id_card_address'   => 'required',
                 'company_id'         => 'required',
-                'place_id'          => 'required',
-                'department_id'     => 'required',
-                'position_id'       => 'required',
+  
+                
                 'province_id'       => 'required',
                 'city_id'           => 'required',
                 'subdistrict_id'    => 'required',
@@ -420,9 +419,7 @@ class UserController extends Controller
                 'id_card.required'              => 'No Identitas tidak boleh kosong.',
                 'id_card_address.required'      => 'Alamat Identitas tidak boleh kosong.',
                 'company.required'              => 'Perusahaan tidak boleh kosong.',
-                'place_id.required'             => 'Penempatan tidak boleh kosong.',
-                'department_id.required'        => 'Departemen / Divisi tidak boleh kosong.',
-                'position_id.required'          => 'Posisi / level tidak boleh kosong.',
+            
                 'province_id.required'          => 'Provinsi tidak boleh kosong.',
                 'city_id.required'              => 'Kota tidak boleh kosong.',
                 'subdistrict_id.required'       => 'Kecamatan tidak boleh kosong.',
@@ -506,9 +503,7 @@ class UserController extends Controller
                     $query->id_card         = $request->id_card ? $request->id_card : NULL;
                     $query->id_card_address = $request->id_card_address;
                     $query->company_id	    = $request->company_id ? $request->company_id : NULL;
-                    $query->place_id        = $request->place_id ? $request->place_id : NULL;
-                    $query->department_id   = $request->type == '1' ? $request->department_id : NULL;
-                    $query->position_id     = $request->type == '1' ? $request->position_id :NULL;
+                   
                     $query->province_id     = $request->province_id;
                     $query->city_id         = $request->city_id;
                     $query->subdistrict_id  = $request->subdistrict_id;
@@ -553,9 +548,7 @@ class UserController extends Controller
                         'id_card_address'       => $request->id_card_address,
                         'company_id'	        => $request->company_id ? $request->company_id : NULL,
                         'place_id'	            => $request->place_id ? $request->place_id : NULL,
-                        'department_id'         => $request->type == '1' ? $request->department_id : NULL,
-                        'position_id'           => $request->type == '1' ? $request->position_id :NULL,
-                        'province_id'           => $request->province_id,
+                        
                         'city_id'               => $request->city_id,
                         'subdistrict_id'        => $request->subdistrict_id,
                         'tax_id'                => $request->tax_id,

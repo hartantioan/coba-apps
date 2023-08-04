@@ -191,6 +191,81 @@
     </div>
 </div>
 
+<div id="modal5" class="modal modal-fixed-footer" style="height: 70% !important;width:50%">
+    <div class="modal-header ml-6 mt-2">
+        <h6>Range Printing</h6>
+    </div>
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <form class="row" id="form_data_print_multi" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_multi" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <ul class="tabs">
+                            <li class="tab">
+                                <a href="#range-tabs" class="" id="part-tabs-btn">
+                                <span>By No</span>
+                                </a>
+                            </li>
+                            <li class="tab">
+                                <a href="#date-tabs" class="">
+                                <span>By Date</span>
+                                </a>
+                            </li>
+                            <li class="indicator" style="left: 0px; right: 0px;"></li>
+                        </ul>
+                        <div id="range-tabs" style="display: block;" class="">                           
+                            <div class="row ml-2 mt-2">
+                                <div class="row">
+                                    <div class="input-field col m4 s12">
+                                        <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
+                                        <label class="" for="range_end">No Awal</label>
+                                    </div>
+                                    
+                                    <div class="input-field col m4 s12">
+                                        <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
+                                        <label class="active" for="range_end">No akhir</label>
+                                    </div>
+                                    <div class="input-field col m4 s12">
+                                        <label>
+                                            <input name="type_date" type="radio" checked value="1"/>
+                                            <span>Dengan range biasa</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                <div class="input-field col m8 s12">
+                                    <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
+                                    <label class="" for="range_end">Masukkan angka dengan koma</label>
+                                </div>
+                               
+                                <div class="input-field col m4 s12">
+                                    <label>
+                                        <input name="type_date" type="radio" value="2"/>
+                                        <span>Dengan Range koma</span>
+                                    </label>
+                                </div>
+                                </div>
+                                <div class="col s12 mt-3">
+                                    <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
+                                </div>
+                            </div>                         
+                        </div>
+                        <div id="date-tabs" style="display: none;" class="">
+                            
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
         <i class="material-icons">view_comfy</i>
@@ -655,7 +730,10 @@
 
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
-   
+        var table = $('#datatable_serverside').DataTable();
+        var data = table.data().toArray();
+        var etNumbers = data.map(item => item[2]);
+        formData.append('tabledata',etNumbers);
         $.ajax({
             url: '{{ Request::url() }}/print_by_range',
             type: 'POST',

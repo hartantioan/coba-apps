@@ -1373,7 +1373,8 @@ class PurchaseInvoiceController extends Controller
          
                     $html = '';
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Print A/P Invoice',
@@ -1427,7 +1428,8 @@ class PurchaseInvoiceController extends Controller
                 $html = '';
 
                 foreach($merged as $code){
-                    $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$code)->first();
+                    $etNumbersArray = explode(',', $request->tabledata);
+                    $query = PurchaseInvoice::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                     if($query){
                         $data = [
                             'title'     => 'Print A/P Invoice',
@@ -1496,7 +1498,8 @@ class PurchaseInvoiceController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Print A/P Invoice',
@@ -1564,7 +1567,8 @@ class PurchaseInvoiceController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = PurchaseInvoice::where('Code', 'LIKE', '%'.$code)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = PurchaseInvoice::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Print A/P Invoice',

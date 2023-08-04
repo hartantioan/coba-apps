@@ -638,7 +638,8 @@ class RetirementController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = Retirement::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = Retirement::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Retirement',
@@ -706,7 +707,8 @@ class RetirementController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = Retirement::where('Code', 'LIKE', '%'.$code)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = Retirement::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Retirement',

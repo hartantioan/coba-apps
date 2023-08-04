@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\HR\EmployeeTransferController;
+
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Finance\FinanceReportController;
 use App\Http\Controllers\Inventory\DeadStockController;
@@ -8,6 +10,8 @@ use App\Http\Controllers\Inventory\GoodScaleController;
 use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Inventory\StockInRupiahController;
 use App\Http\Controllers\Inventory\StockInQtyController;
+use App\Http\Controllers\MasterData\EmployeeController;
+use App\Http\Controllers\MasterData\EmployeeScheduleController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
 use App\Http\Controllers\MasterData\HardwareItemGroupController;
 use App\Http\Controllers\Other\MenuIndexController;
@@ -203,6 +207,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
                 Route::get('good_scale_item', [Select2Controller::class, 'goodScaleItem']);
+                Route::get('shift', [Select2Controller::class, 'shift']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -496,6 +501,48 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [AllowanceController::class, 'show']);
                         Route::post('create',[AllowanceController::class, 'create'])->middleware('operation.access:allowance,update');
                         Route::post('destroy', [AllowanceController::class, 'destroy'])->middleware('operation.access:allowance,delete');
+                    });
+
+                    Route::prefix('employee_schedule')->middleware('operation.access:employee_schedule,view')->group(function () {
+                        Route::get('/',[EmployeeScheduleController::class, 'index']);
+                        Route::get('datatable',[EmployeeScheduleController::class, 'datatable']);
+                        Route::get('row_detail', [EmployeeScheduleController::class, 'rowDetail']);
+                        Route::post('show', [EmployeeScheduleController::class, 'show']);
+                        Route::post('show_from_code', [EmployeeScheduleController::class, 'showFromCode']);
+                        Route::post('print',[EmployeeScheduleController::class, 'print']);
+                        Route::get('export',[EmployeeScheduleController::class, 'export']);
+                        Route::post('import',[EmployeeScheduleController::class, 'import'])->middleware('operation.access:employee_schedule,update');
+                        Route::post('print_by_range',[EmployeeScheduleController::class, 'printByRange']);
+                        Route::get('print_individual/{id}',[EmployeeScheduleController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                        Route::post('void_status', [EmployeeScheduleController::class, 'voidStatus'])->middleware('operation.access:employee_schedule,void');
+                        Route::post('create_multi',[EmployeeScheduleController::class, 'createMulti'])->middleware('operation.access:employee_schedule,update');
+                        Route::post('create_single',[EmployeeScheduleController::class, 'createSingle'])->middleware('operation.access:employee_schedule,update');
+                        Route::post('destroy', [EmployeeScheduleController::class, 'destroy'])->middleware('operation.access:employee_schedule,delete');
+                        Route::get('approval/{id}',[EmployeeScheduleController::class, 'approval'])->withoutMiddleware('direct.access');
+                    });
+
+                    Route::prefix('employee')->middleware('operation.access:employee,view')->group(function () {
+                        Route::get('/',[EmployeeController::class, 'index']);
+                        Route::get('datatable',[EmployeeController::class, 'datatable']);
+                        Route::get('datatable_family',[EmployeeController::class, 'datatableFamily']);
+                        Route::get('datatable_education',[EmployeeController::class, 'datatableEducation']);
+                        Route::get('datatable_work_experience',[EmployeeController::class, 'datatableWorkExperience']);
+                        Route::get('row_detail', [EmployeeController::class, 'rowDetail']);
+                        Route::get('family',[EmployeeController::class, 'indexFamily']);
+                        Route::get('education',[EmployeeController::class, 'indexEducation']);
+                        Route::get('work_experience',[EmployeeController::class, 'indexWorkExperience']);
+                        Route::post('show_experience', [EmployeeController::class, 'showWorkExperience']);
+                        Route::post('show_family', [EmployeeController::class, 'showFamily']);
+                        Route::post('copy_schedule', [EmployeeController::class, 'copySchedule']);
+                        Route::post('show_education', [EmployeeController::class, 'showEducation']);
+                        Route::get('get_schedule', [EmployeeController::class, 'getSchedule']);
+                        Route::post('create_family',[EmployeeController::class, 'createFamily'])->middleware('operation.access:employee,update');
+                        Route::post('create_education',[EmployeeController::class, 'createEducation'])->middleware('operation.access:employee,update');
+                        Route::post('create_work_experience',[EmployeeController::class, 'createExperience'])->middleware('operation.access:employee,update');
+                        Route::post('destroy', [EmployeeController::class, 'destroy'])->middleware('operation.access:employee,delete');
+                        Route::post('destroy_family', [EmployeeController::class, 'destroyFamily'])->middleware('operation.access:employee,delete');
+                        Route::post('destroy_experience', [EmployeeController::class, 'destroyWorkExperience'])->middleware('operation.access:employee,delete');
+                        Route::post('destroy_education', [EmployeeController::class, 'destroyEducation'])->middleware('operation.access:employee,delete');
                     });
                 });
 
@@ -991,6 +1038,34 @@ Route::prefix('admin')->group(function () {
 
                 
 
+            });
+
+            Route::prefix('hr')->middleware('direct.access')->group(function () {
+                Route::prefix('employee_transfer')->middleware('operation.access:employee_transfer,view')->group(function () {
+                    Route::get('/',[EmployeeTransferController::class, 'index']);
+                    Route::get('datatable',[EmployeeTransferController::class, 'datatable']);
+                    Route::get('row_detail', [EmployeeTransferController::class, 'rowDetail']);
+                    Route::post('show', [EmployeeTransferController::class, 'show']);
+                    Route::post('show_from_code', [EmployeeTransferController::class, 'showFromCode']);
+                    Route::post('print',[EmployeeTransferController::class, 'print']);
+                    Route::get('export',[EmployeeTransferController::class, 'export']);
+                    Route::post('print_by_range',[EmployeeTransferController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[EmployeeTransferController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [EmployeeTransferController::class, 'voidStatus'])->middleware('operation.access:employee_transfer,void');
+                    Route::post('create',[EmployeeTransferController::class, 'create'])->middleware('operation.access:employee_transfer,update');
+                    Route::post('destroy', [EmployeeTransferController::class, 'destroy'])->middleware('operation.access:employee_transfer,delete');
+                    Route::get('approval/{id}',[EmployeeTransferController::class, 'approval'])->withoutMiddleware('direct.access');
+                });
+
+                Route::prefix('shift')->middleware('operation.access:employee,view')->group(function () {
+                    Route::get('/',[EmployeeTransferController::class, 'index']);
+                    Route::get('datatable',[EmployeeTransferController::class, 'datatable']);
+                    Route::get('row_detail', [EmployeeTransferController::class, 'rowDetail']);
+                    Route::post('show', [EmployeeTransferController::class, 'show']);
+                    Route::post('create',[EmployeeTransferController::class, 'create'])->middleware('operation.access:employee,update');
+                    Route::post('destroy', [EmployeeTransferController::class, 'destroy'])->middleware('operation.access:employee,delete');
+          
+                });
             });
 
             Route::prefix('inventory')->middleware('direct.access')->group(function () {

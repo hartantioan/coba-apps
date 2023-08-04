@@ -206,7 +206,7 @@
                             <input id="children" name="children" type="number" value="0">
                             <label class="active" for="children">Jumlah Anak</label>
                         </div>
-                        <div class="input-field col s3 employee_inputs">
+                        <div class="input-field col s3 employee_inputs" id="company_select">
                             <select id="company_id" name="company_id">
                                 @foreach($company as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -214,30 +214,9 @@
                             </select>
                             <label for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s3 employee_inputs">
-                            <select id="place_id" name="place_id">
-                                @foreach($place as $row)
-                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                @endforeach
-                            </select>
-                            <label for="place_id">Penempatan</label>
-                        </div>
-                        <div class="input-field col s3 employee_inputs">
-                            <select id="department_id" name="department_id">
-                                @foreach($department as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="department_id">Departemen</label>
-                        </div>
-                        <div class="input-field col s3 employee_inputs">
-                            <select id="position_id" name="position_id">
-                                @foreach($position as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="position_id">Posisi/Level</label>
-                        </div>
+
+
+
                         <div class="input-field col s3">
                             <select id="gender" name="gender">
                                 <option value="1">Laki-laki</option>
@@ -288,7 +267,7 @@
                             <select class="browser-default" id="country_id" name="country_id"></select>
                             <label class="active" for="country_id">Negara Asal</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3" id="group_select">
                             <select id="group_id" name="group_id"></select>
                             <label for="group_id">Kelompok Partner Bisnis</label>
                         </div>
@@ -1734,6 +1713,7 @@
             }
         });
     }
+
 
     var printService = new WebSocketPrinter({
         onConnect: function () {

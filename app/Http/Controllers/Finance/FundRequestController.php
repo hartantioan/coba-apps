@@ -458,7 +458,8 @@ class FundRequestController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = FundRequest::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = FundRequest::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Fund Request',
@@ -526,7 +527,8 @@ class FundRequestController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = FundRequest::where('Code', 'LIKE', '%'.$code)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = FundRequest::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Fund Request',

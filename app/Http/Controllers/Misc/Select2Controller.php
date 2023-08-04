@@ -23,6 +23,7 @@ use App\Models\PurchaseOrderDetail;
 use App\Models\ReceptionHardwareItemsUsage;
 use App\Models\Region;
 use App\Models\Place;
+use App\Models\Shift;
 use App\Models\Warehouse;
 use App\Models\Country;
 use App\Models\Item;
@@ -264,12 +265,14 @@ class Select2Controller extends Controller {
                 ->where('type','1')->get();
 
         foreach($data as $d) {
+            info($d->name);
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->name.' - '.$d->phone.' Pos. '.$d->position->name.' Dep. '.$d->department->name,
+                'text' => $d->name.' - '.$d->phone.' Pos. '.($d->position ? $d->position->name : 'N/A').' Dep. '.($d->department ? $d->department->name : 'N/A'),
                 'limit_credit'  => $d->limit_credit,
                 'count_limit'   => $d->count_limit_credit,
                 'balance_limit' => $d->limit_credit - $d->count_limit_credit,
+                'arrinfo'       => $d
             ];
         }
 
@@ -1515,6 +1518,23 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->goodScale->code.' '.$d->item->name.' '.$d->qty_balance.' '.$d->item->uomUnit->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function shift(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Shift::where('name', 'like', "%$search%")->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name .'|'. $d->time_in.'-'.$d->time_out,
+                'data'          => $d
             ];
         }
 

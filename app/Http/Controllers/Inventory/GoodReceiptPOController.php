@@ -926,7 +926,8 @@ class GoodReceiptPOController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = GoodReceipt::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = GoodReceipt::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Good Issue',
@@ -994,7 +995,8 @@ class GoodReceiptPOController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = GoodReceipt::where('Code', 'LIKE', '%'.$code)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = GoodReceipt::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Good Issue',

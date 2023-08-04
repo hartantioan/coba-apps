@@ -690,7 +690,8 @@ class CloseBillController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = CloseBill::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = CloseBill::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Close Bill',
@@ -758,7 +759,8 @@ class CloseBillController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = CloseBill::where('Code', 'LIKE', '%'.$code)->first();
+                        $etNumbersArray = explode(',', $request->tabledata);
+                        $query = CloseBill::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Close Bill',

@@ -62,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
             'good_scales'                           => 'App\Models\GoodScale',
             'request_repair_hardware_items_usages'  => 'App\Models\RequestRepairHardwareItemsUsage',
             'maintenance_hardware_items_usages'     => 'App\Models\MaintenanceHardwareItemsUsage',
+            'employee_transfers'                    => 'App\Models\EmployeeTransfer',
             'marketing_orders'                      => 'App\Models\MarketingOrder',
         ]);
     }

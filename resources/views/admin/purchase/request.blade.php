@@ -646,7 +646,10 @@
 
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
-        
+        var table = $('#datatable_serverside').DataTable();
+        var data = table.data().toArray();
+        var etNumbers = data.map(item => item[2]);
+        formData.append('tabledata',etNumbers);
         $.ajax({
             url: '{{ Request::url() }}/print_by_range',
             type: 'POST',

@@ -63,6 +63,7 @@ class User extends Authenticatable
         'user_status',
         'user_image',
         'api_token',
+        'manager_id',
     ];
 
     protected $hidden = [
@@ -282,6 +283,14 @@ class User extends Authenticatable
 
     public function department(){
         return $this->belongsTo('App\Models\Department','department_id','id')->withTrashed();
+    }
+
+    public function manager(){
+        return $this->belongsTo('App\Models\User','manager_id','id')->withTrashed();
+    }
+
+    public function subordinate(){
+        return $this->hasMany('App\Models\User','manager_id','id')->where('status',$this->table);
     }
 
     public function position(){

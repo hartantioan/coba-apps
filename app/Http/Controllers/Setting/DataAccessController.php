@@ -22,7 +22,7 @@ class DataAccessController extends Controller
 {
     public function index()
     {
-        $data = [
+        $data = [ 
             'title'     => 'Akses Data Pegawai',
             'user'      => User::join('departments','departments.id','=','users.department_id')->select('departments.name as department_name','users.*')->orderBy('department_name')->get(),
             'place'     => Place::where('status','1')->get(),

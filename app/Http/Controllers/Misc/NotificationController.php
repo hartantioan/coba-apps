@@ -140,7 +140,9 @@ class NotificationController extends Controller
             $row['time'] = $row->getTimeAgo();
             $arrnotif[] = $row;
             $arrlink[] = $rootUrl.'/admin/'.$row->getURL().'?code='.CustomHelper::encrypt($row->lookable->code ?? '');
+           
         }
+        
 
         $response = [
             'status'            => 200,

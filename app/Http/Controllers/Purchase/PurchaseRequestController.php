@@ -1879,6 +1879,7 @@ class PurchaseRequestController extends Controller
 
     public function printByRange(Request $request){
         $currentDateTime = Date::now();
+        $etNumbersArray = explode(',', $request->tabledata);
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($request->type_date == 1){
             $validation = Validator::make($request->all(), [
@@ -1911,7 +1912,8 @@ class PurchaseRequestController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = PurchaseRequest::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $query = PurchaseRequest::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
+                        info($nomor);
                         if($query){
                             $data = [
                                 'title'     => 'Print Purchase Request',
@@ -1979,7 +1981,7 @@ class PurchaseRequestController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = PurchaseRequest::where('Code', 'LIKE', '%'.$code)->first();
+                        $query = PurchaseRequest::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
                                 'title'     => 'Print Purchase Request',

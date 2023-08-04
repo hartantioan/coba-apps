@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+use App\Imports\ImportEmployeeSchedule;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -19,6 +20,7 @@ use App\Models\Department;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportShift;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class ShiftController extends Controller
 {
@@ -136,22 +138,25 @@ class ShiftController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'name'                      => 'required',
-            'place_id'                  => 'required',
-            'department_id'             => 'required',
-            'min_time_in'               => 'required',
-            'time_in'                   => 'required',
-            'time_out'                  => 'required',
-            'max_time_out'              => 'required',
+            'name'           => 'required',
+            'place_id'       => 'required',
+            'department_id'  => 'required',
+            'min_time_in'    => 'required',
+            'time_in'        => 'required',
+            'time_out'       => 'required',
+            'max_time_out'   => 'required',
+            
         ], [
-            'name.required'                 => 'Nama Shift tidak boleh kosong.',
-            'place_id.required'             => 'Plant tidak boleh kosong.',
-            'department_id.required'        => 'Departemen tidak boleh kosong',
-            'minimum_time_in.required'      => 'Minimum jam masuk tidak boleh kosong',
-            'time_in.required'              => 'Jam masuk tidak boleh kosong',
-            'time_out.required'             => 'Jam pulang tidak boleh kosong',
-            'max_time_out.required'         => 'Maksimum jam pulang tidak boleh kosong'
+            'name.required'          => 'Nama Shift tidak boleh kosong.',
+            'place_id.required'      => 'Plant tidak boleh kosong.',
+            'department_id.required' => 'Departemen tidak boleh kosong',
+            'min_time_in.required'   => 'Minimum jam masuk tidak boleh kosong',
+            'time_in.required'       => 'Jam masuk tidak boleh kosong',
+            'time_out.required'      => 'Jam pulang tidak boleh kosong',
+            'max_time_out.required'  => 'Maksimum jam pulang tidak boleh kosong',
+            
         ]);
+        
 
         if($validation->fails()) {
             $response = [
@@ -163,6 +168,21 @@ class ShiftController extends Controller
             $min_time_in = strtotime($request->min_time_in);
             $time_out = strtotime($request->time_out);
             $max_time_out = strtotime($request->max_time_out);
+            
+            $stime_in = date('H:i', strtotime($request->time_in));
+            $stime_out = date('H:i', strtotime($request->time_out));
+            $code = $stime_in . ' - ' . $stime_out;
+
+            // Check if the code already exists in the database
+            $existingCode = DB::table('shifts')->where('code', $code)->first();
+            if ($existingCode) {
+                $kambing["kambing"][]="Jam Masuk dan Keluar Telah dipakai di shift lain.";
+                return response()->json([
+                    'status' => 422,
+                    'error'  => $kambing
+                ]); 
+                
+            } 
 
             if($time_in < $min_time_in){
                 return response()->json([
@@ -202,8 +222,11 @@ class ShiftController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $time_in = date('H:i', strtotime($request->time_in));
+                    $time_out = date('H:i', strtotime($request->time_out));
+                    $code = $time_in . ' - ' . $time_out;
                     $query = Shift::create([
-                        'code'              => Shift::generateCode(),
+                        'code'              => $code,
                         'name'			    => $request->name,
                         'user_id'           => session('bo_id'),
                         'place_id'          => $request->place_id,
@@ -214,11 +237,11 @@ class ShiftController extends Controller
                         'max_time_out'      => $request->max_time_out,
                         'status'            => $request->status ? $request->status : '2',
                     ]);
-
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 }
+                  
 			}
 			
 			if($query) {               
@@ -253,6 +276,8 @@ class ShiftController extends Controller
         
 		return response()->json($shift);
     }
+
+    
 
     public function destroy(Request $request){
         $query = Shift::find($request->id);

@@ -13,6 +13,7 @@ use App\Models\Capitalization;
 use App\Models\CloseBill;
 use App\Models\Coa;
 use App\Models\Depreciation;
+use App\Models\EmployeeTransfer;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\GoodReceiptDetail;
@@ -61,6 +62,37 @@ class CustomHelper {
 	public static function decrypt($string){
 		$val = base64_decode(str_replace('-','',strrev($string)));
 		return $val;
+	}
+
+	public static function updateEmployeeTransfer($transfer){
+		DB::beginTransaction();
+		if(in_array($transfer->status,['2','3'])){
+			$query = User::find($transfer->account_id);
+			$query->place_id         = $transfer->plant_id;
+			$query->manager_id               = $transfer->manager_id;
+			$query->department_id         = $transfer->department_id;
+			$query->position_id               = $transfer->position_id;
+			$query->save();
+			DB::commit();
+		}
+	}
+
+	public static function revertBackEmployeeTransfer($transfer){
+		DB::beginTransaction();
+		if(in_array($transfer->status,['4','5'])){
+			$latestTransfer = EmployeeTransfer::whereIn('status', [3, 2])
+						->where('account_id', $transfer->account_id)
+						->latest('created_at')
+						->first();
+			
+			$query = User::find($transfer->account_id);
+			$query->place_id         	  = $latestTransfer->plant_id;
+			$query->manager_id            = $latestTransfer->manager_id;
+			$query->department_id         = $latestTransfer->department_id;
+			$query->position_id           = $latestTransfer->position_id;
+			$query->save();
+			DB::commit();
+		}
 	}
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null){
@@ -1674,7 +1706,12 @@ class CustomHelper {
 					}
 				}
 			}
-		}/* else{
+		}elseif($table_name == 'employee_transfers'){
+			$transfer = EmployeeTransfer::find($table_id);
+
+			self::updateEmployeeTransfer($transfer);
+		}
+		/* else{
 
 			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
 				$query->where('table_name',$table_name);

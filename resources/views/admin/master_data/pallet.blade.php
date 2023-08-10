@@ -5,18 +5,20 @@
             <!-- Search for small screen-->
             <div class="container">
                 <div class="row">
-                    <div class="col s12 m6 l6">
+                    <div class="col s8 m6 l6">
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
-                    </div>
-                    <div class="col s12 m6 l6 right-align-md">
                         <ol class="breadcrumbs mb-0">
                             <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
                             </li>
-                            <li class="breadcrumb-item"><a href="#">{{ Str::ucfirst(Request::segment(2)) }}</a>
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(2))) }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ Str::ucfirst(Request::segment(3)) }}
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(3))) }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(4))) }}
                             </li>
                         </ol>
+                    </div>
+                    <div class="col s4 m6 l6">
                     </div>
                 </div>
             </div>
@@ -43,25 +45,18 @@
                             </div>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Menu</h4>
+                                    <h4 class="card-title">List Data</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
-                                            <table id="datatable_serverside" class="display nowrap">
+                                            <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
+                                                        <th>Code</th>
                                                         <th>Nama</th>
-                                                        <th>Url</th>
-                                                        <th>Icon</th>
-                                                        <th>Tabel DB</th>
-                                                        <th>Parent</th>
-                                                        <th>Urutan</th>
+                                                        <th>Harga per Satuan Jual</th>
                                                         <th>Status</th>
-                                                        <th>Maintenance</th>
-                                                        <th>Whitelist</th>
-                                                        <th>Baru</th>
-                                                        <th>Hak Akses</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -80,11 +75,11 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="min-height: 80%;">
+<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Menu</h4>
+                <h4>Tambah/Edit {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -92,67 +87,16 @@
                     <div class="col s12">
                         <div class="input-field col s6">
                             <input type="hidden" id="temp" name="temp">
+                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <label class="active" for="code">Kode</label>
+                        </div>
+                        <div class="input-field col s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s6">
-                            <input id="url" name="url" type="text" placeholder="Nama Url">
-                            <label class="active" for="url">Url</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <select class="select2 browser-default" id="parent_id" name="parent_id">
-                                <option value="">Parent (Utama)</option>
-                                @foreach($menus as $m)
-                                    <option value="{{ $m->id }}">{{ $m->name.' '.$m->url }}</option>
-                                    @foreach($m->sub as $m2)
-                                        <option value="{{ $m2->id }}"> - {{ $m2->name.' '.$m2->url }}</option>
-                                        @foreach($m2->sub as $m3)
-                                            <option value="{{ $m3->id }}"> - - {{ $m3->name.' '.$m3->url }}</option>
-                                            @foreach($m3->sub as $m4)
-                                                <option value="{{ $m4->id }}"> - - - {{ $m4->name.' '.$m4->url }}</option>
-                                            @endforeach
-                                        @endforeach
-                                    @endforeach
-                                @endforeach
-                            </select>
-                            <label class="active" for="parent_id">Parent Menu</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="icon" name="icon" type="text" placeholder="Icon">
-                            <label class="active" for="icon">Icon</label>
-                            <a target="_blank" href="https://fonts.google.com/icons">Lihat list icon</a>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="table_name" name="table_name" type="text" placeholder="Tabel DB (Jika ada)">
-                            <label class="active" for="table_name">Tabel DB (Jika ada)</label>
-                            <a style="color:red;">*Hati-hati. Akan menentukan approval setiap menu/form nantinya.</a>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="order" name="order" type="number" value="0" step="1" placeholder="Nomor urut">
-                            <label class="active" for="order">Urutan</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <div class="switch mb-1">
-                                <label for="maintenance">Maintenance</label>
-                                <label>
-                                    Tidak
-                                    <input checked type="checkbox" id="maintenance" name="maintenance" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
-                            <input id="whitelist" name="whitelist" type="text" placeholder="Whitelist IP, jika > 1 pisahkan koma (,)" style="display:none;">
-                        </div>
-                        <div class="input-field col s6">
-                            <div class="switch mb-1">
-                                <label for="new">Menu Baru?</label>
-                                <label>
-                                    Tidak
-                                    <input checked type="checkbox" id="new" name="new" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
+                            <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this);">
+                            <label class="active" for="nominal">Harga per satuan Jual</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -187,49 +131,33 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
-        $(".select2").select2({
-            dropdownAutoWidth: true,
-            width: '100%',
-        });
         loadDataTable();
+        
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
                 
             },
-            onOpenEnd: function(modal, trigger) {
-                $('#name').focus();
+            onOpenEnd: function(modal, trigger) { 
+                $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
-                if($('#maintenance').is(':checked')){
-                    $('#whitelist').show();
-                }else{
-                    $('#whitelist').hide();
-                }
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#parent_id').val('').trigger('change');
                 M.updateTextFields();
             }
         });
-        $('#maintenance').click(function(){
-            if($(this).is(':checked')){
-                $('#whitelist').show();
-            }else{
-                $('#whitelist').hide();
-            }
-        });
+
     });
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
             "scrollY": '400px',
-            "responsive": false,
-            "scrollX": true,
+            "responsive": true,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -258,18 +186,11 @@
                 }
             },
             columns: [
-                { name: 'id', searchable: false, className: 'center-align' },
+                { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'url', className: 'center-align' },
-                { name: 'icon', orderable: false},
-                { name: 'table_name', className: 'center-align' },
-                { name: 'parent', orderable: false, className: 'center-align' },
-                { name: 'order', className: 'center-align' },
+                { name: 'nominal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'maintenance', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'whitelist', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'new', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'crud', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -278,7 +199,6 @@
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -305,12 +225,6 @@
             success: function(response) {
                 loadingClose('.modal-content');
                 if(response.status == 200) {
-                    $('#parent_id').empty();
-
-                    $.each(response.data, function(i, val) {
-                        $('#parent_id').append(val);
-                    });
-
                     success();
                     M.toast({
                         html: response.message
@@ -355,16 +269,11 @@
                 });
             }
         });
-        
     }
 
     function success(){
-        /* $('#form_data')[0].reset();
-        $('#temp').val('');
-        $('#name').focus();
         loadDataTable();
-        $('#modal1').modal('close'); */
-        location.reload();
+        $('#modal1').modal('close');
     }
 
     function show(id){
@@ -385,32 +294,16 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#url').val(response.url);
-                $('#icon').val(response.icon);
-                $('#table_name').val(response.table_name);
-                $('#order').val(response.order);
-                $('#parent_id').val(response.parent_id).trigger('change');
+                $('#nominal').val(response.nominal);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
                 }
-                if(response.is_maintenance == '1'){
-                    $('#maintenance').prop( "checked", true);
-                    $('#whitelist').show();
-                    $('#whitelist').val(response.whitelist);
-                }else{
-                    $('#maintenance').prop( "checked", false);
-                }
-                if(response.is_new == '1'){
-                    $('#new').prop( "checked", true);
-                }else{
-                    $('#new').prop( "checked", false);
-                }
                 $('.modal-content').scrollTop(0);
-                $('#name').focus();
-
+                $('#code').focus();
                 M.updateTextFields();
             },
             error: function() {

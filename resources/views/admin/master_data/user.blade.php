@@ -284,8 +284,9 @@
                         </div>
                         <div class="col s12 mt-3">
                             <ul class="tabs">
-                                <li class="tab col m6"><a class="active" href="#rekform">Rekening</a></li>
-                                <li class="tab col m6"><a href="#dataform">Info Tambahan</a></li>
+                                <li class="tab col m4"><a class="active" href="#rekform">Rekening</a></li>
+                                <li class="tab col m4"><a href="#dataform">Info Tambahan</a></li>
+                                <li class="tab col m4 other_inputs" style="display:none;""><a href="#driverform">Daftar Supir</a></li>
                             </ul>
                             <div id="rekform" class="col s12 active">
                                 <h5 class="center">Daftar Rekening</h5>
@@ -335,7 +336,30 @@
                                         </tbody>
                                     </table>
                                 </p>
-                            </div>                      
+                            </div>
+                            <div id="driverform" class="col s12">
+                                <h5 class="center">Daftar Supir</h5>
+                                <p class="mt-2 mb-2">
+                                    <table class="bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30%" class="center">Nama</th>
+                                                <th width="60%" class="center">No HP/WA</th>
+                                                <th width="10%" class="center">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-driver">
+                                            <tr id="last-row-driver">
+                                                <td colspan="3" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDriver()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Supir
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+                            </div>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -801,6 +825,7 @@
                 M.updateTextFields();
                 $('.row_bank').remove();
                 $('.row_info').remove();
+                $('.row_driver').remove();
                 refreshGroup();
                 $('#subdistrict_id').empty().append(`
                     <option value="">--Pilih ya--</option>
@@ -876,6 +901,10 @@
         });
 
         $('#body-info').on('click', '.delete-data-info', function() {
+            $(this).closest('tr').remove();
+        });
+
+        $('#body-driver').on('click', '.delete-data-driver', function() {
             $(this).closest('tr').remove();
         });
 
@@ -1354,6 +1383,24 @@
         `);
     }
 
+    function addDriver(){
+        $('#last-row-driver').before(`
+            <tr class="row_driver">
+                <td>
+                    <input name="arr_driver_name[]" type="text" placeholder="Nama supir...">
+                </td>
+                <td class="center">
+                    <input name="arr_driver_hp[]" type="text" placeholder="Ex: 081333313123">
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-driver" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+    }
+
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
@@ -1650,11 +1697,32 @@
                     });
                 }
 
+                if(response.drivers.length > 0){
+                    $.each(response.drivers , function(i, val) {
+                        $('#last-row-driver').before(`
+                            <tr class="row_driver">
+                                <td>
+                                    <input name="arr_driver_name[]" type="text" placeholder="Nama supir..." value="` + val.name + `">
+                                </td>
+                                <td class="center">
+                                    <input name="arr_driver_hp[]" type="text" placeholder="Ex: 081333313123" value="` + val.hp + `">
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-driver" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
                 }
+
                 $('.modal-content').scrollTop(0);
                 $('#name').focus();
                 

@@ -144,6 +144,10 @@ class MarketingOrder extends Model
         return $this->hasMany('App\Models\MarketingOrderDetail');
     }
 
+    public function marketingOrderDelivery(){
+        return $this->hasMany('App\Models\MarketingOrderDelivery','marketing_order_id','id')->whereIn('status',['2','3']);
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
@@ -239,8 +243,28 @@ class MarketingOrder extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        //logic here
+        if($this->marketingOrderDelivery()->exists()){
+            $hasRelation = true;
+        }
+
+        foreach($this->marketingOrderDetail as $row){
+            if($this->marketingOrderDeliveryDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
 
         return $hasRelation;
+    }
+
+    public function hasBalanceMod(){
+        $passed = false;
+
+        foreach($this->marketingOrderDetail as $row){
+            if($row->balanceQtyMod() > 0){
+                $passed = true;
+            }
+        }
+
+        return $passed;
     }
 }

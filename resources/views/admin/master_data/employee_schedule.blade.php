@@ -1,8 +1,8 @@
 <script src="{{ url('app-assets/js/dropzone.min.js') }}"></script>
 <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
-<link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/fullcalendar/css/fullcalendar.min.css">
-<link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/fullcalendar/daygrid/daygrid.min.css">
-<link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/fullcalendar/timegrid/timegrid.min.css">
+<link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/fullcalendar/css/fullcalendar.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/fullcalendar/daygrid/daygrid.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/fullcalendar/timegrid/timegrid.min.css') }}">
 
 <style>
     .fc-content{
@@ -133,7 +133,7 @@
                 <form class="row" id="kambing" onsubmit="return false;">
                     <ul class="tabs">
                         <li class="tab">
-                            <a href="#single-tabs" class="" id="part-tabs-btn">
+                            <a href="#single-tabs1" class="" id="part-tabs-btn">
                             <span>Single</span>
                             </a>
                         </li>
@@ -142,7 +142,7 @@
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
-                    <div id="single-tabs" style="display: block;" class="">                           
+                    <div id="single-tabs1" style="display: block;" class="">                           
                         <div class="row ml-2 mt-2">
                             
                             <div class="col s12">
@@ -452,29 +452,22 @@
             },
             editable: true,
             plugins: ["dayGrid", "timeGrid", "interaction"],
-            droppable: true, // this allows things to be dropped onto the calendar
+            droppable: true,
             drop: function (info) {
                 if (checkbox.checked) {
-                    // if so, remove the element from the "Draggable Events" list
                     info.draggedEl.parentNode.removeChild(info.draggedEl);
                 }
             }
         });
-        // initialize the external events
-        // ----------------------------------------------------------------
-        
-        //   var colorData;
         $('#external-events .fc-event').each(function () {
-            // Different colors for events
             $(this).css({ 'backgroundColor': $(this).data('color'), 'borderColor': $(this).data('color') });
         });
         var colorData;
         var id;
         $('#external-events .fc-event').mousemove(function () {
             colorData = $(this).data('color');
+        });
 
-        })
-        // Draggable event init
         new Draggable(containerEl, {
             itemSelector: '.fc-event',
             eventData: function (eventEl) {
@@ -511,8 +504,6 @@
             onCloseEnd: function(modal, trigger){
                 $('fc-events-container').empty();
                 calendar.removeAllEvents();
-
-                // Rerender the calendar to display the new events
                 calendar.render();
                 $('#form_data')[0].reset();
                 $('#temp').val('');
@@ -527,6 +518,7 @@
         });
 
         $('#modal3').modal({
+            dismissible: false,
             onOpenStart: function(modal,trigger) {
                 
             },
@@ -726,7 +718,7 @@
         
         
             employee_shift.push({
-                'start_date': startDate.toISOString(),// Convert dates to ISO format for easier handling in PHP
+                'start_date': startDate.toISOString(),
                 'end_date': endDate.toISOString(),
                 'shift_id': event.id,
             });

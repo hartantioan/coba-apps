@@ -52,6 +52,22 @@ class MarketingOrderDetail extends Model
         return $this->belongsTo('App\Models\MarketingOrder', 'marketing_order_id', 'id')->withTrashed();
     }
 
+    public function marketingOrderDeliveryDetail(){
+        return $this->hasMany('App\Models\MarketingOrderDeliveryDetail','marketing_order_detail_id','id')->whereHas('marketingOrderDelivery',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balanceQtyMod(){
+        $qty = $this->qty;
+
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $qty -= $row->qty;
+        }
+
+        return $qty;
+    }
+
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }

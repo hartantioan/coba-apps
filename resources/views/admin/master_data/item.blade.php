@@ -3,12 +3,20 @@
         height: auto !important;
     }
 
+    .select-wrapper, .select2-container {
+        height:3.6rem !important;
+    }
+
     table > thead > tr > th {
         font-size: 13px !important;
     }
 
     table.bordered th {
         padding: 5px !important;
+    }
+
+    .modal {
+        top:0px !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -125,11 +133,11 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:70%;">
+<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:100%;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>import Excel</h4>
+                <h4>Import Excel</h4>
                 <div class="col s12">
                     <div id="validation_alertImport" style="display:none;"></div>
                 </div>
@@ -137,7 +145,7 @@
                     @csrf
                     <div class="file-field input-field col m6 s12">
                         <div class="btn">
-                            <span>Dokumen PO</span>
+                            <span>Dokumen Excel</span>
                             <input type="file" class="form-control-file" id="fileExcel" name="file">
                         </div>
                         <div class="file-path-wrapper">
@@ -159,7 +167,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:70%;">
+<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;max-width:100%;min-width:100%;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -259,8 +267,16 @@
                                     </select>
                                     <label class="active" for="sell_unit">Satuan Jual</label>
                                 </div>
+                                <div class="input-field col s12">
+                                    <select class="select2 browser-default" id="pallet_unit" name="pallet_unit">
+                                        @foreach ($pallet as $row)
+                                            <option value="{{ $row->id }}">{{ $row->name.' - '.$row->code }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="active" for="pallet_unit">Satuan Pallet</label>
+                                </div>
                             </div>
-                            <div class="col s4">
+                            <div class="col s4 row">
                                 <div class="input-field col s12">
                                     <input id="buy_convert" name="buy_convert" type="text" placeholder="Ex: 1 SAK Beli = *50* KG Stok" onkeyup="formatRupiah(this);">
                                     <label class="active" for="buy_convert">Konversi Satuan Beli ke Stok</label>
@@ -268,6 +284,10 @@
                                 <div class="input-field col s12">
                                     <input id="sell_convert" name="sell_convert" type="text" placeholder="Ex: 1 Truk Jual = *100* KG Stok" onkeyup="formatRupiah(this);">
                                     <label class="active" for="sell_convert">Konversi Satuan Jual ke Stok</label>
+                                </div>
+                                <div class="input-field col s12">
+                                    <input id="pallet_convert" name="pallet_convert" type="text" placeholder="Ex: 1 Pallet Kayu = *50* Box Keramik" onkeyup="formatRupiah(this);">
+                                    <label class="active" for="pallet_convert">Konversi Pallet ke Satuan Jual</label>
                                 </div>
                             </div>
                             <div class="col s4">
@@ -353,13 +373,14 @@
 
 <!-- END: Page Main-->
 <script>
+    var selected = [];
+    
     $(function() {
+        
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',
         });
-
-        
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
@@ -529,7 +550,43 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
+
+        $('#datatable_serverside tbody').on('click', 'tr', function () {
+            var poin = $(this).find('td:nth-child(2)').text().trim();
+            var index = $.inArray(poin, selected);
+            if ( index === -1 ) {
+                selected.push(poin);
+            } else {
+                selected.splice( index, 1 );
+            }
+        });
+
+        $('.buttons-select-all[aria-controls="datatable_serverside"]').on('click', function (e) {
+            selectDeselectRow();
+        });
+        
+        $('.buttons-select-none[aria-controls="datatable_serverside"]').on('click', function (e) {
+            selectDeselectRow();
+        });
     });
+
+    function selectDeselectRow(){
+        $.map(window.table.rows().nodes(), function (item) {
+            if($(item).hasClass('selected')){
+                var poin = $(item).find('td:nth-child(2)').text().trim();
+                var index = $.inArray(poin, selected);
+                if ( index === -1 ) {
+                    selected.push(poin);
+                }
+            }else{
+                var poinkuy = $(item).find('td:nth-child(2)').text().trim();
+                var indexkuy = $.inArray(poinkuy, selected);
+                if ( indexkuy >= 0 ) {
+                    selected.splice( indexkuy, 1 );
+                }
+            }
+        });
+    }
 
     function rowDetail(data) {
         $.ajax({
@@ -629,6 +686,11 @@
             select: {
                 style: 'multi'
             },
+            "rowCallback": function( row, data ) {
+                if ( $.inArray(data[1], selected) !== -1 ) {
+                    this.api().row(row).select();
+                }
+            }
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
@@ -747,6 +809,8 @@
                 $('#buy_convert').val(response.buy_convert);
                 $('#sell_unit').val(response.sell_unit).trigger('change');
                 $('#sell_convert').val(response.sell_convert);
+                $('#pallet_unit').val(response.pallet_unit).trigger('change');
+                $('#pallet_convert').val(response.pallet_convert);
                 $('#warehouse_id').val(response.warehouses).trigger('change');
                 $('#tolerance_gr').val(response.tolerance_gr);
 
@@ -855,10 +919,9 @@
 
         var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         arr_id_temp=[];
-
-        $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(2)').text().trim();
-            arr_id_temp.push(poin);
+        
+        $.map(selected, function (item) {
+            arr_id_temp.push(item);
         });
         
         if(arr_id_temp.length > 0){
@@ -880,8 +943,6 @@
                         'type': 'INVOICE',
                         'url': response.message
                     })
-                    
-                
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
@@ -906,9 +967,8 @@
         
         var arr_id_temp = [];
 
-        $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(2)').text().trim();
-            arr_id_temp.push(poin);
+        $.map(selected, function (item) {
+            arr_id_temp.push(item);
         });
 
         if(arr_id_temp.length > 0){
@@ -923,9 +983,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
-                    loadingOpen('.modal-content');
+                    loadingOpen('#main');
                 },
                 success: function(response) {
+                    loadingClose('#main');
                     printService.submit({
                         'type': 'INVOICE',
                         'url': response.message
@@ -933,7 +994,7 @@
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
+                    loadingClose('#main');
                     swal({
                         title: 'Ups!',
                         text: 'Check your internet connection.',

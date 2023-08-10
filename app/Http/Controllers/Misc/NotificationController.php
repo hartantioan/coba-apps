@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Misc;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChangeLog;
 use App\Models\Chat;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -125,6 +126,7 @@ class NotificationController extends Controller
 
         $notifs = Notification::where('to_user_id',session('bo_id'))->orderByDesc('id')->limit(5)->get()->sortBy('id');
         $notifnew = count($notifs->where('status','1'));
+        $version = ChangeLog::where('status','1')->orderByDesc('id')->first();
 
         $user = User::find(session('bo_id'));
 
@@ -152,6 +154,7 @@ class NotificationController extends Controller
             'notif_count'       => $notifnew,
             'approval_count'    => $approvals,
             'need_change_pass'  => $user->needChangePassword() ? '1' : '',
+            'version'           => $version ? $version->version : '...',
             'unread_chats'      => $unreadchat > 0 ? 'Anda memiliki '.$unreadchat.' percakapan yang baru dan belum dibaca.' : '',
         ];
         

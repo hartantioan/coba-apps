@@ -135,7 +135,7 @@
             }
 
             @page { margin: 5em 3em 6em 3em; }
-            header { position: fixed; top: -80px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+            header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
         
            

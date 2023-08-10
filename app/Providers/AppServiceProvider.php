@@ -64,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
             'maintenance_hardware_items_usages'     => 'App\Models\MaintenanceHardwareItemsUsage',
             'employee_transfers'                    => 'App\Models\EmployeeTransfer',
             'marketing_orders'                      => 'App\Models\MarketingOrder',
+            'marketing_order_deliveries'            => 'App\Models\MarketingOrderDelivery',
         ]);
     }
 }

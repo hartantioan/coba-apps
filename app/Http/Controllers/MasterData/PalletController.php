@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
+use App\Models\Pallet;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
 
-class UnitController extends Controller
+class PalletController extends Controller
 {
     public function index()
     {
         $data = [
-            'title'     => 'Satuan',
-            'content'   => 'admin.master_data.unit',
+            'title'     => 'Pallet',
+            'content'   => 'admin.master_data.pallet',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -25,6 +25,7 @@ class UnitController extends Controller
             'id',
             'code',
             'name',
+            'nominal',
         ];
 
         $start  = $request->start;
@@ -33,9 +34,9 @@ class UnitController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Unit::count();
+        $total_data = Pallet::count();
         
-        $query_data = Unit::where(function($query) use ($search, $request) {
+        $query_data = Pallet::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -52,7 +53,7 @@ class UnitController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = Unit::where(function($query) use ($search, $request) {
+        $total_filtered = Pallet::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -75,6 +76,7 @@ class UnitController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
+                    number_format($val->nominal,2,',','.'),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -101,7 +103,7 @@ class UnitController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('units', 'code')->ignore($request->temp)] : 'required|unique:units,code',
+            'code' 				=> $request->temp ? ['required', Rule::unique('pallets', 'code')->ignore($request->temp)] : 'required|unique:pallets,code',
             'name'              => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
@@ -118,9 +120,10 @@ class UnitController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = Unit::find($request->temp);
+                    $query = Pallet::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
+                    $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -130,9 +133,10 @@ class UnitController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = Unit::create([
+                    $query = Pallet::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,
+                        'nominal'       => str_replace(',','.',str_replace('.','',$request->nominal)),
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
@@ -144,10 +148,10 @@ class UnitController extends Controller
 			if($query) {
 
                 activity()
-                    ->performedOn(new Unit())
+                    ->performedOn(new Pallet())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit unit.');
+                    ->log('Add / edit pallet.');
 
 				$response = [
 					'status'  => 200,
@@ -165,20 +169,21 @@ class UnitController extends Controller
     }
 
     public function show(Request $request){
-        $unit = Unit::find($request->id);
+        $pl = Pallet::find($request->id);
+        $pl['nominal'] = number_format($pl->nominal,2,',','.');
         				
-		return response()->json($unit);
+		return response()->json($pl);
     }
 
     public function destroy(Request $request){
-        $query = Unit::find($request->id);
+        $query = Pallet::find($request->id);
 		
         if($query->delete()) {
             activity()
-                ->performedOn(new Unit())
+                ->performedOn(new Pallet())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the unit data');
+                ->log('Delete the pallet data');
 
             $response = [
                 'status'  => 200,

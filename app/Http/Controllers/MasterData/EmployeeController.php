@@ -57,7 +57,7 @@ class EmployeeController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = User::count();
+        $total_data = User::where('type','1')->count();
         
         $query_data = User::where(function($query) use ($search, $request) {
                 if($search) {
@@ -73,11 +73,8 @@ class EmployeeController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                if($request->type){
-                    $query->where('type', $request->type);
-                }
             })
+            ->where('type','1')
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -97,11 +94,8 @@ class EmployeeController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
-
-                if($request->type){
-                    $query->where('type', $request->type);
-                }
             })
+            ->where('type','1')
             ->count();
 
         $response['data'] = [];

@@ -31,36 +31,6 @@ class MenuController extends Controller
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
-
-        /* $start_time = microtime(true);
-        
-        $menu = Menu::where('status','1')->get();
-
-        $arrResult = [];
-
-        foreach($menu as $row){
-            $arrResult[] = [
-                'id'        => $row->id,
-                'order'     => $row->order,
-                'name'      => $row->name,
-                'parent_id' => $row->parent_id ? $row->parent_id : 0,
-            ];
-        }
-
-        $res = [];
- 
-        foreach($arrResult as $e){
-            $this->addToArr($res, $e);
-        }
-
-        $key_values = array_column($res, 'order'); 
-        array_multisort($key_values, SORT_ASC, $res);
-
-        $end_time = microtime(true);
-        
-        $execution_time = ($end_time - $start_time);
-            
-        echo json_encode($res).' - '.$execution_time; */
     }
 
     function addToArr(&$arr, $data){
@@ -167,6 +137,7 @@ class MenuController extends Controller
                     $val->order,
                     $val->status(),
                     $val->isMaintenance(),
+                    $val->whitelist,
                     $val->isNew(),
                     !$val->sub()->exists() ?
                     '
@@ -198,15 +169,17 @@ class MenuController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
 			'name' 				=> 'required',
-			'url'			    =>  $request->temp ? ['required', Rule::unique('menus', 'url')->ignore($request->temp)] : 'required|unique:menus,url',
+			'url'			    => $request->temp ? ['required', Rule::unique('menus', 'url')->ignore($request->temp)] : 'required|unique:menus,url',
 			'icon'		        => 'required',
 			'order'		        => 'required',
+            'whitelist'         => $request->maintenance ? 'required' : '',
 		], [
 			'name.required' 					=> 'Nama menu tidak boleh kosong.',
 			'url.required' 					    => 'Url tidak boleh kosong.',
             'url.unique'                        => 'Url telah terpakai',
 			'icon.required'			            => 'Icon tidak boleh kosong.',
-			'order.required'				    => 'Urutan tidak boleh kosong',
+			'order.required'				    => 'Urutan tidak boleh kosong.',
+            'whitelist.required'                => 'Whitelist IP tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {
@@ -293,6 +266,7 @@ class MenuController extends Controller
                     $query->status = $request->status ? $request->status : '2';
                     $query->is_maintenance = $request->maintenance ? $request->maintenance : NULL;
                     $query->is_new = $request->new ? $request->new : NULL;
+                    $query->whitelist = $request->maintenance ? $request->whitelist : NULL;
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -323,7 +297,8 @@ class MenuController extends Controller
                         'order'             => $request->order,
                         'status'            => $request->status ? $request->status : '2',
                         'is_maintenance'    => $request->maintenance ? $request->maintenance : NULL,
-                        'is_new'            => $request->new ? $request->new : NULL
+                        'is_new'            => $request->new ? $request->new : NULL,
+                        'whitelist'         => $request->maintenance ? $request->whitelist : NULL,
                     ]);
                     
                     DB::commit();

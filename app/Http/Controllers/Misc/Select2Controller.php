@@ -15,6 +15,7 @@ use App\Models\HardwareItemGroup;
 use App\Models\InventoryTransferOut;
 use App\Models\ItemStock;
 use App\Models\Line;
+use App\Models\MarketingOrder;
 use App\Models\Menu;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
@@ -43,12 +44,13 @@ use Illuminate\Support\Facades\DB;
 
 class Select2Controller extends Controller {
     
-    protected $dataplaces, $datawarehouses;
+    protected $dataplaces, $dataplacecode, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
     
@@ -330,7 +332,7 @@ class Select2Controller extends Controller {
                 'uom'               => $d->uomUnit->code,
                 'sell_unit'         => $d->sellUnit->code,
                 'old_prices'        => $d->oldPrices($this->dataplaces),
-                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'stock_list'        => $d->currentStockSales($this->dataplaces,$this->datawarehouses),
             ];
         }
 
@@ -1536,6 +1538,59 @@ class Select2Controller extends Controller {
                 'text' 			=> $d->code.' - '.$d->name .'|'. $d->time_in.'-'.$d->time_out,
                 'data'          => $d
             ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function place(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Place::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('name','like',"%$search%");
+        })
+        ->whereIn('id',$this->dataplaces)
+        ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrder(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = MarketingOrder::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('note','like',"%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhereHas('account',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            if($d->hasBalanceMod()){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code,
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);

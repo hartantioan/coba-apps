@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Models\Company;
+use App\Models\UserDriver;
 use App\Models\UserPlace;
 use App\Models\UserWarehouse;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -250,6 +251,7 @@ class UserController extends Controller
 
         $banks = [];
         $infos = [];
+        $drivers = [];
 
         foreach($data->userBank as $row){
             $banks[] = $row->bank->name.' No. rek '.$row->no.' Cab. '.$row->branch.' '.$row->isDefault();
@@ -257,6 +259,10 @@ class UserController extends Controller
 
         foreach($data->userData as $row){
             $infos[] = $row->title.' '.$row->content;
+        }
+
+        foreach($data->userDriver as $row){
+            $drivers[] = $row->name.' '.$row->hp;
         }
 
         $string = '<table>
@@ -372,6 +378,10 @@ class UserController extends Controller
                             <tr>
                                 <th>Info Tambahan</th>
                                 <th>'.implode('<br>',$infos).'</th>
+                            </tr>
+                            <tr>
+                                <th>Daftar Supir</th>
+                                <th>'.implode('<br>',$drivers).'</th>
                             </tr>
                             <tr>
                                 <th>Kelompok</th>
@@ -503,7 +513,6 @@ class UserController extends Controller
                     $query->id_card         = $request->id_card ? $request->id_card : NULL;
                     $query->id_card_address = $request->id_card_address;
                     $query->company_id	    = $request->company_id ? $request->company_id : NULL;
-                   
                     $query->province_id     = $request->province_id;
                     $query->city_id         = $request->city_id;
                     $query->subdistrict_id  = $request->subdistrict_id;
@@ -526,6 +535,7 @@ class UserController extends Controller
 
                     $query->userBank()->delete();
                     $query->userData()->delete();
+                    $query->userDriver()->delete();
 
                     DB::commit();
                 }catch(\Exception $e){
@@ -548,7 +558,6 @@ class UserController extends Controller
                         'id_card_address'       => $request->id_card_address,
                         'company_id'	        => $request->company_id ? $request->company_id : NULL,
                         'place_id'	            => $request->place_id ? $request->place_id : NULL,
-                        
                         'city_id'               => $request->city_id,
                         'subdistrict_id'        => $request->subdistrict_id,
                         'tax_id'                => $request->tax_id,
@@ -597,6 +606,16 @@ class UserController extends Controller
                             'user_id'	    => $query->id,
                             'title'         => $row,
                             'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL
+                        ]);
+                    }
+                }
+
+                if($request->arr_driver_name){
+                    foreach($request->arr_driver_name as $key => $row){
+                        UserDriver::create([
+                            'user_id'	    => $query->id,
+                            'name'          => $row,
+                            'hp'            => $request->arr_driver_hp[$key],
                         ]);
                     }
                 }
@@ -962,6 +981,17 @@ class UserController extends Controller
 		}
 		
 		$user['datas'] = $datas;
+
+        $drivers = [];
+
+        foreach($user->userDriver as $row){
+            $drivers[] = [
+                'name'  => $row->name,
+                'hp'    => $row->hp,
+            ];
+        }
+
+        $user['drivers'] = $drivers;
         				
 		return response()->json($user);
     }

@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/materialize.css?v=7') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/themes/vertical-modern-menu-template/style.css?v=7') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/dashboard-modern.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/intro.css?v=7') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/intro.css?v=8') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/data-tables.css?v=2') }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
     <!-- END: Page Level CSS-->

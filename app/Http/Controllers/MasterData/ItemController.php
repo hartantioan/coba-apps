@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Helpers\CustomHelper;
+use App\Models\Pallet;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -36,6 +37,7 @@ class ItemController extends Controller
             'group'     => ItemGroup::where('status','1')->get(),
             'unit'      => Unit::where('status','1')->get(),
             'warehouse' => Warehouse::where('status','1')->get(),
+            'pallet'    => Pallet::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -173,6 +175,8 @@ class ItemController extends Controller
             'buy_convert'       => 'required',
             'sell_unit'         => 'required',
             'sell_convert'      => 'required',
+            'pallet_unit'       => 'required',
+            'pallet_convert'    => 'required',
             'tolerance_gr'      => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
@@ -184,6 +188,8 @@ class ItemController extends Controller
             'buy_convert.required'      => 'Satuan konversi beli ke stok tidak boleh kosong.',
             'sell_unit.required'        => 'Satuan jual tidak boleh kosong.',
             'sell_convert.required'     => 'Satuan konversi jual ke stok tidak boleh kosong.',
+            'pallet_unit.required'      => 'Satuan pallet tidak boleh kosong.',
+            'pallet_convert.required'   => 'Satuan konversi pallet ke satuan jual tidak boleh kosong.',
             'tolerance_gr.required'     => 'Toleransi penerimaan barang tidak boleh kosong.',
         ]);
 
@@ -205,6 +211,8 @@ class ItemController extends Controller
                     $query->buy_convert         = str_replace(',','.',str_replace('.','',$request->buy_convert));
                     $query->sell_unit           = $request->sell_unit;
                     $query->sell_convert        = str_replace(',','.',str_replace('.','',$request->sell_convert));
+                    $query->pallet_unit         = $request->pallet_unit;
+                    $query->pallet_convert      = str_replace(',','.',str_replace('.','',$request->pallet_convert));
                     $query->tolerance_gr        = str_replace(',','.',str_replace('.','',$request->tolerance_gr));
                     $query->is_inventory_item   = $request->is_inventory_item ? $request->is_inventory_item : NULL;
                     $query->is_sales_item       = $request->is_sales_item ? $request->is_sales_item : NULL;
@@ -230,6 +238,8 @@ class ItemController extends Controller
                         'buy_convert'       => str_replace(',','.',str_replace('.','',$request->buy_convert)),
                         'sell_unit'         => $request->sell_unit,
                         'sell_convert'      => str_replace(',','.',str_replace('.','',$request->sell_convert)),
+                        'pallet_unit'       => $request->pallet_unit,
+                        'pallet_convert'    => str_replace(',','.',str_replace('.','',$request->pallet_convert)),
                         'tolerance_gr'      => str_replace(',','.',str_replace('.','',$request->tolerance_gr)),
                         'is_inventory_item' => $request->is_inventory_item ? $request->is_inventory_item : NULL,
                         'is_sales_item'     => $request->is_sales_item ? $request->is_sales_item : NULL,
@@ -290,6 +300,10 @@ class ItemController extends Controller
                                 <th>1 '.$data->sellUnit->code.' = '.number_format($data->sell_convert,3,',','.').' '.$data->uomUnit->code.'</th>
                             </tr>
                             <tr>
+                                <th>Konversi Pallet ke Satuan Jual</th>
+                                <th>1 '.$data->palletUnit->code.' = '.number_format($data->pallet_convert,3,',','.').' '.$data->sellUnit->code.'</th>
+                            </tr>
+                            <tr>
                                 <th>Item Stok</th>
                                 <th>'.($data->is_inventory_item ? '&#10003;' : '&#10005;').'</th>
                             </tr>
@@ -327,6 +341,7 @@ class ItemController extends Controller
         $item = Item::find($request->id);
         $item['buy_convert'] = number_format($item->buy_convert,3,',','.');
         $item['sell_convert'] = number_format($item->sell_convert,3,',','.');
+        $item['pallet_convert'] = number_format($item->pallet_convert,3,',','.');
         $item['tolerance_gr'] = number_format($item->tolerance_gr,2,',','.');
         				
 		return response()->json($item);

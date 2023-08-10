@@ -25,6 +25,7 @@ class Menu extends Model
         'status',
         'is_maintenance',
         'is_new',
+        'whitelist',
     ];
 
     public function sub()

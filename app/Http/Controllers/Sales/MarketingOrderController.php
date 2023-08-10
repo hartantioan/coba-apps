@@ -114,8 +114,6 @@ class MarketingOrderController extends Controller
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhere('rounding', 'like', "%$search%")
-                            ->orWhere('balance', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -192,8 +190,6 @@ class MarketingOrderController extends Controller
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhere('rounding', 'like', "%$search%")
-                            ->orWhere('balance', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -555,8 +551,8 @@ class MarketingOrderController extends Controller
                     DB::rollback();
                 }
 			}else{
-                /* DB::beginTransaction();
-                try { */
+                DB::beginTransaction();
+                try {
                     $query = MarketingOrder::create([
                         'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
@@ -594,10 +590,10 @@ class MarketingOrderController extends Controller
                         'status'                    => '1',
                     ]);
 
-                    /* DB::commit();
+                    DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                } */
+                }
 			}
 			
 			if($query) {
@@ -702,7 +698,7 @@ class MarketingOrderController extends Controller
                 'item_stock_id'         => $row->item_stock_id,
                 'item_stock_name'       => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code,
                 'item_stock_qty'        => number_format($row->itemStock->qty,3,',','.'),
-                'list_stock'            => $row->item->currentStock($this->dataplaces,$this->datawarehouses),
+                'list_stock'            => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'place_id'              => $row->place_id,
                 'warehouse_id'          => $row->warehouse_id,
             ];
@@ -1169,7 +1165,7 @@ class MarketingOrderController extends Controller
                         $query = MarketingOrder::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Purchase Order',
+                                'title'     => 'Print Sales Order',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';

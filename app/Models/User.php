@@ -195,6 +195,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\UserData');
     }
 
+    public function userDriver(){
+        return $this->hasMany('App\Models\UserDriver');
+    }
+
     public function defaultBank(){
         $bank = '';
 

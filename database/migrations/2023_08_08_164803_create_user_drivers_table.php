@@ -13,17 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('item_bottom_prices', function (Blueprint $table) {
+        Schema::create('user_drivers', function (Blueprint $table) {
             $table->id();
-            $table->string('code',50)->nullable();
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('item_id')->nullable();
-            $table->bigInteger('place_id')->nullable();
-            $table->double('nominal')->nullable();
+            $table->string('name',155)->nullable();
+            $table->string('hp',50)->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');
-
-            $table->index(['user_id','item_id','place_id']);
         });
     }
 
@@ -34,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('item_bottom_prices');
+        Schema::dropIfExists('user_drivers');
     }
 };

@@ -181,6 +181,7 @@ function cekNotif(url){
 				}
 
 				$('.notif-count').text(response.notif_count);
+				$('#version-app').text(response.version);
 				$('.approval-count').text(response.approval_count);
 				
 				if(response.notif_count > 0){

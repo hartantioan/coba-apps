@@ -23,6 +23,8 @@ class Item extends Model
         'buy_convert',
         'sell_unit',
         'sell_convert',
+        'pallet_unit',
+        'pallet_convert',
         'tolerance_gr',
         'is_inventory_item',
         'is_sales_item',
@@ -75,6 +77,10 @@ class Item extends Model
 
     public function buyUnit(){
         return $this->belongsTo('App\Models\Unit', 'buy_unit', 'id')->withTrashed();
+    }
+
+    public function palletUnit(){
+        return $this->belongsTo('App\Models\Pallet', 'pallet_unit', 'id')->withTrashed();
     }
     
     public function sellUnit(){
@@ -169,6 +175,24 @@ class Item extends Model
                 'place_id'      => $detail->place_id,
                 'qty'           => number_format($detail->qty,3,',','.').' '.$this->uomUnit->code,
                 'qty_raw'       => number_format($detail->qty,3,',','.'),
+            ];
+        }
+        
+        return $arrData;
+    }
+
+    public function currentStockSales($dataplaces,$datawarehouses){
+        $arrData = [];
+
+        $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->whereIn('warehouse_id',$datawarehouses)->get();
+        foreach($data as $detail){
+            $arrData[] = [
+                'id'            => $detail->id,
+                'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
+                'warehouse_id'  => $detail->warehouse_id,
+                'place_id'      => $detail->place_id,
+                'qty'           => number_format($detail->qty / $detail->item->sell_convert,3,',','.').' '.$this->uomUnit->code,
+                'qty_raw'       => number_format($detail->qty / $detail->item->sell_convert,3,',','.'),
             ];
         }
         

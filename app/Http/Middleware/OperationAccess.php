@@ -24,9 +24,9 @@ class OperationAccess
             ->whereHas('menu', function($query) use ($url) {
                 $query->where('url', $url);
             })
-            ->count();
+            ->first();
 
-        if($access > 0) {
+        if($access) {
             $user = User::find(session('bo_id'));
             $cekDate = $user->cekMinMaxPostDate($url);
             $minDate = $cekDate ? date('Y-m-d', strtotime('-'.$cekDate->userDate->count_backdate.' days')) : date('Y-m-d');
@@ -39,6 +39,16 @@ class OperationAccess
                         'status'  => 500,
                         'message' => 'Ups, Tanggal post anda tidak boleh kurang dari '.date('d/m/y',strtotime($minDate)).' atau lebih dari '.date('d/m/y',strtotime($maxDate)).'.',
                     ]);
+                }
+            }
+            if($access->menu->is_maintenance){
+                $passed = false;
+                $whitelists = $access->menu->whitelist ? explode(',',$access->menu->whitelist) : [];
+                if(in_array($request->ip(),$whitelists)){
+                    $passed = true;
+                }
+                if(!$passed){
+                    abort(503);
                 }
             }
             return $next($request);

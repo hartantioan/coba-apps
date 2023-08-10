@@ -2494,6 +2494,8 @@
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]
-        }).start();
+        })/* .onbeforechange(function(targetElement){
+            alert(this._currentStep);
+        }) */.start();
     }
 </script>

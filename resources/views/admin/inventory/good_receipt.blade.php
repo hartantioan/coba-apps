@@ -141,11 +141,11 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m2 s12 step1">
                                 <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
                             </div>
-                            <div class="input-field col m1 s12">
+                            <div class="input-field col m1 s12 step2">
                                 <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                     <option value="">--Pilih--</option>
                                     @foreach ($place as $rowplace)
@@ -153,12 +153,12 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="account_id" name="account_id" onchange="/* getPurchaseOrderAll(this.value); */"></select>
                                 <label class="active" for="account_id">Supplier</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step4">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
                                         <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -166,28 +166,28 @@
                                 </select>
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step5">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
                                 <label class="active" for="receiver_name">Nama Penerima</label>
                             </div>
                             
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step6">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Diterima</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step7">
                                 <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. tenggat">
                                 <label class="active" for="due_date">Tgl. Tenggat</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step8">
                                 <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
                                 <label class="active" for="document_date">Tgl. Dokumen</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step9">
                                 <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Surat Jalan">
                                 <label class="active" for="delivery_no">No. Surat Jalan</label>
                             </div>
-                            <div class="file-field input-field col m3 s12">
+                            <div class="file-field input-field col m3 s12 step10">
                                 <div class="btn">
                                     <span>Lampiran Bukti</span>
                                     <input type="file" name="document" id="document">
@@ -196,7 +196,7 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step11">
                                 <div class="col m6 s6">
                                     <p class="mt-2 mb-2">
                                         <h5>Purchase Order</h5>
@@ -216,7 +216,7 @@
                                     <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step12">
                                 <p class="mt-2 mb-2">
                                     <h5>Detail Produk</h5>
                                     <div style="overflow:auto;">
@@ -249,12 +249,12 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step13">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -263,6 +263,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1766,5 +1767,87 @@
                 }
             }
         });
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Transfer Antar Gudang - Masuk',
+                    intro : 'Pencatatan Barang Masuk dari gudang pada form ini'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Kode plant yang dipilih diperuntukan grpo yang akan dibuat'
+                },
+                {
+                    title : 'Supplier',
+                    element : document.querySelector('.step3'),
+                    intro : 'Supplier  terkait dalam GRPO'
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step4'),
+                    intro : 'Perusahaan tempat GRPO ini dibuat atau diperuntukkan' 
+                },
+                {
+                    title : 'Nama Penerima',
+                    element : document.querySelector('.step5'),
+                    intro : 'Nama penerima grpo' 
+                },
+                {
+                    title : 'Tgl. Diterima',
+                    element : document.querySelector('.step6'),
+                    intro : 'Tanggal grpo diterima,harap hati hati jangan sampai salah.' 
+                },
+                {
+                    title : 'Tgl. Tenggat',
+                    element : document.querySelector('.step7'),
+                    intro : 'Tanggal Tenggat dari grpo pada form' 
+                },
+                {
+                    title : 'Tgl. Dokumen',
+                    element : document.querySelector('.step8'),
+                    intro : 'Tanggal yang digunakan saat dokumen ini nanti di print' 
+                },
+                {
+                    title : 'No. Surat Jalan',
+                    element : document.querySelector('.step9'),
+                    intro : 'No surat jalan GRPO terkait jika ada' 
+                },
+                {
+                    title : 'Lampiran Bukti',
+                    element : document.querySelector('.step10'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
+                {
+                    title : 'Purchase Order',
+                    element : document.querySelector('.step11'),
+                    intro : 'Pemilihan PO yang akan digunakan dalam GRPO yang akan dibuat' 
+                },
+                {
+                    title : 'Detail Produk',
+                    element : document.querySelector('.step12'),
+                    intro : 'List produk yang terkait dengan po ataupun grpo .' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step13'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step14'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
     }
 </script>

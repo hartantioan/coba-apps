@@ -179,11 +179,11 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m2 s12 step1">
                                 <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
                             </div>
-                            <div class="input-field col m1 s12">
+                            <div class="input-field col m1 s12 step2">
                                 <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                     <option value="">--Pilih--</option>
                                     @foreach ($place as $rowplace)
@@ -191,7 +191,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
@@ -200,19 +200,19 @@
                                 </select>
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step4">
                                 <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
                                 <label class="active" for="account_id">Partner Bisnis <i>(Pilih untuk MO.Invoice / BS.Karyawan)</i></label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step5">
                                 <select class="browser-default" id="coa_id" name="coa_id"></select>
                                 <label class="active" for="coa_id">Kas / Bank</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step6">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Transfer</label>
                             </div>
-                            <div class="file-field input-field col m3 s12">
+                            <div class="file-field input-field col m3 s12 step8">
                                 <div class="btn">
                                     <span>Lampiran</span>
                                     <input type="file" name="document" id="document">
@@ -221,7 +221,7 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step9">
                                 <select class="form-control" id="currency_id" name="currency_id">
                                     @foreach ($currency as $row)
                                         <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
@@ -229,18 +229,18 @@
                                 </select>
                                 <label class="" for="currency_id">Mata Uang</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step10">
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step11">
                                 <select class="browser-default" id="project_id" name="project_id"></select>
                                 <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                             </div>
                             <div class="col m12 s12">
                                 <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step12">
                                 <p class="mt-2 mb-2">
                                     <h6>Detail MO.Invoice / BS.Karyawan / Coa</h6>
                                     <div style="overflow:auto;">
@@ -271,14 +271,14 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step13">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m4 s12">
 
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step14">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -290,7 +290,7 @@
                                     </thead>
                                 </table>
                             </div>
-                            <div class="col s12 mt-3">
+                            <div class="col s12 mt-3 step15">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
@@ -300,6 +300,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1914,5 +1915,92 @@
                 }
             }
         });
+    }
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Kas / Bank Masuk',
+                    intro : ''
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Kode plant yang dipilih diperuntukan grpo yang akan dibuat'
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step3'),
+                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                },
+                {
+                    title : 'Partner Bisnis',
+                    element : document.querySelector('.step4'),
+                    intro : 'Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
+                },
+                {
+                    title : 'Kas / Bank',
+                    element : document.querySelector('.step5'),
+                    intro : 'COA bank yang akan digunakan dalam form ini.' 
+                },
+                {
+                    title : 'Tgl. Transfer',
+                    element : document.querySelector('.step6'),
+                    intro : 'Tanggal yang ditentukan untuk transfer form.' 
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step7'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step8'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
+                {
+                    title : 'Mata Uang',
+                    element : document.querySelector('.step9'),
+                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
+                },
+                {
+                    title : 'Konversi',
+                    element : document.querySelector('.step10'),
+                    intro : 'Nilai konversi rupiah pada saat Purchase Order dibuat.'
+                },
+                {
+                    title : 'Link Proyek',
+                    element : document.querySelector('.step11'),
+                    intro : 'Proyek yang terkait dalam form ini.'
+                },
+                {
+                    title : 'Detail MO.Invoice / BS.Karyawan / Coa',
+                    element : document.querySelector('.step12'),
+                    intro : 'Berisikan list dari data yang digunakan dalam form.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step13'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Total',
+                    element : document.querySelector('.step14'),
+                    intro : 'Merupakan total yang didapatkan dari penjumlahan di atas.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step15'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
     }
 </script>

@@ -115,21 +115,35 @@ class EmployeeScheduleController extends Controller
     public function show(Request $request){
         $query = EmployeeSchedule::find($request->id);
         $query["employee_name"]=$query->user->name;
-        $query["shift"]=$query->shift->name.'||'.$query->shift->code;
+        $query["shifted"]=$query->shift->name.'||'.$query->shift->code;
 		return response()->json($query);
     }
 
     public function createSingle(Request $request)
     {
-        $validation = Validator::make($request->all(), [
-            'date'          => 'required',
-            'employee_id'      => 'required',
-            'shift_id'       => 'required'
-        ], [
-            'date.required'         => 'Tanggal tidak boleh kosong.',
-            'employee_id.required'     => 'Pegawai tidak boleh kosong.',
-            'shift_id.required'      => 'Shift tidak boleh kosong.',
-        ]);
+        info($request);
+        if($request->temp){
+            $validation = Validator::make($request->all(), [
+                'date_detail'          => 'required',
+                'employee_id_detail'      => 'required',
+                'shift_id_detail'       => 'required'
+            ], [
+                'date_detail.required'         => 'Tanggal tidak boleh kosong.',
+                'employee_id_detail.required'     => 'Pegawai tidak boleh kosong.',
+                'shift_id_detail.required'      => 'Shift tidak boleh kosong.',
+            ]);
+        }else{
+            $validation = Validator::make($request->all(), [
+                'date'          => 'required',
+                'employee_id'      => 'required',
+                'shift_id'       => 'required'
+            ], [
+                'date.required'         => 'Tanggal tidak boleh kosong.',
+                'employee_id.required'     => 'Pegawai tidak boleh kosong.',
+                'shift_id.required'      => 'Shift tidak boleh kosong.',
+            ]);
+        }
+        
 
         if($validation->fails()) {
             $response = [
@@ -143,9 +157,9 @@ class EmployeeScheduleController extends Controller
                 try {
                     $query = EmployeeSchedule::find($request->temp);
 
-                    $query->shift_id             = $request->shift_id;
-                    $query->user_id              = $request->employee_id;
-                    $query->date                 = $request->date;
+                    $query->shift_id             = $request->shift_id_detail;
+                    $query->user_id              = $request->employee_id_detail;
+                    $query->date                 = $request->date_detail;
                     $query->save();
 
                     DB::commit();
@@ -181,6 +195,30 @@ class EmployeeScheduleController extends Controller
 				];
 			}
 		}
+        return response()->json($response);
+    }
+
+    public function destroy(Request $request){
+        $query = EmployeeSchedule::find($request->id);
+		
+        if($query->delete()) {
+            activity()
+                ->performedOn(new EmployeeSchedule())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the Schedule data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
         return response()->json($response);
     }
 

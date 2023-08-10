@@ -193,11 +193,11 @@
                         <fieldset>
                             <legend>1</legend>
                             <div class="row">
-                                <div class="input-field col m2 s12">
+                                <div class="input-field col m2 s12 step1">
                                     <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                     <label class="active" for="code">No. Dokumen</label>
                                 </div>
-                                <div class="input-field col m1 s12">
+                                <div class="input-field col m1 s12 step2">
                                     <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                         <option value="">--Pilih--</option>
                                         @foreach ($place as $rowplace)
@@ -205,12 +205,12 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step3">
                                     <input type="hidden" id="temp" name="temp">
                                     <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
                                     <label class="active" for="account_id">Partner Bisnis</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step4">
                                     <select class="form-control" id="payment_type" name="payment_type" onchange="showRekening();">
                                         <option value="1">Tunai</option>
                                         <option value="2">Transfer</option>
@@ -220,12 +220,12 @@
                                     </select>
                                     <label class="" for="payment_type">Tipe Pembayaran</label>
                                 </div>
-                                <div class="input-field col m3 s12 op-element">
+                                <div class="input-field col m3 s12 op-element step5">
                                     <select class="browser-default" id="coa_source_id" name="coa_source_id"></select>
                                     <label class="active" for="coa_source_id">Kas / Bank</label>
                                     <span class="helper-text" data-error="wrong" data-success="right">Pilih kosong jika rekonsiliasi dengan piutang karyawan dan sisa bayar = 0.</span>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step6">
                                     <select class="form-control" id="company_id" name="company_id">
                                         @foreach ($company as $rowcompany)
                                             <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -233,23 +233,23 @@
                                     </select>
                                     <label class="" for="company_id">Perusahaan</label>
                                 </div>
-                                <div class="input-field col m3 s12 op-element">
+                                <div class="input-field col m3 s12 op-element step7">
                                     <input id="payment_no" name="payment_no" type="text" value="-">
                                     <label class="active" for="payment_no">No. CEK/BG</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step7_1">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                     <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
-                                <div class="input-field col m3 s12 op-element">
+                                <div class="input-field col m3 s12 op-element step8">
                                     <input id="top" name="top" min="0" type="number" value="0" readonly>
                                     <label class="active" for="top">TOP (hari) Autofill</label>
                                 </div>
-                                <div class="input-field col m3 s12 op-element">
+                                <div class="input-field col m3 s12 op-element step9">
                                     <input id="pay_date" name="pay_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar">
                                     <label class="active" for="pay_date">Tgl. Bayar</label>
                                 </div>
-                                <div class="file-field input-field col m3 s12">
+                                <div class="file-field input-field col m3 s12 step10">
                                     <div class="btn">
                                         <span>Lampiran</span>
                                         <input type="file" name="document" id="document">
@@ -258,7 +258,7 @@
                                         <input class="file-path validate" type="text">
                                     </div>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step11">
                                     <select class="form-control" id="currency_id" name="currency_id">
                                         @foreach ($currency as $row)
                                             <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
@@ -266,27 +266,27 @@
                                     </select>
                                     <label class="" for="currency_id">Mata Uang</label>
                                 </div>
-                                <div class="input-field col m3 s12">
+                                <div class="input-field col m3 s12 step12">
                                     <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                     <label class="active" for="currency_rate">Konversi</label>
                                 </div>
                                 <div class="col m12" id="rekening-element" style="display:none;">
                                     <h6>Rekening (Jika transfer)</h6>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step13">
                                         <select class="form-control" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
                                             <option value="">--Pilih Partner Bisnis-</option>
                                         </select>
                                         <label class="" for="user_bank_id">Pilih Dari Daftar</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step14">
                                         <input id="account_bank" name="account_bank" type="text" placeholder="Bank Tujuan">
                                         <label class="active" for="account_bank">Bank Tujuan</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step15">
                                         <input id="account_no" name="account_no" type="text" placeholder="No Rekening Tujuan">
                                         <label class="active" for="account_no">No Rekening</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m3 s12 step16">
                                         <input id="account_name" name="account_name" type="text" placeholder="Nama Pemilik Rekening">
                                         <label class="active" for="account_name">Nama Pemilik Rekening</label>
                                     </div>
@@ -314,7 +314,7 @@
                                         <p class="mt-2 mb-2">
                                             <h6></h6>
                                             <div style="overflow:auto;">
-                                                <table class="bordered" style="max-width:1650px !important;">
+                                                <table class="bordered step17" style="max-width:1650px !important;">
                                                     <thead>
                                                         <tr>
                                                             <th class="center" width="10%">
@@ -352,7 +352,7 @@
                                         <p class="mt-2 mb-2">
                                             <h6>Gunakan fitur ini untuk rekonsiliasi biaya dengan piutang karyawan, pastikan anda menentukan daftar piutang mana yang ingin anda gunakan.</h6>
                                             <div style="overflow:auto;">
-                                                <table class="bordered" style="max-width:1650px !important;">
+                                                <table class="bordered step19" style="max-width:1650px !important;">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">Coa</th>
@@ -376,8 +376,8 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="col m12 s12">
-                                    <p class="mt-2 mb-2">
+                                <div class="col m12 s12 step18">
+                                    <p class="mt-2 mb-2 ">
                                         <h6>Dibayar dengan Outgoing Payment Piutang Karyawan (Jika Ada) - <small>Fitur ini akan men-jurnal entrikan hutang/biaya pada piutang yang anda pilih secara otomatis, ketika disetujui.</small></h6>
                                         <div style="overflow:auto;">
                                             <table class="bordered" style="max-width:1650px !important;">
@@ -418,14 +418,14 @@
                         <fieldset>
                             <legend>3</legend>
                             <div class="row">
-                                <div class="input-field col m4 s12">
+                                <div class="input-field col m4 s12 step20">
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                     <label class="active" for="note">Keterangan</label>
                                 </div>
                                 <div class="input-field col m3 s12">
                                     
                                 </div>
-                                <div class="input-field col m5 s12">
+                                <div class="input-field col m5 s12 step21">
                                     <table width="100%" class="bordered">
                                         <thead>
                                             <tr>
@@ -471,7 +471,7 @@
                                     </table>
                                 </div>
                                 <div class="col s12 mt-3">
-                                    <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                    <button class="btn waves-effect waves-light right submit step22" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                                 </div>
                             </div>
                         </fieldset>
@@ -481,6 +481,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -2766,5 +2767,144 @@
                 });
             }
         });
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Permintaan Pembayaran',
+                    intro : ''
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Kode plant yang dipilih diperuntukan grpo yang akan dibuat'
+                },
+                {
+                    title : 'Partner Bisnis',
+                    element : document.querySelector('.step3'),
+                    intro : 'Partner bisnis yang berkaitan dengan form' 
+                },
+                {
+                    title : 'Tipe Pembayaran',
+                    element : document.querySelector('.step4'),
+                    intro : 'Jenis pembayaran yang digunakan dalam form ini' 
+                },
+                {
+                    title : 'Kas / Bank',
+                    element : document.querySelector('.step5'),
+                    intro : 'COA bank yang akan digunakan dalam form ini.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step6'),
+                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                },
+                {
+                    title : 'No. CEK/BG',
+                    element : document.querySelector('.step7'),
+                    intro : 'No Cek pembayaran terkait form ini.' 
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step7_1'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'TOP (hari) Autofill',
+                    element : document.querySelector('.step8'),
+                    intro : 'Hari didapatkan dari inputan yang dipilih sebelumnya' 
+                },
+                {
+                    title : 'Tgl. Bayar',
+                    element : document.querySelector('.step9'),
+                    intro : 'Tanggal pembayaran form ditentukan.' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step10'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
+                {
+                    title : 'Mata Uang',
+                    element : document.querySelector('.step11'),
+                    intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
+                },
+                {
+                    title : 'Konversi',
+                    element : document.querySelector('.step12'),
+                    intro : 'Nilai konversi rupiah pada saat Purchase Order dibuat.'
+                },
+                {
+                    title : 'Pilih Partner Bisnis Rekening',
+                    element : document.querySelector('.step13'),
+                    intro : 'Pemilihan partner bisnis untuk memilih bank tujuan.'
+                },
+                {
+                    title : 'Bank Tujuan',
+                    element : document.querySelector('.step14'),
+                    intro : 'Pemilihan bank untuk proses transfer dengan form terkait.'
+                },
+                {
+                    title : 'No rekening',
+                    element : document.querySelector('.step15'),
+                    intro : 'No Rekening dari bank yang dipilih.'
+                },
+                {
+                    title : 'Nama Pemilik Rekening',
+                    element : document.querySelector('.step16'),
+                    intro : 'Nama pemilik rekening dari no rekening yang diinput'
+                },
+                {
+                    title : 'List Data ',
+                    element : document.querySelector('.step17'),
+                    intro : '', 
+                },
+                {
+                    title : 'Outgoing Payment Piutang Karyawan',
+                    element : document.querySelector('.step18'),
+                    intro : 'List OP yang dibayar jika ada' 
+                },
+                {
+                    title : 'Rekonsiliasi Biaya',
+                    element : document.querySelector('.step19'),
+                    intro : 'List data piutang yang ingin dibayar.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step20'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Rincian Biaya',
+                    element : document.querySelector('.step21'),
+                    intro : 'Disini rincian biaya bisa dimasukkan sesuai dokumen yang ada. Fitur ini juga mengakomodir PPN dan PPh.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step22'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        })
+        .onbeforechange(function(targetElement){
+            if(this._currentStep == '13'){
+                $('#payment_type').val('2').change();
+            }
+            if(this._currentStep == '19'){
+              
+                window.scrollTo(0, 0);
+                document.getElementById('opdata').style.display = 'none';
+                document.getElementById('costdata').style.display = 'block';
+            }
+        })
+        .start();
     }
 </script>

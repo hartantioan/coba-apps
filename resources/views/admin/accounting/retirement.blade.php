@@ -141,11 +141,11 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s2">
+                        <div class="input-field col s2 step1">
                             <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                             <label class="active" for="code">No. Dokumen</label>
                         </div>
-                        <div class="input-field col s1">
+                        <div class="input-field col s1 step2">
                             <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                 <option value="">--Pilih--</option>
                                 @foreach ($place as $rowplace)
@@ -153,7 +153,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3 step3">
                             <input type="hidden" id="temp" name="temp">
                             <select class="form-control" id="currency_id" name="currency_id">
                                 @foreach ($currency as $row)
@@ -162,19 +162,19 @@
                             </select>
                             <label class="" for="currency_id">Mata Uang</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3 step4">
                             <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                             <label class="active" for="currency_rate">Konversi</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3 step5">
                             <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3 step6">
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="col m12 s12">
+                        <div class="col m12 s12 step7">
                             <div class="card-alert card purple">
                                 <div class="card-content white-text">
                                     <p>Jika nominal retirement / jual diisi maka jurnal akan terbit <b>Ayat Silang Penjualan Aset</b>. <b>0 untuk Beban Aktiva Tetap Rusak/Hilang</b>.</p>
@@ -195,7 +195,7 @@
                                 </div>
                             </p>
                         </div>
-                        <div class="col s12" style="overflow:auto;">
+                        <div class="col s12 step8" style="overflow:auto;">
                             <table class="bordered" style="width:1500px;">
                                 <thead>
                                     <tr>
@@ -220,7 +220,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="col s12 mt-3">
+                        <div class="col s12 mt-3 step9">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
@@ -229,6 +229,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1186,5 +1187,62 @@
                 }
             }
         });
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Purna Operasi',
+                    intro : ''
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Kode plant yang dipilih diperuntukan grpo yang akan dibuat'
+                },
+                {
+                    title : 'Mata Uang',
+                    element : document.querySelector('.step3'),
+                    intro : 'Mata Uang yang digunakan dalam mendefinisikan' 
+                },
+                {
+                    title : 'Konversi',
+                    element : document.querySelector('.step4'),
+                    intro : 'Konversi mata uang pada form ini' 
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step5'),
+                    intro : 'Tanggal Tenggat dari grpo pada form' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Aset',
+                    element : document.querySelector('.step7'),
+                    intro : 'Pemilihan Aset yang akan digunakan dalam pembuatan form' 
+                },
+                {
+                    title : 'List Data',
+                    element : document.querySelector('.step8'),
+                    intro : 'Merupakan List asset yang diotomasi ' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step9'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
     }
 </script>

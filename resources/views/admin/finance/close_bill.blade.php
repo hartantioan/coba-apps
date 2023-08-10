@@ -148,7 +148,7 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step1">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
@@ -157,15 +157,15 @@
                                 </select>
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step2">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step3">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step4">
                                 <div class="col m6 s6">
                                     <p class="mt-2 mb-2">
                                         <h6>Fund Request / Permohonan Dana (Tipe BS)</h6>
@@ -185,7 +185,7 @@
                                     <b>FR Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i>
                                 </div>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step5">
                                 <p class="mt-2 mb-2">
                                     <h6>Detail Fund Request / Permohonan Dana (Tipe BS)</h6>
                                     <div style="overflow:auto;">
@@ -226,7 +226,7 @@
                             </div>
                             <div class="input-field col m4 s12">
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step6">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -256,7 +256,7 @@
                                     </thead>
                                 </table>
                             </div>
-                            <div class="col s12 mt-3">
+                            <div class="col s12 mt-3 step7">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
@@ -266,6 +266,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>

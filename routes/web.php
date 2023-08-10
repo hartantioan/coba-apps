@@ -10,6 +10,7 @@ use App\Http\Controllers\Inventory\GoodScaleController;
 use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Inventory\StockInRupiahController;
 use App\Http\Controllers\Inventory\StockInQtyController;
+use App\Http\Controllers\MasterData\AttendanceMachineController;
 use App\Http\Controllers\MasterData\EmployeeController;
 use App\Http\Controllers\MasterData\EmployeeScheduleController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
@@ -705,6 +706,17 @@ Route::prefix('admin')->group(function () {
                         Route::get('row_detail',[UserDateController::class, 'rowDetail']);
                         Route::post('create',[UserDateController::class, 'create'])->middleware('operation.access:user_date,update');
                         Route::post('destroy', [UserDateController::class, 'destroy'])->middleware('operation.access:user_date,delete');
+                    });
+
+                    Route::prefix('attendance_machine')->middleware('operation.access:attendance_machine,view')->group(function () {
+                        Route::get('/',[AttendanceMachineController::class, 'index']);
+                        Route::get('datatable',[AttendanceMachineController::class, 'datatable']);
+                        Route::get('row_detail',[AttendanceMachineController::class, 'rowDetail']);
+                        Route::post('show', [AttendanceMachineController::class, 'show']);
+                        Route::post('print',[AttendanceMachineController::class, 'print']);
+                        Route::get('export',[AttendanceMachineController::class, 'export']);
+                        Route::post('create',[AttendanceMachineController::class, 'create'])->middleware('operation.access:attendance_machine,update');
+                        Route::post('destroy', [AttendanceMachineController::class, 'destroy'])->middleware('operation.access:attendance_machine,delete');
                     });
 
                     Route::prefix('landed_cost_fee')->middleware('operation.access:landed_cost_fee,view')->group(function () {

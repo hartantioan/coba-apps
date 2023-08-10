@@ -147,11 +147,11 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s2">
+                        <div class="input-field col s2 step1">
                             <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                             <label class="active" for="code">No. Dokumen</label>
                         </div>
-                        <div class="input-field col s1">
+                        <div class="input-field col s1 step2">
                             <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                 <option value="">--Pilih--</option>
                                 @foreach ($place as $rowplace)
@@ -159,7 +159,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3 step3">
                             <input type="hidden" id="temp" name="temp">
                             <select class="form-control" id="company_id" name="company_id">
                                 @foreach($company as $rowcompany)
@@ -168,24 +168,24 @@
                             </select>
                             <label class="" for="company_id">Perusahaan</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3 step4">
                             <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3 step5">
                             <input id="period" name="period" type="month" placeholder="Periode depresiasi" value="{{ date('Y-m') }}">
                             <label class="active" for="period">Periode Depresiasi</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3 step6">
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s3 step7">
                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="preview();" href="javascript:void(0);">
                                 <i class="material-icons left">remove_red_eye</i> Preview
                             </a>
                         </div>
-                        <div class="col s12">
+                        <div class="col s12 step8">
                             <h5>Preview</h5>
                             <table class="bordered">
                                 <thead>
@@ -209,7 +209,7 @@
                             </table>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit step9" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -217,6 +217,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1160,5 +1161,62 @@
                 }
             }
         });
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Depresiasi',
+                    intro : 'Untuk menyusukan Suatu nilai aset barang per periode'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Kode plant yang dipilih diperuntukan grpo yang akan dibuat'
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step3'),
+                    intro : 'Perusahaan tempat GRPO ini dibuat atau diperuntukkan'
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step4'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'Periode',
+                    element : document.querySelector('.step5'),
+                    intro : 'Periode dimana aset itu menyusut' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Preview',
+                    element : document.querySelector('.step7'),
+                    intro : 'Digunakan untuk mengotomasi perhitungan depresiasi asset pada periode yang ditentukan' 
+                },
+                {
+                    title : 'List Data',
+                    element : document.querySelector('.step8'),
+                    intro : 'Merupakan List asset yang diotomasi ' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step9'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
     }
 </script>

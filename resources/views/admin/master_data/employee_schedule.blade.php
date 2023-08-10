@@ -146,10 +146,10 @@
                         <div class="row ml-2 mt-2">
                             
                             <div class="col s12">
-                                
+                                <input type="hidden" id="temp" name="temp">
                                 <div class="input-field col s6" >
                                     <select class="select2 browser-default" id="employee_id_detail" name="employee_id_detail">
-                                        <option value="">--Pilih ya--</option>
+                                      
                                     </select>
                                     <label class="active" for="employee_id_detail">Select Employee</label>
                                 </div>
@@ -159,7 +159,7 @@
                                 </div>
                                 <div class="input-field col s6">
                                     <select class="select2 browser-default" id="shift_id_detail" name="shift_id_detail">
-                                        <option value="">--Pilih ya--</option>
+                                        
                                     </select>
                                     <label class="active" for="shift_id_detail">Select Shift</label>
                                 </div>
@@ -506,7 +506,7 @@
                 calendar.removeAllEvents();
                 calendar.render();
                 $('#form_data')[0].reset();
-                $('#temp').val('');
+              
                 M.updateTextFields();
             }
         });
@@ -542,7 +542,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
-                $('#temp').val('');
+                
                 
             }
         });
@@ -636,7 +636,13 @@
 	}
 
     function saveSingle(){
-        var formData = new FormData($('#form_data')[0]);
+        var formData;
+
+        if ($('#temp').val()) {
+            formData = new FormData($('#kambing')[0]);
+        } else {
+            formData = new FormData($('#form_data')[0]);
+        }
     
         $.ajax({
             url: '{{ Request::url() }}/create_single',
@@ -657,7 +663,13 @@
             success: function(response) {
                 loadingClose('.modal-content');
                 if(response.status == 200) {
-                    success();
+                    if ($('#temp').val()) {
+                        loadDataTable();
+                        $('#modal3').modal('close');
+                    } else {
+                        success();
+                    }
+                    
                     M.toast({
                         html: response.message
                     });
@@ -813,15 +825,17 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal3').modal('open');
-
+                console.log(response);
                 $('#temp').val(id);
                 $('#date_detail').val(response.date);
-                /* $('#employee_id_detail').append(`
-                    <option value="` + response.employee_id + `">` + response.employee_name + `</option>
+                $('#employee_id_detail').empty();
+                $('#shift_id_detail').empty();
+                $('#employee_id_detail').append(`
+                    <option value="` + response.user_id + `">` + response.employee_name + `</option>
                 `);
                 $('#shift_id_detail').append(`
-                    <option value="` + response.employee_id + `">` + response.shift + `</option>
-                `); */
+                    <option value="` + response.shift_id + `">` + response.shifted + `</option>
+                `);
                 
                 
             },

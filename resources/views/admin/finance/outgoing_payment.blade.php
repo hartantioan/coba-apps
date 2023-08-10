@@ -178,12 +178,12 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step1">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="account_id" name="account_id"></select>
                                 <label class="active" for="account_id">Partner Bisnis</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step2">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
                                         <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -191,19 +191,19 @@
                                 </select>
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step3">
                                 <select class="browser-default" id="coa_source_id" name="coa_source_id"></select>
                                 <label class="active" for="account_id">Kas / Bank</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step4">
                                 <input id="post_date" name="post_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                 <label class="active" for="post_date">Tgl. Posting</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step5">
                                 <input id="pay_date" name="pay_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. bayar">
                                 <label class="active" for="pay_date">Tgl. Bayar</label>
                             </div>
-                            <div class="file-field input-field col m3 s12">
+                            <div class="file-field input-field col m3 s12 step6">
                                 <div class="btn">
                                     <span>Lampiran</span>
                                     <input type="file" name="document" id="document">
@@ -212,7 +212,7 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step7">
                                 <select class="form-control" id="currency_id" name="currency_id">
                                     @foreach ($currency as $row)
                                         <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
@@ -220,30 +220,30 @@
                                 </select>
                                 <label class="" for="currency_id">Mata Uang</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step8">
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step9">
                                 <select class="browser-default" id="payment_request_id" name="payment_request_id" onchange="getPaymentRequest();"></select>
                                 <label class="active" for="user_bank_id">Permintaan Pembayaran (Jika Ada)</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step10">
                                 <input id="admin" name="admin" type="text" value="0,000" onkeyup="formatRupiah(this)">
                                 <label class="active" for="admin">Biaya Admin</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step11">
                                 <input id="grandtotal" name="grandtotal" type="text" value="0,000" onkeyup="formatRupiah(this)">
                                 <label class="active" for="grandtotal">Total Bayar (Keluar)</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
                             </div>
-                            <div class="col s12 mt-3">
+                            <div class="col s12 mt-3 step13">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
@@ -253,6 +253,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple " onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1276,5 +1277,82 @@
                 }
             }
         });
+    }
+
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Kas / Bank Keluar',
+                    intro : ''
+                },
+                {
+                    title : 'Partner Bisnis',
+                    element : document.querySelector('.step1'),
+                    intro : 'Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step2'),
+                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                },
+                {
+                    title : 'Kas / Bank',
+                    element : document.querySelector('.step3'),
+                    intro : 'COA bank yang akan digunakan dalam form ini.' 
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step4'),
+                    intro : 'Tanggal Tenggat dari grpo pada form' 
+                },
+                {
+                    title : 'Tgl. Bayar',
+                    element : document.querySelector('.step5'),
+                    intro : 'Tanggal Bayar yang ditentukan untuk form ini' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step6'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
+                {
+                    title : 'Mata Uang',
+                    element : document.querySelector('.step7'),
+                    intro : 'Mata Uang yang digunakan dalam mendefinisikan' 
+                },
+                {
+                    title : 'Konversi',
+                    element : document.querySelector('.step8'),
+                    intro : 'Konversi mata uang pada form ini' 
+                },
+                {
+                    title : 'Permintaan Pembayaraan',
+                    element : document.querySelector('.step9'),
+                    intro : 'Pilih permintaan pembayaran yang terkait form ini' 
+                },
+                {
+                    title : 'Biaya Admin',
+                    element : document.querySelector('.step10'),
+                    intro : 'Biaya admin yang dikeluarkan dalam pembuatan form ini.' 
+                },
+                {
+                    title : 'Total Bayar(Keluar)',
+                    element : document.querySelector('.step11'),
+                    intro : 'Total pembayaran form  yang terotomasi dari penjumlahan data yang diinputini.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step12'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step13'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
     }
 </script>

@@ -158,11 +158,11 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m2 s12 step1">
                                 <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                 <label class="active" for="code">No. Dokumen</label>
                             </div>
-                            <div class="input-field col m1 s12">
+                            <div class="input-field col m1 s12 step2">
                                 <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                     <option value="">--Pilih--</option>
                                     @foreach ($place as $rowplace)
@@ -170,7 +170,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
@@ -180,11 +180,11 @@
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
                             
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 step4">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
-                            <div class="file-field input-field col m3 s12">
+                            <div class="file-field input-field col m3 s12 step5">
                                 <div class="btn">
                                     <span>Lampiran Bukti</span>
                                     <input type="file" name="document" id="document">
@@ -193,18 +193,18 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step6">
                                 <p class="mb-2">
                                     <h6>Silahkan pilih Inventori Transfer Keluar (Asal)</h6>
                                 </p>
                                 <div class="input-field col m4 s4">
                                     <select class="browser-default" id="inventory_transfer_out_id" name="inventory_transfer_out_id" onchange="getTransferOut();"></select>
                                 </div>
-                                <div class="col m8 s8">
+                                <div class="col m8 s8 step7">
                                     <h6><b>Inventory Transfer - Keluar Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m12 s12 step8">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
                                     <div style="overflow:auto;">
@@ -229,11 +229,11 @@
                                     </div>
                                 </p>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m4 s12 step9">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="col s12 mt-3">
+                            <div class="col s12 mt-3 step10">
                                 <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
@@ -243,6 +243,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light purple step10" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -1206,4 +1207,60 @@
         });
     }
 
+    function startIntro(){
+        introJs().setOptions({
+            exitOnOverlayClick : false,
+            steps: [
+                {
+                    title : 'Transfer Antar Gudang - Masuk',
+                    intro : 'Pencatatan Barang Masuk dari gudang pada form ini'
+                },
+                {
+                    title : 'Nomor Dokumen',
+                    element : document.querySelector('.step1'),
+                    intro : 'Nomor dokumen wajib diisikan, dengan kombinasi 4 huruf kode dokumen, tahun pembuatan dokumen, kode plant, serta nomor urut. Nomor ini bersifat unik, tidak akan sama, dan nomor urut paling belakang akan ter-reset secara otomatis berdasarkan tahun tanggal post.'
+                },
+                {
+                    title : 'Kode Plant',
+                    element : document.querySelector('.step2'),
+                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step3'),
+                    intro : 'Perusahaan tempat memo ini dibuat atau diperuntukkan' 
+                },
+                {
+                    title : 'Tgl. Posting',
+                    element : document.querySelector('.step4'),
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step5'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                },
+                {
+                    title : 'Inventori Transfer Keluar',
+                    element : document.querySelector('.step7'),
+                    intro : 'Memilih item yang ingin ditransfer keluar' 
+                },
+                {
+                    title : 'Detail Produk',
+                    element : document.querySelector('.step8'),
+                    intro : 'List dari item yang ada dalam Inventori keluar yang ditambahkan pada inputan sebelumnya ' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step9'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
+                },
+                {
+                    title : 'Tombol Simpan',
+                    element : document.querySelector('.step10'),
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                },
+            ]
+        }).start();
+    }
 </script>

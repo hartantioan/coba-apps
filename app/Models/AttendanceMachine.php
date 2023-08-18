@@ -20,6 +20,17 @@ class AttendanceMachine extends Model
         'ip_address',
         'port',
         'location',
-        'status'
+        'status',
+        'log_counts'
     ];
+
+    public function status(){
+        $status = match ($this->status) {
+          '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',
+          '2' => '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Not Active</span>',
+          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+        };
+
+        return $status;
+    }
 }

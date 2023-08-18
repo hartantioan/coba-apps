@@ -722,15 +722,17 @@
         events.forEach(function(event) {
         var startDate = event.start;
         var endDate;
+        var newStartDate = new Date(startDate);
+        newStartDate.setDate(newStartDate.getDate() + 1);
         if(event.end==null){
-            endDate = event.start;
+            endDate = newStartDate;
         }else{
             endDate = event.end;
         }
         
         
             employee_shift.push({
-                'start_date': startDate.toISOString(),
+                'start_date': newStartDate.toISOString(),
                 'end_date': endDate.toISOString(),
                 'shift_id': event.id,
             });

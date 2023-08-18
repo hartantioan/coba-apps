@@ -203,8 +203,9 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'type', className: 'center-align' },
-                { name: 'note', className: 'center-align' },
+                { name: 'ip_address', className: 'center-align' },
+                { name: 'port', className: 'center-align' },
+                { name: 'location', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -312,8 +313,9 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#note').val(response.note);
-                $('#type').val(response.type).formSelect();
+                $('#ip_address').val(response.ip_address);
+                $('#port').val(response.port);
+                $('#location').val(response.location);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

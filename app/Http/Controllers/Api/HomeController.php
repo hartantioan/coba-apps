@@ -60,12 +60,10 @@ class HomeController extends Controller
     }
 
     public function updateAttendance(Request $request) {
-        /* $cek = User::where('api_token',$request->bearerToken())->count();
-
-        if($cek > 0){ */
+       
             $count = 0;
             $start_time = microtime(true);
-            /* AttendanceTemp::where('machine_id',$request->machine_id)->delete(); */
+           
             $collection = [];
             if($request->arrdata){
                 $collection = collect($request->arrdata)->filter(function ($item) {
@@ -89,35 +87,6 @@ class HomeController extends Controller
 
             return response()->json(['status' => 'success','processed_data' => $count, 'time' => $execution_time], 200);
 
-            /* $count = 0;
-            if($request->arrdata){
-                foreach($request->arrdata as $row){
-                    $exp = explode('.', $row['recordTime']);
-                    $record_time = str_replace('T', ' ', $exp[0]);
-
-                    DB::connection('mysql2')->table('b_absensi_pegawai_temp')->insert([
-                        'uid'           => $row['userSn'],
-                        'nik'           => $row['deviceUserId'],
-                        'keterangan'    => $row['verifyType'],
-                        'tanggal'       => $record_time,
-                        'mesin_absensi' => $request->machine_id,
-                        'user_at'       => 99
-                    ]);
-                    $count++;
-                }
-            }
-
-            return response()->json(['status' => 'success', 'processed' => $count], 200); */
-
-            /* if($users){
-                return response()->json(['status' => 'success'], 200);
-            }else{
-                return response()->json(['status' => 'error'], 500);
-            } */
-
-        /* }else{
-            return response()->json(['status' => 'failed'], 401);
-        } */
     }
 
     public function getAttendance(Request $request) {

@@ -23,4 +23,16 @@ class Attendances extends Model
         'latitude',
         'longitude'
     ];
+
+    public function verifyType(){
+        $verify_type = match ($this->verify_type) {
+            '1' => 'Finger Print',
+            '2' => 'Application',
+            '3' => 'Password',
+            '4' => 'Web',
+            default => 'Invalid',
+        };
+
+        return $verify_type;
+    }
 }

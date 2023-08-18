@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HR\AttendanceController;
 use App\Http\Controllers\HR\EmployeeTransferController;
 
 use App\Http\Controllers\Accounting\AccountingReportController;
@@ -1101,6 +1102,16 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [EmployeeTransferController::class, 'show']);
                     Route::post('create',[EmployeeTransferController::class, 'create'])->middleware('operation.access:employee,update');
                     Route::post('destroy', [EmployeeTransferController::class, 'destroy'])->middleware('operation.access:employee,delete');
+          
+                });
+
+                Route::prefix('attendance')->middleware('operation.access:attendance,view')->group(function () {
+                    Route::get('/',[AttendanceController::class, 'index']);
+                    Route::get('datatable',[AttendanceController::class, 'datatable']);
+                    Route::post('syncron', [AttendanceController::class, 'syncron']);
+                    Route::post('show', [AttendanceController::class, 'show']);
+                    Route::post('create',[AttendanceController::class, 'create'])->middleware('operation.access:attendance,update');
+                    Route::post('destroy', [AttendanceController::class, 'destroy'])->middleware('operation.access:attendance,delete');
           
                 });
             });

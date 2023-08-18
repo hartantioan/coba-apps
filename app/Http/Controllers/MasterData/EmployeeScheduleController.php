@@ -299,13 +299,15 @@ class EmployeeScheduleController extends Controller
         } else {
             DB::beginTransaction();
             $employee_shift_decode=json_decode($request->employee_shift);
-            info($employee_shift_decode);
+        
             
             try {
                 foreach($employee_shift_decode as $shift){
                     
                     $start_date = Carbon::parse($shift->start_date);
                     $end_date = Carbon::parse($shift->end_date);
+                    info($start_date);
+                    info($end_date);
                     foreach ($request->arr_employee as $user_id) {
                         $current_date = $start_date->copy(); // Make a copy of the start date to avoid modifying the original date
                         while ($current_date->lte($end_date)) {

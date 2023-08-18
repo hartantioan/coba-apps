@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceMachine;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class AttendanceMachineController extends Controller
 {
@@ -27,8 +29,11 @@ class AttendanceMachineController extends Controller
         $column = [
             'id',
             'code',
-            'title',
-            'description',
+            'name',
+            'ip_address',
+            'port',
+            'location',
+            'status'
         ];
 
         $start  = $request->start;
@@ -113,9 +118,16 @@ class AttendanceMachineController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'title'          => 'required',
+            'name'          => 'required',
+            'location'      => 'required',
+            'ip_address'          => 'required',
+            'code'			=> $request->temp ? ['required', Rule::unique('attendance_machines', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:purchase_orders,code',
         ], [
-            'title.required' => 'Judul tidak boleh kosong.',
+            'name.required'         => 'Nama tidak boleh kosong.',
+            'location.required'     => 'Lokasi harus diisi',
+            'ip_address.required'   => 'ip address harus diisi',
+            'code.required'         =>  'Kode harus ada dalam form',
+            'code.unique'           => 'Kode telah dipakai',
         ]);
 
         if($validation->fails()) {
@@ -143,8 +155,9 @@ class AttendanceMachineController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = AttendanceMachine::create([
+                        'name'              => $request->name,
                         'code'              => $request->code,
-                        'ip_address'	    => $request->name,
+                        'ip_address'	    => $request->ip_address,
                         'port'              => $request->port,
                         'location'          => $request->location,
                         'status'            => $request->status ? $request->status : '2',

@@ -125,6 +125,18 @@ class FundRequest extends Model
         return $total;
     }
 
+    public function totalReceivableUsedPaidExcept($prd){
+        $total = 0;
+        if($this->document_status == '3'){
+            foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment');
+            })->where('id','<>',$prd)->get() as $row){
+                $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
+            }
+        }
+        return $total;
+    }
+
     public function totalReceivableUsedPaidByDate($date){
         $total = 0;
         if($this->document_status == '3'){

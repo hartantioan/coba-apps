@@ -99,6 +99,14 @@ class GoodReceipt extends Model
         return $ada;
     }
 
+    public function currency(){
+        $currency = '';
+        foreach($this->goodReceiptDetail as $row){
+            $currency = $row->purchaseOrderDetail->purchaseOrder->currency;
+        }
+
+        return $currency;
+    }
     
     public function attachment() 
     {

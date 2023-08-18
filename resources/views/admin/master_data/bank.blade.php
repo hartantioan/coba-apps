@@ -1,3 +1,12 @@
+<style>
+    .select-wrapper, .select2-container {
+        height:3.6rem !important;
+    }
+
+    .switch {
+        height: 3.45rem !important;
+    }
+</style>
 <!-- BEGIN: Page Main-->
 <div id="main">
     <div class="row">
@@ -48,13 +57,23 @@
                                     <h4 class="card-title">List Data</h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card purple">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Daftar bank yang status Tampil = Ya, akan dimunculkan di Sales Order dan AR Invoice sesuai perusahaannya.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Code</th>
-                                                        <th>Nama</th>
+                                                        <th>Nama Bank</th>
+                                                        <th>Atas Nama</th>
+                                                        <th>No.Rekening</th>
+                                                        <th>Perusahaan</th>
+                                                        <th>Cabang</th>
+                                                        <th>Tampil</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -91,7 +110,38 @@
                         </div>
                         <div class="input-field col s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
-                            <label class="active" for="name">Nama</label>
+                            <label class="active" for="name">Nama Bank</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="account_name" name="account_name" type="text" placeholder="Atas Nama">
+                            <label class="active" for="account_name">Atas Nama</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="account_no" name="account_no" type="text" placeholder="No. Rekening">
+                            <label class="active" for="account_no">No. Rekening</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="form-control" id="company_id" name="company_id">
+                                @foreach($company as $b)
+                                    <option value="{{ $b->id }}">{{ $b->code.' - '.$b->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="company_id">Perusahaan</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="branch" name="branch" type="text" placeholder="Nama Cabang">
+                            <label class="active" for="branch">Cabang</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <div class="switch mb-1">
+                                <label for="order">Tampilkan di Dokumen</label>
+                                <label>
+                                    Tidak
+                                    <input checked type="checkbox" id="is_show" name="is_show" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -184,6 +234,11 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'account_name', className: 'center-align' },
+                { name: 'account_no', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
+                { name: 'branch', className: 'center-align' },
+                { name: 'is_show', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -291,6 +346,15 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#account_name').val(response.account_name);
+                $('#account_no').val(response.account_no);
+                $('#company_id').val(response.company_id).formSelect();
+                $('#branch').val(response.branch);
+                if(response.is_show == '1'){
+                    $('#is_show').prop( "checked", true);
+                }else{
+                    $('#is_show').prop( "checked", false);
+                }
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

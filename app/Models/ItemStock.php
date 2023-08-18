@@ -51,6 +51,16 @@ class ItemStock extends Model
         return $price;
     }
 
+    public function priceDate($date){
+        $price = 0;
+        $cek = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
+        if($cek){
+            $price = $cek->price_final;
+        }
+
+        return $price;
+    }
+
     public function requestSparepartDetail(){
         return $this->hasMany('App\Models\RequestSparepartDetail');
     }

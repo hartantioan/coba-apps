@@ -375,7 +375,7 @@ class MarketingOrderDeliveryController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Sales Order telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Jadwal Kirim telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -401,7 +401,7 @@ class MarketingOrderDeliveryController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status marketing order detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status jadwal kirim detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -531,7 +531,7 @@ class MarketingOrderDeliveryController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').' - '.$row->getHpp().'</td>
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';

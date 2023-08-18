@@ -525,8 +525,10 @@ class PurchaseRequestController extends Controller
 
                     if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
+                            if($query->document){
+                                if(Storage::exists($query->document)){
+                                    Storage::delete($query->document);
+                                }
                             }
                             $document = $request->file('file')->store('public/purchase_requests');
                         } else {

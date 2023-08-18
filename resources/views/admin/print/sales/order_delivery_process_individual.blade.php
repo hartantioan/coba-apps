@@ -150,20 +150,18 @@
                     <td width="83%" class="left-align">
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">Sales Order # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">Surat Jalan # {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:10px">Diajukan:</small>
+                                <small style="font-size:10px">Dikirimkan:</small>
                                 <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
-                                <small style="font-size:10px">Valid Hingga:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->valid_date)) }}</span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">Sales Order</h5>
+                                <h5 style="margin-top: -2px">Surat Jalan</h5>
                             </td>
                         </tr>
                     </td>
@@ -184,11 +182,38 @@
                     <!-- header section -->
                     <table border="0" width="100%">
                         <tr>
-                            <td width="30%" class="left-align">
+                            <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
                                             Customer
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->marketingOrderDelivery->marketingOrder->account->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Alamat
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->marketingOrderDelivery->marketingOrder->account->address }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Telepon
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->marketingOrderDelivery->marketingOrder->account->phone.' / '.$data->marketingOrderDelivery->marketingOrder->account->office_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
+                                            Ekspedisi
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
@@ -215,7 +240,7 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="25%" class="left-align">
+                            <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="50%">
@@ -223,16 +248,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="50%">
-                                            {{ $data->deliveryType() }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Broker
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->sender->name }}
+                                            {{ $data->marketingOrderDelivery->marketingOrder->deliveryType() }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -241,29 +257,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ date('d/m/y',strtotime($data->delivery_date)) }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="45%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="30%">
-                                            Almt Kirim
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="70%">
-                                            {{ $data->shipment_address }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Almt Penagihan
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->billing_address }}
+                                            {{ date('d/m/y',strtotime($data->post_date)) }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -272,7 +266,25 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->destination_address.', '.ucwords(strtolower($data->subdistrict->name.' - '.$data->city->name.' - '.$data->province->name)) }}
+                                            {{ $data->marketingOrderDelivery->marketingOrder->destination_address.', '.ucwords(strtolower($data->marketingOrderDelivery->marketingOrder->subdistrict->name.' - '.$data->marketingOrderDelivery->marketingOrder->city->name.' - '.$data->marketingOrderDelivery->marketingOrder->province->name)) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Supir
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->driver_name.' - '.$data->driver_hp }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Kendaraan
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->vehicle_name.' - '.$data->vehicle_no }}
                                         </td>
                                     </tr>
                                 </table>
@@ -286,24 +298,22 @@
                                 <tr>
                                     <th>No.</th>
                                     <th>Item</th>
+                                    <th>Ambil Dari</th>
                                     <th>Qty</th>
                                     <th>Satuan</th>
-                                    <th>Harga</th>
-                                    <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($data->marketingOrderDetail as $key => $row)
+                                @foreach($data->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $row)
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
                                     <td>{{ $row->item->name }}</td>
+                                    <td>{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name }}</td>
                                     <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td align="center">{{ $row->item->sellUnit->code }}</td>
-                                    <td align="right">{{ number_format($row->price_after_discount,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="6">Keterangan: {{ $row->note }}</td>
+                                    <td colspan="5">Keterangan: {{ $row->note }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -313,53 +323,17 @@
                     <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
                         <div class="row">
-                        <div class="column1">
-                            <table style="width:100%">
-                                <tr class="break-row">
-                                    <td>
-                                        Rekening :<br>
-                                        {!! $data->company->banks() !!}
-                                        <div class="mt-3">
-                                            Catatan : {{ $data->note }}
-                                        </div>
-                                        Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
-                                    </td>
-                                    
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="column2">
-                            <table style="border-collapse:collapse;" width="74%">
-                                {{-- <tr class="break-row">
-                                    <td class="right-align">Subtotal</td>
-                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->subtotal,2,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td class="right-align">Diskon</td>
-                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->discount,2,',','.') }}</td>
-                                </tr class="break-row"> --}}
-                                <tr>
-                                    <td class="right-align">Total</td>
-                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
-                                </tr class="break-row">
-                                <tr class="break-row">
-                                    <td class="right-align">PPN</td>
-                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
-                                </tr>
-                                {{-- <tr class="break-row">
-                                    <td class="right-align">Total Stlh PPN</td>
-                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->total_after_tax,2,',','.') }}</td>
-                                </tr> --}}
-                                <tr class="break-row">
-                                    <td class="right-align">Rounding</td>
-                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->rounding,2,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td class="right-align">Grandtotal</td>
-                                    <td class="right-align" align="right" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
-                                </tr>
-                            </table>
-                        </div>
+                            <div class="column1">
+                                <table style="width:100%">
+                                    <tr class="break-row">
+                                        <td>
+                                            <div class="mt-3">
+                                                Catatan : {{ $data->note }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -379,6 +353,14 @@
                                     @endif
                                     <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                                     <div class="mt-1">{{ $data->user->position->name.' - '.$data->user->department->name }}</div>
+                                </td>
+                                <td width="">
+                                    Supir,
+                                    <div style="margin-top:50px;">{{ $data->driver_name }}</div>
+                                </td>
+                                <td width="">
+                                    Customer,
+                                    <div style="margin-top:50px;">...............</div>
                                 </td>
                                 @if($data->approval())
                                     @foreach ($data->approval() as $detail)
@@ -400,8 +382,5 @@
                 </div>
             </div>
         </main>
-       
     </body>
-    
-    
 </html>

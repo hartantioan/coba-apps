@@ -95,7 +95,7 @@ class PurchaseInvoiceController extends Controller
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'total'         => number_format($row->total,2,',','.'),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                    'balance'       => number_format($row->balanceInvoice(),2,',','.'),
+                    'balance'       => $row->currency->symbol.' '.number_format($row->balanceInvoice(),2,',','.'),
                 ];
             }
         }
@@ -112,7 +112,7 @@ class PurchaseInvoiceController extends Controller
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'invoice'       => number_format($invoice,2,',','.'),
-                    'balance'       => number_format($row->grandtotal - $invoice,2,',','.'),
+                    'balance'       => $row->currency->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
                     'info'          => $row->note,
                 ];
             }
@@ -130,7 +130,7 @@ class PurchaseInvoiceController extends Controller
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'invoice'       => number_format($invoice,2,',','.'),
-                    'balance'       => number_format($row->grandtotal - $invoice,2,',','.'),
+                    'balance'       => $row->currency()->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
                     'info'          => $row->note,
                 ];
             }
@@ -148,7 +148,7 @@ class PurchaseInvoiceController extends Controller
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'grandtotal'    => number_format($row->grandtotal,2,',','.'),
                     'invoice'       => number_format($invoice,2,',','.'),
-                    'balance'       => number_format($row->grandtotal - $invoice,2,',','.'),
+                    'balance'       => $row->currency->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
                     'info'          => $row->note,
                 ];
             }
@@ -633,8 +633,10 @@ class PurchaseInvoiceController extends Controller
                     if(in_array($query->status,['1','6'])){
 
                         if($request->has('document')) {
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
+                            if($query->document){
+                                if(Storage::exists($query->document)){
+                                    Storage::delete($query->document);
+                                }
                             }
                             $document = $request->file('document')->store('public/purchase_invoices');
                         } else {

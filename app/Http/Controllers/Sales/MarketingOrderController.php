@@ -491,8 +491,10 @@ class MarketingOrderController extends Controller
 
                     if(in_array($query->status,['1','6'])){
                         if($request->has('document_so')) {
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
+                            if($query->document){
+                                if(Storage::exists($query->document)){
+                                    Storage::delete($query->document);
+                                }
                             }
                             $document = $request->file('document_so')->store('public/marketing_orders');
                         } else {
@@ -617,8 +619,8 @@ class MarketingOrderController extends Controller
                             'other_fee'                     => str_replace(',','.',str_replace('.','',$request->arr_other_fee[$key])),
                             'price_after_discount'          => str_replace(',','.',str_replace('.','',$request->arr_final_price[$key])),
                             'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                            'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax_nominal[$key])),
-                            'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),
+                            'tax'                           => $request->arr_tax_nominal[$key],
+                            'grandtotal'                    => $request->arr_grandtotal[$key],
                             'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                             'item_stock_id'                 => $request->arr_item_stock[$key],
                             'place_id'                      => $request->arr_place[$key],
@@ -692,8 +694,8 @@ class MarketingOrderController extends Controller
                 'other_fee'             => number_format($row->other_fee,2,',','.'),
                 'final_price'           => number_format($row->price_after_discount,2,',','.'),
                 'total'                 => number_format($row->total,2,',','.'),
-                'tax'                   => number_format($row->tax,2,',','.'),
-                'grandtotal'            => number_format($row->grandtotal,2,',','.'),
+                'tax'                   => $row->tax,
+                'grandtotal'            => $row->grandtotal,
                 'note'                  => $row->note,
                 'item_stock_id'         => $row->item_stock_id,
                 'item_stock_name'       => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code,

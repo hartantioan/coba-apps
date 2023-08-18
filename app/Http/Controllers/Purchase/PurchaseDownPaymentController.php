@@ -383,8 +383,10 @@ class PurchaseDownPaymentController extends Controller
                         CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
 
                         if($request->has('document')) {
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
+                            if($query->document){
+                                if(Storage::exists($query->document)){
+                                    Storage::delete($query->document);
+                                }
                             }
                             $document = $request->file('document')->store('public/purchase_down_payments');
                         } else {
@@ -423,7 +425,7 @@ class PurchaseDownPaymentController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status AP Down Payment sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -484,7 +486,7 @@ class PurchaseDownPaymentController extends Controller
                 }
 
                 CustomHelper::sendApproval('purchase_down_payments',$query->id,$query->note);
-                CustomHelper::sendNotification('purchase_down_payments',$query->id,'Pengajuan Purchase Down Payment No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendNotification('purchase_down_payments',$query->id,'Pengajuan AP Down Payment No. '.$query->code,$query->note,session('bo_id'));
                 CustomHelper::addDeposit($query->account_id,$total);
 
                 activity()
@@ -680,7 +682,7 @@ class PurchaseDownPaymentController extends Controller
                     ->withProperties($query)
                     ->log('Void the purchase order down payment data');
     
-                CustomHelper::sendNotification('purchase_down_payments',$query->id,'Purchase Order Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification('purchase_down_payments',$query->id,'AP Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
     
                 $response = [
                     'status'  => 200,
@@ -742,7 +744,7 @@ class PurchaseDownPaymentController extends Controller
                 ->performedOn(new PurchaseOrder())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the purchase order data');
+                ->log('Delete the purchase order down payment data');
 
             $response = [
                 'status'  => 200,
@@ -761,7 +763,7 @@ class PurchaseDownPaymentController extends Controller
     public function printALL(Request $request){
 
         $data = [
-            'title' => 'PURCHASE ORDER DOWN PAYMENT REPORT',
+            'title' => 'AP DOWN PAYMENT REPORT',
             'data' => PurchaseDownPayment::where(function ($query) use ($request) {
                 if($request->search) {
                     $query->where(function($query) use ($request) {

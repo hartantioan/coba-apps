@@ -16,6 +16,7 @@ use App\Models\InventoryTransferOut;
 use App\Models\ItemStock;
 use App\Models\Line;
 use App\Models\MarketingOrder;
+use App\Models\MarketingOrderDelivery;
 use App\Models\Menu;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
@@ -1586,6 +1587,38 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             if($d->hasBalanceMod()){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrderDelivery(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = MarketingOrderDelivery::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('note','like',"%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhereHas('account',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            if(!$d->marketingOrderDeliveryProcess()->exists()){
                 $response[] = [
                     'id'   			=> $d->id,
                     'text' 			=> $d->code,

@@ -59,6 +59,11 @@ class MarketingOrderDelivery extends Model
         return $this->hasMany('App\Models\MarketingOrderDeliveryDetail');
     }
 
+    public function marketingOrderDeliveryProcess()
+    {
+        return $this->hasOne('App\Models\MarketingOrderDeliveryProcess')->whereIn('status',['2','3']);
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
@@ -140,5 +145,44 @@ class MarketingOrderDelivery extends Model
         //logic here
 
         return $hasRelation;
+    }
+    
+    public function getTotal(){
+        $total = 0;
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $priceRow = $row->marketingOrderDetail->total / $row->marketingOrderDetail->qty;
+            $totalRow = $priceRow * $row->qty;
+            $totalRow = $this->marketingOrder->total * ($totalRow / $this->marketingOrder->subtotal);
+            $total += $totalRow;
+        }
+        return $total;
+    }
+
+    public function getTax(){
+        $tax = 0;
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $priceRow = $row->marketingOrderDetail->total / $row->marketingOrderDetail->qty;
+            $totalRow = $priceRow * $row->qty;
+            $taxRow = $this->marketingOrder->tax * ($totalRow / $this->marketingOrder->subtotal);
+            $tax += $taxRow;
+        }
+        /* return floor($tax); */
+        return $tax;
+    }
+
+    public function getRounding(){
+        $round = 0;
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $priceRow = $row->marketingOrderDetail->total / $row->marketingOrderDetail->qty;
+            $totalRow = $priceRow * $row->qty;
+            $roundRow = $this->marketingOrder->rounding * ($totalRow / $this->marketingOrder->subtotal);
+            $round += $roundRow;
+        }
+        return $round;
+    }
+
+    public function getGrandtotal(){
+        $total = $this->getTotal() + $this->getRounding() + $this->getTax();
+        return $total;
     }
 }

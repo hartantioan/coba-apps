@@ -120,17 +120,13 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Jadwal Kirim # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Surat Jalan # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
-                    </div>
-                    <div class="mr-2">
                         <small>Dikirimkan:</small>
-                        <span>{{ date('d/m/y',strtotime($data->delivery_date)) }}</span>
+                        <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -138,7 +134,7 @@
         <!-- logo and title -->
         <div class="row mt-1 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Jadwal Kirim</h5>
+                <h5 class="indigo-text">Surat Jalan</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="35%">
@@ -155,19 +151,19 @@
                     Nama
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrder->account->name }}
+                    {{ $data->marketingOrderDelivery->marketingOrder->account->name }}
                 </div>
                 <div class="col s4">
                     Alamat
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrder->account->address }}
+                    {{ $data->marketingOrderDelivery->marketingOrder->account->address }}
                 </div>
                 <div class="col s4">
                     Telepon
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrder->account->phone.' / '.$data->marketingOrder->account->office_no }}
+                    {{ $data->marketingOrderDelivery->marketingOrder->account->phone.' / '.$data->marketingOrderDelivery->marketingOrder->account->office_no }}
                 </div>
                 <div class="col s12 center-align mt-3">
                     EKSPEDISI
@@ -199,25 +195,37 @@
                     Tipe
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrder->deliveryType() }}
+                    {{ $data->marketingOrderDelivery->marketingOrder->deliveryType() }}
                 </div>
                 <div class="col s4">
                     Tgl.Kirim
                 </div>
                 <div class="col s8">
-                    {{ date('d/m/y',strtotime($data->delivery_date)) }}
+                    {{ date('d/m/y',strtotime($data->post_date)) }}
                 </div>
                 <div class="col s4">
                     Almt Kirim
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrder->shipment_address }}
+                    {{ $data->marketingOrderDelivery->marketingOrder->shipment_address }}
                 </div>
                 <div class="col s4">
                     Almt Tujuan
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrder->destination_address.', '.ucwords(strtolower($data->marketingOrder->subdistrict->name.' - '.$data->marketingOrder->city->name.' - '.$data->marketingOrder->province->name)) }}
+                    {{ $data->marketingOrderDelivery->marketingOrder->destination_address.', '.ucwords(strtolower($data->marketingOrderDelivery->marketingOrder->subdistrict->name.' - '.$data->marketingOrderDelivery->marketingOrder->city->name.' - '.$data->marketingOrderDelivery->marketingOrder->province->name)) }}
+                </div>
+                <div class="col s4">
+                    Supir
+                </div>
+                <div class="col s8">
+                    {{ $data->driver_name.' / '.$data->driver_hp }}
+                </div>
+                <div class="col s4">
+                    Kendaraan
+                </div>
+                <div class="col s8">
+                    {{ $data->vehicle_name.' / '.$data->vehicle_no }}
                 </div>
             </div>
         </div>
@@ -231,23 +239,25 @@
                         <th class="center-align">Stok</th>
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
+                        <th class="center-align">Kondisi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->marketingOrderDeliveryDetail as $key => $row)
+                    @foreach($data->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $row)
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item->name }}</td>
                         <td class="">{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name }}</td>
                         <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="center-align">{{ $row->item->sellUnit->code }}</td>
+                        <td class="center-align"></td>
                     </tr>
                     <tr>
-                        <td colspan="5">Keterangan: {{ $row->note }}</td>
+                        <td colspan="6">Keterangan: {{ $row->note }}</td>
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <div class="mt-3">
                                 Catatan : {{ $data->note }}
                             </div>
@@ -276,6 +286,14 @@
                         <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                         <div class="mt-1">{{ $data->user->position->name.' - '.$data->user->department->name }}</div>
                     </td>
+                    <td class="center-align">
+                        Supir,
+                        <div style="margin-top:75px;">{{ $data->driver_name }}</div>
+                    </td>
+                    <td class="center-align">
+                        Customer,
+                        <div style="margin-top:75px;">...............</div>
+                    </td>
                     @if($data->approval())
                         @foreach ($data->approval() as $detail)
                             @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
@@ -291,7 +309,7 @@
                         @endforeach
                     @endif
                 </tr>
-            </table>   
+            </table>
         </div>
     </div>
 </div>

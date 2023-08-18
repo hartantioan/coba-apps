@@ -34,7 +34,7 @@
                     cekNotif('{{ URL::to('/') }}');
                 },5000);
                 $('.tooltipped').tooltip();
-                checkPageMaintenance('{{ URL::to('/') }}');
+                /* checkPageMaintenance('{{ URL::to('/') }}'); */
             });
         </script>
     @endif

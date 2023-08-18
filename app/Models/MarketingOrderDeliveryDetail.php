@@ -50,4 +50,9 @@ class MarketingOrderDeliveryDetail extends Model
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
     }
+
+    public function getHpp(){
+        $total = round($this->itemStock->priceDate($this->marketingOrderDelivery->post_date) * $this->qty * $this->item->sell_convert,2);
+        return $total;
+    }
 }

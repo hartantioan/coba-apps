@@ -65,6 +65,8 @@ class AppServiceProvider extends ServiceProvider
             'employee_transfers'                    => 'App\Models\EmployeeTransfer',
             'marketing_orders'                      => 'App\Models\MarketingOrder',
             'marketing_order_deliveries'            => 'App\Models\MarketingOrderDelivery',
+            'marketing_order_delivery_processes'    => 'App\Models\MarketingOrderDeliveryProcess',
+            'marketing_order_down_payments'         => 'App\Models\MarketingOrderDownPayment',
         ]);
     }
 }

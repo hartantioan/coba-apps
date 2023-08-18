@@ -84,6 +84,7 @@ use App\Http\Controllers\Purchase\AgingAPController;
 use App\Http\Controllers\Purchase\DownPaymentController;
 
 use App\Http\Controllers\Sales\MarketingOrderController;
+use App\Http\Controllers\Sales\MarketingOrderDownPaymentController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryProcessController;
 
@@ -215,6 +216,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('shift', [Select2Controller::class, 'shift']);
                 Route::get('place', [Select2Controller::class, 'place']);
                 Route::get('marketing_order', [Select2Controller::class, 'marketingOrder']);
+                Route::get('marketing_order_delivery', [Select2Controller::class, 'marketingOrderDelivery']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -1303,6 +1305,23 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [MarketingOrderController::class, 'destroy'])->middleware('operation.access:sales_order,delete');
                 });
 
+                Route::prefix('sales_down_payment')->middleware('operation.access:sales_down_payment,view')->group(function () {
+                    Route::get('/',[MarketingOrderDownPaymentController::class, 'index']);
+                    Route::get('datatable',[MarketingOrderDownPaymentController::class, 'datatable']);
+                    Route::get('row_detail',[MarketingOrderDownPaymentController::class, 'rowDetail']);
+                    Route::post('show', [MarketingOrderDownPaymentController::class, 'show']);
+                    Route::post('get_code', [MarketingOrderDownPaymentController::class, 'getCode']);
+                    Route::post('print',[MarketingOrderDownPaymentController::class, 'print']);
+                    Route::post('print_by_range',[MarketingOrderDownPaymentController::class, 'printByRange']);
+                    Route::get('export',[MarketingOrderDownPaymentController::class, 'export']);
+                    Route::get('viewstructuretree',[MarketingOrderDownPaymentController::class, 'viewStructureTree']);
+                    Route::post('create',[MarketingOrderDownPaymentController::class, 'create'])->middleware('operation.access:sales_down_payment,update');
+                    Route::get('approval/{id}',[MarketingOrderDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[MarketingOrderDownPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MarketingOrderDownPaymentController::class, 'voidStatus'])->middleware('operation.access:sales_down_payment,void');
+                    Route::post('destroy', [MarketingOrderDownPaymentController::class, 'destroy'])->middleware('operation.access:sales_down_payment,delete');
+                });
+
                 Route::prefix('marketing_order_delivery')->middleware('operation.access:marketing_order_delivery,view')->group(function () {
                     Route::get('/',[MarketingOrderDeliveryController::class, 'index']);
                     Route::get('datatable',[MarketingOrderDeliveryController::class, 'datatable']);
@@ -1332,8 +1351,12 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[MarketingOrderDeliveryProcessController::class, 'printByRange']);
                     Route::get('export',[MarketingOrderDeliveryProcessController::class, 'export']);
                     Route::get('viewstructuretree',[MarketingOrderDeliveryProcessController::class, 'viewStructureTree']);
-                    Route::post('get_marketing_order', [MarketingOrderDeliveryProcessController::class, 'getMarketingOrder']);
+                    Route::post('get_marketing_order_delivery', [MarketingOrderDeliveryProcessController::class, 'getMarketingOrderDelivery']);
                     Route::post('remove_used_data', [MarketingOrderDeliveryProcessController::class, 'removeUsedData']);
+                    Route::get('view_journal/{id}',[MarketingOrderDeliveryProcessController::class, 'viewJournal'])->middleware('operation.access:delivery_order,journal');
+                    Route::post('get_tracking', [MarketingOrderDeliveryProcessController::class, 'getTracking']);
+                    Route::post('update_tracking',[MarketingOrderDeliveryProcessController::class, 'updateTracking'])->middleware('operation.access:delivery_order,update');
+                    Route::post('update_return',[MarketingOrderDeliveryProcessController::class, 'updateReturn'])->middleware('operation.access:delivery_order,update');
                     Route::post('create',[MarketingOrderDeliveryProcessController::class, 'create'])->middleware('operation.access:delivery_order,update');
                     Route::get('approval/{id}',[MarketingOrderDeliveryProcessController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[MarketingOrderDeliveryProcessController::class, 'printIndividual'])->withoutMiddleware('direct.access');

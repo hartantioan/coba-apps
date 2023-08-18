@@ -60,4 +60,20 @@ class Company extends Model
 
         return 'BR'.$no;
     }
+
+    public function bank(){
+        return $this->hasMany('App\Models\Bank')->where('status','1')->where('is_show','1');
+    }
+
+    public function banks(){
+        $text = '';
+        $arr = [];
+        foreach($this->bank as $row){
+            $arr[] = $row->name.' Rek. '.$row->account_no.' a/n '.$row->account_name;
+        }
+
+        $text = implode('<br>',$arr);
+
+        return $text;
+    }
 }

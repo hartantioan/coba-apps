@@ -402,8 +402,10 @@ class IncomingPaymentController extends Controller
                     if(in_array($query->status,['1','6'])){
 
                         if($request->has('document')) {
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
+                            if($query->document){
+                                if(Storage::exists($query->document)){
+                                    Storage::delete($query->document);
+                                }
                             }
                             $document = $request->file('document')->store('public/incoming_payments');
                         } else {

@@ -370,7 +370,7 @@ class PaymentRequestController extends Controller
                         'rounding'      => number_format(0,2,',','.'),
                         'balance'       => number_format($row->grandtotal,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
-                        'final'         => number_format($final,2,',','.'),
+                        'final'         => $row->currency->symbol.' '.number_format($final,2,',','.'),
                         'note'          => $row->note,
                     ];
                 }
@@ -396,7 +396,7 @@ class PaymentRequestController extends Controller
                         'rounding'      => number_format(0,2,',','.'),
                         'balance'       => number_format($row->grandtotal,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
-                        'final'         => number_format($final,2,',','.'),
+                        'final'         => $row->currency->symbol.' '.number_format($final,2,',','.'),
                         'note'          => $row->note,
                     ];
                 }
@@ -422,7 +422,7 @@ class PaymentRequestController extends Controller
                         'rounding'      => number_format($row->rounding,2,',','.'),
                         'balance'       => number_format($row->balance,2,',','.'),
                         'memo'          => number_format($memo,2,',','.'),
-                        'final'         => number_format($final,2,',','.'),
+                        'final'         => $row->currency()->symbol.' '.number_format($final,2,',','.'),
                         'note'          => $row->note,
                     ];
                 }
@@ -650,8 +650,10 @@ class PaymentRequestController extends Controller
                     if(in_array($query->status,['1','6'])){
 
                         if($request->has('document')) {
-                            if(Storage::exists($query->document)){
-                                Storage::delete($query->document);
+                            if($query->document){
+                                if(Storage::exists($query->document)){
+                                    Storage::delete($query->document);
+                                }
                             }
                             $document = $request->file('document')->store('public/payment_requests');
                         } else {
@@ -1615,7 +1617,7 @@ class PaymentRequestController extends Controller
                     $cek = PaymentRequest::where('code',CustomHelper::decrypt($request->tempPay))->first();
 
                     $query = OutgoingPayment::create([
-                        'code'			            => $request->code,
+                        'code'			            => $request->codePay,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $cek->company_id,
                         'account_id'                => $cek->account_id,

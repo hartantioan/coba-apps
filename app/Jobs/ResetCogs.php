@@ -8,6 +8,7 @@ use App\Models\InventoryTransferIn;
 use App\Models\InventoryTransferOut;
 use App\Models\ItemCogs;
 use App\Models\Journal;
+use App\Models\MarketingOrderDeliveryProcess;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -77,7 +78,7 @@ class ResetCogs implements ShouldQueue
 						'total_final'	=> $totalprice
 					]);
 				}elseif($row->type == 'OUT'){
-					if($row->lookable_type == 'good_issues' || $row->lookable_type == 'inventory_transfer_outs'){
+					if($row->lookable_type == 'good_issues' || $row->lookable_type == 'inventory_transfer_outs' || $row->lookable_type == 'marketing_order_delivery_processes'){
 						$prevprice = $data[$key-1]->price_final;
 						if($row->lookable_type == 'good_issues'){
 							$gi = GoodIssue::find($row->lookable_id);
@@ -99,6 +100,9 @@ class ResetCogs implements ShouldQueue
 						}elseif($row->lookable_type == 'inventory_transfer_outs'){
 							$it = InventoryTransferOut::find($row->lookable_id);
 							$it->updateJournal();
+						}elseif($row->lookable_type == 'marketing_order_delivery_processes'){
+							$modp = MarketingOrderDeliveryProcess::find($row->lookable_id);
+							$modp->updateJournal();
 						}
 						$finalprice = $prevprice;
 						$totalprice = $prevtotal - $row->total_out;

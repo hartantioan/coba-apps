@@ -172,11 +172,11 @@
                         </div>
                         <div class="input-field col s3">
                             <input id="id_card" name="id_card" type="text" placeholder="No KTP" class="ktp">
-                            <label class="active" for="id_card">No KTP</label>
+                            <label class="active" for="id_card">No KTP / Identitas</label>
                         </div>
                         <div class="input-field col s3">
                             <input id="id_card_address" name="id_card_address" type="text" placeholder="Alamat KTP">
-                            <label class="active" for="id_card_address">Alamat KTP</label>
+                            <label class="active" for="id_card_address">Alamat KTP / Identitas</label>
                         </div>
                         <div class="input-field col s3">
                             <input id="tax_id" name="tax_id" type="text" placeholder="No. NPWP" class="npwp">

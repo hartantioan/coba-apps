@@ -8,78 +8,118 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class InventoryTransferOut extends Model
+class MarketingOrderDownPayment extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'inventory_transfer_outs';
+    protected $table = 'marketing_order_down_payments';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
+        'account_id',
         'company_id',
-        'place_from',
-        'warehouse_from',
-        'place_to',
-        'warehouse_to',
+        'tax_id',
+        'is_tax',
+        'is_include_tax',
+        'percent_tax',
         'post_date',
+        'due_date',
+        'status',
+        'type',
+        'currency_id',
+        'currency_rate',
+        'subtotal',
+        'discount',
+        'total',
+        'tax',
+        'grandtotal',
         'document',
         'note',
-        'receiver_id',
-        'received_date',
-        'document_received',
-        'note_received',
-        'status',
         'void_id',
         'void_note',
-        'void_date',
+        'void_date'
     ];
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
-    public function inventoryTransferIn(){
-        return $this->hasOne('App\Models\InventoryTransferIn','inventory_transfer_out_id','id');
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public function placeFrom(){
-        return $this->belongsTo('App\Models\Place','place_from','id')->withTrashed();
+    public function account()
+    {
+        return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
     }
 
-    public function warehouseFrom(){
-        return $this->belongsTo('App\Models\Warehouse','warehouse_from','id')->withTrashed();
+    public function taxId()
+    {
+        return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
     }
 
-    public function placeTo(){
-        return $this->belongsTo('App\Models\Place','place_to','id')->withTrashed();
+    public function voidUser()
+    {
+        return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function warehouseTo(){
-        return $this->belongsTo('App\Models\Warehouse','warehouse_to','id')->withTrashed();
+    public function supplier(){
+        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }
 
-    public function user(){
-        return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
+    public function isIncludeTax(){
+        $type = match ($this->is_include_tax) {
+          '0' => 'Tidak Termasuk',
+          '1' => 'Termasuk',
+          default => 'Invalid',
+        };
+
+        return $type;
     }
 
-    public function receiver(){
-        return $this->belongsTo('App\Models\User','receiver_id','id')->withTrashed();
+    public function isTax(){
+        $type = match ($this->is_tax) {
+          NULL => 'Tidak',
+          '1' => 'Ya',
+          default => 'Invalid',
+        };
+
+        return $type;
     }
 
-    public function voidUser(){
-        return $this->belongsTo('App\Models\User','void_id','id')->withTrashed();
+    public function type(){
+        $type = match ($this->type) {
+          '1' => 'Cash',
+          '2' => 'Transfer',
+          '3' => 'Giro/Check',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public static function typeStatic($original){
+        $type = match ($original) {
+            '1' => 'Cash',
+            '2' => 'Transfer',
+            '3' => 'Giro/Check',
+            default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
-    }
-
-    public function inventoryTransferOutDetail()
-    {
-        return $this->hasMany('App\Models\InventoryTransferOutDetail');
     }
 
     public function status(){
@@ -130,7 +170,7 @@ class InventoryTransferOut extends Model
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = InventoryTransferOut::selectRaw('RIGHT(code, 8) as code')
+        $query = MarketingOrderDownPayment::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
@@ -170,28 +210,12 @@ class InventoryTransferOut extends Model
         return $ada;
     }
 
-    public function updateJournal(){
-        $journal = Journal::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
-        
-        if($journal){
-            foreach($this->inventoryTransferOutDetail as $row){
-                $priceout = $row->item->priceNow($row->itemStock->place_id,$this->post_date);
-				$nominal = round($row->qty * $priceout,2);
+    
 
-                $row->update([
-                    'price'     => $priceout,
-                    'total'     => $nominal
-                ]);
+    public function hasChildDocument(){
+        $hasRelation = false;
 
-                if($journal){
-                    foreach($journal->journalDetail()->where('item_id',$row->item_id)->get() as $rowupdate){
-                        $rowupdate->update([
-                            'nominal'   => $nominal
-                        ]);
-                    }
-                }
-            }
-        }
+        return $hasRelation;
     }
 
     public function journal(){

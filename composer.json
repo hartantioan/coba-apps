@@ -5,21 +5,22 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.2.4",
         "barryvdh/laravel-dompdf": "^2.0",
         "cboden/ratchet": "^0.4.4",
-        "dipeshsukhia/laravel-html-minify": "^2.0",
+        "dipeshsukhia/laravel-html-minify": "^3.0",
         "doctrine/dbal": "^3.6",
         "guzzlehttp/guzzle": "^7.2",
         "iio/libmergepdf": "^4.0",
-        "laravel/framework": "^9.19",
-        "laravel/sanctum": "^3.0",
+        "laravel/framework": "^10.0",
+        "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.7",
         "maatwebsite/excel": "^3.1",
         "milon/barcode": "^10.0",
         "psr/simple-cache": "1.0",
         "spatie/laravel-activitylog": "^4.7",
-        "spatie/laravel-permission": "^5.8"
+        "spatie/laravel-permission": "^5.8",
+        "symfony/process": "^6.3"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.8",
@@ -29,7 +30,7 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0"
+        "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
         "psr-4": {

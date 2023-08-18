@@ -22,16 +22,41 @@ class MarketingOrderDeliveryProcess extends Model
         'account_id',
         'marketing_order_delivery_id',
         'post_date',
-        'document',
+        'return_date',
+        'user_driver_id',
+        'driver_name',
+        'driver_hp',
+        'vehicle_name',
+        'vehicle_no',
         'note',
         'status',
+        'status_tracking',
+        'document',
         'total',
         'tax',
+        'rounding',
         'grandtotal',
         'void_id',
         'void_note',
         'void_date'
     ];
+
+    public function attachment() 
+    {
+        if($this->document !== NULL && Storage::exists($this->document)) {
+            $document = asset(Storage::url($this->document));
+        } else {
+            $document = asset('website/empty.png');
+        }
+
+        return $document;
+    }
+
+    public function deleteFile(){
+		if(Storage::exists($this->document)) {
+            Storage::delete($this->document);
+        }
+	}
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
@@ -40,6 +65,11 @@ class MarketingOrderDeliveryProcess extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function userDriver()
+    {
+        return $this->belongsTo('App\Models\UserDriver', 'user_driver_id', 'id')->withTrashed();
     }
 
     public function account()
@@ -90,22 +120,15 @@ class MarketingOrderDeliveryProcess extends Model
         return $status;
     }
 
-    public function attachment() 
-    {
-        if($this->document !== NULL && Storage::exists($this->document)) {
-            $document = asset(Storage::url($this->document));
-        } else {
-            $document = asset('website/empty.png');
-        }
+    public function statusTracking(){
+        $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
 
-        return $document;
+        if($status){
+            return $status->status();
+        }else{
+            return 'Status tracking tidak ditemukan.';
+        }
     }
-
-    public function deleteFile(){
-		if(Storage::exists($this->document)) {
-            Storage::delete($this->document);
-        }
-	}
 
     public static function generateCode($prefix)
     {
@@ -137,6 +160,10 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
+    public function marketingOrderDeliveryProcessTrack(){
+        return $this->hasMany('App\Models\MarketingOrderDeliveryProcessTrack','marketing_order_delivery_process_id','id');
+    }
+
     public function hasDetailMatrix(){
         $ada = false;
         if($this->approval()){
@@ -154,6 +181,30 @@ class MarketingOrderDeliveryProcess extends Model
         $hasRelation = false;
 
         return $hasRelation;
+    }
+
+    public function updateJournal(){
+        $journal = Journal::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
+        
+        if($journal){
+            foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+                $priceout = $row->item->priceNow($row->place_id,$this->post_date);
+				$nominal = round($row->qty * $row->item->sell_convert * $priceout,2);
+
+                $row->update([
+                    'price'     => $priceout,
+                    'total'     => $nominal
+                ]);
+
+                if($journal){
+                    foreach($journal->journalDetail()->where('item_id',$row->item_id)->get() as $rowupdate){
+                        $rowupdate->update([
+                            'nominal'   => $nominal
+                        ]);
+                    }
+                }
+            }
+        }
     }
 
     public function journal(){

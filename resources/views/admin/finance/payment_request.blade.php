@@ -1219,6 +1219,7 @@
                     loadingClose('.modal-content');
                     $('#modal6').modal('open');
                     $('#account_name').text($('#account_id').select2('data')[0].text);
+                    $('#top').val(response.top);
 
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
@@ -1337,6 +1338,7 @@
                 }
             });
         }else{
+            $('#top').val('0');
             $('#user_bank_id').empty().append(`
                 <option value="">--Pilih Partner Bisnis-</option>
             `);
@@ -1524,8 +1526,6 @@
                                     </tr>
                                 `);
                             }
-
-                            $('#top').val(response.top);
                             
                             $('.modal-content').scrollTop(0);
                             M.updateTextFields();

@@ -41,8 +41,9 @@ return [
             'provider' => 'users',
         ],
         'api' => [
-            'driver' => 'token', //only check
+            'driver' => 'token',
             'provider' => 'users',
+            'hash' => false,
         ],
     ],
 

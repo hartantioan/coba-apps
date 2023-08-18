@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+use App\Models\Company;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -22,6 +23,7 @@ class BankController extends Controller
         $data = [
             'title'     => 'Bank',
             'content'   => 'admin.master_data.bank',
+            'company'   => Company::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -32,6 +34,11 @@ class BankController extends Controller
             'id',
             'code',
             'name',
+            'account_name',
+            'account_no',
+            'company_id',
+            'branch',
+            'is_show',
         ];
 
         $start  = $request->start;
@@ -46,7 +53,8 @@ class BankController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('account_no', 'like', "%$search%");
                     });
                 }
 
@@ -63,7 +71,8 @@ class BankController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('account_no', 'like', "%$search%");
                     });
                 }
 
@@ -82,6 +91,11 @@ class BankController extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
+                    $val->account_name,
+                    $val->account_no,
+                    $val->company->name,
+                    $val->branch,
+                    $val->isShow(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -110,10 +124,16 @@ class BankController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('banks', 'code')->ignore($request->temp)] : 'required|unique:banks,code',
             'name'              => 'required',
+            'company_id'        => 'required',
+            'account_no'        => 'required',
+            'account_name'      => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
             'name.required'         => 'Nama tidak boleh kosong.',
+            'company_id.required'   => 'Perusahaan tidak boleh kosong.',
+            'account_no.required'   => 'Nomor rekening tidak boleh kosong.',
+            'account_name.required' => 'Atas nama rekening tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -128,6 +148,11 @@ class BankController extends Controller
                     $query = Bank::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
+                    $query->account_name    = $request->account_name;
+                    $query->account_no      = $request->account_no;
+                    $query->company_id      = $request->company_id;
+                    $query->branch          = $request->branch;
+                    $query->is_show         = $request->is_show ? $request->is_show : NULL;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -140,6 +165,11 @@ class BankController extends Controller
                     $query = Bank::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,
+                        'account_name'  => $request->account_name,
+                        'account_no'    => $request->account_no,
+                        'company_id'    => $request->company_id,
+                        'branch'        => $request->branch,
+                        'is_show'       => $request->is_show ? $request->is_show : NULL,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

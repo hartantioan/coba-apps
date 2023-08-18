@@ -25,8 +25,6 @@ class PurchaseInvoice extends Model
         'due_date',
         'document_date',
         'type',
-        'currency_id',
-        'currency_rate',
         'subtotal',
         'discount',
         'total',
@@ -73,14 +71,43 @@ class PurchaseInvoice extends Model
         return $type;
     }
 
-    public function currency()
-    {
-        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
-    }
-
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
+    }
+
+    public function currency(){
+        $currency = '';
+        foreach($this->purchaseInvoiceDetail as $row){
+            if($row->lookable_type == 'coas'){
+                $currency = Currency::where('code','IDR')->where('status','1')->first();
+            }elseif($row->lookable_type == 'purchase_order_details'){
+                $currency = $row->lookable->purchaseOrder->currency;
+            }elseif($row->lookable_type == 'landed_cost_details'){
+                $currency = $row->lookable->landedCost->currency;
+            }else{
+                $currency = $row->lookable->purchaseOrderDetail->purchaseOrder->currency;
+            }
+        }
+
+        return $currency;
+    }
+
+    public function currencyRate(){
+        $rate = 1;
+        foreach($this->purchaseInvoiceDetail as $row){
+            if($row->lookable_type == 'coas'){
+                $rate = 1;
+            }elseif($row->lookable_type == 'purchase_order_details'){
+                $rate = $row->lookable->purchaseOrder->currency_rate;
+            }elseif($row->lookable_type == 'landed_cost_details'){
+                $rate = $row->lookable->landedCost->currency_rate;
+            }else{
+                $rate = $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
+            }
+        }
+
+        return $rate;
     }
 
     public function used(){
@@ -295,6 +322,17 @@ class PurchaseInvoice extends Model
         foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
             $query->whereHas('outgoingPayment');
         })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        return $totalAfterMemo;
+    }
+
+    public function getTotalPaidExcept($prd){
+        $total = $this->balance;
+        $totalAfterMemo = $total - $this->totalMemo();
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->where('id','<>',$prd)->get() as $rowpayment){
             $totalAfterMemo -= $rowpayment->nominal;
         }
         return $totalAfterMemo;

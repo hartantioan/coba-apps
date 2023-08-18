@@ -1172,7 +1172,7 @@
                     <datalist id="tempMargin` + count + `"></datalist>
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
+                    <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `')();">
                         <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                         @foreach ($tax as $row)
                             <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
@@ -1181,7 +1181,7 @@
                 </td>
                 <td>
                     <label>
-                        <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                        <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
                         <span>Ya/Tidak</span>
                     </label>
                 </td>
@@ -1695,6 +1695,7 @@
                 $('#grandtotal').val(response.grandtotal);
                 
                 if(response.details.length > 0){
+                    $('#last-row-item').remove();
                     $('.row_item').each(function(){
                         $(this).remove();
                     });
@@ -1733,7 +1734,7 @@
                                     <datalist id="tempMargin` + count + `"></datalist>
                                 </td>
                                 <td>
-                                    <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countAll();">
+                                    <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `');">
                                         <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                                         @foreach ($tax as $row)
                                             <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
@@ -1742,7 +1743,7 @@
                                 </td>
                                 <td>
                                     <label>
-                                        <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countAll();">
+                                        <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
                                         <span>Ya/Tidak</span>
                                     </label>
                                 </td>
@@ -1784,7 +1785,7 @@
                         if(val.is_include_tax){
                             $('#arr_is_include_tax' + count).prop( "checked", true);
                         }
-                        $('#arr_item').append(`
+                        $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
@@ -1933,11 +1934,23 @@
         var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));
         var finalpricedisc3 = finalpricedisc2 - disc3;
         var rowtotal = (finalpricedisc3 * qty).toFixed(2);
+        var rowtax = 0;
+
+        if($('#arr_tax' + id).val() !== '0'){
+            let percent_tax = parseFloat($('#arr_tax' + id).val());
+            if($('#arr_is_include_tax' + id).is(':checked')){
+                rowtotal = rowtotal / (1 + (percent_tax / 100));
+            }
+            rowtax = rowtotal * (percent_tax / 100);
+        }
+
+        $('#arr_tax_nominal' + id).val(rowtax.toFixed(2));
+        $('#arr_grandtotal' + id).val((parseFloat(rowtax) + parseFloat(rowtotal)).toFixed(2));
 
         if(finalpricedisc3 >= 0){
-            $('#arr_final_price' + id).val(formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
+            $('#arr_final_price' + id).val(formatRupiahIni(finalpricedisc3.toFixed(2).toString().replace('.',',')));
         }else{
-            $('#arr_final_price' + id).val('-' + formatRupiahIni((finalpricedisc3 * qty).toFixed(2).toString().replace('.',',')));
+            $('#arr_final_price' + id).val('-' + formatRupiahIni(finalpricedisc3.toFixed(2).toString().replace('.',',')));
         }
 
         if(rowtotal >= 0){
@@ -1954,31 +1967,11 @@
 
         $('input[name^="arr_total"]').each(function(index){
 			subtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            tax += parseFloat($('input[name^="arr_tax_nominal"]').eq(index).val());;
 		});
 
-        $('input[name^="arr_total"]').each(function(index){
-
-            let rownominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowbobot = 0, rowdiscount = 0;
-            rowbobot = rownominal / subtotal;
-            rowdiscount = discount * rowbobot;
-            rownominal -= rowdiscount;
-
-            if($('select[name^="arr_tax"]').eq(index).val() !== '0'){
-                let percent_tax = parseFloat($('select[name^="arr_tax"]').eq(index).val());
-                if($('input[name^="arr_is_include_tax"]').eq(index).is(':checked')){
-                    rownominal = rownominal / (1 + (percent_tax / 100));
-                }
-                rowtax = rownominal * (percent_tax / 100);
-            }
-            
-            $('input[name^="arr_tax_nominal"]').eq(index).val(rowtax);
-            $('input[name^="arr_grandtotal"]').eq(index).val(rowtax + rownominal);
-
-            tax += rowtax;
-            total += rownominal;
-            
-        });
-
+        total = subtotal - discount;
+        
         tax = Math.floor(tax);
 
         total_after_tax = total + tax;

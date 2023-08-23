@@ -311,9 +311,9 @@
                                         </li>
                                     </ul>
                                     <div id="opdata" class="col s12 active">
-                                        <p class="mt-2 mb-2">
+                                        <p class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
                                             <h6></h6>
-                                            <div style="overflow:auto;">
+                                            <div>
                                                 <table class="bordered step17" style="max-width:1650px !important;">
                                                     <thead>
                                                         <tr>
@@ -351,7 +351,7 @@
                                     <div id="costdata" class="col s12">
                                         <p class="mt-2 mb-2">
                                             <h6>Gunakan fitur ini untuk rekonsiliasi biaya dengan piutang karyawan, pastikan anda menentukan daftar piutang mana yang ingin anda gunakan.</h6>
-                                            <div style="overflow:auto;">
+                                            <div>
                                                 <table class="bordered step19" style="max-width:1650px !important;">
                                                     <thead>
                                                         <tr>
@@ -379,7 +379,7 @@
                                 <div class="col m12 s12 step18">
                                     <p class="mt-2 mb-2 ">
                                         <h6>Dibayar dengan Outgoing Payment Piutang Karyawan (Jika Ada) - <small>Fitur ini akan men-jurnal entrikan hutang/biaya pada piutang yang anda pilih secara otomatis, ketika disetujui.</small></h6>
-                                        <div style="overflow:auto;">
+                                        <div>
                                             <table class="bordered" style="max-width:1650px !important;">
                                                 <thead>
                                                     <tr>
@@ -760,7 +760,6 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
         });
 
         loadDataTable();
@@ -1455,6 +1454,8 @@
                                         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                                     }
                                     
+                                    $('#currency_id').val(val.currency_id).formSelect();
+                                    $('#currency_rate').val(val.currency_rate);
                                 });
                                 
                             }else{

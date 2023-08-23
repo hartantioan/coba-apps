@@ -214,9 +214,6 @@
                             </select>
                             <label for="company_id">Perusahaan</label>
                         </div>
-
-
-
                         <div class="input-field col s3">
                             <select id="gender" name="gender">
                                 <option value="1">Laki-laki</option>
@@ -270,6 +267,13 @@
                         <div class="input-field col s3" id="group_select">
                             <select id="group_id" name="group_id"></select>
                             <label for="group_id">Kelompok Partner Bisnis</label>
+                        </div>
+                        <div class="input-field col s3 employee_inputs">
+                            <select id="employee_type" name="employee_type">
+                                <option value="1">Staff</option>
+                                <option value="2">Non-Staff</option>
+                            </select>
+                            <label for="employee_type">Tipe Pegawai</label>
                         </div>
                         <div class="input-field col s3">
                             <div class="switch mb-1">
@@ -1630,6 +1634,7 @@
                     $('#married_status').val(response.married_status).formSelect();
                     $('#married_date').val(response.married_date);
                     $('#children').val(response.children);
+                    $('#employee_type').val(response.employee_type).formSelect();
                 }else{
                     $('#pic').val(response.pic);
                     $('#pic_no').val(response.pic_no);

@@ -391,6 +391,10 @@ class UserController extends Controller
                                 <th>Terakhir Ubah Password</th>
                                 <th>'.$data->last_change_password.'</th>
                             </tr>
+                            <tr>
+                                <th>Tipe Pegawai</th>
+                                <th>'.$data->employeeType().'</th>
+                            </tr>
                         </thead>
                     </table>';
 		
@@ -408,14 +412,13 @@ class UserController extends Controller
                 'type'              => 'required',
                 'id_card'           => 'required',
                 'id_card_address'   => 'required',
-                'company_id'         => 'required',
-  
-                
+                'company_id'        => 'required',
                 'province_id'       => 'required',
                 'city_id'           => 'required',
                 'subdistrict_id'    => 'required',
                 'country_id'        => 'required',
                 'limit_credit'      => 'required',
+                'employee_type'     => 'required',
             ], [
                 'name.required' 	            => 'Nama tidak boleh kosong.',
                 'username.required'             => 'Username tidak boleh kosong.',
@@ -429,12 +432,12 @@ class UserController extends Controller
                 'id_card.required'              => 'No Identitas tidak boleh kosong.',
                 'id_card_address.required'      => 'Alamat Identitas tidak boleh kosong.',
                 'company.required'              => 'Perusahaan tidak boleh kosong.',
-            
                 'province_id.required'          => 'Provinsi tidak boleh kosong.',
                 'city_id.required'              => 'Kota tidak boleh kosong.',
                 'subdistrict_id.required'       => 'Kecamatan tidak boleh kosong.',
                 'country_id.required'           => 'Negara tidak boleh kosong.',
                 'limit_credit.required'         => 'Limit BS Karyawan tidak boleh kosong.',
+                'employee_type.required'        => 'Tipe Pegawai tidak boleh kosong.'
             ]);
         }else{
             $validation = Validator::make($request->all(), [
@@ -527,10 +530,11 @@ class UserController extends Controller
                     $query->top_internal    = $request->top_internal;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->gender          = $request->gender;
-                    $query->married_status  = $request->type == '1' ? $request->married_status :NULL;
-                    $query->married_date    = $request->type == '1' ? $request->married_date :NULL;
-                    $query->children        = $request->type == '1' ? $request->children :NULL;
+                    $query->married_status  = $request->type == '1' ? $request->married_status : NULL;
+                    $query->married_date    = $request->type == '1' ? $request->married_date : NULL;
+                    $query->children        = $request->type == '1' ? $request->children : NULL;
                     $query->country_id      = $request->country_id;
+                    $query->employee_type   = $request->type == '1' ? $request->employee_type : NULL;
                     $query->save();
 
                     $query->userBank()->delete();
@@ -557,7 +561,7 @@ class UserController extends Controller
                         'id_card'	            => $request->id_card,
                         'id_card_address'       => $request->id_card_address,
                         'company_id'	        => $request->company_id ? $request->company_id : NULL,
-                        'place_id'	            => $request->place_id ? $request->place_id : NULL,
+                        'province_id'	        => $request->province_id,
                         'city_id'               => $request->city_id,
                         'subdistrict_id'        => $request->subdistrict_id,
                         'tax_id'                => $request->tax_id,
@@ -577,7 +581,8 @@ class UserController extends Controller
                         'children'              => $request->type == '1' ? $request->children :NULL,
                         'country_id'            => $request->country_id,
                         'connection_id'         => 0,
-                        'user_status'           => 'Offline'
+                        'user_status'           => 'Offline',
+                        'employee_type'         => $request->type == '1' ? $request->employee_type : NULL,
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
@@ -1134,7 +1139,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             $response = [
                 'status'  => 500,
-                'message' => "Data failed to save"
+                'message' => "Data failed to save : ".$e->getMessage()
             ];
             return response()->json($response);
         }

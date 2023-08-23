@@ -192,6 +192,16 @@ class PurchaseDownPayment extends Model
         return $total;
     }
 
+    public function balancePaidExcept($prd){
+        $total = $this->grandtotal;
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->whereHas('outgoingPayment');
+        })->where('id','<>',$prd)->get() as $rowpayment){
+            $total -= $rowpayment->nominal;
+        }
+        return $total;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',

@@ -496,6 +496,8 @@ class PaymentRequestController extends Controller
                                 'coa_id'        => $data->document_status == '3' ? ($coa ? $coa->id : '') : '',
                                 'coa_name'      => $data->document_status == '3' ? ($coa ? $coa->code.' - '.$coa->name : '') : '',
                                 'memo'          => number_format(0,2,',','.'),
+                                'currency_id'   => $data->currency_id,
+                                'currency_rate' => number_format($data->currency_rate,2,',','.'),
                             ];
                         }
                     }
@@ -522,6 +524,8 @@ class PaymentRequestController extends Controller
                                 'coa_id'        => $coa ? $coa->id : '',
                                 'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
+                                'currency_id'   => $data->currency_id,
+                                'currency_rate' => number_format($data->currency_rate,2,',','.'),
                             ];
                         }
                     }
@@ -548,6 +552,8 @@ class PaymentRequestController extends Controller
                                 'coa_id'        => $coa ? $coa->id : '',
                                 'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
+                                'currency_id'   => $data->currency()->id,
+                                'currency_rate' => number_format($data->currencyRate(),2,',','.'),
                             ];
                         }
                     }

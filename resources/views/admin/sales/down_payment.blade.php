@@ -260,7 +260,7 @@
                                 <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                 <label class="active" for="currency_rate">Konversi</label>
                             </div>
-                            <div class="input-field col m3 s12 step9">
+                            <div class="input-field col m3 s12 step11">
                                 <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
                                     <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                                     @foreach ($tax as $row)
@@ -269,14 +269,14 @@
                                 </select>
                                 <label class="active" for="tax_id">PPN</label>
                             </div>
-                            <div class="input-field col m3 s12 step9">
+                            <div class="input-field col m3 s12 step12">
                                 <select class="browser-default" id="is_include_tax" name="is_include_tax" onchange="countAll();">
                                     <option value="0">--Tidak--</option>
                                     <option value="1">--Ya--</option>
                                 </select>
                                 <label class="active" for="is_include_tax">Termasuk PPN</label>
                             </div>
-                            <div class="input-field col m3 s12 step12">
+                            <div class="input-field col m3 s12 step13">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
@@ -285,7 +285,7 @@
                             <div class="input-field col m8 s12">
 
                             </div>
-                            <div class="input-field col m4 s12 step13">
+                            <div class="input-field col m4 s12 step14">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -322,7 +322,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step15" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -1208,18 +1208,16 @@
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
-                $('#supplier_id').empty();
-                $('#supplier_id').append(`
-                    <option value="` + response.account_id + `">` + response.supplier_name + `</option>
+                $('#account_id').empty();
+                $('#account_id').append(`
+                    <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
                 $('#type').val(response.type).formSelect();
                 $('#company_id').val(response.company_id).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
-                $('#percent_tax').val(response.percent_tax);
-                
+                $('#due_date').val(response.due_date);                
                 $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
 
                 if(response.is_include_tax == '1'){
@@ -1229,48 +1227,13 @@
                 }
                 
                 $('#note').val(response.note);
-                $('#grandtotal').text(response.grandtotal);
-                $('#total').text(response.total);
-                $('#tax').text(response.tax);
+                $('#grandtotal').val(response.grandtotal);
+                $('#total').val(response.total);
+                $('#tax').val(response.tax);
                 $('#subtotal').val(response.subtotal);
-                $('#discount').text(response.discount);
-                
-                if(response.details.length > 0){
-                    $('#body-purchase').empty();
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        $('#body-purchase').append(`
-                            <tr class="row_purchase">
-                                <td class="center-align">
-                                    <label>
-                                        <input type="checkbox" checked id="check` + count + `" name="arr_code[]" value="` + val.purchase_order_encrypt + `" onclick="countAll()" data-id="` + count + `">
-                                        <span>Pilih</span>
-                                    </label>
-                                </td>
-                                <td>
-                                    ` + val.purchase_order_code + `
-                                </td>
-                                <td class="center">
-                                    ` + val.post_date + `
-                                </td>
-                                <td class="center">
-                                    ` + val.delivery_date + `
-                                </td>
-                                <td class="center">
-                                    <input name="arr_note[]" class="browser-default" type="text" value="` + val.note + `" style="width:100%;" id="rowNote` + count + `">
-                                </td>
-                                <td class="center">
-                                    ` + val.total + `
-                                </td>
-                                <td class="center">
-                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.total_dp + `" onkeyup="formatRupiah(this);countAll()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
-                                </td>
-                            </tr>
-                        `);
-                    });
-                }
+                $('#discount').val(response.discount);                
                 $('.modal-content').scrollTop(0);
-                $('#note').focus();
+                $('#subtotal').focus();
                 M.updateTextFields();
             },
             error: function() {
@@ -1464,9 +1427,9 @@
                     intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
                 },
                 {
-                    title : 'Supplier',
+                    title : 'Customer',
                     element : document.querySelector('.step3'),
-                    intro : 'Supplier adalah Partner Bisnis tipe penyedia barang / jasa. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
+                    intro : 'Customer adalah Partner Bisnis tipe pelanggan. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
                 },
                 {
                     title : 'Tipe',
@@ -1504,23 +1467,28 @@
                     intro : 'Nilai konversi rupiah pada saat Purchase Order dibuat.'
                 },
                 {
-                    title : 'Detail Purchase Order',
+                    title : 'PPN',
                     element : document.querySelector('.step11'),
-                    intro : 'Tidak wajib dicentang dan diisikan. Tabel ini berisi informasi Purchase Order yang ingin di linkkan dengan Purchase Down Payment, silahkan isikan keterangan, dan uang muka yang dipakai pada kolom yang disediakan.' 
+                    intro : 'Pajak penjualan. Silahkan tentukan prosentase pajak. Anda bisa men-settingnya di master data - akunting - pajak.' 
+                },
+                {
+                    title : 'Termasuk PPN',
+                    element : document.querySelector('.step12'),
+                    intro : 'Silahkan pilih Ya, jika harga total per barang sudah termasuk dengan PPN.' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step12'),
+                    element : document.querySelector('.step13'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Subtotal & Diskon',
-                    element : document.querySelector('.step13'),
-                    intro : 'Silahkan isikan nominal Subtotal langsung jika anda tidak menggunakan Purchase Order link, dan jika ada diskon anda bisa menambahkannya di inputan Discount.' 
+                    element : document.querySelector('.step14'),
+                    intro : 'Silahkan isikan nominal Subtotal langsung untuk menjadi acuan pembuatan dokumen, dan jika ada diskon anda bisa menambahkannya di inputan Discount.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step14'),
+                    element : document.querySelector('.step15'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

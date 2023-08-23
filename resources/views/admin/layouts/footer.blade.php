@@ -2,7 +2,7 @@
 
     <footer class="page-footer footer footer-static footer-light navbar-border navbar-shadow">
         <div class="footer-copyright">
-            <div class="container"><span>&copy; 2023 <a href="https://blessconbataringan.com" target="_blank">EDP - BLESSCON</a> All rights reserved. <a href="{{ url('admin/application_update') }}" id="version-app">...</a></span><span class="right hide-on-small-only">Design and Developed by <a href="https://blessconbataringan.com">BLESSCON</a></span></div>
+            <div class="container"><span>&copy; 2023 <a href="https://superiorporcelain.co.id" target="_blank">{{ env('APP_NAME') }}</a> All rights reserved. <a href="{{ url('admin/application_update') }}" id="version-app">...</a></span><span class="right hide-on-small-only">Design and Developed by <a href="https://blessconbataringan.com">EDP - BLESSCON</a></span></div>
         </div>
     </footer>
 

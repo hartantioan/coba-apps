@@ -193,6 +193,7 @@ class Item extends Model
                 'place_id'      => $detail->place_id,
                 'qty'           => number_format($detail->qty / $detail->item->sell_convert,3,',','.').' '.$this->uomUnit->code,
                 'qty_raw'       => number_format($detail->qty / $detail->item->sell_convert,3,',','.'),
+                'qty_commited'  => number_format($detail->totalUndeliveredItemSales(),3,',','.'),
             ];
         }
         

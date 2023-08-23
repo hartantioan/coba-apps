@@ -164,6 +164,12 @@ class MarketingOrderDeliveryProcess extends Model
         return $this->hasMany('App\Models\MarketingOrderDeliveryProcessTrack','marketing_order_delivery_process_id','id');
     }
 
+    public function getArrStatusTracking(){
+        $arr = $this->marketingOrderDeliveryProcessTrack()->orderBy('status')->pluck('status')->toArray();
+
+        return $arr;
+    }
+
     public function hasDetailMatrix(){
         $ada = false;
         if($this->approval()){
@@ -179,6 +185,12 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function hasChildDocument(){
         $hasRelation = false;
+
+        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+            if($row->marketingOrderReturnDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
 
         return $hasRelation;
     }

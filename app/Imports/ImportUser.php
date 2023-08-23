@@ -36,9 +36,6 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             'group_id'          => $row['type'],
             'status'            => $row['status'],
             'company_id'        => $row['company_id'],
-            'place_id'          => $row['place_id'],
-            'department_id'     => $row['department_id'],
-            'position_id'       => $row['position_id'],
             'tax_id'            => $row['tax_id'],
             'tax_name'          => $row['tax_name'],
             'tax_address'       => $row['tax_address'],
@@ -55,6 +52,7 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             'married_date'      => $row['married_date'],
             'children'          => $row['children'],
             'country_id'        => $row['country_id'],
+            'employee_type'     => $row['type'] == '1' ? $row['employee_type'] : NULL,
         ]);
     }
     public function rules(): array
@@ -63,7 +61,7 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             '*.name'            => 'required',
             '*.password'        => 'nullable',
             '*.username'        => 'required|string|unique:users,username',
-            '*.phone'           => 'required|string',
+            '*.phone'           => 'required|string|unique:users,phone',
             '*.address'         => 'required|string',
             '*.province_id'     => 'required|integer',
             '*.city_id'         => 'required|integer',
@@ -74,9 +72,6 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             '*.group_id'        => 'required|integer',
             '*.status'          => 'required|integer',
             '*.company_id'      => 'required|integer',
-            '*.place_id'        => 'required|integer',
-            '*.department_id'   => 'required|integer',
-            '*.position_id'     => 'required|integer',
             '*.tax_id'          => 'required|string',
             '*.tax_name'        => 'required|string',
             '*.tax_address'     => 'required|string',
@@ -93,6 +88,7 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             '*.married_date'    => 'nullable',
             '*.children'        => 'nullable',
             '*.country_id'      => 'required|integer',
+            '*.employee_type'   => 'required'
         ];
     }
 

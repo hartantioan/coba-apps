@@ -1193,9 +1193,7 @@
                                             </select>    
                                         </td>
                                         <td>
-                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                                
-                                            </select>
+                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">

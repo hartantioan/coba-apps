@@ -67,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
             'marketing_order_deliveries'            => 'App\Models\MarketingOrderDelivery',
             'marketing_order_delivery_processes'    => 'App\Models\MarketingOrderDeliveryProcess',
             'marketing_order_down_payments'         => 'App\Models\MarketingOrderDownPayment',
+            'marketing_order_returns'               => 'App\Models\MarketingOrderReturn',
         ]);
     }
 }

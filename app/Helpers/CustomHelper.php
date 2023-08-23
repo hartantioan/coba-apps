@@ -29,6 +29,7 @@ use App\Models\ItemGroupWarehouse;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderReturn;
 use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
 use App\Models\Place;
@@ -655,6 +656,20 @@ class CustomHelper {
 						]);
 					}
 				}
+
+				if($pr->rounding){
+					$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$pr->company_id)->first()->id;
+					#start journal rounding
+					if($pr->rounding > 0 || $pr->rounding < 0){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coarounding,
+							'account_id'	=> $account_id,
+							'type'			=> $pr->rounding > 0 ? '1' : '2',
+							'nominal'		=> abs($pr->rounding * $pr->currency_rate),
+						]);
+					}
+				}
 	
 				foreach($pr->paymentRequestCross as $row){
 					$coa = Coa::where('code','100.01.03.03.02')->where('company_id',$pr->company_id)->first();
@@ -683,44 +698,32 @@ class CustomHelper {
 				'status'		=> '3'
 			]);
 
+			$totalPay = $op->balance * $op->currency_rate;
+
+			$balanceKurs = 0;
+			$totalReal = 0;
+			$totalMustPay = 0;
+
 			foreach($op->paymentRequest->paymentRequestDetail as $row){
 				$mustpay = 0;
 				$balanceReal = 0;
-				$balanceKurs = 0;
-				$rounding = $op->rounding * ($row->nominal * $op->total);
 
 				if($row->lookable_type == 'purchase_invoices'){
 					$mustpay = $row->lookable->getTotalPaidExcept($row->id);
 					$balanceReal = $row->lookable->getTotalPaidExcept($row->id) * $row->lookable->currencyRate();
 				}elseif($row->lookable_type == 'fund_requests'){
-					$mustpay = $row->lookable->totalReceivable() - $row->lookable->totalReceivableUsedPaidExcept($row->id);
-					$balanceReal = ($row->lookable->totalReceivable() - $row->lookable->totalReceivableUsedPaid($row->id)) * $row->lookable->currency_rate;
+					$mustpay = $row->nominal;
+					$balanceReal = $row->nominal * $row->lookable->currency_rate;
 				}elseif($row->lookable_type == 'coas'){
 					$mustpay = $row->nominal;
 					$balanceReal = $row->nominal;
 				}elseif($row->lookable_type == 'purchase_down_payments'){
-					$mustpay = $row->lookable->balancePaid();
-					$balanceReal = $row->lookable->balancePaid() * $row->lookable->currency_rate;
+					$mustpay = $row->lookable->balancePaidExcept($row->id);
+					$balanceReal = $row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate;
 				}
-
-				if($mustpay > 0){
-					if($row->nominal >= $mustpay && $op->currency_rate > 1){
-						$balanceKurs = $balanceReal - ($row->nominal * $op->currency_rate) + ($rounding * $op->currency_rate);
-					}
-				}
-
-				if($balanceKurs < 0 || $balanceKurs > 0){
-					$coaselisihkurs = Coa::where('code','700.01.01.01.02')->where('company_id',$op->company_id)->first()->id;
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $coaselisihkurs,
-						'account_id'	=> $op->account_id,
-						'place_id'		=> $row->lookable_type == 'fund_requests' ? $row->lookable->place_id : NULL,
-						'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
-						'type'			=> $balanceKurs < 0  ? '1' : '2',
-						'nominal'		=> abs($balanceKurs),
-					]);
-				}
+				
+				$totalMustPay += $mustpay;
+				$totalReal += $balanceReal;
 
 				if($row->cost_distribution_id){
 					$total = $balanceReal;
@@ -770,6 +773,24 @@ class CustomHelper {
 						'account_id'	=> $account_id,
 						'type'			=> $op->rounding > 0 ? '1' : '2',
 						'nominal'		=> abs($op->rounding * $op->currency_rate),
+					]);
+				}
+			}elseif($op->rounding > 0 && $op->currency_rate > 1){
+				
+			}
+
+			if($op->balance >= $totalMustPay && $op->currency_rate > 1){
+				$balanceKurs = $totalReal - $totalPay;
+				if($balanceKurs < 0 || $balanceKurs > 0){
+					$coaselisihkurs = Coa::where('code','700.01.01.01.02')->where('company_id',$op->company_id)->first()->id;
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coaselisihkurs,
+						'account_id'	=> $op->account_id,
+						'place_id'		=> $row->lookable_type == 'fund_requests' ? $row->lookable->place_id : NULL,
+						'department_id'	=> $row->lookable_type == 'fund_requests' ? $row->lookable->department_id : NULL,
+						'type'			=> $balanceKurs < 0  ? '1' : '2',
+						'nominal'		=> abs($balanceKurs),
 					]);
 				}
 			}
@@ -828,7 +849,7 @@ class CustomHelper {
 				'coa_id'		=> $op->coa_source_id,
 				'account_id'	=> $op->account_id,
 				'type'			=> '2',
-				'nominal'		=> $op->balance * $op->currency_rate,
+				'nominal'		=> $totalPay,
 			]);
 
 		}elseif($table_name == 'good_receives'){
@@ -888,7 +909,68 @@ class CustomHelper {
 					'IN'
 				);
 			}
-		
+		}elseif($table_name == 'marketing_order_returns'){
+			$mor = MarketingOrderReturn::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> 'marketing_order_returns',
+				'lookable_id'	=> $mor->id,
+				'post_date'		=> $mor->post_date,
+				'note'			=> $mor->code,
+				'status'		=> '3'
+			]);
+
+			$coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$mor->company_id)->first()->id;
+
+			foreach($mor->marketingOrderReturnDetail as $row){
+
+				$hpp = $row->marketingOrderDeliveryDetail->getPriceHpp() * $row->qty * $row->item->sell_convert;
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'account_id'	=> $mor->account_id,
+					'coa_id'		=> $row->item->itemGroup->coa_id,
+					'place_id'		=> $row->place_id,
+					'item_id'		=> $row->item_id,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $hpp,
+				]);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'account_id'	=> $mor->account_id,
+					'coa_id'		=> $coahpp,
+					'place_id'		=> $row->place_id,
+					'item_id'		=> $row->item_id,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '2',
+					'nominal'		=> $hpp,
+				]);
+
+				self::sendCogs('marketing_order_returns',
+					$mor->id,
+					$row->place->company_id,
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty * $row->item->sell_convert,
+					$hpp,
+					'IN',
+					$mor->post_date
+				);
+
+				self::sendStock(
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty * $row->item->sell_convert,
+					'IN'
+				);
+			}
+
 		}elseif($table_name == 'good_returns'){
 
 			$gr = GoodReturnPO::find($table_id);

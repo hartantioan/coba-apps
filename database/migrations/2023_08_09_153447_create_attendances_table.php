@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('code',155)->nullable();
             $table->string('employee_no')->nullable();
+            $table->string('attendance_machine_id')->nullable();
             $table->timestamp('date')->nullable();
             $table->string('verify_type')->nullable();
             $table->string('location')->nullable();

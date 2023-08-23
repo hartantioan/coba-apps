@@ -64,6 +64,8 @@ class User extends Authenticatable
         'user_image',
         'api_token',
         'manager_id',
+        'employment_status',
+        'employee_type',
     ];
 
     protected $hidden = [
@@ -87,6 +89,16 @@ class User extends Authenticatable
           '3' => 'Supplier',
           '4' => 'Expedisi',
           default => '',
+        };
+
+        return $type;
+    }
+
+    public function employeeType(){
+        $type = match ($this->employee_type) {
+          '1' => 'Staff',
+          '2' => 'Non-Staff',
+          default => '-',
         };
 
         return $type;

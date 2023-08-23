@@ -142,7 +142,9 @@ class MarketingOrderDelivery extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        //logic here
+        if($this->marketingOrderDeliveryProcess()->exists()){
+            $hasRelation = true;
+        }
 
         return $hasRelation;
     }

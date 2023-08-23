@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('ip_address')->nullable();
             $table->string('port')->nullable();
             $table->string('location')->nullable();
+            $table->string('log_counts')->nullable();
             $table->char('status', 1)->nullable();
             $table->softDeletes('deleted_at');
             $table->timestamps();

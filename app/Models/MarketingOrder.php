@@ -248,7 +248,7 @@ class MarketingOrder extends Model
         }
 
         foreach($this->marketingOrderDetail as $row){
-            if($this->marketingOrderDeliveryDetail()->exists()){
+            if($row->marketingOrderDeliveryDetail()->exists()){
                 $hasRelation = true;
             }
         }

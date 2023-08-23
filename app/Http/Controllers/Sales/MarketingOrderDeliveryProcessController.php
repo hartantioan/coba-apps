@@ -230,6 +230,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Update Tracking" onclick="getTracking(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_shipping</i></button>
+                        <a href="delivery_order/driver/'.CustomHelper::encrypt($val->code).'?d='.CustomHelper::encrypt($val->driver_name).'&p='.CustomHelper::encrypt($val->driver_hp).'" class="btn-floating btn-small mb-1 btn-flat waves-effect waves-light indigo accent-1 white-text" data-popup="tooltip" title="Driver Update Tracking" target="_blank"><i class="material-icons dp48">streetview</i></a>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         '.$btn_jurnal.'
@@ -503,7 +504,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->item->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').' - '.$row->getHpp().'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
@@ -1132,5 +1133,55 @@ class MarketingOrderDeliveryProcessController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function driverIndex(Request $request, $id){
+        $modp = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($id))->whereIn('status',['2','3'])->first();
+        
+        if($modp){
+            $data = [
+                'title'         => 'Driver Update Tracking',
+                'content'       => 'admin.sales.driver_tracking',
+                'data'          => $modp,
+                'code'          => $id,
+                'driver'        => $request->d,
+                'phone'         => $request->p,
+                'arrTracking'   => $modp->getArrStatusTracking(),
+            ];
+
+            return view('admin.layouts.no_header_sidebar', ['data' => $data]);
+        }else{
+            abort(404);
+        }
+    }
+
+    public function driverUpdate(Request $request){
+        $modp = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->code))->whereIn('status',['2','3'])->first();
+
+        if($modp){
+            $cek = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$modp->id)->where('status',$request->status)->first();
+
+            if($cek){
+                $cek->update([
+                    'user_id' => session('bo_id') ? session('bo_id') : NULL,
+                ]);
+            }else{
+                MarketingOrderDeliveryProcessTrack::create([
+                    'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
+                    'marketing_order_delivery_process_id'   => $modp->id,
+                    'status'                                => $request->status,
+                ]);
+            }
+
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Status tracking telah diupdate, halaman akan direfresh.'
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data tracking surat jalan tidak ditemukan.'
+            ]);
+        }        
     }
 }

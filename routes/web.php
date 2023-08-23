@@ -88,6 +88,8 @@ use App\Http\Controllers\Sales\MarketingOrderController;
 use App\Http\Controllers\Sales\MarketingOrderDownPaymentController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryProcessController;
+use App\Http\Controllers\Sales\MarketingOrderReturnController;
+use App\Http\Controllers\Sales\MarketingOrderInvoiceController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -218,6 +220,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('place', [Select2Controller::class, 'place']);
                 Route::get('marketing_order', [Select2Controller::class, 'marketingOrder']);
                 Route::get('marketing_order_delivery', [Select2Controller::class, 'marketingOrderDelivery']);
+                Route::get('marketing_order_delivery_process', [Select2Controller::class, 'marketingOrderDeliveryProcess']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -1326,6 +1329,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[MarketingOrderDownPaymentController::class, 'printByRange']);
                     Route::get('export',[MarketingOrderDownPaymentController::class, 'export']);
                     Route::get('viewstructuretree',[MarketingOrderDownPaymentController::class, 'viewStructureTree']);
+                    Route::get('view_journal/{id}',[MarketingOrderDownPaymentController::class, 'viewJournal'])->middleware('operation.access:sales_down_payment,journal');
                     Route::post('create',[MarketingOrderDownPaymentController::class, 'create'])->middleware('operation.access:sales_down_payment,update');
                     Route::get('approval/{id}',[MarketingOrderDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[MarketingOrderDownPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
@@ -1370,9 +1374,53 @@ Route::prefix('admin')->group(function () {
                     Route::post('update_return',[MarketingOrderDeliveryProcessController::class, 'updateReturn'])->middleware('operation.access:delivery_order,update');
                     Route::post('create',[MarketingOrderDeliveryProcessController::class, 'create'])->middleware('operation.access:delivery_order,update');
                     Route::get('approval/{id}',[MarketingOrderDeliveryProcessController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::prefix('driver')->withoutMiddleware('direct.access')->withoutMiddleware('login')->withoutMiddleware('operation.access:delivery_order,view')->withoutMiddleware('lock')->group(function () {
+                        Route::get('{id}',[MarketingOrderDeliveryProcessController::class, 'driverIndex']);
+                        Route::post('{id}/driver_update',[MarketingOrderDeliveryProcessController::class, 'driverUpdate']);
+                    });
                     Route::get('print_individual/{id}',[MarketingOrderDeliveryProcessController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderDeliveryProcessController::class, 'voidStatus'])->middleware('operation.access:delivery_order,void');
                     Route::post('destroy', [MarketingOrderDeliveryProcessController::class, 'destroy'])->middleware('operation.access:delivery_order,delete');
+                });
+
+                Route::prefix('marketing_order_return')->middleware('operation.access:marketing_order_return,view')->group(function () {
+                    Route::get('/',[MarketingOrderReturnController::class, 'index']);
+                    Route::get('datatable',[MarketingOrderReturnController::class, 'datatable']);
+                    Route::get('row_detail',[MarketingOrderReturnController::class, 'rowDetail']);
+                    Route::post('show', [MarketingOrderReturnController::class, 'show']);
+                    Route::post('get_code', [MarketingOrderReturnController::class, 'getCode']);
+                    Route::post('print',[MarketingOrderReturnController::class, 'print']);
+                    Route::post('print_by_range',[MarketingOrderReturnController::class, 'printByRange']);
+                    Route::get('export',[MarketingOrderReturnController::class, 'export']);
+                    Route::get('viewstructuretree',[MarketingOrderReturnController::class, 'viewStructureTree']);
+                    Route::post('remove_used_data', [MarketingOrderReturnController::class, 'removeUsedData']);
+                    Route::get('view_journal/{id}',[MarketingOrderReturnController::class, 'viewJournal'])->middleware('operation.access:marketing_order_return,journal');
+                    Route::post('create',[MarketingOrderReturnController::class, 'create'])->middleware('operation.access:marketing_order_return,update');
+                    Route::post('send_used_data',[MarketingOrderReturnController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_return,update');
+                    Route::get('approval/{id}',[MarketingOrderReturnController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[MarketingOrderReturnController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MarketingOrderReturnController::class, 'voidStatus'])->middleware('operation.access:marketing_order_return,void');
+                    Route::post('destroy', [MarketingOrderReturnController::class, 'destroy'])->middleware('operation.access:marketing_order_return,delete');
+                });
+
+                Route::prefix('marketing_order_invoice')->middleware('operation.access:marketing_order_invoice,view')->group(function () {
+                    Route::get('/',[MarketingOrderInvoiceController::class, 'index']);
+                    Route::get('datatable',[MarketingOrderInvoiceController::class, 'datatable']);
+                    Route::get('row_detail',[MarketingOrderInvoiceController::class, 'rowDetail']);
+                    Route::post('show', [MarketingOrderInvoiceController::class, 'show']);
+                    Route::post('get_code', [MarketingOrderInvoiceController::class, 'getCode']);
+                    Route::post('print',[MarketingOrderInvoiceController::class, 'print']);
+                    Route::post('print_by_range',[MarketingOrderInvoiceController::class, 'printByRange']);
+                    Route::get('export',[MarketingOrderInvoiceController::class, 'export']);
+                    Route::get('viewstructuretree',[MarketingOrderInvoiceController::class, 'viewStructureTree']);
+                    Route::post('remove_used_data', [MarketingOrderInvoiceController::class, 'removeUsedData']);
+                    Route::get('view_journal/{id}',[MarketingOrderInvoiceController::class, 'viewJournal'])->middleware('operation.access:marketing_order_invoice,journal');
+                    Route::post('create',[MarketingOrderInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_invoice,update');
+                    Route::post('send_used_data',[MarketingOrderInvoiceController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_invoice,update');
+                    Route::get('approval/{id}',[MarketingOrderInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[MarketingOrderInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MarketingOrderInvoiceController::class, 'voidStatus'])->middleware('operation.access:marketing_order_invoice,void');
+                    Route::post('destroy', [MarketingOrderInvoiceController::class, 'destroy'])->middleware('operation.access:marketing_order_invoice,delete');
                 });
             });
 

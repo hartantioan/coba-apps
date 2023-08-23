@@ -11,21 +11,18 @@ class AttendanceController extends Controller
 {
     public function index(Request $request)
     {
+        foreach(AttendanceMachine::where('status','1')->get() as $machine){
+            $output = [];
+            $exitCode = 0;
+            $command = "node C:\Users\windy\absen2\logCount.js " . $machine->ip_address.' '.$machine->id;
+            exec($command, $output, $exitCode);            
+        }
+
         $data = [
             'title'         => 'Jadwal Pegawai',
             'content'       => 'admin.hr.attendance',
             'machine'       => AttendanceMachine::where('status','1')->get(),
         ];
-
-        foreach($data['machine'] as $machine){
-            info($machine->ip_address);
-            $output = [];
-            $exitCode = 0;
-            $command = "node D:\\\\absen_node\\\\logCount.js " . $machine->ip_address.' '.$machine->id;
-            info($command);
-            exec($command, $output, $exitCode);
-            
-        }
         
         return view('admin.layouts.index', ['data' => $data]); 
     }
@@ -37,9 +34,9 @@ class AttendanceController extends Controller
         $id_machine = $request->id_machines;
         $ipAddressesComma = implode(',', $ipAddresses);
         $id_machineComma = implode(',', $id_machine);
-
        
-        $command = "node D:\\\\absen_node\\\\testComma.js " . $ipAddressesComma.' '.$id_machineComma;
+        /* $command = "node D:\\\\absen_node\\\\testComma.js " . $ipAddressesComma.' '.$id_machineComma; */
+        $command = "node C:\Users\windy\absen2\test_new.js " . $ipAddressesComma.' '.$id_machineComma;
         $output = [];
         $exitCode = 0;
         exec($command, $output, $exitCode);

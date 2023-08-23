@@ -699,7 +699,7 @@ class MarketingOrderController extends Controller
                 'note'                  => $row->note,
                 'item_stock_id'         => $row->item_stock_id,
                 'item_stock_name'       => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code,
-                'item_stock_qty'        => number_format($row->itemStock->qty,3,',','.'),
+                'item_stock_qty'        => number_format($row->itemStock->qty / $row->item->sell_convert,3,',','.'),
                 'list_stock'            => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'place_id'              => $row->place_id,
                 'warehouse_id'          => $row->warehouse_id,

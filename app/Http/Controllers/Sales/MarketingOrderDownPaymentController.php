@@ -272,7 +272,7 @@ class MarketingOrderDownPaymentController extends Controller
             'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
-			'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
+			'account_id.required' 				=> 'Customer tidak boleh kosong.',
 			'type.required'                     => 'Tipe tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
@@ -503,5 +503,405 @@ class MarketingOrderDownPaymentController extends Controller
         }else{
             abort(404);
         }
+    }
+
+    public function printIndividual(Request $request,$id){
+        
+        $pr = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($pr){
+            $data = [
+                'title'     => 'Print AR Down Payment',
+                'data'      => $pr
+            ];
+
+            $opciones_ssl=array(
+                "ssl"=>array(
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+                ),
+            );
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+             
+            $pdf = Pdf::loadView('admin.print.sales.order_down_payment_individual', $data)->setPaper('a5', 'landscape');
+            // $pdf->render();
+    
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            
+            $content = $pdf->download()->getOriginalContent();
+            
+            Storage::put('public/pdf/bubla.pdf',$content);
+            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+    
+            return $document_po;
+        }else{
+            abort(404);
+        }
+    }
+
+    public function print(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_id'                => 'required',
+        ], [
+            'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
+        ]);
+        
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $var_link=[];
+            $currentDateTime = Date::now();
+            $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+            foreach($request->arr_id as $key => $row){
+                $pr = MarketingOrderDownPayment::where('code',$row)->first();
+                
+                if($pr){
+                    $data = [
+                        'title'     => 'Print Surat Jalan',
+                        'data'      => $pr,
+                    ];
+                    $img_path = 'website/logo_web_fix.png';
+                    $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                    $image_temp = file_get_contents($img_path);
+                    $img_base_64 = base64_encode($image_temp);
+                    $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                    $data["image"]=$path_img;
+                    $pdf = Pdf::loadView('admin.print.sales.order_down_payment_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf->render();
+                    $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $content = $pdf->download()->getOriginalContent();
+                    $temp_pdf[]=$content;
+                }
+            }
+
+            $merger = new Merger();
+
+            foreach ($temp_pdf as $pdfContent) {
+                $merger->addRaw($pdfContent);
+            }
+
+            $result = $merger->merge();
+
+            Storage::put('public/pdf/bubla.pdf',$result);
+            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $var_link=$document_po;
+
+            $response =[
+                'status'=>200,
+                'message'  =>$var_link
+            ];
+        }
+        
+		
+		return response()->json($response);
+    }
+
+    public function printByRange(Request $request){
+        $currentDateTime = Date::now();
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+        if($request->type_date == 1){
+            $validation = Validator::make($request->all(), [
+                'range_start'                => 'required',
+                'range_end'                  => 'required',
+            ], [
+                'range_start.required'       => 'Isi code awal yang ingin di pilih menjadi awal range',
+                'range_end.required'         => 'Isi code terakhir yang menjadi akhir range',
+            ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            }else{
+                $total_pdf = intval($request->range_end)-intval($request->range_start);
+                $temp_pdf=[];
+                if($request->range_start>$request->range_end){
+                    $kambing["kambing"][]="code awal lebih besar daripada code akhir";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ]; 
+                }
+                elseif($total_pdf>31){
+                    $kambing["kambing"][]="PDF lebih dari 30 buah";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ];
+                }else{   
+                    for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
+                        $query = MarketingOrderDownPayment::where('Code', 'LIKE', '%'.$nomor)->first();
+                        if($query){
+                            $data = [
+                                'title'     => 'Print Marketing Order Delivery',
+                                'data'      => $query
+                            ];
+                            $img_path = 'website/logo_web_fix.png';
+                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                            $image_temp = file_get_contents($img_path);
+                            $img_base_64 = base64_encode($image_temp);
+                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                            $data["image"]=$path_img;
+                            $pdf = Pdf::loadView('admin.print.sales.order_down_payment_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf->render();
+                            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $content = $pdf->download()->getOriginalContent();
+                            $temp_pdf[]=$content;
+                           
+                        }
+                    }
+                    $merger = new Merger();
+                    foreach ($temp_pdf as $pdfContent) {
+                        $merger->addRaw($pdfContent);
+                    }
+
+                    $result = $merger->merge();
+
+                    Storage::put('public/pdf/bubla.pdf',$result);
+                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $var_link=$document_po;
+        
+                    $response =[
+                        'status'=>200,
+                        'message'  =>$var_link
+                    ];
+                } 
+
+            }
+        }elseif($request->type_date == 2){
+            $validation = Validator::make($request->all(), [
+                'range_comma'                => 'required',
+                
+            ], [
+                'range_comma.required'       => 'Isi input untuk comma',
+                
+            ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            }else{
+                $arr = explode(',', $request->range_comma);
+                
+                $merged = array_unique(array_filter($arr));
+
+                if(count($merged)>31){
+                    $kambing["kambing"][]="PDF lebih dari 30 buah";
+                    $response = [
+                        'status' => 422,
+                        'error'  => $kambing
+                    ];
+                }else{
+                    foreach($merged as $code){
+                        $query = MarketingOrderDownPayment::where('Code', 'LIKE', '%'.$code)->first();
+                        if($query){
+                            $data = [
+                                'title'     => 'Print Marketing Order Delivery',
+                                'data'      => $query
+                            ];
+                            $img_path = 'website/logo_web_fix.png';
+                            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                            $image_temp = file_get_contents($img_path);
+                            $img_base_64 = base64_encode($image_temp);
+                            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                            $data["image"]=$path_img;
+                            $pdf = Pdf::loadView('admin.print.sales.order_down_payment_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf->render();
+                            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $content = $pdf->download()->getOriginalContent();
+                            $temp_pdf[]=$content;
+                           
+                        }
+                    }
+                    $merger = new Merger();
+                    foreach ($temp_pdf as $pdfContent) {
+                        $merger->addRaw($pdfContent);
+                    }
+    
+                    $result = $merger->merge();
+
+                    Storage::put('public/pdf/bubla.pdf',$result);
+                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $var_link=$document_po;
+        
+                    $response =[
+                        'status'=>200,
+                        'message'  =>$var_link
+                    ];
+                }
+            }
+        }
+        return response()->json($response);
+    }
+
+    public function show(Request $request){
+        $modp = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        $modp['code_place_id'] = substr($modp->code,7,2);
+        $modp['account_name'] = $modp->account->employee_no.' - '.$modp->account->name;
+        $modp['subtotal'] = number_format($modp->subtotal,2,',','.');
+        $modp['discount'] = number_format($modp->discount,2,',','.');
+        $modp['total'] = number_format($modp->total,2,',','.');
+        $modp['tax'] = number_format($modp->tax,2,',','.');
+        $modp['grandtotal'] = number_format($modp->grandtotal,2,',','.');
+        $modp['currency_rate'] = number_format($modp->currency_rate,2,',','.');
+
+		return response()->json($modp);
+    }
+
+    public function viewJournal(Request $request,$id){
+        $query = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($id))->first();
+        if($query->journal()->exists()){
+            $response = [
+                'title'     => 'Journal',
+                'status'    => 200,
+                'message'   => $query->journal,
+                'user'      => $query->user->name,
+                'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
+            ];
+            $string='';
+            foreach($query->journal->journalDetail()->orderBy('id')->get() as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    <td class="center-align">'.$row->coa->company->name.'</td>
+                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                </tr>';
+            }
+            $response["tbody"] = $string; 
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data masih belum di approve.'
+            ]; 
+        }
+        return response()->json($response);
+    }
+
+    public function destroy(Request $request){
+        $query = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $approved = false;
+        $revised = false;
+
+        if($query->approval()){
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
+                }
+            }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+
+        if(in_array($query->status,['2','3','4','5'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+        
+        if($query->delete()) {
+
+            CustomHelper::removeApproval('marketing_order_down_payments',$query->id);
+
+            activity()
+                ->performedOn(new MarketingOrderDownPayment())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the AP Down Payment data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function voidStatus(Request $request){
+        $query = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+            if(in_array($query->status,['4','5'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada form lainnya.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+    
+                activity()
+                    ->performedOn(new MarketingOrderDownPayment())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the  data');
+    
+                CustomHelper::sendNotification('marketing_order_down_payments',$query->id,'AR Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('marketing_order_down_payments',$query->id);
+                CustomHelper::removeJournal('marketing_order_down_payments',$query->id);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
     }
 }

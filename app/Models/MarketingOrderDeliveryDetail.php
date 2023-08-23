@@ -55,4 +55,24 @@ class MarketingOrderDeliveryDetail extends Model
         $total = round($this->itemStock->priceDate($this->marketingOrderDelivery->post_date) * $this->qty * $this->item->sell_convert,2);
         return $total;
     }
+
+    public function getPriceHpp(){
+        return $this->itemStock->priceDate($this->marketingOrderDelivery->post_date);
+    }
+
+    public function marketingOrderReturnDetail()
+    {
+        return $this->hasMany('App\Models\MarketingOrderReturnDetail')->whereHas('marketingOrderReturn',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function getBalanceQtySentMinusReturn(){
+        $total = $this->qty;
+        foreach($this->marketingOrderReturnDetail as $row){
+            $total -= $row->qty;
+        }
+
+        return $total;
+    }
 }

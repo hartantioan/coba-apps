@@ -354,14 +354,9 @@
     var selectedMachines=[];
     var selectedIP=[];
     $(document).ready(function() {
-        // Track clicked figures
-        
-
-        // Event handler for figure click
         $(document).on('click', '.effect-dexter', function() {
             var machineId = $(this).data('machine-id');
             var machineIP = $(this).data('machine-ip');
-            // Toggle selection and apply/remove selected class
             if (selectedMachines.includes(machineId)) {
                 selectedMachines = selectedMachines.filter(id => id !== machineId);
             } else {
@@ -373,12 +368,11 @@
                 selectedIP.push(machineIP);
             }
             if (!$(this).hasClass('clicked')) {
-            // Add the 'clicked' class to simulate hover effect
+
             $(this).addClass('clicked');
            
             clickedFigures.push(this);
             } else {
-            // Remove the 'clicked' class to simulate unhover effect
             $(this).removeClass('clicked');
           
             clickedFigures.splice(clickedFigures.indexOf(this), 1);
@@ -465,7 +459,7 @@
     function save(){
 		console.log(selectedIP);
         
-        // var formData = new FormData($('#form_data')[0]);
+        /* var formData = new FormData($('#form_data')[0]); */
         
         $.ajax({
             url: '{{ Request::url() }}/syncron',
@@ -492,9 +486,9 @@
                 console.log(response);
                 if(response.status == 200) {
                     success();
-                    M.toast({
+                    /* M.toast({
                         html: response.success
-                    });
+                    }); */
                 } else if(response.status == 422) {
                     $('#validation_alert').show();
                     $('.modal-content').scrollTop(0);
@@ -530,69 +524,6 @@
                 });
             }
         });
-        // $.ajax({
-        //     url: '{{ Request::url() }}/create',
-        //     type: 'POST',
-        //     dataType: 'JSON',
-        //     data: formData,
-        //     contentType: false,
-        //     processData: false,
-        //     cache: true,
-        //     headers: {
-        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //     },
-        //     beforeSend: function() {
-        //         $('#validation_alert').hide();
-        //         $('#validation_alert').html('');
-        //         loadingOpen('.modal-content');
-        //     },
-        //     success: function(response) {
-        //         loadingClose('.modal-content');
-        //         if(response.status == 200) {
-        //             success();
-        //             M.toast({
-        //                 html: response.message
-        //             });
-        //         } else if(response.status == 422) {
-        //             $('#validation_alert').show();
-        //             $('.modal-content').scrollTop(0);
-                    
-        //             swal({
-        //                 title: 'Ups! Validation',
-        //                 text: 'Check your form.',
-        //                 icon: 'warning'
-        //             });
-
-        //             $.each(response.error, function(i, val) {
-        //                 $.each(val, function(i, val) {
-        //                     $('#validation_alert').append(`
-        //                         <div class="card-alert card red">
-        //                             <div class="card-content white-text">
-        //                                 <p>` + val + `</p>
-        //                             </div>
-        //                             <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-        //                                 <span aria-hidden="true">×</span>
-        //                             </button>
-        //                         </div>
-        //                     `);
-        //                 });
-        //             });
-        //         } else {
-        //             M.toast({
-        //                 html: response.message
-        //             });
-        //         }
-        //     },
-        //     error: function() {
-        //         $('.modal-content').scrollTop(0);
-        //         loadingClose('.modal-content');
-        //         swal({
-        //             title: 'Ups!',
-        //             text: 'Check your internet connection.',
-        //             icon: 'error'
-        //         });
-        //     }
-        // });
     }
 
     function success(){

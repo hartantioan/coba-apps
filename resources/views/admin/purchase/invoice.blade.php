@@ -1723,6 +1723,7 @@
                                         $('#arr_include_tax' + count).val(val.include_tax);
 
                                         $('#top').val(val.top);
+
                                     });                        
                                 }else{
                                     $('.row_detail').remove();

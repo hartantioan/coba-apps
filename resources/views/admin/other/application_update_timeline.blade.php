@@ -37,7 +37,14 @@
                 <div class="section section-data-tables">
                     <!-- DataTables example -->
                     <div class="row">
-                        <div class="col s12">
+                        <div class="col l12 m12 s12 center">
+                            <div class="card-alert card purple">
+                                <div class="card-content white-text">
+                                    <p>Info : Untuk melihat daftar update aplikasi silahkan click / tap kotak versi.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col l12 m12 s12">
                             <ul class="timeline" id="body-history-goods" style="padding-left: 4rem; padding-right:4rem;">
                                 @foreach($change_log as $log)
                                     <li class="update-card" data-update-id="{{$log->id}}">

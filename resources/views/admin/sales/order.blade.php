@@ -1081,7 +1081,7 @@
             if($("#arr_item" + nil).select2('data')[0].stock_list.length){
                 $.each($("#arr_item" + nil).select2('data')[0].stock_list, function(i, value) {
                     $('#arr_item_stock' + nil).append(`
-                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
                     `);
                 });
             }else{
@@ -1106,15 +1106,16 @@
             $('#arr_warehouse' + nil).val($(element).find(':selected').data('w'));
             $("#arr_warehouse_name" + nil).text($(element).find(':selected').data('warehouse'));
             $("#arr_qty_now" + nil).text($(element).find(':selected').data('qty'));
-            $("#arr_qty_temporary" + nil).text($(element).find(':selected').data('qty'));
-            $("#rowQty" + nil).data('qty',$(element).find(':selected').data('qty'));
+            let balance = formatRupiahIni((parseFloat($(element).find(':selected').data('qty').replaceAll(".", "").replaceAll(",",".")) - parseFloat($(element).find(':selected').data('qtycom').replaceAll(".", "").replaceAll(",","."))).toFixed(3).toString().replace('.',','));
+            $("#rowQty" + nil).attr('data-qty',balance);
+            $("#arr_qty_temporary" + nil).text(balance);
         }else{
             $('#arr_place' + nil).val('');
             $('#arr_warehouse' + nil).val('');
             $("#arr_warehouse_name" + nil).text('-');
             $("#arr_qty_now" + nil).text('0,000');
             $("#arr_qty_temporary" + nil).text('0,000');
-            $("#rowQty" + nil).data('qty','0');
+            $("#rowQty" + nil).attr('data-qty','0');
         }
     }
 
@@ -1777,7 +1778,7 @@
                         `);
                         $.each(val.list_stock, function(i, value) {
                             $('#arr_item_stock' + count).append(`
-                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
                             `);
                         });
                         $('#arr_item_stock' + count).val(val.item_stock_id).formSelect();

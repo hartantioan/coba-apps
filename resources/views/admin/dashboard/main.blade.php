@@ -64,7 +64,8 @@
                                                     <th class="center-align">Item</th>
                                                     <th class="center-align">Plant</th>
                                                     <th class="center-align">Gudang</th>
-                                                    <th class="center-align">Qty</th>
+                                                    <th class="center-align">Qty in Stock</th>
+                                                    <th class="center-align">Qty Commited</th>
                                                     <th class="center-align">Rp</th>
                                                 </tr>
                                             </thead>
@@ -76,6 +77,7 @@
                                                         <td class="center-align">{{ $row->place->name.' - '.$row->place->company->name }}</td>
                                                         <td class="center-align">{{ $row->warehouse->name }}</td>
                                                         <td class="center-align">{{ number_format($row->qty,3,',','.').' '.$row->item->uomUnit->code }}</td>
+                                                        <td class="center-align">{{ number_format($row->totalUndeliveredItem(),3,',','.').' '.$row->item->uomUnit->code }}</td>
                                                         <td class="right-align">{{ number_format($row->valueNow(),3,',','.') }}</td>
                                                     </tr>
                                                 @endforeach

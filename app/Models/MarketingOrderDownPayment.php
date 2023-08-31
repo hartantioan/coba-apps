@@ -36,6 +36,7 @@ class MarketingOrderDownPayment extends Model
         'tax',
         'grandtotal',
         'document',
+        'tax_no',
         'note',
         'void_id',
         'void_note',
@@ -210,7 +211,21 @@ class MarketingOrderDownPayment extends Model
         return $ada;
     }
 
-    
+    public function marketingOrderInvoiceDetail(){
+        return $this->hasMany('App\Models\MarketingOrderInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balanceInvoice(){
+        $total = $this->grandtotal;
+
+        foreach($this->marketingOrderInvoiceDetail as $row){
+            $total -= $row->grandtotal;
+        }
+
+        return $total;
+    }
 
     public function hasChildDocument(){
         $hasRelation = false;

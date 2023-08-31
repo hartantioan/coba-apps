@@ -60,6 +60,7 @@ use App\Http\Controllers\MasterData\UnitController;
 use App\Http\Controllers\MasterData\BankController;
 use App\Http\Controllers\MasterData\ProjectController;
 use App\Http\Controllers\MasterData\TaxController;
+use App\Http\Controllers\MasterData\TaxSeriesController;
 use App\Http\Controllers\MasterData\BenchmarkPriceController;
 use App\Http\Controllers\MasterData\CostDistributionController;
 use App\Http\Controllers\MasterData\DeliveryCostController;
@@ -90,6 +91,7 @@ use App\Http\Controllers\Sales\MarketingOrderDeliveryController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryProcessController;
 use App\Http\Controllers\Sales\MarketingOrderReturnController;
 use App\Http\Controllers\Sales\MarketingOrderInvoiceController;
+use App\Http\Controllers\Sales\MarketingOrderMemoController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -221,6 +223,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order', [Select2Controller::class, 'marketingOrder']);
                 Route::get('marketing_order_delivery', [Select2Controller::class, 'marketingOrderDelivery']);
                 Route::get('marketing_order_delivery_process', [Select2Controller::class, 'marketingOrderDeliveryProcess']);
+                Route::get('marketing_order_down_payment', [Select2Controller::class, 'marketingOrderDownPayment']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -665,6 +668,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [TaxController::class, 'show']);
                         Route::post('create',[TaxController::class, 'create'])->middleware('operation.access:tax,update');
                         Route::post('destroy', [TaxController::class, 'destroy'])->middleware('operation.access:tax,delete');
+                    });
+
+                    Route::prefix('tax_series')->middleware('operation.access:tax_series,view')->group(function () {
+                        Route::get('/',[TaxSeriesController::class, 'index']);
+                        Route::get('datatable',[TaxSeriesController::class, 'datatable']);
+                        Route::post('show', [TaxSeriesController::class, 'show']);
+                        Route::post('create',[TaxSeriesController::class, 'create'])->middleware('operation.access:tax_series,update');
+                        Route::post('destroy', [TaxSeriesController::class, 'destroy'])->middleware('operation.access:tax_series,delete');
                     });
 
                     Route::prefix('benchmark_price')->middleware('operation.access:benchmark_price,view')->group(function () {
@@ -1325,6 +1336,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[MarketingOrderDownPaymentController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderDownPaymentController::class, 'show']);
                     Route::post('get_code', [MarketingOrderDownPaymentController::class, 'getCode']);
+                    Route::post('get_tax_series', [MarketingOrderDownPaymentController::class, 'getTaxSeries']);
                     Route::post('print',[MarketingOrderDownPaymentController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderDownPaymentController::class, 'printByRange']);
                     Route::get('export',[MarketingOrderDownPaymentController::class, 'export']);
@@ -1409,6 +1421,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[MarketingOrderInvoiceController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderInvoiceController::class, 'show']);
                     Route::post('get_code', [MarketingOrderInvoiceController::class, 'getCode']);
+                    Route::post('get_tax_series', [MarketingOrderInvoiceController::class, 'getTaxSeries']);
                     Route::post('print',[MarketingOrderInvoiceController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderInvoiceController::class, 'printByRange']);
                     Route::get('export',[MarketingOrderInvoiceController::class, 'export']);
@@ -1421,6 +1434,26 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[MarketingOrderInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderInvoiceController::class, 'voidStatus'])->middleware('operation.access:marketing_order_invoice,void');
                     Route::post('destroy', [MarketingOrderInvoiceController::class, 'destroy'])->middleware('operation.access:marketing_order_invoice,delete');
+                });
+
+                Route::prefix('marketing_order_memo')->middleware('operation.access:marketing_order_memo,view')->group(function () {
+                    Route::get('/',[MarketingOrderMemoController::class, 'index']);
+                    Route::get('datatable',[MarketingOrderMemoController::class, 'datatable']);
+                    Route::get('row_detail',[MarketingOrderMemoController::class, 'rowDetail']);
+                    Route::post('show', [MarketingOrderMemoController::class, 'show']);
+                    Route::post('get_code', [MarketingOrderMemoController::class, 'getCode']);
+                    Route::post('print',[MarketingOrderMemoController::class, 'print']);
+                    Route::post('print_by_range',[MarketingOrderMemoController::class, 'printByRange']);
+                    Route::get('export',[MarketingOrderMemoController::class, 'export']);
+                    Route::get('viewstructuretree',[MarketingOrderMemoController::class, 'viewStructureTree']);
+                    Route::post('remove_used_data', [MarketingOrderMemoController::class, 'removeUsedData']);
+                    Route::get('view_journal/{id}',[MarketingOrderMemoController::class, 'viewJournal'])->middleware('operation.access:marketing_order_memo,journal');
+                    Route::post('create',[MarketingOrderMemoController::class, 'create'])->middleware('operation.access:marketing_order_memo,update');
+                    Route::post('send_used_data',[MarketingOrderMemoController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_memo,update');
+                    Route::get('approval/{id}',[MarketingOrderMemoController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[MarketingOrderMemoController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MarketingOrderMemoController::class, 'voidStatus'])->middleware('operation.access:marketing_order_memo,void');
+                    Route::post('destroy', [MarketingOrderMemoController::class, 'destroy'])->middleware('operation.access:marketing_order_memo,delete');
                 });
             });
 

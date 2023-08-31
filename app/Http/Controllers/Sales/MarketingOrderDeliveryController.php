@@ -7,6 +7,7 @@ use App\Models\ItemStock;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryDetail;
+use App\Models\MarketingOrderDetail;
 use App\Models\Place;
 use App\Models\Tax;
 use Illuminate\Http\Request;
@@ -319,6 +320,9 @@ class MarketingOrderDeliveryController extends Controller
 
             $passedZero = true;
             $passedQty = true;
+            $passedCreditLimit = true;
+            $totalLimitCredit = 0;
+            $totalSent = 0;
 
             if($request->arr_qty){
                 foreach($request->arr_qty as $key => $row){
@@ -327,9 +331,30 @@ class MarketingOrderDeliveryController extends Controller
                     }
                     $item_stock = ItemStock::find($request->arr_item_stock[$key]);
                     $qtysell = round($item_stock->qty / $item_stock->item->sell_convert,3);
+
                     if(floatval(str_replace(',','.',str_replace('.','',$row))) > $qtysell){
                         $passedQty = false;
                     }
+
+                    $datamodi = MarketingOrderDetail::find($request->arr_modi[$key]);
+
+                    $total = $datamodi->realPriceAfterGlobalDiscount() * str_replace(',','.',str_replace('.','',$row));
+                    $tax = 0;
+                    $grandtotal = 0;
+                    if($datamodi->tax_id > 0){
+                        if($datamodi->is_include_tax == '1'){
+                            $total = $total * (1 + ($datamodi->percent_tax / 100));
+                        }
+                        $tax = $total * ($datamodi->percent_tax / 100);
+                    }
+
+                    $grandtotal = $total + $tax;
+                    $balanceLimitCredit = $datamodi->marketingOrder->account->limit_credit - $datamodi->marketingOrder->account->count_limit_credit - $grandtotal;
+                    if($balanceLimitCredit < 0){
+                        $passedCreditLimit = false;
+                    }
+                    $totalLimitCredit += $datamodi->marketingOrder->account->limit_credit - $datamodi->marketingOrder->account->count_limit_credit;
+                    $totalSent += $grandtotal;
                 }
 
                 $errorMessage = [];
@@ -348,6 +373,13 @@ class MarketingOrderDeliveryController extends Controller
                         'message' => implode(', ',$errorMessage)
                     ]);
                 }
+            }
+
+            if(!$passedCreditLimit){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item terkirim : '.number_format($totalSent,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalSent,2,',','.').'.'
+                ]);
             }
             
 			if($request->temp){

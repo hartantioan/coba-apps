@@ -44,7 +44,7 @@ class DownPaymentController extends Controller
         
         $date = $request->date;
 
-        $data = DB::select( DB::raw("
+        $data = DB::select("
                 SELECT 
                 *,
                 pdp.type as typepdp,
@@ -76,7 +76,7 @@ class DownPaymentController extends Controller
                 WHERE 
                     pdp.post_date <= :date3
                     AND pdp.grandtotal > 0
-            "), array(
+            ",array(
                 'date1' => $date,
                 'date2' => $date,
                 'date3' => $date,

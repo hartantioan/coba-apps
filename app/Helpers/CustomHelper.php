@@ -29,6 +29,7 @@ use App\Models\ItemGroupWarehouse;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderInvoice;
 use App\Models\MarketingOrderReturn;
 use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
@@ -1699,6 +1700,123 @@ class CustomHelper {
 					'account_id'	=> $row->fundRequest->account_id,
 					'type'			=> '2',
 					'nominal'		=> $row->nominal,
+				]);
+			}
+
+		}elseif($table_name == 'marketing_order_invoices'){
+
+			$moi = MarketingOrderInvoice::find($table_id);
+
+			$coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$moi->company_id)->first()->id;
+			$coauangmuka = Coa::where('code','200.01.06.01.01')->where('company_id',$moi->company_id)->first()->id;
+			$coapenjualan = Coa::where('code','400.01.01.01.01')->where('company_id',$moi->company_id)->first()->id;
+			$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$moi->company_id)->first()->id;
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->code,
+				'status'		=> '3'
+			]);
+
+			$total = 0;
+			$tax = 0;
+			$total_after_tax = 0;
+			$rounding = 0;
+			$grandtotal = 0;
+			$downpayment = 0;
+			$balance = 0;
+			$dp_total = 0;
+			$dp_tax = 0;
+
+			foreach($moi->marketingOrderInvoiceDeliveryProcess as $key => $row){
+				$rowtotal = $row->total * $row->lookable->marketingOrderDelivery->marketingOrder->currency_rate;
+				$rowtax = $row->tax * $row->lookable->marketingOrderDelivery->marketingOrder->currency_rate;
+				$rowaftertax = $row->grandtotal * $row->lookable->marketingOrderDelivery->marketingOrder->currency_rate;
+				$rowrounding = ((($row->total / $moi->total) * $moi->rounding) * $row->lookable->marketingOrderDelivery->marketingOrder->currency_rate);
+
+				if($rowtotal > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coapenjualan,
+						'account_id'	=> $moi->account_id,
+						'type'			=> '2',
+						'nominal'		=> $rowtotal,
+					]);
+				}
+
+				if($rowtax > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->lookable->marketingOrderDetail->taxId->coa_sale_id,
+						'account_id'	=> $moi->account_id,
+						'type'			=> '2',
+						'nominal'		=> $rowtax,
+						'note'			=> 'No Seri Pajak : '.$moi->tax_no,
+					]);
+				}
+
+				if($rowrounding > 0 || $rowrounding < 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coarounding,
+						'account_id'	=> $account_id,
+						'type'			=> $rowrounding > 0 ? '2' : '1',
+						'nominal'		=> $rowrounding,
+					]);
+				}
+
+				$total += $rowtotal;
+				$tax += $rowtax;
+				$total_after_tax += $rowaftertax;
+				$rounding += $rowrounding;
+			}
+
+			$grandtotal = ($total_after_tax + $rounding);
+
+			foreach($moi->marketingOrderInvoiceDownPayment as $key => $row){
+				$rowtotal = $row->total * $row->lookable->currency_rate;
+				$rowtax = $row->tax * $row->lookable->currency_rate;
+
+				if($rowtotal > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coauangmuka,
+						'account_id'	=> $account_id,
+						'type'			=> '1',
+						'nominal'		=> $rowtotal,
+					]);
+				}
+
+				if($rowtax > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->lookable->taxId->coa_sale_id,
+						'account_id'	=> $account_id,
+						'type'			=> '1',
+						'nominal'		=> $rowtax,
+						'note'			=> 'No Seri Pajak : '.$row->tax_no,
+					]);
+				}
+
+				$dp_total += $rowtotal;
+				$dp_tax += $rowtax;
+			}
+
+			$downpayment = $dp_total + $dp_tax;
+
+			$balance = $grandtotal - $downpayment;
+			
+			if($balance > 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coapiutang,
+					'account_id'	=> $moi->account_id,
+					'type'			=> '1',
+					'nominal'		=> $balance,
 				]);
 			}
 			

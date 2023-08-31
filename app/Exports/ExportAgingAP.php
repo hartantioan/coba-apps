@@ -24,7 +24,7 @@ class ExportAgingAP implements FromView , WithEvents
     {
         $totalAll=0;
         $array_filter = [];
-        $query_data = DB::select( DB::raw("
+        $query_data = DB::select("
                 SELECT 
                     *,
                     IFNULL((SELECT 
@@ -58,7 +58,7 @@ class ExportAgingAP implements FromView , WithEvents
                     WHERE 
                         pi.post_date <= :date3
                         AND pi.balance > 0
-            "), array(
+            ", array(
                 'date1' => $this->date,
                 'date2' => $this->date,
                 'date3' => $this->date,
@@ -66,7 +66,7 @@ class ExportAgingAP implements FromView , WithEvents
 
         $newData = [];
 
-        $query_data2 = DB::select( DB::raw("
+        $query_data2 = DB::select("
                 SELECT 
                 *,
                 IFNULL((SELECT 
@@ -100,7 +100,7 @@ class ExportAgingAP implements FromView , WithEvents
                 WHERE 
                     pi.post_date <= :date3
                     AND pi.grandtotal > 0
-            "), array(
+            ", array(
                 'date1' => $this->date,
                 'date2' => $this->date,
                 'date3' => $this->date,

@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class MarketingOrder extends Model
+class MarketingOrderInvoice extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'marketing_orders';
+    protected $table = 'marketing_order_invoices';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
@@ -20,37 +20,21 @@ class MarketingOrder extends Model
         'user_id',
         'account_id',
         'company_id',
-        'type_sales',
         'post_date',
-        'valid_date',
-        'document',
-        'document_no',
-        'type_delivery',
-        'sender_id',
-        'delivery_date',
-        'payment_type',
-        'top_internal',
-        'top_customer',
-        'is_guarantee',
-        'shipment_address',
-        'billing_address',
-        'destination_address',
-        'province_id',
-        'city_id',
-        'subdistrict_id',
-        'sales_id',
-        'currency_id',
-        'currency_rate',
-        'percent_dp',
-        'note',
-        'subtotal',
-        'discount',
+        'due_date',
+        'document_date',
+        'status',
+        'type',
         'total',
         'tax',
         'total_after_tax',
         'rounding',
         'grandtotal',
-        'status',
+        'downpayment',
+        'balance',
+        'document',
+        'tax_no',
+        'note',
         'void_id',
         'void_note',
         'void_date',
@@ -70,60 +54,10 @@ class MarketingOrder extends Model
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
     }
 
-    public function sender(){
-        return $this->belongsTo('App\Models\User','sender_id','id')->withTrashed();
-    }
-
-    public function sales(){
-        return $this->belongsTo('App\Models\User','sales_id','id')->withTrashed();
-    }
-
-    public function province(){
-        return $this->belongsTo('App\Models\Region','province_id','id')->withTrashed();
-    }
-
-    public function city(){
-        return $this->belongsTo('App\Models\Region','city_id','id')->withTrashed();
-    }
-
-    public function subdistrict(){
-        return $this->belongsTo('App\Models\Region','subdistrict_id','id')->withTrashed();
-    }
-
-    public function paymentType(){
-        $type = match ($this->payment_type) {
-            '1' => 'Cash',
-            '2' => 'Credit',
-            default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function isGuarantee(){
-        $is = match ($this->is_guarantee) {
-            '1' => 'Ya',
-            '2' => 'Tidak',
-            default => 'Invalid',
-        };
-
-        return $is;
-    }
-
-    public function deliveryType(){
-        $type = match ($this->type_delivery) {
-            '1' => 'Loco',
-            '2' => 'Franco',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function typeSales(){
-        $type = match ($this->type_sales) {
-            '1'   => 'Standar SO',
-            '2'   => 'Cash / POS',
+    public function type(){
+        $type = match ($this->type) {
+          '1' => 'Cash',
+          '2' => 'Credit',
           default => 'Invalid',
         };
 
@@ -135,22 +69,24 @@ class MarketingOrder extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function currency()
-    {
-        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
-    }
-
-    public function marketingOrderDetail()
-    {
-        return $this->hasMany('App\Models\MarketingOrderDetail');
-    }
-
-    public function marketingOrderDelivery(){
-        return $this->hasMany('App\Models\MarketingOrderDelivery','marketing_order_id','id')->whereIn('status',['2','3']);
-    }
-
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function marketingOrderInvoiceDetail()
+    {
+        /* return $this->hasMany('App\Models\MarketingOrderInvoiceDetail')->where('lookable_type','<>','marketing_order_down_payments'); */
+        return $this->hasMany('App\Models\MarketingOrderInvoiceDetail');
+    }
+
+    public function marketingOrderInvoiceDeliveryProcess()
+    {
+        return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_details');
+    }
+
+    public function marketingOrderInvoiceDownPayment()
+    {
+        return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_down_payments');
     }
 
     public function status(){
@@ -201,7 +137,7 @@ class MarketingOrder extends Model
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = MarketingOrder::selectRaw('RIGHT(code, 8) as code')
+        $query = MarketingOrderInvoice::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
@@ -244,28 +180,10 @@ class MarketingOrder extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        if($this->marketingOrderDelivery()->exists()){
-            $hasRelation = true;
-        }
-
-        foreach($this->marketingOrderDetail as $row){
-            if($row->marketingOrderDeliveryDetail()->exists()){
-                $hasRelation = true;
-            }
-        }
-
         return $hasRelation;
     }
 
-    public function hasBalanceMod(){
-        $passed = false;
-
-        foreach($this->marketingOrderDetail as $row){
-            if($row->balanceQtyMod() > 0){
-                $passed = true;
-            }
-        }
-
-        return $passed;
+    public function journal(){
+        return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
 }

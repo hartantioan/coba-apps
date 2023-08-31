@@ -24,7 +24,7 @@ class ExportDownPayment implements FromView , WithEvents
     {
         $totalbalance=0;
         $array_filter = [];
-        $query_data = DB::select( DB::raw("
+        $query_data = DB::select("
                     SELECT 
                     *,
                     pdp.type as typepdp,
@@ -56,7 +56,7 @@ class ExportDownPayment implements FromView , WithEvents
                     WHERE 
                         pdp.post_date <= :date3
                         AND pdp.grandtotal > 0
-                "), array(
+                ", array(
                     'date1' => $this->date,
                     'date2' => $this->date,
                     'date3' => $this->date,

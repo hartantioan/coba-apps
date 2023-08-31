@@ -139,6 +139,11 @@
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card blue">
+                                                <div class="card-content white-text">
+                                                    <p>Info : AR Down Payment akan otomatis menarik data <i>Nomor Seri Pajak</i> yang anda set di form <b>Master Data - Akunting - Seri Pajak</b>, berdasarkan perusahaan, tanggal berlaku periode (dihitung dari tanggal posting DP), dan nomor urut yang tersedia. Pastikan anda mengisi master data tersebut.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside">
                                                 <thead>
@@ -153,7 +158,7 @@
                                                         <th colspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
-                                                        <th colspan="3" class="center-align">Pajak</th>
+                                                        <th colspan="4" class="center-align">Pajak</th>
                                                         <th rowspan="2">Subtotal</th>
                                                         <th rowspan="2">Diskon</th>
                                                         <th rowspan="2">Total</th>
@@ -170,6 +175,7 @@
                                                         <th>Jenis</th>
                                                         <th>%</th>
                                                         <th>Termasuk?</th>
+                                                        <th>Seri</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -277,15 +283,23 @@
                                 <label class="active" for="is_include_tax">Termasuk PPN</label>
                             </div>
                             <div class="input-field col m3 s12 step13">
+                                <input id="tax_no" name="tax_no" type="text" readonly placeholder="Auto generate : pajak > 0">
+                                <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku)." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
+                            </div>
+                            <div class="input-field col m3 s12 step14">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                         </div>
                         <div class="row">
                             <div class="input-field col m8 s12">
-
+                                <div class="card-alert card red" id="textTax" style="display:none;">
+                                    <div class="card-content white-text">
+                                        <p>Invoice ini akan menerbitkan <b>Nomor Seri Pajak</b>.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="input-field col m4 s12 step14">
+                            <div class="input-field col m4 s12 step15">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -322,7 +336,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step15" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step16" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -548,6 +562,7 @@
                 $('#temp').val('');
                 M.updateTextFields();
                 $('#account_id').empty();
+                $('#textTax').hide();
             }
         });
 
@@ -935,6 +950,53 @@
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );
+
+        if(tax > 0){
+            $('#textTax').show();
+            if(!$('#tax_no').val()){
+                getTaxSeries();
+            }
+        }else{
+            $('#textTax').hide();
+            $('#tax_no').val();
+        }
+    }
+
+    function getTaxSeries(){
+        if($('#company_id').val() && !$('#temp').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_tax_series',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    company_id: $('#company_id').val(),
+                    date: $('#post_date').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    if(response.status == 200){
+                        $('#tax_no').val(response.no);
+                    }else{
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
     }
 
     function chooseAll(element){
@@ -1039,6 +1101,7 @@
                 { name: 'tax_id', className: 'center-align' },
                 { name: 'percent_tax', className: 'center-align' },
                 { name: 'is_include_tax', className: 'center-align' },
+                { name: 'tax_no', className: 'center-align' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
@@ -1217,7 +1280,8 @@
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);                
+                $('#due_date').val(response.due_date);
+                $('#tax_no').val(response.tax_no);            
                 $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
 
                 if(response.is_include_tax == '1'){
@@ -1477,18 +1541,23 @@
                     intro : 'Silahkan pilih Ya, jika harga total per barang sudah termasuk dengan PPN.' 
                 },
                 {
-                    title : 'Keterangan',
+                    title : 'Nomor Seri PPN',
                     element : document.querySelector('.step13'),
+                    intro : 'Nomor seri PPN yang otomatis terbuat ketika nominal pajak diatas 0. Data ini diambil dari perusahaan dan tanggal posting yang diserasikan dengan data pada Master Data - Akunting - Seri Pajak.' 
+                },
+                {
+                    title : 'Keterangan',
+                    element : document.querySelector('.step14'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Subtotal & Diskon',
-                    element : document.querySelector('.step14'),
+                    element : document.querySelector('.step15'),
                     intro : 'Silahkan isikan nominal Subtotal langsung untuk menjadi acuan pembuatan dokumen, dan jika ada diskon anda bisa menambahkannya di inputan Discount.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step15'),
+                    element : document.querySelector('.step16'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

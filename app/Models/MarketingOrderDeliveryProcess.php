@@ -192,6 +192,12 @@ class MarketingOrderDeliveryProcess extends Model
             }
         }
 
+        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+            if($row->marketingOrderInvoiceDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
+
         return $hasRelation;
     }
 
@@ -221,5 +227,15 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function balanceInvoice(){
+        $total = 0;
+
+        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+            $total += $row->balanceInvoice();
+        }
+
+        return $total;
     }
 }

@@ -35,7 +35,7 @@ class AgingAPController extends Controller
         
         $date = $request->date;
 
-        $results = DB::select( DB::raw("
+        $results = DB::select("
             SELECT 
                 *,
                 IFNULL((SELECT 
@@ -69,13 +69,13 @@ class AgingAPController extends Controller
                 WHERE 
                     pi.post_date <= :date3
                     AND pi.balance > 0
-        "), array(
+        ", array(
             'date1' => $date,
             'date2' => $date,
             'date3' => $date,
         ));
 
-        $results2 = DB::select( DB::raw("
+        $results2 = DB::select("
             SELECT 
                 *,
                 IFNULL((SELECT 
@@ -107,7 +107,7 @@ class AgingAPController extends Controller
                 WHERE 
                     pi.post_date <= :date3
                     AND pi.grandtotal > 0
-        "), array(
+        ", array(
             'date1' => $date,
             'date2' => $date,
             'date3' => $date,

@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Sales Order # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">AR Invoice # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -130,7 +130,7 @@
                     </div>
                     <div class="mr-2">
                         <small>Valid Hingga:</small>
-                        <span>{{ date('d/m/y',strtotime($data->valid_date)) }}</span>
+                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
                     </div>
                 </div>
             </div>
@@ -138,7 +138,7 @@
         <!-- logo and title -->
         <div class="row mt-1 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Sales Order</h5>
+                <h5 class="indigo-text">AR Invoice</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="35%">
@@ -169,12 +169,6 @@
                 <div class="col s8">
                     {{ $data->account->phone.' / '.$data->account->office_no }}
                 </div>
-                <div class="col s4">
-                    Bukti
-                </div>
-                <div class="col s8">
-                    <a href="{{ $data->attachment() }}" target="_blank">Lihat</a>
-                </div>
             </div>
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
@@ -187,104 +181,16 @@
                     {{ $data->company->name }}
                 </div>
                 <div class="col s4">
-                    Sales
+                    Tipe Pembayaran
                 </div>
                 <div class="col s8">
-                    {{ $data->sales->name }}
+                    {{ $data->type() }}
                 </div>
                 <div class="col s4">
-                    Tipe Penjualan
+                    Bukti
                 </div>
                 <div class="col s8">
-                    {{ $data->typeSales() }}
-                </div>
-                <div class="col s4">
-                    No Referensi / PO
-                </div>
-                <div class="col s8">
-                    {{ $data->document_no }}
-                </div>
-            </div>
-            <div class="col s6 row mt-2">
-                <div class="col s12 center-align">
-                    PENGIRIMAN
-                </div>
-                <div class="col s4">
-                    Tipe
-                </div>
-                <div class="col s8">
-                    {{ $data->deliveryType() }}
-                </div>
-                <div class="col s4">
-                    Broker
-                </div>
-                <div class="col s8">
-                    {{ $data->sender->name }}
-                </div>
-                <div class="col s4">
-                    Tgl.Kirim
-                </div>
-                <div class="col s8">
-                    {{ date('d/m/y',strtotime($data->delivery_date)) }}
-                </div>
-                <div class="col s4">
-                    Almt Kirim
-                </div>
-                <div class="col s8">
-                    {{ $data->shipment_address }}
-                </div>
-                <div class="col s4">
-                    Almt Penagihan
-                </div>
-                <div class="col s8">
-                    {{ $data->billing_address }}
-                </div>
-                <div class="col s4">
-                    Almt Tujuan
-                </div>
-                <div class="col s8">
-                    {{ $data->destination_address.', '.ucwords(strtolower($data->subdistrict->name.' - '.$data->city->name.' - '.$data->province->name)) }}
-                </div>
-            </div>
-            <div class="col s6 row mt-2">
-                <div class="col s12 center-align">
-                    PEMBAYARAN
-                </div>
-                <div class="col s4">
-                    Tipe
-                </div>
-                <div class="col s8">
-                    {{ $data->paymentType() }}
-                </div>
-                <div class="col s4">
-                    TOP Internal
-                </div>
-                <div class="col s8">
-                    {{ $data->top_internal }} hari
-                </div>
-                <div class="col s4">
-                    TOP Customer
-                </div>
-                <div class="col s8">
-                    {{ $data->top_customer }} hari
-                </div>
-                <div class="col s4">
-                    Garansi
-                </div>
-                <div class="col s8">
-                    {{ $data->isGuarantee() }}
-                </div>
-                <div class="col s4">
-                    Mata Uang
-                </div>
-                <div class="col s8">
-                    {{ $data->currency->name }}
-                </div>
-                <div class="col s4">
-                    Konversi
-                </div>
-                <div class="col s8">
-                    {{ number_format($data->currency_rate,2,',','.').' '.$data->currency->code }}
+                    <a href="{{ $data->attachment() }}" target="_blank">Lihat</a>
                 </div>
             </div>
         </div>
@@ -298,53 +204,38 @@
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                         <th class="center-align">Harga</th>
-                        <th class="center-align">Margin</th>
-                        <th class="center-align">Disc.1 (%)</th>
-                        <th class="center-align">Disc.2 (%)</th>
-                        <th class="center-align">Disc.3 (Rp)</th>
-                        <th class="center-align">Other Fee</th>
-                        <th class="center-align">Harga Final</th>
                         <th class="center-align">Total</th>
+                        <th class="center-align">Termasuk PPN?</th>
+                        <th class="center-align">PPN</th>
+                        <th class="center-align">Grandtotal</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->marketingOrderDetail as $key => $row)
+                    @foreach($data->marketingOrderInvoiceDeliveryProcess as $key => $row)
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
-                        <td class="center-align">{{ $row->item->name }}</td>
+                        <td class="center-align">{{ $row->lookable->item->name }}</td>
                         <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
-                        <td class="center-align">{{ $row->item->sellUnit->code }}</td>
+                        <td class="center-align">{{ $row->lookable->item->sellUnit->code }}</td>
                         <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->margin,2,',','.') }}</td>
-                        <td class="center-align">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
-                        <td class="center-align">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->discount_3,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->other_fee,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->price_after_discount,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
+                        <td class="center-align">{{ $row->isIncludeTax() }}</td>
+                        <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
+                        <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td colspan="8">Keterangan: {{ $row->note }}</td>
-                        <td colspan="4">Ambil dari: {{ $row->place->name.' - Gudang '.$row->warehouse->code }}</td>
                     </tr>
                     
                     @endforeach
                     <tr>
-                        <td colspan="9" rowspan="8">
+                        <td colspan="6" rowspan="8">
                             Rekening :
                             {!! $data->company->banks() !!}
                             <div class="mt-3">
                                 Catatan : {{ $data->note }}
                             </div>
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="2">Subtotal</td>
-                        <td class="right-align">{{ number_format($data->subtotal,2,',','.') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="2">Diskon</td>
-                        <td class="right-align">{{ number_format($data->discount,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">Total</td>
@@ -355,21 +246,29 @@
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Total Stlh Pajak</td>
+                        <td class="right-align" colspan="2">Setelah PPN</td>
                         <td class="right-align">{{ number_format($data->total_after_tax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Rounding</td>
+                        <td class="right-align" colspan="2">Pembulatan</td>
                         <td class="right-align">{{ number_format($data->rounding,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2"><h6>Grandtotal</h6></td>
-                        <td class="right-align"><h6>{{ number_format($data->grandtotal,2,',','.') }}</h6></td>
+                        <td class="right-align" colspan="2">Grandtotal</td>
+                        <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="right-align" colspan="2">DP</td>
+                        <td class="right-align">{{ number_format($data->downpayment,2,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="right-align" colspan="2"><h6>Sisa</h6></td>
+                        <td class="right-align"><h6>{{ number_format($data->balance,2,',','.') }}</h6></td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="12">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}</i></th>
+                        <th colspan="9">Terbilang : <i>{{ CustomHelper::terbilang($data->balance) }}</i></th>
                     </tr>
                 </tfoot>
             </table>
@@ -378,7 +277,7 @@
         <div class="invoice-subtotal mt-2">
             <div class="row">
                 <div class="col m6 s6 l6">
-                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
+                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->document_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
                     

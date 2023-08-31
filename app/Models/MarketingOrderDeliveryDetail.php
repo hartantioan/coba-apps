@@ -67,6 +67,26 @@ class MarketingOrderDeliveryDetail extends Model
         });
     }
 
+    public function marketingOrderInvoiceDetail(){
+        return $this->hasMany('App\Models\MarketingOrderInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balanceInvoice(){
+        $qtytotal = $this->qty - $this->qtyReturn();
+
+        foreach($this->marketingOrderInvoiceDetail as $row){
+            $qtytotal -= $row->qty;
+        }
+
+        return $qtytotal;
+    }
+
+    public function qtyReturn(){
+        return $this->marketingOrderReturnDetail()->sum('qty');
+    }
+
     public function getBalanceQtySentMinusReturn(){
         $total = $this->qty;
         foreach($this->marketingOrderReturnDetail as $row){

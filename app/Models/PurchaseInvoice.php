@@ -237,6 +237,12 @@ class PurchaseInvoice extends Model
             $hasRelation = true;
         }
 
+        foreach($this->purchaseInvoiceDetail as $row){
+            if($row->purchaseMemoDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
+
         return $hasRelation;
     }
 

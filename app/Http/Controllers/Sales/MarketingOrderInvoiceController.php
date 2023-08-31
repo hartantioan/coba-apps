@@ -1,60 +1,60 @@
 <?php
 
 namespace App\Http\Controllers\Sales;
-
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\MarketingOrderDeliveryDetail;
+use App\Models\MarketingOrderDeliveryProcess;
+use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderInvoice;
+use App\Models\MarketingOrderInvoiceDetail;
 use App\Models\Place;
 use App\Models\TaxSeries;
+use Illuminate\Http\Request;
+use App\Helpers\CustomHelper;
+use App\Models\User;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Currency;
-use App\Models\MarketingOrderDownPayment;
-use App\Helpers\CustomHelper;
-use App\Models\User;
-use App\Models\Tax;
+use Illuminate\Support\Facades\Process;
+use Illuminate\Contracts\Process\ProcessResult;
 
-class MarketingOrderDownPaymentController extends Controller
+class MarketingOrderInvoiceController extends Controller
 {
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $datawarehouses;
 
     public function __construct(){
-        $user = User::find(Session::get('bo_id'));
+        $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
-    }
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
+    }
+    
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'AR Down Payment',
-            'content'       => 'admin.sales.down_payment',
-            'currency'      => Currency::where('status','1')->get(),
+            'title'         => 'AR Invoice',
+            'content'       => 'admin.sales.order_invoice',
             'company'       => Company::where('status','1')->get(),
-            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'SODP-'.date('y'),
-            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'newcode'       => 'SINV-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
     }
 
     public function getCode(Request $request){
-        $code = MarketingOrderDownPayment::generateCode($request->val);
+        $code = MarketingOrderInvoice::generateCode($request->val);
         				
 		return response()->json($code);
     }
@@ -108,21 +108,17 @@ class MarketingOrderDownPaymentController extends Controller
             'user_id',
             'account_id',
             'company_id',
-            'type',
-            'document',
             'post_date',
             'due_date',
-            'currency_id',
-            'currency_rate',
+            'document_date',
+            'type',
+            'document',
             'note',
-            'tax_id',
-            'percent_tax',
-            'is_include_tax',
-            'subtotal',
-            'discount',
             'total',
             'tax',
-            'grandtotal'
+            'grandtotal',
+            'downpayment',
+            'balance'
         ];
 
         $start  = $request->start;
@@ -131,30 +127,27 @@ class MarketingOrderDownPaymentController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = MarketingOrderDownPayment::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = MarketingOrderInvoice::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
-        $query_data = MarketingOrderDownPayment::where(function($query) use ($search, $request) {
+        $query_data = MarketingOrderInvoice::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('subtotal', 'like', "%$search%")
-                            ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('downpayment', 'like', "%$search%")
+                            ->orWhere('balance', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhere('tax_no', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             });
                     });
-                }
-
-                if($request->status){
-                    $query->where('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -166,6 +159,10 @@ class MarketingOrderDownPaymentController extends Controller
                     $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
                 if($request->type){
                     $query->where('type',$request->type);
                 }
@@ -173,13 +170,9 @@ class MarketingOrderDownPaymentController extends Controller
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
-                
+
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
-                }
-                
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -188,28 +181,25 @@ class MarketingOrderDownPaymentController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = MarketingOrderDownPayment::where(function($query) use ($search, $request) {
+        $total_filtered = MarketingOrderInvoice::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
-                            ->orWhere('subtotal', 'like', "%$search%")
-                            ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('downpayment', 'like', "%$search%")
+                            ->orWhere('balance', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhere('tax_no', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('account',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             });
                     });
-                }
-
-                if($request->status){
-                    $query->where('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -221,6 +211,10 @@ class MarketingOrderDownPaymentController extends Controller
                     $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+
                 if($request->type){
                     $query->where('type',$request->type);
                 }
@@ -228,13 +222,9 @@ class MarketingOrderDownPaymentController extends Controller
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
-                
+
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
-                }
-                
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -253,24 +243,22 @@ class MarketingOrderDownPaymentController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->supplier->name,
+                    $val->account->name,
                     $val->company->name,
+                    date('d/m/y',strtotime($val->post_date)),
+                    date('d/m/y',strtotime($val->due_date)),
+                    date('d/m/y',strtotime($val->document_date)),
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
-                    date('d M Y',strtotime($val->post_date)),
-                    date('d M Y',strtotime($val->due_date)),
-                    $val->currency->code,
-                    number_format($val->currency_rate,2,',','.'),
-                    $val->note,
-                    $val->taxId()->exists() ? $val->taxId->name : '-',
-                    number_format($val->percent_tax,2,',','.').'%',
-                    $val->isIncludeTax(),
                     $val->tax_no,
-                    number_format($val->subtotal,2,',','.'),
-                    number_format($val->discount,2,',','.'),
+                    $val->note,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
+                    number_format($val->total_after_tax,2,',','.'),
+                    number_format($val->rounding,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
+                    number_format($val->downpayment,2,',','.'),
+                    number_format($val->balance,2,',','.'),
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -299,36 +287,64 @@ class MarketingOrderDownPaymentController extends Controller
         return response()->json($response);
     }
 
+    public function sendUsedData(Request $request){
+        if($request->type == 'marketing_order_delivery_processes'){
+            $modp = MarketingOrderDeliveryProcess::find($request->id);
+        }elseif($request->type == 'marketing_order_down_payments'){
+            $modp = MarketingOrderDownPayment::find($request->id);
+        }
+       
+        if(!$modp->used()->exists()){
+            CustomHelper::sendUsedData($modp->getTable(),$request->id,'Form AR Invoice');
+            return response()->json([
+                'status'    => 200,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Dokumen no. '.$modp->used->lookable->code.' telah dipakai di '.$modp->used->ref.', oleh '.$modp->used->user->name.'.'
+            ]);
+        }
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->type,$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
+    }
+
     public function create(Request $request){
+        
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_down_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_down_payments,code',
-			'account_id' 				=> 'required',
-			'type'                      => 'required',
-            'company_id'                => 'required',
-            'post_date'                 => 'required',
-            'due_date'                  => 'required',
-            'currency_id'               => 'required',
-            'currency_rate'             => 'required',
-            'subtotal'                  => 'required',
-            'total'                     => 'required',
-            'tax'                       => 'required',
-            'grandtotal'                => 'required',
-		], [
-            'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
-			'account_id.required' 				=> 'Customer tidak boleh kosong.',
-			'type.required'                     => 'Tipe tidak boleh kosong',
-            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
-            'post_date.required'                => 'Tgl post tidak boleh kosong.',
-            'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
-            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
-            'total.required'                    => 'Total tidak boleh kosong.',
-            'tax.required'                      => 'PPN tidak boleh kosong.',
-            'grandtotal.required'               => 'Grandtotal tidak boleh kosong.'
-		]);
+            'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_invoices,code',
+            'code_place_id'                 => 'required',
+            'company_id'			        => 'required',
+            'account_id'	                => 'required',
+            'post_date'		                => 'required',
+            'due_date'                      => 'required',
+            'document_date'                 => 'required',
+            'type'		                    => 'required',
+            'arr_lookable_id'		        => 'required|array',
+            'arr_total'                     => 'required|array',
+        ], [
+            'code.required' 	                    => 'Kode tidak boleh kosong.',
+            'code.string'                           => 'Kode harus dalam bentuk string.',
+            'code.min'                              => 'Kode harus minimal 18 karakter.',
+            'code.unique'                           => 'Kode telah dipakai.',
+            'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
+            'account_id.required' 	                => 'Akun Partner Bisnis tidak boleh kosong.',
+            'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
+            'post_date.required' 			        => 'Tanggal posting tidak boleh kosong.',
+            'due_date.required' 			        => 'Tanggal tenggat tidak boleh kosong.',
+            'document_date.required' 			    => 'Tanggal dokumen tidak boleh kosong.',
+            'type.required'                         => 'Tipe pembayaran tidak boleh kosong.',
+            'arr_lookable_id.required'              => 'Item tidak boleh kosong.',
+            'arr_lookable_id.array'                 => 'Item harus dalam bentuk array.',
+            'arr_total.required'                    => 'Total tidak boleh kosong.',
+            'arr_total.array'                       => 'Total harus dalam bentuk array.',
+        ]);
 
         if($validation->fails()) {
             $response = [
@@ -337,10 +353,24 @@ class MarketingOrderDownPaymentController extends Controller
             ];
         } else {
 
+            $user = User::find($request->account_id);
+
+            $limit = $user->limit_credit;
+            $creditNow = $user->count_limit_credit;
+            $balanceNow = $limit - $creditNow;
+            $creditInvoice = str_replace(',','.',str_replace('.','',$request->balance));
+
+            if($creditInvoice > $balanceNow){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Nominal sisa tagihan melebihi sisa kredit yang dimiliki Pelanggan yakni '.number_format($balanceNow,2,',','.').'.'
+                ]);
+            }
+            
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -362,13 +392,11 @@ class MarketingOrderDownPaymentController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'AR Down Payment telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'AR Invoice telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
                     if(in_array($query->status,['1','6'])){
-
-                        CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
 
                         if($request->has('document')) {
                             if($query->document){
@@ -376,37 +404,34 @@ class MarketingOrderDownPaymentController extends Controller
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('document')->store('public/sales_down_payments');
+                            $document = $request->file('document')->store('public/marketing_order_invoices');
                         } else {
                             $document = $query->document;
                         }
 
-                        $query->code = $request->code;
                         $query->user_id = session('bo_id');
+                        $query->code = $request->code;
                         $query->account_id = $request->account_id;
-                        $query->type = $request->type;
                         $query->company_id = $request->company_id;
-                        $query->tax_id = $request->tax_id > 0 ? $request->tax_id : NULL;
-                        $query->is_tax = $request->tax_id > 0 ? '1' : NULL;
-                        $query->is_include_tax = $request->is_include_tax;
-                        $query->percent_tax = $request->percent_tax;
-                        $query->document = $document;
-                        $query->tax_no = $request->tax_no;
-                        $query->currency_id = $request->currency_id;
-                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
-                        $query->note = $request->note;
-                        $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
-                        $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
+                        $query->document_date = $request->document_date;
+                        $query->status = '1';
+                        $query->type = $request->type;
                         $query->total = str_replace(',','.',str_replace('.','',$request->total));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
+                        $query->total_after_tax = str_replace(',','.',str_replace('.','',$request->total_after_tax));
+                        $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
-                        $query->status = '1';
+                        $query->downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
+                        $query->balance = str_replace(',','.',str_replace('.','',$request->balance));
+                        $query->document = $document;
+                        $query->tax_no = $request->tax_no;
+                        $query->note = $request->note;
 
                         $query->save();
-
-                        foreach($query->purchaseDownPaymentDetail as $row){
+                        
+                        foreach($query->marketingOrderInvoiceDetail as $row){
                             $row->delete();
                         }
 
@@ -414,7 +439,7 @@ class MarketingOrderDownPaymentController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status AR Invoice detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -423,29 +448,27 @@ class MarketingOrderDownPaymentController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = MarketingOrderDownPayment::create([
-                        'code'			            => $request->code,
-                        'user_id'		            => session('bo_id'),
-                        'account_id'                => $request->account_id,
-                        'type'	                    => $request->type,
-                        'company_id'                => $request->company_id,
-                        'tax_id'                    => $request->tax_id > 0 ? $request->tax_id : NULL,
-                        'is_tax'                    => $request->tax_id > 0 ? '1' : NULL,
-                        'is_include_tax'            => $request->is_include_tax,
-                        'percent_tax'               => $request->percent_tax,
-                        'document'                  => $request->file('document') ? $request->file('document')->store('public/sales_down_payments') : NULL,
-                        'tax_no'                    => $request->tax_no,
-                        'currency_id'               => $request->currency_id,
-                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'post_date'                 => $request->post_date,
-                        'due_date'                  => $request->due_date,
-                        'note'                      => $request->note,
-                        'subtotal'                  => str_replace(',','.',str_replace('.','',$request->subtotal)),
-                        'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
-                        'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
-                        'tax'                       => str_replace(',','.',str_replace('.','',$request->tax)),
-                        'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
-                        'status'                    => '1'
+                    $query = MarketingOrderInvoice::create([
+                        'code'			                => $request->code,
+                        'user_id'		                => session('bo_id'),
+                        'account_id'                    => $request->account_id,
+                        'company_id'                    => $request->company_id,
+                        'post_date'                     => $request->post_date,
+                        'due_date'                      => $request->due_date,
+                        'document_date'                 => $request->document_date,
+                        'status'                        => '1',
+                        'type'                          => $request->type,
+                        'total'                         => str_replace(',','.',str_replace('.','',$request->total)),
+                        'tax'                           => str_replace(',','.',str_replace('.','',$request->tax)),
+                        'total_after_tax'               => str_replace(',','.',str_replace('.','',$request->total_after_tax)),
+                        'rounding'                      => str_replace(',','.',str_replace('.','',$request->rounding)),
+                        'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
+                        'downpayment'                   => str_replace(',','.',str_replace('.','',$request->downpayment)),
+                        'balance'                       => str_replace(',','.',str_replace('.','',$request->balance)),
+                        'document'                      => $request->file('document') ? $request->file('document')->store('public/marketing_order_invoices') : NULL,
+                        'tax_no'                        => $request->tax_no,
+                        'note'                          => $request->note,
+                        
                     ]);
 
                     DB::commit();
@@ -456,15 +479,54 @@ class MarketingOrderDownPaymentController extends Controller
 			
 			if($query) {
 
-                CustomHelper::sendApproval('marketing_order_down_payments',$query->id,$query->note);
-                CustomHelper::sendNotification('marketing_order_down_payments',$query->id,'Pengajuan AR Down Payment No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::addDeposit($query->account_id,str_replace(',','.',str_replace('.','',$request->grandtotal)));
+                foreach($request->arr_lookable_id as $key => $row){
+                    if($request->arr_lookable_type[$key] == 'marketing_order_delivery_details'){
+                        $rowdata = MarketingOrderDeliveryDetail::find($row);
+                        MarketingOrderInvoiceDetail::create([
+                            'marketing_order_invoice_id'    => $query->id,
+                            'lookable_type'                 => $request->arr_lookable_type[$key],
+                            'lookable_id'                   => $row,
+                            'qty'                           => $rowdata->qty,
+                            'price'                         => $rowdata->marketingOrderDetail->realPriceAfterGlobalDiscount(),
+                            'is_include_tax'                => $rowdata->marketingOrderDetail->is_include_tax,
+                            'percent_tax'                   => $rowdata->marketingOrderDetail->percent_tax,
+                            'tax_id'                        => $rowdata->marketingOrderDetail->tax_id,
+                            'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                            'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                            'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_total_after_tax[$key])),
+                            'note'                          => $rowdata->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDelivery->code.' - '.$rowdata->marketingOrderDelivery->marketingOrderDeliveryProcess->code,
+                        ]);
+                    }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
+                        $rowdata = MarketingOrderDownPayment::find($row);
+                        $rowgrandtotal = str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+                        $bobot = $rowgrandtotal / $rowdata->grandtotal;
+                        MarketingOrderInvoiceDetail::create([
+                            'marketing_order_invoice_id'    => $query->id,
+                            'lookable_type'                 => $request->arr_lookable_type[$key],
+                            'lookable_id'                   => $row,
+                            'qty'                           => 1,
+                            'price'                         => round($bobot * $rowdata->total,2),
+                            'is_include_tax'                => $rowdata->is_include_tax,
+                            'percent_tax'                   => $rowdata->percent_tax,
+                            'tax_id'                        => $rowdata->tax_id,
+                            'total'                         => round($bobot * $rowdata->total,2),
+                            'tax'                           => round($bobot * $rowdata->tax,2),
+                            'grandtotal'                    => round($bobot * $rowdata->grandtotal,2),
+                            'note'                          => $rowdata->code,
+                        ]);
+                        CustomHelper::removeDeposit($rowdata->account_id,$rowgrandtotal);
+                    }
+                }
+
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Invoice No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::addCountLimitCredit($query->account_id,$query->balance);
 
                 activity()
-                    ->performedOn(new MarketingOrderDownPayment())
+                    ->performedOn(new MarketingOrderInvoice())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit sales order down payment.');
+                    ->log('Add / edit AR Invoice.');
 
 				$response = [
 					'status'    => 200,
@@ -477,15 +539,100 @@ class MarketingOrderDownPaymentController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function rowDetail(Request $request)
     {
-        $data   = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12 mt-1"><table style="min-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="9">Daftar Item & Surat Jalan</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Surat Jalan</th>
+                                <th class="center-align">Item</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">PPN</th>
+                                <th class="center-align">Grandtotal</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        foreach($data->marketingOrderInvoiceDeliveryProcess as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code.'</td>
+                <td class="center-align">'.$row->lookable->item->name.'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.$row->lookable->item->sellUnit->code.'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+            </tr>';
+        }
+        
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-3"><table style="min-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="6">Daftar AR Down Payment</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Dokumen</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">PPN</th>
+                                <th class="center-align">Grandtotal</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        foreach($data->marketingOrderInvoiceDownPayment as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->lookable->code.'</td>
+                <td class="">'.$row->note.'</td>
+                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-3"><table style="min-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align">Total</th>
+                                <th class="center-align">PPN</th>
+                                <th class="center-align">Total Stl.Pajak</th>
+                                <th class="center-align">Rounding</th>
+                                <th class="center-align">Grandtotal</th>
+                                <th class="center-align">Downpayment</th>
+                                <th class="center-align">Sisa</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align gradient-45deg-amber-amber"><h6 class="white-text">'.number_format($data->total,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-indigo-blue"><h6 class="white-text">'.number_format($data->tax,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-brown-brown"><h6 class="white-text">'.number_format($data->total_after_tax,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-deep-orange-orange"><h6 class="white-text">'.number_format($data->rounding,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-purple-deep-orange"><h6 class="white-text">'.number_format($data->grandtotal,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-light-blue-cyan"><h6 class="white-text">'.number_format($data->downpayment,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-green-teal"><h6 class="white-text">'.number_format($data->balance,2,',','.').'</h6></th>
+                            </tr>
+                        </thead></table></div>';
+
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>
@@ -539,15 +686,15 @@ class MarketingOrderDownPaymentController extends Controller
 
     public function approval(Request $request,$id){
         
-        $mod = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($id))->first();
+        $moi = MarketingOrderInvoice::where('code',CustomHelper::decrypt($id))->first();
                 
-        if($mod){
+        if($moi){
             $data = [
-                'title'     => 'Print AR Down Payment',
-                'data'      => $mod
+                'title'     => 'Print AR Invoice',
+                'data'      => $moi
             ];
 
-            return view('admin.approval.marketing_order_down_payment', $data);
+            return view('admin.approval.marketing_order_invoice', $data);
         }else{
             abort(404);
         }
@@ -555,11 +702,11 @@ class MarketingOrderDownPaymentController extends Controller
 
     public function printIndividual(Request $request,$id){
         
-        $pr = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($id))->first();
+        $pr = MarketingOrderInvoice::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Print AR Down Payment',
+                'title'     => 'Print Pengembalian DO',
                 'data'      => $pr
             ];
 
@@ -576,7 +723,7 @@ class MarketingOrderDownPaymentController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.sales.order_down_payment_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.sales.order_invoice_individual', $data)->setPaper('a5', 'landscape');
             // $pdf->render();
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -610,11 +757,11 @@ class MarketingOrderDownPaymentController extends Controller
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
-                $pr = MarketingOrderDownPayment::where('code',$row)->first();
+                $pr = MarketingOrderInvoice::where('code',$row)->first();
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Surat Jalan',
+                        'title'     => 'Print Pengembalian DO',
                         'data'      => $pr,
                     ];
                     $img_path = 'website/logo_web_fix.png';
@@ -623,7 +770,7 @@ class MarketingOrderDownPaymentController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.sales.order_down_payment_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.sales.order_invoice_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -689,10 +836,10 @@ class MarketingOrderDownPaymentController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = MarketingOrderDownPayment::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $query = MarketingOrderInvoice::where('Code', 'LIKE', '%'.$nomor)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Marketing Order Delivery',
+                                'title'     => 'Print Pengembalian DO',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -701,7 +848,7 @@ class MarketingOrderDownPaymentController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.sales.order_down_payment_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.sales.order_invoice_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -755,10 +902,10 @@ class MarketingOrderDownPaymentController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = MarketingOrderDownPayment::where('Code', 'LIKE', '%'.$code)->first();
+                        $query = MarketingOrderInvoice::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Marketing Order Delivery',
+                                'title'     => 'Print Pengembalian DO',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -767,7 +914,7 @@ class MarketingOrderDownPaymentController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.sales.order_down_payment_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.sales.order_invoice_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -798,27 +945,8 @@ class MarketingOrderDownPaymentController extends Controller
         return response()->json($response);
     }
 
-    public function show(Request $request){
-        $modp = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
-        $modp['code_place_id'] = substr($modp->code,7,2);
-        $modp['account_name'] = $modp->account->employee_no.' - '.$modp->account->name;
-        $modp['subtotal'] = number_format($modp->subtotal,2,',','.');
-        $modp['discount'] = number_format($modp->discount,2,',','.');
-        $modp['total'] = number_format($modp->total,2,',','.');
-        $modp['tax'] = number_format($modp->tax,2,',','.');
-        $modp['grandtotal'] = number_format($modp->grandtotal,2,',','.');
-        $modp['currency_rate'] = number_format($modp->currency_rate,2,',','.');
-
-        if($modp->tax_no){
-            $newprefix = '011.'.explode('.',$modp->tax_no)[1].'.'.explode('.',$modp->tax_no)[2];
-            $modp['tax_no'] = $newprefix;
-        }
-
-		return response()->json($modp);
-    }
-
     public function viewJournal(Request $request,$id){
-        $query = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($id))->first();
+        $query = MarketingOrderInvoice::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $response = [
                 'title'     => 'Journal',
@@ -853,8 +981,161 @@ class MarketingOrderDownPaymentController extends Controller
         return response()->json($response);
     }
 
+    public function show(Request $request){
+        $po = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->id))->first();
+        $po['code_place_id'] = substr($po->code,7,2);
+        $po['account_name'] = $po->account->code.' - '.$po->account->name;
+        $po['total'] = number_format($po->total,2,',','.');
+        $po['tax'] = number_format($po->tax,2,',','.');
+        $po['total_after_tax'] = number_format($po->total_after_tax,2,',','.');
+        $po['rounding'] = number_format($po->rounding,2,',','.');
+        $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
+        $po['downpayment'] = number_format($po->downpayment,2,',','.');
+        $po['balance'] = number_format($po->balance,2,',','.');
+
+        if($po->tax_no){
+            $newprefix = '011.'.explode('.',$po->tax_no)[1].'.'.explode('.',$po->tax_no)[2];
+            $po['tax_no'] = $newprefix;
+        }
+
+        $arrSj = [];
+        $arrDp = [];
+        $arrUsed = [];
+        
+        foreach($po->marketingOrderInvoiceDeliveryProcess as $row){
+            $type = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->getTable();
+            $id = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->id;
+            $code = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;
+
+            $cekIndex = $this->getIndexArray($id,$type,$arrUsed);
+
+            if($cekIndex < 0){
+                $arrUsed[] = [
+                    'id'    => $id,
+                    'type'  => $type,
+                    'code'  => $code,
+                ];
+            }
+
+            $arrSj[] = [
+                'id'                                    => $id,
+                'lookable_type'                         => $row->lookable_type,
+                'lookable_id'                           => $row->lookable_id,
+                'total'                                 => number_format($row->total,2,',','.'),
+                'tax'                                   => number_format($row->tax,2,',','.'),
+                'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
+                'code'                                  => $code,
+                'item_name'                             => $row->lookable->item->code.' - '.$row->lookable->item->name,
+                'qty_do'                                => number_format($row->lookable->qty,3,',','.'),
+                'qty_return'                            => number_format($row->lookable->qtyReturn(),3,',','.'),
+                'qty_sent'                              => number_format($row->lookable->getBalanceQtySentMinusReturn(),3,',','.'),
+                'unit'                                  => $row->lookable->item->sellUnit->code,
+                'price'                                 => number_format($row->price,2,',','.'),
+                'percent_tax'                           => number_format($row->percent_tax,2,',','.'),
+                'is_include_tax'                        => $row->is_include_tax,
+                'note'                                  => $row->note,
+            ];
+        }
+
+        foreach($po->marketingOrderInvoiceDownPayment as $row){
+            $cekIndex = $this->getIndexArray($row->lookable_id,$row->lookable_type,$arrUsed);
+
+            if($cekIndex < 0){
+                $arrUsed[] = [
+                    'id'    => $row->lookable_id,
+                    'type'  => $row->lookable_type,
+                    'code'  => $row->lookable->code,
+                ];
+            }
+
+            $arrDp[] = [
+                'type'      => $row->lookable_type,
+                'id'        => $row->lookable_id,
+                'code'      => $row->lookable->code,
+                'post_date' => $row->lookable->post_date,
+                'subtotal'  => number_format($row->lookable->subtotal,2,',','.'),
+                'discount'  => number_format($row->lookable->discount,2,',','.'),
+                'total'     => number_format($row->lookable->total,2,',','.'),
+                'tax'       => number_format($row->lookable->tax,2,',','.'),
+                'grandtotal'=> number_format($row->lookable->grandtotal,2,',','.'),
+                'balance'   => number_format($row->lookable->balanceInvoice(),2,',','.'),
+                'note'      => $row->lookable->note,
+            ];
+        }
+
+        foreach($arrUsed as $row){
+            CustomHelper::sendUsedData($row['type'],$row['id'],'Form AR Invoice');
+        }
+
+        $po['details'] = $arrSj;
+        $po['dps'] = $arrDp;
+        $po['used'] = $arrUsed;
+        				
+		return response()->json($po);
+    }
+
+    function getIndexArray($id,$type,$array){
+        $index = -1;
+
+        foreach($array as $key => $row){
+            if($row['id'] == $id && $row['type'] == $type){
+                $index = $key;
+            }
+        }
+
+        return $index;
+    }
+
+    public function voidStatus(Request $request){
+        $query = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+            if(in_array($query->status,['4','5'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada form lainnya.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+    
+                activity()
+                    ->performedOn(new MarketingOrderInvoice())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the data');
+    
+                CustomHelper::sendNotification($query->getTable(),$query->id,'AR Invoice No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval($query->getTable(),$query->id);
+                CustomHelper::removeJournal($query->getTable(),$query->id);
+                CustomHelper::removeCountLimitCredit($query->account_id,$query->balance);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
     public function destroy(Request $request){
-        $query = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -889,68 +1170,21 @@ class MarketingOrderDownPaymentController extends Controller
         
         if($query->delete()) {
 
-            CustomHelper::removeApproval('marketing_order_down_payments',$query->id);
-            CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
+            $query->marketingOrderInvoiceDetail()->delete();
+
+            CustomHelper::removeApproval($query->getTable(),$query->id);
+            CustomHelper::removeCountLimitCredit($query->account_id,$query->balance);
 
             activity()
-                ->performedOn(new MarketingOrderDownPayment())
+                ->performedOn(new MarketingOrderInvoice())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the AP Down Payment data');
+                ->log('Delete the marketing order return data');
 
             $response = [
                 'status'  => 200,
                 'message' => 'Data deleted successfully.'
             ];
-        } else {
-            $response = [
-                'status'  => 500,
-                'message' => 'Data failed to delete.'
-            ];
-        }
-
-        return response()->json($response);
-    }
-
-    public function voidStatus(Request $request){
-        $query = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
-        
-        if($query) {
-            if(in_array($query->status,['4','5'])){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
-                ];
-            }elseif($query->hasChildDocument()){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data telah digunakan pada form lainnya.'
-                ];
-            }else{
-                $query->update([
-                    'status'    => '5',
-                    'void_id'   => session('bo_id'),
-                    'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
-                ]);
-
-                CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
-    
-                activity()
-                    ->performedOn(new MarketingOrderDownPayment())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Void the  data');
-    
-                CustomHelper::sendNotification('marketing_order_down_payments',$query->id,'AR Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('marketing_order_down_payments',$query->id);
-                CustomHelper::removeJournal('marketing_order_down_payments',$query->id);
-
-                $response = [
-                    'status'  => 200,
-                    'message' => 'Data closed successfully.'
-                ];
-            }
         } else {
             $response = [
                 'status'  => 500,

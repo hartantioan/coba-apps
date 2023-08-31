@@ -80,11 +80,20 @@ class MarketingOrderDetail extends Model
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
 
-    public function tax(){
+    public function taxId(){
         return $this->belongsTo('App\Models\Tax','tax_id','id')->withTrashed();
     }
 
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
+    }
+
+    public function realPriceAfterGlobalDiscount(){
+        $bobot = $this->total / $this->marketingOrder->subtotal;
+        $discountRow = $bobot * $this->marketingOrder->discount;
+        $discountPerItem = $discountRow / $this->qty;
+        $realPrice = $this->price_after_discount - $discountPerItem;
+
+        return $realPrice;
     }
 }

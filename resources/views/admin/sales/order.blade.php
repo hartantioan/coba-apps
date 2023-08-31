@@ -195,6 +195,7 @@
                                                         <th>Sales</th>
                                                         <th>Mata Uang</th>
                                                         <th>Konversi</th>
+                                                        <th>% DP</th>
                                                         <th>Catatan</th>
                                                         <th>Subtotal</th>
                                                         <th>Diskon</th>
@@ -367,12 +368,16 @@
                                         <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                         <label class="active" for="currency_rate">Konversi</label>
                                     </div>
+                                    <div class="input-field col m3 s12 step24">
+                                        <input id="percent_dp" name="percent_dp" type="number" value="0" min="0" max="100">
+                                        <label class="active" for="percent_dp">Prosentase DP (%)</label>
+                                    </div>
                                 </fieldset>
                             </div>
                             <div class="col s12">
                                 <fieldset>
                                     <legend>4. Lain-lain</legend>
-                                    <div class="file-field input-field col m3 s12 step24">
+                                    <div class="file-field input-field col m3 s12 step25">
                                         <div class="btn">
                                             <span>Dokumen PO</span>
                                             <input type="file" name="document_so" id="document_so">
@@ -381,13 +386,13 @@
                                             <input class="file-path validate" type="text">
                                         </div>
                                     </div>
-                                    <div class="input-field col m3 s12 step25">
+                                    <div class="input-field col m3 s12 step26">
                                         <select class="browser-default" id="sales_id" name="sales_id"></select>
                                         <label class="active" for="sales_id">Sales</label>
                                     </div>
                                 </fieldset>
                             </div>
-                            <div class="col s12 step26">
+                            <div class="col s12 step27">
                                 <fieldset style="min-width: 100%;">
                                     <legend>5. Produk Detail</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
@@ -435,18 +440,18 @@
                                 </fieldset>
                             </div>
                             <div class="col m12 s12 center">
-                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-1 step27" onclick="addItem()" href="javascript:void(0);">
+                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-1 step28" onclick="addItem()" href="javascript:void(0);">
                                     <i class="material-icons left">add</i> Tambah Baris
                                 </a>
                             </div>
-                            <div class="input-field col m4 s12 step28">
+                            <div class="input-field col m4 s12 step29">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m4 s12">
 
                             </div>
-                            <div class="input-field col m4 s12 step29">
+                            <div class="input-field col m4 s12 step30">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -495,7 +500,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step30" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step31" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -1401,6 +1406,7 @@
                 { name: 'sales_id', className: '' },
                 { name: 'currency_id', className: '' },
                 { name: 'currency_rate', className: 'right-align' },
+                { name: 'percent_dp', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'discount', className: 'right-align' },
@@ -2132,38 +2138,43 @@
                     intro : 'Nilai konversi rupiah pada saat Sales Order dibuat.'
                 },
                 {
-                    title : 'File Lampiran',
+                    title : 'Persen DP',
                     element : document.querySelector('.step24'),
+                    intro : 'Persen Down Payment yang akan menjadi acuan pengecekan credit limit Customer pada saat barang akan dijadwalkan pengirimannya. Silahkan isikan 0, jika tagihan akan dibayarkan secara kredit dan pengecekan akan didasarkan pada limit credit Customer. Silahkan isikan 100 jika tagihan adalah dibayarkan dengan 100% down payment.'
+                },
+                {
+                    title : 'File Lampiran',
+                    element : document.querySelector('.step25'),
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
                     title : 'Sales',
-                    element : document.querySelector('.step25'),
+                    element : document.querySelector('.step26'),
                     intro : 'Inputan ini digunakan untuk mengatur sales terkait dengan penjualan. Data diambil dari Partner Bisnis tipe Karyawan / Pegawai.' 
                 },
                 {
                     title : 'Detail produk',
-                    element : document.querySelector('.step26'),
+                    element : document.querySelector('.step27'),
                     intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, dan Gudang Tujuan, karena itu nantinya akan menentukan dimana barang ketika diterima.' 
                 },
                 {
                     title : 'Tambah Baris',
-                    element : document.querySelector('.step27'),
+                    element : document.querySelector('.step28'),
                     intro : 'Untuk menambahkan baris produk yang ingin diinput silahkan tekan tombol ini.' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step28'),
+                    element : document.querySelector('.step29'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Diskon & Rounding',
-                    element : document.querySelector('.step29'),
+                    element : document.querySelector('.step30'),
                     intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal. Sedangkan untuk Rounding akan menambah atau mengurangi nilai grandtotal sesuai inputan pengguna.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step30'),
+                    element : document.querySelector('.step31'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

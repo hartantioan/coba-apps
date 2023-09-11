@@ -701,31 +701,30 @@ class AttendancePeriodController extends Controller
     }
 
     public function presenceReport(Request $request){
-        $presenceReports  = PresenceReport::where('period_id',$request->id)->get();
-        $distinctUserIds = $presenceReports->pluck('user_id')->unique()->toArray();
-        $distinctDates = $presenceReports->pluck('date')->unique()->toArray();
+        $distinctUserIds = PresenceReport::where('period_id',$request->id)->groupBy('user_id')->pluck('user_id')->toArray();
+        $distinctDates = PresenceReport::where('period_id',$request->id)->groupBy('date')->pluck('date')->toArray();
         $userDetail=[];
       
         foreach($distinctUserIds as $key_user=>$user_id){
             foreach($distinctDates as $key_dates=>$row_dates){
                 $userDetail[$key_user][$key_dates]=[
-                    'user_name' =>'',
-                    'late_status'=>[],
-                    'date'=>'',
-                    'nama_shift'=>[]
+                    'user_name'     =>'',
+                    'late_status'   =>[],
+                    'date'          =>'',
+                    'nama_shift'    =>[],
                 ];
-                foreach($presenceReports as $key_presence=>$row_presence){
-                    if($row_presence->date==$row_dates&&$row_presence->user_id == $user_id){
-                        $userDetail[$key_user][$key_dates]['user_name']=$row_presence->user->nama;
-                        $userDetail[$key_user][$key_dates]['date']=$row_dates;
-                        $userDetail[$key_user][$key_dates]['nama_shift'][]=$row_presence->nama_shift;
-                        $userDetail[$key_user][$key_dates]['late_status'][]=$row_presence->late_status;
-                    }
+                foreach(PresenceReport::where('user_id',$user_id)->where('date',$row_dates)->where('period_id',$request->id)->get() as $key_presence=>$row_presence){
+                    $userDetail[$key_user][$key_dates]['user_name']=$row_presence->user->nama;
+                    $userDetail[$key_user][$key_dates]['date']=$row_dates;
+                    $userDetail[$key_user][$key_dates]['nama_shift'][]=$row_presence->nama_shift;
+                    $userDetail[$key_user][$key_dates]['late_status'][]=$row_presence->late_status;
                 }
             }
         }
+
         $string_table="";
-        foreach($userDetail as $key_presenced=>$row_user_presence){
+
+        foreach($userDetail as $key_presenced => $row_user_presence){
         
             $string_table.="
                 <tr>

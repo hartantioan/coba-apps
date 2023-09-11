@@ -60,6 +60,7 @@ class AgingAPController extends Controller
                             AND pid.id = pmd.lookable_id
                         WHERE pmd.lookable_type = 'purchase_invoice_details'
                         AND pm.post_date <= :date2
+                        AND pm.status IN ('2','3')
                 ),0) AS total_memo,
                 u.name AS account_name,
                 u.employee_no AS account_code
@@ -69,6 +70,7 @@ class AgingAPController extends Controller
                 WHERE 
                     pi.post_date <= :date3
                     AND pi.balance > 0
+                    AND pi.status IN ('2','3')
         ", array(
             'date1' => $date,
             'date2' => $date,
@@ -98,6 +100,7 @@ class AgingAPController extends Controller
                         WHERE pmd.lookable_type = 'purchase_down_payments'
                         AND pmd.lookable_id = pi.id
                         AND pm.post_date <= :date2
+                        AND pm.status IN ('2','3')
                 ),0) AS total_memo,
                 u.name AS account_name,
                 u.employee_no AS account_code
@@ -107,6 +110,7 @@ class AgingAPController extends Controller
                 WHERE 
                     pi.post_date <= :date3
                     AND pi.grandtotal > 0
+                    AND pi.status IN ('2','3')
         ", array(
             'date1' => $date,
             'date2' => $date,

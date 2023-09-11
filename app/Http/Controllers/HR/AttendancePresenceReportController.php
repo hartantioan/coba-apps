@@ -163,9 +163,6 @@ class AttendancePresenceReportController extends Controller
                             
                             //pengurangan apabila lebih besar dari 1 maka shift tidak bersamaan
                         }
-                        
-                       
-
                         if($row_schedule_filter->shift->is_next_day == '1'){
                             if (count($query_data) < 3) {
                                 foreach($query_data2 as $row_attendance_filter){

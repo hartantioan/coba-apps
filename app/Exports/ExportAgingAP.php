@@ -49,6 +49,7 @@ class ExportAgingAP implements FromView , WithEvents
                                 AND pid.id = pmd.lookable_id
                             WHERE pmd.lookable_type = 'purchase_invoice_details'
                             AND pm.post_date <= :date2
+                            AND pm.status IN ('2','3')
                     ),0) AS total_memo,
                     u.name AS account_name,
                     u.employee_no AS account_code
@@ -58,6 +59,7 @@ class ExportAgingAP implements FromView , WithEvents
                     WHERE 
                         pi.post_date <= :date3
                         AND pi.balance > 0
+                        AND pi.status IN ('2','3')
             ", array(
                 'date1' => $this->date,
                 'date2' => $this->date,
@@ -91,6 +93,7 @@ class ExportAgingAP implements FromView , WithEvents
                             AND pid.id = pmd.lookable_id
                         WHERE pmd.lookable_type = 'purchase_down_payments'
                         AND pm.post_date <= :date2
+                        AND pm.status IN ('2','3')
                 ),0) AS total_memo,
                 u.name AS account_name,
                 u.employee_no AS account_code
@@ -100,6 +103,7 @@ class ExportAgingAP implements FromView , WithEvents
                 WHERE 
                     pi.post_date <= :date3
                     AND pi.grandtotal > 0
+                    AND pi.status IN ('2','3')
             ", array(
                 'date1' => $this->date,
                 'date2' => $this->date,

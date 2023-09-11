@@ -39,36 +39,38 @@ class MarketingOrderAgingController extends Controller
             SELECT 
                 *,
                 IFNULL((SELECT 
-                    SUM(nominal) 
-                    FROM payment_request_details prd 
-                    JOIN outgoing_payments op
-                        ON op.payment_request_id = prd.payment_request_id
+                    SUM(ipd.total) 
+                    FROM incoming_payment_details ipd 
+                    JOIN incoming_payments ip
+                        ON ip.id = ipd.incoming_payment_id
                     WHERE 
-                        prd.lookable_id = pi.id 
-                        AND prd.lookable_type = 'purchase_invoices'
-                        AND op.post_date <= :date1
-                        AND op.status IN ('2','3')
+                        ipd.lookable_id = moi.id 
+                        AND ipd.lookable_type = 'marketing_order_invoices'
+                        AND ip.post_date <= :date1
+                        AND ip.status IN ('2','3')
                 ),0) AS total_payment,
                 IFNULL((
                     SELECT
-                        SUM(pmd.grandtotal)
-                        FROM purchase_memo_details pmd
-                        JOIN purchase_memos pm
-                            ON pm.id = pmd.purchase_memo_id
-                        JOIN purchase_invoice_details pid
-                            ON pid.purchase_invoice_id = pi.id
-                            AND pid.id = pmd.lookable_id
-                        WHERE pmd.lookable_type = 'purchase_invoice_details'
-                        AND pm.post_date <= :date2
+                        SUM(momd.balance)
+                        FROM marketing_order_memo_details momd
+                        JOIN marketing_order_memos mom
+                            ON mom.id = momd.marketing_order_memo_id
+                        JOIN marketing_order_invoice_details midd
+                            ON midd.marketing_order_invoice_id = moi.id
+                            AND midd.id = momd.lookable_id
+                        WHERE momd.lookable_type = 'marketing_order_invoice_details'
+                        AND mom.post_date <= :date2
+                        AND mom.status IN ('2','3')
                 ),0) AS total_memo,
                 u.name AS account_name,
                 u.employee_no AS account_code
-                FROM purchase_invoices pi
+                FROM marketing_order_invoices moi
                 LEFT JOIN users u
-                    ON u.id = pi.account_id
+                    ON u.id = moi.account_id
                 WHERE 
-                    pi.post_date <= :date3
-                    AND pi.balance > 0
+                    moi.post_date <= :date3
+                    AND moi.balance > 0
+                    AND moi.status IN ('2','3')
         ", array(
             'date1' => $date,
             'date2' => $date,
@@ -79,34 +81,36 @@ class MarketingOrderAgingController extends Controller
             SELECT 
                 *,
                 IFNULL((SELECT 
-                    SUM(nominal) 
-                    FROM payment_request_details prd 
-                    JOIN outgoing_payments op
-                        ON op.payment_request_id = prd.payment_request_id
+                    SUM(ipd.total)
+                    FROM incoming_payment_details ipd 
+                    JOIN incoming_payments ip
+                        ON ip.id = ipd.incoming_payment_id
                     WHERE 
-                        prd.lookable_id = pi.id 
-                        AND prd.lookable_type = 'purchase_down_payments'
-                        AND op.post_date <= :date1
-                        AND op.status IN ('2','3')
+                        ipd.lookable_id = modp.id 
+                        AND ipd.lookable_type = 'marketing_order_down_payments'
+                        AND ip.post_date <= :date1
+                        AND ip.status IN ('2','3')
                 ),0) AS total_payment,
                 IFNULL((
                     SELECT
-                        SUM(pmd.grandtotal)
-                        FROM purchase_memo_details pmd
-                        JOIN purchase_memos pm
-                            ON pm.id = pmd.purchase_memo_id
-                        WHERE pmd.lookable_type = 'purchase_down_payments'
-                        AND pmd.lookable_id = pi.id
-                        AND pm.post_date <= :date2
+                        SUM(momd.balance)
+                        FROM marketing_order_memo_details momd
+                        JOIN marketing_order_memos mom
+                            ON mom.id = momd.marketing_order_memo_id
+                        WHERE momd.lookable_type = 'marketing_order_down_payments'
+                        AND momd.lookable_id = modp.id
+                        AND mom.post_date <= :date2
+                        AND mom.status IN ('2','3')
                 ),0) AS total_memo,
                 u.name AS account_name,
                 u.employee_no AS account_code
-                FROM purchase_down_payments pi
+                FROM marketing_order_down_payments modp
                 LEFT JOIN users u
-                    ON u.id = pi.account_id
+                    ON u.id = modp.account_id
                 WHERE 
-                    pi.post_date <= :date3
-                    AND pi.grandtotal > 0
+                    modp.post_date <= :date3
+                    AND modp.grandtotal > 0
+                    AND modp.status IN ('2','3')
         ", array(
             'date1' => $date,
             'date2' => $date,
@@ -134,8 +138,8 @@ class MarketingOrderAgingController extends Controller
                     $newData[$index]['arrInvoiceBalanceOver'][] = $daysDiff > 90 ? $row->code : null;
                 }else{
                     $newData[] = [
-                        'supplier_code'         => $row->account_code,
-                        'supplier_name'         => $row->account_name,
+                        'customer_code'         => $row->account_code,
+                        'customer_name'         => $row->account_name,
                         'balance0'              => $daysDiff <= 0 ? $balance : 0,
                         'balance30'             => $daysDiff <= 30 && $daysDiff > 0 ? $balance : 0,
                         'balance60'             => $daysDiff <= 60 && $daysDiff > 30 ? $balance : 0,
@@ -171,8 +175,8 @@ class MarketingOrderAgingController extends Controller
                     $newData[$index]['arrInvoiceBalanceOver'][] = $daysDiff > 90 ? $row->code : null;
                 }else{
                     $newData[] = [
-                        'supplier_code'         => $row->account_code,
-                        'supplier_name'         => $row->account_name,
+                        'customer_code'         => $row->account_code,
+                        'customer_name'         => $row->account_name,
                         'balance0'              => $daysDiff <= 0 ? $balance : 0,
                         'balance30'             => $daysDiff <= 30 && $daysDiff > 0 ? $balance : 0,
                         'balance60'             => $daysDiff <= 60 && $daysDiff > 30 ? $balance : 0,
@@ -270,7 +274,7 @@ class MarketingOrderAgingController extends Controller
     function findDuplicate($value,$array){
         $index = -1;
         foreach($array as $key => $row){
-            if($row['supplier_code'] == $value){
+            if($row['customer_code'] == $value){
                 $index = $key;
             }
         }

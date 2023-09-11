@@ -801,8 +801,12 @@
         if($('#account_id').val()){
             $('#top_internal').val($('#account_id').select2('data')[0].top_internal);
             $('#top_customer').val($('#account_id').select2('data')[0].top_customer);
+            var result = new Date($('#post_date').val());
+            result.setDate(result.getDate() + parseInt($('#account_id').select2('data')[0].top_customer));
+            $('#valid_date').val(result.toISOString().split('T')[0]);
         }else{
             $('#top_internal,#top_customer').val('0');
+            $('#valid_date').val('{{ date("Y-m-d") }}');
         }
     }
 

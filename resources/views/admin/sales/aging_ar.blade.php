@@ -85,7 +85,7 @@
                                                     <tr>
                                                         <th rowspan="2" class="center-align">No.</th>
                                                         <th rowspan="2" class="center-align">Supplier</th>
-                                                        <th colspan="5" class="center-align">Nominal Jatuh Tempo (Dari Tgl. Dokumen Diterima)</th>
+                                                        <th colspan="5" class="center-align">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Tenggat)</th>
                                                         <th rowspan="2" class="center-align">Total</th>
                                                     </tr>
                                                     <tr>
@@ -199,7 +199,7 @@
                             $('#detail-result').append(`
                                 <tr class="row_detail">
                                     <td class="center-align">` + (i+1) + `</td>
-                                    <td>` + val.supplier_name + `</td>
+                                    <td>` + val.customer_name + `</td>
                                     <td class="right-align ` + (val.balance0 > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '') + `" onclick="detailShow(this)" data-invoice="` + val.arrInvoiceBalance0.filter(Boolean).join() + `">` + formatRupiahIni(val.balance0.toFixed(2).toString().replace('.',',')) + `</td>
                                     <td class="right-align ` + (val.balance30 > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '') + `" onclick="detailShow(this)" data-invoice="` + val.arrInvoiceBalance30.filter(Boolean).join() + `">` + formatRupiahIni(val.balance30.toFixed(2).toString().replace('.',',')) + `</td>
                                     <td class="right-align ` + (val.balance60 > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '') + `" onclick="detailShow(this)" data-invoice="` + val.arrInvoiceBalance60.filter(Boolean).join() + `">` + formatRupiahIni(val.balance60.toFixed(2).toString().replace('.',',')) + `</td>

@@ -218,7 +218,7 @@
                             </div>
                             <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id"></select>
+                                <select class="browser-default" id="account_id" name="account_id" onchange="getTopCustomer();"></select>
                                 <label class="active" for="account_id">Partner Bisnis</label>
                             </div>
                             <div class="input-field col m3 s12 step4">
@@ -837,6 +837,16 @@
             }
             
         });
+    }
+
+    function getTopCustomer(){
+        if($('#account_id').val()){
+            var result = new Date($('#post_date').val());
+            result.setDate(result.getDate() + parseInt($('#account_id').select2('data')[0].top_customer));
+            $('#due_date').val(result.toISOString().split('T')[0]);
+        }else{
+            $('#due_date').val('{{ date("Y-m-d") }}');
+        }
     }
 
     String.prototype.replaceAt = function(index, replacement) {

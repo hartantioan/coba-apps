@@ -844,6 +844,8 @@
                             </div>
                         `);
 
+                        $('#due_date').val(datakuy.due_date);
+
                         $.each(datakuy.details, function(i, val) {
                             var count = makeid(10);
                             $('#body-item').append(`
@@ -953,6 +955,8 @@
                                 <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.type + `','` + $('#marketing_order_down_payment_id').val() + `')">close</i>
                             </div>
                         `);
+
+                        $('#due_date').val(datakuy.due_date);
 
                         var count = makeid(10);
 

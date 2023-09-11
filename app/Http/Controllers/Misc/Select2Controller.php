@@ -1767,6 +1767,7 @@ class Select2Controller extends Controller {
                     'real_tax'          => number_format($taxAll,2,',','.'),
                     'real_grandtotal'   => number_format($grandtotalAll,2,',','.'),
                     'type'              => $d->getTable(),
+                    'due_date'          => $d->marketingOrderDelivery->marketingOrder->valid_date,
                 ];
             }
         }
@@ -1810,6 +1811,7 @@ class Select2Controller extends Controller {
                     'percent_tax'       => $d->percent_tax,
                     'tax_id'            => $d->tax_id ? $d->tax_id : '0',
                     'post_date'         => date('d/m/y',strtotime($d->post_date)),
+                    'due_date'          => $d->due_date,
                     'subtotal'          => number_format($d->subtotal,2,',','.'),
                     'discount'          => number_format($d->discount,2,',','.'),
                     'total'             => number_format($d->total,2,',','.'),
@@ -1878,6 +1880,7 @@ class Select2Controller extends Controller {
                     'code'              => $d->code,
                     'type'              => $d->getTable(),
                     'post_date'         => date('d/m/y',strtotime($d->post_date)),
+                    'due_date'          => $d->due_date,
                     'total'             => number_format($arrNominalMain['total'],2,',','.'),
                     'tax'               => number_format($arrNominalMain['tax'],2,',','.'),
                     'total_after_tax'   => number_format($arrNominalMain['total_after_tax'],2,',','.'),

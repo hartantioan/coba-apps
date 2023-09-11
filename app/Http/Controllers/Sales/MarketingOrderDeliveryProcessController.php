@@ -8,8 +8,11 @@ use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryDetail;
 use App\Models\MarketingOrderDeliveryProcessTrack;
+use App\Models\MarketingOrderInvoice;
+use App\Models\MarketingOrderInvoiceDetail;
 use App\Models\Place;
 use App\Models\Tax;
+use App\Models\TaxSeries;
 use App\Models\UserDriver;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
@@ -435,7 +438,6 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'vehicle_no'                    => $request->vehicle_no,
                         'note'                          => $request->note,
                         'status'                        => '1',
-                        'status_tracking'               => '1',
                         'total'                         => $mod->getTotal(),
                         'tax'                           => $mod->getTax(),
                         'rounding'                      => $mod->getRounding(),
@@ -455,6 +457,143 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'marketing_order_delivery_process_id'   => $query->id,
                     'status'                                => '1',
                 ]);
+
+                #linkkan ke AR Invoice
+                if($query->marketingOrderDelivery->marketingOrder->account->is_ar_invoice){
+                    $total = 0;
+                    $tax = 0;
+                    $total_after_tax = 0;
+                    $downpayment = 0;
+                    $arrDownPayment = [];
+                    $passedDp = false;
+                    $passedTaxSeries = false;
+                    
+                    foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+                        $total += $row->getTotal();
+                        $tax += $row->getTax();
+                        $total_after_tax += $row->getGrandtotal();
+                    }
+
+                    if($query->marketingOrderDelivery->marketingOrder->percent_dp > 0){
+                        $tempDownpayment = $total_after_tax * ($query->marketingOrderDelivery->marketingOrder->percent_dp / 100);
+                        $tempBalance = $tempDownpayment;
+                        foreach($query->marketingOrderDelivery->marketingOrder->account->marketingOrderDownPayment()->orderBy('code')->get() as $row){
+                            if($tempBalance > 0){
+                                $balanceInvoice = $row->balanceInvoice();
+                                if($balanceInvoice > 0){
+                                    $nominal = 0;
+                                    if($tempBalance > $balanceInvoice){
+                                        $nominal = $balanceInvoice;
+                                    }else{
+                                        $nominal = $tempBalance;
+                                    }
+                                    $arrDownPayment[] = [
+                                        'id'            => $row->id,
+                                        'type'          => $row->getTable(),
+                                        'code'          => $row->code,
+                                        'is_include_tax'=> $row->is_include_tax,
+                                        'percent_tax'   => $row->percent_tax,
+                                        'tax_id'        => $row->tax_id,
+                                        'total'         => $nominal / (1 + ($row->percent_tax / 100)),
+                                        'tax'           => ($nominal / (1 + ($row->percent_tax / 100))) * ($row->percent_tax / 100),
+                                        'grandtotal'    => $nominal,
+                                    ];
+                                    $downpayment += $nominal;
+                                    $tempBalance -= $nominal;
+                                }
+                            }
+                        }
+                        if($tempBalance > 0){
+                            $passedDp = false;
+                        }else{
+                            $passedDp = true;
+                        }
+                    }else{
+                        $passedDp = true;
+                    }
+
+                    if($passedDp){
+                        $balance = $total_after_tax - $downpayment;
+                        $code = MarketingOrderInvoice::generateCode('SINV-'.date('y').substr($query->code,7,2));
+                        $arrTax = TaxSeries::getTaxCode($query->company_id,$query->post_date);
+                        if($tax > 0){
+                            if($arrTax['status'] == '200'){
+                                $passedTaxSeries = true;
+                            }
+                        }else{
+                            $passedTaxSeries = true;
+                        }
+                        if($passedTaxSeries){
+                            $querymoi = MarketingOrderInvoice::create([
+                                'code'			                => $code,
+                                'user_id'		                => session('bo_id'),
+                                'account_id'                    => $query->marketingOrderDelivery->marketingOrder->account_id,
+                                'company_id'                    => $query->company_id,
+                                'post_date'                     => $query->post_date,
+                                'due_date'                      => $query->post_date,
+                                'document_date'                 => $query->post_date,
+                                'status'                        => '1',
+                                'type'                          => $query->marketingOrderDelivery->marketingOrder->payment_type,
+                                'total'                         => $total,
+                                'tax'                           => $tax,
+                                'total_after_tax'               => $total_after_tax,
+                                'rounding'                      => 0,
+                                'grandtotal'                    => $total_after_tax,
+                                'downpayment'                   => $downpayment,
+                                'balance'                       => $balance,
+                                'document'                      => NULL,
+                                'tax_no'                        => $tax > 0 ? $arrTax['no'] : NULL,
+                                'note'                          => 'Dibuat otomatis setelah Surat Jalan No. '.$query->code,
+                            ]);
+
+                            foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $rowdata){
+                                MarketingOrderInvoiceDetail::create([
+                                    'marketing_order_invoice_id'    => $querymoi->id,
+                                    'lookable_type'                 => $rowdata->getTable(),
+                                    'lookable_id'                   => $rowdata->id,
+                                    'qty'                           => $rowdata->qty,
+                                    'price'                         => $rowdata->marketingOrderDetail->realPriceAfterGlobalDiscount(),
+                                    'is_include_tax'                => $rowdata->marketingOrderDetail->is_include_tax,
+                                    'percent_tax'                   => $rowdata->marketingOrderDetail->percent_tax,
+                                    'tax_id'                        => $rowdata->marketingOrderDetail->tax_id,
+                                    'total'                         => $rowdata->getTotal(),
+                                    'tax'                           => $rowdata->getTax(),
+                                    'grandtotal'                    => $rowdata->getGrandtotal(),
+                                    'note'                          => $rowdata->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDelivery->code.' - '.$query->code,
+                                ]);
+                            }
+
+                            foreach($arrDownPayment as $rowdata){
+                                MarketingOrderInvoiceDetail::create([
+                                    'marketing_order_invoice_id'    => $querymoi->id,
+                                    'lookable_type'                 => $rowdata['type'],
+                                    'lookable_id'                   => $rowdata['id'],
+                                    'qty'                           => 1,
+                                    'price'                         => $rowdata['total'],
+                                    'is_include_tax'                => $rowdata['is_include_tax'],
+                                    'percent_tax'                   => $rowdata['percent_tax'],
+                                    'tax_id'                        => $rowdata['tax_id'],
+                                    'total'                         => $rowdata['total'],
+                                    'tax'                           => $rowdata['tax'],
+                                    'grandtotal'                    => $rowdata['grandtotal'],
+                                    'note'                          => $rowdata['code'],
+                                ]);
+                                CustomHelper::removeDeposit($querymoi->account_id,$rowdata['grandtotal']);
+                            }
+            
+                            CustomHelper::sendApproval($querymoi->getTable(),$querymoi->id,$querymoi->note);
+                            CustomHelper::sendNotification($querymoi->getTable(),$querymoi->id,'Pengajuan AR Invoice No. '.$querymoi->code,$querymoi->note,session('bo_id'));
+                            CustomHelper::addCountLimitCredit($querymoi->account_id,$querymoi->balance);
+            
+                            activity()
+                                ->performedOn(new MarketingOrderInvoice())
+                                ->causedBy(session('bo_id'))
+                                ->withProperties($querymoi)
+                                ->log('Add / edit AR Invoice.');
+                        }
+                    }
+                }
+                #end linkkan ke AR Invoice
 
                 CustomHelper::sendApproval('marketing_order_delivery_processes',$query->id,$query->note);
                 CustomHelper::sendNotification('marketing_order_delivery_processes',$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note,session('bo_id'));
@@ -491,6 +630,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
+                                <th class="center-align">Referensi</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Ambil Dari</th>
                                 <th class="center-align">Qty</th>
@@ -502,6 +642,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         foreach($data->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>

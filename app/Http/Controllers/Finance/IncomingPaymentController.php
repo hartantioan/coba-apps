@@ -9,6 +9,10 @@ use App\Models\CostDistribution;
 use App\Models\Currency;
 use App\Models\IncomingPayment;
 use App\Models\IncomingPaymentDetail;
+use App\Models\MarketingOrderDelivery;
+use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderInvoice;
+use App\Models\MarketingOrderMemo;
 use App\Models\OutgoingPayment;
 use App\Models\Place;
 use App\Models\Tax;
@@ -68,35 +72,81 @@ class IncomingPaymentController extends Controller
 
         $details = [];
 
-        $op = OutgoingPayment::where('account_id',$data->id)
-        ->whereIn('status',['2','3'])
-        ->whereHas('paymentRequest',function($query){
-            $query->whereHas('paymentRequestDetail',function($query){
-                $query->whereHasMorph('lookable',
-                [FundRequest::class],
-                function (Builder $query){
-                    $query->where('document_status','3');
+        if($data->type == '1'){
+            $op = OutgoingPayment::where('account_id',$data->id)
+            ->whereIn('status',['2','3'])
+            ->whereHas('paymentRequest',function($query){
+                $query->whereHas('paymentRequestDetail',function($query){
+                    $query->whereHasMorph('lookable',
+                    [FundRequest::class],
+                    function (Builder $query){
+                        $query->where('document_status','3');
+                    });
                 });
-            });
-        })->get();
-        
-        if(isset($op)){
-            foreach($op as $row){
-                $balance = $row->balancePaymentIncoming();
-                if(!$row->used()->exists() && $balance > 0){
+            })->get();
+            
+            if(isset($op)){
+                foreach($op as $row){
+                    $balance = $row->balancePaymentIncoming();
+                    if(!$row->used()->exists() && $balance > 0){
+                        $details[] = [
+                            'id'                    => $row->id,
+                            'type'                  => $row->getTable(),
+                            'code'                  => $row->code,
+                            'name'                  => $row->account->name,
+                            'payment_request_code'  => $row->paymentRequest->code,
+                            'post_date'             => date('d/m/y',strtotime($row->post_date)),
+                            'coa_name'              => $row->coaSource->name,
+                            'admin'                 => number_format($row->admin,2,',','.'),
+                            'total'                 => number_format($row->total,2,',','.'),
+                            'grandtotal'            => number_format($row->grandtotal,2,',','.'),
+                            'used'                  => number_format($row->totalUsedCross(),2,',','.'),
+                            'balance'               => number_format($balance,2,',','.'),
+                        ];
+                    }
+                }
+            }
+        }elseif($data->type == '2'){
+            foreach($data->marketingOrderDownPayment as $row){
+                if(!$row->used()->exists() && $row->balancePaymentIncoming() > 0){
                     $details[] = [
                         'id'                    => $row->id,
-                        'type'                  => 'outgoing_payments',
+                        'type'                  => $row->getTable(),
                         'code'                  => $row->code,
-                        'name'                  => $row->account->name,
-                        'payment_request_code'  => $row->paymentRequest->code,
                         'post_date'             => date('d/m/y',strtotime($row->post_date)),
-                        'coa_name'              => $row->coaSource->name,
-                        'admin'                 => number_format($row->admin,2,',','.'),
-                        'total'                 => number_format($row->total,2,',','.'),
                         'grandtotal'            => number_format($row->grandtotal,2,',','.'),
-                        'used'                  => number_format($row->totalUsedCross(),2,',','.'),
-                        'balance'               => number_format($balance,2,',','.'),
+                        'memo'                  => number_format($row->totalPayMemo(),2,',','.'),
+                        'balance'               => number_format($row->balancePaymentIncoming(),2,',','.'),
+                    ];
+                }
+            }
+
+            foreach($data->marketingOrderInvoice as $row){
+                if(!$row->used()->exists() && $row->balancePaymentIncoming() > 0){
+                    $details[] = [
+                        'id'                    => $row->id,
+                        'type'                  => $row->getTable(),
+                        'code'                  => $row->code,
+                        'post_date'             => date('d/m/y',strtotime($row->post_date)),
+                        'grandtotal'            => number_format($row->balance,2,',','.'),
+                        'memo'                  => number_format($row->totalPayMemo(),2,',','.'),
+                        'balance'               => number_format($row->balancePaymentIncoming(),2,',','.'),
+                    ];
+                }
+            }
+
+            foreach($data->marketingOrderMemo()->whereHas('marketingOrderMemoDetail',function($query){
+                $query->where('lookable_type','coas');
+            })->get() as $row){
+                if(!$row->used()->exists() && $row->balance() > 0){
+                    $details[] = [
+                        'id'                    => $row->id,
+                        'type'                  => $row->getTable(),
+                        'code'                  => $row->code,
+                        'post_date'             => date('d/m/y',strtotime($row->post_date)),
+                        'grandtotal'            => number_format($row->balance,2,',','.'),
+                        'memo'                  => number_format($row->totalUsed(),2,',','.'),
+                        'balance'               => number_format($row->balance(),2,',','.'),
                     ];
                 }
             }
@@ -117,7 +167,7 @@ class IncomingPaymentController extends Controller
                     if($op){
                         $balance = $op->balancePaymentIncoming();
                         if(!$op->used()->exists() && $balance > 0){
-                            CustomHelper::sendUsedData($op->getTable(),$op->id,'Form Payment Request');
+                            CustomHelper::sendUsedData($op->getTable(),$op->id,'Form Kas Masuk');
                             $coa = Coa::where('code','100.01.03.03.02')->where('company_id',$op->company_id)->first();
                             $details[] = [
                                 'id'                    => $op->id,
@@ -134,6 +184,80 @@ class IncomingPaymentController extends Controller
                                 'used'                  => number_format($op->totalUsedCross(),2,',','.'),
                                 'balance'               => number_format($balance,2,',','.'),
                                 'coa_id'                => $coa->id,
+                            ];
+                        }
+                    }
+                }elseif($request->arr_type[$key] == 'marketing_order_down_payments'){
+                    $dp = MarketingOrderDownPayment::find(intval($row));
+                    if($dp){
+                        $balance = $dp->balancePaymentIncoming();
+                        if(!$dp->used()->exists() && $balance > 0){
+                            CustomHelper::sendUsedData($dp->getTable(),$dp->id,'Form Kas Masuk');
+                            $coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$dp->company_id)->first();
+                            $details[] = [
+                                'id'                    => $dp->id,
+                                'code'                  => $dp->code,
+                                'rawcode'               => $dp->code,
+                                'type'                  => $dp->getTable(),
+                                'name'                  => $dp->account->name,
+                                'payment_request_code'  => '-',
+                                'post_date'             => date('d/m/y',strtotime($dp->post_date)),
+                                'coa_name'              => $coapiutang->name,
+                                'admin'                 => number_format(0,2,',','.'),
+                                'total'                 => number_format($dp->grandtotal,2,',','.'),
+                                'grandtotal'            => number_format($dp->grandtotal,2,',','.'),
+                                'used'                  => number_format($dp->totalPayMemo(),2,',','.'),
+                                'balance'               => number_format($balance,2,',','.'),
+                                'coa_id'                => $coapiutang->id,
+                            ];
+                        }
+                    }
+                }elseif($request->arr_type[$key] == 'marketing_order_invoices'){
+                    $moi = MarketingOrderInvoice::find(intval($row));
+                    if($moi){
+                        $balance = $moi->balancePaymentIncoming();
+                        if(!$moi->used()->exists() && $balance > 0){
+                            CustomHelper::sendUsedData($moi->getTable(),$moi->id,'Form Kas Masuk');
+                            $coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$moi->company_id)->first();
+                            $details[] = [
+                                'id'                    => $moi->id,
+                                'code'                  => $moi->code,
+                                'rawcode'               => $moi->code,
+                                'type'                  => $moi->getTable(),
+                                'name'                  => $moi->account->name,
+                                'payment_request_code'  => '-',
+                                'post_date'             => date('d/m/y',strtotime($moi->post_date)),
+                                'coa_name'              => $coapiutang->name,
+                                'admin'                 => number_format(0,2,',','.'),
+                                'total'                 => number_format($moi->balance,2,',','.'),
+                                'grandtotal'            => number_format($moi->balance,2,',','.'),
+                                'used'                  => number_format($moi->totalPayMemo(),2,',','.'),
+                                'balance'               => number_format($balance,2,',','.'),
+                                'coa_id'                => $coapiutang->id,
+                            ];
+                        }
+                    }
+                }elseif($request->arr_type[$key] == 'marketing_order_memos'){
+                    $moi = MarketingOrderMemo::find(intval($row));
+                    if($moi){
+                        $balance = $moi->balance();
+                        if(!$moi->used()->exists() && $balance > 0){
+                            CustomHelper::sendUsedData($moi->getTable(),$moi->id,'Form Kas Masuk');
+                            $details[] = [
+                                'id'                    => $moi->id,
+                                'code'                  => $moi->code,
+                                'rawcode'               => $moi->code,
+                                'type'                  => $moi->getTable(),
+                                'name'                  => $moi->account->name,
+                                'payment_request_code'  => '-',
+                                'post_date'             => date('d/m/y',strtotime($moi->post_date)),
+                                'coa_name'              => '-',
+                                'admin'                 => number_format(0,2,',','.'),
+                                'total'                 => '-'.number_format($moi->balance,2,',','.'),
+                                'grandtotal'            => '-'.number_format($moi->balance,2,',','.'),
+                                'used'                  => '-'.number_format($moi->totalUsed(),2,',','.'),
+                                'balance'               => '-'.number_format($balance,2,',','.'),
+                                'coa_id'                => 0,
                             ];
                         }
                     }
@@ -369,6 +493,15 @@ class IncomingPaymentController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+
+            $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+
+            if($grandtotal <= 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Nominal tidak boleh dibawah sama dengan 0.'
+                ]);
+            }
             
 			if($request->temp){
                 DB::beginTransaction();
@@ -473,19 +606,22 @@ class IncomingPaymentController extends Controller
                 DB::beginTransaction();
                 try {
                     foreach($request->arr_coa as $key => $row){
+                        $total = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
+                        $rounding = str_replace(',','.',str_replace('.','',$request->arr_rounding[$key]));
+                        $subtotal = str_replace(',','.',str_replace('.','',$request->arr_subtotal[$key]));
                         IncomingPaymentDetail::create([
                             'incoming_payment_id'   => $query->id,
                             'lookable_type'         => $request->arr_type[$key],
                             'lookable_id'           => $request->arr_type[$key] == 'coas' ? $request->arr_coa[$key] : $request->arr_id[$key],
                             'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
-                            'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                            'rounding'              => str_replace(',','.',str_replace('.','',$request->arr_rounding[$key])),
-                            'subtotal'              => str_replace(',','.',str_replace('.','',$request->arr_subtotal[$key])),
+                            'total'                 => $total,
+                            'rounding'              => $rounding,
+                            'subtotal'              => $subtotal,
                             'note'                  => $request->arr_note[$key],
                         ]);
 
-                        if($request->arr_type[$key] == 'outgoing_payments'){
-                            CustomHelper::removeCountLimitCredit($query->account_id,str_replace(',','.',str_replace('.','',$request->arr_total[$key])));
+                        if($request->arr_type[$key] == 'outgoing_payments' || $request->arr_type[$key] == 'marketing_order_down_payments' || $request->arr_type[$key] == 'marketing_order_invoices' || $request->arr_type[$key] == 'marketing_order_memos'){
+                            CustomHelper::removeCountLimitCredit($query->account_id,$total);
                         }
                     }
                     DB::commit();

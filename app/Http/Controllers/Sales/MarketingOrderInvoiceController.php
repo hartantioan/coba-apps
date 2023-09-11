@@ -60,45 +60,7 @@ class MarketingOrderInvoiceController extends Controller
     }
 
     public function getTaxSeries(Request $request){
-        $data = TaxSeries::where('company_id',$request->company_id)->where('start_date','<=',$request->date)->where('end_date','>=',$request->date)->where('status','1')->first();
-
-        if($data){
-            $year = date('y',strtotime($request->date));
-            $list = TaxSeries::getListCurrentTaxSeries($request->company_id,$year);
-            $no = '';
-            if(count($list) > 0){
-                $lastData = $list[0];
-                $currentno = intval(explode('.',$lastData)[count(explode('.',$lastData)) - 1]) + 1;
-                $startno = intval(explode('.',$data->start_no)[count(explode('.',$data->start_no)) - 1]);
-                $endno = intval(explode('.',$data->end_no)[count(explode('.',$data->end_no)) - 1]);
-                if($currentno >= $startno && $currentno <= $endno){
-                    $newcurrent = str_pad($currentno, 8, 0, STR_PAD_LEFT);
-                    $no = explode('.',$data->start_no)[0].'.'.explode('.',$data->start_no)[1].'.'.$newcurrent;
-                    $response = [
-                        'status'    => 200,
-                        'no'        => $no,
-                    ];
-                }else{
-                    $response = [
-                        'status'  => 500,
-                        'message' => 'Nomor seri baru di luar batas seri pajak yang ada. Silahkan tambahkan data terbaru.'
-                    ];
-                }
-            }else{
-                $no = $data->start_no;
-                $response = [
-                    'status'    => 200,
-                    'no'        => $no,
-                ];
-            }
-        }else{
-            $response = [
-                'status'  => 500,
-                'message' => 'Data Nomor Seri Pajak untuk perusahaan dan tanggal tidak ditemukan.'
-            ];
-        }
-        				
-		return response()->json($response);
+		return response()->json(TaxSeries::getTaxCode($request->company_id,$request->date));
     }
 
     public function datatable(Request $request){
@@ -357,7 +319,7 @@ class MarketingOrderInvoiceController extends Controller
 
             $limit = $user->limit_credit;
             $creditNow = $user->count_limit_credit;
-            $balanceNow = $limit - $creditNow;
+            $balanceNow = $limit - $creditNow - $user->grandtotalUninvoiceDoCredit() - $user->grandtotalUnsentModCredit();
             $creditInvoice = str_replace(',','.',str_replace('.','',$request->balance));
 
             if($creditInvoice > $balanceNow){

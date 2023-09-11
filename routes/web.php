@@ -92,6 +92,11 @@ use App\Http\Controllers\Sales\MarketingOrderDeliveryProcessController;
 use App\Http\Controllers\Sales\MarketingOrderReturnController;
 use App\Http\Controllers\Sales\MarketingOrderInvoiceController;
 use App\Http\Controllers\Sales\MarketingOrderMemoController;
+use App\Http\Controllers\Sales\MarketingOrderReportController;
+use App\Http\Controllers\Sales\MarketingOrderOutstandingController;
+use App\Http\Controllers\Sales\MarketingOrderPaymentController;
+use App\Http\Controllers\Sales\MarketingOrderPriceController;
+use App\Http\Controllers\Sales\MarketingOrderAgingController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -178,6 +183,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('employee', [Select2Controller::class, 'employee']);
                 Route::get('supplier', [Select2Controller::class, 'supplier']);
                 Route::get('customer', [Select2Controller::class, 'customer']);
+                Route::get('employee_customer', [Select2Controller::class, 'employeeCustomer']);
                 Route::get('warehouse', [Select2Controller::class, 'warehouse']);
                 Route::get('asset_item', [Select2Controller::class, 'assetItem']);
                 Route::get('purchase_request', [Select2Controller::class, 'purchaseRequest']);
@@ -224,6 +230,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_delivery', [Select2Controller::class, 'marketingOrderDelivery']);
                 Route::get('marketing_order_delivery_process', [Select2Controller::class, 'marketingOrderDeliveryProcess']);
                 Route::get('marketing_order_down_payment', [Select2Controller::class, 'marketingOrderDownPayment']);
+                Route::get('marketing_order_invoice', [Select2Controller::class, 'marketingOrderInvoice']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -1442,6 +1449,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[MarketingOrderMemoController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderMemoController::class, 'show']);
                     Route::post('get_code', [MarketingOrderMemoController::class, 'getCode']);
+                    Route::post('get_tax_series', [MarketingOrderMemoController::class, 'getTaxSeries']);
                     Route::post('print',[MarketingOrderMemoController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderMemoController::class, 'printByRange']);
                     Route::get('export',[MarketingOrderMemoController::class, 'export']);
@@ -1454,6 +1462,41 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[MarketingOrderMemoController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderMemoController::class, 'voidStatus'])->middleware('operation.access:marketing_order_memo,void');
                     Route::post('destroy', [MarketingOrderMemoController::class, 'destroy'])->middleware('operation.access:marketing_order_memo,delete');
+                });
+
+                Route::prefix('sales_report')->middleware('direct.access')->group(function () {
+                    Route::prefix('sales_recap')->middleware('operation.access:sales_recap,view')->group(function () {
+                        Route::get('/',[MarketingOrderReportController::class, 'index']);
+                        Route::post('filter_by_date',[MarketingOrderReportController::class, 'filterByDate']);
+                        Route::get('export',[MarketingOrderReportController::class, 'export']);
+                    });
+
+                    Route::prefix('sales_outstanding')->middleware('operation.access:sales_outstanding,view')->group(function () {
+                        Route::get('/',[MarketingOrderOutstandingController::class, 'index']);
+                        Route::post('filter_by_date',[MarketingOrderOutstandingController::class, 'filterByDate']);
+                        Route::get('export',[MarketingOrderOutstandingController::class, 'export']);
+                    });
+
+                    Route::prefix('sales_payment_history')->middleware('operation.access:sales_payment_history,view')->group(function () {
+                        Route::get('/',[MarketingOrderPaymentController::class, 'index']);
+                        Route::get('datatable_downpayment',[MarketingOrderPaymentController::class, 'datatableDownpayment']);
+                        Route::get('datatable_invoice',[MarketingOrderPaymentController::class, 'datatableInvoice']);
+                        Route::post('show',[MarketingOrderPaymentController::class, 'show']);
+                    });
+
+                    Route::prefix('sales_price_history')->middleware('operation.access:sales_price_history,view')->group(function () {
+                        Route::get('/',[MarketingOrderPriceController::class, 'index']);
+                        Route::get('datatable',[MarketingOrderPriceController::class, 'datatable']);
+                        Route::post('print',[MarketingOrderPriceController::class, 'print']);
+                        Route::get('export',[MarketingOrderPriceController::class, 'export']);
+                    });
+
+                    Route::prefix('sales_aging')->middleware('operation.access:sales_aging,view')->group(function () {
+                        Route::get('/',[MarketingOrderAgingController::class, 'index']);
+                        Route::post('filter',[MarketingOrderAgingController::class, 'filter']);
+                        Route::post('show_detail',[MarketingOrderAgingController::class, 'showDetail']);
+                        Route::get('export',[MarketingOrderAgingController::class, 'export']);
+                    });
                 });
             });
 

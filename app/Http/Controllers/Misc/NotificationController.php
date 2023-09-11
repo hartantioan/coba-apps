@@ -46,7 +46,6 @@ class NotificationController extends Controller
         $query_data = Notification::where(function($query) use ($search, $request) {
             $query->where('to_user_id',session('bo_id'));
             if($search) {
-                info($search);
                 $query->where(function($query) use ($search, $request) {
                     $query->where('title', 'like', "%$search%")
                     ->where('to_user_id',session('bo_id'))

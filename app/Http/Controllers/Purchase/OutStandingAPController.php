@@ -176,7 +176,7 @@ class OutStandingAPController extends Controller
         }else{
             $response =[
                 'status'  =>500,
-                'message' =>'ada yang error'
+                'message' =>'Data error'
             ];
         }
         return response()->json($response);

@@ -60,45 +60,7 @@ class MarketingOrderDownPaymentController extends Controller
     }
 
     public function getTaxSeries(Request $request){
-        $data = TaxSeries::where('company_id',$request->company_id)->where('start_date','<=',$request->date)->where('end_date','>=',$request->date)->where('status','1')->first();
-
-        if($data){
-            $year = date('y',strtotime($request->date));
-            $list = TaxSeries::getListCurrentTaxSeries($request->company_id,$year);
-            $no = '';
-            if(count($list) > 0){
-                $lastData = $list[0];
-                $currentno = intval(explode('.',$lastData)[count(explode('.',$lastData)) - 1]) + 1;
-                $startno = intval(explode('.',$data->start_no)[count(explode('.',$data->start_no)) - 1]);
-                $endno = intval(explode('.',$data->end_no)[count(explode('.',$data->end_no)) - 1]);
-                if($currentno >= $startno && $currentno <= $endno){
-                    $newcurrent = str_pad($currentno, 8, 0, STR_PAD_LEFT);
-                    $no = explode('.',$data->start_no)[0].'.'.explode('.',$data->start_no)[1].'.'.$newcurrent;
-                    $response = [
-                        'status'    => 200,
-                        'no'        => $no,
-                    ];
-                }else{
-                    $response = [
-                        'status'  => 500,
-                        'message' => 'Nomor seri baru di luar batas seri pajak yang ada. Silahkan tambahkan data terbaru.'
-                    ];
-                }
-            }else{
-                $no = $data->start_no;
-                $response = [
-                    'status'    => 200,
-                    'no'        => $no,
-                ];
-            }
-        }else{
-            $response = [
-                'status'  => 500,
-                'message' => 'Data Nomor Seri Pajak untuk perusahaan dan tanggal tidak ditemukan.'
-            ];
-        }
-        				
-		return response()->json($response);
+        return response()->json(TaxSeries::getTaxCode($request->company_id,$request->date));
     }
 
     public function datatable(Request $request){
@@ -253,7 +215,7 @@ class MarketingOrderDownPaymentController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->supplier->name,
+                    $val->account->name,
                     $val->company->name,
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
@@ -336,6 +298,27 @@ class MarketingOrderDownPaymentController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+
+            $passedCreditLimit = true;
+
+            $account = User::find($request->account_id);
+
+            $grandtotalUnsentModCredit = $account->grandtotalUnsentModCredit();
+            $grandtotalUnsentDoCredit = $account->grandtotalUninvoiceDoCredit();
+
+            $balanceLimitCredit = $account->limit_credit - $account->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit - str_replace(',','.',str_replace('.','',$request->grandtotal));
+            $totalLimitCredit = $account->limit_credit - $account->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
+
+            if($balanceLimitCredit < 0){
+                $passedCreditLimit = false;
+            }
+
+            if(!$passedCreditLimit){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal down payment : '.$request->grandtotal.' maka terjadi selisih nominal sebesar '.number_format($balanceLimitCredit,2,',','.').'.',
+                ]);
+            }
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -459,6 +442,7 @@ class MarketingOrderDownPaymentController extends Controller
                 CustomHelper::sendApproval('marketing_order_down_payments',$query->id,$query->note);
                 CustomHelper::sendNotification('marketing_order_down_payments',$query->id,'Pengajuan AR Down Payment No. '.$query->code,$query->note,session('bo_id'));
                 CustomHelper::addDeposit($query->account_id,str_replace(',','.',str_replace('.','',$request->grandtotal)));
+                CustomHelper::addCountLimitCredit($query->account_id,str_replace(',','.',str_replace('.','',$request->grandtotal)));
 
                 activity()
                     ->performedOn(new MarketingOrderDownPayment())
@@ -891,6 +875,7 @@ class MarketingOrderDownPaymentController extends Controller
 
             CustomHelper::removeApproval('marketing_order_down_payments',$query->id);
             CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
+            CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
 
             activity()
                 ->performedOn(new MarketingOrderDownPayment())
@@ -935,6 +920,7 @@ class MarketingOrderDownPaymentController extends Controller
                 ]);
 
                 CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
+                CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
     
                 activity()
                     ->performedOn(new MarketingOrderDownPayment())

@@ -529,13 +529,15 @@ class MarketingOrderController extends Controller
                         $query->sales_id = $request->sales_id;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
+                        $query->percent_dp = $request->percent_dp;
                         $query->note = $request->note;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
                         $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
                         $query->total = str_replace(',','.',str_replace('.','',$request->total));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
                         $query->total_after_tax = str_replace(',','.',str_replace('.','',$request->total_after_tax));
-                        $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
+                        /* $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding)); */
+                        $query->rounding = 0;
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->status = '1';
 
@@ -584,13 +586,15 @@ class MarketingOrderController extends Controller
                         'sales_id'                  => $request->sales_id,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
+                        'percent_dp'                => $request->percent_dp,
                         'note'                      => $request->note,
                         'subtotal'                  => str_replace(',','.',str_replace('.','',$request->subtotal)),
                         'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
                         'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
                         'tax'                       => str_replace(',','.',str_replace('.','',$request->tax)),
                         'total_after_tax'           => str_replace(',','.',str_replace('.','',$request->total_after_tax)),
-                        'rounding'                  => str_replace(',','.',str_replace('.','',$request->rounding)),
+                        /* 'rounding'                  => str_replace(',','.',str_replace('.','',$request->rounding)), */
+                        'rounding'                  => 0,
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'status'                    => '1',
                     ]);

@@ -24,6 +24,7 @@ class MarketingOrderMemo extends Model
         'note',
         'status',
         'document',
+        'tax_no',
         'total',
         'tax',
         'total_after_tax',
@@ -154,5 +155,31 @@ class MarketingOrderMemo extends Model
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function incomingPaymentDetail(){
+        return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function balance(){
+        $total = -1 * $this->balance;
+
+        foreach($this->incomingPaymentDetail as $row){
+            $total -= $row->total;
+        }
+
+        return $total;
+    }
+
+    public function totalUsed(){
+        $total = 0;
+
+        foreach($this->incomingPaymentDetail as $row){
+            $total += $row->total;
+        }
+
+        return $total;
     }
 }

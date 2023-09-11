@@ -25,6 +25,7 @@ class MarketingOrderDelivery extends Model
         'delivery_date',
         'note',
         'status',
+        'grandtotal',
         'void_id',
         'void_note',
         'void_date',
@@ -186,5 +187,11 @@ class MarketingOrderDelivery extends Model
     public function getGrandtotal(){
         $total = $this->getTotal() + $this->getRounding() + $this->getTax();
         return $total;
+    }
+
+    public function updateGrandtotal(){
+        MarketingOrderDelivery::find($this->id)->update([
+            'grandtotal'    => $this->getGrandtotal(),
+        ]);
     }
 }

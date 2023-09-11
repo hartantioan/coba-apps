@@ -150,7 +150,6 @@ class ReturnHardwareItemUsageController extends Controller
         DB::beginTransaction();
         try{
             $query_code = HardwareItem::where('code',$barcode)->first();
-            info($query_code->id);
             $query_hardware_item_id = $query_code->id;
             $lastInsertedData = ReceptionHardwareItemsUsage::where('hardware_item_id', $query_hardware_item_id)
                             ->latest()

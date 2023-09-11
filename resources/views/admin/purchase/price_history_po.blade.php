@@ -22,11 +22,6 @@
                             <span class="hide-on-small-onl">Refresh</span>
                             <i class="material-icons right">refresh</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
-                            <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
-                            <i class="material-icons right">local_printshop</i>
-                        </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
                             <i class="material-icons hide-on-med-and-up">view_list</i>
                             <span class="hide-on-small-onl">Excel</span>

@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -22,29 +23,36 @@ class ExportOutstandingAP implements FromView , WithEvents
     public function view(): View
     {
         $totalAll=0;
-        $request='kas';
         $array_filter = [];
-        $query_data = PurchaseInvoice::where(function($query) use ( $request) {
+        $query_data = PurchaseInvoice::where(function($query){
                 if($this->date) {
                     $query->whereDate('post_date', '<=', $this->date);
                 }
             })
             ->get();
+            $query_data2 = PurchaseDownPayment::where(function($query) {
+                if($this->date) {
+                    $query->whereDate('post_date', '<=', $this->date);
+                }
+            })
+            ->whereIn('status',['2','3'])
+            ->get();
+
             foreach($query_data as $row_invoice){
                 $data_tempura = [
                     'code' => $row_invoice->code,
                     'vendor' => $row_invoice->account->name,
-                    'post_date'=>date('d M Y',strtotime($row_invoice->post_date)),
-                    'rec_date'=>date('d M Y',strtotime($row_invoice->received_date)),
-                    'due_date'=>date('d M Y',strtotime($row_invoice->due_date)),
+                    'post_date'=>date('d/m/y',strtotime($row_invoice->post_date)),
+                    'rec_date'=>date('d/m/y',strtotime($row_invoice->received_date)),
+                    'due_date'=>date('d/m/y',strtotime($row_invoice->due_date)),
                     'grandtotal'=>number_format($row_invoice->balance,2,',','.'),
-                    'payed'=>$row_invoice->totalMemoByDate($this->date),
-                    'sisa'=>$row_invoice->getTotalPaidByDate($this->date)
+                    'payed'=>number_format($row_invoice->totalMemoByDate($this->date),2,',','.'),
+                    'sisa'=>number_format($row_invoice->getTotalPaidByDate($this->date),2,',','.'),
                 ];
+
                 $detail=[];
-                $totalAll+=$row_invoice->balance;
+                
                 foreach($row_invoice->purchaseInvoiceDetail as $row){
-                    
                     if($row->purchaseOrderDetail()){
                         $detail[] = [
                             'po'=> $row->lookable->purchaseOrder->code,
@@ -108,15 +116,50 @@ class ExportOutstandingAP implements FromView , WithEvents
                         
                         ];
                     }
-
-                   
                 }
+
                 if($data_tempura['sisa'] != number_format(0,2,',','.')){
-                    $data_tempura['details']=$detail;
-                    $array_filter[]=$data_tempura;
+                    $totalAll += str_replace(',','.',str_replace('.','',$data_tempura['sisa']));
+                    $data_tempura['details'] = $detail;
+                    $array_filter[] = $data_tempura;
                 }
                 
-            }  
+            }
+
+            foreach($query_data2 as $row_dp){
+                $total = $row_dp->balancePaymentRequestByDate($this->date);
+                $data_tempura = [
+                    'code' => $row_dp->code,
+                    'vendor' => $row_dp->supplier->name,
+                    'post_date'=>date('d/m/y',strtotime($row_dp->post_date)),
+                    'rec_date'=>'',
+                    'due_date'=>date('d/m/y',strtotime($row_dp->due_date)),
+                    'grandtotal'=>number_format($row_dp->grandtotal,2,',','.'),
+                    'payed'=>number_format($row_dp->totalMemoByDate($this->date),2,',','.'),
+                    'sisa'=>number_format($total,2,',','.'),
+                ];
+
+                $detail=[];
+                $detail[] = [
+                    'po'=> $row_dp->code,
+                    'top'=>0,
+                    'item_name'=>'-',
+                    'note1'=>$row_dp->note,
+                    'note2'=>'-',
+                    'qty'=>1,
+                    'unit'=>'-',
+                    'price_o'=>number_format(0,2,',','.'),
+                    'total' =>number_format($row_dp->nominal,2,',','.'),
+                    'ppn'=>number_format(0,2,',','.'),
+                    'pph'=>number_format(0,2,',','.'),
+                ];
+
+                if($total > 0){
+                    $totalAll += $total;
+                    $data_tempura['details'] = $detail;
+                    $array_filter[] = $data_tempura;
+                }
+            }
         return view('admin.exports.outstanding_ap', [
             'data' => $array_filter,
             'totalall' =>number_format($totalAll,2,',','.')

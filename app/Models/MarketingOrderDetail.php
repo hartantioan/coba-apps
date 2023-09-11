@@ -63,6 +63,7 @@ class MarketingOrderDetail extends Model
 
         foreach($this->marketingOrderDeliveryDetail as $row){
             $qty -= $row->qty;
+            $qty += $row->qtyReturn();
         }
 
         return $qty;

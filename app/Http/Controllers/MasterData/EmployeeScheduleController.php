@@ -121,7 +121,6 @@ class EmployeeScheduleController extends Controller
 
     public function createSingle(Request $request)
     {
-        info($request);
         if($request->temp){
             $validation = Validator::make($request->all(), [
                 'date_detail'          => 'required',
@@ -306,8 +305,6 @@ class EmployeeScheduleController extends Controller
                     
                     $start_date = Carbon::parse($shift->start_date);
                     $end_date = Carbon::parse($shift->end_date);
-                    info($start_date);
-                    info($end_date);
                     foreach ($request->arr_employee as $user_id) {
                         $current_date = $start_date->copy(); // Make a copy of the start date to avoid modifying the original date
                         while ($current_date->lte($end_date)) {

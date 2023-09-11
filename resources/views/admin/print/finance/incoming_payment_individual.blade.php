@@ -303,7 +303,7 @@
                                 @foreach($data->incomingPaymentDetail as $key => $row)
                                 <tr>
                                     <td>{{ $row->lookable->code }}</td>
-                                    <td>{{ class_basename($row->lookable) }}</td>
+                                    <td>{{ $row->type() }}</td>
                                     <td>{{ ($row->cost_distribution_id ? $row->costDistribution->code : '-') }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td align="right">{{ number_format($row->total,3,',','.') }}</td>

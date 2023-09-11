@@ -71,6 +71,7 @@ class AppServiceProvider extends ServiceProvider
             'marketing_order_invoices'              => 'App\Models\MarketingOrderInvoice',
             'marketing_order_delivery_details'      => 'App\Models\MarketingOrderDeliveryDetail',
             'marketing_order_invoice_details'       => 'App\Models\MarketingOrderInvoiceDetail',
+            'marketing_order_memos'                 => 'App\Models\MarketingOrderMemo',
         ]);
     }
 }

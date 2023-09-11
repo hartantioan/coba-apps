@@ -1,0 +1,43 @@
+<table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
+    <thead>
+        <tr align="center">
+            <tr>
+            <th class="center-align">No.</th>
+            <th class="center-align">Item</th>
+            <th class="center-align">Customer</th>
+            <th class="center-align">Dokumen</th>
+            <th class="center-align">Tgl.Post</th>
+            <th class="center-align">Harga</th>
+            <th class="center-align">Margin</th>
+            <th class="center-align">Diskon 1</th>
+            <th class="center-align">Diskon 2</th>
+            <th class="center-align">Diskon 3</th>
+            <th class="center-align">Final Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($data as $key => $row)
+        <tr>
+            <td align="center">{{$key+1}}</td>
+            <td align="center">{{$row['item']}}</td>
+            <td align="center">{{$row['customer']}}</td>
+            <td align="center">{{$row['code']}}</td>
+            <td align="center">{{$row['date']}}</td>
+            <td align="center">{{$row['price']}}</td>
+            <td align="center">{{$row['margin']}}</td>
+            <td align="center">{{$row['disc1']}}</td>
+            <td align="center">{{$row['disc2']}}</td>
+            <td align="center">{{$row['disc3']}}</td>
+            <td align="center">{{$row['final_price']}}</td>
+        </tr>
+        @endforeach
+        @if(count($data) == 0)
+            <tr>
+                <td colspan="11" align="center">
+                    Data tidak ditemukan
+                </td>
+            </tr>
+        @endif
+    </tbody>
+    
+</table>

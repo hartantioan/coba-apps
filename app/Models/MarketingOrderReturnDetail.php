@@ -45,4 +45,12 @@ class MarketingOrderReturnDetail extends Model
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
     }
+
+    public function getGrandtotal(){
+        $total = 0;
+        $totalDelivered = $this->marketingOrderDeliveryDetail->getGrandtotal();
+        $bobot = $this->qty / $this->marketingOrderDeliveryDetail->qty;
+        $total = $bobot * $totalDelivered;
+        return $total;
+    }
 }

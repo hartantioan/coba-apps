@@ -43,6 +43,86 @@ class MarketingOrderInvoiceDetail extends Model
         return $this->belongsTo('App\Models\MarketingOrderInvoice', 'marketing_order_invoice_id', 'id')->withTrashed();
     }
 
+    public function marketingOrderMemoDetail(){
+        return $this->hasMany('App\Models\MarketingOrderMemoDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderMemo',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function getDownPayment(){
+        $bobot = $this->total / $this->marketingOrderInvoice->total;
+        $downpayment = $bobot * $this->marketingOrderInvoice->downpayment;
+        return $downpayment - $this->getMemoDownPayment();
+    }
+
+    public function getMemoDownPayment(){
+        $total = 0;
+        foreach($this->marketingOrderMemoDetail as $row){
+            $total += $row->downpayment;
+        }
+        return $total;
+    }
+
+    public function getMemo(){
+        $total = 0;
+        foreach($this->marketingOrderMemoDetail as $row){
+            $total += $row->balance;
+        }
+        return $total;
+    }
+
+    public function getGrandtotal(){
+        $bobot = $this->total / $this->marketingOrderInvoice->total;
+        $total = $bobot * $this->marketingOrderInvoice->grandtotal;
+        return $total;
+    }
+
+    public function getRounding(){
+        $bobot = $this->total / $this->marketingOrderInvoice->total;
+        $total = $bobot * $this->marketingOrderInvoice->rounding;
+        return $total;
+    }
+
+    public function getPrice(){
+        $price = $this->total / $this->qty;
+        return $price;
+    }
+
+    public function arrBalanceMemo(){
+        $bobot = $this->total / $this->marketingOrderInvoice->total;
+        $total = round($bobot * $this->marketingOrderInvoice->total,2);
+        $tax = round($bobot * $this->marketingOrderInvoice->tax,2);
+        $total_after_tax = round($bobot * $this->marketingOrderInvoice->total_after_tax,2);
+        $rounding = round($bobot * $this->marketingOrderInvoice->rounding,2);
+        $grandtotal = round($bobot * $this->marketingOrderInvoice->grandtotal,2);
+        $downpayment = round($bobot * $this->marketingOrderInvoice->downpayment,2);
+        $balance = round($bobot * $this->marketingOrderInvoice->balance,2);
+
+        $arr = [];
+
+        foreach($this->marketingOrderMemoDetail as $row){
+            $total -= $row->total;
+            $tax -= $row->tax;
+            $total_after_tax -= $row->total_after_tax;
+            $rounding -= $row->rounding;
+            $grandtotal -= $row->grandtotal;
+            $downpayment -= $row->downpayment;
+            $balance -= $row->balance;           
+        }
+
+        $arr = [
+            'total'             => $total,
+            'tax'               => $tax,
+            'total_after_tax'   => $total_after_tax,
+            'rounding'          => $rounding,
+            'grandtotal'        => $grandtotal,
+            'downpayment'       => $downpayment,
+            'balance'           => $balance,
+        ];
+
+        return $arr;
+    }
+
     public function isIncludeTax(){
         $type = match ($this->is_include_tax) {
           '0' => 'Tidak',
@@ -51,5 +131,11 @@ class MarketingOrderInvoiceDetail extends Model
         };
 
         return $type;
+    }
+
+    public function getPayment(){
+        $bobot = $this->total / $this->marketingOrderInvoice->total;
+        $total = $bobot * $this->marketingOrderInvoice->totalPay();
+        return $total;
     }
 }

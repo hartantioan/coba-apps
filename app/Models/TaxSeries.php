@@ -79,5 +79,47 @@ class TaxSeries extends Model
         $newList = array_merge($dataInvoice,$dataDp);
         rsort($newList);
         return $newList;
+    } 
+
+    public static function getTaxCode($company_id,$date){
+        $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->first();
+
+        if($data){
+            $year = date('y',strtotime($date));
+            $list = TaxSeries::getListCurrentTaxSeries($company_id,$year);
+            $no = '';
+            if(count($list) > 0){
+                $lastData = $list[0];
+                $currentno = intval(explode('.',$lastData)[count(explode('.',$lastData)) - 1]) + 1;
+                $startno = intval(explode('.',$data->start_no)[count(explode('.',$data->start_no)) - 1]);
+                $endno = intval(explode('.',$data->end_no)[count(explode('.',$data->end_no)) - 1]);
+                if($currentno >= $startno && $currentno <= $endno){
+                    $newcurrent = str_pad($currentno, 8, 0, STR_PAD_LEFT);
+                    $no = explode('.',$data->start_no)[0].'.'.explode('.',$data->start_no)[1].'.'.$newcurrent;
+                    $response = [
+                        'status'    => 200,
+                        'no'        => $no,
+                    ];
+                }else{
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Nomor seri baru di luar batas seri pajak yang ada. Silahkan tambahkan data terbaru.'
+                    ];
+                }
+            }else{
+                $no = $data->start_no;
+                $response = [
+                    'status'    => 200,
+                    'no'        => $no,
+                ];
+            }
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data Nomor Seri Pajak untuk perusahaan dan tanggal tidak ditemukan.'
+            ];
+        }
+
+        return $response;
     }
 }

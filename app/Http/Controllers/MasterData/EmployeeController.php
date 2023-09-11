@@ -344,7 +344,6 @@ class EmployeeController extends Controller
             'year_start',
             'year_end',
         ];
-        info($request);
         $start  = $request->start;
         $length = $request->length;
         $order  = $column[$request->input('order.0.column')];
@@ -620,7 +619,6 @@ class EmployeeController extends Controller
 
                 DB::beginTransaction();
                 try {
-                    info($request);
                     $query = UserFamily::create([
                         'code'              => UserFamily::generateCode(),
                         'name'			    => $request->name,

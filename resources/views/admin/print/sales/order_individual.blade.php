@@ -244,6 +244,15 @@
                                             {{ date('d/m/y',strtotime($data->delivery_date)) }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            Down Payment (%)
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ number_format($data->percent_dp,2,',','.') }}
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
                             <td width="45%" class="left-align">

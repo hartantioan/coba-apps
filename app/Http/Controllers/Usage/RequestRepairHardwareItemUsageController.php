@@ -185,7 +185,6 @@ class RequestRepairHardwareItemUsageController extends Controller
                     ]);
                 }
             }catch(\Exception $e){
-                info($e);
                 DB::rollback();
             }
         }else{

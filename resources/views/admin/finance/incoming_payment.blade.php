@@ -202,7 +202,7 @@
                             </div>
                             <div class="input-field col m3 s12 step4">
                                 <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
-                                <label class="active" for="account_id">Partner Bisnis <i>(Pilih untuk MO.Invoice / BS.Karyawan)</i></label>
+                                <label class="active" for="account_id">Partner Bisnis</label>
                             </div>
                             <div class="input-field col m3 s12 step5">
                                 <select class="browser-default" id="coa_id" name="coa_id"></select>
@@ -242,7 +242,7 @@
                             </div>
                             <div class="col m12 s12 step12">
                                 <p class="mt-2 mb-2">
-                                    <h6>Detail MO.Invoice / BS.Karyawan / Coa</h6>
+                                    <h6>Detail AR Invoice / AR Down Payment / AR Credit Memo / BS.Karyawan / Coa</h6>
                                     <div style="overflow:auto;">
                                         <table class="bordered" style="max-width:1650px !important;">
                                             <thead>
@@ -356,9 +356,9 @@
                 <div class="row">
                     <div class="col s12 mt-2">
                         <ul class="collapsible">
-                            <li class="active">
+                            <li class="active" id="employee-tab">
                                 <div class="collapsible-header purple lightrn-1 white-text">
-                                    <i class="material-icons">layers</i> MO Invoice (COMING SOON...)
+                                    <i class="material-icons">layers</i> BS Karyawan
                                 </div>
                                 <div class="collapsible-body">
                                     <div id="datatable_buttons_multi"></div>
@@ -366,8 +366,8 @@
                                     <table id="table_multi" class="display" width="100%">
                                         <thead>
                                             <tr>
-                                                <th class="center">Kode Out. Payment</th>
-                                                <th class="center">Kode Payment Req.</th>
+                                                <th class="center">No.OP</th>
+                                                <th class="center">No.Pay.Req</th>
                                                 <th class="center">Bisnis Partner</th>
                                                 <th class="center">Tgl.Post</th>
                                                 <th class="center">Coa Kas/Bank</th>
@@ -379,6 +379,27 @@
                                             </tr>
                                         </thead>
                                         <tbody id="body-detail-multi"></tbody>
+                                    </table>
+                                </div>
+                            </li>
+                            <li class="active" id="other-tab">
+                                <div class="collapsible-header purple lightrn-1 white-text">
+                                    <i class="material-icons">layers</i> AR Invoice / AR Down Payment / AR Credit Memo
+                                </div>
+                                <div class="collapsible-body">
+                                    <div id="datatable_buttons_multi_other"></div>
+                                    <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                                    <table id="table_multi_other" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">No.Dokumen</th>
+                                                <th class="center">Tgl.Post</th>
+                                                <th class="center">Total Tagihan</th>
+                                                <th class="center">Total Memo/Terpakai/Dibayar</th>
+                                                <th class="center">Total Sisa</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-multi-other"></tbody>
                                     </table>
                                 </div>
                             </li>
@@ -702,14 +723,57 @@
                 });
                 $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
                 $('select[name="table_multi_length"]').addClass('browser-default');
+
+                table_multi_other = $('#table_multi_other').DataTable({
+                    "responsive": true,
+                    "ordering": false,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                $('#table_multi_other_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi_other');
+                $('select[name="table_multi_other_length"]').addClass('browser-default');
             },
             onCloseEnd: function(modal, trigger){
+                $('#body-detail-multi,#body-detail-multi-other').empty();
                 $('#table_multi').DataTable().clear().destroy();
+                $('#table_multi_other').DataTable().clear().destroy();
+                var instance = M.Collapsible.getInstance($('.collapsible')); 
+                instance.close();
             }
         });
 
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
-        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
+        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/employee_customer") }}');
         select2ServerSide('#coa_id', '{{ url("admin/select2/coa_cash_bank") }}');
 
         $('#body-detail').on('click', '.delete-data-item', function() {
@@ -862,43 +926,64 @@
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
-                            $('#body-detail-multi').append(`
-                                <tr data-id="` + val.id + `" data-type="` + val.type + `">
-                                    <td class="center">
-                                        ` + val.code + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.payment_request_code + `
-                                    </td>
-                                    <td>
-                                        ` + val.name + `
-                                    </td>
-                                    <td>
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td>
-                                        ` + val.coa_name + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.admin + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.total + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.grandtotal + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.used + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.balance + `
-                                    </td>
-                                </tr>
-                            `);
+                            if(val.type == 'outgoing_payments'){
+                                $('#body-detail-multi').append(`
+                                    <tr data-id="` + val.id + `" data-type="` + val.type + `">
+                                        <td class="center">
+                                            ` + val.code + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.payment_request_code + `
+                                        </td>
+                                        <td>
+                                            ` + val.name + `
+                                        </td>
+                                        <td>
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td>
+                                            ` + val.coa_name + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.admin + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.used + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.balance + `
+                                        </td>
+                                    </tr>
+                                `);
+                            }else{
+                                $('#body-detail-multi-other').append(`
+                                    <tr data-id="` + val.id + `" data-type="` + val.type + `">
+                                        <td class="center">
+                                            ` + val.code + `
+                                        </td>
+                                        <td>
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.memo + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.balance + `
+                                        </td>
+                                    </tr>
+                                `);
+                            }
                         });
                     }
-
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 },
@@ -931,15 +1016,27 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                let passed = false, arr_id = [], arr_type = [];
+                let passedEmployee = false, arr_id = [], arr_type = [], passedOther = false;
                 
                 $.map(table_multi.rows('.selected').nodes(), function (item) {
-                    passed = true;
+                    passedEmployee = true;
                     arr_id.push($(item).data('id'));
                     arr_type.push($(item).data('type'));
                 });
 
-                if(passed == true){
+                $.map(table_multi_other.rows('.selected').nodes(), function (item) {
+                    passedOther = true;
+                    arr_id.push($(item).data('id'));
+                    arr_type.push($(item).data('type'));
+                });
+
+                if(passedEmployee == true && passedOther == true){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Anda tidak bisa mencampur BS Karyawan dengan AR Invoice / AR Down Payment / AR Credit Memo.',
+                        icon: 'warning'
+                    });
+                }else if(passedEmployee == true || passedOther == true){
                     $.ajax({
                         url: '{{ Request::url() }}/get_account_data',
                         type: 'POST',
@@ -969,6 +1066,11 @@
                                             <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `',` + val.id + `,'` + val.rawcode + `')">close</i>
                                         </div>
                                     `);
+                                    let readonly = 'readonly';
+                                    let array = ['marketing_order_down_payments','marketing_order_memos'];
+                                    if(array.includes(val.type)){
+                                        readonly = '';
+                                    }
                                     $('#last-row-detail').before(`
                                         <tr class="row_detail" data-id="` + val.id + `" data-code="` + val.rawcode + `">
                                             <input type="hidden" name="arr_id[]" value="` + val.id + `">
@@ -984,7 +1086,7 @@
                                                 -
                                             </td>
                                             <td class="center">
-                                                <input id="arr_total` + count + `" name="arr_total[]" data-limit="` + val.balance + `" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" readonly>
+                                                <input id="arr_total` + count + `" name="arr_total[]" data-limit="` + val.balance + `" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                             </td>
                                             <td class="center">
                                                 <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
@@ -1082,6 +1184,18 @@
             });
         }
         countAll();
+    }
+
+    function countRow(id){
+        var total = parseFloat($('#arr_total' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+            limit = parseFloat($('#arr_total' + id).data('limit').toString().replaceAll(".", "").replaceAll(",","."));
+
+        if(limit > 0){
+            if(total > limit){
+                total = limit;
+                $('#arr_total' + id).val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
+            }
+        }
     }
 
     function removeUsedData(table,id,code){
@@ -1253,38 +1367,38 @@
 
                 let passed = true;
 
-                if($('select[name^="arr_coa"]').length > 0){
-                    $('select[name^="arr_coa"]').each(function(index){
+                if($('select[name^="arr_coa[]"]').length > 0){
+                    $('select[name^="arr_coa[]"]').each(function(index){
                         formData.append('arr_coa[]',$(this).val());
                         formData.append('arr_cost_distribution[]',(
-                            $('select[name^="arr_cost_distribution"]').eq(index).val() ? $('select[name^="arr_cost_distribution"]').eq(index).val() : ''
+                            $('select[name^="arr_cost_distribution[]"]').eq(index).val() ? $('select[name^="arr_cost_distribution[]"]').eq(index).val() : ''
                         ));
-                        formData.append('arr_total[]',$('input[name^="arr_total"]').eq(index).val());
-                        formData.append('arr_rounding[]',$('input[name^="arr_rounding"]').eq(index).val());
-                        formData.append('arr_subtotal[]',$('input[name^="arr_subtotal"]').eq(index).val());
-                        formData.append('arr_type[]',$('input[name^="arr_type"]').eq(index).val());
+                        formData.append('arr_total[]',$('input[name^="arr_total[]"]').eq(index).val());
+                        formData.append('arr_rounding[]',$('input[name^="arr_rounding[]"]').eq(index).val());
+                        formData.append('arr_subtotal[]',$('input[name^="arr_subtotal[]"]').eq(index).val());
+                        formData.append('arr_type[]',$('input[name^="arr_type[]"]').eq(index).val());
                         formData.append('arr_note[]',(
-                            $('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''
+                            $('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''
                         ));
-                        if(!$(this).val() || !$('input[name^="arr_total"]').eq(index).val() || !$('input[name^="arr_rounding"]').eq(index).val() || !$('input[name^="arr_subtotal"]').eq(index).val()){
+                        if(!$(this).val() || !$('input[name^="arr_total[]"]').eq(index).val() || !$('input[name^="arr_rounding[]"]').eq(index).val() || !$('input[name^="arr_subtotal[]"]').eq(index).val()){
                             passed = false;
                         }
                     });
                 }
 
-                if($('input[name^="arr_coa"]').length > 0){
-                    $('input[name^="arr_coa"]').each(function(index){
+                if($('input[name^="arr_coa[]"]').length > 0){
+                    $('input[name^="arr_coa[]"]').each(function(index){
                         formData.append('arr_coa[]',$(this).val());
-                        formData.append('arr_id[]',$('input[name^="arr_id"]').eq(index).val());
+                        formData.append('arr_id[]',$('input[name^="arr_id[]"]').eq(index).val());
                         formData.append('arr_cost_distribution[]','');
-                        formData.append('arr_total[]',$('input[name^="arr_total"]').eq(index).val());
-                        formData.append('arr_rounding[]',$('input[name^="arr_rounding"]').eq(index).val());
-                        formData.append('arr_subtotal[]',$('input[name^="arr_subtotal"]').eq(index).val());
-                        formData.append('arr_type[]',$('input[name^="arr_type"]').eq(index).val());
+                        formData.append('arr_total[]',$('input[name^="arr_total[]"]').eq(index).val());
+                        formData.append('arr_rounding[]',$('input[name^="arr_rounding[]"]').eq(index).val());
+                        formData.append('arr_subtotal[]',$('input[name^="arr_subtotal[]"]').eq(index).val());
+                        formData.append('arr_type[]',$('input[name^="arr_type[]"]').eq(index).val());
                         formData.append('arr_note[]',(
-                            $('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note"]').eq(index).val() : ''
+                            $('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''
                         ));
-                        if(!$(this).val() || !$('input[name^="arr_total"]').eq(index).val() || !$('input[name^="arr_rounding"]').eq(index).val() || !$('input[name^="arr_subtotal"]').eq(index).val()){
+                        if(!$(this).val() || !$('input[name^="arr_total[]"]').eq(index).val() || !$('input[name^="arr_rounding[]"]').eq(index).val() || !$('input[name^="arr_subtotal[]"]').eq(index).val()){
                             passed = false;
                         }
                     });
@@ -1433,6 +1547,11 @@
                     $('.row_detail').remove();
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
+                        let readonly = 'readonly';
+                        let array = ['marketing_order_down_payments','marketing_order_memos'];
+                        if(array.includes(val.type)){
+                            readonly = '';
+                        }
                         $('#last-row-detail').before(`
                             <tr class="row_detail">
                                 <input type="hidden" name="arr_type[]" value="` + val.type + `">
@@ -1453,7 +1572,7 @@
                                     -
                                 </td>
                                 <td class="center">
-                                    <input id="arr_total` + count + `" name="arr_total[]" data-limit="0" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                    <input id="arr_total` + count + `" name="arr_total[]" data-limit="0" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                 </td>
                                 <td class="center">
                                     <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="` + val.rounding + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
@@ -1981,7 +2100,7 @@
                     intro : 'Proyek yang terkait dalam form ini.'
                 },
                 {
-                    title : 'Detail MO.Invoice / BS.Karyawan / Coa',
+                    title : 'Detail AR Invoice / AR Down Payment / BS.Karyawan / Coa',
                     element : document.querySelector('.step12'),
                     intro : 'Berisikan list dari data yang digunakan dalam form.' 
                 },

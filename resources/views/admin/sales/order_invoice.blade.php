@@ -232,7 +232,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step9">
                                         <input id="tax_no" name="tax_no" type="text" readonly placeholder="Auto generate : pajak > 0">
-                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku)." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
+                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
                                     </div>
                                     {{-- <div class="input-field col m1 s12 step10">
                                         <button class="btn waves-effect waves-light green" onclick="getTaxSeries();"><i class="material-icons">autorenew</i></button>
@@ -796,9 +796,6 @@
                         </td>
                     </tr>
                 `);
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }
                 $('#marketing_order_down_payment_id').empty();
                 $('#table-dp').animate( { 
                     scrollLeft: '0' }, 
@@ -2045,7 +2042,7 @@
             getTaxSeries();
         }else{
             $('#textTax').hide();
-            $('#tax_no').val();
+            $('#tax_no').val('');
         }
     }
 

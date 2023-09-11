@@ -407,7 +407,6 @@ class EmployeeTransferController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = EmployeeTransfer::where('code',$row)->first();
-                info($row);
                 if($pr){
                     $data = [
                         'title'     => '',

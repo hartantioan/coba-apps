@@ -92,12 +92,13 @@
     $(document).ready(function () {
         $('.update-card').click(function () {
             const updateId = $(this).data('update-id');
-
-            // Toggle the visibility of elements with the same data-update-id attribute
             $('.timeline-inverted[data-update-id="' + updateId + '"]').toggle();
-
-            // Hide other elements with different data-update-id attribute
             $('.timeline-inverted[data-update-id!="' + updateId + '"]').hide();
+            if($('.timeline-inverted[data-update-id="' + updateId + '"]').is(':visible')){
+                $('html, body').animate({
+                    scrollTop: $('.timeline-inverted[data-update-id="' + updateId + '"]').offset().top - 100
+                }, 500);
+            }
         });
     });
 </script>

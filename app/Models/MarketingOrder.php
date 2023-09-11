@@ -268,4 +268,91 @@ class MarketingOrder extends Model
 
         return $passed;
     }
+
+    public function totalMod(){
+        $total = 0;
+        foreach($this->marketingOrderDetail as $row){
+            foreach($row->marketingOrderDeliveryDetail as $rowmodd){
+                $total += $rowmodd->getGrandtotal();
+                /* foreach($rowmodd->marketingOrderReturnDetail as $rowreturn){
+                    $total -= $rowreturn->getGrandtotal();
+                } */
+            }
+        }
+        return $total;
+    }
+
+    public function totalModProcess(){
+        $total = 0;
+        foreach($this->marketingOrderDetail as $row){
+            foreach($row->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
+                $query->whereHas('marketingOrderDeliveryProcess');
+            })->get() as $rowmodd){
+                $total += $rowmodd->getGrandtotal();
+                /* foreach($rowmodd->marketingOrderReturnDetail as $rowreturn){
+                    $total -= $rowreturn->getGrandtotal();
+                } */
+            }
+        }
+        return $total;
+    }
+
+    public function totalReturn(){
+        $total = 0;
+        foreach($this->marketingOrderDetail as $row){
+            foreach($row->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
+                $query->whereHas('marketingOrderDeliveryProcess');
+            })->get() as $rowmodd){
+                foreach($rowmodd->marketingOrderReturnDetail as $rowreturn){
+                    $total += $rowreturn->getGrandtotal();
+                }
+            }
+        }
+        return $total;
+    }
+
+    public function totalInvoice(){
+        $total = 0;
+
+        foreach($this->marketingOrderDetail as $row){
+            foreach($row->marketingOrderDeliveryDetail as $rowmodd){
+                foreach($rowmodd->marketingOrderInvoiceDetail as $rowinvoice){
+                    $total += $rowinvoice->getGrandtotal();
+                }
+            }
+        }
+
+        return $total;
+    }
+
+    public function totalMemo(){
+        $total = 0;
+
+        foreach($this->marketingOrderDetail as $row){
+            foreach($row->marketingOrderDeliveryDetail as $rowmodd){
+                foreach($rowmodd->marketingOrderInvoiceDetail as $rowinvoice){
+                    foreach($rowinvoice->marketingOrderMemoDetail as $rowmemo){
+                        $total += $rowmemo->grandtotal;
+                    }
+                }
+            }
+        }
+
+        return $total;
+    }
+
+    public function totalPayment(){
+        $total = 0;
+
+        foreach($this->marketingOrderDetail as $row){
+            foreach($row->marketingOrderDeliveryDetail as $rowmodd){
+                foreach($rowmodd->marketingOrderInvoiceDetail as $rowinvoice){
+                    $total += $rowinvoice->getDownPayment();
+                    $total += $rowinvoice->getPayment();
+                }
+            }
+        }
+
+        return $total;
+    }
 }

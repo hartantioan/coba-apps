@@ -67,10 +67,6 @@ class MarketingOrderDownPayment extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function supplier(){
-        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
-    }
-
     public function isIncludeTax(){
         $type = match ($this->is_include_tax) {
           '0' => 'Tidak Termasuk',
@@ -217,6 +213,18 @@ class MarketingOrderDownPayment extends Model
         });
     }
 
+    public function incomingPaymentDetail(){
+        return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function marketingOrderMemoDetail(){
+        return $this->hasMany('App\Models\MarketingOrderMemoDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderMemo',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function balanceInvoice(){
         $total = $this->grandtotal;
 
@@ -224,16 +232,91 @@ class MarketingOrderDownPayment extends Model
             $total -= $row->grandtotal;
         }
 
+        foreach($this->marketingOrderMemoDetail as $row){
+            $total -= $row->balance;
+        }
+
         return $total;
+    }
+
+    public function totalMemo(){
+        $total = 0;
+
+        foreach($this->marketingOrderMemoDetail as $row){
+            $total += $row->balance;
+        }
+
+        return $total;
+    }
+
+    public function balancePaymentIncoming(){
+        $total = $this->grandtotal - $this->totalMemo() - $this->totalPay();
+
+        return $total;
+    }
+
+    public function totalPay(){
+        $total = 0;
+
+        foreach($this->incomingPaymentDetail as $row){
+            $total += $row->total;
+        }
+
+        return $total;
+    }
+
+    public function totalPayMemo(){
+        $total = $this->totalPay() + $this->totalMemo();
+        return $total;
+    }
+
+    public function arrBalanceInvoice(){
+        $balance = $this->grandtotal;
+
+        foreach($this->marketingOrderInvoiceDetail as $row){
+            $balance -= $row->grandtotal;
+        }
+
+        foreach($this->marketingOrderMemoDetail as $row){
+            $balance -= $row->balance;
+        }
+
+        $bobot = $balance / $this->grandtotal;
+
+        $arr = [
+            'total'         => number_format(round($bobot * $this->total,2),2,',','.'),
+            'tax'           => number_format(round($bobot * $this->tax,2),2,',','.'),
+            'grandtotal'    => number_format(round($bobot * $this->grandtotal,2),2,',','.'),
+        ];
+
+        return $arr;
     }
 
     public function hasChildDocument(){
         $hasRelation = false;
+
+        if($this->marketingOrderMemoDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->incomingPaymentDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->marketingOrderInvoiceDetail()->exists()){
+            $hasRelation = true;
+        }
 
         return $hasRelation;
     }
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function getPercentPayment(){
+        $total = $this->grandtotal - $this->totalMemo();
+        $percent = round(($this->totalPay() / $total) * 100);
+        return $percent;
     }
 }

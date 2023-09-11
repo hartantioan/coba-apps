@@ -286,6 +286,12 @@
                 <div class="col s8">
                     {{ number_format($data->currency_rate,2,',','.').' '.$data->currency->code }}
                 </div>
+                <div class="col s4">
+                    DP (%)
+                </div>
+                <div class="col s8">
+                    {{ number_format($data->percent_dp,2,',','.') }} %
+                </div>
             </div>
         </div>
         

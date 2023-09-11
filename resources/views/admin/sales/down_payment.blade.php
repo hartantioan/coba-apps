@@ -284,7 +284,7 @@
                             </div>
                             <div class="input-field col m3 s12 step13">
                                 <input id="tax_no" name="tax_no" type="text" readonly placeholder="Auto generate : pajak > 0">
-                                <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku)." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
+                                <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
                             </div>
                             <div class="input-field col m3 s12 step14">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
@@ -958,7 +958,7 @@
             }
         }else{
             $('#textTax').hide();
-            $('#tax_no').val();
+            $('#tax_no').val('');
         }
     }
 

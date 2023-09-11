@@ -549,6 +549,9 @@
                         $('#marketing_order_id').empty();
                     }else{
                         $('#delivery_date').val(response.delivery_date);
+                        $('#account_id').empty().append(`
+                            <option value="` + response.sender_id + `">` + response.sender_name + `</option>
+                        `);
 
                         if(response.details.length > 0){
                             $('#body-item').empty();

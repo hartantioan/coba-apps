@@ -37,8 +37,19 @@ class IncomingPaymentDetail extends Model
     public function getCode(){
         $code = match ($this->lookable_type) {
             'coas'                      => $this->lookable->code.' - '.$this->lookable->name,
-            'outgoing_payments'         => $this->lookable->code,
-            default                     => '-',
+            default                     => $this->lookable->code,
+        };
+
+        return $code;
+    }
+
+    public function type(){
+        $code = match ($this->lookable_type) {
+            'coas'                          => 'Coa',
+            'marketing_order_invoices'      => 'AR Invoice',
+            'marketing_order_memos'         => 'AR Credit Memo',
+            'marketing_order_down_payments' => 'AR Down Payment',
+            default                         => $this->lookable->code,
         };
 
         return $code;

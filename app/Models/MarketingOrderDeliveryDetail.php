@@ -30,6 +30,27 @@ class MarketingOrderDeliveryDetail extends Model
         return $this->belongsTo('App\Models\MarketingOrderDetail', 'marketing_order_detail_id', 'id')->withTrashed();
     }
 
+    public function getTotal(){
+        $total = $this->qty * $this->marketingOrderDetail->realPriceAfterGlobalDiscount();
+        if($this->marketingOrderDetail->tax_id > 0 && $this->marketingOrderDetail->is_include_tax == '1'){
+            $total = $total / (1 + ($this->marketingOrderDetail->percent_tax / 100));
+        }
+        return $total;
+    }
+
+    public function getTax(){
+        $tax = 0;
+        if($this->marketingOrderDetail->tax_id > 0){
+            $tax = $this->getTotal() * ($this->marketingOrderDetail->percent_tax / 100);
+        }
+        return $tax;
+    }
+
+    public function getGrandtotal(){
+        $grandtotal = $this->getTotal() + $this->getTax();
+        return $grandtotal;
+    }
+
     public function marketingOrderDelivery()
     {
         return $this->belongsTo('App\Models\MarketingOrderDelivery', 'marketing_order_delivery_id', 'id')->withTrashed();

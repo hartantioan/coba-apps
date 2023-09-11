@@ -249,7 +249,6 @@ class PurchasePaymentHistoryController extends Controller
 
     public function viewHistoryPayment(Request $request){
         $query_invoice = PurchaseInvoice::where('code',CustomHelper::decrypt($request->code))->first();
-        info($query_invoice);
         $data_temp = [];
         $grandtotal=$query_invoice->grandtotal;
         $downpayment=$query_invoice->downpayment;

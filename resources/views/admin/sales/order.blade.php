@@ -165,6 +165,11 @@
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
+                                            <div class="card-alert card green">
+                                                <div class="card-content white-text">
+                                                    <p>Info : Pada form ini akan ada inputan prosentase DP(%) yang mana akan menjadi acuan pro rata pengecekan DP dan limit kredit pelanggan dalam pembuatan AR Invoice secara otomatis setelah Surat Jalan dibuat (mengacu pada pengaturan Master Data - Organisasi - Partner Bisnis untuk seting pelanggan - Auto Generate SJ > AR Invoice = Ya). Contoh : jika Marketing Order Delivery dibuat dari Sales Order yang memiliki DP (100%), maka akan dilakukan pengecekan terhadap AR Down Payment yang tersisa berdasarkan pro rata prosentase DP. Jika syarat tidak terpenuhi maka AR Invoice tidak akan terbuat otomatis. Jika tidak ada DP (0%) maka, akan dilakukan pengecekan terhadap sisa kredit pelanggan, jika syarat tidak terpenuhi maka AR Invoice tidak akan terbuat otomatis.</p>
+                                                </div>
+                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <table id="datatable_serverside">
                                                 <thead>
@@ -484,7 +489,7 @@
                                                 <input class="browser-default" id="total_after_tax" name="total_after_tax" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr style="display:none;">
                                             <td>Rounding</td>
                                             <td class="right-align">
                                                 <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
@@ -1691,6 +1696,7 @@
                 $('#is_guarantee').val(response.is_guarantee).formSelect();
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
+                $('#percent_dp').val(response.percent_dp);
                 $('#sales_id').empty().append(`<option value="` + response.sales_id + `">` + response.sales_name + `</option>`);
                 $('#note').val(response.note);
                 $('#subtotal').val(response.subtotal);
@@ -1974,8 +1980,18 @@
 
         $('input[name^="arr_total"]').each(function(index){
 			subtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            tax += parseFloat($('input[name^="arr_tax_nominal"]').eq(index).val());;
 		});
+
+        $('input[name^="arr_total"]').each(function(index){
+            let rownominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            let bobot = rownominal / subtotal;
+            let rowdiscount = discount * bobot;
+            let percent_tax = parseFloat($('select[name^="arr_tax"]').eq(index).val());
+            if($('input[name^="arr_is_include_tax"]').eq(index).is(':checked')){
+                rownominal = (rownominal - rowdiscount) / (1 + (percent_tax / 100));
+            }
+            tax += (rownominal - rowdiscount) * (percent_tax / 100);
+        });
 
         total = subtotal - discount;
         

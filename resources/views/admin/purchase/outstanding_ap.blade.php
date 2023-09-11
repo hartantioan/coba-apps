@@ -74,7 +74,6 @@
                                 <h4 class="card-title">
                                     Hasil
                                 </h4>
-                                <h6>Untuk melihat detail tagihan pada masing-masing nominal, silahkan klik/tap kotak nominal berwarna <span class="blue-text text-darken-2">biru</span>.</h6>
                                 <div class="row">
                                     <div class="col s12 m12" style="overflow: auto">
                                         <div class="result" style="width:2500px;">

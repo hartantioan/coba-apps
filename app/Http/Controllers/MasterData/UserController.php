@@ -395,6 +395,10 @@ class UserController extends Controller
                                 <th>Tipe Pegawai</th>
                                 <th>'.$data->employeeType().'</th>
                             </tr>
+                            <tr>
+                                <th>Auto Generate AR Invoice (dari SJ)</th>
+                                <th>'.$data->arInvoice().'</th>
+                            </tr>
                         </thead>
                     </table>';
 		
@@ -535,6 +539,7 @@ class UserController extends Controller
                     $query->children        = $request->type == '1' ? $request->children : NULL;
                     $query->country_id      = $request->country_id;
                     $query->employee_type   = $request->type == '1' ? $request->employee_type : NULL;
+                    $query->is_ar_invoice   = $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL;
                     $query->save();
 
                     $query->userBank()->delete();
@@ -583,6 +588,7 @@ class UserController extends Controller
                         'connection_id'         => 0,
                         'user_status'           => 'Offline',
                         'employee_type'         => $request->type == '1' ? $request->employee_type : NULL,
+                        'is_ar_invoice'         => $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL,
                     ]);
                     DB::commit();
                 }catch(\Exception $e){

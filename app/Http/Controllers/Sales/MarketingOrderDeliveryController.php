@@ -186,7 +186,6 @@ class MarketingOrderDeliveryController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -227,6 +226,7 @@ class MarketingOrderDeliveryController extends Controller
 
     public function getMarketingOrder(Request $request){
         $data = MarketingOrder::find($request->id);
+        $data['sender_name'] = $data->sender->name;
         if($data->used()->exists()){
             $data['status'] = '500';
             $data['message'] = 'Marketing Order No. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
@@ -324,6 +324,17 @@ class MarketingOrderDeliveryController extends Controller
             $totalLimitCredit = 0;
             $totalSent = 0;
 
+            $cekmo = MarketingOrder::find($request->marketing_order_id);
+
+            $grandtotalUnsentModCredit = $cekmo->account->grandtotalUnsentModCredit();
+            $grandtotalUnsentModDp = $cekmo->account->grandtotalUnsentModDp();
+            $grandtotalUnsentDoCredit = $cekmo->account->grandtotalUninvoiceDoCredit();
+            $grandtotalUnsentDoDp = $cekmo->account->grandtotalUninvoiceDoDp();
+
+            $total = 0;
+            $tax = 0;
+            $grandtotal = 0;
+
             if($request->arr_qty){
                 foreach($request->arr_qty as $key => $row){
                     if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
@@ -338,23 +349,37 @@ class MarketingOrderDeliveryController extends Controller
 
                     $datamodi = MarketingOrderDetail::find($request->arr_modi[$key]);
 
-                    $total = $datamodi->realPriceAfterGlobalDiscount() * str_replace(',','.',str_replace('.','',$row));
-                    $tax = 0;
-                    $grandtotal = 0;
+                    $rowtotal = $datamodi->realPriceAfterGlobalDiscount() * str_replace(',','.',str_replace('.','',$row));
+                    $rowtax = 0;
                     if($datamodi->tax_id > 0){
                         if($datamodi->is_include_tax == '1'){
-                            $total = $total * (1 + ($datamodi->percent_tax / 100));
+                            $rowtotal = $rowtotal * (1 + ($datamodi->percent_tax / 100));
                         }
-                        $tax = $total * ($datamodi->percent_tax / 100);
+                        $rowtax += $rowtotal * ($datamodi->percent_tax / 100);
                     }
 
-                    $grandtotal = $total + $tax;
-                    $balanceLimitCredit = $datamodi->marketingOrder->account->limit_credit - $datamodi->marketingOrder->account->count_limit_credit - $grandtotal;
-                    if($balanceLimitCredit < 0){
-                        $passedCreditLimit = false;
-                    }
-                    $totalLimitCredit += $datamodi->marketingOrder->account->limit_credit - $datamodi->marketingOrder->account->count_limit_credit;
-                    $totalSent += $grandtotal;
+                    $total += $rowtotal;
+                    $tax += $rowtax;                    
+                }
+
+                $grandtotal = $total + $tax;
+
+                $percent_credit = 100 - $cekmo->percent_dp;
+
+                $totalCredit = ($percent_credit / 100) * $grandtotal;
+                $totalDp = ($cekmo->percent_dp / 100) * $grandtotal;
+
+                $balanceLimitCredit = $cekmo->account->limit_credit - $cekmo->account->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit - $totalCredit;
+                $balanceLimitDp = $cekmo->account->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp;
+                $totalLimitCredit = $cekmo->account->limit_credit - $cekmo->account->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
+                $totalLimitDp = $cekmo->account->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
+                
+                if($balanceLimitCredit < 0){
+                    $passedCreditLimit = false;
+                }
+
+                if($balanceLimitDp < 0){
+                    $passedCreditLimit = false;
                 }
 
                 $errorMessage = [];
@@ -378,7 +403,7 @@ class MarketingOrderDeliveryController extends Controller
             if(!$passedCreditLimit){
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item terkirim : '.number_format($totalSent,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalSent,2,',','.').'.'
+                    'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item Kredit terkirim : '.number_format($totalCredit,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalCredit,2,',','.').'. Dan sisa limit DP '.number_format($totalLimitDp,2,',','.').' sedangkan nominal Item DP terkirim : '.number_format($totalDp,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitDp - $totalDp,2,',','.').'.',
                 ]);
             }
             
@@ -466,7 +491,7 @@ class MarketingOrderDeliveryController extends Controller
                 try {
                     
                     foreach($request->arr_modi as $key => $row){
-                        MarketingOrderDeliveryDetail::create([
+                        $querydetail = MarketingOrderDeliveryDetail::create([
                             'marketing_order_delivery_id'   => $query->id,
                             'marketing_order_detail_id'     => $row,
                             'item_id'                       => $request->arr_item[$key],
@@ -482,6 +507,8 @@ class MarketingOrderDeliveryController extends Controller
                 }catch(\Exception $e){
                     DB::rollback();
                 }
+
+                $query->updateGrandtotal();
 
                 CustomHelper::sendApproval('marketing_order_deliveries',$query->id,$query->note);
                 CustomHelper::sendNotification('marketing_order_deliveries',$query->id,'Pengajuan Marketing Order Delivery No. '.$query->code,$query->note,session('bo_id'));
@@ -550,6 +577,7 @@ class MarketingOrderDeliveryController extends Controller
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
+                                <th class="center-align">Referensi</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Ambil Dari</th>
                                 <th class="center-align">Qty</th>
@@ -561,6 +589,7 @@ class MarketingOrderDeliveryController extends Controller
         foreach($data->marketingOrderDeliveryDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>

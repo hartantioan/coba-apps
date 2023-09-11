@@ -1915,7 +1915,6 @@ class PurchaseRequestController extends Controller
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $query = PurchaseRequest::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
-                        info($nomor);
                         if($query){
                             $data = [
                                 'title'     => 'Print Purchase Request',

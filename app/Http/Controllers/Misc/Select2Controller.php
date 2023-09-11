@@ -19,6 +19,7 @@ use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderInvoice;
 use App\Models\Menu;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
@@ -203,6 +204,7 @@ class Select2Controller extends Controller {
                 'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
                 'uom'           => '-',
                 'code'          => CustomHelper::encrypt($d->code),
+                'type'          => $d->getTable(),
             ];
         }
 
@@ -270,7 +272,6 @@ class Select2Controller extends Controller {
                 ->where('type','1')->get();
 
         foreach($data as $d) {
-            info($d->name);
             $response[] = [
                 'id'   			=> $d->id,
                 'text' => $d->name.' - '.$d->phone.' Pos. '.($d->position ? $d->position->name : 'N/A').' Dep. '.($d->department ? $d->department->name : 'N/A'),
@@ -278,6 +279,34 @@ class Select2Controller extends Controller {
                 'count_limit'   => $d->count_limit_credit,
                 'balance_limit' => $d->limit_credit - $d->count_limit_credit,
                 'arrinfo'       => $d
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function employeeCustomer(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = User::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('employee_no', 'like', "%$search%")
+                    ->orWhere('username', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('address', 'like', "%$search%")
+                    ->orWhere('pic', 'like', "%$search%")
+                    ->orWhere('pic_no', 'like', "%$search%")
+                    ->orWhere('office_no', 'like', "%$search%");
+                })
+                ->whereIn('type',['1','2'])
+                ->where('status','1')->orderBy('type')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->employee_no.' - '.$d->name.' - '.$d->type(),
+                'type'          => $d->type,
             ];
         }
 
@@ -514,10 +543,12 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->employee_no.' - '.$d->name,
-                'top_customer'  => $d->top,
-                'top_internal'  => $d->top_internal,
+                'id'   			        => $d->id,
+                'text' 			        => $d->employee_no.' - '.$d->name,
+                'top_customer'          => $d->top,
+                'top_internal'          => $d->top_internal,
+                'limit_credit'          => number_format($d->limit_credit,2,',','.'),
+                'count_limit_credit'    => number_format($d->count_limit_credit,2,',','.'),
             ];
         }
 
@@ -1669,7 +1700,7 @@ class Select2Controller extends Controller {
 
                 foreach($d->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
                     $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
-                    $total = $price * $row->qty;
+                    $total = $price * $row->getBalanceQtySentMinusReturn();
                     if($row->marketingOrderDetail->tax_id > 0){
                         if($row->marketingOrderDetail->is_include_tax == '1'){
                             $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
@@ -1750,12 +1781,16 @@ class Select2Controller extends Controller {
         ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
+            $arrNominal = $d->arrBalanceInvoice();
             if($d->balanceInvoice() > 0){
                 $response[] = [
                     'id'   			    => $d->id,
                     'text' 			    => $d->code.' - Cust. '.$d->account->name,
                     'code'              => $d->code,
                     'type'              => $d->getTable(),
+                    'is_include_tax'    => $d->is_include_tax,
+                    'percent_tax'       => $d->percent_tax,
+                    'tax_id'            => $d->tax_id ? $d->tax_id : '0',
                     'post_date'         => date('d/m/y',strtotime($d->post_date)),
                     'subtotal'          => number_format($d->subtotal,2,',','.'),
                     'discount'          => number_format($d->discount,2,',','.'),
@@ -1763,7 +1798,77 @@ class Select2Controller extends Controller {
                     'tax'               => number_format($d->tax,2,',','.'),
                     'grandtotal'        => number_format($d->grandtotal,2,',','.'),
                     'balance'           => number_format($d->balanceInvoice(),2,',','.'),
+                    'balance_array'     => $arrNominal,
                     'note'              => $d->note,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrderInvoice(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+        $account_id = $request->account_id;
+        $data = MarketingOrderInvoice::where(function($query) use($search,$account_id){
+            $query->where(function($query) use ($search){
+                $query->where('code', 'like', "%$search%")
+                    ->orWhere('note','like',"%$search%")
+                    ->orWhereHas('user',function($query) use ($search){
+                        $query->where('name','like',"%$search%")
+                            ->orWhere('employee_no','like',"%$search%");
+                    });
+            })
+            ->where(function($query) use ($account_id){
+                if($account_id){
+                    $query->where('account_id',$account_id);
+                }
+            });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])->get();
+        
+        foreach($data as $d) {
+            if($d->balancePaymentIncoming() > 0){
+                $arrNominalMain = $d->arrBalanceMemo();
+                $arrDetail = [];
+                foreach($d->marketingOrderInvoiceDeliveryProcess as $row){
+                    $arrNominal = $row->arrBalanceMemo();
+                    $arrDetail[] = [
+                        'id'                => $row->id,
+                        'code'              => $d->code,
+                        'type'              => $row->getTable(),
+                        'is_include_tax'    => $row->is_include_tax,
+                        'percent_tax'       => $row->percent_tax,
+                        'tax_id'            => $row->tax_id ? $row->tax_id : '0',
+                        'total'             => number_format($arrNominal['total'],2,',','.'),
+                        'tax'               => number_format($arrNominal['tax'],2,',','.'),
+                        'total_after_tax'   => number_format($arrNominal['total_after_tax'],2,',','.'),
+                        'rounding'          => number_format($arrNominal['rounding'],2,',','.'),
+                        'grandtotal'        => number_format($arrNominal['grandtotal'],2,',','.'),
+                        'downpayment'       => number_format($arrNominal['downpayment'],2,',','.'),
+                        'balance'           => number_format($arrNominal['balance'],2,',','.'),
+                    ];
+                }
+
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->code.' - Cust. '.$d->account->name,
+                    'code'              => $d->code,
+                    'type'              => $d->getTable(),
+                    'post_date'         => date('d/m/y',strtotime($d->post_date)),
+                    'total'             => number_format($arrNominalMain['total'],2,',','.'),
+                    'tax'               => number_format($arrNominalMain['tax'],2,',','.'),
+                    'total_after_tax'   => number_format($arrNominalMain['total_after_tax'],2,',','.'),
+                    'rounding'          => number_format($arrNominalMain['rounding'],2,',','.'),
+                    'grandtotal'        => number_format($arrNominalMain['grandtotal'],2,',','.'),
+                    'downpayment'       => number_format($arrNominalMain['downpayment'],2,',','.'),
+                    'balance'           => number_format($arrNominalMain['balance'],2,',','.'),
+                    'note'              => $d->note,
+                    'details'           => $arrDetail,
                 ];
             }
         }

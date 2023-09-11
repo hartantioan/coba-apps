@@ -10,6 +10,10 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
+
+    .select2-container {
+        min-width: 0px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -73,16 +77,6 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_type" style="font-size:1rem;">Tipe :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_type" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Cash</option>
-                                                        <option value="2">Credit</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
                                                 <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_company" onchange="loadDataTable()">
@@ -133,6 +127,7 @@
                                                         <th>Perusahaan</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Dokumen</th>
+                                                        <th>No.Seri Pajak</th>
                                                         <th>Keterangan</th>
                                                         <th>Total</th>
                                                         <th>PPN</th>
@@ -200,32 +195,14 @@
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
                                     <div class="input-field col m3 s12 step5">
-                                        <select class="form-control" id="type" name="type">
-                                            <option value="1">Cash</option>
-                                            <option value="2">Credit</option>
-                                        </select>
-                                        <label class="" for="type">Tipe</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step6">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                         <label class="active" for="post_date">Tgl. Posting</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step7">
-                                        <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                                        <label class="active" for="due_date">Tgl. Kadaluarsa</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step8">
-                                        <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. dokumen">
-                                        <label class="active" for="document_date">Tgl. Dokumen</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step9">
+                                    <div class="input-field col m3 s12 step6">
                                         <input id="tax_no" name="tax_no" type="text" readonly placeholder="Auto generate : pajak > 0">
-                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku)." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
+                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
                                     </div>
-                                    {{-- <div class="input-field col m1 s12 step10">
-                                        <button class="btn waves-effect waves-light green" onclick="getTaxSeries();"><i class="material-icons">autorenew</i></button>
-                                    </div> --}}
-                                    <div class="file-field input-field col m3 s12 step10">
+                                    <div class="file-field input-field col m3 s12 step7">
                                         <div class="btn">
                                             <span>Lampiran</span>
                                             <input type="file" name="document" id="document">
@@ -234,56 +211,67 @@
                                             <input class="file-path validate" type="text">
                                         </div>
                                     </div>
-                                    <div class="input-field col m9 s12 step2">
-                                    </div>
                                 </fieldset>
                             </div>
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Surat Jalan Terpakai</legend>
-                                    <div class="col m3 s12 step11">
+                                    <legend>2. Dokumen Terpakai</legend>
+                                    <div class="col m3 s12 step8">
                                         <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
                                     </div>
                                 </fieldset>
                             </div>
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;overflow:auto;">
-                                    <legend>3. Surat Jalan</legend>
+                                    <legend>3. Detail Dokumen Terpakai</legend>
                                     <div class="row">
-                                        <div class="input-field col m5 step12">
-                                            <select class="browser-default" id="marketing_order_delivery_process_id" name="marketing_order_delivery_process_id"></select>
-                                            <label class="active" for="marketing_order_delivery_process_id">Surat Jalan</label>
+                                        <div class="input-field col m2 step9">
+                                            <select class="browser-default" id="marketing_order_invoice_id" name="marketing_order_invoice_id"></select>
+                                            <label class="active" for="marketing_order_invoice_id">AR Invoice</label>
                                         </div>
-                                        <div class="col m4 step13">
-                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMarketingOrderDelivery();" href="javascript:void(0);">
-                                                <i class="material-icons left">add</i> Surat Jalan
+                                        <div class="col m1 pt-1">
+                                            <a class="btn-floating mb-1 waves-effect waves-light" onclick="getMarketingInvoice();" href="javascript:void(0);">
+                                                <i class="material-icons">add</i>
                                             </a>
                                         </div>
+                                        <div class="input-field col m2 step10">
+                                            <select class="browser-default" id="marketing_order_down_payment_id" name="marketing_order_down_payment_id"></select>
+                                            <label class="active" for="marketing_order_down_payment_id">AR Down Payment</label>
+                                        </div>
+                                        <div class="col m1 pt-1">
+                                            <a class="btn-floating mb-1 waves-effect waves-light" onclick="getMarketingDownPayment();" href="javascript:void(0);">
+                                                <i class="material-icons">add</i>
+                                            </a>
+                                        </div>
+                                        <div class="input-field col m2 step11">
+                                            <select class="browser-default" id="coa_id" name="coa_id"></select>
+                                            <label class="active" for="coa_id">Coa</label>
+                                        </div>
+                                        <div class="col m1 pt-1">
+                                            <a class="btn-floating mb-1 waves-effect waves-light" onclick="getCoa();" href="javascript:void(0);">
+                                                <i class="material-icons">add</i>
+                                            </a>
+                                        </div>
+                                        <div class="col m3">
+                                            Anda bisa menambahkan Coa untuk mengurangi piutang karyawan.
+                                        </div>
                                     </div> 
-                                    <div class="col m12 s12" style="width:2500px !important;" id="table-item">
+                                    <div class="col m12 s12 step12" id="table-item">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">Surat Jalan</th>
-                                                        <th class="center">Item & Asal</th>
-                                                        <th class="center">Qty Terkirim</th>
-                                                        <th class="center">Qty Retur</th>
-                                                        <th class="center">Qty Sisa</th>
-                                                        <th class="center">Satuan</th>
-                                                        <th class="center">Harga@</th>
-                                                        <th class="center">Total</th>
-                                                        <th class="center">PPN (%)</th>
-                                                        <th class="center">Termasuk PPN</th>
-                                                        <th class="center">PPN</th>
-                                                        <th class="center">Grandtotal</th>
+                                                        <th class="center">Dokumen</th>
+                                                        <th class="center">Tgl.Post</th>
                                                         <th class="center">Keterangan</th>
+                                                        <th class="center">Nominal</th>
+                                                        <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="13">
-                                                            Silahkan tambahkan Surat Jalan...
+                                                        <td colspan="5">
+                                                            Silahkan tambahkan AR Invoice / AR Down Payment / Coa...
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -292,50 +280,7 @@
                                     </div>
                                 </fieldset>
                             </div>
-                            <div class="col s12">
-                                <fieldset style="min-width: 100%;overflow:auto;">
-                                    <legend>4. AR Down Payment</legend>
-                                    <div class="row">
-                                        <div class="input-field col m5 step14">
-                                            <select class="browser-default" id="marketing_order_down_payment_id" name="marketing_order_down_payment_id"></select>
-                                            <label class="active" for="marketing_order_down_payment_id">AR Down Payment</label>
-                                        </div>
-                                        <div class="col m4 step15">
-                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMarketingDownPayment();" href="javascript:void(0);">
-                                                <i class="material-icons left">add</i> AR Down Payment
-                                            </a>
-                                        </div>
-                                    </div> 
-                                    <div class="col m12 s12" style="width:1800px !important;" id="table-dp">
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">No.Dokumen</th>
-                                                        <th class="center">Tgl.Posting</th>
-                                                        <th class="center">Subtotal</th>
-                                                        <th class="center">Diskon</th>
-                                                        <th class="center">Total</th>
-                                                        <th class="center">PPN</th>
-                                                        <th class="center">Grandtotal</th>
-                                                        <th class="center">Keterangan</th>
-                                                        <th class="center">Digunakan</th>
-                                                        <th class="center">Hapus</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-dp">
-                                                    <tr id="last-row-dp">
-                                                        <td colspan="10">
-                                                            Silahkan tambahkan AR Down Payment...
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </p>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="input-field col m4 s12 step16">
+                            <div class="input-field col m4 s12 step13">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
@@ -346,56 +291,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="input-field col m4 s12 step17">
+                            <div class="input-field col m4 s12 step14">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
-                                            <td>Total</td>
+                                            <td style="font-size: 15px !important;">Grandtotal</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="total" name="total" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>PPN</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="tax" name="tax" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Total Setelah Pajak</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="total_after_tax" name="total_after_tax" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Rounding</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Grandtotal</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Uang Muka (AR DP)</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sisa</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="balance" name="balance" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
+                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;" readonly>
                                             </td>
                                         </tr>
                                     </thead>
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step18" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step15" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -643,6 +552,14 @@
                 $('#account_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
+                }else{
+                    $('#body-item').empty().append(`
+                        <tr id="last-row-item">
+                            <td colspan="5">
+                                Silahkan tambahkan AR Invoice / AR Down Payment / Coa...
+                            </td>
+                        </tr>
+                    `);
                 }
                 M.updateTextFields();
                 window.onbeforeunload = function() {
@@ -650,6 +567,7 @@
                 };
                 countAll();
                 $('#textTax').hide();
+                $('#tax_no').val('');
             }
         });
 
@@ -714,8 +632,9 @@
         });
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
+        select2ServerSide('#coa_id', '{{ url("admin/select2/coa") }}');
 
-        $('#marketing_order_delivery_process_id').select2({
+        $('#marketing_order_invoice_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
             allowClear: true,
@@ -723,7 +642,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/marketing_order_delivery_process") }}',
+                url: '{{ url("admin/select2/marketing_order_invoice") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 data: function(params) {
@@ -774,37 +693,39 @@
             }
         });
 
-        $('#body-dp').on('click', '.delete-data-dp', function() {
+        $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
-            if($('.row_dp').length == 0){
-                $('#body-dp').append(`
-                    <tr id="last-row-dp">
-                        <td colspan="10">
-                            Silahkan tambahkan AR Down Payment...
+            countAll();
+            if($('.row_item').length == 0){
+                $('#body-item').append(`
+                    <tr id="last-row-item">
+                        <td colspan="5">
+                            Silahkan tambahkan AR Invoice / AR Down Payment / Coa...
                         </td>
                     </tr>
                 `);
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }
-                $('#marketing_order_down_payment_id').empty();
-                $('#table-dp').animate( { 
+                $('#table-item').animate( { 
                     scrollLeft: '0' }, 
                 500);
             }
-            countAll();
         });
     });
 
-    function getMarketingOrderDelivery(){
-        if($('#marketing_order_delivery_process_id').val()){
+    function getMarketingInvoice(){
+        if($('#marketing_order_invoice_id').val()){
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }
+
+            let datakuy = $('#marketing_order_invoice_id').select2('data')[0];
+
             $.ajax({
                 url: '{{ Request::url() }}/send_used_data',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: $('#marketing_order_delivery_process_id').val(),
-                    type: 'marketing_order_delivery_processes',
+                    id: $('#marketing_order_invoice_id').val(),
+                    type: datakuy.type,
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -826,69 +747,50 @@
                             $('#last-row-item').remove();
                         }
 
-                        let datakuy = $('#marketing_order_delivery_process_id').select2('data')[0];
-
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
                                 ` + datakuy.code + `
-                                <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.type + `','` + $('#marketing_order_delivery_process_id').val() + `')">close</i>
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.type + `','` + $('#marketing_order_invoice_id').val() + `')">close</i>
                             </div>
                         `);
-
                         $.each(datakuy.details, function(i, val) {
                             var count = makeid(10);
                             $('#body-item').append(`
-                                <tr class="row_item" data-id="` + $('#marketing_order_delivery_process_id').val() + `">
-                                    <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.lookable_type + `">
-                                    <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.lookable_id + `">
+                                <tr class="row_item" data-id="` + $('#marketing_order_invoice_id').val() + `">
+                                    <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.type + `">
+                                    <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.id + `">
+                                    <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="` + val.is_include_tax + `">
+                                    <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="` + val.percent_tax + `">
+                                    <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="` + val.tax_id + `">
                                     <input type="hidden" name="arr_total[]" id="arr_total` + count + `" value="` + val.total + `">
                                     <input type="hidden" name="arr_tax[]" id="arr_tax` + count + `" value="` + val.tax + `">
-                                    <input type="hidden" name="arr_total_after_tax[]" id="arr_total_after_tax` + count + `" value="` + val.grandtotal + `">
-                                    <input type="hidden" name="arr_grandtotal[]" class="browser-default" value="0">
+                                    <input type="hidden" name="arr_total_after_tax[]" id="arr_total_after_tax` + count + `" value="` + val.total_after_tax + `">
+                                    <input type="hidden" name="arr_rounding[]" id="arr_rounding` + count + `" value="` + val.rounding + `">
+                                    <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="` + val.grandtotal + `">
+                                    <input type="hidden" name="arr_downpayment[]" id="arr_downpayment` + count + `" value="` + val.downpayment + `">
+                                    <input type="hidden" name="arr_balance[]" id="arr_balance` + count + `" value="` + val.balance + `">
                                     <td>
                                         ` + val.code + `
                                     </td>
-                                    <td>
-                                        ` + val.item_name + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.qty_do + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.qty_return + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.qty_sent + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.unit + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.price + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.total + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.percent_tax + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + (val.is_include_tax == '1' ? 'Ya' : 'Tidak') + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.tax + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.grandtotal + `
+                                    <td class="center">
+                                        ` + datakuy.post_date + `
                                     </td>
                                     <td>
-                                        ` + val.note + `
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail...">
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.balance + `" data-nominal="` + val.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_nominal`+ count +`" readonly>
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
                                     </td>
                                 </tr>
                             `);
                         });
 
-                        $('#marketing_order_delivery_process_id').empty();
+                        $('#marketing_order_invoice_id').empty();
 
                         countAll();
                     }
@@ -908,6 +810,9 @@
 
     function getMarketingDownPayment(){
         if($('#marketing_order_down_payment_id').val()){
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }
             $.ajax({
                 url: '{{ Request::url() }}/send_used_data',
                 type: 'POST',
@@ -932,8 +837,8 @@
                             icon: 'warning'
                         });
                     }else{
-                        if($('#last-row-dp').length > 0){
-                            $('#last-row-dp').remove();
+                        if($('#last-row-item').length > 0){
+                            $('#last-row-item').remove();
                         }
 
                         let datakuy = $('#marketing_order_down_payment_id').select2('data')[0];
@@ -947,48 +852,43 @@
 
                         var count = makeid(10);
 
-                        $('#body-dp').append(`
-                            <tr class="row_dp" data-id="` + $('#marketing_order_down_payment_id').val() + `">
+                        $('#body-item').append(`
+                            <tr class="row_item" data-id="` + $('#marketing_order_down_payment_id').val() + `">
                                 <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + datakuy.type + `">
-                                <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + $('#marketing_order_down_payment_id').val() + `">
-                                <td class="center-align">
+                                <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + datakuy.id + `">
+                                <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="` + datakuy.is_include_tax + `">
+                                <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="` + datakuy.percent_tax + `">
+                                <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="` + datakuy.tax_id + `">
+                                <input type="hidden" name="arr_total[]" id="arr_total` + count + `" value="` + datakuy.balance_array.total + `">
+                                <input type="hidden" name="arr_tax[]" id="arr_tax` + count + `" value="` + datakuy.balance_array.tax + `">
+                                <input type="hidden" name="arr_total_after_tax[]" id="arr_total_after_tax` + count + `" value="` + datakuy.balance_array.grandtotal + `">
+                                <input type="hidden" name="arr_rounding[]" id="arr_rounding` + count + `" value="0">
+                                <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="` + datakuy.balance_array.grandtotal + `">
+                                <input type="hidden" name="arr_downpayment[]" id="arr_downpayment` + count + `" value="0">
+                                <input type="hidden" name="arr_balance[]" id="arr_balance` + count + `" value="` + datakuy.balance_array.grandtotal + `">
+                                <td>
                                     ` + datakuy.code + `
                                 </td>
-                                <td>
+                                <td class="center">
                                     ` + datakuy.post_date + `
                                 </td>
-                                <td class="right-align">
-                                    ` + datakuy.subtotal + `
-                                </td>
-                                <td class="right-align">
-                                    ` + datakuy.discount + `
-                                </td>
-                                <td class="right-align">
-                                    ` + datakuy.total + `
-                                </td>
-                                <td class="right-align">
-                                    ` + datakuy.tax + `
-                                </td>
-                                <td class="right-align">
-                                    ` + datakuy.grandtotal + `
-                                </td>
                                 <td>
-                                    ` + datakuy.note + `
+                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail...">
                                 </td>
                                 <td class="center">
-                                    <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + datakuy.balance + `" data-nominal="` + datakuy.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
+                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + datakuy.balance + `" data-nominal="` + datakuy.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_nominal`+ count +`">
                                 </td>
                                 <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-dp" href="javascript:void(0);">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>
                             </tr>
                         `);
 
-                        countAll();
-
                         $('#marketing_order_down_payment_id').empty();
+
+                        countAll();
                     }
                 },
                 error: function() {
@@ -1004,14 +904,77 @@
         }
     }
 
+    function getCoa(){
+        if($('#coa_id').val()){
+            if($('#account_id').val()){
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+                if($('#last-row-item').length > 0){
+                    $('#last-row-item').remove();
+                }
+                let datakuy = $('#coa_id').select2('data')[0];
+                var count = makeid(10);
+                $('#body-item').append(`
+                    <tr class="row_item" data-id="` + $('#coa_id').val() + `">
+                        <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + datakuy.type + `">
+                        <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + datakuy.id + `">
+                        <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="0">
+                        <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="0">
+                        <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="0">
+                        <input type="hidden" name="arr_total[]" id="arr_total` + count + `" value="0">
+                        <input type="hidden" name="arr_tax[]" id="arr_tax` + count + `" value="0">
+                        <input type="hidden" name="arr_total_after_tax[]" id="arr_total_after_tax` + count + `" value="0">
+                        <input type="hidden" name="arr_rounding[]" id="arr_rounding` + count + `" value="0">
+                        <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="0">
+                        <input type="hidden" name="arr_downpayment[]" id="arr_downpayment` + count + `" value="0">
+                        <input type="hidden" name="arr_balance[]" id="arr_balance` + count + `" value="0">
+                        <td>
+                            ` + datakuy.text + `
+                        </td>
+                        <td class="center">
+                            -
+                        </td>
+                        <td>
+                            <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail...">
+                        </td>
+                        <td class="center">
+                            <input name="arr_nominal[]" class="browser-default" type="text" value="0,00" data-nominal="0,00" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `');applyNominal('` + count + `',this.value);" style="text-align:right;width:100% !important;" id="arr_nominal`+ count +`">
+                        </td>
+                        <td class="center">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                `);
+                $('#coa_id').empty();
+                countAll();
+            }else{
+                swal({
+                    title: 'Ups!',
+                    text: 'Silahkan pilih customer, karena akan ada pengecekan sisa saldo piutang.',
+                    icon: 'warning'
+                });
+            }
+        }
+    }
+
+    function applyNominal(code,nil){
+        $('#arr_total' + code).val(nil);
+        $('#arr_total_after_tax' + code).val(nil);
+        $('#arr_grandtotal' + code).val(nil);
+        $('#arr_balance' + code).val(nil);
+    }
+
     function checkRow(val){
-        var total = parseFloat($('#arr_grandtotal' + val).val().replaceAll(".", "").replaceAll(",",".")), 
-            totalLimit = parseFloat($('#arr_grandtotal' + val).data('nominal').toString().replaceAll(".", "").replaceAll(",","."));
+        var total = parseFloat($('#arr_nominal' + val).val().replaceAll(".", "").replaceAll(",",".")), 
+            totalLimit = parseFloat($('#arr_nominal' + val).data('nominal').replaceAll(".", "").replaceAll(",","."));
 
         if(totalLimit > 0){
             if(total > totalLimit){
                 total = totalLimit;
-                $('#arr_grandtotal' + val).val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
+                $('#arr_nominal' + val).val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
             }
         }
     }
@@ -1345,29 +1308,17 @@
                 
             },
             success: function(response) {
-                if(type == 'marketing_order_delivery_processes'){
-                    $('.row_item[data-id="' + id + '"]').remove();
-                    if($('.row_item').length == 0){
-                        $('#body-item').empty().append(`
-                            <tr id="last-row-item">
-                                <td colspan="13">
-                                    Silahkan tambahkan Surat Jalan...
-                                </td>
-                            </tr>
-                        `);
-                    }
-                }else if(type == 'marketing_order_down_payments'){
-                    $('.row_dp[data-id="' + id + '"]').remove();
-                    if($('.row_dp').length == 0){
-                        $('#body-dp').empty().append(`
-                            <tr id="last-row-dp">
-                                <td colspan="10">
-                                    Silahkan tambahkan AR Down Payment...
-                                </td>
-                            </tr>
-                        `);
-                    }
+                $('.row_item[data-id="' + id + '"]').remove();
+                if($('.row_item').length == 0){
+                    $('#body-item').empty().append(`
+                        <tr id="last-row-item">
+                            <td colspan="5">
+                                Silahkan tambahkan AR Invoice / AR Down Payment / Coa...
+                            </td>
+                        </tr>
+                    `);
                 }
+                
                 countAll();
             },
             error: function() {
@@ -1455,6 +1406,7 @@
                 { name: 'company_id', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: '' },
+                { name: 'tax_no', className: '' },
                 { name: 'note', className: '' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
@@ -1544,96 +1496,84 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]), passed = true, passedTax = true;
+                var formData = new FormData($('#form_data')[0]), passedTax = true;
 
-                $('input[name^="arr_qty"]').each(function(index){
-                    if(parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) == 0){
-                        passed = false;
+                $('input[name^="arr_tax[]"]').each(function(index){
+                    if(parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) > 0){
+                        if(!$('#tax_no').val()){
+                            passedTax = false;
+                        }
                     }
                 });
-
-                if(parseFloat($('#tax').val().replaceAll(".", "").replaceAll(",",".")) > 0){
-                    if(!$('#tax_no').val()){
-                        passedTax = false;
-                    }
-                }
                 
-                if(passed){
-                    if(passedTax){
-                        $.ajax({
-                            url: '{{ Request::url() }}/create',
-                            type: 'POST',
-                            dataType: 'JSON',
-                            data: formData,
-                            contentType: false,
-                            processData: false,
-                            cache: true,
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            beforeSend: function() {
-                                $('#validation_alert').hide();
-                                $('#validation_alert').html('');
-                                loadingOpen('.modal-content');
-                            },
-                            success: function(response) {
-                                loadingClose('.modal-content');
-                                if(response.status == 200) {
-                                    success();
-                                    M.toast({
-                                        html: response.message
-                                    });
-                                } else if(response.status == 422) {
-                                    $('#validation_alert').show();
-                                    $('.modal-content').scrollTop(0);
-                                    
-                                    swal({
-                                        title: 'Ups! Validation',
-                                        text: 'Check your form.',
-                                        icon: 'warning'
-                                    });
-
-                                    $.each(response.error, function(i, val) {
-                                        $.each(val, function(i, val) {
-                                            $('#validation_alert').append(`
-                                                <div class="card-alert card red">
-                                                    <div class="card-content white-text">
-                                                        <p>` + val + `</p>
-                                                    </div>
-                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">×</span>
-                                                    </button>
-                                                </div>
-                                            `);
-                                        });
-                                    });
-                                } else {
-                                    M.toast({
-                                        html: response.message
-                                    });
-                                }
-                            },
-                            error: function() {
+                if(passedTax){
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
                                 $('.modal-content').scrollTop(0);
-                                loadingClose('.modal-content');
+                                
                                 swal({
-                                    title: 'Ups!',
-                                    text: 'Check your internet connection.',
-                                    icon: 'error'
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
                                 });
                             }
-                        });
-                    }else{
-                        swal({
-                            title: 'Ups!',
-                            text: 'Nomor seri tidak boleh kosong, ketika nominal PPN diatas 0.',
-                            icon: 'warning'
-                        });
-                    }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Qty tidak boleh kosong.',
+                        text: 'Nomor seri tidak boleh kosong, ketika nominal PPN diatas 0.',
                         icon: 'warning'
                     });
                 }
@@ -1672,18 +1612,9 @@
                 `);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
-                $('#document_date').val(response.document_date);
                 $('#tax_no').val(response.tax_no);
                 $('#note').val(response.note);
-                $('#total').val(response.total);
-                $('#tax').val(response.tax);
-                $('#total_after_tax').val(response.total_after_tax);
-                $('#rounding').val(response.rounding);
-                $('#grandtotal').val(response.grandtotal);
-                $('#downpayment').val(response.downpayment);
-                $('#balance').val(response.balance);
-                $('#tax_no').val(response.tax_no);
+                $('#grandtotal').val(response.balance);
 
                 if(response.details.length > 0){
                     if($('.data-used').length > 0){
@@ -1706,93 +1637,30 @@
                             <tr class="row_item" data-id="` + val.id + `">
                                 <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.lookable_type + `">
                                 <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.lookable_id + `">
+                                <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="` + val.is_include_tax + `">
+                                <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="` + val.percent_tax + `">
+                                <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="` + val.tax_id + `">
                                 <input type="hidden" name="arr_total[]" id="arr_total` + count + `" value="` + val.total + `">
                                 <input type="hidden" name="arr_tax[]" id="arr_tax` + count + `" value="` + val.tax + `">
-                                <input type="hidden" name="arr_total_after_tax[]" id="arr_total_after_tax` + count + `" value="` + val.grandtotal + `">
-                                <input type="hidden" name="arr_grandtotal[]" class="browser-default" value="0">
+                                <input type="hidden" name="arr_total_after_tax[]" id="arr_total_after_tax` + count + `" value="` + val.total_after_tax + `">
+                                <input type="hidden" name="arr_rounding[]" id="arr_rounding` + count + `" value="` + val.rounding + `">
+                                <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="` + val.grandtotal + `">
+                                <input type="hidden" name="arr_downpayment[]" id="arr_downpayment` + count + `" value="` + val.downpayment + `">
+                                <input type="hidden" name="arr_balance[]" id="arr_balance` + count + `" value="` + val.balance + `">
                                 <td>
                                     ` + val.code + `
                                 </td>
-                                <td>
-                                    ` + val.item_name + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.qty_do + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.qty_return + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.qty_sent + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.unit + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.price + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.total + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.percent_tax + `
-                                </td>
-                                <td class="center-align">
-                                    ` + (val.is_include_tax == '1' ? 'Ya' : 'Tidak') + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.tax + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.grandtotal + `
-                                </td>
-                                <td>
-                                    ` + val.note + `
-                                </td>
-                            </tr>
-                        `);
-                    });
-                }
-
-                if(response.dps.length > 0){
-                    if($('#last-row-dp').length > 0){
-                        $('#last-row-dp').remove();
-                    }
-                    $.each(response.dps, function(i, val) {
-                        var count = makeid(10);
-                        $('#body-dp').append(`
-                            <tr class="row_dp" data-id="` + val.id + `">
-                                <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.type + `">
-                                <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.id + `">
-                                <td class="center-align">
-                                    ` + val.code + `
-                                </td>
-                                <td>
+                                <td class="center">
                                     ` + val.post_date + `
                                 </td>
-                                <td class="right-align">
-                                    ` + val.subtotal + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.discount + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.total + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.tax + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.grandtotal + `
-                                </td>
                                 <td>
-                                    ` + val.note + `
+                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail..." value="` + val.note + `">
                                 </td>
                                 <td class="center">
-                                    <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + val.grandtotal + `" data-nominal="` + val.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
+                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.balance + `" data-nominal="` + val.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `');` + (val.lookable_type == 'coas' ? `applyNominal('` + count + `',this.value);` : ``) + `" style="text-align:right;width:100% !important;" id="arr_nominal`+ count +`">
                                 </td>
                                 <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-dp" href="javascript:void(0);">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>
@@ -1800,7 +1668,7 @@
                         `);
                     });
                 }
-                
+                countAll();
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -1976,52 +1844,18 @@
     }
 
     function countAll(){
-        let total = 0, tax = 0, total_after_tax = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, downpayment = 0, balance = 0;
+        let grandtotal = 0, tax = 0;
 
-        $('input[name^="arr_total[]"]').each(function(index){
-            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        $('input[name^="arr_nominal[]"]').each(function(index){
+            grandtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
         $('input[name^="arr_tax[]"]').each(function(index){
             tax += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
-        tax = Math.floor(tax);
-
-        $('input[name^="arr_total_after_tax[]"]').each(function(index){
-            total_after_tax += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-        });
-
-        grandtotal = total_after_tax + rounding;
-
-        $('input[name^="arr_grandtotal[]"]').each(function(index){
-            downpayment += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-        });
-
-        balance = grandtotal - downpayment;
-
-        $('#total').val(
-            (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
-        );
-        
-        $('#tax').val(
-            (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
-        );
-
-        $('#total_after_tax').val(
-            (total_after_tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total_after_tax).toString().replace('.',','))
-        );
-
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
-        );
-
-        $('#downpayment').val(
-            (downpayment >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(downpayment).toString().replace('.',','))
-        );
-
-        $('#balance').val(
-            (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
         );
 
         if(tax > 0){
@@ -2029,7 +1863,7 @@
             getTaxSeries();
         }else{
             $('#textTax').hide();
-            $('#tax_no').val();
+            $('#tax_no').val('');
         }
     }
 
@@ -2038,8 +1872,8 @@
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'AR Invoice',
-                    intro : 'Form ini digunakan untuk mengelola data invoice penagihan ke customer yang diambil dari lebih dari satu data Surat Jalan (DO) dikurangi dengan barang yang diretur. Anda juga bisa menambahkan dokumen AR Down Payment disini sebagai pemotong tagihan. Di form ini terdapat fitur auto-generate nomor seri pajak yang diambil dari form Master Data - Akunting - Seri Pajak sesuai dengan perusahaan dan tanggal berlaku.'
+                    title : 'AR Credit Memo',
+                    intro : 'Form ini digunakan untuk mengelola data credit memo untuk dokumen AR Invoice, AR Down Payment, dan Piutang Usaha dari sebuah Partner Bisnis. Anda hanya bisa mengambil 1 macam data saja, contoh : jika anda menambahkan dokumen AR Invoice, dan anda menambahkan langsung AR Down Payment, maka dokumen AR Invoice akan ditumpuk dengan data AR Down Payment. Khusus untuk Piutang Usaha, maka pengguna harus memilih coa lawan dari Piutang Usaha untuk nantinya akan menjadi jurnal.'
                 },
                 {
                     title : 'Nomor Dokumen',
@@ -2062,73 +1896,58 @@
                     intro : 'Perusahaan dimana dokumen ini dibuat.' 
                 },
                 {
-                    title : 'Tipe',
-                    element : document.querySelector('.step5'),
-                    intro : 'Tipe pembayaran cash atau kredit.' 
-                },
-                {
                     title : 'Tgl. Posting',
-                    element : document.querySelector('.step6'),
+                    element : document.querySelector('.step5'),
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
                 {
-                    title : 'Tgl. Tenggat',
-                    element : document.querySelector('.step7'),
-                    intro : 'Tanggal tenggat adalah batas tanggal berlaku untuk invoice yang dibuat.' 
-                },
-                {
-                    title : 'Tgl. Dokumen',
-                    element : document.querySelector('.step8'),
-                    intro : 'Tanggal dokumen adalah tanggal yang muncul di dokumen ketika dicetak.' 
-                },
-                {
                     title : 'Nomor Seri PPN',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.step6'),
                     intro : 'Nomor seri PPN yang otomatis terbuat ketika nominal pajak diatas 0. Data ini diambil dari perusahaan dan tanggal posting yang diserasikan dengan data pada Master Data - Akunting - Seri Pajak.' 
                 },
                 {
                     title : 'File Lampiran',
-                    element : document.querySelector('.step10'),
+                    element : document.querySelector('.step7'),
                     intro : 'File bukti lampiran yang ingin digunakan sebagai bukti. Hanya bisa mengupload 1 file saja.' 
                 },
                 {
-                    title : 'Data SJ Terpakai',
-                    element : document.querySelector('.step11'),
-                    intro : 'Daftar SJ terpakai, fungsinya untuk mengunci data agar hanya terpakai pada form dan user aktif saat ini saja. Silahkan hapus jika ingin diakses oleh user lainnya.' 
+                    title : 'Data Dokumen Terpakai',
+                    element : document.querySelector('.step8'),
+                    intro : 'Daftar dokumen terpakai, fungsinya untuk mengunci data agar hanya terpakai pada form dan user aktif saat ini saja. Silahkan hapus jika ingin diakses oleh user lainnya.' 
                 },
                 {
-                    title : 'Surat Jalan',
-                    element : document.querySelector('.step12'),
-                    intro : 'Daftar surat jalan yang ingin dimasukkan ke dalam pengembalian. Anda bisa menambahkan lebih dari satu surat jalan dan barang, namun hanya untuk 1 Partner Bisnis yang sama.' 
-                },
-                {
-                    title : 'Tambah Surat Jalan',
-                    element : document.querySelector('.step13'),
-                    intro : 'Tombol untuk menambahkan surat jalan terpilih.'
+                    title : 'AR Invoice',
+                    element : document.querySelector('.step9'),
+                    intro : 'Daftar AR Invoice yang ingin ditambahkan untuk dipotong.' 
                 },
                 {
                     title : 'AR Down Payment',
-                    element : document.querySelector('.step14'),
-                    intro : 'Daftar AR Down Payment yang digunakan untuk memotong tagihan AR Invoice.' 
+                    element : document.querySelector('.step10'),
+                    intro : 'Daftar AR Down Payment yang ingin ditambahkan untuk dipotong.' 
                 },
                 {
-                    title : 'Tambah AR Down Payment',
-                    element : document.querySelector('.step15'),
-                    intro : 'Tombol untuk menambahkan down payment terpilih.'
+                    title : 'Coa',
+                    element : document.querySelector('.step11'),
+                    intro : 'Daftar Coa yang ingin ditambahkan untuk dijadikan AR Credit Memo mandiri / tidak ada link dengan dokumen lainnya.' 
+                },
+                {
+                    title : 'Tabel Detail',
+                    element : document.querySelector('.step12'),
+                    intro : 'Daftar sementara informasi dokumen / coa yang ditambahkan dari menu sebelumnya.' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step16'),
+                    element : document.querySelector('.step13'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Informasi Nominal',
-                    element : document.querySelector('.step17'),
-                    intro : 'Nominal yang ada disini tidak bisa dirubah, karena otomatis dihitung dari dokumen surat jalan dan down payment yang ada pada tabel sebelumnya.' 
+                    element : document.querySelector('.step14'),
+                    intro : 'Nominal yang ada disini tidak bisa dirubah, karena otomatis dihitung dari dokumen pada tabel sebelumnya.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step18'),
+                    element : document.querySelector('.step15'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

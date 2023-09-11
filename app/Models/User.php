@@ -66,6 +66,7 @@ class User extends Authenticatable
         'manager_id',
         'employment_status',
         'employee_type',
+        'is_ar_invoice',
     ];
 
     protected $hidden = [
@@ -102,6 +103,15 @@ class User extends Authenticatable
         };
 
         return $type;
+    }
+
+    public function arInvoice(){
+        $arInvoice = match ($this->is_ar_invoice) {
+          '1' => 'Ya',
+          default => 'Tidak',
+        };
+
+        return $arInvoice;
     }
 
     public function marriedStatus(){
@@ -231,6 +241,94 @@ class User extends Authenticatable
 
     public function purchaseInvoice(){
         return $this->hasMany('App\Models\PurchaseInvoice','account_id','id')->whereIn('status',['2','3']);
+    }
+
+    public function marketingOrderDownPayment(){
+        return $this->hasMany('App\Models\MarketingOrderDownPayment','account_id','id')->whereIn('status',['2','3']);
+    }
+
+    public function marketingOrderInvoice(){
+        return $this->hasMany('App\Models\MarketingOrderInvoice','account_id','id')->whereIn('status',['2','3']);
+    }
+
+    public function marketingOrderMemo(){
+        return $this->hasMany('App\Models\MarketingOrderMemo','account_id','id')->whereIn('status',['2','3']);
+    }
+
+    public function marketingOrder(){
+        return $this->hasMany('App\Models\MarketingOrder','account_id','id')->whereIn('status',['2','3']);
+    }
+
+    public function grandtotalUnsentMod(){
+        $totalMod = 0;
+        foreach($this->marketingOrder as $row){
+            foreach($row->marketingOrderDelivery()->whereDoesntHave('marketingOrderDeliveryProcess')->get() as $rowmod){
+                $totalMod += $rowmod->getGrandtotal();
+            }
+        }
+
+        return $totalMod;
+    }
+
+    public function grandtotalUnsentModCredit(){
+        $totalMod = 0;
+        foreach($this->marketingOrder as $row){
+            foreach($row->marketingOrderDelivery()->whereDoesntHave('marketingOrderDeliveryProcess')->get() as $rowmod){
+                $totalMod += ($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100));
+            }
+        }
+
+        return $totalMod;
+    }
+
+    public function grandtotalUnsentModDp(){
+        $totalMod = 0;
+        foreach($this->marketingOrder as $row){
+            foreach($row->marketingOrderDelivery()->whereDoesntHave('marketingOrderDeliveryProcess')->get() as $rowmod){
+                $totalMod += ($rowmod->getGrandtotal() * ($row->percent_dp/100));
+            }
+        }
+
+        return $totalMod;
+    }
+
+    public function grandtotalUninvoiceDo(){
+        $totalDo = 0;
+        foreach($this->marketingOrder as $row){
+            foreach($row->marketingOrderDelivery()->whereHas('marketingOrderDeliveryProcess')->get() as $rowmod){
+                foreach($rowmod->marketingOrderDeliveryDetail()->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmodd){
+                    $totalDo += $rowmodd->getGrandtotal();
+                }
+            }
+        }
+
+        return $totalDo;
+    }
+
+    public function grandtotalUninvoiceDoCredit(){
+        $totalDo = 0;
+        foreach($this->marketingOrder as $row){
+            foreach($row->marketingOrderDelivery()->whereHas('marketingOrderDeliveryProcess')->get() as $rowmod){
+                foreach($rowmod->marketingOrderDeliveryDetail()->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmodd){
+                    $totalDo += ($rowmodd->getGrandtotal() * ((100 - $row->percent_dp)/100));
+                }
+            }
+        }
+
+        return $totalDo;
+    }
+
+    public function grandtotalUninvoiceDoDp(){
+        $totalDo = 0;
+        foreach($this->marketingOrder as $row){
+            foreach($row->marketingOrderDelivery()->whereHas('marketingOrderDeliveryProcess')->get() as $rowmod){
+                foreach($rowmod->marketingOrderDeliveryDetail()->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmodd){
+                    $totalDo += ($rowmodd->getGrandtotal() * ($row->percent_dp/100));
+                }
+            }
+        }
+
+        return $totalDo;
     }
 
     public function userPlace(){

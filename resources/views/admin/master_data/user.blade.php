@@ -275,6 +275,17 @@
                             </select>
                             <label for="employee_type">Tipe Pegawai</label>
                         </div>
+                        <div class="input-field col s3 customer_inputs" style="display:none;">
+                            <div class="switch mb-1">
+                                <label for="is_ar_invoice">Auto Generate SJ -> AR Invoice</label>
+                                <label>
+                                    Tidak
+                                    <input checked type="checkbox" id="is_ar_invoice" name="is_ar_invoice" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
+                        </div>
                         <div class="input-field col s3">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
@@ -1486,10 +1497,16 @@
     function changeMode(element){
         if($(element).val() == '1'){
             $('.other_inputs').hide();
+            $('.customer_inputs').hide();
             $('.employee_inputs').show();
         }else{
             $('.other_inputs').show();
             $('.employee_inputs').hide();
+            if($(element).val() == '2'){
+                $('.customer_inputs').show();
+            }else{
+                $('.customer_inputs').hide();
+            }
         }
     }
 
@@ -1726,6 +1743,12 @@
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
+                }
+
+                if(response.is_ar_invoice == '1'){
+                    $('#is_ar_invoice').prop( "checked", true);
+                }else{
+                    $('#is_ar_invoice').prop( "checked", false);
                 }
 
                 $('.modal-content').scrollTop(0);

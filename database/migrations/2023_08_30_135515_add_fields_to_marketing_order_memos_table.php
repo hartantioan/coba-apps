@@ -15,7 +15,8 @@ return new class extends Migration
             $table->bigInteger('company_id')->nullable()->after('user_id');
             $table->bigInteger('account_id')->nullable()->after('company_id');
             $table->date('post_date')->nullable()->after('account_id');
-            $table->double('total')->nullable()->after('document');
+            $table->string('tax_no',155)->nullable()->after('document');
+            $table->double('total')->nullable()->after('tax_no');
             $table->double('total_after_tax')->nullable()->after('tax');
             $table->double('rounding')->nullable()->after('total_after_tax');
             $table->double('downpayment')->after('grandtotal')->nullable();

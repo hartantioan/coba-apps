@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\HR\AttendanceController;
+use App\Http\Controllers\HR\AttendanceLatenessReportController;
+use App\Http\Controllers\HR\AttendanceMonthlyReportController;
+use App\Http\Controllers\HR\AttendancePresenceReportController;
 use App\Http\Controllers\HR\EmployeeTransferController;
 
 use App\Http\Controllers\Accounting\AccountingReportController;
@@ -12,6 +15,7 @@ use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Inventory\StockInRupiahController;
 use App\Http\Controllers\Inventory\StockInQtyController;
 use App\Http\Controllers\MasterData\AttendanceMachineController;
+use App\Http\Controllers\MasterData\AttendancePeriodController;
 use App\Http\Controllers\MasterData\EmployeeController;
 use App\Http\Controllers\MasterData\EmployeeScheduleController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
@@ -26,6 +30,7 @@ use App\Http\Controllers\Usage\ReceptionHardwareItemUsageController;
 use App\Http\Controllers\Usage\ReturnHardwareItemUsageController;
 use App\Http\Controllers\Usage\RequestRepairHardwareItemUsageController;
 use App\Http\Controllers\Usage\MaintenanceHardwareItemUsageController;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
@@ -226,6 +231,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('good_scale_item', [Select2Controller::class, 'goodScaleItem']);
                 Route::get('shift', [Select2Controller::class, 'shift']);
                 Route::get('place', [Select2Controller::class, 'place']);
+                Route::get('period', [Select2Controller::class, 'period']);
                 Route::get('marketing_order', [Select2Controller::class, 'marketingOrder']);
                 Route::get('marketing_order_delivery', [Select2Controller::class, 'marketingOrderDelivery']);
                 Route::get('marketing_order_delivery_process', [Select2Controller::class, 'marketingOrderDeliveryProcess']);
@@ -583,6 +589,19 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy_family', [EmployeeController::class, 'destroyFamily'])->middleware('operation.access:employee,delete');
                         Route::post('destroy_experience', [EmployeeController::class, 'destroyWorkExperience'])->middleware('operation.access:employee,delete');
                         Route::post('destroy_education', [EmployeeController::class, 'destroyEducation'])->middleware('operation.access:employee,delete');
+                    });
+
+                    Route::prefix('attendance_period')->middleware('operation.access:attendance_period,view')->group(function () {
+                        Route::get('/',[AttendancePeriodController::class, 'index']);
+                        Route::get('datatable',[AttendancePeriodController::class, 'datatable']);
+                        Route::post('create',[AttendancePeriodController::class, 'create'])->middleware('operation.access:attendance_period,update');
+                        Route::post('show',[AttendancePeriodController::class, 'show']);
+                        Route::post('lateness_report',[AttendancePeriodController::class, 'latenessReport']);
+                        Route::post('presence_report',[AttendancePeriodController::class, 'presenceReport']);
+                        Route::post('daily_report',[AttendancePeriodController::class, 'dailyReport']);
+                        Route::post('close',[AttendancePeriodController::class, 'close'])->middleware('operation.access:attendance_period,update');
+
+                        Route::post('destroy', [AttendancePeriodController::class, 'destroy'])->middleware('operation.access:attendance_period,delete');
                     });
                 });
 
@@ -1130,10 +1149,33 @@ Route::prefix('admin')->group(function () {
                     Route::get('/',[AttendanceController::class, 'index']);
                     Route::get('datatable',[AttendanceController::class, 'datatable']);
                     Route::post('syncron', [AttendanceController::class, 'syncron']);
+                    Route::get('check_job_status/{jobId}',[AttendanceController::class, 'checkJobStatus'] )->withoutMiddleware('direct.access');
                     Route::post('show', [AttendanceController::class, 'show']);
+                    Route::post('import',[AttendanceController::class, 'import'])->middleware('operation.access:attendance,update');
                     Route::post('create',[AttendanceController::class, 'create'])->middleware('operation.access:attendance,update');
                     Route::post('destroy', [AttendanceController::class, 'destroy'])->middleware('operation.access:attendance,delete');
           
+                });
+
+                Route::prefix('hr_report')->middleware('direct.access')->group(function () {
+                    Route::prefix('lateness_report')->middleware('operation.access:lateness_report,view')->group(function () {
+                        Route::get('/',[AttendanceLatenessReportController::class, 'index']);
+                        Route::get('datatable',[AttendanceLatenessReportController::class, 'datatable']);
+                        Route::post('filter_by_date',[AttendanceLatenessReportController::class, 'filterByDate']);
+              
+                    });  
+                    Route::prefix('presence_report')->middleware('operation.access:presence_report,view')->group(function () {
+                        Route::get('/',[AttendancePresenceReportController::class, 'index']);
+                        Route::get('datatable',[AttendancePresenceReportController::class, 'datatable']);
+                        Route::post('filter_by_date',[AttendancePresenceReportController::class, 'filterByDate']);
+                    });
+                    
+                    Route::prefix('recap_periode')->middleware('operation.access:recap_periode,view')->group(function () {
+                        Route::get('/',[AttendanceMonthlyReportController::class, 'index']);
+                        Route::get('datatable',[AttendanceMonthlyReportController::class, 'datatable']);
+                        Route::post('filter_by_date',[AttendanceMonthlyReportController::class, 'filterByDate']);
+              
+                    });   
                 });
             });
 

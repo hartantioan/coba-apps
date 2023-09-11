@@ -7,6 +7,7 @@ use App\Imports\ImportEmployeeSchedule;
 use App\Models\EmployeeSchedule;
 use App\Models\Shift;
 use App\Models\User;
+use App\Models\UserAbsensiMesin;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -88,8 +89,8 @@ class EmployeeScheduleController extends Controller
 					';
                 $response['data'][] = [
                     $nomor,
-                    $val->user->employee_no,
-                    $val->user->name,
+                    $val->user->employee_no ?? '',
+                    $val->user->name ?? '',
                     $val->date,
                     $val->shift->time_in.'-'.$val->shift->time_out,
                     $btn
@@ -289,6 +290,11 @@ class EmployeeScheduleController extends Controller
             'employee_shift.required'         => 'Belum ada shift dalam form',
             'arr_employee.required'     => 'Belum ada pegawai yang dipilih.',
         ]);
+        $user_data = UserAbsensiMesin::where(function($query) use ( $request) {
+            // if($request->user_id) {
+            //     $query->where('nik', $request->user_id);
+            // }
+        })->get();
 
         if($validation->fails()) {
             $response = [
@@ -305,14 +311,24 @@ class EmployeeScheduleController extends Controller
                     
                     $start_date = Carbon::parse($shift->start_date);
                     $end_date = Carbon::parse($shift->end_date);
+                    
                     foreach ($request->arr_employee as $user_id) {
                         $current_date = $start_date->copy(); // Make a copy of the start date to avoid modifying the original date
                         while ($current_date->lte($end_date)) {
-                            $query = EmployeeSchedule::create([
-                                'shift_id'          => $shift->shift_id,
-                                'date'	            => $current_date,
-                                'user_id'           => $user_id,
-                            ]);
+                            // $query = EmployeeSchedule::create([
+                            //     'shift_id'          => $shift->shift_id,
+                            //     'date'	            => $current_date,
+                            //     'user_id'           => $user_id,
+                            // ]);
+                            foreach($user_data as $row_user){
+                                $query = EmployeeSchedule::create([
+                                    'shift_id'          => $shift->shift_id,
+                                    'date'	            => $current_date,
+                                    'user_id'           => $row_user->nik,
+                                ]);
+                            }
+                            
+                            
 
                             $current_date->addDay(); // Or use addWeek(), addMonth(), etc., depending on your needs
                         }

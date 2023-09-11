@@ -5,6 +5,12 @@
 <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/fullcalendar/timegrid/timegrid.min.css') }}">
 
 <style>
+    #trash-area {
+        width: 100px;
+        height: 100px;
+        background-color: #f2f2f2;
+        border: 2px dashed #999;
+    }
     .fc-content{
         height: -webkit-fill-available;
         display: flex;
@@ -272,6 +278,7 @@
                                                 </p>
                                                 </div>
                                             </div>
+                                            <div id="trash-area"></div>
                                             </div>
                                             <div class="col m9 s12">
                                                 <div id='fc-external-drag' style="height:100%"></div>
@@ -445,19 +452,52 @@
         var containerEl = document.getElementById('external-events');
         var calendarEl = document.getElementById('fc-external-drag');
         var checkbox = document.getElementById('drop-remove');
+        var maxEventsPerDay = 4;
         calendar = new Calendar(calendarEl, {
             header: {
             left: 'prev,next today',
             center: 'title',
             },
+            
             editable: true,
             plugins: ["dayGrid", "timeGrid", "interaction"],
             droppable: true,
+            dayMaxEventRows: false,
+            views: {
+                
+                dayGrid: {
+                    eventLimit: 3 // adjust to 6 only for timeGridWeek/timeGridDay
+                }
+            },
             drop: function (info) {
                 if (checkbox.checked) {
                     info.draggedEl.parentNode.removeChild(info.draggedEl);
                 }
-            }
+            },
+            eventRender: function (info) {
+                var date = info.event.start.toISOString().split('T')[0];
+                var eventsOnDay = calendar.getEvents().filter(function (event) {
+                return (
+                    event.start.toISOString().split('T')[0] === date && event.start !== info.event.start
+                );
+                });
+
+                // Disable dragging if there are already maxEventsPerDay draggable events
+                if (eventsOnDay.length >= maxEventsPerDay) {
+                    info.event.remove();
+                }
+            },
+            eventClick: function (info) {
+                // Function to remove the clicked event
+                function removeEvent() {
+                    info.event.remove();
+                }
+
+                // Show a confirmation dialog or directly remove the event
+                if (confirm("Are you sure you want to delete this event?")) {
+                    removeEvent();
+                }
+            },
         });
         $('#external-events .fc-event').each(function () {
             $(this).css({ 'backgroundColor': $(this).data('color'), 'borderColor': $(this).data('color') });
@@ -477,9 +517,7 @@
                     id:eventEl.getAttribute('data-id'),
                 };
             }
-        });
-        
-            
+        });    
         
         $(".select2").select2({
             dropdownAutoWidth: true,

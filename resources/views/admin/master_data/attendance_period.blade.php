@@ -1,4 +1,39 @@
 <!-- BEGIN: Page Main-->
+<style>
+    .modal {
+        top:0px !important;
+    }
+    .fixed {
+        left: 10px;
+        z-index: 20;
+    }
+
+    .fixed2 {
+        left: 100px; /* Adjust as needed */
+        z-index: 20;
+    }
+
+    .fixed1 {
+        left: 200px; /* Adjust as needed */
+        z-index: 20;
+    }
+    td:first-child,
+    {
+        position: sticky;
+        left: 10px;
+        background-color: #c5c3c3;
+    }
+    td:nth-child(2) {
+        position: sticky;
+        left: 100px;
+        background-color: #c5c3c3;
+    }
+    td:nth-child(3) {
+        position: sticky;
+        left: 200px;
+        background-color: #c5c3c3;
+    }
+</style>
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
@@ -40,7 +75,7 @@
                     <div class="row">
                         <div class="col s12">
                             <div class="card-panel">
-                                <div class="row">
+                                <div class="row"> 
                                     <div class="col s12 ">
                                         <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
@@ -64,14 +99,10 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Kode</th>
-                                                        <th>Plant</th>
-                                                        <th>Departemen</th>
                                                         <th>Nama</th>
-                                                        <th>Min Time In</th>
-                                                        <th>Time In</th>
-                                                        <th>Time Out</th>
-                                                        <th>Max Time Out</th>
-                                                        <th>Status</th>
+                                                        <th>Periode Mulai</th>
+                                                        <th>Periode Akhir</th>
+                                                        <th>Plant</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -82,6 +113,7 @@
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -93,70 +125,36 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Shift</h4>
+                <h4>Tambah/Edit {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
                         <div class="input-field col s4">
+                            <input id="code" name="code" type="text" placeholder="Nama Periode">
+                            <label class="active" for="code">Code</label>
+                        </div>
+                        <div class="input-field col s4">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="name" name="name" type="text" placeholder="Nama Shift">
+                            <input id="name" name="name" type="text" placeholder="Nama Periode">
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col s4">
-                            <select class="form-control" id="place_id" name="place_id">
-                                @foreach($place as $b)
-                                    <option value="{{ $b->id }}">{{ $b->code }}</option>
+                            <select id="plant_id" name="plant_id">
+                                @foreach($place as $row)
+                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="place_id">Plant</label>
+                            <label for="plant_id">Plant</label>
                         </div>
-                        <div class="input-field col s4">
-                            <select class="form-control" id="department_id" name="department_id">
-                                @foreach($department as $b)
-                                    <option value="{{ $b->id }}">{{ $b->name }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="department_id">Departemen</label>
+                        <div class="input-field col m6 s12">
+                            <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                            <label class="active" for="start_date">Tanggal Awal</label>
                         </div>
-                        <div class="input-field col s4">
-                            <input id="min_time_in" name="min_time_in" type="text" placeholder="Minimum time in" class="timepicker">
-                            <label class="active" for="min_time_in">Minimum Time In</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <input id="time_in" name="time_in" type="text" placeholder="Time in" class="timepicker">
-                            <label class="active" for="time_in">Time In</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <input id="time_out" name="time_out" type="text" placeholder="Time out" class="timepicker">
-                            <label class="active" for="time_out">Time Out</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <input id="max_time_out" name="max_time_out" type="text" placeholder="Maximum time out" class="timepicker">
-                            <label class="active" for="max_time_out">Maximum Time Out</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <div class="switch mb-1">
-                                <label for="status">Status</label>
-                                <label class="right">
-                                    Non-Active
-                                    <input checked type="checkbox" id="status" name="status" value="1">
-                                    <span class="lever"></span>
-                                    Active
-                                </label>
-                            </div>
-                        </div>
-                        <div class="input-field col s4">
-                            <div class="switch mb-1">
-                                <label for="status">is Next Day</label>
-                                <label class="right">
-                                    Non-Active
-                                    <input type="checkbox" id="is_next_day" name="is_next_day" value="1">
-                                    <span class="lever"></span>
-                                    Active
-                                </label>
-                            </div>
+                        <div class="input-field col m6 s12">
+                            <input id="end_date" name="end_date"  type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                            <label class="active" for="end_date">Tanggal Akhir</label>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
@@ -171,11 +169,96 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
     <div class="modal-content">
         <div class="row">
-            <div class="col s12" id="show_detail">
+            <div class="col s12 m6">
+                <h4 class="card-title">
+                    Hasil
+                </h4>
+            </div>
+            <div class="col s12 m6">
+                <div class="row">
+                    <div class="col s12 m6">
+                        <span style="display: inline-flex;"><i class="material-icons" style="color: green;    font-weight: 700;">check</i><p>: Tepat Waktu</p></span>
+                    </div>
+                    <div class="col s12 m6">
+                        <span style="display: inline-flex;"><i class="material-icons" style="color: goldenrod;    font-weight: 700;">check</i><p>: Tidak Check Pulang</p></span>
+                    </div>
+                    <div class="col s12 m6">
+                        <span style="display: inline-flex;"><i class="material-icons" style="color: purple;    font-weight: 700;">check</i><p>: Tidak Check Masuk</p></span>
+                    </div>
+                    <div class="col s12 m6">
+                        <span style="display: inline-flex;"><i class="material-icons" style="color: blue;    font-weight: 700;">check</i><p>: Telat Masuk Saja</p></span>
+                    </div>
+                    <div class="col s12 m6">
+                        <span style="display: inline-flex;"><i class="material-icons" style="color: crimson;    font-weight: 700;">check</i><p>: Telat Masuk Tidak Check Pulang</p></span>
+                    </div>
+                    <div class="col s12 m6">
+                        <span style="display: inline-flex;"><i class="material-icons" style="color: red;    font-weight: 700;">close</i><p>: Absent</p></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="row">
+            <div class="col s12 m12" style="overflow: auto">
+                <div class="result" style="width:2500px;">
+                    <table class="bordered" style="font-size:10px;">
+                        <tbody id="detail_kehadiran">
+                            
+                        </tbody>
+                    </table>
+                </div>  
+                
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
 
+<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12 m6">
+                <h4 class="card-title">
+                    Lateness Daily Report
+                </h4>
+            </div>
+            
+        </div>
+        
+        
+        <div class="row">
+            <div class="col s12 m12" style="overflow: auto">
+                <div class="result" style="width:2500px;">
+                    <table class="bordered" style="font-size:10px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align fixed">No.</th>
+                                <th class="center-align fixed2">NIK</th>
+                                <th class="center-align fixed1">Nama</th>
+                                <th class="center-align">Tanggal</th>
+                                <th class="center-align">Nama Shift</th>
+                                <th class="center-align">Shift Awal</th>
+                                <th class="center-align">Shift Masuk</th>
+                                <th class="center-align">Check In</th>
+                                <th class="center-align">Tipe</th>
+                                <th class="center-align">Shift Pulang</th>
+                                <th class="center-align">Check Out</th>
+                                <th class="center-align">Shift Akhir</th>
+                                <th class="center-align">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daily_report">
+                            
+                        </tbody>
+                    </table>
+                </div>  
+                
             </div>
         </div>
     </div>
@@ -193,23 +276,10 @@
 <!-- END: Page Main-->
 <script>
     $(function() {
-        
-        
         loadDataTable();
 
         $('#datatable_serverside').on('click', 'button', function(event) {
-            event.stopPropagation();    
-        });
-
-        $('#modal4').modal({
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) { 
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#show_detail').empty();
-            }
+            event.stopPropagation();
         });
         
         $('#modal1').modal({
@@ -217,8 +287,8 @@
             onOpenStart: function(modal,trigger) {
                 
             },
-            onOpenEnd: function(modal, trigger) { 
-                $('#code').focus();
+            onOpenEnd: function(modal, trigger) {
+                $('#title').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -226,41 +296,41 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#coa_id').val('').trigger('change');
                 M.updateTextFields();
             }
         });
 
-        $('.timepicker').timepicker({
-            container: "body",
-            twelveHour: false
-        });
-    });
-
-    function rowDetail(data) {
-        $.ajax({
-            url: '{{ Request::url() }}/row_detail',
-            type: 'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
+        $('#modal2').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
             },
-            data: {
-                id: data
+            onOpenEnd: function(modal, trigger) {
             },
-            success: function(response) {
-                $('#modal4').modal('open');
-                $('#show_detail').html(response);
-                loadingClose('.modal-content');
-            },
-            error: function() {
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#detail_kehadiran').empty();
+                M.updateTextFields();
             }
         });
-	}
+
+        $('#modal3').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#daily_report').empty();
+                M.updateTextFields();
+            }
+        });
+
+        select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
+        select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
+    });
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -298,14 +368,10 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align' },
                 { name: 'code', className: 'center-align' },
-                { name: 'place', className: 'center-align' },
-                { name: 'department', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'min_time_in', className: 'center-align' },
-                { name: 'time_in', className: 'center-align' },
-                { name: 'time_out', className: 'center-align' },
-                { name: 'max_time_out', className: 'center-align' },
-                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'name', className: '' },
+                { name: 'start_date', className: '' },
+                { name: 'end_date', className: 'center-align'},
+                { name: 'plant_id', className: 'center-align'},
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -416,6 +482,76 @@
         $('#modal1').modal('close');
     }
 
+    function reportPresence(id){
+        $.ajax({
+            url: '{{ Request::url() }}/presence_report',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                if(response.status == 200) {
+                    success();
+                    $('#detail_kehadiran').append(response.message);
+                    $('#modal2').modal('open');
+                    
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function reportDaily(id){
+        $.ajax({
+            url: '{{ Request::url() }}/daily_report',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                if(response.status == 200) {
+                    success();
+                    $('#daily_report').append(response.message);
+                    $('#modal3').modal('open');
+                    
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function show(id){
         $.ajax({
             url: '{{ Request::url() }}/show',
@@ -436,18 +572,9 @@
                 
                 $('#temp').val(id);
                 $('#name').val(response.name);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#department_id').val(response.department_id).formSelect();
-                $('#min_time_in').val(response.min_time_in);
-                $('#time_in').val(response.time_in);
-                $('#time_out').val(response.time_out);
-                $('#max_time_out').val(response.max_time_out);
-
-                if(response.status == '1'){
-                    $('#status').prop( "checked", true);
-                }else{
-                    $('#status').prop( "checked", false);
-                }
+                $("#start_date").val(response.start_date);
+                $("#end_date").val(response.end_date);
+                $("#code").val(response.code);
 
                 $('.modal-content').scrollTop(0);
                 $('#name').focus();
@@ -460,6 +587,50 @@
                     title: 'Ups!',
                     text: 'Check your internet connection.',
                     icon: 'error'
+                });
+            }
+        });
+    }
+
+    function closed(id){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Anda tidak bisa mengembalikan Periode yang telah ditutup!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/close',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        id: id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        loadDataTable();
+                        M.updateTextFields();
+                    },
+                    error: function() {
+                        
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
                 });
             }
         });
@@ -565,8 +736,7 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        var type = $('#filter_type').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

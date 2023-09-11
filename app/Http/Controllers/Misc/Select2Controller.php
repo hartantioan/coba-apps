@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Misc;
 
 use App\Helpers\CustomHelper;
 use App\Models\ApprovalStage;
+use App\Models\AttendancePeriod;
 use App\Models\CostDistribution;
 use App\Models\Department;
 use App\Models\FundRequest;
@@ -1571,6 +1572,23 @@ class Select2Controller extends Controller {
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name .'|'. $d->time_in.'-'.$d->time_out,
                 'data'          => $d
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function period(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = AttendancePeriod::where('name', 'like', "%$search%")->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                
             ];
         }
 

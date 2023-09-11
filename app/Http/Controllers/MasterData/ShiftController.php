@@ -234,6 +234,7 @@ class ShiftController extends Controller
                         'min_time_in'       => $request->min_time_in,
                         'time_in'           => $request->time_in,
                         'time_out'          => $request->time_out,
+                        'is_next_day'       => $request->is_next_day ?? 0,
                         'max_time_out'      => $request->max_time_out,
                         'status'            => $request->status ? $request->status : '2',
                     ]);

@@ -168,7 +168,7 @@ class AgingAPController extends Controller
                     $newData[$index]['balance90'] = $daysDiff <= 90 && $daysDiff > 60 ? $newData[$index]['balance90'] + $balance : $newData[$index]['balance90'];
                     $newData[$index]['balanceOver'] = $daysDiff > 90 ? $newData[$index]['balanceOver'] + $balance : $newData[$index]['balanceOver'];
                     $newData[$index]['total'] = $newData[$index]['total'] + $balance;
-                    $newData[$index]['arrInvoiceBalance0'][] = $daysDiff <= 0 ? $daysDiff : null;
+                    $newData[$index]['arrInvoiceBalance0'][] = $daysDiff <= 0 ? $row->code : null;
                     $newData[$index]['arrInvoiceBalance30'][] = $daysDiff <= 30 && $daysDiff > 0 ? $row->code : null;
                     $newData[$index]['arrInvoiceBalance60'][] = $daysDiff <= 60 && $daysDiff > 30 ? $row->code : null;
                     $newData[$index]['arrInvoiceBalance90'][] = $daysDiff <= 90 && $daysDiff > 60 ? $row->code : null;

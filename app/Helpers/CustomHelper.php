@@ -1979,6 +1979,7 @@ class CustomHelper {
 						]);
 					}
 				}elseif($row->lookable_type == 'marketing_order_down_payments'){
+
 					if($row->total > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -1992,7 +1993,7 @@ class CustomHelper {
 					if($row->tax > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->lookable->lookable->marketingOrderDetail->taxId->coa_sale_id,
+							'coa_id'		=> $row->lookable->taxId->coa_sale_id,
 							'account_id'	=> $mom->account_id,
 							'type'			=> '2',
 							'nominal'		=> -1 * $row->tax * $row->lookable->currency_rate,

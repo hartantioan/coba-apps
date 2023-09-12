@@ -488,7 +488,7 @@
                                             </tr>
                                             <tr>
                                                 <th width="16%" class="center">View</th>
-                                                <th width="16%" class="center">Create/Update</th>
+                                                <th width="16%" class="center">Create/Update/Duplicate</th>
                                                 <th width="16%" class="center">Delete</th>
                                                 <th width="16%" class="center">Void</th>
                                                 <th width="16%" class="center">Journal</th>

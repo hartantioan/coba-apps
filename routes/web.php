@@ -102,6 +102,7 @@ use App\Http\Controllers\Sales\MarketingOrderOutstandingController;
 use App\Http\Controllers\Sales\MarketingOrderPaymentController;
 use App\Http\Controllers\Sales\MarketingOrderPriceController;
 use App\Http\Controllers\Sales\MarketingOrderAgingController;
+use App\Http\Controllers\Sales\MarketingOrderDPReportController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -1538,6 +1539,12 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter',[MarketingOrderAgingController::class, 'filter']);
                         Route::post('show_detail',[MarketingOrderAgingController::class, 'showDetail']);
                         Route::get('export',[MarketingOrderAgingController::class, 'export']);
+                    });
+
+                    Route::prefix('sales_down_payment_report')->middleware('operation.access:sales_down_payment_report,view')->group(function () {
+                        Route::get('/',[MarketingOrderDPReportController::class, 'index']);
+                        Route::post('filter',[MarketingOrderDPReportController::class, 'filter']);
+                        Route::get('export',[MarketingOrderDPReportController::class, 'export']);
                     });
                 });
             });

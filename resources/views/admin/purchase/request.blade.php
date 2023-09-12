@@ -669,7 +669,7 @@
                 loadingClose('.modal-content');
                 if(response.status == 200) {
                     $('#modal5').modal('close');
-                   /*  printService.submit({
+                    /*  printService.submit({
                         'type': 'INVOICE',
                         'url': response.message
                     }) */
@@ -715,7 +715,6 @@
                     icon: 'error'
                 });
             }
-            
         });
     }
 
@@ -1120,6 +1119,152 @@
                     title: 'Ups!',
                     text: 'Check your internet connection.',
                     icon: 'error'
+                });
+            }
+        });
+    }
+
+    function duplicate(id){
+        swal({
+            title: "Apakah anda yakin ingin salin?",
+            text: "Pastikan item yang ingin anda salin sudah sesuai!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/show',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        id: id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        $('#modal1').modal('open');
+                        
+                        $('#note').val(response.note);
+                        $('#post_date').val(response.post_date);
+                        $('#due_date').val(response.due_date);
+                        $('#required_date').val(response.required_date);
+                        $('#due_date').removeAttr('min');
+                        $('#required_date').removeAttr('min');
+                        $('#company_id').val(response.company_id).formSelect();
+
+                        if(response.project_id){
+                            $('#project_id').empty();
+                            $('#project_id').append(`
+                                <option value="` + response.project_id + `">` + response.project_name + `</option>
+                            `);
+                        }
+
+                        if(response.details.length > 0){
+                            $('.row_item').each(function(){
+                                $(this).remove();
+                            });
+
+                            $.each(response.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#last-row-item').before(`
+                                    <tr class="row_item">
+                                        <td>
+                                            <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                        </td>
+                                        <td>
+                                            <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this)">
+                                        </td>
+                                        <td class="center">
+                                            <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                        </td>
+                                        <td>
+                                            <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                        </td>
+                                        <td>
+                                            <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
+                                        </td>
+                                        <td>
+                                            <input name="arr_required_date[]" type="date" value="` + val.date + `" min="` + $('#post_date').val() + `">
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                                @foreach ($place as $rowplace)
+                                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($line as $rowline)
+                                                    <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($machine as $row)
+                                                    <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                @endforeach    
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                                <option value="">--Kosong--</option>
+                                                @foreach ($department as $rowdept)
+                                                    <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                                $('#arr_item' + count).append(`
+                                    <option value="` + val.item_id + `">` + val.item_name + `</option>
+                                `);
+                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                                $('#arr_warehouse' + count).append(`
+                                    <option value="` + val.warehouse_id + `">` + val.warehouse_name + `</option>
+                                `);
+                                $('#arr_place' + count).val(val.place_id);
+                                $('#arr_line' + count).val(val.line_id);
+                                $('#arr_machine' + count).val(val.machine_id);
+                                $('#arr_department' + count).val(val.department_id);
+                            });
+                        }
+                        
+                        $('.modal-content').scrollTop(0);
+                        $('#note').focus();
+                        M.updateTextFields();
+
+                        $('#code_place_id').val(response.code_place_id).formSelect().trigger('change');
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
                 });
             }
         });

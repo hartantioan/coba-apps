@@ -249,6 +249,18 @@ class MarketingOrderDownPayment extends Model
         return $total;
     }
 
+    public function totalMemoByDate($date){
+        $total = 0;
+
+        foreach($this->marketingOrderMemoDetail()->whereHas('marketingOrderMemo',function($query)use($date){
+            $query->whereDate('post_date','<=',$date);
+        })->get() as $row){
+            $total += $row->balance;
+        }
+
+        return $total;
+    }
+
     public function balancePaymentIncoming(){
         $total = $this->grandtotal - $this->totalMemo() - $this->totalPay();
 
@@ -259,6 +271,18 @@ class MarketingOrderDownPayment extends Model
         $total = 0;
 
         foreach($this->incomingPaymentDetail as $row){
+            $total += $row->total;
+        }
+
+        return $total;
+    }
+
+    public function totalPayByDate($date){
+        $total = 0;
+
+        foreach($this->incomingPaymentDetail()->whereHas('incomingPayment',function($query)use($date){
+            $query->whereDate('post_date','<=',$date);
+        })->get() as $row){
             $total += $row->total;
         }
 

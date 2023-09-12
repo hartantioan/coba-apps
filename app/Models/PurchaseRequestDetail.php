@@ -26,6 +26,7 @@ class PurchaseRequestDetail extends Model
         'machine_id',
         'department_id',
         'warehouse_id',
+        'status',
     ];
 
     public function purchaseRequest()

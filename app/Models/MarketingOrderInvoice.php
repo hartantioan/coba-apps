@@ -209,7 +209,21 @@ class MarketingOrderInvoice extends Model
 
         foreach($this->marketingOrderInvoiceDetail as $row){
             foreach($row->marketingOrderMemoDetail as $momd){
-                $total += $this->balance;
+                $total += $momd->balance;
+            }
+        }
+
+        return $total;
+    }
+
+    public function totalMemoByDate($date){
+        $total = 0;
+
+        foreach($this->marketingOrderInvoiceDetail as $row){
+            foreach($row->marketingOrderMemoDetail()->whereHas('marketingOrderMemo',function($query)use($date){
+                $query->whereDate('post_date','<=',$date);
+            })->get() as $momd){
+                $total += $momd->balance;
             }
         }
 
@@ -256,6 +270,18 @@ class MarketingOrderInvoice extends Model
         $total = 0;
 
         foreach($this->incomingPaymentDetail as $row){
+            $total += $row->total;
+        }
+
+        return $total;
+    }
+
+    public function totalPayByDate($date){
+        $total = 0;
+
+        foreach($this->incomingPaymentDetail()->whereHas('incomingPayment',function($query)use($date){
+            $query->whereDate('post_date','<=',$date);
+        })->get() as $row){
             $total += $row->total;
         }
 

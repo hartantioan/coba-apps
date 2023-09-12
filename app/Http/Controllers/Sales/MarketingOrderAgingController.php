@@ -168,7 +168,7 @@ class MarketingOrderAgingController extends Controller
                     $newData[$index]['balance90'] = $daysDiff <= 90 && $daysDiff > 60 ? $newData[$index]['balance90'] + $balance : $newData[$index]['balance90'];
                     $newData[$index]['balanceOver'] = $daysDiff > 90 ? $newData[$index]['balanceOver'] + $balance : $newData[$index]['balanceOver'];
                     $newData[$index]['total'] = $newData[$index]['total'] + $balance;
-                    $newData[$index]['arrInvoiceBalance0'][] = $daysDiff <= 0 ? $daysDiff : null;
+                    $newData[$index]['arrInvoiceBalance0'][] = $daysDiff <= 0 ? $row->code : null;
                     $newData[$index]['arrInvoiceBalance30'][] = $daysDiff <= 30 && $daysDiff > 0 ? $row->code : null;
                     $newData[$index]['arrInvoiceBalance60'][] = $daysDiff <= 60 && $daysDiff > 30 ? $row->code : null;
                     $newData[$index]['arrInvoiceBalance90'][] = $daysDiff <= 90 && $daysDiff > 60 ? $row->code : null;
@@ -215,17 +215,17 @@ class MarketingOrderAgingController extends Controller
 
         foreach($arrInvoice as $row){
             $prefix = substr($row,0,4);
-            if($prefix == 'PODP'){
-                $dp = PurchaseDownPayment::where('code',$row)->first();
+            if($prefix == 'SODP'){
+                $dp = MarketingOrderDownPayment::where('code',$row)->first();
+                info($dp);
                 if($dp){
                     $memo = $dp->totalMemoByDate($date);
-                    $paid = $dp->totalPaidByDate($date);
+                    $paid = $dp->totalPayByDate($date);
                     $balance = $dp->grandtotal - $memo - $paid;
                     $results[] = [
                         'code'          => $dp->code,
-                        'vendor'        => $dp->supplier->name,
+                        'vendor'        => $dp->account->name,
                         'post_date'     => date('d/m/y',strtotime($dp->post_date)),
-                        'rec_date'      => '-',
                         'due_date'      => date('d/m/y',strtotime($dp->due_date)),
                         'due_days'      => $this->dateDiffInDays($dp->due_date,$date),
                         'grandtotal'    => number_format($dp->grandtotal,2,',','.'),
@@ -236,16 +236,15 @@ class MarketingOrderAgingController extends Controller
                     $grandtotal += $balance;
                 }
             }else{
-                $pi = PurchaseInvoice::where('code',$row)->first();
+                $pi = MarketingOrderInvoice::where('code',$row)->first();
                 if($pi){
                     $memo = $pi->totalMemoByDate($date);
-                    $paid = $pi->getTotalPaidDate($date);
+                    $paid = $pi->totalPayByDate($date);
                     $balance = $pi->balance - $memo - $paid;
                     $results[] = [
                         'code'          => $pi->code,
                         'vendor'        => $pi->account->name,
                         'post_date'     => date('d/m/y',strtotime($pi->post_date)),
-                        'rec_date'      => date('d/m/y',strtotime($pi->received_date)),
                         'due_date'      => date('d/m/y',strtotime($pi->due_date)),
                         'due_days'      => $this->dateDiffInDays($pi->due_date,$date),
                         'grandtotal'    => number_format($pi->balance,2,',','.'),
@@ -268,7 +267,7 @@ class MarketingOrderAgingController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportAgingAP($request->date), 'aging_ap_'.uniqid().'.xlsx');
+		return Excel::download(new ExportAgingAR($request->date), 'aging_ar_'.uniqid().'.xlsx');
     }
 
     function findDuplicate($value,$array){

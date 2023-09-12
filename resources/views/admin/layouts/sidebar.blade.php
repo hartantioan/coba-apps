@@ -19,6 +19,7 @@
                     <i class="material-icons">settings_input_svideo</i><span class="menu-title" data-i18n="Dashboard">Dashboard</span>
                 </a>
             </li>
+            
             @php $menu = App\Models\Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(); @endphp
 
             @foreach($menu as $m)

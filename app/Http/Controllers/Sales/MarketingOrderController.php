@@ -67,6 +67,7 @@ class MarketingOrderController extends Controller
             'sales_type',
             'post_date',
             'valid_date',
+            'project_id',
             'document',
             'document_no',
             'delivery_type',
@@ -265,6 +266,7 @@ class MarketingOrderController extends Controller
                     $val->typeSales(),
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->valid_date)),
+                    $val->project()->exists() ? $val->project->name : '-',
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->document_no,
                     $val->deliveryType(),
@@ -513,6 +515,7 @@ class MarketingOrderController extends Controller
                         $query->valid_date = $request->valid_date;
                         $query->document_no = $request->document_no;
                         $query->document = $document;
+                        $query->project_id = $request->project_id;
                         $query->type_delivery = $request->type_delivery;
                         $query->sender_id = $request->sender_id;
                         $query->delivery_date = $request->delivery_date;
@@ -529,7 +532,7 @@ class MarketingOrderController extends Controller
                         $query->sales_id = $request->sales_id;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->percent_dp = $request->percent_dp;
+                        $query->percent_dp = str_replace(',','.',str_replace('.','',$request->percent_dp));
                         $query->note = $request->note;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
                         $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
@@ -568,6 +571,7 @@ class MarketingOrderController extends Controller
                         'type_sales'	            => $request->type_sales,
                         'post_date'                 => $request->post_date,
                         'valid_date'                => $request->valid_date,
+                        'project_id'                => $request->project_id,
                         'document_no'               => $request->document_no,
                         'document'                  => $request->file('document_so') ? $request->file('document_so')->store('public/marketing_orders') : NULL,
                         'type_delivery'             => $request->type_delivery,
@@ -586,7 +590,7 @@ class MarketingOrderController extends Controller
                         'sales_id'                  => $request->sales_id,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'percent_dp'                => $request->percent_dp,
+                        'percent_dp'                => str_replace(',','.',str_replace('.','',$request->percent_dp)),
                         'note'                      => $request->note,
                         'subtotal'                  => str_replace(',','.',str_replace('.','',$request->subtotal)),
                         'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
@@ -680,6 +684,8 @@ class MarketingOrderController extends Controller
         $po['rounding'] = number_format($po->rounding,2,',','.');
         $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
         $po['currency_rate'] = number_format($po->currency_rate,2,',','.');
+        $po['project_name'] = $po->project()->exists() ? $po->project->code.' - '.$po->project->name : '';
+        $po['percent_dp'] = number_format($po->percent_dp,2,',','.');
 
         $arr = [];
         

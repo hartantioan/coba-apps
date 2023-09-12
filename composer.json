@@ -20,6 +20,7 @@
         "psr/simple-cache": "1.0",
         "spatie/laravel-activitylog": "^4.7",
         "spatie/laravel-permission": "^5.8",
+        "staudenmeir/laravel-adjacency-list": "^1.0",
         "symfony/process": "^6.3"
     },
     "require-dev": {

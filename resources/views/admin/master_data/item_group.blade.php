@@ -247,8 +247,8 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align' },
                 { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'parent', className: 'center-align' },
+                { name: 'name', className: '' },
+                { name: 'parent', className: '' },
                 { name: 'coa', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },

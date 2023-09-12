@@ -31,6 +31,12 @@ class CoaController extends Controller
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+
+        /* $coas = Coa::tree()->get()->toTree();
+
+        return view('admin.layouts.menu', [
+            'coas' => $coas
+        ]); */
     }
 
     public function datatable(Request $request){

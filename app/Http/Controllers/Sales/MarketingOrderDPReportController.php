@@ -1,20 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Purchase;
+namespace App\Http\Controllers\Sales;
 
-use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
-use App\Models\Coa;
 use App\Models\Company;
-use App\Models\JournalDetail;
-use App\Models\PurchaseDownPayment;
+use App\Models\MarketingOrderDownPayment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Exports\ExportDownPayment;
+use App\Exports\ExportDownPaymentAR;
 use Maatwebsite\Excel\Facades\Excel;
 
-class DownPaymentController extends Controller
+class MarketingOrderDPReportController extends Controller
 {
     protected $dataplaces, $datawarehouses, $dataplacecode;
 
@@ -31,7 +28,7 @@ class DownPaymentController extends Controller
         
         $data = [
             'title'     => 'Laporan Sisa Down Payment',
-            'content'   => 'admin.purchase.report_down_payment',
+            'content'   => 'admin.sales.report_down_payment',
             'company'   => Company::where('status','1')->get(),
         ];
 
@@ -45,38 +42,40 @@ class DownPaymentController extends Controller
         $date = $request->date;
 
         $data = DB::select("
-                SELECT 
-                *,
-                pdp.type as typepdp,
-                IFNULL((SELECT 
-                    SUM(nominal) 
-                    FROM purchase_invoice_dps pid 
-                    JOIN purchase_invoices pi
-                        ON pid.purchase_invoice_id = pi.id
-                    WHERE 
-                        pid.purchase_down_payment_id = pdp.id
-                        AND pi.post_date <= :date1
-                        AND pi.status IN ('2','3')
-                ),0) AS total_used,
-                IFNULL((
-                    SELECT
-                        SUM(pmd.grandtotal)
-                        FROM purchase_memo_details pmd
-                        JOIN purchase_memos pm
-                            ON pm.id = pmd.purchase_memo_id
-                        WHERE pmd.lookable_type = 'purchase_down_payments'
-                        AND pmd.lookable_id = pdp.id
-                        AND pm.post_date <= :date2
-                ),0) AS total_memo,
-                u.name AS account_name,
-                u.employee_no AS account_code
-                FROM purchase_down_payments pdp
-                LEFT JOIN users u
-                    ON u.id = pdp.account_id
+            SELECT 
+            *,
+            modp.type as typepdp,
+            IFNULL((SELECT 
+                SUM(moid.total)
+                FROM marketing_order_invoice_details moid 
+                JOIN marketing_order_invoices moi
+                    ON moi.id = moid.marketing_order_invoice_id
                 WHERE 
-                    pdp.post_date <= :date3
-                    AND pdp.grandtotal > 0
-                    AND pdp.status IN ('2','3')
+                    moid.lookable_id = modp.id 
+                    AND moid.lookable_type = 'marketing_order_down_payments'
+                    AND moi.post_date <= :date1
+                    AND moi.status IN ('2','3')
+            ),0) AS total_used,
+            IFNULL((
+                SELECT
+                    SUM(momd.total)
+                    FROM marketing_order_memo_details momd
+                    JOIN marketing_order_memos mom
+                        ON mom.id = momd.marketing_order_memo_id
+                    WHERE momd.lookable_type = 'marketing_order_down_payments'
+                    AND momd.lookable_id = modp.id
+                    AND mom.post_date <= :date2
+                    AND mom.status IN ('2','3')
+            ),0) AS total_memo,
+            u.name AS account_name,
+            u.employee_no AS account_code
+            FROM marketing_order_down_payments modp
+            LEFT JOIN users u
+                ON u.id = modp.account_id
+            WHERE 
+                modp.post_date <= :date3
+                AND modp.grandtotal > 0
+                AND modp.status IN ('2','3')
             ",array(
                 'date1' => $date,
                 'date2' => $date,
@@ -88,12 +87,12 @@ class DownPaymentController extends Controller
         $totalbalance = 0;
 
         foreach($data as $row){
-            $balance = $row->grandtotal - $row->total_used - $row->total_memo;
+            $balance = $row->total - $row->total_used - $row->total_memo;
             if($balance > 0){
                 $results[] = [
                     'code'          => $row->code,
-                    'supplier_name' => $row->name,
-                    'type'          => PurchaseDownPayment::typeStatic($row->typepdp),
+                    'customer_name' => $row->account_name,
+                    'type'          => MarketingOrderDownPayment::typeStatic($row->typepdp),
                     'post_date'     => date('d/m/y',strtotime($row->post_date)),
                     'due_date'      => date('d/m/y',strtotime($row->due_date)),
                     'note'          => $row->note,
@@ -123,6 +122,6 @@ class DownPaymentController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportDownPayment($request->date), 'down_payment_'.uniqid().'.xlsx');
+		return Excel::download(new ExportDownPaymentAR($request->date), 'down_payment_ar_'.uniqid().'.xlsx');
     }
 }

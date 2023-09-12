@@ -24,6 +24,7 @@ class MarketingOrder extends Model
         'post_date',
         'valid_date',
         'document',
+        'project_id',
         'document_no',
         'type_delivery',
         'sender_id',
@@ -68,6 +69,10 @@ class MarketingOrder extends Model
 
     public function account(){
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
+    }
+
+    public function project(){
+        return $this->belongsTo('App\Models\Project','project_id','id')->withTrashed();
     }
 
     public function sender(){

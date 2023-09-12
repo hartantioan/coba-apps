@@ -125,7 +125,6 @@
                             <th class="center-align">No Invoice</th>
                             <th class="center-align">Supplier/Vendor</th>
                             <th class="center-align">TGL Post</th>
-                            <th class="center-align">TGL Terima</th>
                             <th class="center-align">TGL Jatuh Tempo</th>
                             <th class="center-align">Jatuh Tempo (Hari)</th>
                             <th class="center-align">Grandtotal</th>
@@ -288,7 +287,6 @@
                                         <td>` + val.code + `</td>
                                         <td>` + val.vendor + `</td>
                                         <td class="center-align">` + val.post_date + `</td>
-                                        <td class="center-align">` + val.rec_date + `</td>
                                         <td class="center-align">` + val.due_date + `</td>
                                         <td class="center-align">` + val.due_days + `</td>
                                         <td class="right-align">` + val.grandtotal + `</td>
@@ -300,7 +298,7 @@
                             });
                             $('#show_detail').append(`
                                 <tr id="text-grandtotal">
-                                    <td class="right-align" colspan="10">Total</td>
+                                    <td class="right-align" colspan="9">Total</td>
                                     <td class="right-align">` + response.grandtotal + `</td>
                                 </tr>
                             `);

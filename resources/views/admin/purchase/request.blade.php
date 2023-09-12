@@ -410,6 +410,34 @@
     </div>
 </div>
 
+<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <p class="mt-2 mb-2">
+                    <h4>Detail Produk</h4>
+                    <table class="bordered" style="width:2500px;">
+                        <thead>
+                            <tr>
+                                <th class="center">Check</th>
+                                <th class="center">Item</th>
+                                <th class="center">Satuan</th>
+                                <th class="center">Stok Skrg</th>
+                                <th class="center">Stok PO</th>
+                                <th class="center">Stok PR</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-item"></tbody>
+                    </table>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>

@@ -59,4 +59,19 @@ class IncomingPaymentDetail extends Model
     {
         return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id');
     }
+
+    public function purchaseInvoiceDetail()
+    {
+        return $this->belongsTo('App\Models\MarketingOrderInvoice','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function marketingOrderInvoice(){
+        return $this->belongsTo('App\Models\MarketingOrderInvoice', 'lookable_id', 'id')->where('lookable_type',$this->table)->withTrashed();
+    }
+
+    public function marketingOrderDownPayment(){
+        return $this->belongsTo('App\Models\MarketingOrderDownPayment', 'lookable_id', 'id')->where('lookable_type',$this->table)->withTrashed();
+    }
 }

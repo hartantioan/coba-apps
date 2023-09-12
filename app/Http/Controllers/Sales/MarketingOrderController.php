@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Department;
+use App\Models\IncomingPayment;
 use App\Models\Line;
 use App\Models\MarketingOrder;
+use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDetail;
+use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderInvoice;
 use App\Models\Place;
 use App\Models\Machine;
 use Illuminate\Http\Request;
@@ -1219,4 +1223,424 @@ class MarketingOrderController extends Controller
         }
         return response()->json($response);
     }
+
+
+    public function viewStructureTree(Request $request){
+        $query = MarketingOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        $data_id_mo=[];
+        $data_id_mo_delivery = [];
+        $data_id_mo_dp=[];
+        $data_id_mo_return=[];
+        $data_id_mo_invoice=[];
+        $data_id_mo_memo=[];
+        $data_incoming_payment=[];
+
+        $data_go_chart=[];
+        $data_link=[];
+
+
+        if($query){
+            $data_marketing_order = [
+                "name"=>$query->code,
+                "key" => $query->code,
+                "color"=>"lightblue",
+                'properties'=> [
+                    ['name'=> "Tanggal :".$query->post_date],
+                    
+                 ],
+                'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->code),           
+            ];
+
+            $data_go_chart[]= $data_marketing_order;
+            $data_id_mo[]=$query->id;
+
+            $added = true;
+            if($query->marketingOrderDelivery()->exists()){
+                foreach($query->marketingOrderDelivery as $row_mod_del){
+                    $modelvery=[
+                        "name"=>$row_mod_del->code,
+                        "key" => $row_mod_del->code,
+                        'properties'=> [
+                            ['name'=> "Tanggal :".$row_mod_del->post_date],
+                            ['name'=> "Nominal : Rp.:".number_format($row_mod_del->grandtotal,2,',','.')]
+                         ],
+                        'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_mod_del->code),  
+                    ];
+
+                    $data_go_chart[]=$modelvery;
+                    $data_link[]=[
+                        'from'=>$query->code,
+                        'to'=>$row_mod_del->code,
+                        'string_link'=>$query->code.$row_mod_del->code
+                    ]; 
+                    $data_id_mo_delivery[]= $row_mod_del->id;
+
+                    if($row_mod_del->marketingOrderDeliveryProcess()->exists()){
+                        $mo_deliv_pro[]=[
+                            "name"=>$row_mod_del->marketingOrderDeliveryProcess->code,
+                            "key" => $row_mod_del->marketingOrderDeliveryProcess->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$row_mod_del->marketingOrderDeliveryProcess->post_date],
+                                ['name'=> "Nominal : Rp.:".number_format($row_mod_del->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
+                            ],
+                            'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_mod_del->code), 
+                        ];
+                        $data_go_chart[]=$mo_deliv_pro;
+                        $data_link[]=[
+                            'from'=>$row_mod_del->code,
+                            'to'=>$row_mod_del->marketingOrderDeliveryProcess->code,
+                            'string_link'=>$row_mod_del->code.$row_mod_del->marketingOrderDeliveryProcess->code
+                        ]; 
+                        $data_id_mo_delivery[]= $row_mod_del->marketingOrderDeliveryProcess->id;
+
+                    }
+                } 
+            }
+             
+
+
+            while($added){
+                $added=false;
+                // mencaari incoming payment
+                foreach($data_incoming_payment as $row_id_ip){
+                    $query_ip = IncomingPayment::find($row_id_ip);
+                    foreach($query_ip->incomingPaymentDetail as $row_ip_detail){
+                        if($row_ip_detail->marketingOrderDownPayment()->exists()){
+                            $mo_downpayment=[
+                                "name"=>$row_ip_detail->marketingOrderDownPayment->code,
+                                "key" => $row_ip_detail->marketingOrderDownPayment->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_ip_detail->marketingOrderDownPayment->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_ip_detail->marketingOrderDownPayment->grandtotal,2,',','.')]
+                                ],
+                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_ip_detail->marketingOrderDownPayment->code),
+                            ];
+                            $data_go_chart[]=$mo_downpayment;
+                            $data_link[]=[
+                                'from'=>$row_ip_detail->marketingOrderDownPayment->code,
+                                'to'=>$query_ip->code,
+                                'string_link'=>$row_ip_detail->marketingOrderDownPayment->code.$query_ip->code,
+                            ];
+                            $data_id_mo_dp[] = $row_ip_detail->marketingOrderDownPayment->id;
+                            
+                        }
+                        if($row_ip_detail->marketingOrderInvoice()->exists()){
+                            $mo_invoice=[
+                                "name"=>$row_ip_detail->marketingOrderInvoice->code,
+                                "key" => $row_ip_detail->marketingOrderInvoice->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_ip_detail->marketingOrderInvoice->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_ip_detail->marketingOrderInvoice->grandtotal,2,',','.')]
+                                ],
+                                'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_ip_detail->marketingOrderInvoice->code),
+                            ];
+                            $data_go_chart[]=$mo_invoice;
+                            $data_link[]=[
+                                'from'=>$row_ip_detail->marketingOrderInvoice->code,
+                                'to'=>$query_ip->code,
+                                'string_link'=>$row_ip_detail->marketingOrderInvoice->code.$query_ip->code,
+                            ];
+                            $data_id_mo_invoice[] = $row_ip_detail->marketingOrderInvoice->id;
+                            
+                        }
+                    }
+                }
+                // menacari down_payment
+                foreach($data_id_mo_dp as $row_id_dp){
+                    $query_dp= MarketingOrderDownPayment::find($row_id_dp);
+                    
+                    if($query_dp->incomingPaymentDetail()->exists()){
+                        foreach($query_dp->incomingPaymentDetail as $row_incoming_payment){
+                            $mo_incoming_payment=[
+                                "name"=>$row_incoming_payment->incomingPayment->code,
+                                "key" => $row_incoming_payment->incomingPayment->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_incoming_payment->incomingPayment->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_incoming_payment->incomingPayment->grandtotal,2,',','.')]
+                                ],
+                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_incoming_payment->incomingPayment->code),
+                            ];
+                            $data_go_chart[]=$mo_incoming_payment;
+                            $data_link[]=[
+                                'from'=>$query_dp->code,
+                                'to'=>$row_incoming_payment->incomingPayment->code,
+                                'string_link'=>$query_dp->code.$row_incoming_payment->incomingPayment->code,
+                            ];
+                            if(!in_array($row_incoming_payment->incomingPayment->id, $data_incoming_payment)){
+                                $data_incoming_payment[] = $row_incoming_payment->incomingPayment->id;
+                                $added = true;
+                            }
+                        }
+                    }
+                    
+                    if($query_dp->marketingOrderInvoiceDetail()->exists()){
+                        foreach($query_dp->marketingOrderInvoiceDetail as $row_invoice_detail){
+                            $data_invoice = [
+                                "name"=>$row_invoice_detail->marketingOrderInvoice->code,
+                                "key" => $row_invoice_detail->marketingOrderInvoice->code,
+                                
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderInvoice->post_date],
+                                ],
+                                'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderInvoice->code),
+                            ];
+                            
+                            $data_go_chart[]=$data_invoice;
+                            $data_link[]=[
+                                'from'=>$query_dp->code,
+                                'to'=>$row_invoice_detail->marketingOrderInvoice->code,
+                                'string_link'=>$query_dp->code.$row_invoice_detail->marketingOrderInvoice->code,
+                            ];
+                            
+                            if(!in_array($row_invoice_detail->marketingOrderInvoice->id, $data_id_mo_invoice)){
+                                $data_id_mo_invoice[] = $row_invoice_detail->marketingOrderInvoice->id;
+                                $added = true;
+                            }
+                        }
+                    }
+
+
+                }
+                // menacari anakan invoice
+                foreach($data_id_mo_invoice as $row_id_invoice){
+                    $query_invoice = MarketingOrderInvoice::find($row_id_invoice);
+                    if($query_invoice->incomingPaymentDetail()->exists()){
+                        foreach($query_invoice->incomingPaymentDetail as $row_ip_detail){
+                            $mo_incoming_payment=[
+                                "name"=>$row_ip_detail->incomingPayment->code,
+                                "key" => $row_ip_detail->incomingPayment->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_ip_detail->incomingPayment->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_ip_detail->incomingPayment->grandtotal,2,',','.')]
+                                ],
+                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_ip_detail->incomingPayment->code),
+                            ];
+                            $data_go_chart[]=$mo_incoming_payment;
+                            $data_link[]=[
+                                'from'=>$query_invoice->code,
+                                'to'=>$row_ip_detail->incomingPayment->code,
+                                'string_link'=>$query_invoice->code.$row_ip_detail->incomingPayment->code,
+                            ];
+                            if(!in_array($row_ip_detail->incomingPayment->id, $data_incoming_payment)){
+                                $data_incoming_payment[] = $row_ip_detail->incomingPayment->id;
+                                $added = true;
+                            }
+                        }
+                    }
+                    foreach($query_invoice->marketingOrderInvoiceDetail as $row_invoice_detail){
+                        if($row_invoice_detail->marketingOrderDownPayment()->exists){
+                            $mo_downpayment=[
+                                "name"=>$row_invoice_detail->marketingOrderDownPayment->code,
+                                "key" => $row_invoice_detail->marketingOrderDownPayment->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderDownPayment->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderDownPayment->grandtotal,2,',','.')]
+                                ],
+                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderDownPayment->code),
+                            ];
+                            $data_go_chart[]=$mo_downpayment;
+                            $data_link[]=[
+                                'from'=>$query_invoice->code,
+                                'to'=>$row_invoice_detail->marketingOrderDownPayment->code,
+                                'string_link'=>$query_invoice->code.$row_invoice_detail->marketingOrderDownPayment->code,
+                            ];
+                            
+                            if(!in_array($row_invoice_detail->marketingOrderDownPayment->id, $data_id_mo_dp)){
+                                $data_id_mo_dp[] = $row_invoice_detail->marketingOrderDownPayment->id;
+                                $added = true;
+                            }
+                        }
+                        if($row_invoice_detail->marketingOrderMemoDetail()->exists()){
+                            foreach($row_invoice_detail->marketingOrderMemoDetail as $row_memo){
+                                $mo_memo=[
+                                    "name"=>$row_memo->marketingOrderMemo->code,
+                                    "key" => $row_memo->marketingOrderMemo->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_memo->marketingOrderMemo->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($row_memo->marketingOrderMemo->grandtotal,2,',','.')]
+                                    ],
+                                    'url'=>request()->root()."/admin/sales/marketing_order_memo?code=".CustomHelper::encrypt($row_memo->marketingOrderMemo->code),
+                                ];
+                                $data_go_chart[]=$mo_memo;
+                                $data_link[]=[
+                                    'from'=>$query_invoice->code,
+                                    'to'=>$row_memo->marketingOrderMemo->code,
+                                    'string_link'=>$query_invoice->code.$row_memo->marketingOrderMemo->code,
+                                ];
+                                $data_id_mo_memo[] = $row_memo->marketingOrderMemo->id;
+                                // if(!in_array($row_memo->marketingOrderMemo->id, $data_id_mo_memo)){
+                                //     $data_id_mo_memo[] = $row_memo->marketingOrderMemo->id;
+                                //     $added = true;
+                                // }
+                            }
+                        }
+                        if($row_invoice_detail->marketingOrderDeliveryDetail()->exists()){
+                            $mo_delivery=[
+                                "name"=>$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
+                                "key" => $row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->grandtotal,2,',','.')]
+                                ],
+                                'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code),
+                            ];
+                            $data_go_chart[]=$mo_delivery;
+                            $data_link[]=[
+                                'from'=>$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
+                                'to'=>$query_invoice->code,
+                                'string_link'=>$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code.$query_invoice->code,
+                            ];
+                            $data_id_mo_delivery[]=$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->id;
+                        }
+                    }
+
+                }
+                // mencari delivery anakan
+                foreach($data_id_mo_delivery as $row_id_mo_delivery){
+                    $query_mo_delivery = MarketingOrderDelivery::find($row_id_mo_delivery);
+                    if($query_mo_delivery->marketingOrderDeliveryProcess()->exists()){
+                        $data_mo_delivery_process = [
+                            "name"=>$query_mo_delivery->marketingOrderDeliveryProcess->code,
+                            "key" => $query_mo_delivery->marketingOrderDeliveryProcess->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_mo_delivery->marketingOrderDeliveryProcess->post_date],
+                            ],
+                            'url'=>request()->root()."/admin/sales/delivery_order_process/?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrderDeliveryProcess->code),
+                        ];
+                        
+                        $data_go_chart[]=$data_mo_delivery_process;
+                        $data_link[]=[
+                            'from'=>$query_mo_delivery->code,
+                            'to'=>$query_mo_delivery->marketingOrderDeliveryProcess->code,
+                            'string_link'=>$query_mo_delivery->code.$query_mo_delivery->marketingOrderDeliveryProcess->code,
+                        ];
+                        
+                    }//mencari process dari delivery
+                    foreach($query_mo_delivery->marketingOrderDeliveryDetail as $row_delivery_detail){
+                        if($row_delivery_detail->marketingOrderInvoiceDetail()->exists()){
+                            foreach($row_delivery_detail->marketingOrderInvoiceDetail as $row_invoice_detail){
+                                $data_invoice = [
+                                    "name"=>$row_invoice_detail->marketingOrderInvoice->code,
+                                    "key" => $row_invoice_detail->marketingOrderInvoice->code,
+                                   
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderInvoice->post_date],
+                                    ],
+                                    'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderInvoice->code),
+                                ];
+                                
+                                $data_go_chart[]=$data_invoice;
+                                $data_link[]=[
+                                    'from'=>$query_mo_delivery->code,
+                                    'to'=>$row_invoice_detail->marketingOrderInvoice->code,
+                                    'string_link'=>$query_mo_delivery->code.$row_invoice_detail->marketingOrderInvoice->code,
+                                ];
+                                
+                                if(!in_array($row_invoice_detail->marketingOrderInvoice->id, $data_id_mo_invoice)){
+                                    $data_id_mo_invoice[] = $row_invoice_detail->marketingOrderInvoice->id;
+                                    $added = true;
+                                }
+                            }
+                        }//mencari marketing order invoice
+
+                        if($row_delivery_detail->marketingOrderReturnDetail()->exists()){
+                            foreach($row_delivery_detail->marketingOrderReturnDetail as $row_return_detail){
+                                $data_return = [
+                                    "name"=>$row_return_detail->marketingOrderReturn->code,
+                                    "key" => $row_return_detail->marketingOrderReturn->code,
+                                    
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_return_detail->marketingOrderReturn->post_date],
+                                    ],
+                                    'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_return_detail->marketingOrderReturn->code),
+                                ];
+                                
+                                $data_go_chart[]=$data_return;
+                                $data_link[]=[
+                                    'from'=>$query_mo_delivery->code,
+                                    'to'=>$row_return_detail->marketingOrderReturn->code,
+                                    'string_link'=>$query_mo_delivery->code.$row_return_detail->marketingOrderReturn->code,
+                                ];
+                                
+                                $data_id_mo_return[]=$row_return_detail->marketingOrderReturn->id;
+                            }
+                        }//mencari marketing order return
+                    }
+                    if($query_mo_delivery->marketingOrder()->exists()){
+                        $data_marketing_order = [
+                            "name"=> $query_mo_delivery->marketingOrder->code,
+                            "key" => $query_mo_delivery->marketingOrder->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_mo_delivery->marketingOrder->post_date],
+                                
+                             ],
+                            'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrder->code),           
+                        ];
+            
+                        $data_go_chart[]= $data_marketing_order;
+                        $data_id_mo[]=$query_mo_delivery->marketingOrder->id;
+                    }
+                }
+
+                foreach($data_id_mo as $row_id_mo){
+                    $query_mo= MarketingOrder::find($row_id_mo);
+
+                    foreach($query_mo->marketingOrderDelivery as $row_mod_del){
+                        $modelvery=[
+                            "name"=>$row_mod_del->code,
+                            "key" => $row_mod_del->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$row_mod_del->post_date],
+                                ['name'=> "Nominal : Rp.:".number_format($row_mod_del->grandtotal,2,',','.')]
+                             ],
+                            'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_mod_del->code),  
+                        ];
+    
+                        $data_go_chart[]=$modelvery;
+                        $data_link[]=[
+                            'from'=>$query_mo->code,
+                            'to'=>$row_mod_del->code,
+                            'string_link'=>$query_mo->code.$row_mod_del->code
+                        ]; 
+
+                        if(!in_array($row_mod_del->id, $data_id_mo_delivery)){
+                            $data_id_mo_delivery[] = $row_mod_del->id; 
+                            $added = true;
+                        } 
+                    }
+                }
+            }
+            function unique_key($array,$keyname){
+
+                $new_array = array();
+                foreach($array as $key=>$value){
+                
+                    if(!isset($new_array[$value[$keyname]])){
+                    $new_array[$value[$keyname]] = $value;
+                    }
+                
+                }
+                $new_array = array_values($new_array);
+                return $new_array;
+            }
+
+           
+            $data_go_chart = unique_key($data_go_chart,'name');
+            $data_link=unique_key($data_link,'string_link');
+
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link
+            ];
+        }else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+        return response()->json($response);
+    }
+
 }

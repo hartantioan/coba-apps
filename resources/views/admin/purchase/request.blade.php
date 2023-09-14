@@ -414,22 +414,30 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <p class="mt-2 mb-2">
-                    <h4>Detail Produk</h4>
-                    <table class="bordered" style="width:2500px;">
-                        <thead>
-                            <tr>
-                                <th class="center">Check</th>
-                                <th class="center">Item</th>
-                                <th class="center">Satuan</th>
-                                <th class="center">Stok Skrg</th>
-                                <th class="center">Stok PO</th>
-                                <th class="center">Stok PR</th>
-                            </tr>
-                        </thead>
-                        <tbody id="body-item"></tbody>
-                    </table>
-                </p>
+                <form class="row" id="form_done" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_done" style="display:none;"></div>
+                    </div>
+                    <p class="mt-2 mb-2">
+                        <h4>Detail Penutupan Permintaan Pembelian per Item</h4>
+                        <input type="hidden" id="tempDone" name="tempDone">
+                        <table class="bordered" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th class="center">Tutup</th>
+                                    <th class="center">Item</th>
+                                    <th class="center">Satuan</th>
+                                    <th class="center">Qty Req.</th>
+                                    <th class="center">Qty PO</th>
+                                    <th class="center">Qty Gantungan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-done"></tbody>
+                        </table>
+                    </p>
+                    <button class="btn waves-effect waves-light right submit" onclick="saveDone();">Simpan <i class="material-icons right">send</i></button>
+                </form>
+                <p>Info : Item yang tertutup akan dianggap sudah menjadi PO secara keseluruhan, sehingga tidak akan muncul di form Order Pembelian.</p>
             </div>
         </div>
     </div>
@@ -497,6 +505,20 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
+            }
+        });
+
+        $('#modal6').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert_done').hide();
+                $('#validation_alert_done').html('');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-done').empty();
+                $('#tempDone').val('');
             }
         });
 
@@ -861,6 +883,73 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
+    function done(id){
+        $.ajax({
+            url: '{{ Request::url() }}/get_items',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                $('#modal6').modal('open');
+                $('#tempDone').val(id);
+                
+                if(response.details.length > 0){
+                    $('#body-done').html('');
+
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        $('#body-done').append(`
+                            <tr class="row_done">
+                                <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.id + `">
+                                <td class="center">
+                                    <label>
+                                        <input type="checkbox" id="arr_value` + count + `" name="arr_value[]" value="1" ` + (val.closed ? 'checked' : '') + `>
+                                        <span>Tutup</span>
+                                    </label>
+                                </td>
+                                <td>
+                                    ` + val.item_name + `
+                                </td>
+                                <td class="center">
+                                    <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty_po + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty_balance + `
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+                $('.modal-content').scrollTop(0);
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function printData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
@@ -983,6 +1072,95 @@
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function saveDone(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                
+                var formData = new FormData($('#form_done')[0]);
+
+                formData.delete("arr_value[]");
+
+                $('input[name^="arr_id[]"]').each(function(index){
+                    formData.append('arr_value[]',($('input[name^="arr_value[]"]').eq(index).is(':checked') ? $('input[name^="arr_value[]"]').eq(index).val() : ''));
+                });
+
+                $.ajax({
+                    url: '{{ Request::url() }}/create_done',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert_done').hide();
+                        $('#validation_alert_done').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            loadDataTable();
+                            $('#modal6').modal('close');
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert_done').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert_done').append(`
                                         <div class="card-alert card red">
                                             <div class="card-content white-text">
                                                 <p>` + val + `</p>

@@ -15,7 +15,6 @@
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
-            
             <!-- Search for small screen-->
             <div class="container"> 
                 <div class="row">
@@ -30,19 +29,6 @@
                             </li>
                         </ol>
                     </div>
-                    <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
-                            <i class="material-icons hide-on-med-and-up">refresh</i>
-                            <span class="hide-on-small-onl">Refresh</span>
-                            <i class="material-icons right">refresh</i>
-                        </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
-                            <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
-                            <i class="material-icons right">local_printshop</i>
-                        </a>
-                      
-                    </div>
                 </div>
             </div>
         </div>
@@ -52,7 +38,6 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            
                             <ul class="collapsible collapsible-accordion">
                                 <li>
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
@@ -603,6 +588,42 @@
     </div>
 </div>
 
+<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <form class="row" id="form_done" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert_done" style="display:none;"></div>
+                    </div>
+                    <p class="mt-2 mb-2">
+                        <h4>Detail Penutupan Permintaan Pembelian per Item</h4>
+                        <input type="hidden" id="tempDone" name="tempDone">
+                        <table class="bordered" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th class="center">Tutup</th>
+                                    <th class="center">Item</th>
+                                    <th class="center">Satuan</th>
+                                    <th class="center">Qty Order</th>
+                                    <th class="center">Qty Diterima</th>
+                                    <th class="center">Qty Gantungan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-done"></tbody>
+                        </table>
+                    </p>
+                    <button class="btn waves-effect waves-light right submit" onclick="saveDone();">Simpan <i class="material-icons right">send</i></button>
+                </form>
+                <p>Info : Item yang tertutup akan dianggap sudah diterima / masuk gudang secara keseluruhan, sehingga tidak akan muncul di form Penerimaan PO / Goods Receipt.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -724,6 +745,20 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 
+            }
+        });
+
+        $('#modal6').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert_done').hide();
+                $('#validation_alert_done').html('');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-done').empty();
+                $('#tempDone').val('');
             }
         });
         
@@ -2495,5 +2530,161 @@
         })/* .onbeforechange(function(targetElement){
             alert(this._currentStep);
         }) */.start();
+    }
+
+    function done(id){
+        $.ajax({
+            url: '{{ Request::url() }}/get_items',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                $('#modal6').modal('open');
+                $('#tempDone').val(id);
+                
+                if(response.details.length > 0){
+                    $('#body-done').html('');
+
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        $('#body-done').append(`
+                            <tr class="row_done">
+                                <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.id + `">
+                                <td class="center">
+                                    <label>
+                                        <input type="checkbox" id="arr_value` + count + `" name="arr_value[]" value="1" ` + (val.closed ? 'checked' : '') + `>
+                                        <span>Tutup</span>
+                                    </label>
+                                </td>
+                                <td>
+                                    ` + val.item_name + `
+                                </td>
+                                <td class="center">
+                                    <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty_gr + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty_balance + `
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+                $('.modal-content').scrollTop(0);
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function saveDone(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                
+                var formData = new FormData($('#form_done')[0]);
+
+                formData.delete("arr_value[]");
+
+                $('input[name^="arr_id[]"]').each(function(index){
+                    formData.append('arr_value[]',($('input[name^="arr_value[]"]').eq(index).is(':checked') ? $('input[name^="arr_value[]"]').eq(index).val() : ''));
+                });
+
+                $.ajax({
+                    url: '{{ Request::url() }}/create_done',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert_done').hide();
+                        $('#validation_alert_done').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            loadDataTable();
+                            $('#modal6').modal('close');
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert_done').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert_done').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
     }
 </script>

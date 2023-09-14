@@ -73,6 +73,7 @@
                                                         <th>#</th>
                                                         <th>Dari</th>
                                                         <th>Judul</th>
+                                                        <th>Catatan</th>
                                                         <th>Waktu</th>
                                                         <th>Aksi</th>
                                                     </tr>
@@ -133,7 +134,8 @@
             columns: [
                         { name: 'id', searchable: false, className: 'center-align details-control' },
                         { name: 'from', className: 'center-align' },
-                        { name: 'title', className: 'center-align' },
+                        { name: 'title', className: '' },
+                        { name: 'note', className: '' },
                         { name: 'timestamp', className: 'center-align' },
                         { name: 'action', searchable: false, orderable: false, className: 'center-align' }
                     ],

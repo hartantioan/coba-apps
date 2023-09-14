@@ -10,6 +10,9 @@
     <meta name="keywords" content="...">
     <meta name="author" content="ThemeSelect">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- hilangkan ini bahaya -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <!-- end hilangkan -->
     <title>Login | Superior Porcelain Sukses</title>
     <link rel="apple-touch-icon" href="{{ url('website/logo_web_small.png') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small.png') }}">

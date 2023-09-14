@@ -8,44 +8,78 @@
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
             <!-- Search for small screen-->
-            <div class="container">
+            <div class="container"> 
                 <div class="row">
-                    <div class="card">
-                        <div class="card-content">
-                            <h4 class="card-title">
-                                Rekap Purchase 
-                            </h4>
-                            <form class="row" id="form_data" onsubmit="return false;">
-                                <div class="col s12">
-                                    <div id="validation_alert" style="display:none;"></div>
+                    <div class="col s8 m6 l6">
+                        <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
+                        <ol class="breadcrumbs mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(2))) }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(3))) }}
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12">
+            <!-- Search for small screen-->
+            <div class="container">
+                <div class="section section-data-tables">
+                    <div class="row">
+                        <div class="col s12">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4 class="card-title">
+                                        Rekap Purchase 
+                                    </h4>
+                                    <form class="row" id="form_data" onsubmit="return false;">
+                                        <div class="col s12">
+                                            <div id="validation_alert" style="display:none;"></div>
+                                        </div>
+                                        <div class="col s12">
+                                            <div class="row">
+                                                <div class="input-field col m4 s12">
+                                                    <select class="form-control" id="type" name="type">
+                                                        @foreach ($menus as $row)
+                                                            <option value="{{ $row->fullUrl() }}">{{ $row->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <label class="" for="type">Tipe Module Purchase</label>
+                                                </div>
+                                                <div class="input-field col m4 s12">
+                                                    <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                                    <label class="active" for="start_date">Tanggal Awal</label>
+                                                </div>
+                                                <div class="input-field col m4 s12">
+                                                    <input id="end_date" name="end_date"  type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                                    <label class="active" for="end_date">Tanggal Akhir</label>
+                                                </div>
+                                                <div class="col s12 mt-3">
+                                                    <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Download Rekap <i class="material-icons right">file_download</i></button>
+                                                    <button class="btn waves-effect waves-light right cyan submit mr-2" onclick="getOutstanding();">Lihat Tunggakan <i class="material-icons right">list</i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class="col s12">
+                            </div>
+                            <div class="card" id="show-result" style="display:none;">
+                                <div class="card-content">
+                                    <h4 class="card-title">
+                                        Daftar Tunggakan Dokumen
+                                    </h4>
                                     <div class="row">
-                                        <div class="input-field col m4 s12">
-                                            <select class="form-control" id="type" name="type">
-                                                @foreach ($menus as $row)
-                                                    <option value="{{ $row->fullUrl() }}">{{ $row->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label class="" for="type">Tipe Module Purchase</label>
-                                        </div>
-                                        <div class="input-field col m4 s12">
-                                            <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                                            <label class="active" for="start_date">Tanggal Awal</label>
-                                        </div>
-                                        <div class="input-field col m4 s12">
-                                            <input id="end_date" name="end_date"  type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                                            <label class="active" for="end_date">Tanggal Akhir</label>
-                                        </div>
-                                        <div class="col s12 mt-3">
-                                            <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Get Rekap <i class="material-icons right">file_download</i></button>
+                                        <div class="col s12" id="content-result">
+
                                         </div>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
         </div>
@@ -57,9 +91,56 @@
      
     function exportExcel(){
         var tipe = $('#type').val();
-        var search = $('#start_date').val();
-        var status = $('#end_date').val();
-        window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + search + "&end_date=" + status;
+        var startDate = $('#start_date').val();
+        var endDate = $('#end_date').val();
+        window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + startDate + "&end_date=" + endDate;
+    }
+
+    function getOutstanding(){
+        $('#show-result').hide();
+        $('#content-result').html('');
+        var tipekuy = $('#type').val();
+        var startDatekuy = $('#start_date').val();
+        var endDatekuy = $('#end_date').val();
+
+        $.ajax({
+            url: "{{ URL::to('/') }}/admin/" + tipekuy + "/get_outstanding",
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                type: tipekuy,
+                startDate: startDatekuy,
+                endDate: endDatekuy,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                if(response.status == '200'){
+                    $('#show-result').show();
+                    $('#content-result').html(response.content);
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: response.message,
+                        icon: 'error'
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
     function printPreview(code){

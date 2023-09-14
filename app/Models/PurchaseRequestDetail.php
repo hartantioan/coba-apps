@@ -59,6 +59,16 @@ class PurchaseRequestDetail extends Model
         return $this->belongsTo('App\Models\Department', 'department_id', 'id')->withTrashed();
     }
 
+    public function qtyPO(){
+        $qty = 0;
+
+        foreach($this->purchaseOrderDetail as $row){
+            $qty += $row->qty;
+        }
+
+        return $qty;
+    }
+
     public function qtyBalance(){
         $qty = $this->qty;
 
@@ -67,6 +77,18 @@ class PurchaseRequestDetail extends Model
         }
 
         return $qty;
+    }
+
+    public function qtyUnreceivedPO(){
+        $total = 0;
+
+        foreach(PurchaseOrderDetail::where('item_id',$this->item_id)->where('place_id',$this->place_id)->whereHas('purchaseOrder',function($query){
+            $query->whereIn('status',['2','3']);
+        })->get() as $row){
+            $total += $row->getBalanceReceipt();
+        }
+
+        return $total;
     }
 
     public function warehouse()

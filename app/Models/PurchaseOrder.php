@@ -236,11 +236,10 @@ class PurchaseOrder extends Model
     }
 
     
-
     public function hasBalance(){
         $qty = 0;
 
-        foreach($this->purchaseOrderDetail as $row){
+        foreach($this->purchaseOrderDetail()->whereNull('status')->get() as $row){
             $qty += $row->getBalanceReceipt();
         }
 
@@ -255,7 +254,7 @@ class PurchaseOrder extends Model
         $qtyBalance = 0;
         $totalQty = 0;
 
-        foreach($this->purchaseOrderDetail as $row){
+        foreach($this->purchaseOrderDetail()->whereNull('status')->get() as $row){
             $totalQty += $row->qty;
             $qtyBalance += $row->getBalanceReceipt();
         }

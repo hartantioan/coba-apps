@@ -1557,6 +1557,9 @@
                         if(!$('select[name^="arr_item"]').eq(index).val()){
                             passed = false;
                         }
+                        if(!$('select[name^="arr_item_stock"]').eq(index).val()){
+                            passed = false;
+                        }
                     });
                 }else{
                     passed = false;
@@ -1629,7 +1632,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Item tidak boleh kosong.',
+                        text: 'Item / stok tidak boleh kosong.',
                         icon: 'warning'
                     });
                 }

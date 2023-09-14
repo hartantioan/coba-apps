@@ -46,6 +46,7 @@ class IncomingPaymentDetail extends Model
     public function type(){
         $code = match ($this->lookable_type) {
             'coas'                          => 'Coa',
+            'outgoing_payments'             => 'Kas Keluar / Outgoing Payment',
             'marketing_order_invoices'      => 'AR Invoice',
             'marketing_order_memos'         => 'AR Credit Memo',
             'marketing_order_down_payments' => 'AR Down Payment',
@@ -60,18 +61,45 @@ class IncomingPaymentDetail extends Model
         return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id');
     }
 
-    public function purchaseInvoiceDetail()
+    public function coa()
     {
-        return $this->belongsTo('App\Models\MarketingOrderInvoice','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
-            $query->whereIn('status',['2','3']);
-        });
+        if($this->lookable_type == 'coas'){
+            return $this->belongsTo('App\Models\Coa','lookable_id','id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
+    }
+
+    public function outgoingPayment()
+    {
+        if($this->lookable_type == 'outgoing_payments'){
+            return $this->belongsTo('App\Models\OutgoingPayment','lookable_id','id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
     }
 
     public function marketingOrderInvoice(){
-        return $this->belongsTo('App\Models\MarketingOrderInvoice', 'lookable_id', 'id')->where('lookable_type',$this->table)->withTrashed();
+        if($this->lookable_type == 'marketing_order_invoices'){
+            return $this->belongsTo('App\Models\MarketingOrderInvoice', 'lookable_id', 'id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
+    }
+
+    public function marketingOrderMemo(){
+        if($this->lookable_type == 'marketing_order_memos'){
+            return $this->belongsTo('App\Models\MarketingOrderMemo', 'lookable_id', 'id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
     }
 
     public function marketingOrderDownPayment(){
-        return $this->belongsTo('App\Models\MarketingOrderDownPayment', 'lookable_id', 'id')->where('lookable_type',$this->table)->withTrashed();
+        if($this->lookable_type == 'marketing_order_down_payments'){
+            return $this->belongsTo('App\Models\MarketingOrderDownPayment', 'lookable_id', 'id')->withTrashed();
+        }else{
+            return $this->where('id',-1);
+        }
     }
 }

@@ -955,13 +955,16 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[PurchaseRequestController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseRequestController::class, 'rowDetail']);
                     Route::post('show', [PurchaseRequestController::class, 'show']);
+                    Route::post('get_items', [PurchaseRequestController::class, 'getItems']);
                     Route::post('get_code', [PurchaseRequestController::class, 'getCode']);
+                    Route::post('get_outstanding', [PurchaseRequestController::class, 'getOutstanding']);
                     Route::post('print',[PurchaseRequestController::class, 'print']);
                     Route::get('export',[PurchaseRequestController::class, 'export']);
                     Route::post('print_by_range',[PurchaseRequestController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[PurchaseRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[PurchaseRequestController::class, 'viewStructureTree']);
                     Route::post('create',[PurchaseRequestController::class, 'create'])->middleware('operation.access:purchase_request,update');
+                    Route::post('create_done',[PurchaseRequestController::class, 'createDone'])->middleware('operation.access:purchase_request,update');
                     Route::post('void_status', [PurchaseRequestController::class, 'voidStatus'])->middleware('operation.access:purchase_request,void');
                     Route::get('approval/{id}',[PurchaseRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseRequestController::class, 'destroy'])->middleware('operation.access:purchase_request,delete');
@@ -1018,6 +1021,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[PurchaseOrderController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseOrderController::class, 'rowDetail']);
                     Route::post('show', [PurchaseOrderController::class, 'show']);
+                    Route::post('get_items', [PurchaseOrderController::class, 'getItems']);
                     Route::post('get_code', [PurchaseOrderController::class, 'getCode']);
                     Route::post('print',[PurchaseOrderController::class, 'print']);
                     Route::post('print_by_range',[PurchaseOrderController::class, 'printByRange']);
@@ -1026,6 +1030,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_details', [PurchaseOrderController::class, 'getDetails']);
                     Route::post('remove_used_data', [PurchaseOrderController::class, 'removeUsedData']);
                     Route::post('create',[PurchaseOrderController::class, 'create'])->middleware('operation.access:purchase_order,update');
+                    Route::post('create_done',[PurchaseOrderController::class, 'createDone'])->middleware('operation.access:purchase_order,update');
                     Route::get('approval/{id}',[PurchaseOrderController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[PurchaseOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [PurchaseOrderController::class, 'voidStatus'])->middleware('operation.access:purchase_order,void');

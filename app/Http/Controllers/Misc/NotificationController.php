@@ -33,6 +33,7 @@ class NotificationController extends Controller
             'id',
             'from_user_id',
             'title',
+            'note',
         ];
 
         $start  = $request->start;
@@ -97,6 +98,7 @@ class NotificationController extends Controller
                     $nomor,
                     $val->fromUser->name,
                     $val->title,
+                    $val->note,
                     date('d/m/y H:i:s',strtotime($val->created_at)),
                     '
                         <a type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Kunjungi Halaman" href="'.$rootUrl.'/admin/'.$val->getURL().'?code='.CustomHelper::encrypt($val->lookable->code ?? '').'"><i class="material-icons dp48">keyboard_tab</i></a>

@@ -43,6 +43,7 @@ class PurchaseOrderDetail extends Model
         'machine_id',
         'department_id',
         'warehouse_id',
+        'status',
     ];
 
     public function isIncludeTax(){
@@ -160,12 +161,14 @@ class PurchaseOrderDetail extends Model
 
     public function getBalanceReceipt()
     {
-
         $received = $this->goodReceiptDetail()->sum('qty');
-
         $balance = $this->qty - $received;
-
         return $balance;
+    }
+
+    public function qtyGR(){
+        $total = $this->goodReceiptDetail()->sum('qty');;
+        return $total;
     }
 
     public function purchaseRequestDetail()

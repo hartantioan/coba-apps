@@ -315,6 +315,7 @@ class PurchaseOrderController extends Controller
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -365,7 +366,7 @@ class PurchaseOrderController extends Controller
                 $details = [];
 
                 if($request->type == 'po'){
-                    foreach($data->purchaseRequestDetail as $row){
+                    foreach($data->purchaseRequestDetail()->whereNull('status')->get() as $row){
                         if($row->qtyBalance() > 0){
                             $details[] = [
                                 'reference_id'                  => $row->id,
@@ -2526,5 +2527,88 @@ class PurchaseOrderController extends Controller
             'status'    => 200,
             'message'   => ''
         ]);
+    }
+
+    public function getItems(Request $request){
+        $pr = PurchaseOrder::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $arr = [];
+
+        foreach($pr->purchaseOrderDetail as $row){
+            $arr[] = [
+                'id'                => $row->id,
+                'item_id'           => $row->item_id,
+                'item_name'         => $row->item->name,
+                'qty'               => number_format($row->qty,3,',','.'),
+                'unit'              => $row->item->buyUnit->code,
+                'qty_balance'       => number_format($row->getBalanceReceipt(),3,',','.'),
+                'qty_gr'            => number_format($row->qtyGR(),3,',','.'),
+                'closed'            => $row->status ? $row->status : '',
+            ];
+        }
+
+        $pr['details'] = $arr;
+        				
+		return response()->json($pr);
+    }
+
+    public function createDone(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_id'            => 'required|array',
+            'arr_value'         => 'required|array',
+		], [
+            'arr_id.required'       => 'Item tidak boleh kosong',
+            'arr_id.array'          => 'Item harus dalam bentuk array.',
+            'arr_value.required'    => 'Nilai tidak boleh kosong',
+            'arr_value.array'       => 'Nilai harus dalam bentuk array.',
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+
+            $query = PurchaseOrder::where('code',CustomHelper::decrypt($request->tempDone))->first();
+
+            if($query){
+                $arr = [];
+
+                foreach($request->arr_id as $key => $row){
+                    $prd = PurchaseOrderDetail::find(intval($row));
+                    if($prd){
+                        $prd->update([
+                            'status'    => $request->arr_value[$key] ? $request->arr_value[$key] : NULL,
+                        ]);
+                        if($request->arr_value[$key]){
+                            $arr[] = $prd->item->name;
+                        }
+                    }
+                }
+
+                $items = implode(', ',$arr);
+
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Purchase Order No. '.$query->code.' telah ditutup per item','List yang ditutup adalah sebagai berikut : '.$items.'.',session('bo_id'));
+
+                activity()
+                    ->performedOn(new PurchaseOrder())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit purchase order.');
+
+                $response = [
+                    'status'    => 200,
+                    'message'   => 'Data successfully saved.',
+                ];
+            }else{
+                $response = [
+                    'status'    => 500,
+                    'message'   => 'Data tidak ditemukan.',
+                ];
+            }
+		}
+		
+		return response()->json($response);
     }
 }

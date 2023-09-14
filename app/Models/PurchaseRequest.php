@@ -153,7 +153,7 @@ class PurchaseRequest extends Model
     public function hasBalance(){
         $qty = 0;
 
-        foreach($this->purchaseRequestDetail as $row){
+        foreach($this->purchaseRequestDetail()->whereNull('status')->get() as $row){
             $qty += $row->qtyBalance();
         }
 

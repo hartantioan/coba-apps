@@ -2028,4 +2028,146 @@ class PurchaseRequestController extends Controller
         }
         return response()->json($response);
     }
+
+    public function getItems(Request $request){
+        $pr = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $arr = [];
+
+        foreach($pr->purchaseRequestDetail as $row){
+            $arr[] = [
+                'id'                => $row->id,
+                'item_id'           => $row->item_id,
+                'item_name'         => $row->item->name,
+                'qty'               => number_format($row->qty,3,',','.'),
+                'unit'              => $row->item->buyUnit->code,
+                'qty_balance'       => number_format($row->qtyBalance(),3,',','.'),
+                'qty_po'            => number_format($row->qtyPO(),3,',','.'),
+                'closed'            => $row->status ? $row->status : '',
+            ];
+        }
+
+        $pr['details'] = $arr;
+        				
+		return response()->json($pr);
+    }
+
+    public function createDone(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_id'            => 'required|array',
+            'arr_value'         => 'required|array',
+		], [
+            'arr_id.required'       => 'Item tidak boleh kosong',
+            'arr_id.array'          => 'Item harus dalam bentuk array.',
+            'arr_value.required'    => 'Nilai tidak boleh kosong',
+            'arr_value.array'       => 'Nilai harus dalam bentuk array.',
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+
+            $query = PurchaseRequest::where('code',CustomHelper::decrypt($request->tempDone))->first();
+
+            if($query){
+                $arr = [];
+
+                foreach($request->arr_id as $key => $row){
+                    $prd = PurchaseRequestDetail::find(intval($row));
+                    if($prd){
+                        $prd->update([
+                            'status'    => $request->arr_value[$key] ? $request->arr_value[$key] : NULL,
+                        ]);
+                        if($request->arr_value[$key]){
+                            $arr[] = $prd->item->name;
+                        }
+                    }
+                }
+
+                $items = implode(', ',$arr);
+
+                CustomHelper::sendNotification('purchase_requests',$query->id,'Purchase Request No. '.$query->code.' telah ditutup per item','List yang ditutup adalah sebagai berikut : '.$items.'.',session('bo_id'));
+
+                activity()
+                    ->performedOn(new PurchaseRequest())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit purchase request.');
+
+                $response = [
+                    'status'    => 200,
+                    'message'   => 'Data successfully saved.',
+                ];
+            }else{
+                $response = [
+                    'status'    => 500,
+                    'message'   => 'Data tidak ditemukan.',
+                ];
+            }
+		}
+		
+		return response()->json($response);
+    }
+
+    public function getOutstanding(Request $request)
+    {
+        $start_date = $request->startDate;
+        $end_date = $request->endDate;
+
+        $data = PurchaseRequestDetail::whereHas('purchaseRequest',function($query)use($start_date,$end_date){
+                    $query->where(function($query) use ($start_date, $end_date) {
+                        $query->whereDate('post_date', '>=', $start_date)
+                            ->whereDate('post_date', '<=', $end_date);
+                    })->whereIn('status',['2','3']);
+                })->whereNull('status')->get();
+        
+        $string = '<div class="row pt-1 pb-1"><div class="col s12"><table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="10">Daftar Item Request Pembelian</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No</th>
+                                <th class="center-align">Dokumen</th>
+                                <th class="center-align">Tgl.Post</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Status</th>
+                                <th class="center-align">Item</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Qty Req.</th>
+                                <th class="center-align">Qty PO</th>
+                                <th class="center-align">Kekurangan</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        foreach($data as $key => $row){
+            if($row->qtyBalance() > 0){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td class="center-align">'.$row->purchaseRequest->code.'</td>
+                    <td class="center-align">'.date('d/m/y',strtotime($row->purchaseRequest->post_date)).'</td>
+                    <td class="">'.$row->purchaseRequest->note.'</td>
+                    <td class="center-align">'.$row->purchaseRequest->status().'</td>
+                    <td class="">'.$row->item->name.'</td>
+                    <td class="center-align">'.$row->item->buyUnit->code.'</td>
+                    <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
+                    <td class="right-align">'.number_format($row->qtyPO(),3,',','.').'</td>
+                    <td class="right-align">'.number_format($row->qtyBalance(),3,',','.').'</td>
+                </tr>';
+            }
+        }
+        
+        $string .= '</tbody></table></div></div>';
+
+        $response = [
+            'status'    => 200,
+            'content'   => $string,
+            'message'   => 'Data tidak ditemukan.',
+        ];
+		
+        return response()->json($response);
+    }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
+use App\Models\IncomingPayment;
 use App\Models\LandedCost;
 use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
@@ -875,6 +876,9 @@ class OutgoingPaymentController extends Controller
         $data_id_pr=[];
         $data_id_memo=[];
         $data_id_pyrcs=[];
+        $data_incoming_payment=[];
+        $data_id_outgoing_payment=[];
+
 
         if($query) {
 
@@ -1542,6 +1546,107 @@ class OutgoingPaymentController extends Controller
                     }
                     
                 }
+
+                foreach($data_incoming_payment as $row_id_ip){
+                    $query_ip = IncomingPayment::find($row_id_ip);
+                    foreach($query_ip->incomingPaymentDetail as $row_ip_detail){
+                        if($row_ip_detail->outgoingPayment()->exists()){
+                            $data_down_payment=[
+                                "name"=>$row_ip_detail->outgoingPayment->code,
+                                "key" => $row_ip_detail->outgoingPayment->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_ip_detail->outgoingPayment->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_ip_detail->outgoingPayment->grandtotal,2,',','.')]
+                                ],
+                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_ip_detail->outgoingPayment->code),
+                            ];
+                            $data_go_chart[]=$data_down_payment;
+                            $data_link[]=[
+                                'from'=>$row_ip_detail->outgoingPayment->code,
+                                'to'=>$query_ip->code,
+                                'string_link'=>$row_ip_detail->outgoingPayment->code.$query_ip->code,
+                            ];
+                            $data_id_outgoing_payment[] = $row_ip_detail->outgoingPayment->id;
+                            
+                        }
+                    }
+                }
+
+                foreach($data_id_outgoing_payment as $outgoing_payment_id){
+                    $query_op = OutgoingPayment::find($outgoing_payment_id);
+                    if($query_op->paymentRequest()->exists()){
+                        $data_pyr_tempura=[
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_op->paymentRequest->post_date],
+                                ['name'=> "Nominal : Rp.".number_format($query_op->paymentRequest->grandtotal,2,',','.')]
+                            ],
+                            "key" => $query_op->paymentRequest->code,
+                            "name" => $query_op->paymentRequest->code,
+                            'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($query_op->paymentRequest->code),
+                        ];
+                        $data_go_chart[]=$data_pyr_tempura;
+                        $data_link[]=[
+                            'from'=>$query_op->code,
+                            'to'=>$query_op->paymentRequest->code,
+                            'string_link'=>$query_op->code.$query_op->paymentRequest->code,
+                        ];
+                        if(!in_array($query_op->paymentRequest->id, $data_id_pyrs)){
+                            $data_id_pyrs[] = $query_op->paymentRequest->id;
+                            $added = true;
+                        }
+                    }
+                    if($query_op->incomingPaymentDetail()->exists()){
+                        foreach($query_op->incomingPaymentDetail as $row_ip_detail){
+                            $data_ip=[
+                                "name"=> $row_ip_detail->incomingPayment->code,
+                                "key" => $row_ip_detail->incomingPayment->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_ip_detail->incomingPayment->post_date],
+                                    
+                                 ],
+                                'url'=>request()->root()."/admin/finance/incoming_payment?code=".CustomHelper::encrypt($row_ip_detail->incomingPayment->code),
+                            ];
+                            $data_go_chart[]= $data_ip;
+                            
+                            $data_link[]=[
+                                'from'=>$query_op->code,
+                                'to'=>$row_ip_detail->incomingPayment->code,
+                                'string_link'=>$query_op->code.$row_ip_detail->incomingPayment->code,
+                            ];
+
+                            if(!in_array($row_ip_detail->incomingPayment->id, $data_incoming_payment)){
+                                $data_incoming_payment[]=$row_ip_detail->incomingPayment->id;
+                                $added=true;
+                            }
+                        }
+                    }
+                    if($query_op->paymentRequestCross()->exists()){
+                        foreach($query_op->paymentRequestCross as $row_pyr_cross){
+                            $data_pyrc_tempura = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :".$row_pyr_cross->post_date],
+                                        ['name'=> "Nominal : Rp.".number_format($row_pyr_cross->grandtotal,2,',','.')]
+                                    ],
+                                    "key" => $row_pyr_cross->code,
+                                    "name" => $row_pyr_cross->code,
+                                    'url'=>request()->root()."/admin/purchase/payment_request_cross?code=".CustomHelper::encrypt($row_pyr_cross->code),  
+                                ];
+                       
+                                $data_go_chart[]=$data_pyrc_tempura;
+                                $data_link[]=[
+                                    'from'=>$row_pyr_cross->code,
+                                    'to'=>$row_pyr_detail->paymentRequest->code,
+                                    'string_link'=>$row_pyr_cross->code.$row_pyr_detail->paymentRequest->code,
+                                ];
+                                if(!in_array($row_pyr_cross->id, $data_id_pyrcs)){
+                                    $data_id_pyrcs[] = $row_pyr_cross->id;
+                                }
+                        }
+                    }
+
+                }
+
+                /// tambahi added true bso
                 foreach($data_id_pyrcs as $payment_request_cross_id){
                     $query_pyrc = PaymentRequestCross::find($payment_request_cross_id);
                     if($query_pyrc->paymentRequest->exists()){
@@ -1562,7 +1667,7 @@ class OutgoingPaymentController extends Controller
                         ];
                         
                         if(!in_array($query_pyrc->id, $data_id_pyrs)){
-                            $data_id_pyrs[] = $query_pyrc->id;
+                            $data_id_pyrs[] = $query_pyrc->paymentRequest->id;
                             $added=true;
                         }
                     }
@@ -1583,6 +1688,10 @@ class OutgoingPaymentController extends Controller
                             'to'=>$query_pyrc->paymentRequest->code,
                             'string_link'=>$query_pyrc->lookable->code.$query_pyrc->paymentRequest->code,
                         ];
+                        if(!in_array($query_pyrc->lookable->id, $data_id_outgoing_payment)){
+                            $data_id_outgoing_payment[] = $query_pyrc->lookable->id;
+                            $added=true;
+                        }
                     }
                 }
                 foreach($data_id_dp as $downpayment_id){

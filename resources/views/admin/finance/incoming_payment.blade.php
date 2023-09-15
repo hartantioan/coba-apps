@@ -1975,7 +1975,7 @@
     }
 
     function viewStructureTree(id){
-        /* $.ajax({
+        $.ajax({
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
@@ -2002,8 +2002,8 @@
                     icon: 'error'
                 });
             }
-        }); */
-        alert('coming soon!');
+        });
+        // alert('coming soon!');
     }
     
     function viewJournal(id){

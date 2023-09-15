@@ -1248,7 +1248,7 @@ class MarketingOrderController extends Controller
                 "color"=>"lightblue",
                 'properties'=> [
                     ['name'=> "Tanggal :".$query->post_date],
-                    
+                    ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                  ],
                 'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->code),           
             ];
@@ -1257,47 +1257,7 @@ class MarketingOrderController extends Controller
             $data_id_mo[]=$query->id;
 
             $added = true;
-            if($query->marketingOrderDelivery()->exists()){
-                foreach($query->marketingOrderDelivery as $row_mod_del){
-                    $modelvery=[
-                        "name"=>$row_mod_del->code,
-                        "key" => $row_mod_del->code,
-                        'properties'=> [
-                            ['name'=> "Tanggal :".$row_mod_del->post_date],
-                            ['name'=> "Nominal : Rp.:".number_format($row_mod_del->grandtotal,2,',','.')]
-                         ],
-                        'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_mod_del->code),  
-                    ];
-
-                    $data_go_chart[]=$modelvery;
-                    $data_link[]=[
-                        'from'=>$query->code,
-                        'to'=>$row_mod_del->code,
-                        'string_link'=>$query->code.$row_mod_del->code
-                    ]; 
-                    $data_id_mo_delivery[]= $row_mod_del->id;
-
-                    if($row_mod_del->marketingOrderDeliveryProcess()->exists()){
-                        $mo_deliv_pro[]=[
-                            "name"=>$row_mod_del->marketingOrderDeliveryProcess->code,
-                            "key" => $row_mod_del->marketingOrderDeliveryProcess->code,
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$row_mod_del->marketingOrderDeliveryProcess->post_date],
-                                ['name'=> "Nominal : Rp.:".number_format($row_mod_del->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
-                            ],
-                            'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_mod_del->code), 
-                        ];
-                        $data_go_chart[]=$mo_deliv_pro;
-                        $data_link[]=[
-                            'from'=>$row_mod_del->code,
-                            'to'=>$row_mod_del->marketingOrderDeliveryProcess->code,
-                            'string_link'=>$row_mod_del->code.$row_mod_del->marketingOrderDeliveryProcess->code
-                        ]; 
-                        $data_id_mo_delivery[]= $row_mod_del->marketingOrderDeliveryProcess->id;
-
-                    }
-                } 
-            }
+            
              
 
 
@@ -1376,21 +1336,31 @@ class MarketingOrderController extends Controller
                     }
                     
                     if($query_dp->marketingOrderInvoiceDetail()->exists()){
+                        $arr = [];
                         foreach($query_dp->marketingOrderInvoiceDetail as $row_invoice_detail){
+                            if($row_invoice_detail->marketingOrderInvoice->marketingOrderInvoiceDeliveryProcess()->exists()){
+                                foreach($row_invoice_detail->marketingOrderInvoice->marketingOrderInvoiceDeliveryProcess as $rowmoidp){
+                                    $arr[] = $rowmoidp->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;  
+                                }
+                            }
+                            
+                            $newArray = array_unique($arr);
+                            $string = implode(', ', $newArray);
                             $data_invoice = [
                                 "name"=>$row_invoice_detail->marketingOrderInvoice->code,
                                 "key" => $row_invoice_detail->marketingOrderInvoice->code,
-                                
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderInvoice->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderInvoice->grandtotal,2,',','.')],
+                                    ['name'=> "No Surat Jalan  :".$string.""]
                                 ],
                                 'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderInvoice->code),
                             ];
                             
                             $data_go_chart[]=$data_invoice;
                             $data_link[]=[
-                                'from'=>$query_dp->code,
-                                'to'=>$row_invoice_detail->marketingOrderInvoice->code,
+                                'from'=>$row_invoice_detail->marketingOrderInvoice->code,
+                                'to'=>$query_dp->code,
                                 'string_link'=>$query_dp->code.$row_invoice_detail->marketingOrderInvoice->code,
                             ];
                             
@@ -1429,28 +1399,57 @@ class MarketingOrderController extends Controller
                             }
                         }
                     }
-                    foreach($query_invoice->marketingOrderInvoiceDetail as $row_invoice_detail){
-                        if($row_invoice_detail->marketingOrderDownPayment()->exists){
-                            $mo_downpayment=[
-                                "name"=>$row_invoice_detail->marketingOrderDownPayment->code,
-                                "key" => $row_invoice_detail->marketingOrderDownPayment->code,
+                    if($query_invoice->marketingOrderInvoiceDeliveryProcess()->exists()){
+                        foreach($query_invoice->marketingOrderInvoiceDeliveryProcess as $row_delivery_detail){
+                            
+                            $mo_delivery=[
+                                "name"=> $row_delivery_detail->lookable->marketingOrderDelivery->code,
+                                "key" => $row_delivery_detail->lookable->marketingOrderDelivery->code,
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderDownPayment->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderDownPayment->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row_delivery_detail->lookable->marketingOrderDelivery->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_delivery_detail->lookable->marketingOrderDelivery->grandtotal,2,',','.')],
+                                    
                                 ],
-                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderDownPayment->code),
+                                'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_delivery_detail->lookable->marketingOrderDelivery->code),
+                            ];
+                            $data_go_chart[]=$mo_delivery;
+                            $data_link[]=[
+                                'from'=>$row_delivery_detail->lookable->marketingOrderDelivery->code,
+                                'to'=>$query_invoice->code,
+                                'string_link'=>$row_delivery_detail->lookable->marketingOrderDelivery->code.$query_invoice->code,
+                            ];
+                            $data_id_mo_delivery[]=$row_delivery_detail->lookable->marketingOrderDelivery->id;
+                        }    
+                        
+                    }
+                    if($query_invoice->marketingOrderInvoiceDownPayment()->exists()){
+                        foreach($query_invoice->marketingOrderInvoiceDownPayment as $row_dp){
+                            $mo_downpayment=[
+                                "name"=>$row_dp->lookable->code,
+                                "key" =>$row_dp->lookable->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_dp->lookable->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_dp->lookable->grandtotal,2,',','.')]
+                                ],
+                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_dp->lookable->code),
                             ];
                             $data_go_chart[]=$mo_downpayment;
                             $data_link[]=[
                                 'from'=>$query_invoice->code,
-                                'to'=>$row_invoice_detail->marketingOrderDownPayment->code,
-                                'string_link'=>$query_invoice->code.$row_invoice_detail->marketingOrderDownPayment->code,
+                                'to'=>$row_dp->lookable->code,
+                                'string_link'=>$query_invoice->code.$row_dp->lookable->code,
                             ];
                             
-                            if(!in_array($row_invoice_detail->marketingOrderDownPayment->id, $data_id_mo_dp)){
-                                $data_id_mo_dp[] = $row_invoice_detail->marketingOrderDownPayment->id;
+                            if(!in_array($row_dp->lookable->id, $data_id_mo_dp)){
+                                $data_id_mo_dp[] =$row_dp->lookable->id;
                                 $added = true;
                             }
+                        }
+                        
+                    }
+                    foreach($query_invoice->marketingOrderInvoiceDetail as $row_invoice_detail){
+                        if($row_invoice_detail->marketingOrderInvoice->marketingOrderInvoiceDownPayment()->exists()){
+                            
                         }
                         if($row_invoice_detail->marketingOrderMemoDetail()->exists()){
                             foreach($row_invoice_detail->marketingOrderMemoDetail as $row_memo){
@@ -1476,28 +1475,12 @@ class MarketingOrderController extends Controller
                                 // }
                             }
                         }
-                        if($row_invoice_detail->marketingOrderDeliveryDetail()->exists()){
-                            $mo_delivery=[
-                                "name"=>$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
-                                "key" => $row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->grandtotal,2,',','.')]
-                                ],
-                                'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code),
-                            ];
-                            $data_go_chart[]=$mo_delivery;
-                            $data_link[]=[
-                                'from'=>$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
-                                'to'=>$query_invoice->code,
-                                'string_link'=>$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code.$query_invoice->code,
-                            ];
-                            $data_id_mo_delivery[]=$row_invoice_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->id;
-                        }
+                        
                     }
 
                 }
                 // mencari delivery anakan
+                $data_deliv_process=[];
                 foreach($data_id_mo_delivery as $row_id_mo_delivery){
                     $query_mo_delivery = MarketingOrderDelivery::find($row_id_mo_delivery);
                     if($query_mo_delivery->marketingOrderDeliveryProcess()->exists()){
@@ -1506,6 +1489,7 @@ class MarketingOrderController extends Controller
                             "key" => $query_mo_delivery->marketingOrderDeliveryProcess->code,
                             'properties'=> [
                                 ['name'=> "Tanggal :".$query_mo_delivery->marketingOrderDeliveryProcess->post_date],
+                                ['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
                             ],
                             'url'=>request()->root()."/admin/sales/delivery_order_process/?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrderDeliveryProcess->code),
                         ];
@@ -1520,13 +1504,24 @@ class MarketingOrderController extends Controller
                     }//mencari process dari delivery
                     foreach($query_mo_delivery->marketingOrderDeliveryDetail as $row_delivery_detail){
                         if($row_delivery_detail->marketingOrderInvoiceDetail()->exists()){
+                            $arr = [];
                             foreach($row_delivery_detail->marketingOrderInvoiceDetail as $row_invoice_detail){
+                                if($row_invoice_detail->marketingOrderInvoice->marketingOrderInvoiceDeliveryProcess()->exists()){
+                                    foreach($row_invoice_detail->marketingOrderInvoice->marketingOrderInvoiceDeliveryProcess as $rowmoidp){
+                                        $arr[] = $rowmoidp->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;  
+                                    }
+                                }
+                                
+                                $newArray = array_unique($arr);
+                                $string = implode(', ', $newArray);
                                 $data_invoice = [
                                     "name"=>$row_invoice_detail->marketingOrderInvoice->code,
                                     "key" => $row_invoice_detail->marketingOrderInvoice->code,
                                    
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderInvoice->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderInvoice->grandtotal,2,',','.')],
+                                        ['name'=> "No Surat Jalan  :".$string.""]
                                     ],
                                     'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderInvoice->code),
                                 ];
@@ -1553,6 +1548,7 @@ class MarketingOrderController extends Controller
                                     
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_return_detail->marketingOrderReturn->post_date],
+                                        ['name'=> "Nominal : Rp.:".number_format($row_return_detail->marketingOrderReturn->grandtotal,2,',','.')]
                                     ],
                                     'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_return_detail->marketingOrderReturn->code),
                                 ];
@@ -1574,7 +1570,7 @@ class MarketingOrderController extends Controller
                             "key" => $query_mo_delivery->marketingOrder->code,
                             'properties'=> [
                                 ['name'=> "Tanggal :".$query_mo_delivery->marketingOrder->post_date],
-                                
+                                ['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrder->grandtotal,2,',','.')]
                              ],
                             'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrder->code),           
                         ];
@@ -1625,8 +1621,10 @@ class MarketingOrderController extends Controller
                 $new_array = array_values($new_array);
                 return $new_array;
             }
-
-           
+        
+            // foreach($data_go_chart as $row_dg){
+            //     info($row_dg);
+            // }
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 

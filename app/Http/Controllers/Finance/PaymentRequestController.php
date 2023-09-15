@@ -568,7 +568,7 @@ class PaymentRequestController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'			        => $request->temp ? ['required', Rule::unique('payment_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|unique:payment_requests,code',
+            'code'			        => $request->temp ? ['required', Rule::unique('payment_requests', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:payment_requests,code',
 			'account_id' 			=> 'required',
             'company_id'            => 'required',
             'coa_source_id'         => $request->payment_type == '5' ? '' : 'required',
@@ -589,6 +589,8 @@ class PaymentRequestController extends Controller
             'arr_note_cost'         => $request->arr_coa_cost ? 'required|array' : '',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code.string'                       => 'Kode harus dalam bentuk string.',
+            'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai.',
 			'account_id.required' 			    => 'Supplier/Vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
@@ -1602,10 +1604,12 @@ class PaymentRequestController extends Controller
 
     public function createPay(Request $request){
         $validation = Validator::make($request->all(), [
-            'codePay'			        => 'required|unique:outgoing_payments,code',
+            'codePay'			        => 'required|string|min:18|unique:outgoing_payments,code',
             'pay_date_pay'              => 'required',
 		], [
             'codePay.required' 	        => 'Kode tidak boleh kosong.',
+            'codePay.string'            => 'Kode harus dalam bentuk string.',
+            'codePay.min'               => 'Kode harus minimal 18 karakter.',
             'codePay.unique'            => 'Kode telah dipakai.',
             'pay_date_pay.required'     => 'Tanggal bayar tidak boleh kosong.',
 		]);

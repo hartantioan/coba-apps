@@ -8,6 +8,7 @@ use App\Models\ApprovalSource;
 use App\Models\Company;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
+use App\Models\Item;
 use App\Models\Line;
 use App\Models\LandedCost;
 use App\Models\Machine;
@@ -16,6 +17,7 @@ use App\Models\PaymentRequestCross;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
+use App\Models\PurchaseOrderDetail;
 use App\Models\UserDateUser;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
@@ -40,13 +42,14 @@ use App\Exports\ExportPurchaseRequest;
 
 class PurchaseRequestController extends Controller
 {
-    protected $dataplaces, $lasturl, $mindate, $maxdate, $dataplacecode;
+    protected $dataplaces, $lasturl, $mindate, $maxdate, $dataplacecode, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
     public function index(Request $request)
     {
@@ -2139,7 +2142,7 @@ class PurchaseRequestController extends Controller
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Qty Req.</th>
                                 <th class="center-align">Qty PO</th>
-                                <th class="center-align">Kekurangan</th>
+                                <th class="center-align">Tunggakan</th>
                             </tr>
                         </thead><tbody>';
         
@@ -2169,5 +2172,65 @@ class PurchaseRequestController extends Controller
         ];
 		
         return response()->json($response);
+    }
+
+    public function getItemFromStock(Request $request){
+        
+        if(count($this->dataplaces) > 0 && count($this->datawarehouses) > 0){
+            $data = Item::where('status','1')->whereHas('itemGroup',function($query){
+                $query->whereHas('itemGroupWarehouse',function($query){
+                    $query->whereIn('warehouse_id',$this->datawarehouses);
+                });
+            })->get();
+    
+            $arr = [];
+
+            foreach($data as $key => $row){
+                $min_stock = $row->min_stock / $row->buy_convert;
+                $max_stock = $row->max_stock / $row->buy_convert;
+                $qtyStock = $row->itemStock()->whereIn('place_id',[$this->dataplaces])->sum('qty') / $row->buy_convert;
+                $prd = PurchaseRequestDetail::whereIn('place_id',[$this->dataplaces])->where('item_id',$row)->whereHas('purchaseRequest',function($query){
+                    $query->whereIn('status',['2','3']);
+                })->whereNull('status')->get();
+                $stockPrd = 0;
+                foreach($prd as $rowprd){
+                    $stockPrd += $rowprd->qtyBalance();
+                }
+                $pod = PurchaseOrderDetail::whereIn('place_id',[$this->dataplaces])->where('item_id',$row)->whereHas('purchaseOrder',function($query){
+                    $query->whereIn('status',['2','3']);
+                })->whereNull('status')->get();
+                $stockPo = 0;
+                foreach($pod as $rowpod){
+                    $stockPo += $rowpod->getBalanceReceipt();
+                }
+                $balance = $max_stock - $qtyStock - $stockPrd - $stockPo;
+                if($balance > $min_stock){
+                    $arr[] = [
+                        'item_id'       => $row->id,
+                        'item_name'     => $row->code.' - '.$row->name,
+                        'unit'          => $row->buyUnit->code,
+                        'in_stock'      => number_format($qtyStock,3,',','.'),
+                        'in_pr'         => number_format($stockPrd,3,',','.'),
+                        'in_po'         => number_format($stockPo,3,',','.'),
+                        'min_stock'     => number_format($min_stock,3,',','.'),
+                        'max_stock'     => number_format($max_stock,3,',','.'),
+                        'qty_request'   => number_format($balance,3,',','.'),
+                    ];
+                }
+            }
+    
+            $response = [
+                'status'    => 200,
+                'message'   => 'Data berhasil dimuat.',
+                'details'   => $arr
+            ];
+        }else{
+            $response = [
+                'status'    => 500,
+                'message'   => 'Mohon maaf, anda belum memiliki hak akses pada Plant dan Gudang. Silahkan hubungi administrator untuk bisa menggunakan fitur ini.'
+            ];
+        }
+        				
+		return response()->json($response);
     }
 }

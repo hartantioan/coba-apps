@@ -59,7 +59,7 @@
                                                 </div>
                                                 <div class="col s12 mt-3">
                                                     <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Download Rekap <i class="material-icons right">file_download</i></button>
-                                                    <button class="btn waves-effect waves-light right cyan submit mr-2" onclick="getOutstanding();">Lihat Tunggakan <i class="material-icons right">list</i></button>
+                                                    <button class="btn waves-effect waves-light right cyan submit mr-2" onclick="getOutstanding();">Lihat Tunggakan Qty <i class="material-icons right">list</i></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -131,14 +131,21 @@
                     });
                 }
             },
-            error: function() {
-                $('.modal-content').scrollTop(0);
+            error: function(xhr, status) {
                 loadingClose('#main');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
+                if(xhr.status == '404'){
+                    swal({
+                        title: 'Mohon maaf!',
+                        text: 'Laporan Tunggakan pada Modul ' + $( "#type option:selected" ).text() + ' belum siap. Sementara hanya untuk Permintaan Pembelian dan Order Pembelian',
+                        icon: 'warning'
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
             }
         });
     }

@@ -178,6 +178,8 @@ class ItemController extends Controller
             'pallet_unit'       => 'required',
             'pallet_convert'    => 'required',
             'tolerance_gr'      => 'required',
+            'min_stock'         => 'required',
+            'max_stock'         => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah dipakai',
@@ -191,6 +193,8 @@ class ItemController extends Controller
             'pallet_unit.required'      => 'Satuan pallet tidak boleh kosong.',
             'pallet_convert.required'   => 'Satuan konversi pallet ke satuan jual tidak boleh kosong.',
             'tolerance_gr.required'     => 'Toleransi penerimaan barang tidak boleh kosong.',
+            'min_stock.required'        => 'Nilai minimal stock tidak boleh kosong.',
+            'max_stock.required'        => 'Nilai maksimal stock tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -219,6 +223,8 @@ class ItemController extends Controller
                     $query->is_purchase_item    = $request->is_purchase_item ? $request->is_purchase_item : NULL;
                     $query->is_service          = $request->is_service ? $request->is_service : NULL;
                     $query->note                = $request->note;
+                    $query->min_stock           = str_replace(',','.',str_replace('.','',$request->min_stock));
+                    $query->max_stock           = str_replace(',','.',str_replace('.','',$request->max_stock));
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
 
@@ -246,6 +252,8 @@ class ItemController extends Controller
                         'is_purchase_item'  => $request->is_purchase_item ? $request->is_purchase_item : NULL,
                         'is_service'        => $request->is_service ? $request->is_service : NULL,
                         'note'              => $request->note,
+                        'min_stock'         => str_replace(',','.',str_replace('.','',$request->min_stock)),
+                        'max_stock'         => str_replace(',','.',str_replace('.','',$request->max_stock)),
                         'status'            => $request->status ? $request->status : '2',
                     ]);
                     DB::commit();
@@ -331,6 +339,14 @@ class ItemController extends Controller
                                 <th>Toleransi Penerimaan Barang Lebih (%)</th>
                                 <th>'.number_format($data->tolerance_gr,2,',','.').'</th>
                             </tr>
+                            <tr>
+                                <th>Minimal Stock</th>
+                                <th>'.number_format($data->min_stock,2,',','.').' '.$data->uomUnit->code.'</th>
+                            </tr>
+                            <tr>
+                                <th>Maksimal Stock</th>
+                                <th>'.number_format($data->max_stock,2,',','.').' '.$data->uomUnit->code.'</th>
+                            </tr>
                         </thead>
                     </table>';
 		
@@ -343,6 +359,8 @@ class ItemController extends Controller
         $item['sell_convert'] = number_format($item->sell_convert,3,',','.');
         $item['pallet_convert'] = number_format($item->pallet_convert,3,',','.');
         $item['tolerance_gr'] = number_format($item->tolerance_gr,2,',','.');
+        $item['min_stock'] = number_format($item->min_stock,3,',','.');
+        $item['max_stock'] = number_format($item->max_stock,3,',','.');
         				
 		return response()->json($item);
     }

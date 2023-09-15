@@ -233,11 +233,19 @@
                             <label class="active" for="item_group_id">Grup Item</label>
                         </div>
                         <div class="col s12">
-                            <div class="input-field col s6">
+                            <div class="input-field col s3">
                                 <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
                                 <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
                             </div>
-                            <div class="input-field col s6">
+                            <div class="input-field col s3">
+                                <input id="min_stock" name="min_stock" type="text" value="0,000" onkeyup="formatRupiah(this);">
+                                <label class="active" for="min_stock">Minimal Stock (Satuan Stock)</label>
+                            </div>
+                            <div class="input-field col s3">
+                                <input id="max_stock" name="max_stock" type="text" value="0,000" onkeyup="formatRupiah(this);">
+                                <label class="active" for="max_stock">Maksimal Stock (Satuan Stock)</label>
+                            </div>
+                            <div class="input-field col s3">
                                 <div class="switch mb-1">
                                     <label for="status">Status</label>
                                     <label class="right">
@@ -813,6 +821,8 @@
                 $('#pallet_convert').val(response.pallet_convert);
                 $('#warehouse_id').val(response.warehouses).trigger('change');
                 $('#tolerance_gr').val(response.tolerance_gr);
+                $('#min_stock').val(response.min_stock);
+                $('#max_stock').val(response.max_stock);
 
                 if(response.is_inventory_item == '1'){
                     $('#is_inventory_item').prop( "checked", true);

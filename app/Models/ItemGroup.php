@@ -20,7 +20,6 @@ class ItemGroup extends Model
         'name',
         'parent_id',
         'coa_id',
-        'warehouse_id',
         'status'
     ];
 
@@ -47,10 +46,6 @@ class ItemGroup extends Model
 
     public function coa(){
         return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
-    }
-
-    public function warehouse(){
-        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 
     public function status(){

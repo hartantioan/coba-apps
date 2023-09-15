@@ -31,6 +31,8 @@ class Item extends Model
         'is_purchase_item',
         'is_service',
         'note',
+        'min_stock',
+        'max_stock',
         'status'
     ];
 

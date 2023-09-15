@@ -958,6 +958,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_items', [PurchaseRequestController::class, 'getItems']);
                     Route::post('get_code', [PurchaseRequestController::class, 'getCode']);
                     Route::post('get_outstanding', [PurchaseRequestController::class, 'getOutstanding']);
+                    Route::post('get_items_from_stock', [PurchaseRequestController::class, 'getItemFromStock']);
                     Route::post('print',[PurchaseRequestController::class, 'print']);
                     Route::get('export',[PurchaseRequestController::class, 'export']);
                     Route::post('print_by_range',[PurchaseRequestController::class, 'printByRange']);
@@ -1023,6 +1024,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [PurchaseOrderController::class, 'show']);
                     Route::post('get_items', [PurchaseOrderController::class, 'getItems']);
                     Route::post('get_code', [PurchaseOrderController::class, 'getCode']);
+                    Route::post('get_outstanding', [PurchaseOrderController::class, 'getOutstanding']);
                     Route::post('print',[PurchaseOrderController::class, 'print']);
                     Route::post('print_by_range',[PurchaseOrderController::class, 'printByRange']);
                     Route::get('export',[PurchaseOrderController::class, 'export']);

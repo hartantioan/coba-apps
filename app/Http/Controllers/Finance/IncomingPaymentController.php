@@ -684,7 +684,7 @@ class IncomingPaymentController extends Controller
                 <td class="right-align">'.number_format($row->total,3,',','.').'</td>
                 <td class="right-align">'.number_format($row->rounding,3,',','.').'</td>
                 <td class="right-align">'.number_format($row->subtotal,3,',','.').'</td>
-                <td class="">'.$row->note.'</td>
+                <td class="">'.$row->note.' - '.($row->marketingOrderInvoice()->exists() ? 'Ya' : 'Tidak').'</td>
             </tr>';
         }
         

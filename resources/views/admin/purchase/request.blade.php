@@ -263,9 +263,12 @@
                                                 </td>
                                             </tr>
                                             <tr id="last-row-item">
-                                                <td colspan="12" class="center">
+                                                <td colspan="12">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> New Item
+                                                        <i class="material-icons left">add</i> Tambah 1
+                                                    </a>
+                                                    <a class="waves-effect waves-light green btn-small mb-1 mr-1" onclick="addItemFromStock()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Dari Stok
                                                     </a>
                                                 </td>
                                             </tr>
@@ -446,6 +449,39 @@
     </div>
 </div>
 
+<div id="modal7" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div id="validation_alert_done" style="display:none;"></div>
+                <p class="mt-2 mb-2">
+                    <h4>Daftar Item <= Min Stock</h4>
+                    <table class="bordered" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center">Pilih</th>
+                                <th class="center">Item</th>
+                                <th class="center">Satuan</th>
+                                <th class="center">Qty Stok</th>
+                                <th class="center">Qty PR</th>
+                                <th class="center">Qty PO</th>
+                                <th class="center">Min Stok</th>
+                                <th class="center">Max Stok</th>
+                                <th class="center">Qty Order</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-stock"></tbody>
+                    </table>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn waves-effect waves-light right submit" onclick="useStock();">Gunakan <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -519,6 +555,18 @@
             onCloseEnd: function(modal, trigger){
                 $('#body-done').empty();
                 $('#tempDone').val('');
+            }
+        });
+
+        $('#modal7').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-stock').empty();
             }
         });
 
@@ -1607,6 +1655,180 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+    }
+
+    function useStock(){
+        let passed = false, arr_id = [], arr_name = [], arr_qty = [];
+        $('input[name^="arr_value_stock[]"]').each(function(index){
+            if($(this).is(':checked')){
+                passed = true;
+                arr_id.push($('input[name^="arr_id_item[]"]').eq(index).val());
+                arr_name.push($('span[name^="arr_item_name[]"]').eq(index).text());
+                arr_qty.push($('input[name^="arr_qty_order[]"]').eq(index).val());
+            }
+        });
+        if(passed){
+            $('.row_item').remove();
+            for(let i = 0; i < arr_id.length;i++){
+                var count = makeid(10);
+                $('#last-row-item').before(`
+                    <tr class="row_item">
+                        <td>
+                            <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                        </td>
+                        <td>
+                            <input name="arr_qty[]" type="text" value="` + arr_qty[i] + `" onkeyup="formatRupiahNoMinus(this)">
+                        </td>
+                        <td class="center">
+                            <span id="arr_satuan` + count + `">-</span>
+                        </td>
+                        <td>
+                            <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
+                        </td>
+                        <td>
+                            <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
+                        </td>
+                        <td>
+                            <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="` + $('#post_date').val() + `">
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                @foreach ($place as $rowplace)
+                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                @endforeach
+                            </select>    
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                <option value="">--Kosong--</option>
+                                @foreach ($line as $rowline)
+                                    <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                @endforeach
+                            </select>    
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                <option value="">--Kosong--</option>
+                                @foreach ($machine as $row)
+                                    <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                @endforeach    
+                            </select>
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                <option value="">--Silahkan pilih item--</option>    
+                            </select>
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                <option value="">--Kosong--</option>
+                                @foreach ($department as $rowdept)
+                                    <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                @endforeach
+                            </select>    
+                        </td>
+                        <td class="center">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                `);
+                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                $('#arr_item' + count).append(`
+                    <option value="` + arr_id[i] + `">` + arr_name[i] + `</option>
+                `);
+            }
+            $('#modal7').modal('close');
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih / centang item untuk memindahkan.',
+                icon: 'warning'
+            });
+        }
+    }
+
+    function addItemFromStock(){
+        $.ajax({
+            url: '{{ Request::url() }}/get_items_from_stock',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                if(response.status == '200'){
+                    $('#modal7').modal('open');
+
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-stock').before(`
+                                <tr class="row_stock">
+                                    <input type="hidden" name="arr_id_item[]" id="arr_id_item` + count + `" value="` + val.item_id + `">
+                                    <td class="center-align">
+                                        <label>
+                                            <input type="checkbox" id="arr_value_stock` + count + `" name="arr_value_stock[]" value="1">
+                                            <span>Pilih</span>
+                                        </label>
+                                    </td>
+                                    <td class="">
+                                        <span name="arr_item_name[]">` + val.item_name + `</span>
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.unit + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.in_stock + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.in_pr + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.in_po + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.min_stock + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.max_stock + `
+                                    </td>
+                                    <td class="right-align">
+                                        <input name="arr_qty_order[]" type="text" value="` + val.qty_request + `" onkeyup="formatRupiahNoMinus(this)">
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: response.message,
+                        icon: 'warning'
+                    });
+                }
+                loadingClose('#main');
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
     function changePlace(element){

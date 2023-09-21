@@ -123,6 +123,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
+                                                        <th>Status Kirim</th>
                                                         <th>Code</th>
                                                         <th>Petugas</th>
                                                         <th>Customer</th>
@@ -131,7 +132,8 @@
                                                         <th>No. SO</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Tgl.Kirim</th>
-                                                        <th>Catatan</th>
+                                                        <th>Catatan Internal</th>
+                                                        <th>Catatan Eksternal</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -217,12 +219,12 @@
                                     <legend>3. Produk Detail</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered" style="width:1800px;">
+                                            <table class="bordered" style="width:1500px;">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Item</th>
                                                         <th class="center">Stock</th>
-                                                        <th class="center">Plant & Gudang</th>
+                                                        <th class="center">Plant & Gudang (dari SO)</th>
                                                         <th class="center">Qty Pesanan</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Keterangan</th>
@@ -242,8 +244,12 @@
                                 </fieldset>
                             </div>
                             <div class="input-field col m4 s12 step10">
-                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
+                                <textarea class="materialize-textarea" id="note_internal" name="note_internal" placeholder="Catatan / Keterangan Internal" rows="3"></textarea>
+                                <label class="active" for="note_internal">Keterangan Internal</label>
+                            </div>
+                            <div class="input-field col m4 s12 step11">
+                                <textarea class="materialize-textarea" id="note_external" name="note_external" placeholder="Catatan / Keterangan Eksternal" rows="3"></textarea>
+                                <label class="active" for="note_external">Keterangan Eksternal</label>
                             </div>
                             <div class="input-field col m4 s12">
 
@@ -252,7 +258,7 @@
                                 
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step11" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step12" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -403,9 +409,8 @@
             width: '100%',
         });
 
-        $('#datatable_serverside').on('click', 'button', function(event) {
+        $('#datatable_serverside').on('click', 'button, select', function(event) {
             event.stopPropagation();
-            
         });
 
         loadDataTable();
@@ -521,6 +526,42 @@
         select2ServerSide('#marketing_order_id,#filter_marketing_order', '{{ url("admin/select2/marketing_order") }}');
     });
 
+    function updateSendStatus(code,element){
+        var status = $(element).val();
+        $.ajax({
+            type : "POST",
+            url  : '{{ Request::url() }}/update_send_status',
+            data : {
+                code : code,
+                status : status,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            cache: false,
+            beforeSend: function() {
+                loadingOpen('#datatable_serverside');
+            },
+            success: function(data){
+                loadingClose('#datatable_serverside');
+                if(data.status == '200'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    if(data.status == '422'){
+                        $(element).val(data.value);
+                    }
+                    swal({
+                        title: 'Ups!',
+                        text: data.message,
+                        icon: 'warning'
+                    });
+                }
+            }
+        });
+    }
+
     function getMarketingOrder(){
         if($('#marketing_order_id').val()){
             $.ajax({
@@ -552,6 +593,8 @@
                         $('#account_id').empty().append(`
                             <option value="` + response.sender_id + `">` + response.sender_name + `</option>
                         `);
+                        $('#note_internal').val(response.note_internal);
+                        $('#note_external').val(response.note_external);
 
                         if(response.details.length > 0){
                             $('#body-item').empty();
@@ -595,14 +638,23 @@
                                         </td>
                                     </tr>
                                 `);
-
-                                $.each(val.list_stock, function(i, value) {
+                                
+                                if(val.list_stock.length > 0){
                                     $('#arr_item_stock' + count).append(`
-                                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                        <option value="">--Silahkan pilih stok--</option>
                                     `);
-                                });
+                                    $.each(val.list_stock, function(i, value) {
+                                        $('#arr_item_stock' + count).append(`
+                                            <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                        `);
+                                    });
 
-                                $('#arr_item_stock' + count).val(val.item_stock_id);
+                                    $('#arr_item_stock' + count).val(val.item_stock_id);
+                                }else{
+                                    $('#arr_item_stock' + count).append(`
+                                        <option value="" disabled selected>--Data stok tidak ditemukan--</option>
+                                    `);
+                                }
                             });
                         }
                     }
@@ -852,6 +904,10 @@
             $('#arr_place' + nil).val($(element).find(':selected').data('p'));
             $('#arr_warehouse' + nil).val($(element).find(':selected').data('w'));
             $("#arr_warehouse_name" + nil).text($(element).find(':selected').data('warehouse'));
+        }else{
+            $('#arr_place' + nil).val('');
+            $('#arr_warehouse' + nil).val('');
+            $("#arr_warehouse_name" + nil).text('-');
         }
     }
 
@@ -1018,6 +1074,7 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'send_status', className: '' },
                 { name: 'code', className: '' },
                 { name: 'user_id', className: '' },
                 { name: 'customer_id', searchable: false, orderable: false, className: '' },
@@ -1026,7 +1083,8 @@
                 { name: 'marketing_order_no', searchable: false, orderable: false, className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'delivery_date', className: '' },
-                { name: 'note', className: '' },
+                { name: 'note_internal', className: '' },
+                { name: 'note_external', className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1130,6 +1188,9 @@
                         if(!$('input[name^="arr_modi"]').eq(index).val()){
                             passed = false;
                         }
+                        if(!$('select[name^="arr_item_stock"]').eq(index).val()){
+                            passed = false;
+                        }
                     });
                 }else{
                     passed = false;
@@ -1202,7 +1263,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Item tidak boleh kosong.',
+                        text: 'Item / Stok tidak boleh kosong.',
                         icon: 'warning'
                     });
                 }
@@ -1246,7 +1307,8 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
                 $('#delivery_date').val(response.delivery_date);
-                $('#note').val(response.note);
+                $('#note_internal').val(response.note_internal);
+                $('#note_external').val(response.note_external);
                 
                 if(response.details.length > 0){
                     $('#last-row-item').remove();
@@ -1497,13 +1559,18 @@
                     intro : 'Data yang tampil disini adalah data tarikan dari Sales Order. Disini anda bisa memilih ulang barang diambil dari stok yang mana (kolom Stock), menentukan Qty pesanan sesuai keadaan pengiriman, dan menambahkan keterangan baru.'
                 },
                 {
-                    title : 'Keterangan',
+                    title : 'Keterangan Internal',
                     element : document.querySelector('.step10'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan internal untuk dokumen ini untuk catatan antar departemen (internal perusahaan) saja.' 
+                },
+                {
+                    title : 'Keterangan Eksternal',
+                    element : document.querySelector('.step11'),
+                    intro : 'Silahkan isi / tambahkan keterangan eksternal untuk dokumen ini dan kepentingan luar perusahaan.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step11'),
+                    element : document.querySelector('.step12'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

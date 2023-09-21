@@ -8,7 +8,7 @@
     }
 
     .select-wrapper, .select2-container {
-        height:3.9rem !important;
+        height:3.6rem !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -187,22 +187,25 @@
                                                         <th>No.Dokumen</th>
                                                         <th>Tipe Pengiriman</th>
                                                         <th>Pengirim</th>
+                                                        <th>Tipe Transport</th>
                                                         <th>Tgl.Kirim</th>
                                                         <th>Tipe Pembayaran</th>
                                                         <th>TOP.Internal</th>
                                                         <th>TOP.Customer</th>
                                                         <th>Bergaransi</th>
-                                                        <th>Alamat Pengiriman</th>
                                                         <th>Alamat Penagihan</th>
+                                                        <th>Outlet</th>
                                                         <th>Alamat Tujuan</th>
                                                         <th>Provinsi Tujuan</th>
                                                         <th>Kota Tujuan</th>
-                                                        <th>Kec./Kel.Tujuan</th>
+                                                        <th>Kecamatan Tujuan</th>
+                                                        <th>KelurahanTujuan</th>
                                                         <th>Sales</th>
                                                         <th>Mata Uang</th>
                                                         <th>Konversi</th>
                                                         <th>% DP</th>
-                                                        <th>Catatan</th>
+                                                        <th>Catatan Internal</th>
+                                                        <th>Catatan Eksternal</th>
                                                         <th>Subtotal</th>
                                                         <th>Diskon</th>
                                                         <th>Total</th>
@@ -261,6 +264,12 @@
                                         <label class="active" for="account_id">Customer</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
+                                        <select class="select2 browser-default" id="billing_address" name="billing_address">
+                                            <option value="">--Pilih customer ya--</option>
+                                        </select>
+                                        <label class="active" for="billing_address">Alamat Penagihan</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step5">
                                         <select class="form-control" id="company_id" name="company_id">
                                             @foreach ($company as $rowcompany)
                                                 <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -268,26 +277,26 @@
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step5">
+                                    <div class="input-field col m3 s12 step6">
                                         <select class="form-control" id="type_sales" name="type_sales">
                                             <option value="1">Standar SO</option>
                                             <option value="2">Cash / POS</option>
                                         </select>
                                         <label class="" for="type_sales">Tipe Penjualan</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step6">
+                                    <div class="input-field col m3 s12 step7">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                         <label class="active" for="post_date">Tgl. Posting</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step7">
+                                    <div class="input-field col m3 s12 step8">
                                         <input id="valid_date" name="valid_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Valid">
                                         <label class="active" for="valid_date">Valid Hingga</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step8">
+                                    <div class="input-field col m3 s12 step9">
                                         <select class="browser-default" id="project_id" name="project_id"></select>
                                         <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step9">
+                                    <div class="input-field col m3 s12 step10">
                                         <input id="document_no" name="document_no" type="text" placeholder="No. Referensi dokumen...">
                                         <label class="active" for="document_no">No. Referensi</label>
                                     </div>
@@ -296,48 +305,54 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. Pengiriman</legend>
-                                    <div class="input-field col m3 s12 step10">
+                                    <div class="input-field col m3 s12 step11">
                                         <select class="form-control" id="type_delivery" name="type_delivery">
                                             <option value="1">Loco</option>
                                             <option value="2">Franco</option>
                                         </select>
                                         <label class="" for="type_delivery">Tipe Pengiriman</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step11">
+                                    <div class="input-field col m3 s12 step12">
                                         <select class="browser-default" id="sender_id" name="sender_id"></select>
                                         <label class="active" for="sender_id">Broker</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step12">
+                                    <div class="input-field col m3 s12 step15">
+                                        <select class="browser-default" id="transportation_id" name="transportation_id"></select>
+                                        <label class="active" for="transportation_id">Tipe Transport</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step13">
                                         <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kirim">
                                         <label class="active" for="delivery_date">Tgl.Kirim</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step13">
-                                        <textarea class="materialize-textarea" id="shipment_address" name="shipment_address" placeholder="Alamat Pengiriman (Ekspedisi)" rows="3"></textarea>
-                                        <label class="active" for="shipment_address">Alamat Pengiriman (Ekspedisi)</label>
+                                    <div class="input-field col m3 s12 step15">
+                                        <select class="browser-default" id="outlet_id" name="outlet_id" onchange="getOutletAddress();"></select>
+                                        <label class="active" for="outlet_id">Outlet</label>
                                     </div>
                                     <div class="input-field col m3 s12 step14">
-                                        <textarea class="materialize-textarea" id="billing_address" name="billing_address" placeholder="Alamat Penagihan" rows="3"></textarea>
-                                        <label class="active" for="delivery_date">Alamat Penagihan</label>
+                                        <textarea class="materialize-textarea" id="destination_address" name="destination_address" placeholder="Alamat Tujuan" rows="3"></textarea>
+                                        <label class="active" for="destination_address">Alamat Tujuan Kirim</label>
                                     </div>
                                     <div class="input-field col m3 s12 step15">
-                                        <textarea class="materialize-textarea" id="destination_address" name="destination_address" placeholder="Alamat Tujuan" rows="3"></textarea>
-                                        <label class="active" for="destination_address">Alamat Tujuan</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step16">
                                         <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
                                         <label class="active" for="province_id">Provinsi</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step17">
-                                        <select class="select2 browser-default" id="city_id" name="city_id" onchange="getSubdistrict();">
+                                    <div class="input-field col m3 s12 step16">
+                                        <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
                                             <option value="">--Pilih ya--</option>
                                         </select>
                                         <label class="active" for="city_id">Kota</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step17">
+                                        <select class="select2 browser-default" id="district_id" name="district_id" onchange="getSubdistrict();">
+                                            <option value="">--Pilih ya--</option>
+                                        </select>
+                                        <label class="active" for="district_id">Kecamatan</label>
                                     </div>
                                     <div class="input-field col m3 s12 step18">
                                         <select class="select2 browser-default" id="subdistrict_id" name="subdistrict_id">
                                             <option value="">--Pilih ya--</option>
                                         </select>
-                                        <label class="active" for="district_id">Kelurahan</label>
+                                        <label class="active" for="subdistrict_id">Kelurahan</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -367,9 +382,9 @@
                                         <label class="" for="is_guarantee">Bergaransi</label>
                                     </div>
                                     <div class="input-field col m3 s12 step23">
-                                        <select class="form-control" id="currency_id" name="currency_id">
+                                        <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                             @foreach ($currency as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
+                                                <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                             @endforeach
                                         </select>
                                         <label class="" for="currency_id">Mata Uang</label>
@@ -407,12 +422,13 @@
                                     <legend>5. Produk Detail</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered" style="width:2500px;">
+                                            <table class="bordered" style="width:3250px;">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Item</th>
                                                         <th class="center">Stock</th>
-                                                        <th class="center">Plant & Gudang</th>
+                                                        <th class="center">Plant</th>
+                                                        <th class="center">Gudang</th>
                                                         <th class="center">Qty Skrg</th>
                                                         <th class="center">Qty Sementara</th>
                                                         <th class="center">Qty Pesanan</th>
@@ -439,7 +455,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="19">
+                                                        <td colspan="20">
                                                             Silahkan tambahkan baris ...
                                                         </td>
                                                     </tr>
@@ -455,13 +471,17 @@
                                 </a>
                             </div>
                             <div class="input-field col m4 s12 step30">
-                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
+                                <textarea class="materialize-textarea" id="note_internal" name="note_internal" placeholder="Catatan / Keterangan Internal" rows="3"></textarea>
+                                <label class="active" for="note_internal">Keterangan Internal</label>
+                            </div>
+                            <div class="input-field col m4 s12 step31">
+                                <textarea class="materialize-textarea" id="note_external" name="note_external" placeholder="Catatan / Keterangan Eksternal" rows="3"></textarea>
+                                <label class="active" for="note_external">Keterangan Eksternal</label>
                             </div>
                             <div class="input-field col m4 s12">
 
                             </div>
-                            <div class="input-field col m4 s12 step31">
+                            <div class="input-field col m4 s12 step32">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -510,7 +530,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step32" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step33" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -655,7 +675,7 @@
 
 <script>
 
-    var city = [], subdistrict = [];
+    var city = [], district = [], subdistrict = [];
 
     $(function() {
         $(".select2").select2({
@@ -702,11 +722,14 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
+                if(!$('#temp').val()){
+                    loadCurrency();
+                }
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#account_id,#sender_id,#sales_id,#project_id').empty();
+                $('#account_id,#sender_id,#sales_id,#project_id,#transportation_id,#outlet_id').empty();
                 $('#subtotal,#discount,#total,#tax,#grandtotal,#rounding,#balance').val('0,00');
                 $('.row_item').each(function(){
                     $(this).remove();
@@ -715,7 +738,7 @@
                 if($('.row_item').length == 0 && $('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="19">
+                            <td colspan="20">
                                 Silahkan tambahkan baris ...
                             </td>
                         </tr>
@@ -725,8 +748,11 @@
                     500);
                 }
                 M.updateTextFields();
-                $('#subdistrict_id,#city_id').empty().append(`
+                $('#province_id,#subdistrict_id,#district_id,#city_id').empty().append(`
                     <option value="">--Pilih ya--</option>
+                `);
+                $('#billing_address').empty().append(`
+                    <option value="">--Pilih customer ya--</option>
                 `);
                 window.onbeforeunload = function() {
                     return null;
@@ -785,7 +811,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="19">
+                        <td colspan="20">
                             Silahkan tambahkan baris ...
                         </td>
                     </tr>
@@ -801,7 +827,52 @@
         select2ServerSide('#sender_id,#filter_sender', '{{ url("admin/select2/supplier_vendor") }}');
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
+        select2ServerSide('#transportation_id', '{{ url("admin/select2/transportation") }}');
+        select2ServerSide('#outlet_id', '{{ url("admin/select2/outlet") }}');
     });
+
+    function getOutletAddress(){
+        if($('#outlet_id').val()){
+            $('#province_id,#subdistrict_id,#district_id,#city_id').empty();
+            $('#destination_address').val($('#outlet_id').select2('data')[0].address);
+            $('#province_id').empty().append(`
+                <option value="` + $('#outlet_id').select2('data')[0].province_id + `">` + $('#outlet_id').select2('data')[0].province_name + `</option>
+            `);
+            $.each($('#outlet_id').select2('data')[0].cities, function(i, val) {
+                $('#city_id').append(`
+                    <option value="` + val.id + `" ` + ($('#outlet_id').select2('data')[0].city_id == val.id ? 'selected' : '') + `>` + val.name + `</option>
+                `);
+            });
+            let index = -1;
+            $.each($('#outlet_id').select2('data')[0].cities, function(i, val) {
+                if(val.id == $('#outlet_id').select2('data')[0].city_id){
+                    index = i;
+                }
+            });
+            if(index >= 0){
+                $.each($('#outlet_id').select2('data')[0].cities[index].district, function(i, value) {
+                    let selected = '';
+                    $('#district_id').append(`
+                        <option value="` + value.id + `" ` + (value.id == $('#outlet_id').select2('data')[0].district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
+                    `);
+                    if(value.id == $('#outlet_id').select2('data')[0].district_id){
+                        subdistrict = value.subdistrict;
+                    }
+                });
+
+                $.each(subdistrict, function(i, value) {
+                    $('#subdistrict_id').append(`
+                        <option value="` + value.id + `" ` + (value.id == $('#outlet_id').select2('data')[0].subdistrict_id ? 'selected' : '') + `>` + value.name + `</option>
+                    `);
+                });
+            }
+        }else{
+            $('destination_address').val('');
+            $('#province_id,#subdistrict_id,#district_id,#city_id').empty().append(`
+                <option value="">--Pilih ya--</option>
+            `);
+        }
+    }
 
     function getTopCustomer(){
         if($('#account_id').val()){
@@ -810,14 +881,29 @@
             var result = new Date($('#post_date').val());
             result.setDate(result.getDate() + parseInt($('#account_id').select2('data')[0].top_customer));
             $('#valid_date').val(result.toISOString().split('T')[0]);
+            $('#billing_address').empty();
+            if($('#account_id').select2('data')[0].billing_address.length > 0){
+                $.each($('#account_id').select2('data')[0].billing_address, function(i, val) {
+                    $('#billing_address').append(`
+                        <option value="` + val.id + `">` + val.title + ` ` + val.content + `</option>
+                    `);
+                });
+            }else{
+                $('#billing_address').append(`
+                    <option value="">--Data tidak ditemukan--</option>
+                `); 
+            }
         }else{
             $('#top_internal,#top_customer').val('0');
             $('#valid_date').val('{{ date("Y-m-d") }}');
+            $('#billing_address').empty().append(`
+                <option value="">--Pilih customer ya--</option>
+            `);
         }
     }
 
     function getCity(){
-        $('#city_id,#subdistrict_id').empty().append(`
+        $('#city_id,#subdistrict_id,#district_id').empty().append(`
             <option value="">--Pilih ya--</option>
         `);
         if($('#province_id').val()){
@@ -829,11 +915,13 @@
             });
         }else{
             city = [];
+            district = [];
+            subdistrict = [];
         }
     }
 
-    function getSubdistrict(){
-        $('#subdistrict_id').empty().append(`
+    function getDistrict(){
+        $('#subdistrict_id,#district_id').empty().append(`
             <option value="">--Pilih ya--</option>
         `);
         if($('#city_id').val()){
@@ -845,7 +933,38 @@
                 }
             });
 
-            $.each(city[index].subdistrict, function(i, value) {
+            $.each(city[index].district, function(i, value) {
+                $('#district_id').append(`
+                    <option value="` + value.id + `" data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
+                `);
+            });
+        }else{
+            district = [];
+            subdistrict = [];
+        }
+    }
+
+    function getSubdistrict(){
+        $('#subdistrict_id').empty().append(`
+            <option value="">--Pilih ya--</option>
+        `);
+        if($('#district_id').val()){
+            
+            let index = -1;
+
+            $.each(city, function(i, val) {
+                if(val.id == $('#city_id').val()){
+                    index = i;
+                }
+            });
+
+            $.each(city[index].district, function(i, value) {
+                if(value.id == $('#district_id').val()){
+                    subdistrict = value.subdistrict;
+                }
+            });
+
+            $.each(subdistrict, function(i, value) {
                 $('#subdistrict_id').append(`
                     <option value="` + value.id + `">` + value.name + `</option>
                 `);
@@ -1096,6 +1215,8 @@
     }
     
     function getRowUnit(nil){
+        $('#tempPrice' + nil).empty();
+        $("#arr_warehouse" + nil).empty();
         if($("#arr_item" + nil).val()){
             $('#arr_item_stock' + nil).empty();
             if($("#arr_item" + nil).select2('data')[0].stock_list.length){
@@ -1112,8 +1233,38 @@
 
             $('#arr_unit' + nil).text($("#arr_item" + nil).select2('data')[0].sell_unit);
 
+            if($("#arr_item" + nil).select2('data')[0].list_warehouse.length > 0){
+                $.each($("#arr_item" + nil).select2('data')[0].list_warehouse, function(i, value) {
+                    $('#arr_warehouse' + nil).append(`
+                        <option value="` + value.id + `">` + value.name + `</option>
+                    `);
+                });
+            }else{
+                $("#arr_warehouse" + nil).append(`
+                    <option value="">--Gudang tidak diatur di master data Grup Item--</option>
+                `);
+            }
+
+            if($("#arr_item" + nil).select2('data')[0].old_prices.length > 0){
+                $.each($("#arr_item" + nil).select2('data')[0].old_prices, function(i, value) {
+                    if($('#account_id').val()){
+                        if(value.customer_id == $('#account_id').val()){
+                            $('#tempPrice' + nil).append(`
+                                <option value="` + value.price + `">` + value.sales_code + ` Supplier ` + value.customer_name + ` Tgl ` + value.post_date + `</option>
+                            `);
+                        }
+                    }else{
+                        $('#tempPrice' + nil).append(`
+                            <option value="` + value.price + `">` + value.sales_code + ` Supplier ` + value.customer_name + ` Tgl ` + value.post_date + `</option>
+                        `);
+                    }
+                });
+            }
         }else{
             $('#arr_item_stock' + nil).empty().append(`
+                <option value="">--Silahkan pilih item--</option>
+            `);
+            $("#arr_warehouse" + nil).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
         }
@@ -1124,15 +1275,13 @@
         if($(element).val()){
             $('#arr_place' + nil).val($(element).find(':selected').data('p'));
             $('#arr_warehouse' + nil).val($(element).find(':selected').data('w'));
-            $("#arr_warehouse_name" + nil).text($(element).find(':selected').data('warehouse'));
             $("#arr_qty_now" + nil).text($(element).find(':selected').data('qty'));
             let balance = formatRupiahIni((parseFloat($(element).find(':selected').data('qty').replaceAll(".", "").replaceAll(",",".")) - parseFloat($(element).find(':selected').data('qtycom').replaceAll(".", "").replaceAll(",","."))).toFixed(3).toString().replace('.',','));
             $("#rowQty" + nil).attr('data-qty',balance);
             $("#arr_qty_temporary" + nil).text(balance);
         }else{
-            $('#arr_place' + nil).val('');
-            $('#arr_warehouse' + nil).val('');
-            $("#arr_warehouse_name" + nil).text('-');
+            $('#arr_place' + nil).val($("#arr_place" + nil + " option:first").val());
+            $('#arr_warehouse' + nil).val($("#arr_warehouse" + nil + " option:first").val());
             $("#arr_qty_now" + nil).text('0,000');
             $("#arr_qty_temporary" + nil).text('0,000');
             $("#rowQty" + nil).attr('data-qty','0');
@@ -1163,8 +1312,6 @@
         $('#last-row-item').remove();
         $('#body-item').append(`
             <tr class="row_item">
-                <input type="hidden" name="arr_place[]" id="arr_place` + count + `">
-                <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `">
                 <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="0,00">
                 <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="0,00">
                 <td>
@@ -1175,7 +1322,18 @@
                         <option value="">--Silahkan pilih item--</option>
                     </select>
                 </td>
-                <td class="center-align" id="arr_warehouse_name` + count + `">-</td>
+                <td class="center-align">
+                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                        @foreach ($place as $rowplace)
+                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td class="center-align">
+                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                        <option value="">--Silahkan pilih item--</option>
+                    </select>    
+                </td>
                 <td class="right-align" id="arr_qty_now` + count + `">0,000</td>
                 <td class="right-align" id="arr_qty_temporary` + count + `">0,000</td>
                 <td>
@@ -1408,22 +1566,25 @@
                 { name: 'document_no', className: '' },
                 { name: 'delivery_type', className: '' },
                 { name: 'sender_id', className: '' },
+                { name: 'transportation_id', className: '' },
                 { name: 'delivery_date', className: '' },
                 { name: 'payment_type', className: '' },
                 { name: 'top_internal', className: '' },
                 { name: 'top_customer', className: '' },
                 { name: 'is_guarantee', className: '' },
-                { name: 'shipment_address', className: '' },
                 { name: 'billing_address', className: '' },
+                { name: 'outlet_id', className: '' },
                 { name: 'destination_address', className: '' },
                 { name: 'province_id', className: '' },
                 { name: 'city_id', className: '' },
+                { name: 'district_id', className: '' },
                 { name: 'subdistrict_id', className: '' },
                 { name: 'sales_id', className: '' },
                 { name: 'currency_id', className: '' },
                 { name: 'currency_rate', className: 'right-align' },
                 { name: 'percent_dp', className: 'center-align' },
-                { name: 'note', className: '' },
+                { name: 'note_internal', className: '' },
+                { name: 'note_external', className: '' },
                 { name: 'subtotal', className: 'right-align' },
                 { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
@@ -1533,14 +1694,14 @@
                 formData.delete("arr_total[]");
                 formData.delete("arr_note[]");
                 
-                if($('input[name^="arr_place"]').length > 0){
-                    $('input[name^="arr_place"]').each(function(index){
+                if($('select[name^="arr_place[]"]').length > 0){
+                    $('select[name^="arr_place[]"]').each(function(index){
                         formData.append('arr_place[]',$(this).val());
-                        formData.append('arr_warehouse[]',$('input[name^="arr_warehouse"]').eq(index).val());
+                        formData.append('arr_warehouse[]',$('select[name^="arr_warehouse"]').eq(index).val());
                         formData.append('arr_tax_nominal[]',$('input[name^="arr_tax_nominal"]').eq(index).val());
                         formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"]').eq(index).val());
                         formData.append('arr_item[]',$('select[name^="arr_item"]').eq(index).val());
-                        formData.append('arr_item_stock[]',$('select[name^="arr_item_stock"]').eq(index).val());
+                        formData.append('arr_item_stock[]',($('select[name^="arr_item_stock"]').eq(index).val() ? $('select[name^="arr_item_stock"]').eq(index).val() : '' ));
                         formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
                         formData.append('arr_price[]',$('input[name^="arr_price"]').eq(index).val());
                         formData.append('arr_margin[]',$('input[name^="arr_margin"]').eq(index).val());
@@ -1557,7 +1718,10 @@
                         if(!$('select[name^="arr_item"]').eq(index).val()){
                             passed = false;
                         }
-                        if(!$('select[name^="arr_item_stock"]').eq(index).val()){
+                        if(!$(this).val()){
+                            passed = false;
+                        }
+                        if(!$('select[name^="arr_warehouse"]').eq(index).val()){
                             passed = false;
                         }
                     });
@@ -1632,7 +1796,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Item / stok tidak boleh kosong.',
+                        text: 'Item / stok / plant / gudang tidak boleh kosong.',
                         icon: 'warning'
                     });
                 }
@@ -1677,17 +1841,27 @@
                 $('#type_delivery').val(response.type_delivery).formSelect();
                 $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
                 $('#delivery_date').val(response.delivery_date);
-                $('#shipment_address').val(response.shipment_address);
-                $('#billing_address').val(response.billing_address);
+                $('#transportation_id').empty().append(`
+                    <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>
+                `);
+                $('#outlet_id').empty().append(`
+                    <option value="` + response.outlet_id + `">` + response.outlet_name + `</option>
+                `);
+                $('#billing_address').empty();
+                $.each(response.user_data, function(i, val) {
+                    $('#billing_address').append(`
+                        <option value="` + val.id + `" ` + (val.id == response.user_data_id ? 'selected' : '') + `>` + val.title + ` ` + val.content + `</option>
+                    `);
+                });
                 $('#destination_address').val(response.destination_address);
                 $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
-                $('#subdistrict_id,#city_id').empty().append(`
+                $('#subdistrict_id,#district_id,#city_id').empty().append(`
                     <option value="">--Pilih ya--</option>
                 `);
                 $('#project_id').empty();
                 if(response.project_name){
                     $('#project_id').append(`
-                        <option value="` + response.project_name + `">` + response.project_id + `</option>
+                        <option value="` + response.project_id + `">` + response.project_name + `</option>
                     `);
                 }
                 $.each(response.cities, function(i, val) {
@@ -1703,13 +1877,22 @@
                     }
                 });
                 if(index >= 0){
-                    $.each(response.cities[index].subdistrict, function(i, value) {
+                    $.each(response.cities[index].district, function(i, value) {
+                        let selected = '';
+                        $('#district_id').append(`
+                            <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
+                        `);
+                        if(value.id == response.district_id){
+                            subdistrict = value.subdistrict;
+                        }
+                    });
+
+                    $.each(subdistrict, function(i, value) {
                         $('#subdistrict_id').append(`
-                            <option value="` + value.id + `">` + value.name + `</option>
+                            <option value="` + value.id + `" ` + (value.id == response.subdistrict_id ? 'selected' : '') + `>` + value.name + `</option>
                         `);
                     });
                 }
-                $('#subdistrict_id').val(response.subdistrict_id).formSelect();
                 $('#payment_type').val(response.payment_type).formSelect();
                 $('#top_internal').val(response.top_internal);
                 $('#top_customer').val(response.top_customer);
@@ -1718,7 +1901,8 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#percent_dp').val(response.percent_dp);
                 $('#sales_id').empty().append(`<option value="` + response.sales_id + `">` + response.sales_name + `</option>`);
-                $('#note').val(response.note);
+                $('#note_internal').val(response.note_internal);
+                $('#note_external').val(response.note_external);
                 $('#subtotal').val(response.subtotal);
                 $('#discount').val(response.discount);
                 $('#total').val(response.total);
@@ -1737,8 +1921,6 @@
                         var count = makeid(10);
                         $('#body-item').append(`
                             <tr class="row_item">
-                                <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
-                                <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                 <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="` + val.tax + `">
                                 <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="` + val.grandtotal + `">
                                 <td>
@@ -1749,7 +1931,16 @@
                                         <option value="">--Silahkan pilih item--</option>
                                     </select>
                                 </td>
-                                <td class="center-align" id="arr_warehouse_name` + count + `">` + val.item_stock_name + `</td>
+                                <td class="center-align">
+                                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="center-align">
+                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>    
+                                </td>
                                 <td class="right-align" id="arr_qty_now` + count + `">` + val.item_stock_qty + `</td>
                                 <td class="right-align" id="arr_qty_temporary` + count + `">` + val.item_stock_qty + `</td>
                                 <td>
@@ -1808,12 +1999,18 @@
                                 </td>
                             </tr>
                         `);
+                        $.each(val.list_warehouse, function(i, value) {
+                            $('#arr_warehouse' + count).append(`
+                                <option value="` + value.id + `" ` + (value.id == val.warehouse_id ? 'selected' : '') + `>` + value.name + `</option>
+                            `);
+                        });
                         $.each(val.list_stock, function(i, value) {
                             $('#arr_item_stock' + count).append(`
                                 <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
                             `);
                         });
                         $('#arr_item_stock' + count).val(val.item_stock_id).formSelect();
+                        $('#arr_place' + count).val(val.place_id);
                         $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
                         if(val.is_include_tax){
                             $('#arr_is_include_tax' + count).prop( "checked", true);
@@ -2074,74 +2271,74 @@
                     intro : 'Customer adalah Partner Bisnis tipe penyedia pelanggan. Jika ingin menambahkan data baru, silahkan ke form Master Data - Organisasi - Partner Bisnis.' 
                 },
                 {
-                    title : 'Perusahaan',
+                    title : 'Alamat penagihan',
                     element : document.querySelector('.step4'),
+                    intro : 'Silahkan pilih alamat penagihan yang diambil dari master data partner bisnis pada detail alamat penagihan.' 
+                },
+                {
+                    title : 'Perusahaan',
+                    element : document.querySelector('.step5'),
                     intro : 'Perusahaan dimana dokumen ini dibuat.' 
                 },
                 {
                     title : 'Tipe Penjualan',
-                    element : document.querySelector('.step5'),
+                    element : document.querySelector('.step6'),
                     intro : 'Tipe Penjualan ada 2 macam, yang pertama adalah <b>Standar SO</b>, yakni SO yang dibuat sesuai pada umumnya, ada pembelian dan pembayaran yang berjangka dari Customer. Sedangkan tipe Cash / POS, adalah SO yang dibuat pada saat Customer membeli langsung secara cash ataupun secara retail / eceran.' 
                 },
                 {
                     title : 'Tgl. Posting',
-                    element : document.querySelector('.step6'),
+                    element : document.querySelector('.step7'),
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
                 {
                     title : 'Tgl. Valid SO',
-                    element : document.querySelector('.step7'),
+                    element : document.querySelector('.step8'),
                     intro : 'Tanggal berlaku SO / Penawaran, set sesuai dengan masa berlaku yang diinginkan.' 
                 },
                 {
                     title : 'Proyek (Jika ada)',
-                    element : document.querySelector('.step8'),
+                    element : document.querySelector('.step9'),
                     intro : 'Silahkan pilih proyek ini jika penjualan ingin dihubungkan dengan data Proyek. Data proyek bisa ditambahkan pada form Master Data - Administrasi - Proyek.' 
                 },
                 {
                     title : 'No. Referensi',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.step10'),
                     intro : 'No referensi bisa diisikan dengan no dokumen PO dari customer atau dokumen terkait lainnya yang mendukung penjualan ini.' 
                 },
                 {
                     title : 'Tipe Pengiriman',
-                    element : document.querySelector('.step10'),
+                    element : document.querySelector('.step11'),
                     intro : 'Ada 2 macam tipe pengiriman, yakni yang pertama adalah Franco adalah biaya pengiriman barang dibebankan pada penjual. Sedangkan Loco, adalah kebalikan dari Franco, dimana biaya pengiriman barang dibebankan kepada customer.'
                 },
                 {
                     title : 'Broker',
-                    element : document.querySelector('.step11'),
+                    element : document.querySelector('.step12'),
                     intro : 'Broker adalah pihak ekspedisi pengirim, silahkan tambahkan jika tidak ada, di Menu Master Data - Organisasi - Partner Bisnis.' 
                 },
                 {
                     title : 'Tgl. Kirim',
-                    element : document.querySelector('.step12'),
+                    element : document.querySelector('.step13'),
                     intro : 'Tanggal perkiraan pengiriman barang dari gudang.' 
                 },
                 {
-                    title : 'Alamat Pengiriman (Ekspedisi)',
-                    element : document.querySelector('.step13'),
-                    intro : 'Isi alamat pengiriman jika dikirimkan ke pihak ketiga sebagai pengirim. Contoh, jika Customer meminta mengirimkan barang ke ekspedisi langganan dia, di jl. Pahlawan, maka alamat ini diisi dengan alamat pihak ketiga tersebut.' 
-                },
-                {
-                    title : 'Alamat Penagihan',
-                    element : document.querySelector('.step14'),
-                    intro : 'Alamat penagihan adalah alamat dimana dokumen penagihan invoice dikirimkan.' 
-                },
-                {
                     title : 'Alamat Tujuan',
-                    element : document.querySelector('.step15'),
+                    element : document.querySelector('.step14'),
                     intro : 'Alamat tujuan adalah alamat dimana barang ingin dikirimkan.' 
                 },
                 {
                     title : 'Provinsi',
-                    element : document.querySelector('.step16'),
+                    element : document.querySelector('.step15'),
                     intro : 'Provinsi dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
                 },
                 {
                     title : 'Kota',
-                    element : document.querySelector('.step17'),
+                    element : document.querySelector('.step16'),
                     intro : 'Kota dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
+                },
+                {
+                    title : 'Kecamatan',
+                    element : document.querySelector('.step17'),
+                    intro : 'Kecamatan dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
                 },
                 {
                     title : 'Kelurahan',
@@ -2176,7 +2373,7 @@
                 {
                     title : 'Konversi',
                     element : document.querySelector('.step24'),
-                    intro : 'Nilai konversi rupiah pada saat Sales Order dibuat.'
+                    intro : 'Nilai konversi rupiah pada saat dokumen dibuat. Nilai konversi secara otomatis diisi ketika form tambah baru dibuka pertama kali dan data diambil dari situs exchangerate.host. Pastikan kode mata uang benar di master data agar nilai konversi tidak error.'
                 },
                 {
                     title : 'Persen DP',
@@ -2204,18 +2401,23 @@
                     intro : 'Untuk menambahkan baris produk yang ingin diinput silahkan tekan tombol ini.' 
                 },
                 {
-                    title : 'Keterangan',
+                    title : 'Keterangan Internal',
                     element : document.querySelector('.step30'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan internal untuk dokumen ini untuk catatan antar departemen (internal perusahaan) saja.' 
+                },
+                {
+                    title : 'Keterangan Eksternal',
+                    element : document.querySelector('.step31'),
+                    intro : 'Silahkan isi / tambahkan keterangan eksternal untuk dokumen ini dan kepentingan luar perusahaan.' 
                 },
                 {
                     title : 'Diskon & Rounding',
-                    element : document.querySelector('.step31'),
+                    element : document.querySelector('.step32'),
                     intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal. Sedangkan untuk Rounding akan menambah atau mengurangi nilai grandtotal sesuai inputan pengguna.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step32'),
+                    element : document.querySelector('.step33'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]
@@ -2263,16 +2465,21 @@
                         $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
                         $('#delivery_date').val(response.delivery_date);
                         $('#shipment_address').val(response.shipment_address);
-                        $('#billing_address').val(response.billing_address);
+                        $('#billing_address').empty();
+                        $.each(response.user_data, function(i, val) {
+                            $('#billing_address').append(`
+                                <option value="` + val.id + `" ` + (val.id == response.user_data_id ? 'selected' : '') + `>` + val.title + ` ` + val.content + `</option>
+                            `);
+                        });
                         $('#destination_address').val(response.destination_address);
                         $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
-                        $('#subdistrict_id,#city_id').empty().append(`
+                        $('#subdistrict_id,#district_id,#city_id').empty().append(`
                             <option value="">--Pilih ya--</option>
                         `);
                         $('#project_id').empty();
                         if(response.project_name){
                             $('#project_id').append(`
-                                <option value="` + response.project_name + `">` + response.project_id + `</option>
+                                <option value="` + response.project_id + `">` + response.project_name + `</option>
                             `);
                         }
                         $.each(response.cities, function(i, val) {
@@ -2288,13 +2495,22 @@
                             }
                         });
                         if(index >= 0){
-                            $.each(response.cities[index].subdistrict, function(i, value) {
+                            $.each(response.cities[index].district, function(i, value) {
+                                let selected = '';
+                                $('#district_id').append(`
+                                    <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
+                                `);
+                                if(value.id == response.district_id){
+                                    subdistrict = value.subdistrict;
+                                }
+                            });
+
+                            $.each(subdistrict, function(i, value) {
                                 $('#subdistrict_id').append(`
-                                    <option value="` + value.id + `">` + value.name + `</option>
+                                    <option value="` + value.id + `" ` + (value.id == response.subdistrict_id ? 'selected' : '') + `>` + value.name + `</option>
                                 `);
                             });
                         }
-                        $('#subdistrict_id').val(response.subdistrict_id).formSelect();
                         $('#payment_type').val(response.payment_type).formSelect();
                         $('#top_internal').val(response.top_internal);
                         $('#top_customer').val(response.top_customer);

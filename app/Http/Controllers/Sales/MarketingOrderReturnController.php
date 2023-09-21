@@ -39,7 +39,7 @@ class MarketingOrderReturnController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'Pengembalian DO',
+            'title'         => 'AR Retur',
             'content'       => 'admin.sales.order_return',
             'company'       => Company::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
@@ -222,7 +222,7 @@ class MarketingOrderReturnController extends Controller
     public function sendUsedData(Request $request){
         $modp = MarketingOrderDeliveryProcess::find($request->id);
         if(!$modp->used()->exists()){
-            CustomHelper::sendUsedData($modp->getTable(),$request->id,'Form Pengembalian DO');
+            CustomHelper::sendUsedData($modp->getTable(),$request->id,'Form AR Retur');
             return response()->json([
                 'status'    => 200,
             ]);
@@ -357,7 +357,7 @@ class MarketingOrderReturnController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status pengembalian DO detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status AR Retur detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -402,13 +402,13 @@ class MarketingOrderReturnController extends Controller
                 }
 
                 CustomHelper::sendApproval('marketing_order_returns',$query->id,$query->note);
-                CustomHelper::sendNotification('marketing_order_returns',$query->id,'Pengajuan Pengembalian DO No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendNotification('marketing_order_returns',$query->id,'Pengajuan AR Retur DO No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new MarketingOrderReturn())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit pengembalian DO.');
+                    ->log('Add / edit AR Retur DO.');
 
 				$response = [
 					'status'    => 200,
@@ -519,7 +519,7 @@ class MarketingOrderReturnController extends Controller
                 
         if($mod){
             $data = [
-                'title'     => 'Print Pengembalian DO',
+                'title'     => 'Print AR Retur',
                 'data'      => $mod
             ];
 
@@ -535,7 +535,7 @@ class MarketingOrderReturnController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Print Pengembalian DO',
+                'title'     => 'Print AR Retur',
                 'data'      => $pr
             ];
 
@@ -590,7 +590,7 @@ class MarketingOrderReturnController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Pengembalian DO',
+                        'title'     => 'Print AR Retur',
                         'data'      => $pr,
                     ];
                     $img_path = 'website/logo_web_fix.png';
@@ -668,7 +668,7 @@ class MarketingOrderReturnController extends Controller
                         $query = MarketingOrderReturn::where('Code', 'LIKE', '%'.$nomor)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Pengembalian DO',
+                                'title'     => 'Print AR Retur',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -734,7 +734,7 @@ class MarketingOrderReturnController extends Controller
                         $query = MarketingOrderReturn::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Pengembalian DO',
+                                'title'     => 'Print AR Retur',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -844,7 +844,7 @@ class MarketingOrderReturnController extends Controller
         $arrUsed = array_unique($arrUsed);
 
         foreach($arrUsed as $row){
-            CustomHelper::sendUsedData('marketing_order_delivery_processes',$row['id'],'Form Pengembalian DO');
+            CustomHelper::sendUsedData('marketing_order_delivery_processes',$row['id'],'Form AR Retur');
         }
 
         $po['details'] = $arr;
@@ -881,7 +881,7 @@ class MarketingOrderReturnController extends Controller
                     ->withProperties($query)
                     ->log('Void the data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengembalian DO No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'AR Retur No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
                 CustomHelper::removeJournal($query->getTable(),$query->id);
                 CustomHelper::removeCogs($query->getTable(),$query->id);

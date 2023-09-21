@@ -22,6 +22,7 @@ use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
 use App\Models\Menu;
+use App\Models\Outlet;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
@@ -30,6 +31,7 @@ use App\Models\ReceptionHardwareItemsUsage;
 use App\Models\Region;
 use App\Models\Place;
 use App\Models\Shift;
+use App\Models\Transportation;
 use App\Models\Warehouse;
 use App\Models\Country;
 use App\Models\Item;
@@ -112,7 +114,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = Region::where('name', 'like', "%$search%")->whereRaw("CHAR_LENGTH(code) = 2")->get();
+        $data = Region::where('name', 'like', "%$search%")->whereRaw("LENGTH(code) = 2")->get();
 
         foreach($data as $d) {
             $response[] = [
@@ -364,8 +366,9 @@ class Select2Controller extends Controller {
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'sell_unit'         => $d->sellUnit->code,
-                'old_prices'        => $d->oldPrices($this->dataplaces),
+                'old_prices'        => $d->oldSalePrices($this->dataplaces),
                 'stock_list'        => $d->currentStockSales($this->dataplaces,$this->datawarehouses),
+                'list_warehouse'    => $d->warehouseList(),
             ];
         }
 
@@ -550,6 +553,7 @@ class Select2Controller extends Controller {
                 'top_internal'          => $d->top_internal,
                 'limit_credit'          => number_format($d->limit_credit,2,',','.'),
                 'count_limit_credit'    => number_format($d->count_limit_credit,2,',','.'),
+                'billing_address'       => $d->getBillingAddress()
             ];
         }
 
@@ -1344,8 +1348,8 @@ class Select2Controller extends Controller {
                     'place_name'        => $row->place_id ? $row->place->code : '',
                     'line_id'           => $row->line_id ? $row->line_id : '',
                     'line_name'         => $row->line_id ? $row->line->code.' - '.$row->line->name : '',
-                    'machine_id'        => $row->machine_id ? $row->machine_id : '',
-                    'machine_name'      => $row->machine_id ? $row->machine->name : '',
+                    'machine_id'        => $row->machine()->exists ? $row->machine_id : '',
+                    'machine_name'      => $row->machine()->exists ? $row->machine->name : '',
                     'department_id'     => $row->department_id ? $row->department_id : '',
                     'department_name'   => $row->department_id ? $row->department->name : '',
                     'warehouse_id'      => $row->warehouse_id ? $row->warehouse_id : '',
@@ -1622,7 +1626,8 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = MarketingOrder::where(function($query) use($search){
             $query->where('code', 'like', "%$search%")
-                ->orWhere('note','like',"%$search%")
+                ->orWhere('note_internal','like',"%$search%")
+                ->orWhere('note_external','like',"%$search%")
                 ->orWhereHas('user',function($query) use ($search){
                     $query->where('name','like',"%$search%")
                         ->orWhere('employee_no','like',"%$search%");
@@ -1654,7 +1659,8 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = MarketingOrderDelivery::where(function($query) use($search){
             $query->where('code', 'like', "%$search%")
-                ->orWhere('note','like',"%$search%")
+                ->orWhere('note_internal','like',"%$search%")
+                ->orWhere('note_external','like',"%$search%")
                 ->orWhereHas('user',function($query) use ($search){
                     $query->where('name','like',"%$search%")
                         ->orWhere('employee_no','like',"%$search%");
@@ -1666,7 +1672,9 @@ class Select2Controller extends Controller {
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-        ->whereIn('status',['2','3'])->get();
+        ->whereIn('status',['2','3'])
+        ->whereNotNull('send_status')
+        ->get();
 
         foreach($data as $d) {
             if(!$d->marketingOrderDeliveryProcess()->exists()){
@@ -1688,7 +1696,8 @@ class Select2Controller extends Controller {
         $data = MarketingOrderDeliveryProcess::where(function($query) use($search,$account_id){
             $query->where(function($query) use ($search){
                 $query->where('code', 'like', "%$search%")
-                    ->orWhere('note','like',"%$search%")
+                    ->orWhere('note_internal','like',"%$search%")
+                    ->orWhere('note_external','like',"%$search%")
                     ->orWhereHas('user',function($query) use ($search){
                         $query->where('name','like',"%$search%")
                             ->orWhere('employee_no','like',"%$search%");
@@ -1892,6 +1901,58 @@ class Select2Controller extends Controller {
                     'details'           => $arrDetail,
                 ];
             }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function transportation(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Transportation::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function outlet(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Outlet::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'address'           => $d->address,
+                'province_id'       => $d->province_id,
+                'province_name'     => $d->province->name,
+                'city_id'           => $d->city_id,
+                'city_name'         => $d->city->name,
+                'district_id'       => $d->district_id,
+                'district_name'     => $d->district->name,
+                'subdistrict_id'    => $d->subdistrict_id,
+                'subdistrict_name'  => $d->subdistrict->name,
+                'cities'            => $d->province->getCity(),
+            ];
         }
 
         return response()->json(['items' => $response]);

@@ -28,22 +28,26 @@ class MarketingOrder extends Model
         'document_no',
         'type_delivery',
         'sender_id',
+        'transportation_id',
         'delivery_date',
+        'outlet_id',
         'payment_type',
         'top_internal',
         'top_customer',
         'is_guarantee',
-        'shipment_address',
+        'user_data_id',
         'billing_address',
         'destination_address',
         'province_id',
         'city_id',
+        'district_id',
         'subdistrict_id',
         'sales_id',
         'currency_id',
         'currency_rate',
         'percent_dp',
-        'note',
+        'note_internal',
+        'note_external',
         'subtotal',
         'discount',
         'total',
@@ -67,8 +71,22 @@ class MarketingOrder extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
+    public function transportation()
+    {
+        return $this->belongsTo('App\Models\Transportation', 'transportation_id', 'id')->withTrashed();
+    }
+
+    public function outlet()
+    {
+        return $this->belongsTo('App\Models\Outlet', 'outlet_id', 'id')->withTrashed();
+    }
+
     public function account(){
         return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
+    }
+
+    public function userData(){
+        return $this->belongsTo('App\Models\UserData','user_data_id','id')->withTrashed();
     }
 
     public function project(){
@@ -89,6 +107,10 @@ class MarketingOrder extends Model
 
     public function city(){
         return $this->belongsTo('App\Models\Region','city_id','id')->withTrashed();
+    }
+
+    public function district(){
+        return $this->belongsTo('App\Models\Region','district_id','id')->withTrashed();
     }
 
     public function subdistrict(){

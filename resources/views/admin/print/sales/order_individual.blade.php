@@ -246,7 +246,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            Down Payment (%)
+                                            DP (%)
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
@@ -259,11 +259,11 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="30%">
-                                            Almt Kirim
+                                            Tipe Transport
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="70%">
-                                            {{ $data->shipment_address }}
+                                            {{ $data->transportation->name }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -276,12 +276,21 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td width="30%">
+                                            Outlet
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="70%">
+                                            {{ $data->outlet->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>
                                             Almt Tujuan
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->destination_address.', '.ucwords(strtolower($data->subdistrict->name.' - '.$data->city->name.' - '.$data->province->name)) }}
+                                            {{ $data->destination_address.', '.ucwords(strtolower($data->subdistrict->name.' - '.$data->district->name.' - '.$data->city->name.' - '.$data->province->name)) }}
                                         </td>
                                     </tr>
                                 </table>
@@ -329,7 +338,10 @@
                                         Rekening :<br>
                                         {!! $data->company->banks() !!}
                                         <div class="mt-3">
-                                            Catatan : {{ $data->note }}
+                                            Catatan Internal : {{ $data->note_internal }}
+                                        </div>
+                                        <div class="mt-3">
+                                            Catatan Eksternal : {{ $data->note_external }}
                                         </div>
                                         Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal).' '.$data->currency->document_text }}
                                     </td>

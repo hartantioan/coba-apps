@@ -50,7 +50,7 @@ class MarketingOrderReportController extends Controller
                 'customer'          => $row->account->name,
                 'post_date'         => date('d/m/y',strtotime($row->post_date)),
                 'top'               => $row->top_customer,
-                'note'              => $row->note,
+                'note'              => $row->note_internal.' - '.$row->note_external,
                 'subtotal'          => number_format($row->subtotal,2,',','.'),
                 'discount'          => number_format($row->discount,2,',','.'),
                 'total'             => number_format($row->total,2,',','.'),

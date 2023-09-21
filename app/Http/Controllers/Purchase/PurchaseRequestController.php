@@ -2215,6 +2215,7 @@ class PurchaseRequestController extends Controller
                         'min_stock'     => number_format($min_stock,3,',','.'),
                         'max_stock'     => number_format($max_stock,3,',','.'),
                         'qty_request'   => number_format($balance,3,',','.'),
+                        'list_warehouse'=> $row->warehouseList(),
                     ];
                 }
             }

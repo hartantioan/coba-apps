@@ -376,7 +376,7 @@ class UserController extends Controller
                                 <th>'.implode('<br>',$banks).'</th>
                             </tr>
                             <tr>
-                                <th>Info Tambahan</th>
+                                <th>Alamat Penagihan</th>
                                 <th>'.implode('<br>',$infos).'</th>
                             </tr>
                             <tr>
@@ -423,6 +423,7 @@ class UserController extends Controller
                 'country_id'        => 'required',
                 'limit_credit'      => 'required',
                 'employee_type'     => 'required',
+                'place_id'          => 'required',
             ], [
                 'name.required' 	            => 'Nama tidak boleh kosong.',
                 'username.required'             => 'Username tidak boleh kosong.',
@@ -441,7 +442,8 @@ class UserController extends Controller
                 'subdistrict_id.required'       => 'Kecamatan tidak boleh kosong.',
                 'country_id.required'           => 'Negara tidak boleh kosong.',
                 'limit_credit.required'         => 'Limit BS Karyawan tidak boleh kosong.',
-                'employee_type.required'        => 'Tipe Pegawai tidak boleh kosong.'
+                'employee_type.required'        => 'Tipe Pegawai tidak boleh kosong.',
+                'place_id.required'             => 'Plant pegawai tidak boleh kosong.'
             ]);
         }else{
             $validation = Validator::make($request->all(), [
@@ -520,6 +522,7 @@ class UserController extends Controller
                     $query->id_card         = $request->id_card ? $request->id_card : NULL;
                     $query->id_card_address = $request->id_card_address;
                     $query->company_id	    = $request->company_id ? $request->company_id : NULL;
+                    $query->place_id	    = $request->type == '1' ? $request->place_id : NULL;
                     $query->province_id     = $request->province_id;
                     $query->city_id         = $request->city_id;
                     $query->subdistrict_id  = $request->subdistrict_id;
@@ -542,10 +545,6 @@ class UserController extends Controller
                     $query->is_ar_invoice   = $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL;
                     $query->save();
 
-                    $query->userBank()->delete();
-                    $query->userData()->delete();
-                    $query->userDriver()->delete();
-
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
@@ -555,7 +554,7 @@ class UserController extends Controller
                 try {
                     $query = User::create([
                         'name'			        => $request->name,
-                        'employee_no'           => User::generateCode($request->type),
+                        'employee_no'           => User::generateCode($request->type,$request->employee_type,$request->place_id),
                         'username'	            => $request->username ? $request->username : NULL,
                         'password'		        => $request->password ? bcrypt($request->password) : NULL,
                         'phone'	                => $request->phone,
@@ -566,6 +565,7 @@ class UserController extends Controller
                         'id_card'	            => $request->id_card,
                         'id_card_address'       => $request->id_card_address,
                         'company_id'	        => $request->company_id ? $request->company_id : NULL,
+                        'place_id'	            => $request->type == '1' ? $request->place_id : NULL,
                         'province_id'	        => $request->province_id,
                         'city_id'               => $request->city_id,
                         'subdistrict_id'        => $request->subdistrict_id,
@@ -598,36 +598,65 @@ class UserController extends Controller
 			
 			if($query) {
                 if($request->arr_bank){
+                    $query->userBank()->whereNotIn('id',$request->arr_id_bank)->delete();
                     $checked = isset($request->check) ? intval($request->check) : '';
                     foreach($request->arr_bank as $key => $row){
-                        UserBank::create([
-                            'user_id'	    => $query->id,
-                            'bank_id'	    => $row,
-                            'name'          => $request->arr_name[$key],
-                            'no'            => $request->arr_no[$key],
-                            'branch'        => $request->arr_branch[$key],
-                            'is_default'    => $key == $checked ? '1' : '0',
-                        ]);
+                        if($request->arr_id_bank[$key]){
+                            UserBank::find(intval($request->arr_id_bank[$key]))->update([
+                                'user_id'	    => $query->id,
+                                'bank_id'	    => $row,
+                                'name'          => $request->arr_name[$key],
+                                'no'            => $request->arr_no[$key],
+                                'branch'        => $request->arr_branch[$key],
+                                'is_default'    => $key == $checked ? '1' : '0',
+                            ]);
+                        }else{
+                            UserBank::create([
+                                'user_id'	    => $query->id,
+                                'bank_id'	    => $row,
+                                'name'          => $request->arr_name[$key],
+                                'no'            => $request->arr_no[$key],
+                                'branch'        => $request->arr_branch[$key],
+                                'is_default'    => $key == $checked ? '1' : '0',
+                            ]);
+                        }
                     }
                 }
 
                 if($request->arr_title){
+                    $query->userData()->whereNotIn('id',$request->arr_id_data)->delete();
                     foreach($request->arr_title as $key => $row){
-                        UserData::create([
-                            'user_id'	    => $query->id,
-                            'title'         => $row,
-                            'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL
-                        ]);
+                        if($request->arr_id_data[$key]){
+                            UserData::find(intval($request->arr_id_data[$key]))->update([
+                                'title'         => $row,
+                                'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL
+                            ]);
+                        }else{
+                            UserData::create([
+                                'user_id'	    => $query->id,
+                                'title'         => $row,
+                                'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL
+                            ]);
+                        }
                     }
                 }
 
                 if($request->arr_driver_name){
+                    $query->userDriver()->whereNotIn('id',$request->arr_id_driver)->delete();
                     foreach($request->arr_driver_name as $key => $row){
-                        UserDriver::create([
-                            'user_id'	    => $query->id,
-                            'name'          => $row,
-                            'hp'            => $request->arr_driver_hp[$key],
-                        ]);
+                        if($request->arr_id_driver[$key]){
+                            UserDriver::find(intval($request->arr_id_driver[$key]))->update([
+                                'user_id'	    => $query->id,
+                                'name'          => $row,
+                                'hp'            => $request->arr_driver_hp[$key],
+                            ]);
+                        }else{
+                            UserDriver::create([
+                                'user_id'	    => $query->id,
+                                'name'          => $row,
+                                'hp'            => $request->arr_driver_hp[$key],
+                            ]);
+                        }
                     }
                 }
 
@@ -971,6 +1000,7 @@ class UserController extends Controller
 		
 		foreach($user->userBank as $row){
 			$banks[] = [
+                'id'            => $row->id,
                 'bank_id'       => $row->bank_id,
                 'bank_name'     => $row->bank->code.' - '.$row->bank->name,
                 'name'          => $row->name,
@@ -986,6 +1016,7 @@ class UserController extends Controller
 
         foreach($user->userData as $row){
 			$datas[] = [
+                'id'        => $row->id,
                 'title'     => $row->title,
                 'content'   => $row->content
             ];
@@ -997,6 +1028,7 @@ class UserController extends Controller
 
         foreach($user->userDriver as $row){
             $drivers[] = [
+                'id'    => $row->id,
                 'name'  => $row->name,
                 'hp'    => $row->hp,
             ];

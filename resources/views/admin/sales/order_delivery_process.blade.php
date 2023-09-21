@@ -135,7 +135,8 @@
                                                         <th>No.HP/WA Supir</th>
                                                         <th>Tipe Kendaraan</th>
                                                         <th>Nopol Kendaraan</th>
-                                                        <th>Catatan</th>
+                                                        <th>Catatan Internal</th>
+                                                        <th>Catatan Eksternal</th>
                                                         <th>Tgl.Kembali SJ</th>
                                                         <th>Bukti Kembali</th>
                                                         <th>Alamat Tujuan</th>
@@ -270,8 +271,12 @@
                                 </fieldset>
                             </div>
                             <div class="input-field col m4 s12 step13">
-                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
+                                <textarea class="materialize-textarea" id="note_internal" name="note_internal" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <label class="active" for="note_internal">Keterangan Internal</label>
+                            </div>
+                            <div class="input-field col m4 s12 step14">
+                                <textarea class="materialize-textarea" id="note_external" name="note_external" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <label class="active" for="note_external">Keterangan Eksternal</label>
                             </div>
                             <div class="input-field col m4 s12">
 
@@ -280,7 +285,7 @@
                                 
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step15" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -775,6 +780,8 @@
                         $('#marketing_order_delivery_id').empty();
                     }else{
                         $('#post_date').val(response.delivery_date);
+                        $('#note_internal').val(response.note_internal);
+                        $('#note_external').val(response.note_external);
 
                         if(response.drivers.length > 0){
                             $('#user_driver_id').empty().append(`
@@ -1459,7 +1466,8 @@
                 { name: 'driver_no', className: '' },
                 { name: 'vehicle_name', className: '' },
                 { name: 'vehicle_no', className: '' },
-                { name: 'note', className: '' },
+                { name: 'note_internal', className: '' },
+                { name: 'note_external', className: '' },
                 { name: 'return_date', searchable: false, orderable: false, className: '' },
                 { name: 'document', searchable: false, orderable: false, className: '' },
                 { name: 'delivery_address', searchable: false, orderable: false, className: '' },
@@ -1650,7 +1658,8 @@
                 `);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
-                $('#note').val(response.note);
+                $('#note_internal').val(response.note_internal);
+                $('#note_external').val(response.note_external);
                 $('#vehicle_name').val(response.vehicle_name);
                 $('#vehicle_no').val(response.vehicle_no);
 
@@ -1915,13 +1924,18 @@
                     intro : 'Data yang tampil disini adalah data tarikan dari Sales Order. Disini anda bisa memilih ulang barang diambil dari stok yang mana (kolom Stock), menentukan Qty pesanan sesuai keadaan pengiriman, dan menambahkan keterangan baru.'
                 },
                 {
-                    title : 'Keterangan',
+                    title : 'Keterangan Internal',
                     element : document.querySelector('.step13'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan internal untuk dokumen ini untuk catatan antar departemen (internal perusahaan) saja.' 
+                },
+                {
+                    title : 'Keterangan Eksternal',
+                    element : document.querySelector('.step14'),
+                    intro : 'Silahkan isi / tambahkan keterangan eksternal untuk dokumen ini dan kepentingan luar perusahaan.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step14'),
+                    element : document.querySelector('.step15'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

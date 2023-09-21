@@ -234,9 +234,9 @@
                             <div class="col m12">
                                 <h6>Mata Uang</h6>
                                 <div class="input-field col m3 s12">
-                                    <select class="form-control" id="currency_id" name="currency_id">
+                                    <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                         @foreach ($currency as $row)
-                                            <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
+                                            <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                         @endforeach
                                     </select>
                                     <label class="" for="currency_id">Mata Uang</label>
@@ -376,6 +376,9 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
+                if(!$('#temp').val()){
+                    loadCurrency();
+                }
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();

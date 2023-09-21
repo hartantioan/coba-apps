@@ -36,7 +36,7 @@ class User extends Authenticatable
         'group_id',
         'status',
         'company_id',
-        'plant_id',
+        'place_id',
         'department_id',
         'position_id',
         'logo',
@@ -162,35 +162,60 @@ class User extends Authenticatable
         return '<img src="'.$path_img.'" width="100px">';
     }
 
-    public static function generateCode($type)
+    public static function generateCode($type, $kind, $place_id)
     {
         $prefix = '';
 
         if($type == '1'){
-            $prefix = 'E';
-        }elseif($type == '2'){
-            $prefix = 'C';
-        }elseif($type == '3'){
-            $prefix = 'S';
-        }elseif($type == '4'){
-            $prefix = 'V';
+            if($kind){
+                if($kind == '1'){
+                    $prefix = '3'.date('y');
+                }elseif($kind == '2'){
+                    $prefix = '3'.'.'.$place_id.'-'.date('y').date('m');
+                }
+
+                $query = User::selectRaw('RIGHT(employee_no, 3) as code')
+                    ->whereRaw("employee_no LIKE '$prefix%'")
+                    ->withTrashed()
+                    ->orderByDesc('id')
+                    ->limit(1)
+                    ->get();
+
+                if($query->count() > 0) {
+                    $code = (int)$query[0]->code + 1;
+                } else {
+                    $code = '001';
+                }
+
+                $no = str_pad($code, 3, 0, STR_PAD_LEFT);
+
+                return $prefix.$no;
+            }
+        }else{
+            if($type == '2'){
+                $prefix = 'C';
+            }elseif($type == '3'){
+                $prefix = 'S';
+            }elseif($type == '4'){
+                $prefix = 'V';
+            }
+    
+            $query = User::selectRaw('type, RIGHT(employee_no, 6) as code')
+                ->where('type',$type)
+                ->orderByDesc('id')
+                ->limit(1)
+                ->get();
+    
+            if($query->count() > 0) {
+                $code = (int)$query[0]->code + 1;
+            } else {
+                $code = '000001';
+            }
+    
+            $no = str_pad($code, 6, 0, STR_PAD_LEFT);
+    
+            return $prefix.$no;
         }
-
-        $query = User::selectRaw('type, RIGHT(employee_no, 6) as code')
-            ->where('type',$type)
-            ->orderByDesc('id')
-            ->limit(1)
-            ->get();
-
-        if($query->count() > 0) {
-            $code = (int)$query[0]->code + 1;
-        } else {
-            $code = '000001';
-        }
-
-        $no = str_pad($code, 6, 0, STR_PAD_LEFT);
-
-        return $prefix.$no;
     }
 
     public function status(){
@@ -215,6 +240,18 @@ class User extends Authenticatable
 
     public function userData(){
         return $this->hasMany('App\Models\UserData');
+    }
+
+    public function getBillingAddress(){
+        $arr = [];
+        foreach($this->userData as $row){
+            $arr[] = [
+                'id'        => $row->id,
+                'title'     => $row->title,
+                'content'   => $row->content,
+            ];
+        }
+        return $arr;
     }
 
     public function userDriver(){

@@ -1658,13 +1658,15 @@
     }
 
     function useStock(){
-        let passed = false, arr_id = [], arr_name = [], arr_qty = [];
+        let passed = false, arr_id = [], arr_name = [], arr_unit = [], arr_qty = [], arr_warehouse = [];
         $('input[name^="arr_value_stock[]"]').each(function(index){
             if($(this).is(':checked')){
                 passed = true;
                 arr_id.push($('input[name^="arr_id_item[]"]').eq(index).val());
                 arr_name.push($('span[name^="arr_item_name[]"]').eq(index).text());
+                arr_unit.push($('span[name^="arr_item_unit[]"]').eq(index).text());
                 arr_qty.push($('input[name^="arr_qty_order[]"]').eq(index).val());
+                arr_warehouse.push($('input[name^="arr_warehouse_item[]"]').eq(index).val());
             }
         });
         if(passed){
@@ -1680,7 +1682,7 @@
                             <input name="arr_qty[]" type="text" value="` + arr_qty[i] + `" onkeyup="formatRupiahNoMinus(this)">
                         </td>
                         <td class="center">
-                            <span id="arr_satuan` + count + `">-</span>
+                            <span id="arr_satuan` + count + `">` + arr_unit[i] + `</span>
                         </td>
                         <td>
                             <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
@@ -1738,8 +1740,21 @@
                 $('#arr_item' + count).append(`
                     <option value="` + arr_id[i] + `">` + arr_name[i] + `</option>
                 `);
+                $("#arr_warehouse" + count).empty();
+                if(JSON.parse(arr_warehouse[i]).length > 0){
+                    $.each(JSON.parse(arr_warehouse[i]), function(i, value) {
+                        $('#arr_warehouse' + count).append(`
+                            <option value="` + value.id + `">` + value.name + `</option>
+                        `);
+                    });
+                }else{
+                    $("#arr_warehouse" + count).append(`
+                        <option value="">--Gudang tidak diatur di master data Grup Item--</option>
+                    `);
+                }
             }
             $('#modal7').modal('close');
+            
         }else{
             swal({
                 title: 'Ups!',
@@ -1770,9 +1785,10 @@
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
-                            $('#body-stock').before(`
+                            $('#body-stock').append(`
                                 <tr class="row_stock">
                                     <input type="hidden" name="arr_id_item[]" id="arr_id_item` + count + `" value="` + val.item_id + `">
+                                    <input type="hidden" name="arr_warehouse_item[]" id="arr_warehouse_item` + count + `" value='` + JSON.stringify(val.list_warehouse) + `'>
                                     <td class="center-align">
                                         <label>
                                             <input type="checkbox" id="arr_value_stock` + count + `" name="arr_value_stock[]" value="1">
@@ -1783,7 +1799,7 @@
                                         <span name="arr_item_name[]">` + val.item_name + `</span>
                                     </td>
                                     <td class="center-align">
-                                        ` + val.unit + `
+                                        <span name="arr_item_unit[]">` + val.unit + `</span>
                                     </td>
                                     <td class="right-align">
                                         ` + val.in_stock + `

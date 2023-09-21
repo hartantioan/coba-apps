@@ -45,7 +45,7 @@
                                     <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
                                 </div>
                                 <div class="input-field col s12">
-                                    <h5 class="ml-4">Sign in</h5>
+                                    <h5 class="ml-4">Silahkan Masuk</h5>
                                 </div>
                             </div>
                             <div class="row margin">
@@ -67,7 +67,7 @@
                                     <p>
                                         <label>
                                             <input type="checkbox" id="showPassword"/>
-                                            <span>Show Password</span>
+                                            <span>Lihat Password</span>
                                         </label>
                                     </p>
                                 </div>
@@ -79,10 +79,10 @@
                             </div>
                             <div class="row">
                                 <div class="input-field col s6 m6 l6">
-                                    
+                                    <p class="margin medium-small"><a href="{{ url('admin/register') }}">Register Karyawan Non-Staff</a></p>
                                 </div>
                                 <div class="input-field col s6 m6 l6">
-                                    <p class="margin right-align medium-small"><a href="{{ url('admin/login/forget') }}">Forgot password ?</a></p>
+                                    <p class="margin right-align medium-small"><a href="{{ url('admin/login/forget') }}">Lupa Password ?</a></p>
                                 </div>
                             </div>
                         </form>

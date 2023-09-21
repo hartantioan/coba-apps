@@ -23,8 +23,10 @@ class MarketingOrderDelivery extends Model
         'marketing_order_id',
         'post_date',
         'delivery_date',
-        'note',
+        'note_internal',
+        'note_external',
         'status',
+        'send_status',
         'grandtotal',
         'void_id',
         'void_note',
@@ -78,6 +80,15 @@ class MarketingOrderDelivery extends Model
           '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
           '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+        };
+
+        return $status;
+    }
+
+    public function sendStatus(){
+        $status = match ($this->send_status) {
+          '1' => 'SIAP DIKIRIM',
+          default => 'BELUM SIAP DIKIRIM',
         };
 
         return $status;

@@ -19,6 +19,20 @@ class Region extends Model
         'name',
     ];
 
+    public function getDistrict(){
+        $arr = [];
+        $data = Region::where('code', 'like', "$this->code%")->whereRaw("CHAR_LENGTH(code) = 8")->get();
+        foreach($data as $row){
+            $arr[] = [
+                'id'            => $row->id,
+                'code'          => $row->code,
+                'name'          => $row->name,
+                'subdistrict'   => $row->getSubdistrict(),
+            ];
+        }
+        return $arr;
+    }
+
     public function getSubdistrict(){
         $arr = [];
         $data = Region::where('code', 'like', "$this->code%")->whereRaw("CHAR_LENGTH(code) = 13")->get();
@@ -40,6 +54,7 @@ class Region extends Model
                 'id'            => $row->id,
                 'code'          => $row->code,
                 'name'          => $row->name,
+                'district'      => $row->getDistrict(),
                 'subdistrict'   => $row->getSubdistrict(),
             ];
         }

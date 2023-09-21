@@ -62,6 +62,7 @@ class MarketingOrderDeliveryController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
+            'send_status',
             'code',
             'user_id',
             'customer_id',
@@ -70,7 +71,8 @@ class MarketingOrderDeliveryController extends Controller
             'marketing_order_no',
             'post_date',
             'delivery_date',
-            'note',
+            'note_internal',
+            'note_external'
         ];
 
         $start  = $request->start;
@@ -85,7 +87,8 @@ class MarketingOrderDeliveryController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('note_internal', 'like', "%$search%")
+                            ->orWhere('note_external', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -139,7 +142,8 @@ class MarketingOrderDeliveryController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('note_internal', 'like', "%$search%")
+                            ->orWhere('note_external', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -191,6 +195,12 @@ class MarketingOrderDeliveryController extends Controller
             foreach($query_data as $val) {
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    '
+                        <select class="browser-default" onchange="updateSendStatus(`'.CustomHelper::encrypt($val->code).'`,this)" style="width:150px;">
+                            <option value="" '.(!$val->send_status ? 'selected' : '').'>BELUM SIAP</option>
+                            <option value="1" '.($val->send_status == '1' ? 'selected' : '').'>SIAP DIKIRIM</option>
+                        </select>
+                    ',
                     $val->code,
                     $val->user->name,
                     $val->marketingOrder->account->name,
@@ -199,7 +209,8 @@ class MarketingOrderDeliveryController extends Controller
                     $val->marketingOrder->code,
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->delivery_date)),
-                    $val->note,
+                    $val->note_internal,
+                    $val->note_external,
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -252,7 +263,7 @@ class MarketingOrderDeliveryController extends Controller
                         'qty'           => number_format($row->balanceQtyMod(),3,',','.'),
                         'unit'          => $row->item->sellUnit->code,
                         'note'          => $row->note,
-                        'item_stock_id' => $row->item_stock_id,
+                        'item_stock_id' => $row->item_stock_id ? $row->item_stock_id : '',
                     ];
                 }
 
@@ -435,7 +446,7 @@ class MarketingOrderDeliveryController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Jadwal Kirim telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Marketing Order Delivery telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -448,7 +459,8 @@ class MarketingOrderDeliveryController extends Controller
                         $query->marketing_order_id = $request->marketing_order_id;
                         $query->post_date = $request->post_date;
                         $query->delivery_date = $request->delivery_date;
-                        $query->note = $request->note;
+                        $query->note_internal = $request->note_internal;
+                        $query->note_external = $request->note_external;
                         $query->status = '1';
 
                         $query->save();
@@ -461,7 +473,7 @@ class MarketingOrderDeliveryController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status jadwal kirim detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Marketing Order Delivery detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -478,7 +490,8 @@ class MarketingOrderDeliveryController extends Controller
                         'marketing_order_id'	    => $request->marketing_order_id,
                         'post_date'                 => $request->post_date,
                         'delivery_date'             => $request->delivery_date,
-                        'note'                      => $request->note,
+                        'note_internal'             => $request->note_internal,
+                        'note_external'             => $request->note_external,
                         'status'                    => '1',
                     ]);
 
@@ -513,8 +526,8 @@ class MarketingOrderDeliveryController extends Controller
 
                 $query->updateGrandtotal();
 
-                CustomHelper::sendApproval('marketing_order_deliveries',$query->id,$query->note);
-                CustomHelper::sendNotification('marketing_order_deliveries',$query->id,'Pengajuan Marketing Order Delivery No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval('marketing_order_deliveries',$query->id,$query->note_internal.' - '.$query->note_external);
+                CustomHelper::sendNotification('marketing_order_deliveries',$query->id,'Pengajuan Marketing Order Delivery No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
                 activity()
                     ->performedOn(new MarketingOrderDelivery())
@@ -1472,6 +1485,39 @@ class MarketingOrderDeliveryController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function updateSendStatus(Request $request){
+        $data = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->code))->first();
+        if($data){
+            if(!$data->marketingOrderDeliveryProcess()->exists()){
+                $data->update([
+                    'send_status'   => $request->status ? $request->status : NULL,
+                ]);
+
+                CustomHelper::sendNotification($data->getTable(),$data->id,'Status Pengiriman Surat Jalan No. '.$data->code.' telah diupdate','Status pengiriman dokumen anda telah dinyatakan '.$data->sendStatus().'.',session('bo_id'));
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Status berhasil dirubah.',
+                    'value'   => $data->send_status ? $data->send_status : '',
+                ];
+            }else{
+                $response = [
+                    'status'  => 422,
+                    'message' => 'Maaf, data sudah dijadikan Surat Jalan.',
+                    'value'   => $data->send_status ? $data->send_status : '',
+                ];
+            }
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Maaf, data tidak ditemukan.',
+                'value'   => '',
             ];
         }
 

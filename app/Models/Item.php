@@ -143,7 +143,7 @@ class Item extends Model
         foreach($po as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
                 $arrPrice[] = [
-                    'purchase_code' => $row->code,
+                    'sales_code'    => $row->code,
                     'customer_id'   => $row->account_id,
                     'customer_name' => $row->account->name,
                     'price'         => number_format($rowdetail->price,2,',','.'),

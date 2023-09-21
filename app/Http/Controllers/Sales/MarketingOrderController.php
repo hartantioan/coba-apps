@@ -13,6 +13,9 @@ use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
 use App\Models\Place;
 use App\Models\Machine;
+use App\Models\Region;
+use App\Models\Transportation;
+use App\Models\UserData;
 use Illuminate\Http\Request;
 use App\Models\Currency;
 use App\Helpers\CustomHelper;
@@ -45,6 +48,7 @@ class MarketingOrderController extends Controller
             'content'       => 'admin.sales.order',
             'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
+            'transportation'=> Transportation::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
@@ -76,13 +80,14 @@ class MarketingOrderController extends Controller
             'document_no',
             'delivery_type',
             'sender_id',
+            'transportation_id',
             'delivery_date',
             'payment_type',
             'top_internal',
             'top_customer',
             'is_guarantee',
-            'shipment_address',
             'billing_address',
+            'outlet_id',
             'destination_address',
             'province_id',
             'city_id',
@@ -90,7 +95,8 @@ class MarketingOrderController extends Controller
             'sales_id',
             'currency_id',
             'currency_rate',
-            'note',
+            'note_internal',
+            'note_external',
             'subtotal',
             'discount',
             'total',
@@ -113,7 +119,8 @@ class MarketingOrderController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('document_no', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('note_internal', 'like', "%$search%")
+                            ->orWhere('note_external', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
@@ -189,7 +196,8 @@ class MarketingOrderController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('document_no', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('note_internal', 'like', "%$search%")
+                            ->orWhere('note_external', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
@@ -275,22 +283,25 @@ class MarketingOrderController extends Controller
                     $val->document_no,
                     $val->deliveryType(),
                     $val->sender->name,
+                    $val->transportation->name,
                     date('d/m/y',strtotime($val->delivery_date)),
                     $val->paymentType(),
                     $val->top_internal,
                     $val->top_customer,
                     $val->isGuarantee(),
-                    $val->shipment_address,
                     $val->billing_address,
+                    $val->outlet->name,
                     $val->destination_address,
                     $val->province->name,
                     $val->city->name,
+                    $val->district->name,
                     $val->subdistrict->name,
                     $val->sales->name,
                     $val->currency->name,
                     number_format($val->currency_rate,2,',','.'),
                     $val->percent_dp,
-                    $val->note,
+                    $val->note_internal,
+                    $val->note_external,
                     number_format($val->subtotal,2,',','.'),
                     number_format($val->discount,2,',','.'),
                     number_format($val->total,2,',','.'),
@@ -339,11 +350,13 @@ class MarketingOrderController extends Controller
             'type_delivery'             => 'required',
             'sender_id'                 => 'required',
             'delivery_date'             => 'required',
-            'shipment_address'          => 'required',
+            'transportation_id'         => 'required',
+            'outlet_id'                 => 'required',
             'billing_address'           => 'required',
             'destination_address'       => 'required',
             'province_id'               => 'required',
             'city_id'                   => 'required',
+            'district_id'               => 'required',
             'subdistrict_id'            => 'required',
             'payment_type'              => 'required',
             'top_internal'              => 'required',
@@ -390,12 +403,14 @@ class MarketingOrderController extends Controller
             'type_delivery.required'		    => 'Tipe pengiriman tidak boleh kosong.',
             'sender_id.required'                => 'Pihak pengirim tidak boleh kosong.',
             'delivery_date.required'            => 'Tanggal pengiriman estimasi tidak boleh kosong.',
-            'shipment_address.required'         => 'Alamat pengirim ekspedisi tidak boleh kosong.',
+            'transportation_id.required'        => 'Tipe transportasi tidak boleh kosong.',
+            'outlet_id.required'                => 'Outlet tidak boleh kosong.',
             'billing_address.required'          => 'Alamat penagihan tidak boleh kosong.',
             'destination_address.required'      => 'Alamat tujuan tidak boleh kosong.',
             'province_id.required'              => 'Provinsi tujuan tidak boleh kosong.',
             'city_id.required'                  => 'Kota tujuan tidak boleh kosong.',
-            'subdistrict_id.required'           => 'Kecamatan tidak boleh kosong',
+            'district_id.required'              => 'Kecamatan tujuan tidak boleh kosong.',
+            'subdistrict_id.required'           => 'Kelurahan tidak boleh kosong',
             'payment_type.required'             => 'Tipe pembayaran tidak boleh kosong.',
             'top_internal.required'             => 'TOP internal tidak boleh kosong.',
             'top_customer.required'             => 'TOP customer tidak boleh kosong',
@@ -469,6 +484,8 @@ class MarketingOrderController extends Controller
                     ]);
                 }
             }
+
+            $userData = UserData::find($request->billing_address);
             
 			if($request->temp){
                 DB::beginTransaction();
@@ -528,17 +545,21 @@ class MarketingOrderController extends Controller
                         $query->top_internal = $request->top_internal;
                         $query->top_customer = $request->top_customer;
                         $query->is_guarantee = $request->is_guarantee;
-                        $query->shipment_address = $request->shipment_address;
-                        $query->billing_address = $request->billing_address;
+                        $query->transportation_id = $request->transportation_id;
+                        $query->outlet_id = $request->outlet_id;
+                        $query->user_data_id = $request->billing_address;
+                        $query->billing_address = $userData->title.' '.$userData->content;
                         $query->destination_address = $request->destination_address;
                         $query->province_id = $request->province_id;
                         $query->city_id = $request->city_id;
+                        $query->district_id = $request->district_id;
                         $query->subdistrict_id = $request->subdistrict_id;
                         $query->sales_id = $request->sales_id;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->percent_dp = str_replace(',','.',str_replace('.','',$request->percent_dp));
-                        $query->note = $request->note;
+                        $query->note_internal = $request->note_internal;
+                        $query->note_external = $request->note_external;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
                         $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
                         $query->total = str_replace(',','.',str_replace('.','',$request->total));
@@ -586,17 +607,21 @@ class MarketingOrderController extends Controller
                         'top_internal'              => $request->top_internal,
                         'top_customer'              => $request->top_customer,
                         'is_guarantee'              => $request->is_guarantee,
-                        'shipment_address'          => $request->shipment_address,
-                        'billing_address'           => $request->billing_address,
+                        'transportation_id'         => $request->transportation_id,
+                        'outlet_id'                 => $request->outlet_id,
+                        'user_data_id'              => $request->billing_address,
+                        'billing_address'           => $userData->title.' '.$userData->content,
                         'destination_address'       => $request->destination_address,
                         'province_id'               => $request->province_id,
                         'city_id'                   => $request->city_id,
+                        'district_id'               => $request->district_id,
                         'subdistrict_id'            => $request->subdistrict_id,
                         'sales_id'                  => $request->sales_id,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'percent_dp'                => str_replace(',','.',str_replace('.','',$request->percent_dp)),
-                        'note'                      => $request->note,
+                        'note_internal'             => $request->note_internal,
+                        'note_external'             => $request->note_external,
                         'subtotal'                  => str_replace(',','.',str_replace('.','',$request->subtotal)),
                         'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
                         'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
@@ -638,7 +663,7 @@ class MarketingOrderController extends Controller
                             'tax'                           => $request->arr_tax_nominal[$key],
                             'grandtotal'                    => $request->arr_grandtotal[$key],
                             'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
-                            'item_stock_id'                 => $request->arr_item_stock[$key],
+                            'item_stock_id'                 => $request->arr_item_stock[$key] ? $request->arr_item_stock[$key] : NULL,
                             'place_id'                      => $request->arr_place[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key],
                         ]);
@@ -649,8 +674,8 @@ class MarketingOrderController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval('marketing_orders',$query->id,$query->note);
-                CustomHelper::sendNotification('marketing_orders',$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval('marketing_orders',$query->id,$query->note_internal.' - '.$query->note_external);
+                CustomHelper::sendNotification('marketing_orders',$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
                 activity()
                     ->performedOn(new MarketingOrder())
@@ -691,6 +716,9 @@ class MarketingOrderController extends Controller
         $po['currency_rate'] = number_format($po->currency_rate,2,',','.');
         $po['project_name'] = $po->project()->exists() ? $po->project->code.' - '.$po->project->name : '';
         $po['percent_dp'] = number_format($po->percent_dp,2,',','.');
+        $po['user_data'] = $po->account->getBillingAddress();
+        $po['transportation_name'] = $po->transportation->code.' - '.$po->transportation->name;
+        $po['outlet_name'] = $po->outlet->code.' - '.$po->outlet->name;
 
         $arr = [];
         
@@ -721,6 +749,7 @@ class MarketingOrderController extends Controller
                 'list_stock'            => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'place_id'              => $row->place_id,
                 'warehouse_id'          => $row->warehouse_id,
+                'list_warehouse'        => $row->item->warehouseList(),
             ];
         }
 

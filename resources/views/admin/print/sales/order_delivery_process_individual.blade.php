@@ -139,7 +139,9 @@
             @page { margin: 5em 3em 6em 3em; }
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
-        
+            #table-info > tbody > tr > td {
+                padding: 5px;
+            }
            
         </style>
     </head>
@@ -328,7 +330,7 @@
                                     <tr class="break-row">
                                         <td>
                                             <div class="mt-3">
-                                                Catatan : {{ $data->note }}
+                                                Catatan : {{ $data->note_external }}
                                             </div>
                                         </td>
                                     </tr>
@@ -378,6 +380,23 @@
                                 @endif
                             </tr>
                         </table>  
+                    </div>
+                    <div class="invoice-subtotal break-row">
+                        <table border="1" style="border-collapse:collapse;font-size:8px;" id="table-info" width="100%">
+                            <tbody>
+                                <tr>
+                                    <td width="50%">Komplain harap menyertakan bukti foto dan/atau video sebelum saat proses bongkar.</td>
+                                    <td width="50%">Dicetak pada : {{ date('d/m/y H:i') }}</td>
+                                </tr>
+                                <tr>
+                                    <td width="100%" colspan="2">
+                                        Penerima membubuhkan tanda tangan dan stempel setelah : <br>
+                                        1. Mengetahui dan memeriksa barang yang diterima sesuai betul yang dicantumkan di Surat Jalan, baik jenis maupun jumlahnya.<br>
+                                        2. Mengetahui dan menyetujui bahwa barang yang belum lunas, masih merupakan milik PENJUAL, sehingga tidak keberatan apabila sewaktu-waktu ditarik kembali.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

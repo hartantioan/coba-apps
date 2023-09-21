@@ -193,11 +193,11 @@
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
-                            <div class="col m12 s12 step6">
+                            <div class="col m12 s12">
                                 <p class="mb-2">
                                     <h6>Silahkan pilih Inventori Transfer Keluar (Asal)</h6>
                                 </p>
-                                <div class="input-field col m4 s4">
+                                <div class="input-field col m4 s4 step6">
                                     <select class="browser-default" id="inventory_transfer_out_id" name="inventory_transfer_out_id" onchange="getTransferOut();"></select>
                                 </div>
                                 <div class="col m8 s8 step7">
@@ -233,8 +233,8 @@
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="col s12 mt-3 step10">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <div class="col s12 mt-3">
+                                <button class="btn waves-effect waves-light right submit step10" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -1242,8 +1242,13 @@
                 },
                 {
                     title : 'Inventori Transfer Keluar',
-                    element : document.querySelector('.step7'),
+                    element : document.querySelector('.step6'),
                     intro : 'Memilih item yang ingin ditransfer keluar' 
+                },
+                {
+                    title : 'Inventori Transfer Keluar Terpakai',
+                    element : document.querySelector('.step7'),
+                    intro : 'Silahkan hapus Transfer Keluar terpakai agar bisa diakses di form lainnya.' 
                 },
                 {
                     title : 'Detail Produk',

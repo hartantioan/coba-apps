@@ -171,9 +171,9 @@
                                 <label class="active" for="post_date">Tgl. Post</label>
                             </div>
                             <div class="input-field col m3 s12 step5">
-                                <select class="form-control" id="currency_id" name="currency_id">
+                                <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                     @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
+                                        <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="" for="currency_id">Mata Uang</label>
@@ -454,6 +454,9 @@
                 window.onbeforeunload = function() {
                     return 'You will lose all changes made since your last save';
                 };
+                if(!$('#temp').val()){
+                    loadCurrency();
+                }
             },
             onCloseEnd: function(modal, trigger){
                 $("#form_data :input").prop("disabled", false);
@@ -1286,7 +1289,7 @@
             steps: [
                 {
                     title : 'Good Receive',
-                    intro : 'Form ini digunakan untuk membuat GRPO dari purchase order yang terkait '
+                    intro : 'Form ini digunakan untuk menambahkan stok barang tanpa melalui pembelian. Biasanya digunakan untuk menambahkan barang yang tiba-tiba ada dan tidak tahu historinya. Namun perlu diingat bahwa disini pengguna juga harus menentukan nominal barang tersebut yang mana bisa dilihat di situs e-Commerce sebagai referensi.'
                 },
                 {
                     title : 'Nomor Dokumen',
@@ -1316,7 +1319,7 @@
                 {
                     title : 'Konversi',
                     element : document.querySelector('.step6'),
-                    intro : 'Nilai Konversi mata uang' 
+                    intro : 'Nilai konversi rupiah pada saat dokumen dibuat. Nilai konversi secara otomatis diisi ketika form tambah baru dibuka pertama kali dan data diambil dari situs exchangerate.host. Pastikan kode mata uang benar di master data agar nilai konversi tidak error.' 
                 },
                 {
                     title : 'File Lampiran',

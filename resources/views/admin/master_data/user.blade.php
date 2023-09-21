@@ -143,7 +143,7 @@
                                 <option value="3">Supplier</option>
                                 <option value="4">Ekspedisi</option>
                             </select>
-                            <label for="type">Tipe</label>
+                            <label for="type">Tipe Partner Bisnis</label>
                         </div>
                         <div class="input-field col s3">
                             <input type="hidden" id="temp" name="temp">
@@ -275,6 +275,14 @@
                             </select>
                             <label for="employee_type">Tipe Pegawai</label>
                         </div>
+                        <div class="input-field col s3 employee_inputs">
+                            <select class="form-control" id="place_id" name="place_id">
+                                @foreach ($place as $rowplace)
+                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="place_id">Plant (Untuk nomor pegawai)</label>
+                        </div>
                         <div class="input-field col s3 customer_inputs" style="display:none;">
                             <div class="switch mb-1">
                                 <label for="is_ar_invoice">Auto Generate SJ -> AR Invoice</label>
@@ -300,7 +308,7 @@
                         <div class="col s12 mt-3">
                             <ul class="tabs">
                                 <li class="tab col m4"><a class="active" href="#rekform">Rekening</a></li>
-                                <li class="tab col m4"><a href="#dataform">Info Tambahan</a></li>
+                                <li class="tab col m4"><a href="#dataform">Alamat Penagihan</a></li>
                                 <li class="tab col m4 other_inputs" style="display:none;""><a href="#driverform">Daftar Supir</a></li>
                             </ul>
                             <div id="rekform" class="col s12 active">
@@ -330,7 +338,7 @@
                                 </p>
                             </div>
                             <div id="dataform" class="col s12">
-                                <h5 class="center">Daftar Info Tambahan</h5>
+                                <h5 class="center">Daftar Alamat Penagihan</h5>
                                 <p class="mt-2 mb-2">
                                     <table class="bordered">
                                         <thead>
@@ -344,7 +352,7 @@
                                             <tr id="last-row-info">
                                                 <td colspan="3" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addInfo()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Informasi
+                                                        <i class="material-icons left">add</i> Tambah Alamat
                                                     </a>
                                                 </td>
                                             </tr>
@@ -504,7 +512,7 @@
                                                         <td>
                                                             @if (!$m->childHasChild())
                                                                 <label>
-                                                                    <input type="checkbox" class="checkboxView" onclick="checkAll(this,{{ $m->id }},'view')"/>
+                                                                    <input type="checkbox" class="checkboxView" onclick="checkAll(this,{{ $m->id }},'view')" data-id="{{ $m->id }}"/>
                                                                     <span>Pilih</span>
                                                                 </label>
                                                             @endif
@@ -550,7 +558,7 @@
                                                                 </td>
                                                                 <td>
                                                                     <label>
-                                                                        <input type="checkbox" class="checkboxView" onclick="checkAll(this,{{ $msub->id }},'view')"/>
+                                                                        <input type="checkbox" class="checkboxView" onclick="checkAll(this,{{ $msub->id }},'view')" data-id="{{ $msub->id }}"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
@@ -1030,6 +1038,20 @@
             });
 
         });
+
+        /* $('input[name^="checkboxView[]"]').click(function(){
+            var ada = false;
+            $('input[name^="checkboxView[]"][data-parent="' + $(this).data('parent') + '"]').each(function(){
+                if($(this).is(":checked")){
+                    ada = true;
+                }
+            });
+            if(ada){
+                $('.checkboxView[data-id="' + $(this).data('parent') + '"]').prop('checked', true);
+            }else{
+                $('.checkboxView[data-id="' + $(this).data('parent') + '"]').prop('checked', false);
+            }
+        }); */
     });
 
     function successImport(){
@@ -1352,6 +1374,7 @@
         var count = $('select[name^="arr_bank"]').length;
         $('#last-row-bank').before(`
             <tr class="row_bank">
+                <input type="hidden" name="arr_id_bank[]" value="">
                 <td>
                     <select class="browser-default bank-array" id="arr_bank` + count + `" name="arr_bank[]"></select>
                 </td>
@@ -1383,6 +1406,7 @@
     function addInfo(){
         $('#last-row-info').before(`
             <tr class="row_info">
+                <input type="hidden" name="arr_id_data[]" value="">
                 <td>
                     <input name="arr_title[]" type="text" placeholder="Judul informasi tambahan">
                 </td>
@@ -1401,6 +1425,7 @@
     function addDriver(){
         $('#last-row-driver').before(`
             <tr class="row_driver">
+                <input type="hidden" name="arr_id_driver[]" value="">
                 <td>
                     <input name="arr_driver_name[]" type="text" placeholder="Nama supir...">
                 </td>
@@ -1513,6 +1538,28 @@
     function save(){
 			
         var formData = new FormData($('#form_data')[0]);
+
+        formData.delete('arr_id_data[]');
+        formData.delete('arr_id_bank[]');
+        formData.delete('arr_id_driver[]');
+
+        $('input[name^="arr_id_data[]"]').each(function(){
+            formData.append('arr_id_data[]',
+                $(this).val() ? $(this).val() : ''
+            );
+        });
+        
+        $('input[name^="arr_id_bank[]"]').each(function(){
+            formData.append('arr_id_bank[]',
+                $(this).val() ? $(this).val() : ''
+            );
+        });
+
+        $('input[name^="arr_id_driver[]"]').each(function(){
+            formData.append('arr_id_driver[]',
+                $(this).val() ? $(this).val() : ''
+            );
+        });
         
         $.ajax({
             url: '{{ Request::url() }}/create',
@@ -1645,13 +1692,13 @@
 
                 if(response.type == '1'){
                     $('#company_id').val(response.company_id).formSelect();
-                    $('#place_id').val(response.place_id).formSelect();
                     $('#department_id').val(response.department_id).formSelect();
                     $('#position_id').val(response.position_id).formSelect();
                     $('#married_status').val(response.married_status).formSelect();
                     $('#married_date').val(response.married_date);
                     $('#children').val(response.children);
                     $('#employee_type').val(response.employee_type).formSelect();
+                    $('#place_id').val(response.place_id).formSelect();
                 }else{
                     $('#pic').val(response.pic);
                     $('#pic_no').val(response.pic_no);
@@ -1667,6 +1714,7 @@
                     $.each(response.banks, function(i, val) {
                         $('#last-row-bank').before(`
                             <tr class="row_bank">
+                                <input type="hidden" name="arr_id_bank[]" value="` + val.id + `">
                                 <td>
                                     <select class="browser-default bank-array" id="arr_bank` + i + `" name="arr_bank[]"></select>
                                 </td>
@@ -1703,6 +1751,7 @@
                     $.each(response.datas, function(i, val) {
                         $('#last-row-info').before(`
                             <tr class="row_info">
+                                <input type="hidden" name="arr_id_data[]" value="` + val.id + `">
                                 <td>
                                     <input name="arr_title[]" type="text" placeholder="Judul informasi tambahan" value="` + val.title + `">
                                 </td>
@@ -1723,6 +1772,7 @@
                     $.each(response.drivers , function(i, val) {
                         $('#last-row-driver').before(`
                             <tr class="row_driver">
+                                <input type="hidden" name="arr_id_driver[]" value="` + val.id + `">
                                 <td>
                                     <input name="arr_driver_name[]" type="text" placeholder="Nama supir..." value="` + val.name + `">
                                 </td>

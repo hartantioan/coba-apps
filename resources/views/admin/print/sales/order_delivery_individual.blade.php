@@ -150,7 +150,7 @@
                     <td width="83%" class="left-align">
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">Jadwal Kirim # {{ $data->code }}</span>
+                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">MOD # {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -163,7 +163,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">Jadwal Kirim</h5>
+                                <h5 style="margin-top: -2px">Marketing Order Delivery</h5>
                             </td>
                         </tr>
                     </td>
@@ -321,7 +321,10 @@
                                     <tr class="break-row">
                                         <td>
                                             <div class="mt-3">
-                                                Catatan : {{ $data->note }}
+                                                Catatan Internal : {{ $data->note_internal }}
+                                            </div>
+                                            <div class="mt-3">
+                                                Catatan Eksternal : {{ $data->note_external }}
                                             </div>
                                         </td>
                                     </tr>

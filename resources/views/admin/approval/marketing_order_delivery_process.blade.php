@@ -259,7 +259,10 @@
                     <tr>
                         <td colspan="6">
                             <div class="mt-3">
-                                Catatan : {{ $data->note }}
+                                Catatan Internal : {{ $data->note_internal }}
+                            </div>
+                            <div class="mt-3">
+                                Catatan Eksternal : {{ $data->note_external }}
                             </div>
                         </td>
                     </tr>

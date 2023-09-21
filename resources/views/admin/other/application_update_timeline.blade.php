@@ -11,6 +11,10 @@
     #description-text ul:not(.browser-default) {
         padding-left: 20px !important;
     }
+
+    .update-card:hover {
+        cursor: pointer;
+    }
 </style>
 <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/pages/page-timeline.css') }}">
 <div id="main">
@@ -60,6 +64,7 @@
                                                     </div>
                                                     <p><i class="material-icons profile-card-i">restore</i><b>Version:</b> {{$log->version}}</p>
                                                     <p><i class="material-icons profile-card-i">date_range</i>{{date('d/m/y',strtotime($log->release_date))}}</p>
+                                                    <p style="position:absolute;right:10px;bottom:0;">Diupdate Tgl. {{ date('d/m/y H:i:s',strtotime($log->updated_at)) }}</p>
                                                 </div>
                                             </div>
                                         </div>

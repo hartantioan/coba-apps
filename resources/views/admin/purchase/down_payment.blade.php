@@ -245,9 +245,9 @@
                                 </div>
                             </div>
                             <div class="input-field col m3 s12 step9">
-                                <select class="form-control" id="currency_id" name="currency_id">
+                                <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                     @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}">{{ $row->code.' '.$row->name }}</option>
+                                        <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="" for="currency_id">Mata Uang</label>
@@ -538,6 +538,9 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                if(!$('#temp').val()){
+                    loadCurrency();
+                }
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -1598,7 +1601,7 @@
                 {
                     title : 'Konversi',
                     element : document.querySelector('.step10'),
-                    intro : 'Nilai konversi rupiah pada saat Purchase Order dibuat.'
+                    intro : 'Nilai konversi rupiah pada saat dokumen dibuat. Nilai konversi secara otomatis diisi ketika form tambah baru dibuka pertama kali dan data diambil dari situs exchangerate.host. Pastikan kode mata uang benar di master data agar nilai konversi tidak error.'
                 },
                 {
                     title : 'Detail Purchase Order',

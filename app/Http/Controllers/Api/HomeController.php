@@ -66,9 +66,9 @@ class HomeController extends Controller
            
             $collection = [];
             if($request->arrdata){
-                $collection = collect($request->arrdata)->filter(function ($item) {
+                $collection = collect($request->arrdata)/* ->filter(function ($item) {
                     return false !== stripos($item['recordTime'], '2023-07');
-                });
+                }) */;
                 foreach($collection as $row){
                     AttendanceTemp::create([
                         'code'          => $row['userSn'],

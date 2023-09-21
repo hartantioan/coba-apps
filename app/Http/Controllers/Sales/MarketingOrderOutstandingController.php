@@ -75,7 +75,7 @@ class MarketingOrderOutstandingController extends Controller
                             'memo'              => number_format($memo,2,',','.'),
                             'payment'           => number_format($payment,2,',','.'),
                             'balance'           => number_format($balance,2,',','.'),
-                            'note'              => $rowdetail->note,
+                            'note'              => $rowdetail->note_internal.' - '.$rowdetail->note_external,
                         ];
                     }
                     $grandtotalAll += $balance;

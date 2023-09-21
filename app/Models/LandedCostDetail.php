@@ -143,7 +143,7 @@ class LandedCostDetail extends Model
             $query->where('type','2');
         })->sum('total');
 
-        $arr['total_local'] = round(($this->nominal / $this->landedCost->total) * $totalLocal,2);
+        $arr['total_local'] = $this->landedCost->total > 0 ? 0 : round(($this->nominal / $this->landedCost->total) * $totalLocal,2);
         $arr['coa_local'] = Coa::where('code','200.01.05.01.10')->where('company_id',$this->place->company_id)->first()->id;
         $arr['total_import'] = round(($this->nominal / $this->landedCost->total) * $totalImport,2);
         $arr['coa_import'] = Coa::where('code','200.01.05.01.11')->where('company_id',$this->place->company_id)->first()->id;

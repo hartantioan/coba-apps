@@ -222,16 +222,16 @@
                     {{ $data->sender->name }}
                 </div>
                 <div class="col s4">
+                    Tipe Transport
+                </div>
+                <div class="col s8">
+                    {{ $data->transportation->name }}
+                </div>
+                <div class="col s4">
                     Tgl.Kirim
                 </div>
                 <div class="col s8">
                     {{ date('d/m/y',strtotime($data->delivery_date)) }}
-                </div>
-                <div class="col s4">
-                    Almt Kirim
-                </div>
-                <div class="col s8">
-                    {{ $data->shipment_address }}
                 </div>
                 <div class="col s4">
                     Almt Penagihan
@@ -240,10 +240,16 @@
                     {{ $data->billing_address }}
                 </div>
                 <div class="col s4">
+                    Outlet
+                </div>
+                <div class="col s8">
+                    {{ $data->outlet->name }}
+                </div>
+                <div class="col s4">
                     Almt Tujuan
                 </div>
                 <div class="col s8">
-                    {{ $data->destination_address.', '.ucwords(strtolower($data->subdistrict->name.' - '.$data->city->name.' - '.$data->province->name)) }}
+                    {{ $data->destination_address.', '.ucwords(strtolower($data->subdistrict->name.' - '.$data->district->name.' - '.$data->city->name.' - '.$data->province->name)) }}
                 </div>
             </div>
             <div class="col s6 row mt-2">
@@ -340,7 +346,10 @@
                             Rekening :
                             {!! $data->company->banks() !!}
                             <div class="mt-3">
-                                Catatan : {{ $data->note }}
+                                Catatan Internal : {{ $data->note_internal }}
+                            </div>
+                            <div class="mt-3">
+                                Catatan Eksternal : {{ $data->note_external }}
                             </div>
                         </td>
                     </tr>

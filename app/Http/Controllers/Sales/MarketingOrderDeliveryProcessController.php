@@ -80,7 +80,8 @@ class MarketingOrderDeliveryProcessController extends Controller
             'driver_no',
             'vehicle_name',
             'vehicle_no',
-            'note',
+            'note_internal',
+            'note_external'
         ];
 
         $start  = $request->start;
@@ -95,7 +96,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('note_internal', 'like', "%$search%")
+                            ->orWhere('note_external', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -152,7 +154,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhere('note_internal', 'like', "%$search%")
+                            ->orWhere('note_external', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -224,7 +227,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->driver_hp,
                     $val->vehicle_name,
                     $val->vehicle_no,
-                    $val->note,
+                    $val->note_internal,
+                    $val->note_external,
                     $val->return_date ? date('d/m/y',strtotime($val->return_date)) : '-',
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->marketingOrderDelivery->marketingOrder->destination_address
@@ -266,7 +270,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         $data = MarketingOrderDelivery::find($request->id);
         if($data->used()->exists()){
             $data['status'] = '500';
-            $data['message'] = 'Jadwal Kirim No. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+            $data['message'] = 'MOD No. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
             if(!$data->marketingOrderDeliveryProcess()->exists()){
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Surat Jalan');
@@ -297,7 +301,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $data['drivers'] = $drivers;
             }else{
                 $data['status'] = '500';
-                $data['message'] = 'Seluruh item pada Jadwal Kirim No. '.$data->code.' sudah dikirimkan. Data tidak bisa ditambahkan.';
+                $data['message'] = 'Seluruh item pada MOD No. '.$data->code.' sudah dikirimkan. Data tidak bisa ditambahkan.';
             }
         }
 
@@ -400,7 +404,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $query->driver_hp = $request->driver_hp;
                         $query->vehicle_name = $request->vehicle_name;
                         $query->vehicle_no = $request->vehicle_no;
-                        $query->note = $request->note;
+                        $query->note_internal = $request->note_internal;
+                        $query->note_external = $request->note_external;
                         $query->status = '1';
                         $query->status_tracking = '1';
                         $query->total = $mod->getTotal();
@@ -439,7 +444,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'driver_hp'                     => $request->driver_hp,
                         'vehicle_name'                  => $request->vehicle_name,
                         'vehicle_no'                    => $request->vehicle_no,
-                        'note'                          => $request->note,
+                        'note_internal'                 => $request->note_internal,
+                        'note_external'                 => $request->note_external,
                         'status'                        => '1',
                         'total'                         => $mod->getTotal(),
                         'tax'                           => $mod->getTax(),
@@ -584,8 +590,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 CustomHelper::removeDeposit($querymoi->account_id,$rowdata['grandtotal']);
                             }
             
-                            CustomHelper::sendApproval($querymoi->getTable(),$querymoi->id,$querymoi->note);
-                            CustomHelper::sendNotification($querymoi->getTable(),$querymoi->id,'Pengajuan AR Invoice No. '.$querymoi->code,$querymoi->note,session('bo_id'));
+                            CustomHelper::sendApproval($querymoi->getTable(),$querymoi->id,$querymoi->note_internal.' - '.$querymoi->note->external);
+                            CustomHelper::sendNotification($querymoi->getTable(),$querymoi->id,'Pengajuan AR Invoice No. '.$querymoi->code,$querymoi->note_internal.' - '.$querymoi->note->external,session('bo_id'));
                             CustomHelper::addCountLimitCredit($querymoi->account_id,$querymoi->balance);
             
                             activity()
@@ -598,8 +604,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                 }
                 #end linkkan ke AR Invoice
 
-                CustomHelper::sendApproval('marketing_order_delivery_processes',$query->id,$query->note);
-                CustomHelper::sendNotification('marketing_order_delivery_processes',$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval('marketing_order_delivery_processes',$query->id,$query->note_internal.' - '.$query->note_external);
+                CustomHelper::sendNotification('marketing_order_delivery_processes',$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
                 activity()
                     ->performedOn(new MarketingOrderDeliveryProcess())

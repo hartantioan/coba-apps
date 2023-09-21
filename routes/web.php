@@ -34,6 +34,7 @@ use App\Http\Controllers\Usage\MaintenanceHardwareItemUsageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\RegistrationController;
 
 use App\Http\Controllers\Personal\ChatController;
 use App\Http\Controllers\MasterData\HardwareItemController;
@@ -73,6 +74,8 @@ use App\Http\Controllers\MasterData\UserDateController;
 use App\Http\Controllers\MasterData\LandedCostFeeController;
 use App\Http\Controllers\MasterData\BottomPriceController;
 use App\Http\Controllers\MasterData\PalletController;
+use App\Http\Controllers\MasterData\TransportationController;
+use App\Http\Controllers\MasterData\OutletController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -153,6 +156,11 @@ Route::prefix('admin')->group(function () {
     Route::prefix('login')->group(function () {
         Route::get('/', [AuthController::class, 'login']);
         Route::post('auth',[AuthController::class, 'auth']);
+    });
+
+    Route::prefix('register')->group(function () {
+        Route::get('/', [RegistrationController::class, 'index']);
+        Route::post('save',[RegistrationController::class, 'create']);
     });
 
     Route::prefix('logout')->group(function () {
@@ -238,6 +246,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_delivery_process', [Select2Controller::class, 'marketingOrderDeliveryProcess']);
                 Route::get('marketing_order_down_payment', [Select2Controller::class, 'marketingOrderDownPayment']);
                 Route::get('marketing_order_invoice', [Select2Controller::class, 'marketingOrderInvoice']);
+                Route::get('transportation', [Select2Controller::class, 'transportation']);
+                Route::get('outlet', [Select2Controller::class, 'outlet']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -350,6 +360,14 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[PositionController::class, 'export']);
                         Route::post('create',[PositionController::class, 'create'])->middleware('operation.access:position,update');
                         Route::post('destroy', [PositionController::class, 'destroy'])->middleware('operation.access:position,delete');
+                    });
+
+                    Route::prefix('outlet')->middleware('operation.access:outlet,view')->group(function () {
+                        Route::get('/',[OutletController::class, 'index']);
+                        Route::get('datatable',[OutletController::class, 'datatable']);
+                        Route::post('show', [OutletController::class, 'show']);
+                        Route::post('create',[OutletController::class, 'create'])->middleware('operation.access:outlet,update');
+                        Route::post('destroy', [OutletController::class, 'destroy'])->middleware('operation.access:outlet,delete');
                     });
                 });
 
@@ -734,15 +752,6 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [CostDistributionController::class, 'destroy'])->middleware('operation.access:cost_distribution,delete');
                     });
 
-                    Route::prefix('delivery_cost')->middleware('operation.access:delivery_cost,view')->group(function () {
-                        Route::get('/',[DeliveryCostController::class, 'index']);
-                        Route::get('datatable',[DeliveryCostController::class, 'datatable']);
-                        Route::post('show', [DeliveryCostController::class, 'show']);
-                        Route::post('import',[DeliveryCostController::class, 'import'])->middleware('operation.access:delivery_cost,update');
-                        Route::post('create',[DeliveryCostController::class, 'create'])->middleware('operation.access:delivery_cost,update');
-                        Route::post('destroy', [DeliveryCostController::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');
-                    });
-
                     Route::prefix('user_date')->middleware('operation.access:user_date,view')->group(function () {
                         Route::get('/',[UserDateController::class, 'index']);
                         Route::get('datatable',[UserDateController::class, 'datatable']);
@@ -770,6 +779,25 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [LandedCostFeeController::class, 'show']);
                         Route::post('create',[LandedCostFeeController::class, 'create'])->middleware('operation.access:landed_cost_fee,update');
                         Route::post('destroy', [LandedCostFeeController::class, 'destroy'])->middleware('operation.access:landed_cost_fee,delete');
+                    });
+                });
+
+                Route::prefix('master_delivery')->group(function () {
+                    Route::prefix('transportation')->middleware('operation.access:transportation,view')->group(function () {
+                        Route::get('/', [TransportationController::class, 'index']);
+                        Route::get('datatable', [TransportationController::class, 'datatable']);
+                        Route::post('show', [TransportationController::class, 'show']);
+                        Route::post('create', [TransportationController::class, 'create'])->middleware('operation.access:transportation,update');
+                        Route::post('destroy', [TransportationController::class, 'destroy'])->middleware('operation.access:transportation,delete');
+                    });
+
+                    Route::prefix('delivery_cost')->middleware('operation.access:delivery_cost,view')->group(function () {
+                        Route::get('/',[DeliveryCostController::class, 'index']);
+                        Route::get('datatable',[DeliveryCostController::class, 'datatable']);
+                        Route::post('show', [DeliveryCostController::class, 'show']);
+                        Route::post('import',[DeliveryCostController::class, 'import'])->middleware('operation.access:delivery_cost,update');
+                        Route::post('create',[DeliveryCostController::class, 'create'])->middleware('operation.access:delivery_cost,update');
+                        Route::post('destroy', [DeliveryCostController::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');
                     });
                 });
             });
@@ -1419,6 +1447,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_marketing_order', [MarketingOrderDeliveryController::class, 'getMarketingOrder']);
                     Route::post('remove_used_data', [MarketingOrderDeliveryController::class, 'removeUsedData']);
                     Route::post('create',[MarketingOrderDeliveryController::class, 'create'])->middleware('operation.access:marketing_order_delivery,update');
+                    Route::post('update_send_status',[MarketingOrderDeliveryController::class, 'updateSendStatus'])->middleware('operation.access:marketing_order_delivery,update');
                     Route::get('approval/{id}',[MarketingOrderDeliveryController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[MarketingOrderDeliveryController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderDeliveryController::class, 'voidStatus'])->middleware('operation.access:marketing_order_delivery,void');

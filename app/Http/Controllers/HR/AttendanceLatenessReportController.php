@@ -8,6 +8,7 @@ use App\Models\EmployeeSchedule;
 use App\Models\User;
 use App\Models\UserAbsensiMesin;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 
 class AttendanceLatenessReportController extends Controller
@@ -30,9 +31,9 @@ class AttendanceLatenessReportController extends Controller
         $start_date = Carbon::parse($request->start_date);
         $end_date = Carbon::parse($request->end_date);
         
-        $user_data = UserAbsensiMesin::where(function($query) use ( $request) {
+        $user_data = User::where(function($query) use ( $request) {
                 if($request->user_id) {
-                    $query->where('nik', $request->user_id);
+                    $query->where('employee_no', $request->user_id);
                 }
             })->get();
 
@@ -48,9 +49,9 @@ class AttendanceLatenessReportController extends Controller
                 foreach($user_data as $c=>$row_user){
                    
                     $query_data = EmployeeSchedule::whereDate('date', $date->toDateString())
-                              ->where('user_id',$row_user->nik)
+                              ->where('user_id',$row_user->employee_no)
                               ->get();
-                    $cleanedNik = str_replace(' ', '', $row_user->nik);
+                    $cleanedNik = str_replace(' ', '', $row_user->employee_no);
                     $query_data2 = Attendances::where('date','like',$date->toDateString()."%")
                                 ->where('employee_no',$cleanedNik)
                                 ->get();
@@ -99,15 +100,9 @@ class AttendanceLatenessReportController extends Controller
                             $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
                             
                             $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
-                            if($row_user->nik == "123017"){
-                                info($timeDifference); 
-                                info('masuk sini belum terakir time diff');
-                            }
+                           
                             if($timeDifference>2 && $key <= 2){
-                                if($row_user->nik == "123017"){
-                                  
-                                    info('masuk sini belum terakir tapi melanjutkan');
-                                }
+                                
                                 $exact_in[$key]=0;
                                 $exact_out[$key]=0;
                                 if(count(($query_data))==3){
@@ -122,41 +117,35 @@ class AttendanceLatenessReportController extends Controller
                                     $exact_in[$key]=0;
                                     $exact_out[$key]=0;
                                 }
-                                if($row_user->nik == "123017"){
-                                  
-                                    info('masuk sini terakir');
-                                }
+                               
                                 
                             }elseif($timeDifference <= 2 && $key < 2 && count($query_data) !=3){
-                                if($row_user->nik == "123017"){
-                                  
-                                    info('masuk sini lanjutan');
-                                }
+                                
                                 if($login[0]!=null){//utk melihat shift ke 2 dalam shift yang totalnya ada 2
-                                    if($row_user->nik == "123017"){
-                                  
-                                        info('masuk sini lanjutaneeee');
-                                    }
+                                    
                                     $exact_in[$key]=1;
-                                    $exact_out[$key]=1;
+                                    
                                     $array_masuk[$key]='Lanjutan';
                                     if($key>0){
                                         $array_keluar[$key-1]='Lanjutan';
                                         $exact_out[$key-1]=1;
                                     }
-                                    $array_keluar[$key]='Lanjutan';
+                                    
                                 }else{
                                     $exact_in[$key]=0;
                                     $exact_out[$key]=0; 
                                 }
                                 
                             }elseif($timeDifference <= 2 && $key <= 2 && count($query_data) ==3){
+                                
                                 if($login[0]!=null){
+                           
                                     $exact_in[$key]=1;
                                     $exact_out[$key]=1;
                                     $array_masuk[$key]='Lanjutan';
                                     $array_keluar[$key]='Lanjutan';
                                 }else{
+                                   
                                     $exact_in[$key]=0;
                                     $exact_out[$key]=0; 
                                 }
@@ -167,6 +156,7 @@ class AttendanceLatenessReportController extends Controller
                         
                        
                         if($row_schedule_filter->shift->is_next_day == '1'){
+                  
                             if (count($query_data) < 3) {
                                 foreach($query_data2 as $row_attendance_filter){
                                     $dateAttd = Carbon::parse($row_attendance_filter->date);
@@ -184,7 +174,8 @@ class AttendanceLatenessReportController extends Controller
                                             $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
                                             
                                         }
-                                        
+                                    
+                                     
                                     if ($timePart >= $min_time_in && $timePart <= $time_in) {
                                         $exact_in[$key]= 1 ;
                                         
@@ -202,16 +193,28 @@ class AttendanceLatenessReportController extends Controller
                                         }
                                         
                                     }elseif($timePart > $time_in && $timePart < $time_out){
-                                        $exact_in [$key]= 2 ;
+                                        $time1 = new DateTime($time_in);
+                                        $time2 = new DateTime($timePart);
+                                        $timeDifference = $time1->diff($time2);
+
+                                        // Extract the hours from the time difference
+                                        $hoursDifference = $timeDifference->h;
+
                                         
-                                        $array_masuk[$key]=$timePart;
+                                        if($hoursDifference<2){
+                                            $exact_in [$key]= 2 ;
+                                            $array_masuk[$key]=$timePart;
+                                        }
+                                       
+                                        
+                                       
                                     }
                                 }
                             }
                             $query_nextday = Attendances::where('date', 'like', $date->copy()->addDay()->toDateString()."%")
                                             ->where('employee_no', $cleanedNik)
                                             ->get();
-                         
+                            
                             foreach($query_nextday as $row_attendance_filter){
                                 $dateAttd = Carbon::parse($row_attendance_filter->date);
                                 
@@ -231,10 +234,12 @@ class AttendanceLatenessReportController extends Controller
                                         
                                     }  
                                 }
-
+                                
                             }
                             
                         }else{
+                           
+                              
                             $minTimeIn = Carbon::parse($min_time_in);
                             $maxTimeOut = Carbon::parse($max_time_out);
                             foreach($query_data2 as $row_attendance_filter){
@@ -248,7 +253,7 @@ class AttendanceLatenessReportController extends Controller
                                         $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
                                         $minutes = floor($diffInSeconds / 60);
                                         $seconds = $diffInSeconds % 60;
-                                        
+                                      
                                         
                                         $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
                                         
@@ -323,34 +328,20 @@ class AttendanceLatenessReportController extends Controller
                         }
                         if($key==0){// melakukan pengecekan saat pertama kali looping schedule untuk memberikan keterangan masuk / tidaknya atau berupa lanjutan atau tidak
                             
-                            if($row_user->nik == "123017"){
-                               
-                                info('masuk sini else');
-                            }
+                           
                             if (count($query_data) === 3) {
-                                if($row_user->nik == "123017"){
-                                    
-                                    info('masuk sini 123017');
-                                }if($login[$key]==null){
+                                if($login[$key]==null){
                                     $exact_in[$key]=0;
                                     $exact_out[$key]= 0 ;
                                 }
                                 
                                 if($login[$key]!=null){
-                                    if($row_user->nik == "123017"){
-                                        info('masuk sini 123017');
-                                    }
+                                    
                                     $exact_out[$key]= 1 ;
                                 }
                             }else{
-                                if($row_user->nik == "123017"){
+                                if($login[$key] == null && $masuk_awal == null){
                                     
-                                    info('masuk sini dia 123017');
-                                }if($login[$key] == null && $masuk_awal == null){
-                                    if($row_user->nik == "123017"){
-                                    
-                                        info('masuk sini dia 123017212');
-                                    }
                                     $exact_in[$key]= 0 ;
                                     $exact_out[$key]= 0 ;
                                     if($logout!=null){
@@ -379,6 +370,11 @@ class AttendanceLatenessReportController extends Controller
                             $array_keluar[0]="Lanjutan";
                             $array_masuk[1]="Lanjutan";
                             $array_keluar[1]="Lanjutan";
+                        }if($key==2 && $exact_in[0]!=null){
+                            $exact_in[2]=1;
+                            $array_masuk[2]="Lanjutan";
+                            $array_keluar[1]="Lanjutan";
+                            $array_keluar[0]="Lanjutan";
                         }
                         
                         $time_ins[]=$time_in;
@@ -419,8 +415,8 @@ class AttendanceLatenessReportController extends Controller
                     
                     $attendance_detail[(string)$date][]=[
                         'date' => Carbon::parse($date)->format('d/m/Y'),
-                        'user_no'=>$row_user->nik,
-                        'user' =>$row_user->nama,
+                        'user_no'=>$row_user->employee_no,
+                        'user' =>$row_user->name,
                         'in'   => $exact_in,
                         'out'  => $exact_out,
                         'login'=> $masuk_awal,

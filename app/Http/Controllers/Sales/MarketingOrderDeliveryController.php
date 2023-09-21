@@ -1122,7 +1122,7 @@ class MarketingOrderDeliveryController extends Controller
                                     ['name'=> "Tanggal :".$row_ip_detail->marketingOrderDownPayment->post_date],
                                     ['name'=> "Nominal : Rp.:".number_format($row_ip_detail->marketingOrderDownPayment->grandtotal,2,',','.')]
                                 ],
-                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_ip_detail->marketingOrderDownPayment->code),
+                                'url'=>request()->root()."/admin/finance/incoming_payment?code=".CustomHelper::encrypt($row_ip_detail->marketingOrderDownPayment->code),
                             ];
                             $data_go_chart[]=$mo_downpayment;
                             $data_link[]=[
@@ -1338,7 +1338,7 @@ class MarketingOrderDeliveryController extends Controller
                                 ['name'=> "Tanggal :".$query_mo_delivery->marketingOrderDeliveryProcess->post_date],
                                 ['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
                             ],
-                            'url'=>request()->root()."/admin/sales/delivery_order_process/?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrderDeliveryProcess->code),
+                            'url'=>request()->root()."/admin/sales/delivery_order/?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrderDeliveryProcess->code),
                         ];
                         
                         $data_go_chart[]=$data_mo_delivery_process;
@@ -1419,7 +1419,7 @@ class MarketingOrderDeliveryController extends Controller
                                 ['name'=> "Tanggal :".$query_mo_delivery->marketingOrder->post_date],
                                 ['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrder->grandtotal,2,',','.')]
                              ],
-                            'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrder->code),           
+                            'url'=>request()->root()."/admin/sales/marketing_order_delivery?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrder->code),           
                         ];
             
                         $data_go_chart[]= $data_marketing_order;

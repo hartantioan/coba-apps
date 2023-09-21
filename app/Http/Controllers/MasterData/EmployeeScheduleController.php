@@ -290,12 +290,12 @@ class EmployeeScheduleController extends Controller
             'employee_shift.required'         => 'Belum ada shift dalam form',
             'arr_employee.required'     => 'Belum ada pegawai yang dipilih.',
         ]);
-        $user_data = UserAbsensiMesin::where(function($query) use ( $request) {
+        $user_data = User::where(function($query) use ( $request) {
             // if($request->user_id) {
             //     $query->where('nik', $request->user_id);
             // }
         })->get();
-
+        
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -320,14 +320,19 @@ class EmployeeScheduleController extends Controller
                             //     'date'	            => $current_date,
                             //     'user_id'           => $user_id,
                             // ]);
-                            foreach($user_data as $row_user){
-                                $query = EmployeeSchedule::create([
-                                    'shift_id'          => $shift->shift_id,
-                                    'date'	            => $current_date,
-                                    'user_id'           => $row_user->nik,
-                                ]);
-                            }
-                            
+                            // foreach($user_data as $row_user){
+                            //     info($row_user->employee_no);
+                            //     $query = EmployeeSchedule::create([
+                            //         'shift_id'          => $shift->shift_id,
+                            //         'date'	            => $current_date,
+                            //         'user_id'           => $row_user->employee_no,
+                            //     ]);
+                            // }
+                            $query = EmployeeSchedule::create([
+                                'shift_id'          => $shift->shift_id,
+                                'date'	            => $current_date,
+                                'user_id'           => '123017',
+                            ]);
                             
 
                             $current_date->addDay(); // Or use addWeek(), addMonth(), etc., depending on your needs

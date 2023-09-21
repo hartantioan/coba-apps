@@ -129,7 +129,12 @@
 
 <script>
     $(function() {
-        
+        if('{{ $code }}'){
+            $('#temp').val('{{$code}}');
+            loadDataTable();
+
+
+        }
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',
@@ -143,6 +148,7 @@
         window.location = "{{ Request::url() }}/export?date=" + date;
     }
     function filterByDate(){
+        $('#temp').val('');
         loadDataTable();
     }
 
@@ -161,6 +167,7 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
+                    temp:$('#temp').val(),
                     period_id: $('#period_id').val()
                 },
                 beforeSend: function() {
@@ -207,6 +214,7 @@
         $('.dt-buttons').appendTo('#datatable_buttons');
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
+
 	}
 
     function reset(){

@@ -20,7 +20,7 @@ class EmployeeSchedule extends Model
         'date',
     ];
     public function user(){
-        return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
+        return $this->belongsTo('App\Models\User','user_id','employee_no')->withTrashed();
     }
 
     public function shift(){

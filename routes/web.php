@@ -619,7 +619,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('presence_report',[AttendancePeriodController::class, 'presenceReport']);
                         Route::post('daily_report',[AttendancePeriodController::class, 'dailyReport']);
                         Route::post('close',[AttendancePeriodController::class, 'close'])->middleware('operation.access:attendance_period,update');
-
+                        Route::get('export',[AttendancePeriodController::class, 'export'])->middleware('operation.access:attendance_period,view');
                         Route::post('destroy', [AttendancePeriodController::class, 'destroy'])->middleware('operation.access:attendance_period,delete');
                     });
                 });

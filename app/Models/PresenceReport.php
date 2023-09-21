@@ -23,7 +23,7 @@ class PresenceReport extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\UserAbsensiMesin', 'user_id', 'nik');
+        return $this->belongsTo('App\Models\User', 'user_id', 'id');
     }
     
 }

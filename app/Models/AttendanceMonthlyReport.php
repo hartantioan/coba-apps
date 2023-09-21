@@ -37,8 +37,9 @@ class AttendanceMonthlyReport extends Model
     ];
 
     public function user(){
-        return $this->belongsTo('App\Models\UserAbsensiMesin','user_id','nik');
+        return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
+    
 
     public function status(){
         $status = match ($this->status) {

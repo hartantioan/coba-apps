@@ -111,14 +111,13 @@ class EmployeeTransferController extends Controller
                 ' <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">create</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->id) . '`)"><i class="material-icons dp48">delete</i></button>';
 
                 $response['data'][] = [
-                    $nomor,
+                    '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->account->name ?? '-',
-                    $val->type,
+                    $val->typeRaw(),
                     $val->post_date,
                     $val->note,
                     $val->status(),
@@ -140,6 +139,60 @@ class EmployeeTransferController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function rowDetail(Request $request)
+    {
+        $data   = EmployeeTransfer::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
+                    <tbody>';
+            $string .= '
+            <tr>
+                <td class="center-align" style="font-weight: 700;background: cornsilk;">Kode</td>
+                <td class="">'.($data->code).'</td>
+            </tr>
+            <tr>
+                <td class="center-align" style="font-weight: 700;background: cornsilk;">User</td>
+                <td class="">'.($data->user->name).'</td>
+            </tr>
+            <tr>
+                <td class="center-align" style="font-weight: 700;background: cornsilk;">Tipe</td>
+                <td class="">'.($data->typeRaw()).'</td>
+            </tr>
+            <tr>
+                <td class="center-align" style="font-weight: 700;background: cornsilk;">Manager</td>
+                <td class="">'.($data->manager->name).'</td>
+            </tr>
+            <tr>
+                <td class="center-align" style="font-weight: 700;background: cornsilk;">Tanggal Mulai</td>
+                <td class="">'.($data->post_date).'</td>
+            </tr>
+            <tr>
+                <td class="center-align" style="font-weight: 700;background: cornsilk;">Tanggal Akhir</td>
+                <td class="">'.($data->valid_date).'</td>
+            </tr>
+            <tr>
+                <td class="center-align" style="font-weight: 700;background: cornsilk;">Penempatan</td>
+                <td class="">'.($data->place->name).'</td>
+            </tr>
+            <tr>
+                <td class="center-align" style="font-weight: 700;background: cornsilk;">Departemen</td>
+                <td class="">'.($data->department->name).'</td>
+            </tr>
+            <tr>
+                <td class="center-align" style="font-weight: 700;background: cornsilk;">Posisi</td>
+                <td class="">'.($data->position->name).'</td>
+            </tr>
+            <tr>   
+                <td class="center-align"style="font-weight: 700;background: cornsilk;">Keterangan</td>
+                <td class="">'.($data->note).'</td>
+            </tr>';
+        
+        
+        $string .= '</tbody></table></div>';
+		
+        return response()->json($string);
     }
     
     public function showFromCode(Request $request){

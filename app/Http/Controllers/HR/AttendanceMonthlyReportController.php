@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\HR;
 
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceMonthlyReport;
 use App\Models\User;
@@ -15,6 +16,7 @@ class AttendanceMonthlyReportController extends Controller
             'title'         => 'Rekap Periode',
             'user'          =>  User::join('departments','departments.id','=','users.department_id')->select('departments.name as department_name','users.*')->orderBy('department_name')->get(),
             'content'       => 'admin.hr.attendance_monthly_report',
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : ''
         ];
 
         return view('admin.layouts.index', ['data' => $data]); 
@@ -53,12 +55,16 @@ class AttendanceMonthlyReportController extends Controller
         $query_data = AttendanceMonthlyReport::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->orWhereHas('user',function($query) use($search){
-                        $query->where('nama','like',"%$search%");
+                        $query->where('name','like',"%$search%");
                     });
                 }
 
                 if($request->period_id){
                     $query->where('period_id', $request->period_id);
+                }
+                
+                if($request->temp){
+                    $query->where('period_id', $request->temp);
                 }
 
                 if($request->user_id){
@@ -74,12 +80,16 @@ class AttendanceMonthlyReportController extends Controller
         $total_filtered = AttendanceMonthlyReport::where(function($query) use ($search, $request) {
             if($search) {
                 $query->orWhereHas('user',function($query) use($search){
-                    $query->where('nama','like',"%$search%");
+                    $query->where('name','like',"%$search%");
                 });
             }
 
             if($request->period_id){
                 $query->where('period_id', $request->period_id);
+            }
+
+            if($request->temp){
+                $query->where('period_id', $request->temp);
             }
 
             if($request->user_id){
@@ -96,7 +106,7 @@ class AttendanceMonthlyReportController extends Controller
 				
                 $response['data'][] = [
                     $nomor,
-                    $val->user->nama,
+                    $val->user->name,
                     $val->effective_day,
                     $val->t1,
                     $val->t2,

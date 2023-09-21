@@ -17,21 +17,21 @@
         left: 200px; /* Adjust as needed */
         z-index: 20;
     }
-    td:first-child,
+    #kambing td:first-child,
     {
         position: sticky;
         left: 10px;
-        background-color: #c5c3c3;
+        background-color: aliceblue;
     }
-    td:nth-child(2) {
+    #kambing td:nth-child(2) {
         position: sticky;
         left: 100px;
-        background-color: #c5c3c3;
+        background-color: aliceblue;
     }
-    td:nth-child(3) {
+    #kambing td:nth-child(3) {
         position: sticky;
         left: 200px;
-        background-color: #c5c3c3;
+        background-color: aliceblue;
     }
 </style>
 <div id="main">
@@ -59,11 +59,7 @@
                             <span class="hide-on-small-onl">Print</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
-                            <i class="material-icons hide-on-med-and-up">view_list</i>
-                            <span class="hide-on-small-onl">Excel</span>
-                            <i class="material-icons right">view_list</i>
-                        </a>
+                        
                     </div>
                 </div>
             </div>
@@ -235,7 +231,7 @@
         <div class="row">
             <div class="col s12 m12" style="overflow: auto">
                 <div class="result" style="width:2500px;">
-                    <table class="bordered" style="font-size:10px;">
+                    <table id="kambing" class="bordered" style="font-size:10px;">
                         <thead>
                             <tr>
                                 <th class="center-align fixed">No.</th>
@@ -246,7 +242,7 @@
                                 <th class="center-align">Shift Awal</th>
                                 <th class="center-align">Shift Masuk</th>
                                 <th class="center-align">Check In</th>
-                                <th class="center-align">Tipe</th>
+                                
                                 <th class="center-align">Shift Pulang</th>
                                 <th class="center-align">Check Out</th>
                                 <th class="center-align">Shift Akhir</th>
@@ -331,6 +327,16 @@
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
     });
+
+    function exportExcel(id){
+        window.location = "{{ Request::url() }}/export?period_id=" + id;
+    }
+
+    function goToMonth(url){
+        var baseUrl = window.location.origin;
+        var redirectUrl = baseUrl + "/admin/hr/hr_report/recap_periode?code=" + url;
+        window.location.href = redirectUrl;
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -733,10 +739,4 @@
         });
     }
 
-    function exportExcel(){
-        var search = window.table.search();
-        var status = $('#filter_status').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
-    }
 </script>

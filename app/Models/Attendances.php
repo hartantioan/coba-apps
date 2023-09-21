@@ -35,4 +35,13 @@ class Attendances extends Model
 
         return $verify_type;
     }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'employee_no', 'employee_no')->withTrashed();
+    }
+    
+    public function plant(){
+        return $this->belongsTo('App\Models\Place','plant_id','id')->withTrashed();
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\MasterData;
 
+use App\Exports\ExportPeriod;
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceDailyReports;
 use App\Models\AttendanceMonthlyReport;
@@ -10,12 +12,15 @@ use App\Models\Attendances;
 use App\Models\EmployeeSchedule;
 use App\Models\Place;
 use App\Models\PresenceReport;
+use App\Models\User;
 use App\Models\UserAbsensiMesin;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttendancePeriodController extends Controller
 {
@@ -91,7 +96,8 @@ class AttendancePeriodController extends Controller
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Harian" onclick="reportDaily(' . $val->id . ')"><i class="material-icons dp48" style="color:black">assignment</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2 btn-small" data-popup="tooltip" title="Laporan Presensi" onclick="reportPresence(' . $val->id . ')"><i class="material-icons dp48" style="color:black">directions_walk</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Monthly" onclick="reportMonthly(' . $val->id . ')"><i class="material-icons dp48" style="color:black">event</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Monthly" onclick="goToMonth(`'.CustomHelper::encrypt($val->id).'`)"><i class="material-icons dp48" style="color:black">event</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Excel" onclick="exportExcel(`'.$val->id.'`)"><i class="material-icons dp48" style="color:black">view_list</i></button>
                     ';
                       
                 }else{
@@ -139,7 +145,7 @@ class AttendancePeriodController extends Controller
         $start_date = Carbon::parse($attendance_period->start_date);
         $end_date = Carbon::parse($attendance_period->end_date);
         
-        $user_data = UserAbsensiMesin::where(function($query) use ( $request) {
+        $user_data = User::where(function($query) use ( $request) {
             // $query->whereIn('nik', [' 123034']);
                 
             })->get();
@@ -151,7 +157,7 @@ class AttendancePeriodController extends Controller
         $user_counter_out_on_time=[];
         if($start_date && $end_date){
             foreach($user_data as $c=>$row_user){
-                $user_id = $row_user->nik;
+                $user_id = $row_user->employee_no;
                 $date = $start_date->copy();
                 $counter_effective_day=0;
                 $counter_absent=0;
@@ -169,12 +175,14 @@ class AttendancePeriodController extends Controller
                 while ($date->lte($end_date)) {
                     $user_datas[$c]['user_name']=$row_user->nama;
                     $query_data = EmployeeSchedule::whereDate('date', $date->toDateString())
-                              ->where('user_id',$row_user->nik)
+                              ->where('user_id',$row_user->employee_no)
                               ->get();
-                    $cleanedNik = str_replace(' ', '', $row_user->nik);
+                    $cleanedNik = str_replace(' ', '', $row_user->employee_no);
+                    info($cleanedNik);
                     $query_data2 = Attendances::where('date','like',$date->toDateString()."%")
                                 ->where('employee_no',$cleanedNik)
                                 ->get();
+                    info($query_data);
 
                               
                     
@@ -223,7 +231,7 @@ class AttendancePeriodController extends Controller
                             $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
                             
                             $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
-                            
+                           
                             if($timeDifference>2 && $key <= 2){
                                 
                                 $exact_in[$key]=0;
@@ -240,32 +248,35 @@ class AttendancePeriodController extends Controller
                                     $exact_in[$key]=0;
                                     $exact_out[$key]=0;
                                 }
-                                
+                               
                                 
                             }elseif($timeDifference <= 2 && $key < 2 && count($query_data) !=3){
                                 
                                 if($login[0]!=null){//utk melihat shift ke 2 dalam shift yang totalnya ada 2
                                     
                                     $exact_in[$key]=1;
-                                    $exact_out[$key]=1;
+                                    
                                     $array_masuk[$key]='Lanjutan';
                                     if($key>0){
                                         $array_keluar[$key-1]='Lanjutan';
                                         $exact_out[$key-1]=1;
                                     }
-                                    $array_keluar[$key]='Lanjutan';
+                                    
                                 }else{
                                     $exact_in[$key]=0;
                                     $exact_out[$key]=0; 
                                 }
                                 
                             }elseif($timeDifference <= 2 && $key <= 2 && count($query_data) ==3){
+                                
                                 if($login[0]!=null){
+                           
                                     $exact_in[$key]=1;
                                     $exact_out[$key]=1;
                                     $array_masuk[$key]='Lanjutan';
                                     $array_keluar[$key]='Lanjutan';
                                 }else{
+                                   
                                     $exact_in[$key]=0;
                                     $exact_out[$key]=0; 
                                 }
@@ -275,6 +286,7 @@ class AttendancePeriodController extends Controller
                         }
 
                         if($row_schedule_filter->shift->is_next_day == '1'){
+                  
                             if (count($query_data) < 3) {
                                 foreach($query_data2 as $row_attendance_filter){
                                     $dateAttd = Carbon::parse($row_attendance_filter->date);
@@ -292,7 +304,8 @@ class AttendancePeriodController extends Controller
                                             $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
                                             
                                         }
-                                        
+                                    
+                                     
                                     if ($timePart >= $min_time_in && $timePart <= $time_in) {
                                         $exact_in[$key]= 1 ;
                                         
@@ -310,16 +323,28 @@ class AttendancePeriodController extends Controller
                                         }
                                         
                                     }elseif($timePart > $time_in && $timePart < $time_out){
-                                        $exact_in [$key]= 2 ;
+                                        $time1 = new DateTime($time_in);
+                                        $time2 = new DateTime($timePart);
+                                        $timeDifference = $time1->diff($time2);
+
+                                        // Extract the hours from the time difference
+                                        $hoursDifference = $timeDifference->h;
+
                                         
-                                        $array_masuk[$key]=$timePart;
+                                        if($hoursDifference<2){
+                                            $exact_in [$key]= 2 ;
+                                            $array_masuk[$key]=$timePart;
+                                        }
+                                       
+                                        
+                                       
                                     }
                                 }
                             }
                             $query_nextday = Attendances::where('date', 'like', $date->copy()->addDay()->toDateString()."%")
                                             ->where('employee_no', $cleanedNik)
                                             ->get();
-                         
+                            
                             foreach($query_nextday as $row_attendance_filter){
                                 $dateAttd = Carbon::parse($row_attendance_filter->date);
                                 
@@ -339,10 +364,12 @@ class AttendancePeriodController extends Controller
                                         
                                     }  
                                 }
-
+                                
                             }
                             
                         }else{
+                           
+                              
                             $minTimeIn = Carbon::parse($min_time_in);
                             $maxTimeOut = Carbon::parse($max_time_out);
                             foreach($query_data2 as $row_attendance_filter){
@@ -356,7 +383,7 @@ class AttendancePeriodController extends Controller
                                         $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
                                         $minutes = floor($diffInSeconds / 60);
                                         $seconds = $diffInSeconds % 60;
-                                        
+                                      
                                         
                                         $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
                                         
@@ -401,7 +428,7 @@ class AttendancePeriodController extends Controller
                                             
                                         }
                                         $array_masuk[$key]=$timePart;
-                                    }                              
+                                    }                                      
                                 }elseif($timePart > $max_time_out){
                                     $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($maxTimeOut);
                                     
@@ -432,7 +459,7 @@ class AttendancePeriodController extends Controller
                         }
                         if($key==0){// melakukan pengecekan saat pertama kali looping schedule untuk memberikan keterangan masuk / tidaknya atau berupa lanjutan atau tidak
                             
-                            
+                           
                             if (count($query_data) === 3) {
                                 if($login[$key]==null){
                                     $exact_in[$key]=0;
@@ -444,7 +471,7 @@ class AttendancePeriodController extends Controller
                                     $exact_out[$key]= 1 ;
                                 }
                             }else{
-                               if($login[$key] == null && $masuk_awal == null){
+                                if($login[$key] == null && $masuk_awal == null){
                                     
                                     $exact_in[$key]= 0 ;
                                     $exact_out[$key]= 0 ;
@@ -474,6 +501,11 @@ class AttendancePeriodController extends Controller
                             $array_keluar[0]="Lanjutan";
                             $array_masuk[1]="Lanjutan";
                             $array_keluar[1]="Lanjutan";
+                        }if($key==2 && $exact_in[0]!=null){
+                            $exact_in[2]=1;
+                            $array_masuk[2]="Lanjutan";
+                            $array_keluar[1]="Lanjutan";
+                            $array_keluar[0]="Lanjutan";
                         }
                         
                         $time_ins[]=$time_in;
@@ -482,6 +514,7 @@ class AttendancePeriodController extends Controller
                         $max_time_outs[]=$max_time_out;        
                         $nama_shifts[]=$row_schedule_filter->shift->name;
                         $shift_id[]=$row_schedule_filter->shift->id;
+                        info($row_schedule_filter->shift->id);
                         if($masuk_awal){
                             $pembandingdate = Carbon::parse($masuk_awal);
                             $pembanding= $pembandingdate->format('H:i:s');
@@ -526,16 +559,16 @@ class AttendancePeriodController extends Controller
                         }
                     }
                     foreach($exact_in as $key=>$row_exact){
-                        info($row_user->nama);
+                        info($row_user->name);
                         info(Carbon::parse($date)->format('d/m/Y'));
                         $all_exact_in[]=$row_exact;
                         $all_exact_out[]=$exact_out[$key];
                     }
                     
-                    $attendance_detail[$row_user->nama][]=[
+                    $attendance_detail[$row_user->name][]=[
                         'date' => Carbon::parse($date)->format('d/m/Y'),
-                        'user_no'=>$row_user->nik,
-                        'user' =>$row_user->nama,
+                        'user_no'=>$row_user->id,
+                        'user' =>$row_user->name,
                         'in'   => $exact_in,
                         'out'  => $exact_out,
                         'login'=> $masuk_awal,
@@ -588,7 +621,7 @@ class AttendancePeriodController extends Controller
                 $user_datas[$c]["t4"]=$t4;
 
                 $query = AttendanceMonthlyReport::create([
-                    'user_id'                  => $row_user->nik,
+                    'user_id'                  => $row_user->id,
                     'period_id'			        => $attendance_period->id,
                     'effective_day'             => $counter_effective_day,
                     't1'                => $t1,
@@ -641,6 +674,7 @@ class AttendancePeriodController extends Controller
                     ]);
                 } else {
                    foreach($row_attd_detail['in'] as $key_masuk=>$row_masuk){
+                    info($key);
                     $status='';
                         if($row_masuk == '1' && $row_attd_detail['out'][$key_masuk] == '1'){
                             $status = '1';
@@ -699,10 +733,23 @@ class AttendancePeriodController extends Controller
         }
         return response()->json($response);
     }
-
     public function presenceReport(Request $request){
         $distinctUserIds = PresenceReport::where('period_id',$request->id)->groupBy('user_id')->pluck('user_id')->toArray();
-        $distinctDates = PresenceReport::where('period_id',$request->id)->groupBy('date')->pluck('date')->toArray();
+    
+        $distinctDates = PresenceReport::where('period_id', $request->id)
+                ->groupBy('date')
+                ->pluck('date')
+                ->map(function ($date) {
+                    return Carbon::createFromFormat('d/m/Y', $date); // Parse the date with the correct format
+                })
+                ->sortBy(function ($date) {
+                    return $date;
+                })
+                ->map(function ($date) {
+                    return $date->format('d/m/Y'); // Format the date as 'dd/mm/yyyy'
+                })
+                ->toArray();
+        
         $userDetail=[];
       
         foreach($distinctUserIds as $key_user=>$user_id){
@@ -714,7 +761,7 @@ class AttendancePeriodController extends Controller
                     'nama_shift'    =>[],
                 ];
                 foreach(PresenceReport::where('user_id',$user_id)->where('date',$row_dates)->where('period_id',$request->id)->get() as $key_presence=>$row_presence){
-                    $userDetail[$key_user][$key_dates]['user_name']=$row_presence->user->nama;
+                    $userDetail[$key_user][$key_dates]['user_name']=$row_presence->user->name??'';
                     $userDetail[$key_user][$key_dates]['date']=$row_dates;
                     $userDetail[$key_user][$key_dates]['nama_shift'][]=$row_presence->nama_shift;
                     $userDetail[$key_user][$key_dates]['late_status'][]=$row_presence->late_status;
@@ -722,6 +769,8 @@ class AttendancePeriodController extends Controller
             }
         }
 
+        info($userDetail);
+        
         $string_table="";
 
         foreach($userDetail as $key_presenced => $row_user_presence){
@@ -787,19 +836,17 @@ class AttendancePeriodController extends Controller
         ];
         return response()->json($response);
     }
-
     public function dailyReport(Request $request){
         $dailyReports  = AttendanceDailyReports::where('period_id',$request->id)->get();
         $distinctUserIds = $dailyReports->pluck('user_id')->unique()->toArray();
         $distinctDates = $dailyReports->pluck('date')->unique()->toArray();
-        
         $attendanceDetail=[];
         foreach($distinctDates as $key_date=>$row_dates){
             foreach($dailyReports as $key_daily=>$row_daily){
                 if($row_daily['date']==$row_dates){
                     $attendanceDetail[$key_date][]=[
-                        'user_id'=>$row_daily->user->nik,
-                        'user_name'=>$row_daily->user->nama,
+                        'user_id'=>$row_daily->user->employee_no??'',
+                        'user_name'=>$row_daily->user->name??'',
                         'nama_shift'=>$row_daily->shift->name ?? 'tidak ada shift',
                         'min_masuk'=>$row_daily->shift->min_time_in ?? 'tidak ada shift',
                         'max_keluar'=>$row_daily->shift->max_time_out ?? 'tidak ada shift',
@@ -808,7 +855,7 @@ class AttendancePeriodController extends Controller
                         'masuk'=>$row_daily->masuk,
                         'pulang'=>$row_daily->pulang,
                         'date'=>$row_daily->date,
-                        'status'=>$row_daily->status,
+                        'status'=>$row_daily->status(),
                     ];
                 }
             }
@@ -913,5 +960,12 @@ class AttendancePeriodController extends Controller
 		}
 		
 		return response()->json($response);
+    }
+    public function export(Request $request){
+		
+        
+        $period_id = $request->period_id ? $request->period_id:'';
+        info($request);
+		return Excel::download(new ExportPeriod($period_id), 'period_report'.uniqid().'.xlsx');
     }
 }

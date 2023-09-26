@@ -250,7 +250,7 @@
   var user_friendpending = [];
   var tokendiv = document.getElementById('tokenid');
   var tokens = tokendiv.getAttribute('data-from-user-token');
-  var conn = new WebSocket('wss://'+hostname+':8080/?token='+tokens);
+  var conn = new WebSocket('ws://'+hostname+':8080/?token='+tokens);
   
   var websocketDiv = document.getElementById('websocket');
   var from_user_id = websocketDiv.getAttribute('data-from-user-id');

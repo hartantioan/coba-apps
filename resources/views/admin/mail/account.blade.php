@@ -194,27 +194,27 @@
           </tr>
           <tr>
             <td class="email-body" width="100%">
-              <table class="email-body_inner" align="center" width="570" cellpadding="0" cellspacing="0">
+              <table class="email-body_inner" align="center" width="650" cellpadding="0" cellspacing="0">
                 <tr>
                   <td class="content-cell">
-                    <h1>Yay, data anda berhasil terkirim!</h1>
+                    <h1>Yay, akun anda berhasil dibuat!</h1>
                     <p>
-                        Terima kasih telah mendaftarkan diri anda di {{ env('APP_NAME') }}! Kami akan menghubungi anda secepatnya untuk konfirmasi penerimaan.
+                        Berikut adalah informasi url dan login akun anda. Pastikan anda menyimpan pesan ini dengan baik dan menjaganya agar tidak bisa diakses oleh orang lain. Jika akun ini hilang anda bisa meresetnya pada halaman login nantinya.
                     </p>
                     <p>
-                        Nomor Registrasi : {{ $data['code'] }}
+                        Nomor Induk Kepegawaian : {{ $data['result']->employee_no }}
                     </p>
                     <p>
                         Nama Lengkap : {{ $data['result']->name }}
                     </p>
                     <p>
-                        Nama Pengguna : {{ $data['result']->username }}
+                        Password : {{ $data['password'] }}
                     </p>
                     <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td align="center">
                           <div>
-                            <a href="{{ $url }}" class="button button--green" style="color:white !important;">Home</a>
+                            <a href="{{ $url }}/admin/login" class="button button--green" style="color:white !important;">Login</a>
                           </div>
                         </td>
                       </tr>
@@ -225,7 +225,7 @@
                           <p class="sub">Jika anda mengalami masalah dalam menekan tombol link di atas, silahkan salin dan tempel link dibawah ke browser anda.
                           </p>
                           <p class="sub">
-                            <a href="{{ $url }}">{{ env('APP_NAME') }}</a>
+                            <a href="{{ $url }}/admin/login">{{ $url }}/admin/login</a>
                           </p>
                         </td>
                       </tr>

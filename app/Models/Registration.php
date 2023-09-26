@@ -16,6 +16,7 @@ class Registration extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
+        'user_id',
         'code',
         'name',
         'username',
@@ -25,13 +26,14 @@ class Registration extends Model
         'hp',
         'document',
         'status',
+        'add_to_user'
     ];
 
     public function status(){
         $status = match ($this->status) {
-          '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Menunggu</span>',
+          '1' => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Menunggu</span>',
           '2' => '<span class="gradient-45deg-red-pink medium-small white-text padding-3">Ditolak</span>',
-          '3' => '<span class="gradient-45deg-red-green medium-small white-text padding-3">Disetujui</span>',
+          '3' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Disetujui</span>',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
@@ -58,5 +60,14 @@ class Registration extends Model
         }
 
         return $document;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function account(){
+        return $this->hasOne('App\Models\User');
     }
 }

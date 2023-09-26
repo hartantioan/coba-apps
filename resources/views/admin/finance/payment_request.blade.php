@@ -191,7 +191,7 @@
                     </div>
                     <div class="col s12">
                         <fieldset>
-                            <legend>1</legend>
+                            <legend>1. Informasi Utama</legend>
                             <div class="row">
                                 <div class="input-field col m2 s12 step1">
                                     <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
@@ -299,7 +299,7 @@
                     </div>
                     <div class="col s12">
                         <fieldset>
-                            <legend>2</legend>
+                            <legend>2. Daftar Dokumen Terpakai</legend>
                             <div class="row">
                                 <div class="col m12 s12">
                                     <ul class="tabs">
@@ -416,7 +416,7 @@
                     </div>
                     <div class="col s12">
                         <fieldset>
-                            <legend>3</legend>
+                            <legend>3. Lain-lain</legend>
                             <div class="row">
                                 <div class="input-field col m4 s12 step20">
                                     <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>

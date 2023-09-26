@@ -29,6 +29,7 @@ class User extends Authenticatable
         'address',
         'province_id',
         'city_id',
+        'district_id',
         'subdistrict_id',
         'id_card',
         'id_card_address',
@@ -67,6 +68,8 @@ class User extends Authenticatable
         'employment_status',
         'employee_type',
         'is_ar_invoice',
+        'registration_id',
+        'reset_code',
     ];
 
     protected $hidden = [
@@ -400,6 +403,10 @@ class User extends Authenticatable
         return $arr;
     }
 
+    public function registration(){
+        return $this->belongsTo('App\Models\Registration','registration_id','id')->withTrashed();
+    }
+
     public function userFile(){
         return $this->hasMany('App\Models\UserFile');
     }
@@ -414,6 +421,10 @@ class User extends Authenticatable
 
     public function city(){
         return $this->belongsTo('App\Models\Region','city_id','id')->withTrashed();
+    }
+
+    public function district(){
+        return $this->belongsTo('App\Models\Region','district_id','id')->withTrashed();
     }
 
     public function subdistrict(){

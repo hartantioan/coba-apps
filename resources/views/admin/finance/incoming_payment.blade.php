@@ -178,122 +178,146 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="row">
-                            <div class="input-field col m2 s12 step1">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                <label class="active" for="code">No. Dokumen</label>
-                            </div>
-                            <div class="input-field col m1 s12 step2">
-                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                    <option value="">--Pilih--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="input-field col m3 s12 step3">
-                                <input type="hidden" id="temp" name="temp">
-                                <select class="form-control" id="company_id" name="company_id">
-                                    @foreach ($company as $rowcompany)
-                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="company_id">Perusahaan</label>
-                            </div>
-                            <div class="input-field col m3 s12 step4">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
-                                <label class="active" for="account_id">Partner Bisnis</label>
-                            </div>
-                            <div class="input-field col m3 s12 step5">
-                                <select class="browser-default" id="coa_id" name="coa_id"></select>
-                                <label class="active" for="coa_id">Kas / Bank</label>
-                            </div>
-                            <div class="input-field col m3 s12 step6">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Transfer</label>
-                            </div>
-                            <div class="file-field input-field col m3 s12 step8">
-                                <div class="btn">
-                                    <span>Lampiran</span>
-                                    <input type="file" name="document" id="document">
+                        <fieldset>
+                            <legend>1. Informasi Utama</legend>
+                            <div class="row">
+                                <div class="input-field col m2 s12 step1">
+                                    <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                    <label class="active" for="code">No. Dokumen</label>
                                 </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
+                                <div class="input-field col m1 s12 step2">
+                                    <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                        <option value="">--Pilih--</option>
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                            </div>
-                            <div class="input-field col m3 s12 step9">
-                                <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
-                                    @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="currency_id">Mata Uang</label>
-                            </div>
-                            <div class="input-field col m3 s12 step10">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                <label class="active" for="currency_rate">Konversi</label>
-                            </div>
-                            <div class="input-field col m3 s12 step11">
-                                <select class="browser-default" id="project_id" name="project_id"></select>
-                                <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
-                            </div>
-                            <div class="col m12 s12">
-                                <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
-                            </div>
-                            <div class="col m12 s12 step12">
-                                <p class="mt-2 mb-2">
-                                    <h6>Detail AR Invoice / AR Down Payment / AR Credit Memo / BS.Karyawan / Coa</h6>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" style="max-width:1650px !important;">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">Referensi</th>
-                                                    <th class="center">Tgl.Post</th>
-                                                    <th class="center">Tgl.Tenggat</th>
-                                                    <th class="center">Total</th>
-                                                    <th class="center">Pembulatan</th>
-                                                    <th class="center">Subtotal</th>
-                                                    <th class="center">Dist.Biaya</th>
-                                                    <th class="center">Keterangan</th>
-                                                    <th class="center">Hapus</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-detail">
-                                                <tr id="last-row-detail">
-                                                    <td colspan="9" class="center">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Tambah Baris
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                <div class="input-field col m3 s12 step3">
+                                    <input type="hidden" id="temp" name="temp">
+                                    <select class="form-control" id="company_id" name="company_id">
+                                        @foreach ($company as $rowcompany)
+                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="company_id">Perusahaan</label>
+                                </div>
+                                <div class="input-field col m3 s12 step4">
+                                    <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
+                                    <label class="active" for="account_id">Partner Bisnis</label>
+                                </div>
+                                <div class="input-field col m3 s12 step5">
+                                    <select class="browser-default" id="coa_id" name="coa_id"></select>
+                                    <label class="active" for="coa_id">Kas / Bank</label>
+                                </div>
+                                <div class="input-field col m3 s12 step6">
+                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                    <label class="active" for="post_date">Tgl. Transfer</label>
+                                </div>
+                                <div class="file-field input-field col m3 s12 step8">
+                                    <div class="btn">
+                                        <span>Lampiran</span>
+                                        <input type="file" name="document" id="document">
                                     </div>
-                                </p>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
+                                    </div>
+                                </div>
+                                <div class="input-field col m3 s12 step9">
+                                    <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
+                                        @foreach ($currency as $row)
+                                            <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="currency_id">Mata Uang</label>
+                                </div>
+                                <div class="input-field col m3 s12 step10">
+                                    <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                    <label class="active" for="currency_rate">Konversi</label>
+                                </div>
+                                <div class="input-field col m3 s12 step11">
+                                    <select class="browser-default" id="project_id" name="project_id"></select>
+                                    <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
+                                </div>
                             </div>
-                            <div class="input-field col m4 s12 step13">
-                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
+                        </fieldset>
+                    </div>
+                    <div class="col s12">
+                        <fieldset>
+                            <legend>2. Daftar Dokumen Terpakai</legend>
+                            <div class="row">
+                                <div class="col m12 s12">
+                                    <h6><b>Data Terpakai</b> : <i id="list-used-data"></i></h6>
+                                </div>
                             </div>
-                            <div class="input-field col m4 s12">
+                        </fieldset>
+                    </div>
+                    <div class="col s12">
+                        <fieldset>
+                            <legend>3. Detail Dokumen dan Nominal</legend>
+                            <div class="row">
+                                <div class="col m12 s12 step12">
+                                    <p class="mt-2 mb-2">
+                                        <h6>Detail AR Invoice / AR Down Payment / AR Credit Memo / BS.Karyawan / Coa</h6>
+                                        <div style="overflow:auto;">
+                                            <table class="bordered" style="max-width:1650px !important;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Referensi</th>
+                                                        <th class="center">Tgl.Post</th>
+                                                        <th class="center">Tgl.Tenggat</th>
+                                                        <th class="center">Total</th>
+                                                        <th class="center">Pembulatan</th>
+                                                        <th class="center">Subtotal</th>
+                                                        <th class="center">Dist.Biaya</th>
+                                                        <th class="center">Keterangan</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-detail">
+                                                    <tr id="last-row-detail">
+                                                        <td colspan="9" class="center">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah Baris
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </p>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col s12">
+                        <fieldset>
+                            <legend>4. Keterangan dan Total</legend>
+                            <div class="row">
+                                <div class="input-field col m4 s12 step13">
+                                    <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                    <label class="active" for="note">Keterangan</label>
+                                </div>
+                                <div class="input-field col m4 s12">
 
+                                </div>
+                                <div class="input-field col m4 s12 step14">
+                                    <table width="100%" class="bordered">
+                                        <thead>
+                                            <tr>
+                                                <td>Total</td>
+                                                <td class="right-align">
+                                                    <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" readonly>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div class="col s12 mt-3 step15">
+                                    <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                </div>
                             </div>
-                            <div class="input-field col m4 s12 step14">
-                                <table width="100%" class="bordered">
-                                    <thead>
-                                        <tr>
-                                            <td>Total</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                            <div class="col s12 mt-3 step15">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
-                            </div>
-                        </div>
+                        </fieldset>
                     </div>
                 </form>
             </div>

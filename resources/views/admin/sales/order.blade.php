@@ -316,11 +316,11 @@
                                         <select class="browser-default" id="sender_id" name="sender_id"></select>
                                         <label class="active" for="sender_id">Broker</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step15">
+                                    <div class="input-field col m3 s12 step13">
                                         <select class="browser-default" id="transportation_id" name="transportation_id"></select>
                                         <label class="active" for="transportation_id">Tipe Transport</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step13">
+                                    <div class="input-field col m3 s12 step14">
                                         <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kirim">
                                         <label class="active" for="delivery_date">Tgl.Kirim</label>
                                     </div>
@@ -328,27 +328,27 @@
                                         <select class="browser-default" id="outlet_id" name="outlet_id" onchange="getOutletAddress();"></select>
                                         <label class="active" for="outlet_id">Outlet</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step14">
+                                    <div class="input-field col m3 s12 step16">
                                         <textarea class="materialize-textarea" id="destination_address" name="destination_address" placeholder="Alamat Tujuan" rows="3"></textarea>
                                         <label class="active" for="destination_address">Alamat Tujuan Kirim</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step15">
+                                    <div class="input-field col m3 s12 step17">
                                         <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
                                         <label class="active" for="province_id">Provinsi</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step16">
+                                    <div class="input-field col m3 s12 step18">
                                         <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
                                             <option value="">--Pilih ya--</option>
                                         </select>
                                         <label class="active" for="city_id">Kota</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step17">
+                                    <div class="input-field col m3 s12 step19">
                                         <select class="select2 browser-default" id="district_id" name="district_id" onchange="getSubdistrict();">
                                             <option value="">--Pilih ya--</option>
                                         </select>
                                         <label class="active" for="district_id">Kecamatan</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step18">
+                                    <div class="input-field col m3 s12 step20">
                                         <select class="select2 browser-default" id="subdistrict_id" name="subdistrict_id">
                                             <option value="">--Pilih ya--</option>
                                         </select>
@@ -359,29 +359,29 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>3. Pembayaran</legend>
-                                    <div class="input-field col m3 s12 step19">
+                                    <div class="input-field col m3 s12 step21">
                                         <select class="form-control" id="payment_type" name="payment_type" onchange="resetTerm()">
                                             <option value="1">Cash</option>
                                             <option value="2">Credit</option>
                                         </select>
                                         <label class="" for="payment_type">Tipe Pembayaran</label>
                                     </div>                   
-                                    <div class="input-field col m3 s12 step20">
+                                    <div class="input-field col m3 s12 step22">
                                         <input id="top_internal" name="top_internal" type="number" value="0" min="0" step="1">
                                         <label class="active" for="top_internal">TOP Internal (hari)</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step21">
+                                    <div class="input-field col m3 s12 step23">
                                         <input id="top_customer" name="top_customer" type="number" value="0" min="0" step="1">
                                         <label class="active" for="top_customer">TOP Customer (hari)</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step22">
+                                    <div class="input-field col m3 s12 step24">
                                         <select class="form-control" id="is_guarantee" name="is_guarantee">
                                             <option value="1">Ya</option>
                                             <option value="2">Tidak</option>
                                         </select>
                                         <label class="" for="is_guarantee">Bergaransi</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step23">
+                                    <div class="input-field col m3 s12 step25">
                                         <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                             @foreach ($currency as $row)
                                                 <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
@@ -389,11 +389,11 @@
                                         </select>
                                         <label class="" for="currency_id">Mata Uang</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step24">
+                                    <div class="input-field col m3 s12 step26">
                                         <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                         <label class="active" for="currency_rate">Konversi</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step25">
+                                    <div class="input-field col m3 s12 step27">
                                         <input id="percent_dp" name="percent_dp" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;">
                                         <label class="active" for="percent_dp">Prosentase DP (%)</label>
                                     </div>
@@ -402,7 +402,7 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>4. Lain-lain</legend>
-                                    <div class="file-field input-field col m3 s12 step26">
+                                    <div class="file-field input-field col m3 s12 step28">
                                         <div class="btn">
                                             <span>Dokumen PO</span>
                                             <input type="file" name="document_so" id="document_so">
@@ -411,13 +411,13 @@
                                             <input class="file-path validate" type="text">
                                         </div>
                                     </div>
-                                    <div class="input-field col m3 s12 step27">
+                                    <div class="input-field col m3 s12 step29">
                                         <select class="browser-default" id="sales_id" name="sales_id"></select>
                                         <label class="active" for="sales_id">Sales</label>
                                     </div>
                                 </fieldset>
                             </div>
-                            <div class="col s12 step28">
+                            <div class="col s12 step30">
                                 <fieldset style="min-width: 100%;">
                                     <legend>5. Produk Detail</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
@@ -466,22 +466,22 @@
                                 </fieldset>
                             </div>
                             <div class="col m12 s12 center">
-                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-1 step29" onclick="addItem()" href="javascript:void(0);">
+                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-1 step31" onclick="addItem()" href="javascript:void(0);">
                                     <i class="material-icons left">add</i> Tambah Baris
                                 </a>
                             </div>
-                            <div class="input-field col m4 s12 step30">
+                            <div class="input-field col m4 s12 step32">
                                 <textarea class="materialize-textarea" id="note_internal" name="note_internal" placeholder="Catatan / Keterangan Internal" rows="3"></textarea>
                                 <label class="active" for="note_internal">Keterangan Internal</label>
                             </div>
-                            <div class="input-field col m4 s12 step31">
+                            <div class="input-field col m4 s12 step33">
                                 <textarea class="materialize-textarea" id="note_external" name="note_external" placeholder="Catatan / Keterangan Eksternal" rows="3"></textarea>
                                 <label class="active" for="note_external">Keterangan Eksternal</label>
                             </div>
                             <div class="input-field col m4 s12">
 
                             </div>
-                            <div class="input-field col m4 s12 step32">
+                            <div class="input-field col m4 s12 step34">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -530,7 +530,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step33" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step35" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -2316,108 +2316,118 @@
                     intro : 'Broker adalah pihak ekspedisi pengirim, silahkan tambahkan jika tidak ada, di Menu Master Data - Organisasi - Partner Bisnis.' 
                 },
                 {
-                    title : 'Tgl. Kirim',
+                    title : 'Tipe Transport',
                     element : document.querySelector('.step13'),
+                    intro : 'Tipe kendaraan yang digunakan dalam pengiriman barang nantinya.' 
+                },
+                {
+                    title : 'Tgl. Kirim',
+                    element : document.querySelector('.step14'),
                     intro : 'Tanggal perkiraan pengiriman barang dari gudang.' 
                 },
                 {
+                    title : 'Outlet',
+                    element : document.querySelector('.step15'),
+                    intro : 'Tempat tujuan barang akan dikirimkan dalam bentuk toko / supermarket / distributor.' 
+                },
+                {
                     title : 'Alamat Tujuan',
-                    element : document.querySelector('.step14'),
+                    element : document.querySelector('.step16'),
                     intro : 'Alamat tujuan adalah alamat dimana barang ingin dikirimkan.' 
                 },
                 {
                     title : 'Provinsi',
-                    element : document.querySelector('.step15'),
+                    element : document.querySelector('.step17'),
                     intro : 'Provinsi dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
                 },
                 {
                     title : 'Kota',
-                    element : document.querySelector('.step16'),
+                    element : document.querySelector('.step18'),
                     intro : 'Kota dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
                 },
                 {
                     title : 'Kecamatan',
-                    element : document.querySelector('.step17'),
+                    element : document.querySelector('.step19'),
                     intro : 'Kecamatan dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
                 },
                 {
                     title : 'Kelurahan',
-                    element : document.querySelector('.step18'),
+                    element : document.querySelector('.step20'),
                     intro : 'Kelurahan dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
                 },
                 {
                     title : 'Tipe Pembayaran',
-                    element : document.querySelector('.step19'),
+                    element : document.querySelector('.step21'),
                     intro : 'Tipe pembayaran SO. Untuk Cash, maka TOP Internal dan TOP Customer akan menjadi 0. Untuk, tipe Credit, maka TOP Internal dan TOP Customer bisa diedit.' 
                 },
                 {
                     title : 'TOP (Term of Payment) Internal',
-                    element : document.querySelector('.step20'),
+                    element : document.querySelector('.step22'),
                     intro : 'Tenggat pembayaran internal dalam satuan hari, untuk Finance.'
                 },
                 {
                     title : 'TOP (Term of Payment) Customer',
-                    element : document.querySelector('.step21'),
+                    element : document.querySelector('.step23'),
                     intro : 'Tenggat pembayaran customer dalam satuan hari.'
                 },
                 {
                     title : 'Garansi',
-                    element : document.querySelector('.step22'),
+                    element : document.querySelector('.step24'),
                     intro : 'Apakah SO ini bergaransi atau tidak.'
                 },
                 {
                     title : 'Mata Uang',
-                    element : document.querySelector('.step23'),
+                    element : document.querySelector('.step25'),
                     intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
                 },
                 {
                     title : 'Konversi',
-                    element : document.querySelector('.step24'),
+                    element : document.querySelector('.step26'),
                     intro : 'Nilai konversi rupiah pada saat dokumen dibuat. Nilai konversi secara otomatis diisi ketika form tambah baru dibuka pertama kali dan data diambil dari situs exchangerate.host. Pastikan kode mata uang benar di master data agar nilai konversi tidak error.'
                 },
                 {
                     title : 'Persen DP',
-                    element : document.querySelector('.step25'),
+                    element : document.querySelector('.step27'),
                     intro : 'Persen Down Payment yang akan menjadi acuan pengecekan credit limit Customer pada saat barang akan dijadwalkan pengirimannya. Silahkan isikan 0, jika tagihan akan dibayarkan secara kredit dan pengecekan akan didasarkan pada limit credit Customer. Silahkan isikan 100 jika tagihan adalah dibayarkan dengan 100% down payment.'
                 },
                 {
                     title : 'File Lampiran',
-                    element : document.querySelector('.step26'),
+                    element : document.querySelector('.step28'),
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
                     title : 'Sales',
-                    element : document.querySelector('.step27'),
+                    element : document.querySelector('.step29'),
                     intro : 'Inputan ini digunakan untuk mengatur sales terkait dengan penjualan. Data diambil dari Partner Bisnis tipe Karyawan / Pegawai.' 
                 },
                 {
                     title : 'Detail produk',
-                    element : document.querySelector('.step28'),
+                    element : document.querySelector('.step30'),
                     intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, dan Gudang Tujuan, karena itu nantinya akan menentukan dimana barang ketika diterima.' 
                 },
                 {
                     title : 'Tambah Baris',
-                    element : document.querySelector('.step29'),
+                    element : document.querySelector('.step31'),
                     intro : 'Untuk menambahkan baris produk yang ingin diinput silahkan tekan tombol ini.' 
                 },
                 {
                     title : 'Keterangan Internal',
-                    element : document.querySelector('.step30'),
+                    element : document.querySelector('.step32'),
                     intro : 'Silahkan isi / tambahkan keterangan internal untuk dokumen ini untuk catatan antar departemen (internal perusahaan) saja.' 
                 },
                 {
                     title : 'Keterangan Eksternal',
-                    element : document.querySelector('.step31'),
+                    element : document.querySelector('.step33'),
                     intro : 'Silahkan isi / tambahkan keterangan eksternal untuk dokumen ini dan kepentingan luar perusahaan.' 
                 },
                 {
-                    title : 'Diskon & Rounding',
-                    element : document.querySelector('.step32'),
+                    title : 'Informasi Total',
+                    element : document.querySelector('.step34'),
                     intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal. Sedangkan untuk Rounding akan menambah atau mengurangi nilai grandtotal sesuai inputan pengguna.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step33'),
+                    element : document.querySelector('.step35'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

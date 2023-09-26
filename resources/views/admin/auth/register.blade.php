@@ -28,6 +28,7 @@
     <!-- END: Page Level CSS-->
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/waitMe.min.css') }}">
     <!-- END: Custom CSS-->
     <style>
         #main_body {
@@ -63,9 +64,6 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col s12">
-                                        <div id="validation_alert_form" style="display:none;"></div>
-                                    </div>
                                     <div class="input-field col s6">
                                         <i class="material-icons prefix pt-2">person_pin</i>
                                         <input id="name" type="text" name="name">
@@ -136,13 +134,10 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col s12">
-                                        <div id="validation_alert_upload" style="display:none;"></div>
-                                    </div>
                                     <div class="file-field input-field col s12">
                                         <div class="btn">
-                                            <span>Document</span>
-                                            <input type="file" name="document" id="document">
+                                            <span>Dok.(Max.10Mb)</span>
+                                            <input type="file" name="document" id="document" accept="application/pdf">
                                         </div>
                                         <div class="file-path-wrapper">
                                             <input class="file-path validate" type="text">
@@ -152,6 +147,14 @@
                                 <div class="row">
                                     <div class="input-field col s12">
                                         <button class="btn waves-effect waves-light border-round gradient-45deg-purple-deep-orange col s12" type="submit" onclick="">Kirim</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s12">
+                                        <div id="validation_alert_form" style="display:none;"></div>
+                                    </div>
+                                    <div class="col s12">
+                                        <div id="validation_alert_upload" style="display:none;"></div>
                                     </div>
                                 </div>
                             </form>
@@ -175,6 +178,7 @@
     <script src="{{ url('app-assets/js/plugins.js') }}"></script>
     <script src="{{ url('app-assets/js/search.js') }}"></script>
     <script src="{{ url('app-assets/js/custom/custom-script.js') }}"></script>
+    <script src="{{ url('app-assets/js/custom/waitMe.min.js') }}"></script>
     <!-- END THEME  JS-->
     <!-- BEGIN PAGE LEVEL JS-->
 	<script>
@@ -261,7 +265,90 @@
 					});
 				}
 			});
+
+            $("#register_upload").submit(function(event) {
+				event.preventDefault();
+                let formData = new FormData($('#register_upload')[0]);
+                formData.append('type','upload');
+                $.ajax({
+                    url: '{{ Request::url() }}/save',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert_upload').hide();
+                        $('#validation_alert_upload').html('');
+                        loadingOpen('body');
+                    },
+                    success: function(response) {
+                        loadingClose('body');
+                        if(response.status == 200) {				
+                            swal({
+                                title: 'Success',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(function(){
+                                location.reload();
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert_upload').show();
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert_upload').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                        
+                        }
+                    },
+                    error: function() {
+                        loadingClose('body');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+			});
 		});
+
+        function loadingOpen(element){
+            $(element).waitMe({
+                effect: 'timer',
+                text: 'Please Wait ...',
+                bg: 'rgba(255,255,255,0.7)',
+                color: '#000',
+                waitTime: -1,
+                textPos: 'vertical'
+            });
+        }
+
+        function loadingClose(element){
+            $(element).waitMe('hide');
+        }
 	</script>
     <!-- END PAGE LEVEL JS-->
 </body>

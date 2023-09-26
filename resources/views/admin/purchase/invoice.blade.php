@@ -3235,12 +3235,6 @@
                     element : document.querySelector('.step_2_1'),
                     intro : 'Pada Tabel dibawah ini terdapat tabel yang menampilkan data yang nantinya akan dimasukkan. Penambahan Baris 1 dan Multi akan menambahkan total jumlah baris yang dapat digunakan untuk mengisi data entah itu satu atau lebih dengan limit yaitu 50 baris.'
                 },
-                {
-                    title : 'Kode Plant',
-                    element : document.querySelector('.step2'),
-                    intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
-                },
-                
             ]
         }).start();
     }

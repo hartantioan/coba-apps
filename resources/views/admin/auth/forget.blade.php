@@ -13,7 +13,7 @@
     {{-- <!-- hilangkan ini bahaya -->
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <!-- end hilangkan --> --}}
-    <title>Login | Superior Porcelain Sukses</title>
+    <title>Lupa Password | Superior Porcelain Sukses</title>
     <link rel="apple-touch-icon" href="{{ url('website/logo_web_small.png') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url('website/logo_web_small.png') }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -28,6 +28,7 @@
     <!-- END: Page Level CSS-->
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/waitMe.min.css') }}">
     <!-- END: Custom CSS-->
 </head>
 <!-- END: Head-->
@@ -39,42 +40,28 @@
             <div class="container">
                 <div id="login-page" class="row">
                     <div class="col s12 m6 l4 z-depth-4 card-panel border-radius-6 login-card bg-opacity-8">
-                        <form class="login-form" id="login_form">
+                        <form class="login-form" id="reset_form">
                             <div class="row">
                                 <div class="input-field col s12 center-align">
                                     <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
                                 </div>
                                 <div class="input-field col s12">
-                                    <h5 class="ml-4">Silahkan Masuk</h5>
+                                    <h5 class="ml-4">Reset Password</h5>
                                 </div>
                             </div>
                             <div class="row margin">
                                 <div class="input-field col s12">
-                                    <i class="material-icons prefix pt-2">person_pin</i>
-                                    <input id="id_card" type="text" name="id_card">
-                                    <label for="id_card" class="center-align">NIK</label>
-                                </div>
-                            </div>
-                            <div class="row margin">
-                                <div class="input-field col s12">
-                                    <i class="material-icons prefix pt-2">lock_outline</i>
-                                    <input id="password" type="password" name="password">
-                                    <label for="password">Password</label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col s12 m12 l12 ml-2 mt-1">
-                                    <p>
-                                        <label>
-                                            <input type="checkbox" id="showPassword"/>
-                                            <span>Lihat Password</span>
-                                        </label>
-                                    </p>
+                                    <i class="material-icons prefix pt-2">mail</i>
+                                    <input id="email" type="email" name="email">
+                                    <label for="email" class="center-align">Email</label>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="input-field col s12">
-                                    <button class="btn waves-effect waves-light border-round gradient-45deg-purple-deep-orange col s12" type="submit" onclick="">Login</button>
+                                    <button class="btn waves-effect waves-light border-round gradient-45deg-purple-deep-orange col s12" type="submit" onclick="">Kirim</button>
+                                </div>
+                                <div class="input-field col s12 center-align">
+                                    <p>Silahkan tunggu, email verifikasi akan dikirimkan.</p>
                                 </div>
                             </div>
                             <div class="row">
@@ -82,7 +69,7 @@
                                     <p class="margin medium-small"><a href="{{ url('admin/register') }}">Register Karyawan Non-Staff</a></p>
                                 </div>
                                 <div class="input-field col s6 m6 l6">
-                                    <p class="margin right-align medium-small"><a href="{{ url('admin/forget') }}">Lupa Password ?</a></p>
+                                    <p class="margin right-align medium-small"><a href="{{ url('admin/login') }}">Login</a></p>
                                 </div>
                             </div>
                         </form>
@@ -105,6 +92,7 @@
     <script src="{{ url('app-assets/js/plugins.js') }}"></script>
     <script src="{{ url('app-assets/js/search.js') }}"></script>
     <script src="{{ url('app-assets/js/custom/custom-script.js') }}"></script>
+    <script src="{{ url('app-assets/js/custom/waitMe.min.js') }}"></script>
     <!-- END THEME  JS-->
     <!-- BEGIN PAGE LEVEL JS-->
 	<script>
@@ -118,64 +106,47 @@
 				}
 			});
 			
-			$("#login_form").submit(function(event) {
+			$("#reset_form").submit(function(event) {
 				event.preventDefault();
-				if($('#id_card').val() !== '' && $('#password').val() !== ''){
-					$.ajax({
-					 url: '{{ url("admin/login/auth") }}',
-					 type: 'POST',
-					 dataType: 'JSON',
-					 contentType: false,
-					 processData: false,
-					 data: new FormData($('#login_form')[0]),
-					 cache: true,
-					 headers: {
-						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-					 },
-					 beforeSend: function() {
-						
-					 },
-					 success: function(response) {
-						
-						if(response.status == 200) {
-							setTimeout(function() {
-                                @if(Request::get('url'))
-                                    window.location.href = "{!! base64_decode(Request::get('url')) !!}";
-                                @else
-                                    location.reload();
-                                @endif
-							}, 1500);							
-							swal({
-								title: 'Success',
-								text: response.message,
-								icon: 'success'
-							});
-						} else if(response.status == 422) {
-							swal({
-								title: 'Validation',
-								text: response.message,
-								icon: 'warning'
-							});
-						} else {
-						   
-						}
-					 },
-					 error: function() {
-						
-						swal({
-							title: 'Ups!',
-							text: 'Check your internet connection.',
-							icon: 'error'
-						});
-					 }
-				  });
-				}else{
-					swal({
-						title: 'Ups, error.',
-						text: 'Please fill in the forms.',
-						icon: 'error'
-					});
-				}
+                $.ajax({
+                    url: '{{ url("admin/forget/create_reset") }}',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    contentType: false,
+                    processData: false,
+                    data: new FormData($('#reset_form')[0]),
+                    cache: true,
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#reset_form');
+                    },
+                    success: function(response) {
+                        loadingClose('#reset_form');
+                        if(response.status == 200) {
+                            swal({
+                                title: 'Success',
+                                text: response.message,
+                                icon: 'success'
+                            });
+                        } else {
+                            swal({
+                                title: 'Ups. Sorry!',
+                                text: response.message,
+                                icon: 'warning'
+                            });
+                        }
+                    },
+                    error: function() {
+                        loadingClose('#reset_form');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
 			});
 		});
 	</script>

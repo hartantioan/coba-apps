@@ -1,11 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+use App\Helpers\CustomHelper;
+use App\Mail\SendMail;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -331,6 +334,132 @@ class AuthController extends Controller
                     'message' => 'Data failed to add.'
                 ];
             }
+        }
+
+        return response()->json($response);
+    }
+
+    public function forget()
+    {
+        if(session('bo_id')) {
+            return redirect('admin/dashboard');
+        }
+
+        return view('admin.auth.forget');
+    }
+
+    public function createReset(Request $request){
+        
+        $query = User::where('email',$request->email)->where('status','1')->where('type','1')->first();
+        
+        if($query) {
+            $code = Str::random(50);
+            $encryptCode = CustomHelper::encrypt($code);
+
+            $query->update([
+                'reset_code' => $code
+            ]);
+
+            $data = [
+                'subject'   => 'Reset Akun',
+                'view'      => 'admin.mail.reset_password',
+                'code'      => $encryptCode,
+                'result'    => $query,
+            ];
+
+            Mail::to($request->email)->send(new SendMail($data));
+
+            if(Mail::flushMacros()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Terdapat kesalahan sistem, mohon ditunggu.'
+                ];
+            }else{
+                activity()
+                    ->performedOn(new User())
+                    ->withProperties($query)
+                    ->log('Send Link Reset Password '.$query->name);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Link reset berhasil dikirimkan ke email anda.'
+                ];
+            }
+            
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Email tidak ditemukan.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function resetPage(Request $request)
+    {
+
+        if(session('bo_id')) {
+            return redirect('admin/dashboard');
+        }
+
+        $data = User::where('reset_code',CustomHelper::decrypt($request->data))->first();
+
+        if($data){
+            $data = [
+                'title'     => 'Profil Pengguna',
+                'data'      => $data,
+                'code'      => $request->data,
+            ];
+
+            return view('admin.auth.reset_page', ['data' => $data]);
+        }else{
+            abort(404);
+        }
+    }
+
+    public function changePassword(Request $request){
+        
+        $query = User::where('status','1')->where('reset_code',CustomHelper::decrypt($request->code))->first();
+        
+        if($query) {
+
+            $query->update([
+                'reset_code'            => NULL,
+                'password'              => bcrypt($request->password),
+                'last_change_password'  => date('Y-m-d H:i:s'),
+            ]);
+
+            $data = [
+                'subject'   => 'Berhasil Reset Password',
+                'view'      => 'admin.mail.success_reset_password',
+                'result'    => $query,
+            ];
+
+            Mail::to($query->email)->send(new SendMail($data));
+
+            if(Mail::flushMacros()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Terdapat kesalahan sistem, mohon ditunggu.'
+                ];
+            }else{
+                activity()
+                    ->performedOn(new User())
+                    ->withProperties($query)
+                    ->log('Successfully Reset Password '.$query->name);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Berhasil reset password. Halaman akan dialihkan.'
+                ];
+            }
+            
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data tidak ditemukan.'
+            ];
         }
 
         return response()->json($response);

@@ -93,6 +93,8 @@ use App\Http\Controllers\Purchase\PurchaseMemoController;
 use App\Http\Controllers\Purchase\AgingAPController;
 use App\Http\Controllers\Purchase\DownPaymentController;
 
+use App\Http\Controllers\Production\MarketingOrderPlanController;
+
 use App\Http\Controllers\Sales\MarketingOrderController;
 use App\Http\Controllers\Sales\MarketingOrderDownPaymentController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryController;
@@ -161,6 +163,13 @@ Route::prefix('admin')->group(function () {
     Route::prefix('register')->group(function () {
         Route::get('/', [RegistrationController::class, 'index']);
         Route::post('save',[RegistrationController::class, 'create']);
+    });
+
+    Route::prefix('forget')->group(function () {
+        Route::get('/', [AuthController::class, 'forget']);
+        Route::post('create_reset',[AuthController::class, 'createReset']);
+        Route::post('change_password',[AuthController::class, 'changePassword']);
+        Route::get('reset_page', [AuthController::class, 'resetPage']);
     });
 
     Route::prefix('logout')->group(function () {
@@ -1155,6 +1164,16 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('hr')->middleware('direct.access')->group(function () {
+                Route::prefix('registration')->middleware('operation.access:registration,view')->group(function () {
+                    Route::get('/',[RegistrationController::class, 'hrIndex']);
+                    Route::get('datatable',[RegistrationController::class, 'hrDatatable']);
+                    Route::get('row_detail', [RegistrationController::class, 'hrRowDetail']);
+                    Route::post('show', [RegistrationController::class, 'hrShow']);
+                    Route::get('export',[RegistrationController::class, 'hrExport']);
+                    Route::post('create',[RegistrationController::class, 'hrCreate'])->middleware('operation.access:registration,update');
+                    Route::post('destroy', [RegistrationController::class, 'hrDestroy'])->middleware('operation.access:registration,delete');
+                });
+
                 Route::prefix('employee_transfer')->middleware('operation.access:employee_transfer,view')->group(function () {
                     Route::get('/',[EmployeeTransferController::class, 'index']);
                     Route::get('datatable',[EmployeeTransferController::class, 'datatable']);
@@ -1394,6 +1413,25 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter',[DeadStockController::class, 'filter']);
                         Route::get('export',[DeadStockController::class, 'export']);
                     });
+                });
+            });
+
+            Route::prefix('production')->middleware('direct.access')->group(function () {
+                Route::prefix('marketing_order_plan')->middleware('operation.access:marketing_order_plan,view')->group(function () {
+                    Route::get('/',[MarketingOrderPlanController::class, 'index']);
+                    Route::get('datatable',[MarketingOrderPlanController::class, 'datatable']);
+                    Route::get('row_detail',[MarketingOrderPlanController::class, 'rowDetail']);
+                    Route::post('show', [MarketingOrderPlanController::class, 'show']);
+                    Route::post('get_code', [MarketingOrderPlanController::class, 'getCode']);
+                    Route::post('print',[MarketingOrderPlanController::class, 'print']);
+                    Route::post('print_by_range',[MarketingOrderPlanController::class, 'printByRange']);
+                    Route::get('export',[MarketingOrderPlanController::class, 'export']);
+                    Route::get('viewstructuretree',[MarketingOrderPlanController::class, 'viewStructureTree']);
+                    Route::post('create',[MarketingOrderPlanController::class, 'create'])->middleware('operation.access:marketing_order_plan,update');
+                    Route::get('approval/{id}',[MarketingOrderPlanController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[MarketingOrderPlanController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MarketingOrderPlanController::class, 'voidStatus'])->middleware('operation.access:marketing_order_plan,void');
+                    Route::post('destroy', [MarketingOrderPlanController::class, 'destroy'])->middleware('operation.access:marketing_order_plan,delete');
                 });
             });
 

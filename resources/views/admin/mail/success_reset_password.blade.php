@@ -194,27 +194,18 @@
           </tr>
           <tr>
             <td class="email-body" width="100%">
-              <table class="email-body_inner" align="center" width="570" cellpadding="0" cellspacing="0">
+              <table class="email-body_inner" align="center" width="650" cellpadding="0" cellspacing="0">
                 <tr>
                   <td class="content-cell">
-                    <h1>Yay, data anda berhasil terkirim!</h1>
+                    <h1>Yay, password akun anda berhasil direset!</h1>
                     <p>
-                        Terima kasih telah mendaftarkan diri anda di {{ env('APP_NAME') }}! Kami akan menghubungi anda secepatnya untuk konfirmasi penerimaan.
-                    </p>
-                    <p>
-                        Nomor Registrasi : {{ $data['code'] }}
-                    </p>
-                    <p>
-                        Nama Lengkap : {{ $data['result']->name }}
-                    </p>
-                    <p>
-                        Nama Pengguna : {{ $data['result']->username }}
+                        Selamat, password anda berhasil diatur ulang. Berikut adalah informasi url dan login akun anda. Pastikan anda menyimpan password baru dengan baik.
                     </p>
                     <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td align="center">
                           <div>
-                            <a href="{{ $url }}" class="button button--green" style="color:white !important;">Home</a>
+                            <a href="{{ $url }}/admin/login" class="button button--green" style="color:white !important;">Login</a>
                           </div>
                         </td>
                       </tr>
@@ -225,7 +216,7 @@
                           <p class="sub">Jika anda mengalami masalah dalam menekan tombol link di atas, silahkan salin dan tempel link dibawah ke browser anda.
                           </p>
                           <p class="sub">
-                            <a href="{{ $url }}">{{ env('APP_NAME') }}</a>
+                            <a href="{{ $url }}/admin/login">{{ $url }}/admin/login</a>
                           </p>
                         </td>
                       </tr>

@@ -40,6 +40,7 @@ class ResetCogs implements ShouldQueue
      */
     public function handle()
     {
+		info('JALAN MULAI');
         $data = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->whereDate('date','>=',$this->date)->orderBy('date')->orderBy('id')->get();
 		$databefore = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->whereDate('date','<',$this->date)->orderByDesc('date')->orderByDesc('id')->first();
 
@@ -126,5 +127,7 @@ class ResetCogs implements ShouldQueue
 				}
 			}
 		}
+
+		info('JALAN SELESAI');
     }
 }

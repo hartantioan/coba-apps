@@ -94,6 +94,7 @@ use App\Http\Controllers\Purchase\AgingAPController;
 use App\Http\Controllers\Purchase\DownPaymentController;
 
 use App\Http\Controllers\Production\MarketingOrderPlanController;
+use App\Http\Controllers\Production\ProductionScheduleController;
 
 use App\Http\Controllers\Sales\MarketingOrderController;
 use App\Http\Controllers\Sales\MarketingOrderDownPaymentController;
@@ -1432,6 +1433,23 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[MarketingOrderPlanController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderPlanController::class, 'voidStatus'])->middleware('operation.access:marketing_order_plan,void');
                     Route::post('destroy', [MarketingOrderPlanController::class, 'destroy'])->middleware('operation.access:marketing_order_plan,delete');
+                });
+
+                Route::prefix('production_schedule')->middleware('operation.access:production_schedule,view')->group(function () {
+                    Route::get('/',[ProductionScheduleController::class, 'index']);
+                    Route::get('datatable',[ProductionScheduleController::class, 'datatable']);
+                    Route::get('row_detail',[ProductionScheduleController::class, 'rowDetail']);
+                    Route::post('show', [ProductionScheduleController::class, 'show']);
+                    Route::post('get_code', [ProductionScheduleController::class, 'getCode']);
+                    Route::post('print',[ProductionScheduleController::class, 'print']);
+                    Route::post('print_by_range',[ProductionScheduleController::class, 'printByRange']);
+                    Route::get('export',[ProductionScheduleController::class, 'export']);
+                    Route::get('viewstructuretree',[ProductionScheduleController::class, 'viewStructureTree']);
+                    Route::post('create',[ProductionScheduleController::class, 'create'])->middleware('operation.access:production_schedule,update');
+                    Route::get('approval/{id}',[ProductionScheduleController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[ProductionScheduleController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionScheduleController::class, 'voidStatus'])->middleware('operation.access:production_schedule,void');
+                    Route::post('destroy', [ProductionScheduleController::class, 'destroy'])->middleware('operation.access:production_schedule,delete');
                 });
             });
 

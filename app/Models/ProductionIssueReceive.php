@@ -8,21 +8,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class ProductionSchedule extends Model
+class ProductionIssueReceive extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'production_schedules';
+    protected $table = 'production_issue_receives';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
         'company_id',
-        'machine_id',
         'post_date',
         'document',
-        'production_code',
         'status',
         'void_id',
         'void_note',
@@ -44,9 +42,9 @@ class ProductionSchedule extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function productionScheduleDetail()
+    public function productionIssueReceiveDetail()
     {
-        return $this->hasMany('App\Models\ProductionScheduleDetail');
+        return $this->hasMany('App\Models\ProductionIssueReceiveDetail');
     }
 
     public function used(){
@@ -101,7 +99,7 @@ class ProductionSchedule extends Model
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = ProductionSchedule::selectRaw('RIGHT(code, 8) as code')
+        $query = ProductionIssueReceive::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')

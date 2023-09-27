@@ -72,6 +72,12 @@ class AppServiceProvider extends ServiceProvider
             'marketing_order_delivery_details'      => 'App\Models\MarketingOrderDeliveryDetail',
             'marketing_order_invoice_details'       => 'App\Models\MarketingOrderInvoiceDetail',
             'marketing_order_memos'                 => 'App\Models\MarketingOrderMemo',
+            'marketing_order_plans'                 => 'App\Models\MarketingOrderPlan',
+            'marketing_order_plan_details'          => 'App\Models\MarketingOrderPlanDetail',
+            'production_schedules'                  => 'App\Models\ProductionSchedule',
+            'production_schedule_details'           => 'App\Models\ProductionScheduleDetail',
+            'production_issue_receives'             => 'App\Models\ProductionIssueReceive',
+            'production_isseu_receive_details'      => 'App\Models\ProductionIssueReceiveDetail',
         ]);
     }
 }

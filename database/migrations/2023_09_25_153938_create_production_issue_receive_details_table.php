@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('production_issue_receive_id')->nullable();
             $table->bigInteger('production_schedule_detail_id')->nullable();
+            $table->bigInteger('production_issue_receive_detail_id')->nullable();
             $table->string('lookable_type',155)->nullable();
             $table->bigInteger('lookable_id')->nullable();
             $table->bigInteger('qty')->nullable();
@@ -22,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['production_issue_receive_id','production_schedule_detail_id','lookable_id'],'pir_detail_index');
+            $table->index(['production_issue_receive_id','production_schedule_detail_id','production_issue_receive_detail_id','lookable_id'],'pir_detail_index');
         });
     }
 

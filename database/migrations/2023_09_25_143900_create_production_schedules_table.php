@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('machine_id')->nullable();
             $table->date('post_date')->nullable();
             $table->string('document')->nullable();
+            $table->string('production_code',155)->nullable();
             $table->bigInteger('status')->nullable();
             $table->bigInteger('void_id')->nullable();
             $table->string('void_note')->nullable();

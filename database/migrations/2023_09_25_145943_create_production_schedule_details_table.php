@@ -17,6 +17,7 @@ return new class extends Migration
             $table->bigInteger('shift_id')->nullable();
             $table->bigInteger('marketing_order_plan_detail_id')->nullable();
             $table->bigInteger('item_id')->nullable();
+            $table->bigInteger('bom_id')->nullable();
             $table->double('qty')->nullable();
             $table->timestamps();
             $table->softDeletes('deleted_at');

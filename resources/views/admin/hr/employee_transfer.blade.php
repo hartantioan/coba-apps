@@ -343,8 +343,6 @@
         select2ServerSide('#employee_id', '{{ url("admin/select2/employee") }}');
         select2ServerSide('#manager_id', '{{ url("admin/select2/employee") }}');
 
-        // ... Your other code ...
-
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const selectedCode = $('#selectedCode').val();

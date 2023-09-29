@@ -39,11 +39,13 @@ class ProductionScheduleController extends Controller
             'content'       => 'admin.production.schedule',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'machine'       => Machine::where('status','1')->get(),
+            'machine'       => Machine::where('status','1')->whereHas('line',function($query){
+                $query->whereIn('place_id',$this->dataplaces);
+            })->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'MOPL-'.date('y'),
+            'newcode'       => 'PRSC-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -61,11 +63,8 @@ class ProductionScheduleController extends Controller
             'user_id',
             'code',
             'company_id',
-            'place_id',
+            'machine_id',
             'post_date',
-            'start_date',
-            'end_date',
-            'type',
         ];
 
         $start  = $request->start;
@@ -74,9 +73,9 @@ class ProductionScheduleController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = MarketingOrderPlan::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = ProductionSchedule::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
-        $query_data = MarketingOrderPlan::where(function($query) use ($search, $request) {
+        $query_data = ProductionSchedule::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -84,7 +83,7 @@ class ProductionScheduleController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('marketingOrderPlanDetail',function($query) use ($search, $request){
+                            ->orWhereHas('productionScheduleDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -104,10 +103,6 @@ class ProductionScheduleController extends Controller
                     $query->whereDate('post_date','>=', $request->start_date);
                 } else if($request->finish_date) {
                     $query->whereDate('post_date','<=', $request->finish_date);
-                }
-
-                if($request->type){
-                    $query->where('type',$request->type);
                 }
 
             })
@@ -117,7 +112,7 @@ class ProductionScheduleController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = MarketingOrderPlan::where(function($query) use ($search, $request) {
+        $total_filtered = ProductionSchedule::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -125,7 +120,7 @@ class ProductionScheduleController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('marketingOrderPlanDetail',function($query) use ($search, $request){
+                            ->orWhereHas('productionScheduleDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
                                         ->orWhere('name','like',"%$search%");
@@ -145,10 +140,6 @@ class ProductionScheduleController extends Controller
                     $query->whereDate('post_date','>=', $request->start_date);
                 } else if($request->finish_date) {
                     $query->whereDate('post_date','<=', $request->finish_date);
-                }
-
-                if($request->type){
-                    $query->where('type',$request->type);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -164,11 +155,8 @@ class ProductionScheduleController extends Controller
                     $val->user->name,
                     $val->code,
                     $val->company->name,
-                    $val->place->name,
+                    $val->machine->name,
                     date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->start_date)),
-                    date('d/m/y',strtotime($val->end_date)),
-                    $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
@@ -176,7 +164,6 @@ class ProductionScheduleController extends Controller
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">content_copy</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];

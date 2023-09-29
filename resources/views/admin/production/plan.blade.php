@@ -1120,6 +1120,7 @@
                         }
                         
                         $('.modal-content').scrollTop(0);
+                        
                         M.updateTextFields();
 
                         $('#code_place_id').val(response.code_place_id).formSelect().trigger('change');

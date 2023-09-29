@@ -69,7 +69,7 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Code</th>
-                                                        <th>Plant</th>
+                                                        <th>Line-Plant</th>
                                                         <th>Nama</th>
                                                         <th>Keterangan</th>
                                                         <th>Status</th>

@@ -1523,7 +1523,7 @@
             },
             ajax: {
                 url: '{{ Request::url() }}/datatable',
-                type: 'GET',
+                type: 'POST',
                 data: {
                     status : $('#filter_status').val(),
                     sales_type : $('#filter_sales_type').val(),
@@ -1536,6 +1536,9 @@
                     'currency_id[]' : $('#filter_currency').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

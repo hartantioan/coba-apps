@@ -1456,7 +1456,7 @@ Route::prefix('admin')->group(function () {
             Route::prefix('sales')->middleware('direct.access')->group(function () {
                 Route::prefix('sales_order')->middleware('operation.access:sales_order,view')->group(function () {
                     Route::get('/',[MarketingOrderController::class, 'index']);
-                    Route::get('datatable',[MarketingOrderController::class, 'datatable']);
+                    Route::post('datatable',[MarketingOrderController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderController::class, 'show']);
                     Route::post('get_code', [MarketingOrderController::class, 'getCode']);

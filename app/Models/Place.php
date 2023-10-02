@@ -64,6 +64,27 @@ class Place extends Model
         return $this->hasMany('App\Models\WorkOrder')->whereIn('status',['2','3']);;
     }
 
+    public function line(){
+        return $this->hasMany('App\Models\Line')->where('status','1');
+    }
+
+    public function machine(){
+        $arr = [];
+
+        foreach($this->line as $row){
+            foreach($row->machine as $rowmachine){
+                $arr[] = [
+                    'id'        => $rowmachine->id,
+                    'code'      => $rowmachine->code,
+                    'name'      => $rowmachine->name,
+                    'place_id'  => $this->id,
+                ];
+            }
+        }
+
+        return $arr;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',

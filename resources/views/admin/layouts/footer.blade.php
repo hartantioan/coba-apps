@@ -32,7 +32,7 @@
                 cekNotif('{{ URL::to('/') }}');
                 setInterval(function () {
                     cekNotif('{{ URL::to('/') }}');
-                },5000);
+                },10000);
                 $('.tooltipped').tooltip();
                 /* checkPageMaintenance('{{ URL::to('/') }}'); */
             });

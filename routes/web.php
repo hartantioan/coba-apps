@@ -258,6 +258,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_invoice', [Select2Controller::class, 'marketingOrderInvoice']);
                 Route::get('transportation', [Select2Controller::class, 'transportation']);
                 Route::get('outlet', [Select2Controller::class, 'outlet']);
+                Route::get('marketing_order_plan', [Select2Controller::class, 'marketingOrderPlan']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -1445,7 +1446,9 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[ProductionScheduleController::class, 'printByRange']);
                     Route::get('export',[ProductionScheduleController::class, 'export']);
                     Route::get('viewstructuretree',[ProductionScheduleController::class, 'viewStructureTree']);
+                    Route::post('remove_used_data', [ProductionScheduleController::class, 'removeUsedData']);
                     Route::post('create',[ProductionScheduleController::class, 'create'])->middleware('operation.access:production_schedule,update');
+                    Route::post('send_used_data',[ProductionScheduleController::class, 'sendUsedData'])->middleware('operation.access:production_schedule,update');
                     Route::get('approval/{id}',[ProductionScheduleController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[ProductionScheduleController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionScheduleController::class, 'voidStatus'])->middleware('operation.access:production_schedule,void');

@@ -154,11 +154,18 @@
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
+                                    <div class="input-field col m3 s12 step2">
+                                        <select class="form-control" id="place_id" name="place_id" onchange="getMachine()">
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="place_id">Plant</label>
+                                    </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="machine_id" name="machine_id">
-                                            @foreach ($machine as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name.' - '.$row->line->name }}</option>
-                                            @endforeach
+                                            <option value="">--Silahkan pilih Plant--</option>
                                         </select>
                                         <label class="" for="machine_id">Mesin</label>
                                     </div>
@@ -200,7 +207,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Detail Dokumen Referensi</legend>
+                                    <legend>3. Detail Target Produksi</legend>
                                     <div class="col m12 s12 step10" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered">
@@ -208,9 +215,9 @@
                                                     <tr>
                                                         <th class="center">MOP</th>
                                                         <th class="center">Item</th>
-                                                        <th class="center">Resep BOM</th>
                                                         <th class="center">Qty (Satuan Jual)</th>
-                                                        <th class="center">Satuan</th>
+                                                        <th class="center">Qty (Satuan UOM)</th>
+                                                        <th class="center">Qty (Satuan Pallet)</th>
                                                         <th class="center">Tgl.Request</th>
                                                         <th class="center">Remark</th>
                                                         <th class="center">Hapus</th>
@@ -219,7 +226,38 @@
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
                                                         <td class="center-align" colspan="8">
-                                                            Silahkan pilih Marketing Order Plan...
+                                                            Silahkan tambahkan Marketing Order Plan...
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>4. Detail Shift</legend>
+                                    <div class="col m12 s12 step10" style="overflow:auto;width:100% !important;">
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Shift</th>
+                                                        <th class="center">Item</th>
+                                                        <th class="center">Qty (Satuan UOM)</th>
+                                                        <th class="center">Satuan</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-item-detail">
+                                                    <tr id="last-row-item-detail">
+                                                        <td class="center-align" colspan="5">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addShift();" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Shift
+                                                            </a>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -376,6 +414,8 @@
 
 <!-- END: Page Main-->
 <script>
+    var machines = @json($machine);
+    
     $(function() {
 
         $('#datatable_serverside').on('click', 'button', function(event) {
@@ -452,6 +492,12 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -459,15 +505,24 @@
                 M.updateTextFields();
                 $('#project_id,#warehouse_id').empty();
                 $('.row_item').remove();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
+            let id = $(this).data('id');
+            if($('.row_item[data-id="' + id + '"]').length == 0){
+                $('.data-used[data-id="' + id + '"]').trigger('click');
+            }
         });
 
-        $('#arr_place0,#arr_department0').formSelect();
-        select2ServerSide('#arr_item0', '{{ url("admin/select2/sales_item") }}');
+        select2ServerSide('#marketing_order_plan_id', '{{ url("admin/select2/marketing_order_plan") }}');
     });
 
     function makeTreeOrg(data,link){
@@ -589,8 +644,166 @@
             nodeDataArray: data,
             linkDataArray: link
         });
+    }
+
+    function getMachine(){
+        $('#machine_id').empty();
+        if($('#place_id').val()){
+            let place_id = $('#place_id').val();
+            $.each(machines, function(i, val) {
+                if(val.place_id == place_id){
+                    $('#machine_id').append(`
+                        <option value="` + val.id + `">` + val.code + ` - ` + val.name + `</option>
+                    `);
+                }
+            });
+            alert(machines.length);
+        }else{
+            $('#machine_id').append(`
+                <option value="">--Silahkan pilih Plant--</option>
+            `);
+        }
+    }
+
+    function removeUsedData(type,id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id,
+                type : type,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_item[data-id="' + id + '"]').remove();
+                if($('.row_item').length == 0){
+                    $('#body-item').empty().append(`
+                        <tr id="last-row-item">
+                            <td class="center-align" colspan="8">
+                                Silahkan tambahkan Marketing Order Plan...
+                            </td>
+                        </tr>
+                    `);
+                    $('#marketing_order_plan_id').empty();
+                }
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function addShift(){
+        if($('.row_item').length > 0){
             
-            
+        }else{
+            swal({
+                title: 'Ups! Hayo.',
+                text: 'Silahkan tambahkan satu atau lebih Marketing Order Plan.',
+                icon: 'warning'
+            });
+        }
+    }
+
+    function getMarketingOrderPlan(){
+        if($('#marketing_order_plan_id').val()){
+            let mop = $('#marketing_order_plan_id').select2('data')[0];
+            $.ajax({
+                url: '{{ Request::url() }}/send_used_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#marketing_order_plan_id').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                    }else{
+                        if($('#last-row-item').length > 0){
+                            $('#last-row-item').remove();
+                        }
+
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + mop.code + `
+                                <i class="material-icons close data-used" data-id="` + mop.id + `" onclick="removeUsedData('` + mop.table + `','` + $('#marketing_order_plan_id').val() + `')">close</i>
+                            </div>
+                        `);
+
+                        $.each(mop.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-item').append(`
+                                <tr class="row_item" data-id="` + mop.id + `">
+                                    <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
+                                    <td>
+                                        ` + mop.code + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty_in_sell + ` ` + val.unit_sell + `
+                                    </td>
+                                    <td class="center-align">
+                                        <input name="arr_qty[]" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this)" required style="width:50%;">
+                                        ` + val.unit_uom + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty_in_pallet + ` ` + val.unit_pallet + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.request_date + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.note + `
+                                    </td>
+                                    <td class="center-align">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + mop.id + `" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+
+                        $('#marketing_order_plan_id').empty();
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+
+        }
     }
 
     function printMultiSelect(){

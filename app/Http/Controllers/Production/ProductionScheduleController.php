@@ -34,14 +34,19 @@ class ProductionScheduleController extends Controller
     }
     public function index(Request $request)
     {
+        $machines = [];
+        $places = Place::where('status','1')->whereIn('id',$this->dataplaces)->get();
+
+        foreach($places as $row){
+            $machines[] = $row->machine();
+        }
+
         $data = [
             'title'         => 'Jadwal Produksi',
             'content'       => 'admin.production.schedule',
             'company'       => Company::where('status','1')->get(),
-            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'machine'       => Machine::where('status','1')->whereHas('line',function($query){
-                $query->whereIn('place_id',$this->dataplaces);
-            })->get(),
+            'place'         => $places,
+            'machine'       => $machines,
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -1253,4 +1258,27 @@ class ProductionScheduleController extends Controller
         return response()->json($response);
     }
 
+    public function sendUsedData(Request $request){
+        $mop = MarketingOrderPlan::find($request->id);
+       
+        if(!$mop->used()->exists()){
+            CustomHelper::sendUsedData($mop->getTable(),$request->id,'Form Jadwal Produksi');
+            return response()->json([
+                'status'    => 200,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Dokumen no. '.$mop->used->lookable->code.' telah dipakai di '.$mop->used->ref.', oleh '.$mop->used->user->name.'.'
+            ]);
+        }
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->type,$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
+    }
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('code',155)->nullable();
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('company_id')->nullable();
+            $table->bigInteger('place_id')->nullable();
             $table->bigInteger('machine_id')->nullable();
             $table->date('post_date')->nullable();
             $table->string('document')->nullable();
@@ -27,7 +28,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes('deleted_at');
 
-            $table->index(['user_id','company_id','machine_id'],'pst_index');
+            $table->index(['user_id','company_id','place_id','machine_id'],'pst_index');
         });
     }
 

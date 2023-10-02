@@ -43,7 +43,7 @@ class SendMail extends Mailable
     {
         return $this->view($this->data['view'])
             ->with([
-                'url'   => 'https://superiorporcelain.co.id',
+                'url'   => url('/'),
                 'data'  => $this->data,
             ])
             ->subject($this->data['subject']);

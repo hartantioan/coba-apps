@@ -22,6 +22,7 @@ use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
+use App\Models\MarketingOrderPlan;
 use App\Models\Menu;
 use App\Models\Outlet;
 use App\Models\PaymentRequest;
@@ -1990,6 +1991,52 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrderPlan(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = MarketingOrderPlan::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])
+        ->get();
+
+        foreach($data as $d) {
+            $details = [];
+
+            foreach($d->MarketingOrderPlanDetail as $row){
+                $details[] = [
+                    'mopd_id'       => $row->id,
+                    'item_id'       => $row->item_id,
+                    'item_name'     => $row->item->name,
+                    'qty_in_sell'   => number_format($row->qty,3,',','.'),
+                    'qty_in_uom'    => number_format($row->qty * $row->item->sell_unit,3,',','.'),
+                    'qty_in_pallet' => number_format($row->qty / $row->item->pallet_unit,3,',','.'),
+                    'unit_sell'     => $row->item->sellUnit->code,
+                    'unit_uom'      => $row->item->uomUnit->code,
+                    'unit_pallet'   => $row->item->palletUnit->code,
+                    'request_date'  => date('d/m/y',strtotime($row->request_date)),
+                    'note'          => $row->note,
+                ];
+            }
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' Periode '.date('d/m/y',strtotime($d->start_date)).' - '.date('d/m/y',strtotime($d->end_date)),
+                'table'         => $d->getTable(),
+                'details'       => $details,
+                'code'          => $d->code,
             ];
         }
 

@@ -49,6 +49,6 @@ class Machine extends Model
     }
 
     public function line(){
-        return $this->belongsTo('App\Models\Line')->withTrashed();
+        return $this->belongsTo('App\Models\Line','line_id','id')->withTrashed();
     }
 }

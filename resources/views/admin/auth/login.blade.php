@@ -82,7 +82,7 @@
                                     <p class="margin medium-small"><a href="{{ url('admin/register') }}">Register Karyawan Non-Staff</a></p>
                                 </div>
                                 <div class="input-field col s6 m6 l6">
-                                    <p class="margin right-align medium-small"><a href="{{ url('admin/login/forget') }}">Lupa Password ?</a></p>
+                                    <p class="margin right-align medium-small"><a href="{{ url('admin/forget') }}">Lupa Password ?</a></p>
                                 </div>
                             </div>
                         </form>

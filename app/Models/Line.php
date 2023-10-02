@@ -49,6 +49,10 @@ class Line extends Model
     }
 
     public function place(){
-        return $this->belongsTo('App\Models\Place')->withTrashed();
+        return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
+    }
+
+    public function machine(){
+        return $this->hasMany('App\Models\Machine')->where('status','1');
     }
 }

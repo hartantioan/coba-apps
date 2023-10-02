@@ -220,17 +220,25 @@ class MenuController extends Controller
                     if($query->is_maintenance){
                         if(!$request->maintenance){
                             if($query->parentsub()->exists()){
-                                $query->parentSub->update([
-                                    'is_maintenance' => NULL
-                                ]);
-                                if($query->parentSub->parentSub()->exists()){
-                                    $query->parentSub->parentSub->update([
+                                $siblingMaintenance = false;
+                                foreach($query->parentsub->sub as $row){
+                                    if($row->is_maintenance){
+                                        $siblingMaintenance = true;
+                                    }
+                                }
+                                if(!$siblingMaintenance){
+                                    $query->parentSub->update([
                                         'is_maintenance' => NULL
                                     ]);
-                                    if($query->parentSub->parentSub->parentSub()->exists()){
-                                        $query->parentSub->parentSub->parentSub->update([
+                                    if($query->parentSub->parentSub()->exists()){
+                                        $query->parentSub->parentSub->update([
                                             'is_maintenance' => NULL
                                         ]);
+                                        if($query->parentSub->parentSub->parentSub()->exists()){
+                                            $query->parentSub->parentSub->parentSub->update([
+                                                'is_maintenance' => NULL
+                                            ]);
+                                        }
                                     }
                                 }
                             }

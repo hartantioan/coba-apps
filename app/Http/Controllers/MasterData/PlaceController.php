@@ -141,7 +141,7 @@ class PlaceController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code'              => $request->temp ? ['required', Rule::unique('places', 'code')->ignore($request->temp)] : 'required|unique:places,code',
+            'code'              => $request->temp ? ['required', Rule::unique('places', 'code')->ignore($request->temp),'min:2','max:2'] : 'required|unique:places,code|min:2|max:2',
             'name' 				=> 'required',
             'address'           => 'required',
             'company_id'        => 'required',
@@ -152,6 +152,8 @@ class PlaceController extends Controller
         ], [
             'code.required'             => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah terpakai.',
+            'code.min'                  => 'Panjang karakter kode minimal 2.',
+            'code.max'                  => 'Panjang karakter kode maksimal 2.',
             'name.required' 	        => 'Nama tidak boleh kosong.',
             'address.required'          => 'Alamat tidak boleh kosong.',
             'company_id.required'       => 'Cabang tidak boleh kosong.',

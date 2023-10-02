@@ -280,8 +280,12 @@ class UserController extends Controller
                                 <th>'.$data->address.'</th>
                             </tr>
                             <tr>
-                                <th>Kecamatan</th>
+                                <th>Kelurahan</th>
                                 <th>'.($data->subdistrict_id ? $data->subdistrict->name : '-').'</th>
+                            </tr>
+                            <tr>
+                                <th>Kecamatan</th>
+                                <th>'.($data->district_id ? $data->district->name : '-').'</th>
                             </tr>
                             <tr>
                                 <th>Kota/Kabupaten</th>
@@ -525,6 +529,7 @@ class UserController extends Controller
                     $query->place_id	    = $request->type == '1' ? $request->place_id : NULL;
                     $query->province_id     = $request->province_id;
                     $query->city_id         = $request->city_id;
+                    $query->district_id     = $request->district_id;
                     $query->subdistrict_id  = $request->subdistrict_id;
                     $query->tax_id          = $request->tax_id;
                     $query->tax_name        = $request->tax_name;
@@ -532,7 +537,7 @@ class UserController extends Controller
                     $query->pic             = $request->pic ? $request->pic : NULL;
                     $query->pic_no          = $request->pic_no ? $request->pic_no : NULL;
                     $query->office_no       = $request->office_no ? $request->office_no : NULL;
-                    $query->limit_credit    = $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : NULL;
+                    $query->limit_credit    = $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : ($query->limit_credit > 0 ? $query->limit_credit : 0);
                     $query->top             = $request->top;
                     $query->top_internal    = $request->top_internal;
                     $query->status          = $request->status ? $request->status : '2';
@@ -543,6 +548,7 @@ class UserController extends Controller
                     $query->country_id      = $request->country_id;
                     $query->employee_type   = $request->type == '1' ? $request->employee_type : NULL;
                     $query->is_ar_invoice   = $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL;
+                    $query->last_change_password =  $request->password ? date('Y-m-d H:i:s') : $query->last_change_password;
                     $query->save();
 
                     DB::commit();
@@ -568,6 +574,7 @@ class UserController extends Controller
                         'place_id'	            => $request->type == '1' ? $request->place_id : NULL,
                         'province_id'	        => $request->province_id,
                         'city_id'               => $request->city_id,
+                        'district_id'           => $request->district_id,
                         'subdistrict_id'        => $request->subdistrict_id,
                         'tax_id'                => $request->tax_id,
                         'tax_name'              => $request->tax_name,
@@ -589,6 +596,7 @@ class UserController extends Controller
                         'user_status'           => 'Offline',
                         'employee_type'         => $request->type == '1' ? $request->employee_type : NULL,
                         'is_ar_invoice'         => $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL,
+                        'last_change_password'  => date('Y-m-d H:i:s')
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
@@ -990,11 +998,11 @@ class UserController extends Controller
 
     public function show(Request $request){
         $user = User::find($request->id);
-        $user['province_name'] = $user->province->name;
-        $user['city_name'] = $user->city->name;
+        $user['province_name'] = $user->province->code.' - '.$user->province->name;
+        $user['city_name'] = $user->city->code.' - '.$user->city->name;
         $user['country_name'] = $user->country->name;
         $user['limit_credit'] = $user->limit_credit ? number_format($user->limit_credit, 0, ',', '.') : '';
-        $user['subdistrict_list'] = $user->city->getSubdistrict();
+        $user['cities'] = $user->province->getCity();
 
         $banks = [];
 		

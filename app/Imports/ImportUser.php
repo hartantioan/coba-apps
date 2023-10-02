@@ -21,7 +21,7 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
     public function model(array $row)
     {
         return new User([
-            'employee_no'       => User::generateCode($row['type']),
+            'employee_no'       => User::generateCode($row['type'],$row['employee_type'],$row['plant_id']),
             'name'              => $row['name'],
             'password'          => bcrypt($row['password']),
             'username'          => $row['username'],
@@ -29,9 +29,10 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             'address'           => $row['address'],
             'province_id'       => $row['province_id'],
             'city_id'           => $row['city_id'],
+            'district_id'       => $row['district_id'],
             'subdistrict_id'    => $row['subdistrict_id'],
             'id_card'           => $row['id_card'],
-            'id_card_address'   => $row['id_card'],
+            'id_card_address'   => $row['id_card_address'],
             'type'              => $row['type'],
             'group_id'          => $row['type'],
             'status'            => $row['status'],
@@ -53,6 +54,7 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             'children'          => $row['children'],
             'country_id'        => $row['country_id'],
             'employee_type'     => $row['type'] == '1' ? $row['employee_type'] : NULL,
+            'place_id'          => $row['plant_id'],
         ]);
     }
     public function rules(): array
@@ -65,6 +67,7 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             '*.address'         => 'required|string',
             '*.province_id'     => 'required|integer',
             '*.city_id'         => 'required|integer',
+            '*.district_id'     => 'required|integer',
             '*.subdistrict_id'  => 'required|integer',
             '*.id_card'         => 'nullable',
             '*.id_card_address' => 'nullable',
@@ -88,7 +91,8 @@ class ImportUser implements ToModel,WithHeadingRow, WithValidation,WithBatchInse
             '*.married_date'    => 'nullable',
             '*.children'        => 'nullable',
             '*.country_id'      => 'required|integer',
-            '*.employee_type'   => 'required'
+            '*.employee_type'   => 'required',
+            '*.plant_id'        => 'required|integer',
         ];
     }
 

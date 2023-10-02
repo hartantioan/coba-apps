@@ -241,7 +241,7 @@
                 <tr>
                   <td class="content-cell">
                     <p class="sub center">
-                      <br>Surabaya, Baliwerti 119-121.
+                      <br>Raya Kupang Baru No. 27 Dukuh Kupang, Dukuhpakis, Surabaya 60225
                       <br>Jawa Timur
                       <br>(+62) 811332642
                     </p>

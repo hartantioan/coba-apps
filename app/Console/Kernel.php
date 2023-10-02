@@ -16,7 +16,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('queue:work --stop-when-empty')->everyTwoMinutes()->withoutOverlapping()->runInBackground();
+        /* $schedule->command('queue:work')->everyMinute()->withoutOverlapping()->runInBackground(); */
+        $schedule->command('queue:work --stop-when-empty')->everyMinute()->withoutOverlapping();
+        /* $schedule->command('websocket:init')->everyMinute()->withoutOverlapping()->runInBackground(); */
     }
 
     /**

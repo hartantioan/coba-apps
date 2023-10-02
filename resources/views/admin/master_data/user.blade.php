@@ -247,18 +247,26 @@
                             <label class="active" for="top_internal">TOP Internal</label>
                         </div>
                         <div class="input-field col s3">
-                            <select class="browser-default" id="province_id" name="province_id"></select>
+                            <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
                             <label class="active" for="province_id">Provinsi</label>
                         </div>
                         <div class="input-field col s3">
-                            <select class="browser-default" id="city_id" name="city_id" onchange="getSubdistrict();"></select>
+                            <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
+                                <option value="">--Pilih ya--</option>
+                            </select>
                             <label class="active" for="city_id">Kota/Kabupaten</label>
+                        </div>
+                        <div class="input-field col s3">
+                            <select class="select2 browser-default" id="district_id" name="district_id" onchange="getSubdistrict();">
+                                <option value="">--Pilih ya--</option>
+                            </select>
+                            <label class="active" for="district_id">Kecamatan</label>
                         </div>
                         <div class="input-field col s3">
                             <select class="select2 browser-default" id="subdistrict_id" name="subdistrict_id">
                                 <option value="">--Pilih ya--</option>
                             </select>
-                            <label class="active" for="subdistrict_id">Kecamatan</label>
+                            <label class="active" for="subdistrict_id">Kelurahan</label>
                         </div>
                         <div class="input-field col s3">
                             <select class="browser-default" id="country_id" name="country_id"></select>
@@ -817,10 +825,17 @@
 <script>
     var arrgroup = @json($group);
     var tempuser = 0;
+    var district = [], subdistrict = [];
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',
+        });
+
+        $('.select2').on('select2:open', function (e) {
+            const evt = "scroll.select2";
+            $(e.target).parents().off(evt);
+            $(window).off(evt);
         });
 
         loadDataTable();
@@ -1125,18 +1140,42 @@
 		});
     }
 
-    function getSubdistrict(){
-        if($('#city_id').val()){
-            $('#subdistrict_id').empty();
-            $.each($('#city_id').select2('data')[0].subdistrict, function(i, value) {
-                $('#subdistrict_id').append(`
-                    <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
+    function getCity(){
+        $('#city_id,#district_id,#subdistrict_id').empty().append(`
+            <option value="">--Pilih ya--</option>
+        `);
+        if($('#province_id').val()){
+            $.each($('#province_id').select2('data')[0].cities, function(i, value) {
+                $('#city_id').append(`
+                    <option value="` + value.id + `" data-district='` + JSON.stringify(value.district) + `'>` + value.code + ` - `  + value.name + `</option>
                 `);
             });
-        }else{
-            $('#subdistrict_id').empty().append(`
-                <option value="">--Pilih ya--</option>
-            `);
+        }
+    }
+
+    function getDistrict(){
+        $('#district_id,#subdistrict_id').empty().append(`
+            <option value="">--Pilih ya--</option>
+        `);
+        if($('#city_id').val()){
+            $.each($("#city_id").select2().find(":selected").data("district"), function(i, value) {
+                $('#district_id').append(`
+                    <option value="` + value.id + `" data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.code + ` - ` + value.name + `</option>
+                `);
+            });
+        }
+    }
+
+    function getSubdistrict(){
+        $('#subdistrict_id').empty().append(`
+            <option value="">--Pilih ya--</option>
+        `);
+        if($('#district_id').val()){
+            $.each($("#district_id").select2().find(":selected").data("subdistrict"), function(i, value) {
+                $('#subdistrict_id').append(`
+                    <option value="` + value.id + `">` + value.code + ` - ` + value.name + `</option>
+                `);
+            });
         }
     }
 
@@ -1660,23 +1699,47 @@
 
                 refreshGroup();
                 
-                $('#province_id,#city_id,#country_id').empty();
+                $('#province_id,#country_id').empty();
 
                 $('#province_id').append(`
                     <option value="` + response.province_id + `">` + response.province_name + `</option>
                 `);
-                $('#city_id').append(`
-                    <option value="` + response.city_id + `">` + response.city_name + `</option>
+                
+                $('#subdistrict_id,#district_id,#city_id').empty().append(`
+                    <option value="">--Pilih ya--</option>
                 `);
 
-                $('#subdistrict_id').empty();
-                $.each(response.subdistrict_list, function(i, value) {
-                    $('#subdistrict_id').append(`
-                        <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
+                $.each(response.cities, function(i, val) {
+                    $('#city_id').append(`
+                        <option value="` + val.id + `" ` + (val.id == response.city_id ? 'selected' : '') + `>` + val.code + ` - ` + val.name + `</option>
                     `);
                 });
 
-                $('#subdistrict_id').val(response.subdistrict_id).trigger('change');
+                let index = -1;
+
+                $.each(response.cities, function(i, val) {
+                    if(val.id == response.city_id){
+                        index = i;
+                    }
+                });
+
+                if(index >= 0){
+                    $.each(response.cities[index].district, function(i, value) {
+                        let selected = '';
+                        $('#district_id').append(`
+                            <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.code + ` - ` + value.name + `</option>
+                        `);
+                        if(value.id == response.district_id){
+                            subdistrict = value.subdistrict;
+                        }
+                    });
+
+                    $.each(subdistrict, function(i, value) {
+                        $('#subdistrict_id').append(`
+                            <option value="` + value.id + `" ` + (value.id == response.subdistrict_id ? 'selected' : '') + `>` + value.code + ` - ` + value.name + `</option>
+                        `);
+                    });
+                }
 
                 $('#country_id').append(`
                     <option value="` + response.country_id + `">` + response.country_name + `</option>

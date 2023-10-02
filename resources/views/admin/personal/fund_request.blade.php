@@ -135,183 +135,200 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="row">
-                            <div class="input-field col m2 s12">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                <label class="active" for="code">No. Dokumen</label>
-                            </div>
-                            <div class="input-field col m1 s12">
-                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                    <option value="">--Pilih--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input type="hidden" id="temp" name="temp">
-                                <input type="hidden" id="tempLimit" value="0">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
-                                <label class="active" for="account_id">Partner Bisnis</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="type" name="type">
-                                    <option value="1">BS</option>
-                                    {{-- <option value="2">OPM</option> --}}
-                                </select>
-                                <label class="" for="type">Tipe Permohonan</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                <label class="active" for="required_date">Tgl. Request Pembayaran</label>
-                            </div>
-                            <div class="file-field input-field col m3 s12">
-                                <div class="btn">
-                                    <span>Lampiran</span>
-                                    <input type="file" name="file" id="file" accept="image/*,.pdf">
+                        <fieldset>
+                            <legend>1. Informasi Utama</legend>
+                            <div class="row">
+                                <div class="input-field col m2 s12">
+                                    <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                    <label class="active" for="code">No. Dokumen</label>
                                 </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
-                                </div>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="place_id" name="place_id">
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="place_id">Plant</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="department_id" name="department_id">
-                                    @foreach ($department as $row)
-                                        <option value="{{ $row->id }}" {{ $row->id == session('bo_department_id') ? 'selected' : '' }}>{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="department_id">Departemen</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <textarea id="note" name="note" class="materialize-textarea" placeholder="Ulasan singkat produk..."></textarea>
-                                <label class="active" for="note">Keterangan</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <textarea id="termin_note" name="termin_note" class="materialize-textarea" placeholder="Informasi termin pembayaran..."></textarea>
-                                <label class="active" for="termin_note">Termin</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <select class="form-control" id="payment_type" name="payment_type">
-                                    <option value="1">Tunai</option>
-                                    <option value="2">Transfer</option>
-                                    <option value="3">Cek</option>
-                                    <option value="4">BG</option>
-                                </select>
-                                <label class="" for="payment_type">Tipe Pembayaran</label>
-                            </div>
-                            <div class="input-field col m3 s12 right-align">
-                                <h6>Limit BS : <b><span id="limit">0,00</span></b></h6>
-                            </div>
-                            <div class="col m12">
-                                <h6>Rekening (Jika transfer)</h6>
-                                <div class="input-field col m3 s12">
-                                    <select class="form-control" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
-                                        <option value="">--Pilih Partner Bisnis-</option>
-                                    </select>
-                                    <label class="" for="user_bank_id">Pilih Dari Daftar</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input id="name_account" name="name_account" type="text" placeholder="Rekening atas nama">
-                                    <label class="active" for="name_account">Rekening Penerima</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <input id="no_account" name="no_account" type="text" placeholder="Rekening atas nama">
-                                    <label class="active" for="no_account">Bank & No. Rek. Penerima</label>
-                                </div>
-                            </div>
-                            <div class="col m12">
-                                <h6>Mata Uang</h6>
-                                <div class="input-field col m3 s12">
-                                    <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
-                                        @foreach ($currency as $row)
-                                            <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
+                                <div class="input-field col m1 s12">
+                                    <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                        <option value="">--Pilih--</option>
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
                                         @endforeach
                                     </select>
-                                    <label class="" for="currency_id">Mata Uang</label>
                                 </div>
                                 <div class="input-field col m3 s12">
-                                    <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                    <label class="active" for="currency_rate">Konversi</label>
+                                    <input type="hidden" id="temp" name="temp">
+                                    <input type="hidden" id="tempLimit" value="0">
+                                    <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
+                                    <label class="active" for="account_id">Partner Bisnis</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="type" name="type">
+                                        <option value="1">BS</option>
+                                        {{-- <option value="2">OPM</option> --}}
+                                    </select>
+                                    <label class="" for="type">Tipe Permohonan</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                    <label class="active" for="post_date">Tgl. Posting</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
+                                    <label class="active" for="required_date">Tgl. Request Pembayaran</label>
+                                </div>
+                                <div class="file-field input-field col m3 s12">
+                                    <div class="btn">
+                                        <span>Lampiran</span>
+                                        <input type="file" name="file" id="file" accept="image/*,.pdf">
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
+                                    </div>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="place_id" name="place_id">
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="place_id">Plant</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="department_id" name="department_id">
+                                        @foreach ($department as $row)
+                                            <option value="{{ $row->id }}" {{ $row->id == session('bo_department_id') ? 'selected' : '' }}>{{ $row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="department_id">Departemen</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <textarea id="note" name="note" class="materialize-textarea" placeholder="Ulasan singkat produk..."></textarea>
+                                    <label class="active" for="note">Keterangan</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <textarea id="termin_note" name="termin_note" class="materialize-textarea" placeholder="Informasi termin pembayaran..."></textarea>
+                                    <label class="active" for="termin_note">Termin</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="form-control" id="payment_type" name="payment_type">
+                                        <option value="1">Tunai</option>
+                                        <option value="2">Transfer</option>
+                                        <option value="3">Cek</option>
+                                        <option value="4">BG</option>
+                                    </select>
+                                    <label class="" for="payment_type">Tipe Pembayaran</label>
+                                </div>
+                                <div class="input-field col m3 s12 right-align">
+                                    <h6>Limit BS : <b><span id="limit">0,00</span></b></h6>
                                 </div>
                             </div>
-                            <div class="col m12 s12">
-                                <p class="mt-2 mb-2">
-                                    <h4>Detail Produk</h4>
-                                    <table class="bordered">
+                        </fieldset>
+                    </div>
+                    <div class="col s12">
+                        <fieldset>
+                            <legend>2. Rekening & Mata Uang</legend>
+                            <div class="row">
+                                <div class="col m12">
+                                    <h6>Rekening (Jika transfer)</h6>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="user_bank_id" name="user_bank_id" onchange="getRekening()">
+                                            <option value="">--Pilih Partner Bisnis-</option>
+                                        </select>
+                                        <label class="" for="user_bank_id">Pilih Dari Daftar</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="name_account" name="name_account" type="text" placeholder="Rekening atas nama">
+                                        <label class="active" for="name_account">Rekening Penerima</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="no_account" name="no_account" type="text" placeholder="Rekening atas nama">
+                                        <label class="active" for="no_account">Bank & No. Rek. Penerima</label>
+                                    </div>
+                                </div>
+                                <div class="col m12">
+                                    <h6>Mata Uang</h6>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
+                                            @foreach ($currency as $row)
+                                                <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="currency_id">Mata Uang</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                        <label class="active" for="currency_rate">Konversi</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col s12">
+                        <fieldset>
+                            <legend>3. Detail Barang & Total</legend>
+                            <div class="row">
+                                <div class="col m12 s12">
+                                    <p class="mt-2 mb-2">
+                                        <h4>Detail Produk</h4>
+                                        <table class="bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">Uraian Barang</th>
+                                                    <th class="center">Qty</th>
+                                                    <th class="center">Satuan</th>
+                                                    <th class="center">Harga Satuan</th>
+                                                    <th class="center">PPN</th>
+                                                    <th class="center">Incl.PPN</th>
+                                                    <th class="center">PPh</th>
+                                                    <th class="center">Subtotal</th>
+                                                    <th class="center">Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-item">
+                                                <tr id="last-row-item">
+                                                    <td colspan="9" class="center">
+                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                            <i class="material-icons left">add</i> Tambah Detail
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </p>
+                                </div>
+                                <div class="input-field col m9 s12">
+
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <table width="100%" class="bordered">
                                         <thead>
                                             <tr>
-                                                <th class="center">Uraian Barang</th>
-                                                <th class="center">Qty</th>
-                                                <th class="center">Satuan</th>
-                                                <th class="center">Harga Satuan</th>
-                                                <th class="center">PPN</th>
-                                                <th class="center">Incl.PPN</th>
-                                                <th class="center">PPh</th>
-                                                <th class="center">Subtotal</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-item">
-                                            <tr id="last-row-item">
-                                                <td colspan="9" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Detail
-                                                    </a>
+                                                <td>Total</td>
+                                                <td class="right-align">
+                                                    <input class="browser-default" id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
                                                 </td>
                                             </tr>
-                                        </tbody>
+                                            <tr>
+                                                <td>PPN</td>
+                                                <td class="right-align">
+                                                    <input class="browser-default" id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>PPh</td>
+                                                <td class="right-align">
+                                                    <input class="browser-default" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Grandtotal</td>
+                                                <td class="right-align">
+                                                    <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
+                                                </td>
+                                            </tr>
+                                        </thead>
                                     </table>
-                                </p>
+                                </div>
+                                <div class="col s12 mt-3">
+                                    <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                </div>
                             </div>
-                            <div class="input-field col m9 s12">
-
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <table width="100%" class="bordered">
-                                    <thead>
-                                        <tr>
-                                            <td>Total</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>PPN</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="tax" name="tax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>PPh</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);count();" style="text-align:right;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Grandtotal</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" readonly>
-                                            </td>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
-                            </div>
-                        </div>
+                        </fieldset>
                     </div>
                 </form>
             </div>

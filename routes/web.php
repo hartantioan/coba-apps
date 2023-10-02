@@ -4,6 +4,7 @@ use App\Http\Controllers\HR\AttendanceController;
 use App\Http\Controllers\HR\AttendanceLatenessReportController;
 use App\Http\Controllers\HR\AttendanceMonthlyReportController;
 use App\Http\Controllers\HR\AttendancePresenceReportController;
+use App\Http\Controllers\HR\AttendancePunishmentController;
 use App\Http\Controllers\HR\EmployeeTransferController;
 
 use App\Http\Controllers\Accounting\AccountingReportController;
@@ -16,10 +17,13 @@ use App\Http\Controllers\Inventory\StockInRupiahController;
 use App\Http\Controllers\Inventory\StockInQtyController;
 use App\Http\Controllers\MasterData\AttendanceMachineController;
 use App\Http\Controllers\MasterData\AttendancePeriodController;
+use App\Http\Controllers\MasterData\DivisionController;
 use App\Http\Controllers\MasterData\EmployeeController;
 use App\Http\Controllers\MasterData\EmployeeScheduleController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
 use App\Http\Controllers\MasterData\HardwareItemGroupController;
+use App\Http\Controllers\MasterData\LevelController;
+use App\Http\Controllers\MasterData\PunishmentController;
 use App\Http\Controllers\Other\MenuIndexController;
 use App\Http\Controllers\Purchase\OutStandingAPController;
 use App\Http\Controllers\Purchase\PriceHistoryPOController;
@@ -248,6 +252,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_invoice', [Select2Controller::class, 'marketingOrderInvoice']);
                 Route::get('transportation', [Select2Controller::class, 'transportation']);
                 Route::get('outlet', [Select2Controller::class, 'outlet']);
+                Route::get('position', [Select2Controller::class, 'position']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -368,6 +373,22 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [OutletController::class, 'show']);
                         Route::post('create',[OutletController::class, 'create'])->middleware('operation.access:outlet,update');
                         Route::post('destroy', [OutletController::class, 'destroy'])->middleware('operation.access:outlet,delete');
+                    });
+
+                    Route::prefix('division')->middleware('operation.access:division,view')->group(function () {
+                        Route::get('/',[DivisionController::class, 'index']);
+                        Route::get('datatable',[DivisionController::class, 'datatable']);
+                        Route::post('show', [DivisionController::class, 'show']);
+                        Route::post('create',[DivisionController::class, 'create'])->middleware('operation.access:division,update');
+                        Route::post('destroy', [DivisionController::class, 'destroy'])->middleware('operation.access:division,delete');
+                    });
+
+                    Route::prefix('level')->middleware('operation.access:level,view')->group(function () {
+                        Route::get('/',[LevelController::class, 'index']);
+                        Route::get('datatable',[LevelController::class, 'datatable']);
+                        Route::post('show', [LevelController::class, 'show']);
+                        Route::post('create',[LevelController::class, 'create'])->middleware('operation.access:level,update');
+                        Route::post('destroy', [LevelController::class, 'destroy'])->middleware('operation.access:level,delete');
                     });
                 });
 
@@ -566,6 +587,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [AllowanceController::class, 'show']);
                         Route::post('create',[AllowanceController::class, 'create'])->middleware('operation.access:allowance,update');
                         Route::post('destroy', [AllowanceController::class, 'destroy'])->middleware('operation.access:allowance,delete');
+                    });
+
+                    Route::prefix('master_punishment')->middleware('operation.access:master_punishment,view')->group(function () {
+                        Route::get('/',[PunishmentController::class, 'index']);
+                        Route::get('datatable',[PunishmentController::class, 'datatable']);
+                        Route::post('show', [PunishmentController::class, 'show']);
+                        Route::post('create',[PunishmentController::class, 'create'])->middleware('operation.access:master_punishment,update');
+                        Route::post('destroy', [PunishmentController::class, 'destroy'])->middleware('operation.access:master_punishment,delete');
                     });
 
                     Route::prefix('employee_schedule')->middleware('operation.access:employee_schedule,view')->group(function () {
@@ -1171,6 +1200,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[EmployeeTransferController::class, 'approval'])->withoutMiddleware('direct.access');
                 });
 
+               
+
                 Route::prefix('shift')->middleware('operation.access:employee,view')->group(function () {
                     Route::get('/',[EmployeeTransferController::class, 'index']);
                     Route::get('datatable',[EmployeeTransferController::class, 'datatable']);
@@ -1210,8 +1241,24 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[AttendanceMonthlyReportController::class, 'index']);
                         Route::get('datatable',[AttendanceMonthlyReportController::class, 'datatable']);
                         Route::post('filter_by_date',[AttendanceMonthlyReportController::class, 'filterByDate']);
-              
-                    });   
+                        Route::post('takePlant',[AttendanceMonthlyReportController::class, 'takePlant']);
+                    });
+                    
+                    Route::prefix('punishment')->middleware('operation.access:punishment,view')->group(function () {
+                        Route::get('/',[AttendancePunishmentController::class, 'index']);
+                        Route::get('datatable',[AttendancePunishmentController::class, 'datatable']);
+                        Route::get('row_detail', [AttendancePunishmentController::class, 'rowDetail']);
+                        Route::post('show', [AttendancePunishmentController::class, 'show']);
+                        Route::post('show_from_code', [AttendancePunishmentController::class, 'showFromCode']);
+                        Route::post('print',[AttendancePunishmentController::class, 'print']);
+                        Route::get('export',[AttendancePunishmentController::class, 'export']);
+                        Route::post('print_by_range',[AttendancePunishmentController::class, 'printByRange']);
+                        Route::get('print_individual/{id}',[AttendancePunishmentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                        Route::post('void_status', [AttendancePunishmentController::class, 'voidStatus'])->middleware('operation.access:employee_transfer,void');
+                        Route::post('create',[AttendancePunishmentController::class, 'create'])->middleware('operation.access:employee_transfer,update');
+                        Route::post('destroy', [AttendancePunishmentController::class, 'destroy'])->middleware('operation.access:employee_transfer,delete');
+                        Route::get('approval/{id}',[AttendancePunishmentController::class, 'approval'])->withoutMiddleware('direct.access');
+                    });
                 });
             });
 

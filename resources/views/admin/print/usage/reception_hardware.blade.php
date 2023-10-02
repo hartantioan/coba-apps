@@ -271,7 +271,7 @@
                                 :
                             </td>
                             <td>
-                                {{$data->user->department->name}}
+                                {{$data->user->position->division->name}}
                             </td>
                         </tr>
                     </table>
@@ -350,7 +350,7 @@
                                     <div>{!! $data->user->signature() !!}</div>
                                 @endif
                                 <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                                <div class="mt-1">{{ $data->user->position->name.' - '.$data->user->department->name }}</div>
+                                <div class="mt-1">{{ $data->user->position->Level->name.' - '.$data->user->position->division->name }}</div>
                             </td>
                         </tr>
                     </table>  

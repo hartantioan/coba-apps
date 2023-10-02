@@ -36,6 +36,10 @@ class Department extends Model
         return $status;
     }
 
+    public function division(){
+        return $this->hasMany('App\Models\Division');
+    }
+
     public function user(){
         return $this->hasMany('App\Models\User');
     }

@@ -28,6 +28,18 @@ class AttendancePeriod extends Model
         return $this->belongsTo('App\Models\Place','plant_id','id')->withTrashed();
     }
 
+    public function getPunishment(){
+        $array_punishment=[];
+        $query_punishment = Punishment::where("place_id",$this->plant_id)
+                            ->where("type","1")
+                            ->get();
+
+        foreach($query_punishment as $row_punishment){
+            $array_punishment[]=$row_punishment->code;
+        }
+        return $array_punishment;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Exports\ExportPosition;
+use App\Models\Division;
+use App\Models\Level;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -23,8 +25,10 @@ class PositionController extends Controller
     public function index()
     {
         $data = [
-            'title' => 'Posisi / Level',
-            'content' => 'admin.master_data.position'
+            'title' => 'Posisi/Jabatan',
+            'content' => 'admin.master_data.position',
+            'divisi'  => Division::where('status','1')->get(),
+            'level'   => Level::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -32,10 +36,11 @@ class PositionController extends Controller
 
     public function datatable(Request $request){
         $column = [
-            'id',
             'code',
             'name',
-            'order',
+            'level_id',
+            'division_id',
+            'status'
         ];
 
         $start  = $request->start;
@@ -86,7 +91,8 @@ class PositionController extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
-                    $val->order,
+                    $val->division->name ?? '',
+                    $val->level->name ?? '',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -115,12 +121,14 @@ class PositionController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('positions', 'code')->ignore($request->temp)] : 'required|unique:positions,code',
             'name'              => 'required',
-            'order'             => 'required',
+            'division_id'       => 'required',
+            'level_id'       => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
             'name.required'         => 'Nama tidak boleh kosong.',
-            'order.required'        => 'Order tidak boleh kosong.',
+            'level_id.required'        => 'Level tidak boleh kosong.',
+            'division_id.required'        => 'Divisi tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -135,7 +143,8 @@ class PositionController extends Controller
                     $query = Position::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
-                    $query->order	        = $request->order;
+                    $query->level_id	        = $request->level_id;
+                    $query->division_id	        = $request->division_id;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -148,7 +157,8 @@ class PositionController extends Controller
                     $query = Position::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,
-                        'order'			=> $request->order,
+                        'level_id'			=> $request->level_id,
+                        'division_id'			=> $request->division_id,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

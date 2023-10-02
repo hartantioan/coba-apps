@@ -45,7 +45,7 @@
                                                 <div class="row">
                                                     <div class="input-field col m4 s12">
                                                         <input type="hidden" id="temp" name="temp">
-                                                        <select class="browser-default" id="period_id" name="period_id"></select>
+                                                        <select class="browser-default" id="period_id" name="period_id" onchange="thead()"></select>
                                                         <label class="active" for="period_id">Period</label>
                                                     </div>
                                                     
@@ -82,15 +82,11 @@
                                     <div class="col s12">
                                         <div id="datatable_buttons"></div>
                                         <table id="datatable_serverside" class="display responsive-table wrap">
-                                            <thead>
+                                            <thead id="thead_shift">
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Nama</th>
                                                     <th>Jumlah Shift</th>
-                                                    <th>t1</th>
-                                                    <th>t2</th>
-                                                    <th>t3</th>
-                                                    <th>t4</th>
                                                     <th>Tepat waktu</th>
                                                     <th>Ijin Kusus</th>
                                                     <th>Sakit</th>
@@ -142,6 +138,89 @@
         select2ServerSide('#period_id', '{{ url("admin/select2/period") }}');
 
     });
+    var column_name=[];
+    var column_data_table=[
+                { name: 'user_id', className: 'center-align' },
+                { name: 'period_id', className: 'center-align' },
+                { name: 'effective_day', className: 'center-align' },
+                { name: 'absent', className: 'center-align' },
+                { name: 'special_occasion', className: 'center-align' },
+                { name: 'sick', className: 'center-align' },
+                { name: 'outstation', className: 'center-align' },
+                { name: 'furlough', className: 'center-align' },
+                { name: 'dispen', className: 'center-align' },
+                { name: 'alpha', className: 'center-align' },
+                { name: 'wfh', className: 'center-align' },
+                { name: 'arrived_on_time', className: 'center-align' },
+                { name: 'out_on_time', className: 'center-align' },
+                { name: 'out_log_forget', className: 'center-align' },
+                { name: 'arrived_forget', className: 'center-align' },
+            ];
+    function thead(){
+        $('#thead_shift').empty();
+        if($("#period_id").val()){
+            if($("#period_id").select2('data')[0].punishment_code.length>0){
+                $.each($("#period_id").select2('data')[0].punishment_code, function(i, value) {
+                    column_name.push(value);
+                });
+            }else{
+                column_name=[];
+            }
+        }else{
+            column_name=[];
+        }
+        var string =`
+            <tr>
+            <th>#</th>
+            <th>Nama</th>
+            <th>Jumlah Shift</th>
+        `;
+        $.each(column_name,function(i,val){
+            string+=`<th>`+val+`</th>`;
+            column_data_table.push({ name: val, className: 'center-align' });
+        });
+        string+=`<th>Tepat waktu</th>
+                <th>Ijin Kusus</th>
+                <th>Sakit</th>
+                <th>Dinas Keluar</th>
+                <th>Cuti</th>
+                <th>Dispen</th>
+                <th>Alpha</th>
+                <th>WFH</th>
+                <th>Datang Tepat Waktu</th>
+                <th>Pulang Tepat Waktu</th>
+                <th>Lupa Check Clock Pulang</th>
+                <th>Lupa Check Clock Datang</th>
+            </tr>`;
+            $('#thead_shift').append(string);
+        // $.ajax({
+        //     url: '{{ Request::url() }}/takePlant',
+        //     type: 'POST',
+        //     dataType: 'JSON',
+        //     data: { 
+        //         id : $('#period_id').val()
+        //     },
+        //     headers: {
+        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        //     },
+        //     beforeSend: function() {
+        //         loadingOpen('.modal-content');
+        //     },
+        //     success: function(response) {
+        //         loadingClose('.modal-content');
+        //         $('#thead_shift').append(response.message);
+        //         console.log(response.message);
+        //     },
+        //     error: function() {
+        //         swal({
+        //             title: 'Ups!',
+        //             text: 'Check your internet connection.',
+        //             icon: 'error'
+        //         });
+        //     }
+        // });
+        
+    }
 
     function exportExcel(){
         var date = $('#date').val();
@@ -185,27 +264,7 @@
                     });
                 }
             },
-            columns: [
-                { name: 'user_id', className: 'center-align' },
-                { name: 'period_id', className: 'center-align' },
-                { name: 'effective_day', className: 'center-align' },
-                { name: 't1', className: 'center-align' },
-                { name: 't2', className: 'center-align' },
-                { name: 't3', className: 'center-align' },
-                { name: 't4', className: 'center-align' },
-                { name: 'absent', className: 'center-align' },
-                { name: 'special_occasion', className: 'center-align' },
-                { name: 'sick', className: 'center-align' },
-                { name: 'outstation', className: 'center-align' },
-                { name: 'furlough', className: 'center-align' },
-                { name: 'dispen', className: 'center-align' },
-                { name: 'alpha', className: 'center-align' },
-                { name: 'wfh', className: 'center-align' },
-                { name: 'arrived_on_time', className: 'center-align' },
-                { name: 'out_on_time', className: 'center-align' },
-                { name: 'out_log_forget', className: 'center-align' },
-                { name: 'arrived_forget', className: 'center-align' },
-                ],
+            columns: column_data_table,
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle' 

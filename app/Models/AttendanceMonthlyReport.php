@@ -18,10 +18,6 @@ class AttendanceMonthlyReport extends Model
         'user_id',
         'period_id',
         'effective_day',
-        't1',
-        't2',
-        't3',
-        't4',
         'absent',//masuk
         'special_occasion',
         'sick',

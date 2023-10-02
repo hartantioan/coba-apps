@@ -135,21 +135,6 @@
                             </select>
                             <label for="type">Tipe</label>
                         </div>
-                        <div class="input-field col s6 employee_inputs" id="position_select">
-                            <select id="position_id" name="position_id">
-                                <option value=""></option>
-                                @foreach($position as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="position_id">Posisi/Level</label>
-                        </div>
-                        <div class="input-field col s6" id="manager_select">
-                            <select class="select2 browser-default" id="manager_id" name="manager_id">
-                                <option value="">--Pilih ya--</option>
-                            </select>
-                            <label class="active" for="manager_id">Select Manager</label>
-                        </div>
                         <div class="input-field col s6 employee_inputs" id="place_select">
                             <select id="plant_id" name="plant_id">
                                 <option value=""></option>
@@ -159,15 +144,20 @@
                             </select>
                             <label for="plant_id">Penempatan</label>
                         </div>
-                        <div class="input-field col s6 employee_inputs"id="department_select">
-                            <select id="department_id" name="department_id" >
+                        <div class="input-field col s6 employee_inputs" id="position_select">
+                            <select  class="select2 browser-default" id="position_id" name="position_id">
                                 <option value=""></option>
-                                @foreach($department as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
+                                
                             </select>
-                            <label for="department_id">Departemen</label>
+                            <label class="active" for="position_id">Posisi/Level</label>
                         </div>
+                        <div class="input-field col s6" id="manager_select">
+                            <select class="select2 browser-default" id="manager_id" name="manager_id">
+                                <option value="">--Pilih ya--</option>
+                            </select>
+                            <label class="active" for="manager_id">Select Manager</label>
+                        </div>
+                        
                         <div class="input-field col s6" >
                             <input id="post_date" name="post_date"  min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tanggal Post">
                             <label class="active" for="post_date">Tanggal Post</label>
@@ -290,6 +280,7 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
+   
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -342,7 +333,7 @@
         });
         select2ServerSide('#employee_id', '{{ url("admin/select2/employee") }}');
         select2ServerSide('#manager_id', '{{ url("admin/select2/employee") }}');
-
+        select2ServerSide('#position_id', '{{ url("admin/select2/position") }}');
         // ... Your other code ...
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -351,6 +342,7 @@
         console.log(selectedCode);
 
         if (code) {
+           
             $.ajax({
                 url: '{{ Request::url() }}/show_from_code',
                 type: 'POST',
@@ -367,22 +359,26 @@
                 success: function(response) {
                     loadingClose('#main');
                     $('#modal1').modal('open');
-
+                    $('#temp').val(response.id);
                     $('#employee_id').empty().append(`
-                        <option value="` + response.id + `">` + response.name + `</option>
+                        <option value="` + response.user_id + `">` + response.user.name + `</option>
                     `);
                     if(response.manager != null){
                         $('#manager_id').empty().append(`
                             <option value="` + response.manager_id + `">` + response.manager.name + `</option>
                         `);
                     }
-                    
-                    $('#position_id').val(response.position_id).formSelect();
-                    $('#plant_id').val(response.place_id).formSelect();
-            
-                    $("#department_id").val(response.department_id).formSelect();
-                 
-                    
+                    if(response.position != null){
+                        $('#position_id').empty().append(`
+                            <option value="` + response.position_id + `">` + response.position.name + `</option>
+                        `);
+                    }
+                    console.log(response);
+                  
+                    $('#plant_id').val(response.plant_id).formSelect();
+                    $('#post_date').val(response.post_date);
+                    $('#valid_date').val(response.valid_date);
+                    $('#note').val(response.note);
                     $('.modal-content').scrollTop(0);
                     $('#name').focus();
                     
@@ -471,7 +467,7 @@
     function userDetail(){
         $('#position_id').val($('#employee_id').select2('data')[0].arrinfo.position_id).formSelect();
         $('#plant_id').val($('#employee_id').select2('data')[0].arrinfo.place_id).formSelect();
-        $('#department_id').val($('#employee_id').select2('data')[0].arrinfo.department_id).formSelect();
+       
     }
 
     function hideShow(){
@@ -490,14 +486,14 @@
             $managerSelect.val('').hide();
             $('#position_select').val('').hide();
             $('#place_select').val('').hide();
-            $('#department_select').val('').hide();
+          
         } else {
             $('#valid_date').val('');
             $('#valid_date').prop('readonly', false);
             $managerSelect.val('').show();
             $('#position_select').show().val('');
             $('#place_select').show().val('');
-            $('#department_select').show().val('');
+            
         }
     }
 
@@ -687,7 +683,7 @@
                 $('#position_id').val(response.position_id).formSelect();
                 $('#plant_id').val(response.plant_id).formSelect();
           
-                $("#department_id").val(response.department_id).formSelect();
+                
                 $("#post_date").val(response.post_date);
                 $("#valid_date").val(response.valid_date);
                 $("#note").val(response.note);

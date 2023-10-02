@@ -157,7 +157,7 @@
                                 Posisi
                             </td>
                             <td width="60%">
-                                {{ $data->user->position->name }}
+                                {{ $data->user->position->Level->name }}
                             </td>
                         </tr>
                         <tr>
@@ -165,7 +165,7 @@
                                 Depart.
                             </td>
                             <td width="60%">
-                                {{ $data->user->department->name }}
+                                {{ $data->user->position->division->name }}
                             </td>
                         </tr>
                     </table>
@@ -215,7 +215,7 @@
                             <div>{!! $data->user->signature() !!}</div>
                         @endif
                         <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                        <div class="mt-1">{{ $data->user->position->name.' '.$data->user->department->name }}</div>
+                        <div class="mt-1">{{ $data->user->position->Level->name.' '.$data->user->position->division->name }}</div>
                     </td>
                     @if($data->approval())
                     @foreach ($data->approval()->approvalMatrix()->where('status','2')->get() as $row)
@@ -225,7 +225,7 @@
                                 <div>{!! $row->user->signature() !!}</div>
                             @endif
                             <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                            <div class="mt-1">{{ $row->user->position->name.' - '.$row->user->department->name }}</div>
+                            <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
                         </td>
                     @endforeach
                 @endif

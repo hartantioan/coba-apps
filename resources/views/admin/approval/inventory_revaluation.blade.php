@@ -156,13 +156,13 @@
                         Posisi
                     </div>
                     <div class="col s9">
-                        {{ $data->user->position->name }}
+                        {{ $data->user->position->Level->name }}
                     </div>
                     <div class="col s3">
                         Depart.
                     </div>
                     <div class="col s9">
-                        {{ $data->user->department->name }}
+                        {{ $data->user->position->division->name }}
                     </div>
                 </div>
             </div>
@@ -229,7 +229,7 @@
                             <div>{!! $data->user->signature() !!}</div>
                         @endif
                         <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                        <div class="mt-1">{{ $data->user->position->name.' '.$data->user->department->name }}</div>
+                        <div class="mt-1">{{ $data->user->position->Level->name.' '.$data->user->position->division->name }}</div>
                     </td>
                     @if($data->approval())
                         @foreach ($data->approval() as $detail)
@@ -240,7 +240,7 @@
                                         <div>{!! $row->user->signature() !!}</div>
                                     @endif
                                     <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                                    <div class="mt-1">{{ $row->user->position->name.' - '.$row->user->department->name }}</div>
+                                    <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
                                 </td>
                             @endforeach
                         @endforeach

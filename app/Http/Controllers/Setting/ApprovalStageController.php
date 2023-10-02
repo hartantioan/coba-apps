@@ -260,7 +260,7 @@ class ApprovalStageController extends Controller
         foreach($approval->approvalStageDetail as $row){
             $details[] = [
                 'user_id'   => $row->user_id,
-                'user_name' => $row->user->name.' - '.$row->user->phone.' Pos. '.$row->user->position->name.' Dep. '.$row->user->department->name,
+                'user_name' => $row->user->name.' - '.$row->user->phone.' Pos. '.$row->user->position->Level->name.' Dep. '.$row->user->position->division->name,
             ];
         }
 

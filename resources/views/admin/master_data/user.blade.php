@@ -1692,7 +1692,6 @@
 
                 if(response.type == '1'){
                     $('#company_id').val(response.company_id).formSelect();
-                    $('#department_id').val(response.department_id).formSelect();
                     $('#position_id').val(response.position_id).formSelect();
                     $('#married_status').val(response.married_status).formSelect();
                     $('#married_date').val(response.married_date);

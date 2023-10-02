@@ -32,8 +32,8 @@ class EmployeeController extends Controller
             'place'         => Place::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
-            'user'          => User::join('departments','departments.id','=','users.department_id')->select('departments.name as department_name','users.*')->orderBy('department_name')->get(),
-            'position'      => Position::where('status','1')->orderBy('order')->get(),
+            'user'          => User::where('status','1')->where('type','1')->get(),
+            'position'      => Position::where('status','1')->get(),
             'group'         => Group::where('status','1')->get(['id','name','type'])->toArray(),
             'menu'          => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'       => 'admin.master_data.employee'
@@ -108,8 +108,8 @@ class EmployeeController extends Controller
                 '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Education" onclick="showEducation(' . $val->id . ')"><i class="material-icons dp48">local_library</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Work Experience" onclick="showExperience(' . $val->id . ')"><i class="material-icons dp48">location_city</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Family" onclick="showFamily(' . $val->id . ')"><i class="material-icons dp48">recent_actors</i></button>
-                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light light-blue darken-3 white-text btn-small" data-popup="tooltip" title="Lihat Jadwal" onclick="getSchedule(' . $val->id . ')"><i class="material-icons dp48">event</i></button>
-                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-orange accent-1 white-text btn-small" data-popup="tooltip" title="Copy Schedule" onclick="openCopy(' . $val->id . ')"><i class="material-icons dp48">content_copy</i></button>
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light light-blue darken-3 white-text btn-small" data-popup="tooltip" title="Lihat Jadwal" onclick="getSchedule(' . $val->employee_no . ')"><i class="material-icons dp48">event</i></button>
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-orange accent-1 white-text btn-small" data-popup="tooltip" title="Copy Schedule" onclick="openCopy(' . $val->employee_no . ')"><i class="material-icons dp48">content_copy</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small" data-popup="tooltip" title="Employee Transfer" onclick="goto(\'' . $url . '\')"><i class="material-icons dp48">settings_ethernet</i></button>';
                 
                 $response['data'][] = [
@@ -790,10 +790,7 @@ class EmployeeController extends Controller
                                 <th>Jumlah Anak</th>
                                 <th>'.$data->children.'</th>
                             </tr>
-                            <tr>
-                                <th>Departemen</th>
-                                <th>'.($data->department()->exists() ? $data->department->name : "-").'</th>
-                            </tr>
+                           
                             <tr>
                                 <th>Posisi/Level</th>
                                 <th>'.($data->position()->exists() ? $data->position->name : "-").'</th>
@@ -882,7 +879,7 @@ class EmployeeController extends Controller
             'place'         => Place::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
-            'position'      => Position::where('status','1')->orderBy('order')->get(),
+            'position'      => Position::where('status','1')->get(),
             'group'         => Group::where('status','1')->get(['id','name','type'])->toArray(),
             'menu'          => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'       => 'admin.master_data.employee_family'
@@ -907,8 +904,8 @@ class EmployeeController extends Controller
         $oneMonthFromNow = Carbon::now()->addMonth()->toDateString();
 
         $query_shift = EmployeeSchedule::where('user_id', $request->id)
-            ->whereDate('date', '>', $currentDate)
-            ->whereDate('date', '<', $oneMonthFromNow)
+            // ->whereDate('date', '>', $currentDate)
+            // ->whereDate('date', '<', $oneMonthFromNow)
             ->get();
         $schedules=[];
         foreach($query_shift as $schedule){

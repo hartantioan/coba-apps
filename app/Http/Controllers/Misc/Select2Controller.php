@@ -15,6 +15,7 @@ use App\Models\HardwareItem;
 use App\Models\HardwareItemGroup;
 use App\Models\InventoryTransferOut;
 use App\Models\ItemStock;
+use App\Models\Level;
 use App\Models\Line;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
@@ -24,6 +25,7 @@ use App\Models\MarketingOrderInvoice;
 use App\Models\Menu;
 use App\Models\Outlet;
 use App\Models\PaymentRequest;
+use App\Models\Position;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrderDetail;
@@ -277,7 +279,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' => $d->name.' - '.$d->phone.' Pos. '.($d->position ? $d->position->name : 'N/A').' Dep. '.($d->department ? $d->department->name : 'N/A'),
+                'text' => $d->name.' - '.$d->phone.' Pos. '.($d->position ? $d->position->name : 'N/A'),
                 'limit_credit'  => $d->limit_credit,
                 'count_limit'   => $d->count_limit_credit,
                 'balance_limit' => $d->limit_credit - $d->count_limit_credit,
@@ -1590,9 +1592,9 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
-                
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'punishment_code'   => $d->getPunishment(),
             ];
         }
 
@@ -1952,6 +1954,42 @@ class Select2Controller extends Controller {
                 'subdistrict_id'    => $d->subdistrict_id,
                 'subdistrict_name'  => $d->subdistrict->name,
                 'cities'            => $d->province->getCity(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function position(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Position::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+
+                    $query->orWhereHas('level', function ($query_level) use ($search) {
+                        $query_level->where('name', 'like', "%$search%")
+                        ->orWhere('code', 'like', "%$search%");
+                    });;
+
+                    $query->orWhereHas('division', function ($query_divisi) use ($search) {
+                        $query_divisi->where('name', 'like', "%$search%")
+                        ->orWhere('code', 'like', "%$search%");
+
+                        $query_divisi->orWhereHas('department', function ($query_department) use ($search) {
+                            $query_department->where('name', 'like', "%$search%")
+                            ->orWhere('code', 'like', "%$search%");
+                        });;
+                    });;
+                })
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
             ];
         }
 

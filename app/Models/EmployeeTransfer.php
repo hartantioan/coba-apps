@@ -19,7 +19,6 @@ class EmployeeTransfer extends Model
         'account_id',
         'plant_id',
         'manager_id',
-        'department_id',
         'position_id',
         'type',
         'code',
@@ -46,9 +45,6 @@ class EmployeeTransfer extends Model
         return $this->belongsTo('App\Models\Place','plant_id','id')->withTrashed();
     }
 
-    public function department(){
-        return $this->belongsTo('App\Models\Department','department_id','id')->withTrashed();
-    }
 
     public function position(){
         return $this->belongsTo('App\Models\Position','position_id','id')->withTrashed();

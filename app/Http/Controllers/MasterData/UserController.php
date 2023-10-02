@@ -44,7 +44,7 @@ class UserController extends Controller
             'place'         => Place::where('status','1')->get(),
             'warehouse'     => Warehouse::where('status','1')->get(),
             'department'    => Department::where('status','1')->get(),
-            'position'      => Position::where('status','1')->orderBy('order')->get(),
+            'position'      => Position::where('status','1')->get(),
             'group'         => Group::where('status','1')->get(['id','name','type'])->toArray(),
             'menu'          => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'       => 'admin.master_data.user'

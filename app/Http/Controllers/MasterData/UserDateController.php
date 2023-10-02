@@ -315,7 +315,7 @@ class UserDateController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.$row->user->name.'</td>
                 <td>'.$row->user->place->name.'</td>
-                <td>'.$row->user->department->name.'</td>
+                <td>'.$row->user->position->division->name.'</td>
             </tr>';
         }
 

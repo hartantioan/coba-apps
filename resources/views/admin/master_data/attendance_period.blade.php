@@ -624,6 +624,7 @@
                         loadingOpen('#main');
                     },
                     success: function(response) {
+                        console.log(response);
                         loadingClose('#main');
                         loadDataTable();
                         M.updateTextFields();

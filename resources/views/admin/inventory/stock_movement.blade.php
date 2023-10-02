@@ -54,12 +54,10 @@
                                             <label class="" for="plant"></label>
                                         </div>
                                         <div class="input-field col m3 s12">
-                                            <select class="form-control" id="item" name="item">
-                                                @foreach ($item as $row)
-                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                                @endforeach
+                                            <select class="select2 browser-default" id="item" name="item">
+                                                
                                             </select>
-                                            <label class="" for="item">ITEM</label>
+                                            <label class="active" for="item">ITEM</label>
                                         </div>
                                         <div class="col m3">
                                             <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
@@ -96,6 +94,14 @@
 </div>
 
 <script>
+    $(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+
+        select2ServerSide('#item', '{{ url("admin/select2/item") }}');
+    });
     $('#export_button').hide();
     function filter(){
         var formData = new FormData($('#form_data')[0]);

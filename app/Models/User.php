@@ -37,7 +37,6 @@ class User extends Authenticatable
         'status',
         'company_id',
         'place_id',
-        'department_id',
         'position_id',
         'logo',
         'tax_id',
@@ -430,10 +429,6 @@ class User extends Authenticatable
 
     public function place(){
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
-    }
-
-    public function department(){
-        return $this->belongsTo('App\Models\Department','department_id','id')->withTrashed();
     }
 
     public function manager(){

@@ -76,7 +76,7 @@ class CustomHelper {
 			$query = User::find($transfer->account_id);
 			$query->place_id         = $transfer->plant_id;
 			$query->manager_id               = $transfer->manager_id;
-			$query->department_id         = $transfer->department_id;
+			
 			$query->position_id               = $transfer->position_id;
 			$query->save();
 			DB::commit();
@@ -94,7 +94,7 @@ class CustomHelper {
 			$query = User::find($transfer->account_id);
 			$query->place_id         	  = $latestTransfer->plant_id;
 			$query->manager_id            = $latestTransfer->manager_id;
-			$query->department_id         = $latestTransfer->department_id;
+			
 			$query->position_id           = $latestTransfer->position_id;
 			$query->save();
 			DB::commit();

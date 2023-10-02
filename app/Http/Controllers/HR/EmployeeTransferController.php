@@ -30,7 +30,7 @@ class EmployeeTransferController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
-            'position'      => Position::where('status','1')->orderBy('order')->get(),
+            'position'      => Position::where('status','1')->get(),
             'content'       => 'admin.hr.employee_transfer'
         ];
 
@@ -177,10 +177,6 @@ class EmployeeTransferController extends Controller
                 <td class="">'.($data->place->name).'</td>
             </tr>
             <tr>
-                <td class="center-align" style="font-weight: 700;background: cornsilk;">Departemen</td>
-                <td class="">'.($data->department->name).'</td>
-            </tr>
-            <tr>
                 <td class="center-align" style="font-weight: 700;background: cornsilk;">Posisi</td>
                 <td class="">'.($data->position->name).'</td>
             </tr>
@@ -196,10 +192,14 @@ class EmployeeTransferController extends Controller
     }
     
     public function showFromCode(Request $request){
-        $line = User::find(CustomHelper::decrypt($request->id));
+        $line = EmployeeTransfer::where('code',CustomHelper::decrypt($request->id))->first();
+        info(CustomHelper::decrypt($request->id));
+        info($line);
         if ($line->manager()->exists()) {
             $line['manager'] = $line->manager;
-        }			
+        }
+        $line['user'] = $line->user;
+        $line['position'] = $line->position;			
 		return response()->json($line);
     }
 
@@ -235,7 +235,7 @@ class EmployeeTransferController extends Controller
                     $approved = false;
                     $revised = false;
 
-                    if($query->approval()){
+                    if($query->approval()->exists()){
                         foreach ($query->approval() as $detail){
                             foreach($detail->approvalMatrix as $row){
                                 if($row->approved){
@@ -261,7 +261,7 @@ class EmployeeTransferController extends Controller
                         $query->account_id          = $request->employee_id;
                         $query->plant_id         = $request->plant_id;
                         $query->manager_id               = $request->manager_id;
-                        $query->department_id         = $request->department_id;
+                       
                         $query->position_id               = $request->position_id;
                         $query->type          = $request->type;
                         $query->note            = $request->note;
@@ -290,7 +290,7 @@ class EmployeeTransferController extends Controller
                         'account_id'	    => $request->employee_id,
                         'plant_id'          => $request->plant_id,
                         'manager_id'        => $request->manager_id,
-                        'department_id'     => $request->department_id,
+                        
                         'position_id'       => $request->position_id,
                         'type'              => $request->type,
                         'note'              => $request->note,

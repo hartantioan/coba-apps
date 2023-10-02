@@ -5,6 +5,9 @@ namespace App\Http\Controllers\HR;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceMonthlyReport;
+use App\Models\AttendancePeriod;
+use App\Models\AttendancePunishment;
+use App\Models\Punishment;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -22,31 +25,39 @@ class AttendanceMonthlyReportController extends Controller
         return view('admin.layouts.index', ['data' => $data]); 
     }
     public function datatable(Request $request){
+        $query_period = AttendancePeriod::find($request->period_id);
+        info($request->period_id);
+        $query_punish = Punishment::where('place_id',$query_period->plant_id)
+                        ->where('type','1')
+                        ->get();
         $column = [
             'user_id',
             'period_id',
             'effective_day',
-            't1',
-            't2',
-            't3',
-            't4',
-            'absent',//masuk
+        ];
+        
+        foreach ($query_punish as $row_punish) {
+            $array_nama[] = $row_punish->code;
+        }
+        
+        $additionalColumns = [
+            'absent',          // masuk
             'special_occasion',
             'sick',
-            'outstation',//dinas keluar
-            'furlough',//cuti
+            'outstation',      // dinas keluar
+            'furlough',        // cuti
             'dispen',
-            'alpha',//tidak masuk
+            'alpha',           // tidak masuk
             'wfh',
             'arrived_on_time',
             'out_on_time',
             'out_log_forget',
             'arrived_forget',
         ];
-
+        $combinedArray = array_merge($column, $array_nama, $additionalColumns);
         $start  = $request->start;
         $length = $request->length;
-        $order  = $column[$request->input('order.0.column')];
+        $order  = $combinedArray[$request->input('order.0.column')];
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
@@ -98,34 +109,63 @@ class AttendanceMonthlyReportController extends Controller
 
         })
         ->count();
+        $array=[];
+        foreach($query_data as $row_data){
+            $entry = [];
+            $entry["user_id"]=$row_data->user_id;
+            $entry["username"] = $row_data->user->name;
+            $entry["effective_day"] = $row_data->effective_day;
+            foreach($array_nama as $row_punish){
+                $entry[$row_punish]=0;
+            }
+            $entry["absent"] = $row_data->absent;
+            $entry["sick"] = $row_data->sick;
+            $entry["special_occasion"] = $row_data->special_occasion;
+            $entry["outstation"] = $row_data->outstation;
+            $entry["furlough"] = $row_data->furlough;
+            $entry["dispen"] = $row_data->dispen;
+            $entry["alpha"] = $row_data->alpha;
+            $entry["wfh"] = $row_data->wfh;
+            $entry["arrived_on_time"] = $row_data->arrived_on_time;
+            $entry["out_on_time"] = $row_data->out_on_time;
+            $entry["out_log_forget"] = $row_data->out_log_forget;
+            $entry["arrived_forget"] = $row_data->arrived_forget;
+            
+            $array[] = $entry;
+        }
 
-        $response['data'] = [];
+        $query_attendance_punish = AttendancePunishment::where('period_id',$request->period_id)->get();
+        foreach($query_attendance_punish as $row_punish){
+            info("-----------------");
+           foreach($array as $key_array=>$row_array){
+                if($row_array["user_id"]==$row_punish->user_id){
+                    info($row_array);
+                    if(array_key_exists($row_punish->punishment->code,$row_array)){
+                        
+                        $array[$key_array][$row_punish->punishment->code]=$row_punish->frequent;
+                        
+                    }
+                }
+           }
+        }
+
+        
+        $response['data'] = $array;
         if($query_data <> FALSE) {
             $nomor = $start + 1;
-            foreach($query_data as $val) {
-				
-                $response['data'][] = [
-                    $nomor,
-                    $val->user->name,
-                    $val->effective_day,
-                    $val->t1,
-                    $val->t2,
-                    $val->t3,
-                    $val->t4,
-                    $val->absent,
-                    $val->special_occasion,
-                    $val->sick,
-                    $val->outstation,
-                    $val->furlough,
-                    $val->dispen,
-                    $val->alpha,
-                    $val->wfh,
-                    $val->arrived_on_time,
-                    $val->out_on_time,
-                    $val->out_log_forget,
-                    $val->arrived_forget,
+            foreach($array as $key=>$val_array) {
+                $response['data'][$key] = [
+                    $nomor
                 ];
-
+				foreach($val_array as $key_b=>$row_val){
+                    if($key_b!="user_id"){
+                        
+                        $response['data'][$key][] = [
+                            $row_val
+                        ];
+                    }
+                    
+                }
                 $nomor++;
             }
         }
@@ -145,7 +185,54 @@ class AttendanceMonthlyReportController extends Controller
     public function showPeriod(Request $request){
         if($request->id){
             $query = AttendanceMonthlyReport::where('period_id',$request->id)->get();
-            info($query);
+           
         }
+    }
+
+    public function takePlant(Request $request){
+        info($request);
+        if($request->id){
+            $query = AttendancePeriod::where('id',$request->id)->first();
+            $query_punish = Punishment::where('place_id',$query->plant_id)
+                        ->where('type','1')
+                        ->get();
+            $string_tambahan="";
+            foreach($query_punish as $row_punish){
+                $string_tambahan.="
+                    <th>".$row_punish->code."</th>
+                ";
+            }
+            $string_th="<tr>
+                            <th>#</th>
+                            <th>Nama</th>
+                            <th>Jumlah Shift</th>
+                            ".$string_tambahan."
+                            <th>Tepat waktu</th>
+                            <th>Ijin Kusus</th>
+                            <th>Sakit</th>
+                            <th>Dinas Keluar</th>
+                            <th>Cuti</th>
+                            <th>Dispen</th>
+                            <th>Alpha</th>
+                            <th>WFH</th>
+                            <th>Datang Tepat Waktu</th>
+                            <th>Pulang Tepat Waktu</th>
+                            <th>Lupa Check Clock Pulang</th>
+                            <th>Lupa Check Clock Datang</th>
+                        </tr>";
+            
+            $response =[
+                'status'=>200,
+                'message'  =>$string_th,
+            ];
+        }
+       else{
+            $response =[
+                'status'  =>500,
+                'message' =>'ada yang error'
+            ];
+       }
+       
+       return response()->json($response);
     }
 }

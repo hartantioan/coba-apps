@@ -121,13 +121,13 @@
                     <table class="bordered centered">
                         <thead>
                             <tr>
-                                <th colspan="4">PEGAWAI</th>
-                                <th colspan="4">ACTION</th>
+                                <th colspan="3">PEGAWAI</th>
+                                <th colspan="3">ACTION</th>
                             </tr>
                             <tr>
                                 <th>Code</th>
                                 <th>Nama</th>
-                                <th>Departemen</th>
+
                                 <th>Posisi</th>
                                 <th>Checkbox</th>
                             </tr>
@@ -137,8 +137,8 @@
                             <tr>
                                 <td>{{ $row->employee_no }}</td>
                                 <td>{{ $row->name }}</td>
-                                <td>{{ $row->department->name }}</td>
-                                <td>{{ $row->position->name }}</td>
+                             
+                                <td>{{ $row->position->name??'' }}</td>
                                 <td class="input-field">
                                     <label>
                                         <input type="checkbox" name="arr_employee[]" id="checkbox{{ $row->id }}" value="{{ $row->id }}"/>
@@ -391,10 +391,6 @@
         });
     }
    
-
-   
-
-    
 
     function rowDetail(data) {
         $.ajax({

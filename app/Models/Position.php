@@ -17,12 +17,21 @@ class Position extends Model
     protected $fillable = [
         'code',
         'name',
-        'order',
+        'level_id',
+        'division_id',
         'status'
     ];
 
     public function menu(){
         return $this->hasMany('App\Models\MenuPosition');
+    }
+
+    public function division(){
+        return $this->belongsTo('App\Models\Division','division_id','id');
+    }
+
+    public function Level(){
+        return $this->belongsTo('App\Models\Level','level_id','id');
     }
 
     public function status(){

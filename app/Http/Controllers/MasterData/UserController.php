@@ -324,11 +324,7 @@ class UserController extends Controller
                                 <th>'.$data->children.'</th>
                             </tr>
                             <tr>
-                                <th>Departemen</th>
-                                <th>'.($data->department()->exists() ? $data->department->name : "-").'</th>
-                            </tr>
-                            <tr>
-                                <th>Posisi/Level</th>
+                                <th>Posisi</th>
                                 <th>'.($data->position()->exists() ? $data->position->name : "-").'</th>
                             </tr>
                             <tr>

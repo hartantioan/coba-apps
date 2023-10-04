@@ -23,6 +23,7 @@ class LevelController extends Controller
 
     public function datatable(Request $request){
         $column = [
+            'id',
             'code',
             'name',
             'order',

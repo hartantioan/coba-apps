@@ -9,6 +9,7 @@ use App\Models\ProductionSchedule;
 use App\Models\ProductionScheduleDetail;
 use App\Models\Place;
 use App\Models\Machine;
+use App\Models\ProductionScheduleTarget;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Models\User;
@@ -37,8 +38,15 @@ class ProductionScheduleController extends Controller
         $machines = [];
         $places = Place::where('status','1')->whereIn('id',$this->dataplaces)->get();
 
-        foreach($places as $row){
-            $machines[] = $row->machine();
+        foreach(Machine::where('status','1')->whereHas('line',function($query){
+            $query->where('status','1')->whereIn('place_id',$this->dataplaces);
+        })->get() as $row){
+            $machines[] = [
+                'id'        => $row->id,
+                'code'      => $row->code,
+                'name'      => $row->name.' - '.$row->line->code,
+                'place_id'  => $row->line->place_id,
+            ];
         }
 
         $data = [
@@ -193,18 +201,17 @@ class ProductionScheduleController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_plans', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_plans,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('production_schedules', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:production_schedules,code',
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
+            'machine_id'		        => 'required',
             'post_date'		            => 'required',
-            'date_start'		        => 'required',
-            'date_end'                  => 'required',
-            'type'                      => 'required',
-            'arr_item'                  => 'required|array',
+            'arr_id'                    => 'required|array',
             'arr_qty'                   => 'required|array',
-            'arr_request_date'          => 'required|array',
-            'arr_note'                  => 'required|array',
+            'arr_shift'                 => 'required|array',
+            'arr_item_detail_id'        => 'required|array',
+            'arr_qty_detail'            => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code.string'                       => 'Kode harus dalam bentuk string.',
@@ -212,18 +219,18 @@ class ProductionScheduleController extends Controller
             'code.unique'                       => 'Kode telah dipakai',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
+            'machine_id.required' 			    => 'Mesin tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'date_start.required' 			    => 'Tanggal periode mulai tidak boleh kosong.',
-            'date_end.required' 			    => 'Tanggal periode akhir tidak boleh kosong.',
-            'type.required'		                => 'Tipe tidak boleh kosong.',
-            'arr_item.required'                 => 'Item tidak boleh kosong.',
-            'arr_item.array'                    => 'Item harus array.',
-            'arr_qty.required'                  => 'Qty tidak boleh kosong.',
-            'arr_qty.array'                     => 'Qty harus array.',
-            'arr_request_date.required'         => 'Tgl request tidak boleh kosong.',
-            'arr_request_date.array'            => 'Tgl request harus array.',
-            'arr_note.required'                 => 'Catatan item tidak boleh kosong.',
-            'arr_note.array'                    => 'Catatan item harus array.',
+            'arr_id.required'                   => 'Marketing Order Plan tidak boleh kosong.',
+            'arr_id.array'                      => 'Marketing Order Plan harus array.',
+            'arr_qty.required'                  => 'Qty target tidak boleh kosong.',
+            'arr_qty.array'                     => 'Qty target harus array.',
+            'arr_shift.required'                => 'Shift tidak boleh kosong.',
+            'arr_shift.array'                   => 'Shift harus array.',
+            'arr_item_detail_id.required'       => 'Item dan shift tidak boleh kosong.',
+            'arr_item_detail_id.array'          => 'Item dan shift harus array.',
+            'arr_qty_detail.required'           => 'Qty shift tidak boleh kosong.',
+            'arr_qty_detail.array'              => 'Qty shift harus array.',
         ]);
 
         if($validation->fails()) {
@@ -237,7 +244,7 @@ class ProductionScheduleController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = ProductionSchedule::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -259,7 +266,7 @@ class ProductionScheduleController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Marketing Order Plan telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Jadwal Produksi telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -270,7 +277,7 @@ class ProductionScheduleController extends Controller
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('file')->store('public/marketing_order_plans');
+                            $document = $request->file('file')->store('public/production_schedules');
                         } else {
                             $document = $query->document;
                         }
@@ -279,16 +286,18 @@ class ProductionScheduleController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
+                        $query->machine_id = $request->machine_id;
                         $query->post_date = $request->post_date;
-                        $query->start_date = $request->date_start;
-                        $query->end_date = $request->date_end;
-                        $query->type = $request->type;
                         $query->document = $document;
                         $query->status = '1';
 
                         $query->save();
                         
-                        foreach($query->marketingOrderPlanDetail as $row){
+                        foreach($query->productionScheduleDetail as $row){
+                            $row->delete();
+                        }
+
+                        foreach($query->productionScheduleTarget as $row){
                             $row->delete();
                         }
 
@@ -296,7 +305,7 @@ class ProductionScheduleController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status Marketing Order Plan sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Jadwal Produksi sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -305,16 +314,14 @@ class ProductionScheduleController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = MarketingOrderPlan::create([
+                    $query = ProductionSchedule::create([
                         'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
+                        'machine_id'	            => $request->machine_id,
                         'post_date'                 => $request->post_date,
-                        'start_date'                => $request->date_start,
-                        'end_date'                  => $request->date_end,
-                        'type'                      => $request->type,
-                        'document'                  => $request->file('file') ? $request->file('file')->store('public/marketing_order_plans') : NULL,
+                        'document'                  => $request->file('file') ? $request->file('file')->store('public/production_schedules') : NULL,
                         'status'                    => '1',
                     ]);
 
@@ -329,13 +336,20 @@ class ProductionScheduleController extends Controller
                 DB::beginTransaction();
                 try {
                     
-                    foreach($request->arr_item as $key => $row){
-                        MarketingOrderPlanDetail::create([
-                            'marketing_order_plan_id'       => $query->id,
-                            'item_id'                       => $row,
-                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'request_date'                  => $request->arr_request_date[$key],
-                            'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
+                    foreach($request->arr_id as $key => $row){
+                        ProductionScheduleTarget::create([
+                            'production_schedule_id'            => $query->id,
+                            'marketing_order_plan_detail_id'    => $row,
+                            'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                        ]);
+                    }
+
+                    foreach($request->arr_shift as $key => $row){
+                        ProductionScheduleDetail::create([
+                            'production_schedule_id'        => $query->id,
+                            'shift_id'                      => $row,
+                            'item_id'                       => $request->arr_item_detail_id[$key],
+                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty_detail[$key])),
                         ]);
                     }
 
@@ -344,14 +358,14 @@ class ProductionScheduleController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval('marketing_order_plans',$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification('marketing_order_plans',$query->id,'Pengajuan Marketing Order Plan No. '.$query->code,'Pengajuan Marketing Order Plan No. '.$query->code,session('bo_id'));
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Jadwal Produksi No. '.$query->code,'Pengajuan Jadwal Produksi No. '.$query->code,session('bo_id'));
 
                 activity()
-                    ->performedOn(new MarketingOrderPlan())
+                    ->performedOn(new ProductionSchedule())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit marketing order plan.');
+                    ->log('Add / edit jadwal produksi plan.');
 
 				$response = [
 					'status'    => 200,
@@ -409,34 +423,66 @@ class ProductionScheduleController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = MarketingOrderPlan::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = ProductionSchedule::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="17">Daftar Item</th>
+                                <th class="center-align" colspan="8">Daftar Target Berdasarkan Marketing Order Plan</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
+                                <th class="center-align">MOP</th>
                                 <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
+                                <th class="center-align">Qty Target</th>
+                                <th class="center-align">Qty MOP</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Tgl.Request</th>
                                 <th class="center-align">Keterangan</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->marketingOrderPlanDetail as $key => $row){
+        foreach($data->productionScheduleTarget as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->item->sellUnit->code.'</td>
-                <td class="center-align">'.date('d/m/y',strtotime($row->request_date)).'</td>
-                <td class="">'.$row->note.'</td>
+                <td class="center-align">'.$row->marketingOrderPlanDetail->marketingOrderPlan->code.'</td>
+                <td class="center-align">'.$row->marketingOrderPlanDetail->item->name.'</td>
+                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.').'</td>
+                <td class="center-align">'.$row->marketingOrderPlanDetail->item->uomUnit->code.'</td>
+                <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)).'</td>
+                <td class="">'.$row->marketingOrderPlanDetail->note.'</td>
             </tr>';
         }
         
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="8">Daftar Shift & Target Produksi</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Shift</th>
+                                <th class="center-align">Item</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Satuan</th>
+                            </tr>
+                        </thead><tbody>';
+
+        foreach($data->productionScheduleDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->shift->code->name.'</td>
+                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="right-align">'.number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.').'</td>
+                <td class="center-align">'.$row->marketingOrderPlanDetail->item->uomUnit->code.'</td>
+                <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)).'</td>
+                <td class="">'.$row->marketingOrderPlanDetail->note.'</td>
+            </tr>';
+        }
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">

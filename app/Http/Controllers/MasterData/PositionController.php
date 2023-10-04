@@ -28,7 +28,7 @@ class PositionController extends Controller
             'title' => 'Posisi/Jabatan',
             'content' => 'admin.master_data.position',
             'divisi'  => Division::where('status','1')->get(),
-            'level'   => Level::where('status','1')->get(),
+            'level'   => Level::where('status','1')->orderBy('order')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

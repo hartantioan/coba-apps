@@ -137,7 +137,19 @@ class ShiftController extends Controller
 
     public function create(Request $request){
         
+        $time_in = strtotime($request->time_in);
+        $min_time_in = strtotime($request->min_time_in);
+        $time_out = strtotime($request->time_out);
+        $max_time_out = strtotime($request->max_time_out);
+        
+        $stime_in = date('H:i', strtotime($request->time_in));
+        $stime_out = date('H:i', strtotime($request->time_out));
+        $code = $stime_in . ' - ' . $stime_out;
+
+        $request->merge(['code' => $code]);
+
         $validation = Validator::make($request->all(), [
+            'code'           => $request->temp ? ['required', Rule::unique('shifts', 'code')->ignore($request->temp)] : 'required|unique:shifts,code',
             'name'           => 'required',
             'place_id'       => 'required',
             'department_id'  => 'required',
@@ -147,6 +159,8 @@ class ShiftController extends Controller
             'max_time_out'   => 'required',
             
         ], [
+            'code.required' 	     => 'Kode tidak boleh kosong.',
+            'code.unique'            => 'Kode telah terpakai.',
             'name.required'          => 'Nama Shift tidak boleh kosong.',
             'place_id.required'      => 'Plant tidak boleh kosong.',
             'department_id.required' => 'Departemen tidak boleh kosong',
@@ -164,27 +178,8 @@ class ShiftController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            $time_in = strtotime($request->time_in);
-            $min_time_in = strtotime($request->min_time_in);
-            $time_out = strtotime($request->time_out);
-            $max_time_out = strtotime($request->max_time_out);
-            
-            $stime_in = date('H:i', strtotime($request->time_in));
-            $stime_out = date('H:i', strtotime($request->time_out));
-            $code = $stime_in . ' - ' . $stime_out;
 
-            // Check if the code already exists in the database
-            $existingCode = DB::table('shifts')->where('code', $code)->first();
-            if ($existingCode) {
-                $kambing["kambing"][]="Jam Masuk dan Keluar Telah dipakai di shift lain.";
-                return response()->json([
-                    'status' => 422,
-                    'error'  => $kambing
-                ]); 
-                
-            } 
-
-            if($time_in < $min_time_in){
+            /* if($time_in < $min_time_in){
                 return response()->json([
                     'status'    => 500,
                     'message'   => 'Jam masuk tidak boleh kurang dari minimum jam masuk.',
@@ -196,13 +191,14 @@ class ShiftController extends Controller
                     'status'    => 500,
                     'message'   => 'Jam maksimum pulang tidak boleh kurang dari jam pulang.',
                 ]);
-            }
+            } */
 
 			if($request->temp){
                 DB::beginTransaction();
                 try {
                     $query = Shift::find($request->temp);
 
+                    $query->code                = $code;
                     $query->name                = $request->name;
                     $query->edit_id             = session('bo_id');
                     $query->place_id            = $request->place_id;

@@ -98,7 +98,7 @@
                                                         <th>Code</th>
                                                         <th>Perusahaan</th>
                                                         <th>Mesin</th>
-                                                        <th>Tgl.Post</th>
+                                                        <th>Tgl.Produksi</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>Operasi</th>
@@ -158,7 +158,7 @@
                                         <select class="form-control" id="place_id" name="place_id" onchange="getMachine()">
                                             <option value="">--Pilih--</option>
                                             @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                             @endforeach
                                         </select>
                                         <label class="" for="place_id">Plant</label>
@@ -171,7 +171,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step5">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                                        <label class="active" for="post_date">Tgl. Posting</label>
+                                        <label class="active" for="post_date">Tgl. Produksi</label>
                                     </div>
                                     <div class="file-field input-field col m3 s12 step9">
                                         <div class="btn">
@@ -246,7 +246,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Shift</th>
-                                                        <th class="center">Item</th>
+                                                        <th class="center">Item Target FG</th>
                                                         <th class="center">Qty (Satuan UOM)</th>
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Hapus</th>
@@ -522,6 +522,10 @@
             }
         });
 
+        $('#body-item-detail').on('click', '.delete-data-item-detail', function() {
+            $(this).closest('tr').remove();
+        });
+
         select2ServerSide('#marketing_order_plan_id', '{{ url("admin/select2/marketing_order_plan") }}');
     });
 
@@ -650,19 +654,25 @@
         $('#machine_id').empty();
         if($('#place_id').val()){
             let place_id = $('#place_id').val();
-            $.each(machines, function(i, val) {
-                if(val.place_id == place_id){
-                    $('#machine_id').append(`
-                        <option value="` + val.id + `">` + val.code + ` - ` + val.name + `</option>
-                    `);
+            if(machines.length > 0){
+                for(let i = 0;i<machines.length;i++){
+                    if(machines[i].place_id.toString() === place_id.toString()){
+                        $('#machine_id').append(`
+                            <option value="` + machines[i].id + `">` + machines[i].code + ` - ` + machines[i].name + `</option>
+                        `);
+                    }
                 }
-            });
-            alert(machines.length);
+            }else{
+                $('#machine_id').append(`
+                    <option value="">--Silahkan pilih Plant--</option>
+                `);
+            }
         }else{
             $('#machine_id').append(`
                 <option value="">--Silahkan pilih Plant--</option>
             `);
         }
+        $('#machine_id').formSelect();
     }
 
     function removeUsedData(type,id){
@@ -703,14 +713,127 @@
         });
     }
 
+    function setRow(val){
+        if($('#arr_item_detail_id' + val).val()){
+            $('#arr_qty_detail' + val).val($('#arr_item_detail_id' + val).find(":selected").data("qty"));
+            $('#text-unit' + val).text($('#arr_item_detail_id' + val).find(":selected").data("unit"));
+            checkRow(val);
+        }else{
+            $('#arr_qty_detail' + val).val('0,000');
+            $('#text-unit' + val).text('-');
+        }
+    }
+
+    function checkRow(val){
+        let mopd_id = $('#arr_item_detail_id' + val).find(":selected").data("mopd");
+        let qtyMax = parseFloat($('input[name^="arr_qty[]"][data-mopd="' + mopd_id + '"]').val().toString().replaceAll(".", "").replaceAll(",","."));
+        let qtyRow = parseFloat($('#arr_qty_detail' + val).val().toString().replaceAll(".", "").replaceAll(",","."));
+        let otherQty = 0;
+        $('select[name^="arr_item_detail_id[]"]').each(function(index){
+            if($(this).val()){
+                if($('#arr_item_detail_id' + val).find(":selected").data("mopd") == mopd_id && $(this).attr('id') !== 'arr_item_detail_id' + val){
+                    otherQty += parseFloat($('input[name^="arr_qty_detail[]"]').eq(index).val().toString().replaceAll(".", "").replaceAll(",","."));
+                }
+            }
+        });
+        let qtyTotal = qtyRow + otherQty;
+        let qtyBalance = qtyMax - otherQty;
+        if(qtyTotal > qtyMax && otherQty == 0){
+            $('#arr_qty_detail' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
+        }else if(otherQty >= qtyMax){
+            $('#arr_qty_detail' + val).val('0,000');
+        }
+
+        if(otherQty > 0 && otherQty < qtyMax && qtyTotal > qtyMax){
+            $('#arr_qty_detail' + val).val(formatRupiahIni(qtyBalance.toFixed(3).toString().replace('.',',')));
+        }
+    }
+
     function addShift(){
         if($('.row_item').length > 0){
+            let arrItem = [];
+
+            $('input[name^="arr_item_id[]"]').each(function(index){
+                let arr = {
+                    'mopd_id'   : $('input[name^="arr_id[]"]').eq(index).val(),
+                    'mop_code'  : $('input[name^="arr_code[]"]').eq(index).val(),
+                    'item_id'   : $(this).val(),
+                    'item_name' : $('input[name^="arr_item_name[]"]').eq(index).val() + ' - ' + $('input[name^="arr_code[]"]').eq(index).val() + ' - ' + $('input[name^="arr_qty[]"]').eq(index).val(),
+                    'qty'       : $('input[name^="arr_qty[]"]').eq(index).val(),
+                    'unit'      : $('input[name^="arr_item_unit[]"]').eq(index).val(),
+                };
+
+                arrItem.push(arr);
+            });
+
+            var count = makeid(10);
+
+            let optionItem = `<select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="setRow('` + count + `')">`;
             
+            optionItem += `<option value="">--Pilih item--</option>`;
+
+            $.each(arrItem, function(i, val) {
+                optionItem += `<option value="` + val['item_id'] + `" data-mopd="` + val['mopd_id'] + `" data-qty="` + val['qty'] + `" data-unit="` + val['unit'] + `">` + val['item_name'] + `</option>`;
+            });
+            
+            optionItem += `</select>`;
+
+            $('#last-row-item-detail').before(`
+                <tr class="row_item_detail">
+                    <td>
+                        <select class="browser-default item-array" id="arr_shift` + count + `" name="arr_shift[]"></select>
+                    </td>
+                    <td class="center-align">
+                        ` + optionItem + `
+                    </td>
+                    <td class="center-align">
+                        <input name="arr_qty_detail[]" id="arr_qty_detail` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkRow('` + count + `')" required style="text-align:right;">
+                    </td>
+                    <td class="center-align" id="text-unit` + count + `">
+                        -
+                    </td>
+                    <td class="center-align">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                </tr>
+            `);
+            select2ServerSide('#arr_shift' + count, '{{ url("admin/select2/shift") }}');
+            /* $("#arr_item_detail_id" + count).select2({
+                dropdownAutoWidth: true,
+                width: '100%',
+            }); */
         }else{
             swal({
                 title: 'Ups! Hayo.',
                 text: 'Silahkan tambahkan satu atau lebih Marketing Order Plan.',
                 icon: 'warning'
+            });
+        }
+    }
+
+    function changeQty(val){
+        let mopd_id = $('#arr_id' + val).val();
+        let qtyUom = parseFloat($('#arr_qty' + val).val().toString().replaceAll(".", "").replaceAll(",","."));
+        let qtyMax = parseFloat($('#arr_qty' + val).data('max').toString().replaceAll(".", "").replaceAll(",","."));
+        if(qtyUom > qtyMax){
+            qtyUom = qtyMax;
+            $('#arr_qty' + val).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
+        }
+        let sell_convert = parseFloat($('#arr_sell_convert' + val).val());
+        let pallet_convert = parseFloat($('#arr_pallet_convert' + val).val());
+        let qtySell = qtyUom / sell_convert;
+        let qtyPallet = qtySell / pallet_convert;
+        $('#qty_in_sell' + val).text(formatRupiahIni(qtySell.toFixed(3).toString().replace('.',',')));
+        $('#qty_in_pallet' + val).text(formatRupiahIni(qtyPallet.toFixed(3).toString().replace('.',',')));
+        if($('.row_item_detail').length > 0){
+            $('select[name^="arr_item_detail_id[]"]').each(function(index){
+                if($(this).val()){
+                    if($(this).select2().find(":selected").data("mopd") == mopd_id){
+                        $('input[name^="arr_qty_detail[]"]').eq(index).val('0,000');
+                    }
+                }
             });
         }
     }
@@ -757,6 +880,12 @@
                             $('#body-item').append(`
                                 <tr class="row_item" data-id="` + mop.id + `">
                                     <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
+                                    <input type="hidden" name="arr_code[]" id="arr_code` + count + `" value="` + mop.code + `">
+                                    <input type="hidden" name="arr_item_id[]" id="arr_item_id` + count + `" value="` + val.item_id + `">
+                                    <input type="hidden" name="arr_item_name[]" id="arr_item_name` + count + `" value="` + val.item_name + `">
+                                    <input type="hidden" name="arr_item_unit[]" id="arr_item_unit` + count + `" value="` + val.unit_uom + `">
+                                    <input type="hidden" name="arr_sell_convert[]" id="arr_sell_convert` + count + `" value="` + val.sell_convert + `">
+                                    <input type="hidden" name="arr_pallet_convert[]" id="arr_pallet_convert` + count + `" value="` + val.pallet_convert + `">
                                     <td>
                                         ` + mop.code + `
                                     </td>
@@ -764,14 +893,14 @@
                                         ` + val.item_name + `
                                     </td>
                                     <td class="right-align">
-                                        ` + val.qty_in_sell + ` ` + val.unit_sell + `
+                                        <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
                                     </td>
-                                    <td class="center-align">
-                                        <input name="arr_qty[]" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this)" required style="width:50%;">
+                                    <td class="right-align">
+                                        <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);changeQty('`+ count +`')" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_in_uom + `">
                                         ` + val.unit_uom + `
                                     </td>
                                     <td class="right-align">
-                                        ` + val.qty_in_pallet + ` ` + val.unit_pallet + `
+                                        <b id="qty_in_pallet` + count + `">` + val.qty_in_pallet + `</b> ` + val.unit_pallet + `
                                     </td>
                                     <td class="center-align">
                                         ` + val.request_date + `

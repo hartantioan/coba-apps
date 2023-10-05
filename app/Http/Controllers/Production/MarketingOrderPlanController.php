@@ -397,15 +397,15 @@ class MarketingOrderPlanController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = MarketingOrder::where('code',CustomHelper::decrypt($id))->first();
+        $pr = MarketingOrderPlan::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Print Sales Order',
+                'title'     => 'Marketing Order Plan',
                 'data'      => $pr
             ];
 
-            return view('admin.approval.marketing_order', $data);
+            return view('admin.approval.marketing_order_plan', $data);
         }else{
             abort(404);
         }

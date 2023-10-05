@@ -1263,7 +1263,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#code_place_id').val(response.code_place_id).formSelect();
+                $('#code_place_id').val(response.code_place_id).attr('readonly',true).formSelect();
                 $('#code').val(response.code);
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);

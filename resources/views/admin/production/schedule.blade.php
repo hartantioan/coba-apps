@@ -97,6 +97,7 @@
                                                         <th>Pengguna</th>
                                                         <th>Code</th>
                                                         <th>Perusahaan</th>
+                                                        <th>Plant</th>
                                                         <th>Mesin</th>
                                                         <th>Tgl.Produksi</th>
                                                         <th>Dokumen</th>
@@ -171,7 +172,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step5">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                                        <label class="active" for="post_date">Tgl. Produksi</label>
+                                        <label class="active" for="post_date">Tgl. Post</label>
                                     </div>
                                     <div class="file-field input-field col m3 s12 step9">
                                         <div class="btn">
@@ -245,6 +246,7 @@
                                             <table class="bordered">
                                                 <thead>
                                                     <tr>
+                                                        <th class="center">Tgl.Produksi</th>
                                                         <th class="center">Shift</th>
                                                         <th class="center">Item Target FG</th>
                                                         <th class="center">Qty (Satuan UOM)</th>
@@ -254,7 +256,7 @@
                                                 </thead>
                                                 <tbody id="body-item-detail">
                                                     <tr id="last-row-item-detail">
-                                                        <td class="center-align" colspan="5">
+                                                        <td class="center-align" colspan="6">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addShift();" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Shift
                                                             </a>
@@ -731,7 +733,7 @@
         let otherQty = 0;
         $('select[name^="arr_item_detail_id[]"]').each(function(index){
             if($(this).val()){
-                if($('#arr_item_detail_id' + val).find(":selected").data("mopd") == mopd_id && $(this).attr('id') !== 'arr_item_detail_id' + val){
+                if($(this).find(":selected").data("mopd") == mopd_id && $(this).attr('id') !== 'arr_item_detail_id' + val){
                     otherQty += parseFloat($('input[name^="arr_qty_detail[]"]').eq(index).val().toString().replaceAll(".", "").replaceAll(",","."));
                 }
             }
@@ -780,6 +782,9 @@
 
             $('#last-row-item-detail').before(`
                 <tr class="row_item_detail">
+                    <td class="center-align">
+                        <input name="arr_date[]" id="arr_date` + count + `" type="date" value="{{ date('Y-m-d') }}" required>
+                    </td>
                     <td>
                         <select class="browser-default item-array" id="arr_shift` + count + `" name="arr_shift[]"></select>
                     </td>
@@ -830,7 +835,7 @@
         if($('.row_item_detail').length > 0){
             $('select[name^="arr_item_detail_id[]"]').each(function(index){
                 if($(this).val()){
-                    if($(this).select2().find(":selected").data("mopd") == mopd_id){
+                    if($(this).find(":selected").data("mopd") == mopd_id){
                         $('input[name^="arr_qty_detail[]"]').eq(index).val('0,000');
                     }
                 }
@@ -1116,6 +1121,7 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
+                { name: 'plant_id', className: 'center-align' },
                 { name: 'machine_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
@@ -1197,6 +1203,12 @@
             if (willDelete) {
                 
                 var formData = new FormData($('#form_data')[0]);
+
+                $('select[name^="arr_item_detail_id[]"]').each(function(index){
+                    if($(this).val()){
+                        formData.append('arr_mopd_detail[]',$(this).find(":selected").data("mopd"));
+                    }
+                });
 
                 $.ajax({
                     url: '{{ Request::url() }}/create',
@@ -1291,47 +1303,120 @@
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#post_date').val(response.post_date);
-                $('#date_start').val(response.start_date);
-                $('#date_end').val(response.end_date);
                 $('#company_id').val(response.company_id).formSelect();
-                $('#place_id').val(response.place_id).formSelect();
-                $('#type').val(response.type).formSelect();
+                $('#place_id').val(response.place_id).formSelect().trigger('change');
+                $('#machine_id').val(response.machine_id).formSelect();
 
-                if(response.details.length > 0){
+                if(response.targets.length > 0){
                     $('.row_item').each(function(){
                         $(this).remove();
                     });
 
-                    $.each(response.details, function(i, val) {
+                    $('.row_item_detail').each(function(){
+                        $(this).remove();
+                    });
+
+                    if($('#last-row-item').length > 0){
+                        $('#last-row-item').remove();
+                    }
+
+                    $.each(response.targets, function(i, val) {
                         var count = makeid(10);
-                        $('#last-row-item').before(`
-                            <tr class="row_item">
+                        $('#body-item').append(`
+                            <tr class="row_item" data-id="` + val.id + `">
+                                <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
+                                <input type="hidden" name="arr_code[]" id="arr_code` + count + `" value="` + val.code + `">
+                                <input type="hidden" name="arr_item_id[]" id="arr_item_id` + count + `" value="` + val.item_id + `">
+                                <input type="hidden" name="arr_item_name[]" id="arr_item_name` + count + `" value="` + val.item_name + `">
+                                <input type="hidden" name="arr_item_unit[]" id="arr_item_unit` + count + `" value="` + val.unit + `">
+                                <input type="hidden" name="arr_sell_convert[]" id="arr_sell_convert` + count + `" value="` + val.sell_convert + `">
+                                <input type="hidden" name="arr_pallet_convert[]" id="arr_pallet_convert` + count + `" value="` + val.pallet_convert + `">
                                 <td>
-                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
-                                </td>
-                                <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this)" required>
-                                </td>
-                                <td class="center">
-                                    <span id="arr_satuan` + count + `">` + val.unit + `</span>
-                                </td>
-                                <td>
-                                    <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
+                                    ` + val.code + `
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `" required>
+                                    ` + val.item_name + `
                                 </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                <td class="right-align">
+                                    <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
+                                </td>
+                                <td class="right-align">
+                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);changeQty('`+ count +`')" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_in_uom + `">
+                                    ` + val.unit_uom + `
+                                </td>
+                                <td class="right-align">
+                                    <b id="qty_in_pallet` + count + `">` + val.qty_in_pallet + `</b> ` + val.unit_pallet + `
+                                </td>
+                                <td class="center-align">
+                                    ` + val.request_date + `
+                                </td>
+                                <td class="">
+                                    ` + val.note + `
+                                </td>
+                                <td class="center-align">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + val.id + `" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>
                             </tr>
                         `);
-                        $('#arr_item' + count).append(`
-                            <option value="` + val.item_id + `">` + val.item_name + `</option>
+                    });
+
+                    let arrItem = [];
+                    $('input[name^="arr_item_id[]"]').each(function(index){
+                        let arr = {
+                            'mopd_id'   : $('input[name^="arr_id[]"]').eq(index).val(),
+                            'mop_code'  : $('input[name^="arr_code[]"]').eq(index).val(),
+                            'item_id'   : $(this).val(),
+                            'item_name' : $('input[name^="arr_item_name[]"]').eq(index).val() + ' - ' + $('input[name^="arr_code[]"]').eq(index).val() + ' - ' + $('input[name^="arr_qty[]"]').eq(index).val(),
+                            'qty'       : $('input[name^="arr_qty[]"]').eq(index).val(),
+                            'unit'      : $('input[name^="arr_item_unit[]"]').eq(index).val(),
+                        };
+
+                        arrItem.push(arr);
+                    });
+
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        let optionItem = `<select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="setRow('` + count + `')">`;
+                        
+                        optionItem += `<option value="">--Pilih item--</option>`;
+
+                        $.each(arrItem, function(i, val) {
+                            optionItem += `<option value="` + val['item_id'] + `" data-mopd="` + val['mopd_id'] + `" data-qty="` + val['qty'] + `" data-unit="` + val['unit'] + `">` + val['item_name'] + `</option>`;
+                        });
+                        
+                        optionItem += `</select>`;
+
+                        $('#last-row-item-detail').before(`
+                            <tr class="row_item_detail">
+                                <td class="center-align">
+                                    <input name="arr_date[]" id="arr_date` + count + `" type="date" value="` + val.date + `" required>
+                                </td>
+                                <td>
+                                    <select class="browser-default item-array" id="arr_shift` + count + `" name="arr_shift[]"></select>
+                                </td>
+                                <td class="center-align">
+                                    ` + optionItem + `
+                                </td>
+                                <td class="center-align">
+                                    <input name="arr_qty_detail[]" id="arr_qty_detail` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkRow('` + count + `')" required style="text-align:right;">
+                                </td>
+                                <td class="center-align" id="text-unit` + count + `">
+                                    ` + val.unit + `
+                                </td>
+                                <td class="center-align">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
                         `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+                        $("#arr_item_detail_id" + count + " option[data-mopd='" + val.mopd_id + "'][value='" + val.item_id + "']").prop("selected", true);
+                        $('#arr_shift' + count).append(`
+                            <option value="` + val.shift_id + `">` + val.shift_code + `</option>
+                        `);
+                        select2ServerSide('#arr_shift' + count, '{{ url("admin/select2/shift") }}');
                     });
                 }
                 

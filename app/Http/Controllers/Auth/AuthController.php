@@ -85,29 +85,36 @@ class AuthController extends Controller
     }
 
     public function disable(Request $request){
-        $user = User::where('employee_no', $request->id_card)->where('type','1')->where('status','1')->first();
-		if($user) {
-            if(Hash::check($request->password, $user->password)) {
-                session([
-                    'bo_is_lock' => 0,
-                ]);
-                $response = [
-                    'status'    => 200,
-                    'url'       => session('bo_last_url'),
-                    'message'	=> 'Sukses! Halaman akan dialihkan.'
-                ];
+        if(session('bo_employee_no') == CustomHelper::decrypt($request->id_card)){
+            $user = User::where('employee_no', CustomHelper::decrypt($request->id_card))->where('type','1')->where('status','1')->first();
+            if($user) {
+                if(Hash::check($request->password, $user->password)) {
+                    session([
+                        'bo_is_lock' => 0,
+                    ]);
+                    $response = [
+                        'status'    => 200,
+                        'url'       => session('bo_last_url'),
+                        'message'	=> 'Sukses! Halaman akan dialihkan.'
+                    ];
+                } else {
+                    $response = [
+                        'status' 	=> 422,
+                        'message'	=> 'Password tidak sesuai.'
+                    ];
+                }
             } else {
                 $response = [
                     'status' 	=> 422,
-                    'message'	=> 'Password tidak sesuai.'
+                    'message'	=> 'Pengguna tidak ditemukan.'
                 ];
             }
-		} else {
-			$response = [
-				'status' 	=> 422,
-				'message'	=> 'Pengguna tidak ditemukan.'
-			];
-		}
+        }else{
+            $response = [
+                'status' 	=> 422,
+                'message'	=> 'Apa yang sedang anda lakukan? Hayo jawab.'
+            ];
+        }
         
         return response()->json($response);
     }

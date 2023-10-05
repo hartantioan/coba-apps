@@ -30,12 +30,10 @@
 
             /* Clearfix (clear floats) */
             .row::after {
-            content: "";
-            clear: both;
-            display: table;
+                content: "";
+                clear: both;
+                display: table;
             }
-
-
 
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
@@ -59,13 +57,13 @@
                     font-size:1em !important;
                 }
                 .table-data-item td{
-                    font-size:1em !important;
+                    font-size:0.7em !important;
                 }
                 .table-data-item th{
                     border:1px solid black;
                 }
                 .table-bot td{
-                    font-size:1em !important;
+                    font-size:0.7em !important;
                 }
             }
 
@@ -164,8 +162,6 @@
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:1em">Diajukan: {{ date('d/m/y',strtotime($data->post_date)) }}</small>
-                                <small style="font-size:1em">Mulai: {{ date('d/m/y',strtotime($data->start_date)) }}</small>
-                                <small style="font-size:1em">Sampai: {{ date('d/m/y',strtotime($data->end_date)) }}</small>
                             </td>
                         </tr>
                         <tr>
@@ -195,7 +191,7 @@
                 <div class="card-content invoice-print-area">
                     <table border="0" width="100%" class="tbl-info">
                         <tr>
-                            <td width="25%" class="left-align">
+                            <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="49%">
@@ -216,7 +212,7 @@
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->user->position->name }}
+                                            {{ $data->user->position()->exists() ? $data->user->position->name : '-' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -227,13 +223,9 @@
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->user->department->name }}
+                                            {{ $data->user->position()->exists() ? $data->user->position->division->department->name : '-' }}
                                         </td>
                                     </tr>
-                                </table>
-                            </td>
-                            <td width="41%" class="left-align">
-                                <table border="0" width="100%">
                                     <tr>
                                         <td width="29%" style="vertical-align: top;">
                                             Plant
@@ -247,18 +239,18 @@
                                     </tr>
                                     <tr>
                                         <td style="vertical-align: top;">
-                                            Tipe
+                                            Mesin
                                         </td>
                                         <td width="1%" style="vertical-align: top;">
                                             :
                                         </td>
                                         <td style="vertical-align: top;">
-                                            {{ $data->type() }}
+                                            {{ $data->machine->name }}
                                         </td>
                                     </tr>
                                 </table>
                             </td>
-                            <td width="33%" class="left-align">
+                            <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td>
@@ -279,32 +271,75 @@
                             </td>
                         </tr>
                     </table>
-                
+                </div>
                     <!-- product details table-->
-                    <div class="invoice-product-details">
+                <div class="invoice-product-details">
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th class="center">Item</th>
-                                <th class="center">Jum.</th>
-                                <th class="center">Sat.</th>
-                                <th class="center">Tgl.Request</th>
-                                <th class="center">Catatan</th>
+                                <th colspan="7" class="center-align">Daftar Target Berdasarkan Marketing Order Plan</th>
+                            </tr>
+                            <tr>
+                                <th align="center">No.</th>
+                                <th align="center">MOP</th>
+                                <th align="center">Item</th>
+                                <th align="center">Qty Target</th>
+                                <th align="center">Qty MOP</th>
+                                <th align="center">Satuan</th>
+                                <th align="center">Tgl.Request</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data->marketingOrderPlanDetail as $row)
+                            @foreach($data->productionScheduleTarget as $key => $row)
                             <tr>
-                                <td>{{ $row->item->name }}</td>
-                                <td align="center">{{ $row->qty }}</td>
-                                <td align="center">{{ $row->item->sellUnit->code }}</td>
-                                <td align="center">{{ date('d/m/y',strtotime($row->request_date)) }}</td>
-                                <td>{{ $row->note }}</td>
+                                <td align="center">{{ ($key + 1) }}</td>
+                                <td align="center">{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
+                                <td align="">{{ $row->marketingOrderPlanDetail->item->name }}</td>
+                                <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                                <td align="right">{{ number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.') }}</td>
+                                <td align="center">{{ $row->marketingOrderPlanDetail->item->uomUnit->code }}</td>
+                                <td align="center">{{ date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="7">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
+
+                <div class="invoice-product-details">
+                    <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
+                        <thead>
+                            <tr>
+                                <th colspan="7" class="center-align">Daftar Shift & Target Produksi</th>
+                            </tr>
+                            <tr>
+                                <th align="center">No.</th>
+                                <th align="center">Tgl.Produksi</th>
+                                <th align="center">Shift</th>
+                                <th align="center">Item</th>
+                                <th align="center">MOP</th>
+                                <th align="center">Qty</th>
+                                <th align="center">Satuan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($data->productionScheduleDetail as $key => $row)
+                            <tr>
+                                <td align="center">{{ ($key + 1) }}</td>
+                                <td align="center">{{ date('d/m/y',strtotime($row->production_date)) }}</td>
+                                <td align="center">{{ $row->shift->code }}</td>
+                                <td align="center">{{ $row->item->name }}</td>
+                                <td align="center">{{ $row->marketingOrderPlanDetail->marketingOrderPlan->code }}</td>
+                                <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
+                                <td align="center">{{ $row->item->uomUnit->code }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                
                 <!-- invoice subtotal -->
                 <div class="divider mt-3 mb-3"></div>
                     <div class="invoice-subtotal break-row">

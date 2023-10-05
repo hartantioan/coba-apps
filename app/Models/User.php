@@ -161,7 +161,7 @@ class User extends Authenticatable
         $base64 = base64_encode(file_get_contents($image));
         $path_img = 'data:image/' . $extencion[1] . ';base64,' . $base64;
 
-        return '<img src="'.$path_img.'" width="100px">';
+        return '<img src="'.$path_img.'" width="70px">';
     }
 
     public static function generateCode($type, $kind, $place_id)

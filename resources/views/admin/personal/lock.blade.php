@@ -39,7 +39,7 @@
                         <form class="login-form" id="login_form">
                             <div class="row">
                                 <div class="input-field col s12 center-align">
-                                    <input id="id_card" type="text" name="id_card" value="{{ session('bo_employee_no') }}" hidden>
+                                    <input id="id_card" type="text" name="id_card" value="{{ CustomHelper::encrypt(session('bo_employee_no')) }}" hidden>
                                     <img class="z-depth-4 circle responsive-img" width="100" src="{{ session('bo_photo') }}" alt="">
                                     <h5 class="ml-4">{{ session('bo_name') }}</h5>
                                 </div>
@@ -56,9 +56,9 @@
                                 </label>
                             </div>
                             <div class="row">
-                                <div class="col s12 m12 l12 ml-2 mt-1">
+                                <div class="col s12 m12 l12 ml-2 mt-1 center-align">
                                     <p>
-                                       
+                                       Aplikasi Terkunci.
                                     </p>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@
                                     
                                 </div>
                                 <div class="input-field col s6 m6 l6">
-                                    <p class="margin right-align medium-small"><a href="{{ url('admin/login/forget') }}">Forgot password ?</a></p>
+                                    {{-- <p class="margin right-align medium-small"><a href="{{ url('admin/forget') }}">Forgot password ?</a></p> --}}
                                 </div>
                             </div>
                         </form>
@@ -164,7 +164,6 @@
                  cekNotif('{{ URL::to('/') }}');
              },5000);
              $('.tooltipped').tooltip();
-             checkPageMaintenance('{{ URL::to('/') }}');
          });
      </script>
     @endif

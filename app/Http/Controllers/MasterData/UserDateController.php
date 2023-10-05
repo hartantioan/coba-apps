@@ -31,7 +31,7 @@ class UserDateController extends Controller
             'title'     => 'Tanggal Posting Menu x Pegawai',
             'content'   => 'admin.master_data.user_date',
             'menus'     => $arrMenu,
-            'employees' => User::where('type','1')->where('status','1')->orderBy('place_id','ASC')->orderBy('department_id','ASC')->get(),
+            'employees' => User::where('type','1')->where('status','1')->orderBy('place_id','ASC')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);

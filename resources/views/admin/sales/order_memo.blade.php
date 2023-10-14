@@ -878,6 +878,12 @@
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail...">
                                 </td>
                                 <td class="center">
+                                    <input name="arr_nominal_total[]" class="browser-default" type="text" value="` + datakuy.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_nominal`+ count +`">
+                                </td>
+                                <td class="center">
+                                    <input name="arr_nominal[]" class="browser-default" type="text" value="` + datakuy.balance + `" data-nominal="` + datakuy.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_nominal`+ count +`">
+                                </td>
+                                <td class="center">
                                     <input name="arr_nominal[]" class="browser-default" type="text" value="` + datakuy.balance + `" data-nominal="` + datakuy.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_nominal`+ count +`">
                                 </td>
                                 <td class="center">

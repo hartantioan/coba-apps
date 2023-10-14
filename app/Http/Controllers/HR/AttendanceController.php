@@ -46,8 +46,6 @@ class AttendanceController extends Controller
         $id_machine = $request->id_machines;
         $ipAddressesComma = implode(',', $ipAddresses);
         $id_machineComma = implode(',', $id_machine);
-        info($ipAddressesComma);
-        info($id_machine);
         ProcessAttendanceJob::dispatch($ipAddressesComma, $id_machineComma);
  
         $endTime = microtime(true);
@@ -204,7 +202,6 @@ class AttendanceController extends Controller
         ]);
 
         if ($validator->fails()) {
-            info($validator->errors());
             $response = [
                 'status' => 432,
                 'error'  => $validator->errors()

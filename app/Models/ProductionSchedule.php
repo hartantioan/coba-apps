@@ -159,6 +159,12 @@ class ProductionSchedule extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
+        foreach($this->productionScheduleDetail as $row){
+            if($row->productionIssueReceiveDetail()->exists()){
+                $hasRelation = true;
+            }
+        }
+
         return $hasRelation;
     }
 }

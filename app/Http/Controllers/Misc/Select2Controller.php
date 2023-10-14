@@ -24,9 +24,11 @@ use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
 use App\Models\MarketingOrderPlan;
 use App\Models\Menu;
+use App\Models\MenuUser;
 use App\Models\Outlet;
 use App\Models\PaymentRequest;
 use App\Models\Position;
+use App\Models\ProductionSchedule;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrderDetail;
@@ -1585,6 +1587,27 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function shiftProduction(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Shift::where(function($query)use($request){
+            if($request->place_id){
+                $query->where('place_id',$request->place_id);
+            }
+        })->where('name', 'like', "%$search%")->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name .'|'. $d->time_in.' - '.$d->time_out,
+                'data'          => $d
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function period(Request $request)
     {
         $response = [];
@@ -1649,6 +1672,12 @@ class Select2Controller extends Controller {
                 $response[] = [
                     'id'   			=> $d->id,
                     'text' 			=> $d->code,
+                    'outlet'        => $d->outlet->name,
+                    'address'       => $d->destination_address,
+                    'province'      => $d->province->name,
+                    'city'          => $d->city->name,
+                    'district'      => $d->district->name,
+                    'subdistrict'   => $d->subdistrict->name,
                 ];
             }
         }
@@ -1780,6 +1809,7 @@ class Select2Controller extends Controller {
                     'real_grandtotal'   => number_format($grandtotalAll,2,',','.'),
                     'type'              => $d->getTable(),
                     'due_date'          => $d->marketingOrderDelivery->marketingOrder->valid_date,
+                    'days_due'          => $d->marketingOrderDelivery->marketingOrder->account->top,
                 ];
             }
         }
@@ -1813,7 +1843,7 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $arrNominal = $d->arrBalanceInvoice();
-            if($d->balanceInvoice() > 0){
+            if($d->balancePaymentIncoming() > 0){
                 $response[] = [
                     'id'   			    => $d->id,
                     'text' 			    => $d->code.' - Cust. '.$d->account->name,
@@ -2014,31 +2044,107 @@ class Select2Controller extends Controller {
         ->get();
 
         foreach($data as $d) {
+            if($d->balanceQty() > 0){
+                $details = [];
+
+                foreach($d->MarketingOrderPlanDetail as $row){
+                    $details[] = [
+                        'mopd_id'       => $row->id,
+                        'item_id'       => $row->item_id,
+                        'item_name'     => $row->item->name,
+                        'qty_in_sell'   => number_format($row->qty,3,',','.'),
+                        'qty_in_uom'    => number_format($row->qty * $row->item->sell_convert,3,',','.'),
+                        'qty_in_pallet' => number_format($row->qty / $row->item->pallet_convert,3,',','.'),
+                        'unit_sell'     => $row->item->sellUnit->code,
+                        'unit_uom'      => $row->item->uomUnit->code,
+                        'unit_pallet'   => $row->item->palletUnit->code,
+                        'sell_convert'  => $row->item->sell_convert,
+                        'pallet_convert'=> $row->item->pallet_convert,
+                        'request_date'  => date('d/m/y',strtotime($row->request_date)),
+                        'note'          => $row->note,
+                    ];
+                }
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' Periode '.date('d/m/y',strtotime($d->start_date)).' - '.date('d/m/y',strtotime($d->end_date)),
+                    'table'         => $d->getTable(),
+                    'details'       => $details,
+                    'code'          => $d->code,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionSchedule(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionSchedule::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])
+        ->get();
+
+        foreach($data as $d) {
             $details = [];
 
-            foreach($d->MarketingOrderPlanDetail as $row){
+            foreach($d->productionScheduleDetail as $row){
                 $details[] = [
-                    'mopd_id'       => $row->id,
-                    'item_id'       => $row->item_id,
-                    'item_name'     => $row->item->name,
-                    'qty_in_sell'   => number_format($row->qty,3,',','.'),
-                    'qty_in_uom'    => number_format($row->qty * $row->item->sell_convert,3,',','.'),
-                    'qty_in_pallet' => number_format($row->qty / $row->item->pallet_convert,3,',','.'),
-                    'unit_sell'     => $row->item->sellUnit->code,
-                    'unit_uom'      => $row->item->uomUnit->code,
-                    'unit_pallet'   => $row->item->palletUnit->code,
-                    'sell_convert'  => $row->item->sell_convert,
-                    'pallet_convert'=> $row->item->pallet_convert,
-                    'request_date'  => date('d/m/y',strtotime($row->request_date)),
-                    'note'          => $row->note,
+                    'id'                => $row->id,
+                    'item_id'           => $row->item_id,
+                    'item_name'         => $row->item->name,
+                    'qty_in_sell'       => number_format($row->qty / $row->item->sell_convert,3,',','.'),
+                    'qty_in_uom'        => number_format($row->qty,3,',','.'),
+                    'qty_in_pallet'     => number_format(($row->qty / $row->item->sell_convert) / $row->item->pallet_convert,3,',','.'),
+                    'unit_sell'         => $row->item->sellUnit->code,
+                    'unit_uom'          => $row->item->uomUnit->code,
+                    'unit_pallet'       => $row->item->palletUnit->code,
+                    'sell_convert'      => $row->item->sell_convert,
+                    'pallet_convert'    => $row->item->pallet_convert,
+                    'production_date'   => date('d/m/y',strtotime($row->production_date)),
+                    'shift_id'          => $row->shift_id,
+                    'shift_code'        => $row->shift->code,
                 ];
             }
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' Periode '.date('d/m/y',strtotime($d->start_date)).' - '.date('d/m/y',strtotime($d->end_date)),
+                'text' 			=> $d->code.' Tgl.Post '.date('d/m/y',strtotime($d->post_date)).' - Plant : '.$d->place->code.' - Mesin : '.$d->machine->name,
                 'table'         => $d->getTable(),
                 'details'       => $details,
                 'code'          => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function formUser(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Menu::whereHas('menuUser',function($query)use($search){
+            $query->where('user_id',session('bo_id'));
+        })
+        ->whereHas('approvalSource',function($query){
+            $query->whereHas('approvalMatrix',function($query){
+                $query->where('user_id',session('bo_id'));
+            });
+        })
+        ->where('status','1')->whereDoesntHave('sub')->where('name','like',"%$search%")
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->table_name,
+                'text' 			=> $d->name,
             ];
         }
 

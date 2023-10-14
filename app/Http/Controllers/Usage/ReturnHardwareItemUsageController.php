@@ -166,7 +166,6 @@ class ReturnHardwareItemUsageController extends Controller
                     'message'   => 'Barang masih belum memiliki tuan'
                 ];
             }else{
-                info($lastInsertedData);
                 $query = ReturnHardwareItemsUsage::create([
                     'code' => ReturnHardwareItemsUsage::generateCode(),
                     'reception_hardware_item_usage_id' => $lastInsertedData->id,

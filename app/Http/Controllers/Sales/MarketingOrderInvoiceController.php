@@ -479,13 +479,12 @@ class MarketingOrderInvoiceController extends Controller
                             'grandtotal'                    => round($bobot * $rowdata->grandtotal,2),
                             'note'                          => $rowdata->code,
                         ]);
-                        CustomHelper::removeDeposit($rowdata->account_id,$rowgrandtotal);
+                        
                     }
                 }
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Invoice No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::addCountLimitCredit($query->account_id,$query->balance);
 
                 activity()
                     ->performedOn(new MarketingOrderInvoice())
@@ -1066,6 +1065,14 @@ class MarketingOrderInvoiceController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
+                if(in_array($query->status,['2','3'])){
+                    foreach($query->marketingOrderInvoiceDownPayment as $row){
+                        CustomHelper::addDeposit($row->lookable->account_id,$row->grandtotal * $row->lookable->currency_rate);
+                    }
+                    CustomHelper::removeCountLimitCredit($query->account_id,$query->balance);
+                    info('asd');
+                }
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -1082,7 +1089,6 @@ class MarketingOrderInvoiceController extends Controller
                 CustomHelper::sendNotification($query->getTable(),$query->id,'AR Invoice No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
                 CustomHelper::removeJournal($query->getTable(),$query->id);
-                CustomHelper::removeCountLimitCredit($query->account_id,$query->balance);
 
                 $response = [
                     'status'  => 200,

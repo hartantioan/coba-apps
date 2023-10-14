@@ -151,13 +151,15 @@
                 <tr>
                     <td width="83%" class="left-align">
                         <tr>
-                            <td>
-                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">Surat Jalan # {{ $data->code }}</span>
+                            <td align="center">
+                                <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-bottom:0px">
+                                    {{ $data->code }}
+                                </span>
                             </td>
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:10px">Dikirimkan:</small>
+                                <small style="font-size:10px">Tanggal:</small>
                                 <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                             </td>
                         </tr>
@@ -187,21 +189,12 @@
                             <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="40%">
+                                        <td width="30%">
                                             Customer
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="60%">
+                                        <td width="70%">
                                             {{ $data->marketingOrderDelivery->marketingOrder->account->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Alamat
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->marketingOrderDelivery->marketingOrder->account->address }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -214,30 +207,48 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="40%">
+                                        <td width="30%">
                                             Ekspedisi
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="60%">
+                                        <td width="70%">
                                             {{ $data->account->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            Alamat
+                                        <td width="30%">
+                                            Outlet
                                         </td>
                                         <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->account->address }}
+                                        <td width="70%">
+                                            {{ $data->marketingOrderDelivery->marketingOrder->outlet->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
+                                        <td width="30%">
                                             Telepon
                                         </td>
                                         <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->account->phone.' / '.$data->account->office_no }}
+                                        <td width="70%">
+                                            {{ $data->marketingOrderDelivery->marketingOrder->outlet->phone }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="30%">
+                                            MOD
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="70%">
+                                            {{ $data->marketingOrderDelivery->code }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="30%">
+                                            SO & Ref
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="70%">
+                                            {{ $data->marketingOrderDelivery->marketingOrder->code.' - '.$data->marketingOrderDelivery->marketingOrder->document_no }}
                                         </td>
                                     </tr>
                                 </table>
@@ -245,11 +256,11 @@
                             <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="50%">
+                                        <td width="30%">
                                             Tipe Pengiriman
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="50%">
+                                        <td width="70%">
                                             {{ $data->marketingOrderDelivery->marketingOrder->deliveryType() }}
                                         </td>
                                     </tr>
@@ -299,8 +310,8 @@
                             <thead>
                                 <tr>
                                     <th>No.</th>
+                                    <th>Kode</th>
                                     <th>Item</th>
-                                    <th>Ambil Dari</th>
                                     <th>Qty</th>
                                     <th>Satuan</th>
                                 </tr>
@@ -309,8 +320,8 @@
                                 @foreach($data->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $row)
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
+                                    <td>{{ $row->item->code }}</td>
                                     <td>{{ $row->item->name }}</td>
-                                    <td>{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name }}</td>
                                     <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td align="center">{{ $row->item->sellUnit->code }}</td>
                                 </tr>

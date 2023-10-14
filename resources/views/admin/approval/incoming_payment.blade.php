@@ -190,14 +190,6 @@
                                 {{ $data->coa->name }}
                             </td>
                         </tr>
-                        <tr>
-                            <td width="40%">
-                                Proyek
-                            </td>
-                            <td width="60%">
-                                {{ $data->project_id ? $data->project->name : '-' }}
-                            </td>
-                        </tr>
                     </table>
                 </td>
                 <td width="33%" class="left-align">

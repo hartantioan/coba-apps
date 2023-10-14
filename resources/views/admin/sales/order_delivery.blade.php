@@ -204,6 +204,33 @@
                                         <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Pengiriman">
                                         <label class="active" for="delivery_date">Tgl. Kirim</label>
                                     </div>
+                                    <div class="input-field col m12 s12 row">
+                                        <h6><b>Info Pengiriman Sales Order</b></h6>
+                                        <div class="input-field col m3 s12">
+                                            <span id="info-outlet">-</span>
+                                            <label class="active" for="">Outlet</label>
+                                        </div>
+                                        <div class="input-field col m3 s12">
+                                            <span id="info-address">-</span>
+                                            <label class="active" for="">Alamat</label>
+                                        </div>
+                                        <div class="input-field col m3 s12">
+                                            <span id="info-province">-</span>
+                                            <label class="active" for="">Provinsi</label>
+                                        </div>
+                                        <div class="input-field col m3 s12">
+                                            <span id="info-city">-</span>
+                                            <label class="active" for="">Kota/Kabupaten</label>
+                                        </div>
+                                        <div class="input-field col m3 s12">
+                                            <span id="info-district">-</span>
+                                            <label class="active" for="">Kecamatan</label>
+                                        </div>
+                                        <div class="input-field col m3 s12">
+                                            <span id="info-subdistrict">-</span>
+                                            <label class="active" for="">Kelurahan</label>
+                                        </div>
+                                    </div>
                                 </fieldset>
                             </div>
                             <div class="col s12">
@@ -459,6 +486,12 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#info-outlet').text('-');
+                $('#info-address').text('-');
+                $('#info-province').text('-');
+                $('#info-city').text('-');
+                $('#info-district').text('-');
+                $('#info-subdistrict').text('-');
             }
         });
 
@@ -589,6 +622,12 @@
 
                         $('#marketing_order_id').empty();
                     }else{
+                        $('#info-outlet').text($('#marketing_order_id').select2('data')[0].outlet);
+                        $('#info-address').text($('#marketing_order_id').select2('data')[0].address);
+                        $('#info-province').text($('#marketing_order_id').select2('data')[0].province);
+                        $('#info-city').text($('#marketing_order_id').select2('data')[0].city);
+                        $('#info-district').text($('#marketing_order_id').select2('data')[0].district);
+                        $('#info-subdistrict').text($('#marketing_order_id').select2('data')[0].subdistrict);
                         $('#delivery_date').val(response.delivery_date);
                         $('#account_id').empty().append(`
                             <option value="` + response.sender_id + `">` + response.sender_name + `</option>
@@ -675,6 +714,13 @@
                 $('.data-used').trigger('click');
             }
             $('#delivery_date').val('{{ date("Y-m-d") }}');
+
+            $('#info-outlet').text('-');
+            $('#info-address').text('-');
+            $('#info-province').text('-');
+            $('#info-city').text('-');
+            $('#info-district').text('-');
+            $('#info-subdistrict').text('-');
         }
     }
     
@@ -1309,6 +1355,12 @@
                 $('#delivery_date').val(response.delivery_date);
                 $('#note_internal').val(response.note_internal);
                 $('#note_external').val(response.note_external);
+                $('#info-outlet').text(response.outlet);
+                $('#info-address').text(response.address);
+                $('#info-province').text(response.province);
+                $('#info-city').text(response.city);
+                $('#info-district').text(response.district);
+                $('#info-subdistrict').text(response.subdistrict);
                 
                 if(response.details.length > 0){
                     $('#last-row-item').remove();
@@ -1498,7 +1550,9 @@
             
         },
         onDisconnect: function () {
-           
+            M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            });
         },
         onUpdate: function (message) {
             

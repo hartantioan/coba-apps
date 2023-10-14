@@ -154,7 +154,6 @@ class PunishmentController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    info($request);
                     $query = Punishment::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,

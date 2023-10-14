@@ -99,7 +99,7 @@
                                                         <th>Perusahaan</th>
                                                         <th>Plant</th>
                                                         <th>Mesin</th>
-                                                        <th>Tgl.Produksi</th>
+                                                        <th>Tgl.Post</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>Operasi</th>
@@ -155,7 +155,7 @@
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step2">
+                                    <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="place_id" name="place_id" onchange="getMachine()">
                                             <option value="">--Pilih--</option>
                                             @foreach ($place as $rowplace)
@@ -164,17 +164,17 @@
                                         </select>
                                         <label class="" for="place_id">Plant</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step4">
+                                    <div class="input-field col m3 s12 step5">
                                         <select class="form-control" id="machine_id" name="machine_id">
                                             <option value="">--Silahkan pilih Plant--</option>
                                         </select>
                                         <label class="" for="machine_id">Mesin</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step5">
+                                    <div class="input-field col m3 s12 step6">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
                                     </div>
-                                    <div class="file-field input-field col m3 s12 step9">
+                                    <div class="file-field input-field col m3 s12 step7">
                                         <div class="btn">
                                             <span>File</span>
                                             <input type="file" name="file" id="file">
@@ -190,16 +190,16 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. MOP Terpakai</legend>
-                                    <div class="input-field col m4 s12 step12">
+                                    <div class="input-field col m3 s12 step8">
                                         <select class="browser-default" id="marketing_order_plan_id" name="marketing_order_plan_id"></select>
                                         <label class="active" for="marketing_order_plan_id">Marketing Order Plan</label>
                                     </div>
-                                    <div class="col m2 s12 step13">
+                                    <div class="col m2 s12 step9">
                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMarketingOrderPlan();" href="javascript:void(0);">
                                             <i class="material-icons left">add</i> MOP
                                         </a>
                                     </div>
-                                    <div class="col m6 s12 step8">
+                                    <div class="col m5 s12 step10">
                                         <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
                                     </div>
                                 </fieldset>
@@ -209,7 +209,7 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>3. Detail Target Produksi</legend>
-                                    <div class="col m12 s12 step10" style="overflow:auto;width:100% !important;">
+                                    <div class="col m12 s12 step11" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered">
                                                 <thead>
@@ -241,7 +241,7 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>4. Detail Shift</legend>
-                                    <div class="col m12 s12 step10" style="overflow:auto;width:100% !important;">
+                                    <div class="col m12 s12 step12" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered">
                                                 <thead>
@@ -271,7 +271,7 @@
                         </div>
                         <div class="row">
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step11" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step13" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -804,7 +804,30 @@
                     </td>
                 </tr>
             `);
-            select2ServerSide('#arr_shift' + count, '{{ url("admin/select2/shift") }}');
+            $('#arr_shift' + count).select2({
+                placeholder: '-- Pilih ya --',
+                minimumInputLength: 1,
+                allowClear: true,
+                cache: true,
+                width: 'resolve',
+                dropdownParent: $('body').parent(),
+                ajax: {
+                    url: '{{ url("admin/select2/shift_production") }}',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            place_id: $('#place_id').val(),
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.items
+                        }
+                    }
+                }
+            });
             /* $("#arr_item_detail_id" + count).select2({
                 dropdownAutoWidth: true,
                 width: '100%',
@@ -1435,109 +1458,6 @@
         });
     }
 
-    function duplicate(id){
-        swal({
-            title: "Apakah anda yakin ingin salin?",
-            text: "Pastikan item yang ingin anda salin sudah sesuai!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                $.ajax({
-                    url: '{{ Request::url() }}/show',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        id: id
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('#main');
-                    },
-                    success: function(response) {
-                        loadingClose('#main');
-                        $('#modal1').modal('open');
-                        
-                        $('#code_place_id').val(response.code_place_id).formSelect();
-                        $('#code').val(response.code);
-                        $('#post_date').val(response.post_date);
-                        $('#date_start').val(response.start_date);
-                        $('#date_end').val(response.end_date);
-                        $('#company_id').val(response.company_id).formSelect();
-                        $('#place_id').val(response.place_id).formSelect();
-                        $('#type').val(response.type).formSelect();
-
-                        if(response.details.length > 0){
-                            $('.row_item').each(function(){
-                                $(this).remove();
-                            });
-
-                            $.each(response.details, function(i, val) {
-                                var count = makeid(10);
-                                $('#last-row-item').before(`
-                                    <tr class="row_item">
-                                        <td>
-                                            <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
-                                        </td>
-                                        <td>
-                                            <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this)" required>
-                                        </td>
-                                        <td class="center">
-                                            <span id="arr_satuan` + count + `">` + val.unit + `</span>
-                                        </td>
-                                        <td>
-                                            <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
-                                        </td>
-                                        <td>
-                                            <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `" required>
-                                        </td>
-                                        <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                <i class="material-icons">delete</i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                `);
-                                $('#arr_item' + count).append(`
-                                    <option value="` + val.item_id + `">` + val.item_name + `</option>
-                                `);
-                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
-                            });
-                        }
-                        
-                        $('.modal-content').scrollTop(0);
-                        M.updateTextFields();
-
-                        $('#code_place_id').val(response.code_place_id).formSelect().trigger('change');
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('#main');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        });
-    }
-
-    function getRowUnit(val){
-        if($("#arr_item" + val).val()){
-            $('#arr_satuan' + val).text($("#arr_item" + val).select2('data')[0].sell_unit);
-        }else{
-            $('#arr_satuan' + val).text('-');
-        }
-    }
-
     function destroy(id){
         swal({
             title: "Apakah anda yakin?",
@@ -1579,35 +1499,6 @@
                 });
             }
         });
-    }
-
-    function addItem(){
-        var count = makeid(10);
-        $('#last-row-item').before(`
-            <tr class="row_item">
-                <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
-                </td>
-                <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)" required>
-                </td>
-                <td class="center">
-                    <span id="arr_satuan` + count + `">-</span>
-                </td>
-                <td>
-                    <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
-                </td>
-                <td>
-                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="-" required>
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
     }
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -1718,7 +1609,9 @@
             
         },
         onDisconnect: function () {
-           
+            M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            });
         },
         onUpdate: function (message) {
             
@@ -1730,8 +1623,8 @@
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'Marketing Order Plan',
-                    intro : 'Form ini digunakan untuk mengelola data pengajuan produksi dari tim Marketing kepada tim PPIC / Produksi.'
+                    title : 'Jadwal Produksi',
+                    intro : 'Form ini digunakan untuk mengelola data penjadwalan produksi sesuai .'
                 },
                 {
                     title : 'Nomor Dokumen',
@@ -1751,41 +1644,51 @@
                 {
                     title : 'Plant',
                     element : document.querySelector('.step4'),
-                    intro : 'Plant dimana request dikirimkan.' 
+                    intro : 'Plant dimana produksi akan dijalankan.' 
+                },
+                {
+                    title : 'Mesin',
+                    element : document.querySelector('.step5'),
+                    intro : 'Mesin yang digunakan dalam proses produksi. Akan otomatis terisi berdasarkan daftar mesin yang menempel pada data Plant terpilih.' 
                 },
                 {
                     title : 'Tgl. Posting',
-                    element : document.querySelector('.step5'),
+                    element : document.querySelector('.step6'),
                     intro : 'Tanggal posting yang akan muncul pada saat dokumen dicetak, difilter atau diproses pada form lainnya.' 
                 },
                 {
-                    title : 'Tgl. Mulai Periode',
-                    element : document.querySelector('.step6'),
-                    intro : 'Tanggal mulai periode perkiraan produksi.' 
-                },
-                {
-                    title : 'Tgl. Akhir Periode',
-                    element : document.querySelector('.step7'),
-                    intro : 'Tanggal akhir periode perkiraan produksi.' 
-                },
-                {
-                    title : 'Tipe Produksi',
-                    element : document.querySelector('.step8'),
-                    intro : 'Tanggal akhir periode perkiraan produksi.' 
-                },
-                {
                     title : 'File Lampiran',
-                    element : document.querySelector('.step9'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    element : document.querySelector('.step7'),
+                    intro : 'Silahkan unggah file lampiran. Untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
-                    title : 'Detail produk',
+                    title : 'Marketing Order Plan',
+                    element : document.querySelector('.step8'),
+                    intro : 'Silahkan pilih MOP yang ingin diproses produksinya. Anda bisa memilih lebih dari satu MOP untuk satu kali transaksi dokumen Jadwal Produksi.' 
+                },
+                {
+                    title : 'Tombol tambah MOP',
+                    element : document.querySelector('.step9'),
+                    intro : 'Tombol untuk menambahkan data item MOP ke dalam tabel 3 Detail Target Produksi.' 
+                },
+                {
+                    title : 'Data MOP Terpakai',
                     element : document.querySelector('.step10'),
-                    intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Qty yang diisikan adalah qty dengan satuan jual.' 
+                    intro : 'Data MOP yang terpakai pada saat ditambahkan ke dalam sistem sesuai dengan pengguna aktif saat ini. Silahkan hapus agar MOP bisa diakses oleh pengguna lainnya.' 
+                },
+                {
+                    title : 'Detail Target Produksi',
+                    element : document.querySelector('.step11'),
+                    intro : 'Berisi detail produk / item yang ingin dijadikan target proses Produksi.'
+                },
+                {
+                    title : 'Detail Shift',
+                    element : document.querySelector('.step12'),
+                    intro : 'Berisi detail produk / item yang ingin dijadikan target proses Produksi serta shift yang ingin dicatat.'
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step11'),
+                    element : document.querySelector('.step13'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

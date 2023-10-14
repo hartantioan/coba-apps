@@ -259,7 +259,7 @@ $(document).on('focus', '.select2.select2-container', function (e) {
 function loadCurrency(){
 	let code = $('#currency_id').find(':selected').data('code');
 	$.ajax({
-		url: 'https://api.exchangerate.host/latest?symbols=IDR&base=' + code,
+		url: 'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_sJNdkvotKpFObXVFuzKSo0VBkrTkePfvixsZHBlz&currencies=IDR&base_currency=' + code,
 		type: 'GET',
 		beforeSend: function() {
 			loadingOpen('#currency_rate');
@@ -269,7 +269,7 @@ function loadCurrency(){
 		},
 		success: function(response) {
 			loadingClose('#currency_rate');
-			$('#currency_rate').val(formatRupiahIni(parseFloat(response.rates.IDR).toFixed(2).toString().replace('.',',')));
+			$('#currency_rate').val(formatRupiahIni(parseFloat(response.data.IDR).toFixed(2).toString().replace('.',',')));
 		},
 		error: function() {
 			swal({
@@ -279,4 +279,9 @@ function loadCurrency(){
 			});
 		}
 	});
+}
+
+function getRandomColor() {
+	color = "hsl(" + Math.random() * 360 + ", 100%, 75%)";
+	return color;
 }

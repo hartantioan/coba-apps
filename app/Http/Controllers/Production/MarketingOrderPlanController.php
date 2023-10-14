@@ -1242,9 +1242,6 @@ class MarketingOrderPlanController extends Controller
                 return $new_array;
             }
         
-            // foreach($data_go_chart as $row_dg){
-            //     info($row_dg);
-            // }
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 

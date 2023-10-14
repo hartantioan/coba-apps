@@ -150,16 +150,16 @@
                 <tr>
                     <td width="83%" class="left-align">
                         <tr>
-                            <td>
-                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">AR Down Payment # {{ $data->code }}</span>
+                            <td align="center">
+                                <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-bottom:0px">
+                                    {{ $data->code }}
+                                </span>
                             </td>
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:10px">Tgl.Berlaku:</small>
                                 <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
-                                <small style="font-size:10px">Valid Hingga:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->due_date)) }}</span>
                             </td>
                         </tr>
                         <tr>

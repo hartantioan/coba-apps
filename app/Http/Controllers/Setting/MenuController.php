@@ -222,7 +222,7 @@ class MenuController extends Controller
                             if($query->parentsub()->exists()){
                                 $siblingMaintenance = false;
                                 foreach($query->parentsub->sub as $row){
-                                    if($row->is_maintenance){
+                                    if($row->is_maintenance && $row->id !== $query->id){
                                         $siblingMaintenance = true;
                                     }
                                 }

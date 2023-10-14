@@ -71,7 +71,6 @@ class DeadStockController extends Controller
         $warehouse = $request->warehouse?$request->warehouse:'';
         $date = $request->date ? $request->date:'';
         $hari= $request->hari ? $request->hari:'';
-        info($request);
 		return Excel::download(new ExportDeadStock($plant,$warehouse,$hari,$date), 'dead_stock'.uniqid().'.xlsx');
     }
 }

@@ -136,8 +136,8 @@
                 min-height: auto;
             }
 
-            @page { margin: 5em 3em 6em 3em; }
-            header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+            @page { margin: 4em 2em 4em 2em; }
+            header { position: fixed; top: -50px; left: 0px; right: 0px; height: 100px; margin-bottom: 10em }
                 
         
            
@@ -147,35 +147,19 @@
         <header>
             <table border="0" width="100%">
                 <tr>
-                    <td width="83%" class="left-align">
-                        <tr>
-                            <td>
-                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">AR Invoice # {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small style="font-size:10px">Diajukan:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
-                                <small style="font-size:10px">Tgl.Tenggat:</small>
-                                <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->due_date)) }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h5 style="margin-top: -2px">AR Invoice</h5>
-                            </td>
-                        </tr>
+                    <td width="33%">
+                        <img src="{{ $image }}" width="50%" style="width:60%;">
                     </td>
-                    <td width="33%" align="right">
+                    <td width="33%" align="center">
+                        <span class="invoice-number mr-1" style="font-size:18px;font-weight:800;margin-bottom:0px">
+                            Invoice {{ $data->code }}
+                        </span>
                     </td>
-                    
-                    <td width="34%" align="right">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: absolute; top:50px;width:100px;right:75px;" height="10%" />
+                    <td width="33%" align="center">
+                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:60%;right:75px;height:25px;"/><br>
+                        {{ $data->code }}
                     </td>
                 </tr>
-                
             </table>
         </header>
         <main>
@@ -184,55 +168,37 @@
                     <!-- header section -->
                     <table border="0" width="100%">
                         <tr>
-                            <td width="50%" class="left-align">
+                            <td width="60%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="40%">
-                                            Customer
+                                        <td width="20%">
+                                            Kepada Yth
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="60%">
-                                            {{ $data->account->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Alamat
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->account->address }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Telepon
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->account->phone.' / '.$data->account->office_no }}
+                                        <td width="80%">
+                                            {!! $data->account->name.' <br> '.$data->account->address.' '.$data->account->subdistrict->name.' '.$data->account->district->name.' '.$data->account->city->name.' '.$data->account->province->name.' ('.$data->account->phone.' / '.$data->account->office_no.')' !!}
                                         </td>
                                     </tr>
                                 </table>
                             </td>
-                            <td width="50%" class="left-align">
+                            <td width="40%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="50%">
-                                            Perusahaan
+                                        <td width="30%">
+                                            Tanggal
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="50%">
-                                            {{ $data->company->name }}
+                                        <td width="70%">
+                                            {{ date('d/m/y',strtotime($data->post_date)) }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Tipe Pembayaran
+                                            Jatuh Tempo
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->type() }}
+                                            {{ date('d/m/y',strtotime($data->due_date)) }}
                                         </td>
                                     </tr>
                                 </table>
@@ -246,11 +212,13 @@
                                 <tr>
                                     <th>No.</th>
                                     <th>Item</th>
+                                    <th>NO.MOD</th>
+                                    <th>NO.SJ</th>
+                                    <th>Palet</th>
                                     <th>Qty</th>
                                     <th>Satuan</th>
                                     <th>Harga</th>
                                     <th>Total</th>
-                                    <th>Termasuk PPN?</th>
                                     <th>PPN</th>
                                     <th>Grandtotal</th>
                                 </tr>
@@ -259,17 +227,19 @@
                                 @foreach($data->marketingOrderInvoiceDeliveryProcess as $key => $row)
                                 <tr>
                                     <td align="center" rowspan="2">{{ ($key + 1) }}</td>
-                                    <td align="center">{{ $row->lookable->item->name }}</td>
-                                    <td align="center">{{ number_format($row->qty,3,',','.') }}</td>
+                                    <td align="">{{ $row->lookable->item->name }}</td>
+                                    <td align="">{{ $row->lookable->marketingOrderDelivery->code }}</td>
+                                    <td align="">{{ $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code }}</td>
+                                    <td align="right">{{ number_format($row->qty / $row->lookable->item->pallet_convert,3,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td align="center">{{ $row->lookable->item->sellUnit->code }}</td>
                                     <td align="right">{{ number_format($row->price,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
-                                    <td align="center">{{ $row->isIncludeTax() }}</td>
                                     <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="9">Keterangan: {{ $row->note }}</td>
+                                    <td colspan="11">Keterangan: {{ $row->note }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -389,7 +359,7 @@
                             <tbody>
                                 @foreach($data->marketingOrderInvoiceDownPayment as $key => $row)
                                 <tr>
-                                    <td align="center" rowspan="2">{{ ($key + 1) }}</td>
+                                    <td align="center">{{ ($key + 1) }}</td>
                                     <td align="center">{{ $row->lookable->code }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>

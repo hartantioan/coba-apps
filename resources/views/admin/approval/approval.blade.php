@@ -53,20 +53,31 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <div class="card-panel">
-                                <div class="row">
-                                    <div class="col s12 ">
-                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
-                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
-                                            <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Selesai</option>
-                                            </select>
-                                        </div>
+                            <ul class="collapsible collapsible-accordion">
+                                <li>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-body">
+                                        <div class="row">
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Menunggu</option>
+                                                        <option value="2">Selesai</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_form" style="font-size:1rem;">Filter Form :</label>
+                                                <div class="input-field">
+                                                    <select class="browser-default" id="filter_form" onchange="loadDataTable()"></select>
+                                                </div>
+                                            </div>
+                                        </div>  
                                     </div>
-                                </div>
-                            </div>
+                                </li>
+                            </ul>
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">List Data
@@ -252,6 +263,8 @@
         $('#datatable_serverside tbody').on('click', 'button', function (event) {
             event.stopPropagation();
         });
+
+        select2ServerSide('#filter_form', '{{ url("admin/select2/form_user") }}');
     });
 
     function multiApprove(){
@@ -299,8 +312,7 @@
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
-                    branch : $('#filter_branch').val(),
-                    'type[]' : $('#filter_type').val()
+                    form : $('#filter_form').val()
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

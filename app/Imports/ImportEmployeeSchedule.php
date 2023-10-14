@@ -92,7 +92,6 @@ class ImportEmployeeSchedule implements ToCollection
             }
         }
         
-        // info(json_encode($data_shift_schedule));
         // Process the formatted data as needed
         // For example, you can save it to a database or perform any other actions
         // $dataFormatted contains the formatted data

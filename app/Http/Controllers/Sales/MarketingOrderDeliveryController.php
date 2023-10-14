@@ -355,7 +355,7 @@ class MarketingOrderDeliveryController extends Controller
                         $passedZero = false;
                     }
                     $item_stock = ItemStock::find($request->arr_item_stock[$key]);
-                    $qtysell = round($item_stock->qty / $item_stock->item->sell_convert,3);
+                    $qtysell = round(($item_stock->qty / $item_stock->item->sell_convert) - $item_stock->totalQtyUnapproved(),3);
 
                     if(floatval(str_replace(',','.',str_replace('.','',$row))) > $qtysell){
                         $passedQty = false;
@@ -555,6 +555,12 @@ class MarketingOrderDeliveryController extends Controller
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account->name;
         $po['marketing_order_code'] = $po->marketingOrder->code;
+        $po['outlet'] = $po->marketingOrder->outlet->name;
+        $po['address'] = $po->marketingOrder->destination_address;
+        $po['province'] = $po->marketingOrder->province->name;
+        $po['city'] = $po->marketingOrder->city->name;
+        $po['district'] = $po->marketingOrder->district->name;
+        $po['subdistrict'] = $po->marketingOrder->subdistrict->name;
 
         $arr = [];
         

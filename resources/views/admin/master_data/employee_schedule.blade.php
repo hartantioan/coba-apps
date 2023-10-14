@@ -311,8 +311,8 @@
                                             <tr>
                                                 <td>{{ $row->employee_no }}</td>
                                                 <td>{{ $row->name }}</td>
-                                                <td>{{ $row->department->name }}</td>
-                                                <td>{{ $row->position->name }}</td>
+                                                <td>{{ $row->position()->exists() ? $row->position->division->department->name : '-' }}</td>
+                                                <td>{{ $row->position()->exists() ? $row->position->name : '-' }}</td>
                                                 <td class="input-field">
                                                     <label>
                                                         <input type="checkbox" name="arr_employee[]" id="checkbox{{ $row->id }}" value="{{ $row->id }}"/>
@@ -466,7 +466,7 @@
             views: {
                 
                 dayGrid: {
-                    eventLimit: 3 // adjust to 6 only for timeGridWeek/timeGridDay
+                    eventLimit: 3
                 }
             },
             drop: function (info) {
@@ -482,18 +482,15 @@
                 );
                 });
 
-                // Disable dragging if there are already maxEventsPerDay draggable events
                 if (eventsOnDay.length >= maxEventsPerDay) {
                     info.event.remove();
                 }
             },
             eventClick: function (info) {
-                // Function to remove the clicked event
                 function removeEvent() {
                     info.event.remove();
                 }
 
-                // Show a confirmation dialog or directly remove the event
                 if (confirm("Are you sure you want to delete this event?")) {
                     removeEvent();
                 }

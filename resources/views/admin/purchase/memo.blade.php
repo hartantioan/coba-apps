@@ -1272,7 +1272,9 @@
             
         },
         onDisconnect: function () {
-           
+            M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            });
         },
         onUpdate: function (message) {
             

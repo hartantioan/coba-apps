@@ -42,8 +42,6 @@ class ExportPresenceReport implements FromView,ShouldAutoSize,WithTitle
                 ->toArray();
         
         $userDetail=[];
-        info($distinctDates);
-        info($distinctUserIds);
         foreach($distinctUserIds as $key_user=>$user_id){
             foreach($distinctDates as $key_dates=>$row_dates){
                 $userDetail[$key_user][$key_dates]=[
@@ -61,7 +59,6 @@ class ExportPresenceReport implements FromView,ShouldAutoSize,WithTitle
             }
         }
 
-        info($userDetail);
         return view('admin.exports.attendance_presence_report', [
             'data' => $userDetail,
         ]);

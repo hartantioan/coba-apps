@@ -268,6 +268,12 @@ class ApprovalController extends Controller
                 if($request->status){
                     $query->where('status', $request->status);
                 }
+
+                if($request->form){
+                    $query->whereHas('approvalSource',function($query)use($request){
+                        $query->where('lookable_type',$request->form);
+                    });
+                }
             })
             ->whereIn('status',['1','2'])
             ->where('user_id',session('bo_id'))
@@ -297,6 +303,12 @@ class ApprovalController extends Controller
 
                 if($request->status){
                     $query->where('status', $request->status);
+                }
+
+                if($request->form){
+                    $query->whereHas('approvalSource',function($query)use($request){
+                        $query->where('lookable_type',$request->form);
+                    });
                 }
             })
             ->whereIn('status',['1','2'])

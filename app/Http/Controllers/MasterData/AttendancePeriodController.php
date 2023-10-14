@@ -140,7 +140,6 @@ class AttendancePeriodController extends Controller
     }
 
     public function close(Request $request){
-        info('mulais');
         $attendance_period = AttendancePeriod::find($request->id)->first();
         
         $start_time = microtime(true);
@@ -283,11 +282,6 @@ class AttendancePeriodController extends Controller
                                     
                                     $array_masuk[$key]='Lanjutan';
                                     if($key>0){
-                                        // if($row_user->id==1){
-                                        //     info($currentSchedule);
-                                        //     info($previousSchedule);
-                                        //     info("masukkk sini");
-                                        // }
                                         $array_keluar[$key-1]='Lanjutan';
                                         $exact_out[$key-1]=1;
                                     }
@@ -630,7 +624,6 @@ class AttendancePeriodController extends Controller
                         
                         foreach($exact_out as $row_out){
                             if($row_out==0 && $exact_in[$key] == 1){
-                                info($date);
                                 $date_out_forget[]=Carbon::parse($date)->format('d/m/Y');
                                 break;
                             }
@@ -808,7 +801,6 @@ class AttendancePeriodController extends Controller
 
             $execution_time = ($end_time - $start_time);
            
-            info($execution_time);
             $response =[
                 'status'   =>200,
                 'message'  =>$attendance_detail,
@@ -857,8 +849,6 @@ class AttendancePeriodController extends Controller
                 }
             }
         }
-
-        info($userDetail);
         
         $string_table="";
 
@@ -1050,11 +1040,8 @@ class AttendancePeriodController extends Controller
 		
 		return response()->json($response);
     }
-    public function export(Request $request){
-		
-        
+    public function export(Request $request){        
         $period_id = $request->period_id ? $request->period_id:'';
-        info($request);
 		return Excel::download(new ExportPeriod($period_id), 'period_report'.uniqid().'.xlsx');
     }
 }

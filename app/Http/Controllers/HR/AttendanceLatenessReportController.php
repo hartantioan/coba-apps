@@ -26,7 +26,6 @@ class AttendanceLatenessReportController extends Controller
 
   
     public function filterByDate(Request $request){
-        info('mulai');
         $start_time = microtime(true);
         $start_date = Carbon::parse($request->start_date);
         $end_date = Carbon::parse($request->end_date);
@@ -442,7 +441,6 @@ class AttendanceLatenessReportController extends Controller
             $end_time = microtime(true);
         
             $execution_time = ($end_time - $start_time);
-            info($execution_time);
             $response =[
                 'status'=>200,
                 'message'  =>$attendance_detail,
@@ -506,7 +504,6 @@ class AttendanceLatenessReportController extends Controller
     //                 }
     //             }
     //             $key++;
-    //             info($key);
     //             if($schedule_otd){
                     
     //                 if($attendance_otd){
@@ -577,13 +574,11 @@ class AttendanceLatenessReportController extends Controller
                         
     //                 }
     //             }
-    //             info($date);
                 
                 
                 
     //             $date->addDay();
     //         }
-    //         info(json_encode($attendance_detail));
 
     //         $response =[
     //             'status'=>200,

@@ -149,8 +149,10 @@
                 <tr>
                     <td width="83%" class="left-align">
                         <tr>
-                            <td>
-                                <span class="invoice-number mr-1" style="font-size:10px;margin-bottom:0px">Sales Order # {{ $data->code }}</span>
+                            <td align="center">
+                                <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-bottom:0px">
+                                    {{ $data->code }}
+                                </span>
                             </td>
                         </tr>
                         <tr>
@@ -307,6 +309,10 @@
                                     <th>Qty</th>
                                     <th>Satuan</th>
                                     <th>Harga</th>
+                                    <th>Diskon 1</th>
+                                    <th>Diskon 2</th>
+                                    <th>Diskon 3</th>
+                                    <th>Harga Final</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>
@@ -317,11 +323,15 @@
                                     <td>{{ $row->item->name }}</td>
                                     <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td align="center">{{ $row->item->sellUnit->code }}</td>
+                                    <td align="right">{{ number_format($row->price - $row->margin,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->percent_discount_1,2,',','.') }}%</td>
+                                    <td align="right">{{ number_format($row->percent_discount_2,2,',','.') }}%</td>
+                                    <td align="right">{{ number_format($row->discount_3,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->price_after_discount,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="6">Keterangan: {{ $row->note }}</td>
+                                    <td colspan="10">Keterangan: {{ $row->note }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

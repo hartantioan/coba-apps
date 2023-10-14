@@ -200,7 +200,7 @@
                                         </select>
                                     </div>
                                     <div class="input-field col m3 s12 step3">
-                                        <select class="browser-default" id="account_id" name="account_id"></select>
+                                        <select class="browser-default" id="account_id" name="account_id" onchange="addDueDate();"></select>
                                         <label class="active" for="account_id">Customer</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
@@ -252,7 +252,7 @@
                             </div>
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Surat Jalan Terpakai</legend>
+                                    <legend>2. Dokumen Terpakai</legend>
                                     <div class="col m3 s12 step11">
                                         <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
                                     </div>
@@ -1014,6 +1014,16 @@
                     });
                 }
             });
+        }
+    }
+
+    function addDueDate(){
+        if($('#account_id').val()){
+            var result = new Date($('#post_date').val());
+            result.setDate(result.getDate() + parseInt($('#account_id').select2('data')[0].top_customer));
+            $('#due_date').val(result.toISOString().split('T')[0]);
+        }else{
+            $('#due_date').val(null);
         }
     }
 
@@ -1955,7 +1965,9 @@
             
         },
         onDisconnect: function () {
-           
+            M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            });
         },
         onUpdate: function (message) {
             

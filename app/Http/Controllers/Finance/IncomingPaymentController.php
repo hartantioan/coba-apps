@@ -299,7 +299,6 @@ class IncomingPaymentController extends Controller
             'grandtotal',
             'document',
             'note',
-            'project_id',
         ];
 
         $start  = $request->start;
@@ -435,7 +434,6 @@ class IncomingPaymentController extends Controller
                     number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->note,
-                    $val->project_id ? $val->project->name : '-',
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -569,7 +567,6 @@ class IncomingPaymentController extends Controller
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
                         $query->note = $request->note;
-                        $query->project_id = $request->project_id ? $request->project_id : NULL;
                         $query->status = '1';
 
                         $query->save();
@@ -603,7 +600,6 @@ class IncomingPaymentController extends Controller
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/incoming_payments') : NULL,
                         'note'                      => $request->note,
-                        'project_id'                => $request->project_id ? $request->project_id : NULL,
                         'status'                    => '1',
                     ]);
 
@@ -757,7 +753,6 @@ class IncomingPaymentController extends Controller
         $ip['account_name'] = $ip->account_id ? $ip->account->name : '';
         $ip['coa_name'] = $ip->coa->code.' - '.$ip->coa->name;
         $ip['currency_rate'] = number_format($ip->currency_rate,2,',','.');
-        $ip['project_name'] = $ip->project_id ? $ip->project->name : '';
         $coareceivable = Coa::where('code','100.01.03.03.02')->where('company_id',$ip->company_id)->first()->id;
 
         $arr = [];
@@ -793,18 +788,25 @@ class IncomingPaymentController extends Controller
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
+
+                if(in_array($query->status,['2','3'])){
+                    foreach($query->incomingPaymentDetail as $row){
+                        if($row->lookable_type == 'outgoing_payments'){
+                            CustomHelper::addCountLimitCredit($query->account_id,$row->total);
+                        }
+                        if($row->lookable_type == 'marketing_order_down_payments'){
+                            CustomHelper::removeDeposit($row->lookable->account_id,$row->total * $query->currency_rate);
+                            CustomHelper::addCountLimitCredit($row->lookable->account_id,$row->total * $query->currency_rate);
+                        }
+                    }
+                }
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-
-                foreach($query->incomingPaymentDetail as $row){
-                    if($row->lookable_type == 'outgoing_payments'){
-                        CustomHelper::addCountLimitCredit($query->account_id,$row->total);
-                    }
-                }
     
                 activity()
                     ->performedOn(new IncomingPayment())

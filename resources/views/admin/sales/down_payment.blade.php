@@ -155,7 +155,7 @@
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th rowspan="2">Tipe</th>
                                                         <th rowspan="2">Dokumen</th>
-                                                        <th colspan="2" class="center-align">Tanggal</th>
+                                                        <th rowspan="2" class="center-align">Tanggal</th>
                                                         <th colspan="2" class="center-align">Mata Uang</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th colspan="4" class="center-align">Pajak</th>
@@ -168,8 +168,6 @@
                                                         <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>Post</th>
-                                                        <th>Tenggat</th>
                                                         <th>Kode</th>
                                                         <th>Konversi</th>
                                                         <th>Jenis</th>
@@ -218,7 +216,7 @@
                             </div>
                             <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="getTopCustomer();"></select>
+                                <select class="browser-default" id="account_id" name="account_id"></select>
                                 <label class="active" for="account_id">Partner Bisnis</label>
                             </div>
                             <div class="input-field col m3 s12 step4">
@@ -240,10 +238,6 @@
                             <div class="input-field col m3 s12 step6">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m3 s12 step7">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kadaluarsa">
-                                <label class="active" for="due_date">Tgl. Kadaluarsa</label>
                             </div>
                             <div class="file-field input-field col m3 s12 step8">
                                 <div class="btn">
@@ -549,7 +543,6 @@
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ $minDate }}');
                 $('#post_date').attr('max','{{ $maxDate }}');
-                $('#due_date').attr('min','{{ date("Y-m-d") }}');
             },
             onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
@@ -842,16 +835,6 @@
         });
     }
 
-    function getTopCustomer(){
-        if($('#account_id').val()){
-            var result = new Date($('#post_date').val());
-            result.setDate(result.getDate() + parseInt($('#account_id').select2('data')[0].top_customer));
-            $('#due_date').val(result.toISOString().split('T')[0]);
-        }else{
-            $('#due_date').val('{{ date("Y-m-d") }}');
-        }
-    }
-
     String.prototype.replaceAt = function(index, replacement) {
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);
     };
@@ -1107,7 +1090,6 @@
                 { name: 'type', className: 'center-align' },
                 { name: 'document', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'due_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
@@ -1293,7 +1275,6 @@
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
-                $('#due_date').val(response.due_date);
                 $('#tax_no').val(response.tax_no);            
                 $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
 
@@ -1413,7 +1394,9 @@
             
         },
         onDisconnect: function () {
-           
+            M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            });
         },
         onUpdate: function (message) {
             

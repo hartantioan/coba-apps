@@ -264,13 +264,15 @@
                                                         <th class="center">Dokumen</th>
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">Keterangan</th>
-                                                        <th class="center">Nominal</th>
+                                                        <th class="center">Total</th>
+                                                        <th class="center">PPN</th>
+                                                        <th class="center">Grandtotal</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="5">
+                                                        <td colspan="7">
                                                             Silahkan tambahkan AR Invoice / AR Down Payment / Coa...
                                                         </td>
                                                     </tr>
@@ -555,7 +557,7 @@
                 }else{
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="5">
+                            <td colspan="7">
                                 Silahkan tambahkan AR Invoice / AR Down Payment / Coa...
                             </td>
                         </tr>
@@ -699,7 +701,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="5">
+                        <td colspan="7">
                             Silahkan tambahkan AR Invoice / AR Down Payment / Coa...
                         </td>
                     </tr>
@@ -1312,7 +1314,7 @@
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="5">
+                            <td colspan="7">
                                 Silahkan tambahkan AR Invoice / AR Down Payment / Coa...
                             </td>
                         </tr>
@@ -1806,7 +1808,9 @@
             
         },
         onDisconnect: function () {
-           
+            M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            });
         },
         onUpdate: function (message) {
             

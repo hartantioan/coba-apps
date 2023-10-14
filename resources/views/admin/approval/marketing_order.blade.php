@@ -147,7 +147,7 @@
         <div class="divider mb-1 mt-1"></div>
         <!-- invoice address and contact -->
         <div class="row">
-            <div class="col s6 row mt-2">
+            <div class="col s6 m6 row mt-2">
                 <div class="col s12 center-align">
                     CUSTOMER
                 </div>
@@ -169,14 +169,9 @@
                 <div class="col s8">
                     {{ $data->account->phone.' / '.$data->account->office_no }}
                 </div>
-                <div class="col s4">
-                    Bukti
-                </div>
-                <div class="col s8">
-                    <a href="{{ $data->attachment() }}" target="_blank">Lihat</a>
-                </div>
+                
             </div>
-            <div class="col s6 row mt-2">
+            <div class="col s6 m6 row mt-2">
                 <div class="col s12 center-align">
                     INFO UTAMA
                 </div>
@@ -193,19 +188,19 @@
                     {{ $data->sales->name }}
                 </div>
                 <div class="col s4">
-                    Tipe Penjualan
-                </div>
-                <div class="col s8">
-                    {{ $data->typeSales() }}
-                </div>
-                <div class="col s4">
                     No Referensi / PO
                 </div>
                 <div class="col s8">
                     {{ $data->document_no }}
                 </div>
+                <div class="col s4">
+                    Bukti
+                </div>
+                <div class="col s8">
+                    <a href="{{ $data->attachment() }}" target="_blank">Lihat</a>
+                </div>
             </div>
-            <div class="col s6 row mt-2">
+            <div class="col s6 m6 row mt-2">
                 <div class="col s12 center-align">
                     PENGIRIMAN
                 </div>
@@ -252,7 +247,7 @@
                     {{ $data->destination_address.', '.ucwords(strtolower($data->subdistrict->name.' - '.$data->district->name.' - '.$data->city->name.' - '.$data->province->name)) }}
                 </div>
             </div>
-            <div class="col s6 row mt-2">
+            <div class="col s6 m6 row mt-2">
                 <div class="col s12 center-align">
                     PEMBAYARAN
                 </div>

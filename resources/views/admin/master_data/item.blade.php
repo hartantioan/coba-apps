@@ -657,9 +657,9 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'group', className: 'center-align' },
+                { name: 'code', className: '' },
+                { name: 'name', className: '' },
+                { name: 'group', className: '' },
                 { name: 'uom', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -918,7 +918,9 @@
             
         },
         onDisconnect: function () {
-           
+            M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            });
         },
         onUpdate: function (message) {
             

@@ -7,9 +7,14 @@
         font-size: 13px !important;
     }
 
-    .select-wrapper, .select2-container {
+    .select2-container {
+        height:3.5rem !important;
+    }
+
+    .select-wrapper {
         height:3.6rem !important;
     }
+
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -69,16 +74,6 @@
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
                                                         <option value="6">Direvisi</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_inventory" style="font-size:1rem;">Tipe Penjualan :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_sales_type" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Standar SO</option>
-                                                        <option value="2">Cash / POS</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -179,7 +174,6 @@
                                                         <th>Petugas</th>
                                                         <th>Customer</th>
                                                         <th>Perusahaan</th>
-                                                        <th>Tipe Sales</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Valid Hingga</th>
                                                         <th>Proyek</th>
@@ -277,13 +271,6 @@
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step6">
-                                        <select class="form-control" id="type_sales" name="type_sales">
-                                            <option value="1">Standar SO</option>
-                                            <option value="2">Cash / POS</option>
-                                        </select>
-                                        <label class="" for="type_sales">Tipe Penjualan</label>
-                                    </div>
                                     <div class="input-field col m3 s12 step7">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                         <label class="active" for="post_date">Tgl. Posting</label>
@@ -306,9 +293,9 @@
                                 <fieldset>
                                     <legend>2. Pengiriman</legend>
                                     <div class="input-field col m3 s12 step11">
-                                        <select class="form-control" id="type_delivery" name="type_delivery">
-                                            <option value="1">Loco</option>
+                                        <select class="form-control" id="type_delivery" name="type_delivery" onchange="applyDelivery(this.value);">
                                             <option value="2">Franco</option>
+                                            <option value="1">Loco</option>
                                         </select>
                                         <label class="" for="type_delivery">Tipe Pengiriman</label>
                                     </div>
@@ -361,8 +348,8 @@
                                     <legend>3. Pembayaran</legend>
                                     <div class="input-field col m3 s12 step21">
                                         <select class="form-control" id="payment_type" name="payment_type" onchange="resetTerm()">
-                                            <option value="1">Cash</option>
                                             <option value="2">Credit</option>
+                                            <option value="1">Cash</option>
                                         </select>
                                         <label class="" for="payment_type">Tipe Pembayaran</label>
                                     </div>                   
@@ -508,12 +495,12 @@
                                                 <input class="browser-default" id="tax" name="tax" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        {{-- <tr>
                                             <td>Total Setelah Pajak</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="total_after_tax" name="total_after_tax" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
+                                            <td class="right-align"> --}}
+                                                <input class="browser-default" id="total_after_tax" name="total_after_tax" type="hidden" value="0,00" style="text-align:right;width:100%;" readonly>
+                                            {{-- </td>
+                                        </tr> --}}
                                         <tr style="display:none;">
                                             <td>Rounding</td>
                                             <td class="right-align">
@@ -871,6 +858,27 @@
             $('#province_id,#subdistrict_id,#district_id,#city_id').empty().append(`
                 <option value="">--Pilih ya--</option>
             `);
+        }
+    }
+
+    function applyDelivery(val){
+        if(val == '1'){
+            $('#transportation_id').empty();
+        }
+    }
+
+    function resetTerm(){
+        if($('#payment_type').val() == '1'){
+            $('#top_internal').val('0');
+            $('#top_customer').val('0');
+        }else{
+            if($('#account_id').val()){
+                $('#top_internal').val($('#account_id').select2('data')[0].top_internal);
+                $('#top_customer').val($('#account_id').select2('data')[0].top_customer);
+            }else{
+                $('#top_internal').val('0');
+                $('#top_customer').val('0');
+            }
         }
     }
 
@@ -1288,25 +1296,6 @@
         }
     }
 
-    var tempTerm = 0;
-
-    function resetTerm(){
-        if($('#payment_type').val() == '1'){
-            $('#payment_term').val('0');
-        }else{
-            $('#payment_term').val(tempTerm);
-        }
-    }
-
-    function getTopSupplier(){
-        if($("#supplier_id").val()){
-            tempTerm = parseInt($("#supplier_id").select2('data')[0].top);
-        }else{
-            tempTerm = 0;
-        }
-        resetTerm();
-    }
-
     function addItem(){
         var count = makeid(10);
         $('#last-row-item').remove();
@@ -1526,7 +1515,6 @@
                 type: 'POST',
                 data: {
                     status : $('#filter_status').val(),
-                    sales_type : $('#filter_sales_type').val(),
                     delivery_type : $('#filter_delivery').val(),
                     payment_type : $('#filter_payment').val(),
                     'account_id[]' : $('#filter_account').val(),
@@ -1561,7 +1549,6 @@
                 { name: 'user_id', className: '' },
                 { name: 'account_id', className: '' },
                 { name: 'company_id', className: '' },
-                { name: 'sales_type', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'valid_date', className: '' },
                 { name: 'project_id', searchable: false, orderable: false, className: '' },
@@ -1837,7 +1824,6 @@
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
                 $('#company_id').val(response.company_id).formSelect();
-                $('#type_sales').val(response.type_sales).formSelect();
                 $('#post_date').val(response.post_date);
                 $('#valid_date').val(response.valid_date);
                 $('#document_no').val(response.document_no);
@@ -2243,7 +2229,9 @@
             
         },
         onDisconnect: function () {
-           
+            M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            });
         },
         onUpdate: function (message) {
             
@@ -2282,11 +2270,6 @@
                     title : 'Perusahaan',
                     element : document.querySelector('.step5'),
                     intro : 'Perusahaan dimana dokumen ini dibuat.' 
-                },
-                {
-                    title : 'Tipe Penjualan',
-                    element : document.querySelector('.step6'),
-                    intro : 'Tipe Penjualan ada 2 macam, yang pertama adalah <b>Standar SO</b>, yakni SO yang dibuat sesuai pada umumnya, ada pembelian dan pembayaran yang berjangka dari Customer. Sedangkan tipe Cash / POS, adalah SO yang dibuat pada saat Customer membeli langsung secara cash ataupun secara retail / eceran.' 
                 },
                 {
                     title : 'Tgl. Posting',
@@ -2470,7 +2453,6 @@
                             <option value="` + response.account_id + `">` + response.account_name + `</option>
                         `);
                         $('#company_id').val(response.company_id).formSelect();
-                        $('#type_sales').val(response.type_sales).formSelect();
                         $('#post_date').val(response.post_date);
                         $('#valid_date').val(response.valid_date);
                         $('#document_no').val(response.document_no);
@@ -2532,7 +2514,8 @@
                         $('#currency_rate').val(response.currency_rate);
                         $('#percent_dp').val(response.percent_dp);
                         $('#sales_id').empty().append(`<option value="` + response.sales_id + `">` + response.sales_name + `</option>`);
-                        $('#note').val(response.note);
+                        $('#note_internal').val(response.note_internal);
+                        $('#note_external').val(response.note_external);
                         $('#subtotal').val(response.subtotal);
                         $('#discount').val(response.discount);
                         $('#total').val(response.total);

@@ -475,15 +475,6 @@ class MarketingOrderMemoController extends Controller
                         'balance'                       => $arrNominal[$key]['balance'],
                         'note'                          => $request->arr_note[$key],
                     ]);
-
-                    if($request->arr_lookable_type[$key] == 'marketing_order_invoice_details'){
-                        if($momd->downpayment > 0){
-                            CustomHelper::addDeposit($query->account_id,$momd->downpayment);
-                        }
-                    }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
-                        CustomHelper::removeDeposit($query->account_id,$momd->balance);
-                    }
-                    CustomHelper::removeCountLimitCredit($query->account_id,$momd->balance);
                 }
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
@@ -987,23 +978,25 @@ class MarketingOrderMemoController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
+                if(in_array($query->status,['2','3'])){
+                    foreach($query->marketingOrderMemoDetail as $row){
+                        if($row->lookable_type == 'marketing_order_invoice_details'){
+                            if($row->downpayment > 0){
+                                CustomHelper::removeDeposit($query->account_id,$row->downpayment);
+                            }
+                        }elseif($row->lookable_type == 'marketing_order_down_payments'){
+                            CustomHelper::addDeposit($query->account_id,$row->balance);
+                        }
+                        CustomHelper::addCountLimitCredit($query->account_id,$row->balance);
+                    }
+                }
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-
-                foreach($query->marketingOrderMemoDetail as $row){
-                    if($row->lookable_type == 'marketing_order_invoice_details'){
-                        if($row->downpayment > 0){
-                            CustomHelper::removeDeposit($query->account_id,$row->downpayment);
-                        }
-                    }elseif($row->lookable_type == 'marketing_order_down_payments'){
-                        CustomHelper::addDeposit($query->account_id,$row->balance);
-                    }
-                    CustomHelper::addCountLimitCredit($query->account_id,$row->balance);
-                }
     
                 activity()
                     ->performedOn(new MarketingOrderMemo())
@@ -1533,7 +1526,6 @@ class MarketingOrderMemoController extends Controller
                 'message' => 'Data failed to delete.'
             ];
         }
-        info($response);
         return response()->json($response);
 
     }

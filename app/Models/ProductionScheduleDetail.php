@@ -44,4 +44,10 @@ class ProductionScheduleDetail extends Model
     public function marketingOrderPlanDetail(){
         return $this->belongsTo('App\Models\MarketingOrderPlanDetail','marketing_order_plan_detail_id','id')->withTrashed();
     }
+
+    public function productionIssueReceiveDetail(){
+        return $this->hasMany('App\Models\ProductionIssueReceiveDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('productionIssueReceive',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
 }

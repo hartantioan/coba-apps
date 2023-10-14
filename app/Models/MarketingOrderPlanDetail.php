@@ -38,6 +38,15 @@ class MarketingOrderPlanDetail extends Model
         });
     }
 
+    public function totalScheduled()
+    {
+        $total = 0;
+        foreach($this->productionScheduleDetail as $row){
+            $total += $row->qty;
+        }
+        return $total;
+    }
+
     public function productionScheduleTarget()
     {
         return $this->hasMany('App\Models\ProductionScheduleTarget')->whereHas('productionSchedule',function($query){

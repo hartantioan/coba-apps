@@ -169,4 +169,15 @@ class MarketingOrderPlan extends Model
 
         return $hasRelation;
     }
+
+    public function balanceQty(){
+        $total = 0;
+
+        foreach($this->marketingOrderPlanDetail as $row){
+            $total += round($row->qty * $row->item->sell_convert);
+            $total -= round($row->totalScheduled());
+        }
+
+        return $total;
+    }
 }

@@ -229,4 +229,9 @@ class Menu extends Model
 
         return $there;
     }
+
+    public function approvalSource()
+    {
+        return $this->hasMany('App\Models\ApprovalSource','lookable_type','table_name');
+    }
 }

@@ -22,7 +22,7 @@ class EmployeeScheduleController extends Controller
         $data = [
             'title'         => 'Jadwal Pegawai',
             'content'       => 'admin.master_data.employee_schedule',
-            'user'          => User::join('departments','departments.id','=','users.department_id')->select('departments.name as department_name','users.*')->orderBy('department_name')->get(),
+            'user'          => User::where('type','1')->where('status','1')->get(),
             'shift'         => Shift::where('status',1)->get(),
         ];
 
@@ -321,7 +321,6 @@ class EmployeeScheduleController extends Controller
                             //     'user_id'           => $user_id,
                             // ]);
                             // foreach($user_data as $row_user){
-                            //     info($row_user->employee_no);
                             //     $query = EmployeeSchedule::create([
                             //         'shift_id'          => $shift->shift_id,
                             //         'date'	            => $current_date,

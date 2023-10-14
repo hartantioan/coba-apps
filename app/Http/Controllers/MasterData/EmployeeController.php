@@ -445,7 +445,6 @@ class EmployeeController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            info($request);
 			if($request->temp){
                 DB::beginTransaction();
                 try {

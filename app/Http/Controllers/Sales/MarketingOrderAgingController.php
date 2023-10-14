@@ -217,7 +217,6 @@ class MarketingOrderAgingController extends Controller
             $prefix = substr($row,0,4);
             if($prefix == 'SODP'){
                 $dp = MarketingOrderDownPayment::where('code',$row)->first();
-                info($dp);
                 if($dp){
                     $memo = $dp->totalMemoByDate($date);
                     $paid = $dp->totalPayByDate($date);

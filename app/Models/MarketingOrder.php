@@ -20,7 +20,6 @@ class MarketingOrder extends Model
         'user_id',
         'account_id',
         'company_id',
-        'type_sales',
         'post_date',
         'valid_date',
         'document',
@@ -141,16 +140,6 @@ class MarketingOrder extends Model
         $type = match ($this->type_delivery) {
             '1' => 'Loco',
             '2' => 'Franco',
-          default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function typeSales(){
-        $type = match ($this->type_sales) {
-            '1'   => 'Standar SO',
-            '2'   => 'Cash / POS',
           default => 'Invalid',
         };
 

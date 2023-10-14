@@ -227,7 +227,7 @@
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->user->department->name }}
+                                            {{ $data->user->position->division->department->name }}
                                         </td>
                                     </tr>
                                 </table>

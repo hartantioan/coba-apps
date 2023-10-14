@@ -77,7 +77,6 @@ class MarketingOrderDownPaymentController extends Controller
             'type',
             'document',
             'post_date',
-            'due_date',
             'currency_id',
             'currency_rate',
             'note',
@@ -104,7 +103,6 @@ class MarketingOrderDownPaymentController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
@@ -159,7 +157,6 @@ class MarketingOrderDownPaymentController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('due_date', 'like', "%$search%")
                             ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
@@ -224,7 +221,6 @@ class MarketingOrderDownPaymentController extends Controller
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     date('d M Y',strtotime($val->post_date)),
-                    date('d M Y',strtotime($val->due_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
@@ -272,7 +268,6 @@ class MarketingOrderDownPaymentController extends Controller
 			'type'                      => 'required',
             'company_id'                => 'required',
             'post_date'                 => 'required',
-            'due_date'                  => 'required',
             'currency_id'               => 'required',
             'currency_rate'             => 'required',
             'subtotal'                  => 'required',
@@ -288,7 +283,6 @@ class MarketingOrderDownPaymentController extends Controller
 			'type.required'                     => 'Tipe tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
-            'due_date.required'                 => 'Tgl tenggat tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
             'total.required'                    => 'Total tidak boleh kosong.',
@@ -382,7 +376,7 @@ class MarketingOrderDownPaymentController extends Controller
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->post_date = $request->post_date;
-                        $query->due_date = $request->due_date;
+                        $query->due_date = $request->post_date;
                         $query->note = $request->note;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
                         $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
@@ -425,7 +419,7 @@ class MarketingOrderDownPaymentController extends Controller
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'post_date'                 => $request->post_date,
-                        'due_date'                  => $request->due_date,
+                        'due_date'                  => $request->post_date,
                         'note'                      => $request->note,
                         'subtotal'                  => str_replace(',','.',str_replace('.','',$request->subtotal)),
                         'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
@@ -445,8 +439,6 @@ class MarketingOrderDownPaymentController extends Controller
 
                 CustomHelper::sendApproval('marketing_order_down_payments',$query->id,$query->note);
                 CustomHelper::sendNotification('marketing_order_down_payments',$query->id,'Pengajuan AR Down Payment No. '.$query->code,$query->note,session('bo_id'));
-                CustomHelper::addDeposit($query->account_id,str_replace(',','.',str_replace('.','',$request->grandtotal)));
-                CustomHelper::addCountLimitCredit($query->account_id,str_replace(',','.',str_replace('.','',$request->grandtotal)));
 
                 activity()
                     ->performedOn(new MarketingOrderDownPayment())
@@ -878,8 +870,6 @@ class MarketingOrderDownPaymentController extends Controller
         if($query->delete()) {
 
             CustomHelper::removeApproval('marketing_order_down_payments',$query->id);
-            CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
-            CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
 
             activity()
                 ->performedOn(new MarketingOrderDownPayment())
@@ -923,9 +913,6 @@ class MarketingOrderDownPaymentController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
-                CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
-    
                 activity()
                     ->performedOn(new MarketingOrderDownPayment())
                     ->causedBy(session('bo_id'))

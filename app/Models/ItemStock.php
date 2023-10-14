@@ -71,6 +71,20 @@ class ItemStock extends Model
         });
     }
 
+    public function marketingOrderDeliveryDetailUnapproved(){
+        return $this->hasMany('App\Models\MarketingOrderDeliveryDetail','item_stock_id','id')->whereHas('marketingOrderDelivery',function($query){
+            $query->whereIn('status',['1','2','3'])->whereDoesntHave('marketingOrderDeliveryProcess');
+        });
+    }
+
+    public function totalQtyUnapproved(){
+        $total = 0;
+        foreach($this->marketingOrderDeliveryDetailUnapproved as $row){
+            $total += $row->qty;
+        }
+        return $total;
+    }
+
     public function totalUndeliveredItem(){
         $totalUndelivered = 0;
         $totalDelivered = 0;

@@ -26,7 +26,6 @@ class AttendanceMonthlyReportController extends Controller
     }
     public function datatable(Request $request){
         $query_period = AttendancePeriod::find($request->period_id);
-        info($request->period_id);
         $query_punish = Punishment::where('place_id',$query_period->plant_id)
                         ->where('type','1')
                         ->get();
@@ -136,10 +135,8 @@ class AttendanceMonthlyReportController extends Controller
 
         $query_attendance_punish = AttendancePunishment::where('period_id',$request->period_id)->get();
         foreach($query_attendance_punish as $row_punish){
-            info("-----------------");
            foreach($array as $key_array=>$row_array){
                 if($row_array["user_id"]==$row_punish->user_id){
-                    info($row_array);
                     if(array_key_exists($row_punish->punishment->code,$row_array)){
                         
                         $array[$key_array][$row_punish->punishment->code]=$row_punish->frequent;
@@ -190,7 +187,6 @@ class AttendanceMonthlyReportController extends Controller
     }
 
     public function takePlant(Request $request){
-        info($request);
         if($request->id){
             $query = AttendancePeriod::where('id',$request->id)->first();
             $query_punish = Punishment::where('place_id',$query->plant_id)

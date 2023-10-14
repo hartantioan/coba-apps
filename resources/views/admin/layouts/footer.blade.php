@@ -11,8 +11,8 @@
 	<script src="{{ url('app-assets/vendors/data-tables/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ url('app-assets/vendors/data-tables/extensions/responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ url('app-assets/vendors/data-tables/js/dataTables.select.min.js') }}"></script>
-    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"></script>
+    <script src="{{ url('app-assets/vendors/data-tables/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ url('app-assets/vendors/data-tables/js/buttons.colVis.min.js') }}"></script>
     <script src="{{ url('app-assets/vendors/formatter/jquery.formatter.min.js?v=2') }}"></script>
 	<script src="{{ url('app-assets/vendors/quill/katex.min.js') }}"></script>
     <script src="{{ url('app-assets/vendors/quill/highlight.min.js') }}"></script>
@@ -23,7 +23,7 @@
     <script src="{{ url('app-assets/js/plugins.js?v=7') }}"></script>
     <script src="{{ url('app-assets/js/search.js?v=11') }}"></script>
     <script src="{{ url('app-assets/vendors/ckeditor/ckeditor.js') }}"></script>
-    <script src="{{ url('app-assets/js/custom/custom-script.js?v=102') }}"></script>
+    <script src="{{ url('app-assets/js/custom/custom-script.js?v=108') }}"></script>
     
     <script src="{{ url('app-assets/js/custom/go-chart.js') }}"></script>
     @if(session('bo_id'))

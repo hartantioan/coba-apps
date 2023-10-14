@@ -273,6 +273,14 @@ class MarketingOrderDeliveryProcessController extends Controller
             $data['message'] = 'MOD No. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
             if(!$data->marketingOrderDeliveryProcess()->exists()){
+                $data['outlet'] = $data->marketingOrder->outlet->name;
+                $data['sender'] = $data->account->name;
+                $data['address'] = $data->marketingOrder->destination_address;
+                $data['province'] = $data->marketingOrder->province->name;
+                $data['city'] = $data->marketingOrder->city->name;
+                $data['district'] = $data->marketingOrder->district->name;
+                $data['subdistrict'] = $data->marketingOrder->subdistrict->name;
+
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Surat Jalan');
 
                 $details = [];
@@ -533,13 +541,14 @@ class MarketingOrderDeliveryProcessController extends Controller
                             $passedTaxSeries = true;
                         }
                         if($passedTaxSeries){
+                            $dueDate = date('Y-m-d', strtotime($query->post_date. ' + '.$query->marketingOrderDelivery->marketingOrder->account->top.' days'));
                             $querymoi = MarketingOrderInvoice::create([
                                 'code'			                => $code,
                                 'user_id'		                => session('bo_id'),
                                 'account_id'                    => $query->marketingOrderDelivery->marketingOrder->account_id,
                                 'company_id'                    => $query->company_id,
                                 'post_date'                     => $query->post_date,
-                                'due_date'                      => $query->post_date,
+                                'due_date'                      => $dueDate,
                                 'document_date'                 => $query->post_date,
                                 'status'                        => '1',
                                 'type'                          => $query->marketingOrderDelivery->marketingOrder->payment_type,
@@ -587,12 +596,10 @@ class MarketingOrderDeliveryProcessController extends Controller
                                     'grandtotal'                    => $rowdata['grandtotal'],
                                     'note'                          => $rowdata['code'],
                                 ]);
-                                CustomHelper::removeDeposit($querymoi->account_id,$rowdata['grandtotal']);
                             }
             
-                            CustomHelper::sendApproval($querymoi->getTable(),$querymoi->id,$querymoi->note_internal.' - '.$querymoi->note->external);
-                            CustomHelper::sendNotification($querymoi->getTable(),$querymoi->id,'Pengajuan AR Invoice No. '.$querymoi->code,$querymoi->note_internal.' - '.$querymoi->note->external,session('bo_id'));
-                            CustomHelper::addCountLimitCredit($querymoi->account_id,$querymoi->balance);
+                            CustomHelper::sendApproval($querymoi->getTable(),$querymoi->id,$querymoi->note_internal.' - '.$querymoi->note_external);
+                            CustomHelper::sendNotification($querymoi->getTable(),$querymoi->id,'Pengajuan AR Invoice No. '.$querymoi->code,$querymoi->note_internal.' - '.$querymoi->note_external,session('bo_id'));
             
                             activity()
                                 ->performedOn(new MarketingOrderInvoice())
@@ -1015,6 +1022,13 @@ class MarketingOrderDeliveryProcessController extends Controller
         $po = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
         $po['marketing_order_delivery_code'] = $po->marketingOrderDelivery->code;
+        $po['outlet'] = $po->marketingOrderDelivery->marketingOrder->outlet->name;
+        $po['sender'] = $po->marketingOrderDelivery->account->name;
+        $po['address'] = $po->marketingOrderDelivery->marketingOrder->destination_address;
+        $po['province'] = $po->marketingOrderDelivery->marketingOrder->province->name;
+        $po['city'] = $po->marketingOrderDelivery->marketingOrder->city->name;
+        $po['district'] = $po->marketingOrderDelivery->marketingOrder->district->name;
+        $po['subdistrict'] = $po->marketingOrderDelivery->marketingOrder->subdistrict->name;
 
         $arr = [];
         $drivers = [];
@@ -1191,6 +1205,11 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
+                if(in_array($query->status,['2','3'])){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                    CustomHelper::removeCogs($query->getTable(),$query->id);
+                }
+                
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -1206,9 +1225,6 @@ class MarketingOrderDeliveryProcessController extends Controller
     
                 CustomHelper::sendNotification('marketing_order_delivery_processes',$query->id,'Surat Jalan No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('marketing_order_delivery_processes',$query->id);
-
-                CustomHelper::removeJournal('marketing_order_delivery_processes',$query->id);
-                CustomHelper::removeCogs('marketing_order_delivery_processes',$query->id);
 
                 $response = [
                     'status'  => 200,

@@ -17,10 +17,10 @@ class ProductionIssueReceiveDetail extends Model
     protected $fillable = [
         'production_issue_receive_id',
         'production_schedule_detail_id',
-        'production_issue_receive_detail_id',
         'lookable_type',
         'lookable_id',
-        'qty',
+        'bom_id',
+        'nominal',
         'type',
         'batch_no',
     ];
@@ -34,8 +34,8 @@ class ProductionIssueReceiveDetail extends Model
         return $this->belongsTo('App\Models\ProductionScheduleDetail','production_schedule_detail_id','id')->withTrashed();
     }
 
-    public function productionIssueReceiveDetail(){
-        return $this->belongsTo('App\Models\ProductionIssueReceiveDetail','production_issue_receive_detail_id','id')->withTrashed();
+    public function bom(){
+        return $this->belongsTo('App\Models\Bom','bom_id','id')->withTrashed();
     }
 
     public function lookable(){

@@ -193,8 +193,6 @@ class EmployeeTransferController extends Controller
     
     public function showFromCode(Request $request){
         $line = EmployeeTransfer::where('code',CustomHelper::decrypt($request->id))->first();
-        info(CustomHelper::decrypt($request->id));
-        info($line);
         if ($line->manager()->exists()) {
             $line['manager'] = $line->manager;
         }

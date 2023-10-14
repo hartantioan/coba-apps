@@ -35,6 +35,7 @@ use App\Models\MarketingOrderReturn;
 use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
 use App\Models\Place;
+use App\Models\ProductionIssueReceive;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
 use App\Models\PurchaseOrder;
@@ -590,6 +591,7 @@ class CustomHelper {
 							'nominal'		=> $row->total * $ip->currency_rate,
 							'note'			=> $row->note,
 						]);
+						CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->total * $ip->currency_rate);
 					}elseif($row->lookable_type == 'marketing_order_invoices' || $row->lookable_type == 'marketing_order_down_payments' || $row->lookable_type == 'marketing_order_memos'){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -599,6 +601,11 @@ class CustomHelper {
 							'nominal'		=> $row->total * $ip->currency_rate,
 							'note'			=> $row->note,
 						]);
+						if($row->lookable_type == 'marketing_order_down_payments'){
+							self::addDeposit($row->lookable->account_id,$row->total * $ip->currency_rate);
+						}else{
+							CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->total * $ip->currency_rate);
+						}
 					}else{
 						
 					}
@@ -1815,6 +1822,8 @@ class CustomHelper {
 
 				$dp_total += $rowtotal;
 				$dp_tax += $rowtax;
+
+				CustomHelper::removeDeposit($row->lookable->account_id,$rowtotal + $rowtax);
 			}
 
 			$downpayment = $dp_total + $dp_tax;
@@ -1830,6 +1839,8 @@ class CustomHelper {
 					'nominal'		=> $balance,
 				]);
 			}
+
+			CustomHelper::addCountLimitCredit($moi->account_id,$balance);
 
 		}elseif($table_name == 'marketing_order_memos'){
 
@@ -1942,7 +1953,7 @@ class CustomHelper {
 					}
 
 					if($row->downpayment > 0){
-						$currency_rate = 0;
+						$currency_rate = 1;
 						foreach($row->lookable->marketingOrderInvoice->marketingOrderInvoiceDownPayment as $rowdp){
 							$currency_rate = $rowdp->lookable->currency_rate;
 						}
@@ -1954,6 +1965,8 @@ class CustomHelper {
 							'nominal'		=> -1 * $row->downpayment * $currency_rate,
 						]);
 						$totalDebit += $row->downpayment * $currency_rate;
+
+						CustomHelper::addDeposit($mom->account_id,$row->downpayment * $currency_rate);
 					}
 
 					if($row->balance > 0){
@@ -2010,6 +2023,8 @@ class CustomHelper {
 							'nominal'		=> -1 * $row->balance * $row->lookable->currency_rate,
 						]);
 					}
+
+					CustomHelper::removeDeposit($mom->account_id,$row->balance);
 				}elseif($row->lookable_type == 'coas'){
 					if($row->balance > 0){
 						JournalDetail::create([
@@ -2028,6 +2043,8 @@ class CustomHelper {
 						]);
 					}
 				}
+
+				CustomHelper::removeCountLimitCredit($mom->account_id,$row->balance);
 			}
 			
 		}elseif($table_name == 'purchase_invoices'){
@@ -2290,6 +2307,8 @@ class CustomHelper {
 				]);
 			}
 
+			CustomHelper::addCountLimitCredit($modp->account_id,$modp->grandtotal * $modp->currency_rate);
+
 		}elseif($table_name == 'purchase_down_payments'){
 			$journalMap = MenuCoa::whereHas('menu', function($query) use ($table_name){
 				$query->where('table_name',$table_name);
@@ -2336,6 +2355,16 @@ class CustomHelper {
 			$transfer = EmployeeTransfer::find($table_id);
 
 			self::updateEmployeeTransfer($transfer);
+
+		}elseif($table_name == 'production_issue_receives'){
+			$pir = ProductionIssueReceive::find($table_id);
+			
+			$rowtotal = 0;
+			foreach($pir->productionIssueReceiveDetail()->where('type','1')->get() as $row){
+				if($row){
+					
+				}
+			}
 		}
 		/* else{
 

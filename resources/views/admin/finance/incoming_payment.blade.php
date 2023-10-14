@@ -144,7 +144,6 @@
                                                         <th rowspan="2" class="center-align">Grandtotal</th>
                                                         <th rowspan="2" class="center-align">Dokumen</th>
                                                         <th rowspan="2" class="center-align">Keterangan</th>
-                                                        <th rowspan="2" class="center-align">Proyek</th>
                                                         <th rowspan="2" class="center-align">Status</th>
                                                         <th rowspan="2" class="center-align">Action</th>
                                                     </tr>
@@ -212,7 +211,7 @@
                                 </div>
                                 <div class="input-field col m3 s12 step6">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                    <label class="active" for="post_date">Tgl. Transfer</label>
+                                    <label class="active" for="post_date">Tgl. Posting</label>
                                 </div>
                                 <div class="file-field input-field col m3 s12 step8">
                                     <div class="btn">
@@ -234,10 +233,6 @@
                                 <div class="input-field col m3 s12 step10">
                                     <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                     <label class="active" for="currency_rate">Konversi</label>
-                                </div>
-                                <div class="input-field col m3 s12 step11">
-                                    <select class="browser-default" id="project_id" name="project_id"></select>
-                                    <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
                                 </div>
                             </div>
                         </fieldset>
@@ -650,7 +645,7 @@
                 $('#temp').val('');
                 M.updateTextFields();
                 $('.row_detail').remove();
-                $('#account_id,#project_id,#coa_id').empty();
+                $('#account_id,#coa_id').empty();
                 $('#total,#wtax,#grandtotal').text('0,00');
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -799,7 +794,6 @@
             }
         });
 
-        select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/employee_customer") }}');
         select2ServerSide('#coa_id', '{{ url("admin/select2/coa_cash_bank") }}');
 
@@ -1094,7 +1088,7 @@
                                         </div>
                                     `);
                                     let readonly = 'readonly';
-                                    let array = ['marketing_order_down_payments','marketing_order_memos'];
+                                    let array = ['marketing_order_memos'];
                                     if(array.includes(val.type)){
                                         readonly = '';
                                     }
@@ -1116,7 +1110,7 @@
                                                 <input id="arr_total` + count + `" name="arr_total[]" data-limit="` + val.balance + `" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                             </td>
                                             <td class="center">
-                                                <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                                <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                             </td>
                                             <td class="center">
                                                 <input id="arr_subtotal` + count + `" name="arr_subtotal[]" data-limit="0" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
@@ -1184,7 +1178,7 @@
                 let rowtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) + parseFloat($('input[name^="arr_rounding"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
                 total += rowtotal;
                 $('input[name^="arr_subtotal"]').eq(index).val(
-                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
                 );
             });
         }
@@ -1192,7 +1186,7 @@
         grandtotal = total;
 
         $('#grandtotal').val(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );
     }
 
@@ -1305,7 +1299,6 @@
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'document', className: 'center-align' },
                 { name: 'note', className: '' },
-                { name: 'project_id', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1555,11 +1548,6 @@
                         <option value="` + response.account_id + `">` + response.account_name + `</option>
                     `);
                 }
-                if(response.project_name){
-                    $('#project_id').empty().append(`
-                        <option value="` + response.project_id + `">` + response.project_name + `</option>
-                    `);
-                }
                 $('#coa_id').empty().append(`
                     <option value="` + response.coa_id + `">` + response.coa_name + `</option>
                 `);
@@ -1575,7 +1563,7 @@
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         let readonly = 'readonly';
-                        let array = ['marketing_order_down_payments','marketing_order_memos'];
+                        let array = ['marketing_order_memos'];
                         if(array.includes(val.type)){
                             readonly = '';
                         }
@@ -1602,7 +1590,7 @@
                                     <input id="arr_total` + count + `" name="arr_total[]" data-limit="0" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                 </td>
                                 <td class="center">
-                                    <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="` + val.rounding + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                                    <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="` + val.rounding + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
                                 </td>
                                 <td class="center">
                                     <input id="arr_subtotal` + count + `" name="arr_subtotal[]" data-limit="0" class="browser-default" type="text" value="` + val.subtotal + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
@@ -1741,7 +1729,9 @@
             
         },
         onDisconnect: function () {
-           
+            M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            });
         },
         onUpdate: function (message) {
             
@@ -2096,9 +2086,9 @@
                     intro : 'COA bank yang akan digunakan dalam form ini.' 
                 },
                 {
-                    title : 'Tgl. Transfer',
+                    title : 'Tgl. Posting',
                     element : document.querySelector('.step6'),
-                    intro : 'Tanggal yang ditentukan untuk transfer form.' 
+                    intro : 'Tanggal transfer / masuk uang.' 
                 },
                 {
                     title : 'Tgl. Posting',
@@ -2120,11 +2110,6 @@
                     title : 'Konversi',
                     element : document.querySelector('.step10'),
                     intro : 'Nilai konversi rupiah pada saat dokumen dibuat. Nilai konversi secara otomatis diisi ketika form tambah baru dibuka pertama kali dan data diambil dari situs exchangerate.host. Pastikan kode mata uang benar di master data agar nilai konversi tidak error.'
-                },
-                {
-                    title : 'Link Proyek',
-                    element : document.querySelector('.step11'),
-                    intro : 'Proyek yang terkait dalam form ini.'
                 },
                 {
                     title : 'Detail AR Invoice / AR Down Payment / BS.Karyawan / Coa',

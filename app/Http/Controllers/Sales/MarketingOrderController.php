@@ -72,7 +72,6 @@ class MarketingOrderController extends Controller
             'code',
             'user_id',
             'account_id',
-            'sales_type',
             'post_date',
             'valid_date',
             'project_id',
@@ -152,10 +151,6 @@ class MarketingOrderController extends Controller
                     $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
-                if($request->sales_type){
-                    $query->where('type_sales',$request->sales_type);
-                }
-
                 if($request->delivery_type){
                     $query->where('type_delivery',$request->delivery_type);
                 }
@@ -229,10 +224,6 @@ class MarketingOrderController extends Controller
                     $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
-                if($request->sales_type){
-                    $query->where('type_sales',$request->sales_type);
-                }
-
                 if($request->delivery_type){
                     $query->where('type_delivery',$request->delivery_type);
                 }
@@ -275,7 +266,6 @@ class MarketingOrderController extends Controller
                     $val->user->name,
                     $val->account->name,
                     $val->company->name,
-                    $val->typeSales(),
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->valid_date)),
                     $val->project()->exists() ? $val->project->name : '-',
@@ -344,13 +334,12 @@ class MarketingOrderController extends Controller
             'code_place_id'             => 'required',
             'account_id' 				=> 'required',
             'company_id'			    => 'required',
-            'type_sales'		        => 'required',
             'post_date'		            => 'required',
             'valid_date'		        => 'required',
             'type_delivery'             => 'required',
             'sender_id'                 => 'required',
             'delivery_date'             => 'required',
-            'transportation_id'         => 'required',
+            'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
             'outlet_id'                 => 'required',
             'billing_address'           => 'required',
             'destination_address'       => 'required',
@@ -397,7 +386,6 @@ class MarketingOrderController extends Controller
             'code.unique'                       => 'Kode telah dipakai',
             'account_id.required' 				=> 'Customer tidak boleh kosong.',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'type_sales.required' 			    => 'Tipe SO tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'valid_date.required' 			    => 'Tanggal valid SO tidak boleh kosong.',
             'type_delivery.required'		    => 'Tipe pengiriman tidak boleh kosong.',
@@ -532,7 +520,6 @@ class MarketingOrderController extends Controller
                         $query->code = $request->code;
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
-                        $query->type_sales = $request->type_sales;
                         $query->post_date = $request->post_date;
                         $query->valid_date = $request->valid_date;
                         $query->document_no = $request->document_no;
@@ -594,7 +581,6 @@ class MarketingOrderController extends Controller
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
-                        'type_sales'	            => $request->type_sales,
                         'post_date'                 => $request->post_date,
                         'valid_date'                => $request->valid_date,
                         'project_id'                => $request->project_id,
@@ -703,7 +689,7 @@ class MarketingOrderController extends Controller
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account->name;
         $po['sender_name'] = $po->sender->name;
-        $po['sales_name'] = $po->sales->name.' - '.$po->sales->phone.' Pos. '.$po->sales->position->name.' Dep. '.$po->sales->department->name;
+        $po['sales_name'] = $po->sales->name.' - '.$po->sales->phone.' Pos. '.$po->sales->position->name.' Dep. '.$po->sales->position->division->department->name;
         $po['province_name'] = $po->province->name;
         $po['cities'] = $po->province->getCity();
         $po['subtotal'] = number_format($po->subtotal,2,',','.');

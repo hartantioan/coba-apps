@@ -13,6 +13,7 @@ use App\Models\Capitalization;
 use App\Models\CloseBill;
 use App\Models\Coa;
 use App\Models\Depreciation;
+use App\Models\EmployeeSchedule;
 use App\Models\EmployeeTransfer;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
@@ -40,6 +41,7 @@ use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
 use App\Models\PurchaseOrder;
 use App\Models\Retirement;
+use App\Models\ShiftRequest;
 use App\Models\User;
 use App\Models\Notification;
 use App\Models\Menu;
@@ -422,7 +424,26 @@ class CustomHelper {
 					'IN'
 				);
 			}
+		}elseif($table_name == 'shift_requests'){
+			$sr = ShiftRequest::find($table_id);
+			
+			foreach ($sr->shiftRequestDetail as $key => $row) {
+				
+				$query = EmployeeSchedule::create([
+					'user_id' 	=> $sr->account_id,
+					'shift_id' 	=> $row->shift_id, 
+					'date' 		=> $row->date,
+					'status'	=> '1',
+					'shift_request_id'=> $sr->id,
+				]);
+				
+				$query_schedule_update=EmployeeSchedule::find($row->employee_schedule_id);
+				$query_schedule_update->status = '2';
 
+				$query_schedule_update->save();
+			}
+			
+			
 		}elseif($table_name == 'retirements'){
 			$ret = Retirement::find($table_id);
 			

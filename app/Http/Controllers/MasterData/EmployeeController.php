@@ -903,9 +903,12 @@ class EmployeeController extends Controller
         $oneMonthFromNow = Carbon::now()->addMonth()->toDateString();
 
         $query_shift = EmployeeSchedule::where('user_id', $request->id)
+            ->whereNotIn('status',['2','3'])
+            ->whereIn('status',['1',null])
             // ->whereDate('date', '>', $currentDate)
             // ->whereDate('date', '<', $oneMonthFromNow)
             ->get();
+        info($query_shift);
         $schedules=[];
         foreach($query_shift as $schedule){
             $schedules[]=[

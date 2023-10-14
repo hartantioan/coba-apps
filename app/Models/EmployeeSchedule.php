@@ -18,6 +18,8 @@ class EmployeeSchedule extends Model
         'user_id',
         'shift_id',
         'date',
+        'status',
+        'shift_request_id'
     ];
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','employee_no')->withTrashed();

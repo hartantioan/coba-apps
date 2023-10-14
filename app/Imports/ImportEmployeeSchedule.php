@@ -48,7 +48,7 @@ class ImportEmployeeSchedule implements ToCollection
         $arrayDate = $dataFormatted[0]["E-Z"];
         $dates = [];
         foreach ($arrayDate as $timestamp) {
-            $dateTime = \DateTime::createFromFormat('U', ($timestamp - 25569) * 86400);
+            $dateTime = DateTime::createFromFormat('U', ($timestamp - 25569) * 86400);
             $dateFormatted = $dateTime->format('d/m/Y');
             $dates[] = $dateFormatted;
         }
@@ -83,6 +83,8 @@ class ImportEmployeeSchedule implements ToCollection
                             'shift_id'          => $query_shift->id,
                             'date'	            => $formattedDate,
                             'user_id'           => $query_employee->id,
+                            'status'            => '1'
+                            
                         ]);
                         DB::commit();
                     }catch(\Exception $e){

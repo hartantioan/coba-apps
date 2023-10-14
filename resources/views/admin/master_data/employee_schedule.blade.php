@@ -5,12 +5,7 @@
 <link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/fullcalendar/timegrid/timegrid.min.css') }}">
 
 <style>
-    #trash-area {
-        width: 100px;
-        height: 100px;
-        background-color: #f2f2f2;
-        border: 2px dashed #999;
-    }
+    
     .fc-content{
         height: -webkit-fill-available;
         display: flex;
@@ -169,10 +164,6 @@
                                     </select>
                                     <label class="active" for="shift_id_detail">Select Shift</label>
                                 </div>
-                                
-                                  
-                                  
-                                
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="saveSingle();">Simpan <i class="material-icons right">send</i></button>
                                 </div>
@@ -256,29 +247,35 @@
                                 <div class="col s12">
                                     <div class="card">
                                         <div class="card-content">
-                                        <h4 class="card-title">
-                                            External Dragging
-                                        </h4>
+                                        <div class="row">
+                                            <div class="input-field col s3">
+                                                <select class="select2 browser-default" id="department_id" name="department_id" onchange="changeDepartmentToSchedule()">
+                                                    @foreach ($department as $departmente )
+                                                        <option value={{$departmente->id}}>{{$departmente->name}}</option>
+                                                    @endforeach
+                                                </select>
+                                                <label class="active" for="department_id">Select Shift</label>
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col m3 s12">
                                             <div id='external-events'>
                                                 <h5>Draggable Events</h5>
-                                                <div class="fc-events-container mb-5">
-                                                @foreach ($shift as $shift_type )
-                                                    @php
-                                                        $color = '#' . substr(md5(rand()), 0, 6);
-                                                    @endphp
-                                                    <div class='fc-event' data-color='{{ $color }}' data-id={{$shift_type->id}} >{{$shift_type->name.'||'.$shift_type->code}}</div>
-                                                @endforeach
-                                                <p>
-                                                    <label>
-                                                    <input type="checkbox" id="drop-remove" />
-                                                    <span>Remove After Drop</span>
-                                                    </label>
-                                                </p>
+                                                <div class="fc-events-container mb-5" id="event_container">
+                                                    @foreach ($shift as $shift_type )
+                                                        @php
+                                                            $color = '#' . substr(md5(rand()), 0, 6);
+                                                        @endphp
+                                                        <div class='fc-event' data-id={{$shift_type->id}} >{{$shift_type->name.'||'.$shift_type->code}}</div>
+                                                    @endforeach
+                                                    <p>
+                                                        <label>
+                                                        <input type="checkbox" id="drop-remove" />
+                                                        <span>Remove After Drop</span>
+                                                        </label>
+                                                    </p>
                                                 </div>
                                             </div>
-                                            <div id="trash-area"></div>
                                             </div>
                                             <div class="col m9 s12">
                                                 <div id='fc-external-drag' style="height:100%"></div>
@@ -289,40 +286,46 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col s12">
+                            <div class="container">
+                                <div class="section section-data-tables">
+                                    <!-- DataTables example -->
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <input type="hidden" id="selectedCode" value="{{ request()->query('code') }}">
+                                            <div class="card">
+                                                <div class="card-content">
+                                                    <h4 class="card-title">List Data</h4>
+                                                    <div class="row">
+                                                        <div class="col s12">
+                                                            <div id="datatable_buttons_schedule"></div>
+                                                            <table id="datatable_schedule" class="display responsive-table wrap" style="width: 100%;">
+                                                                <thead style="width: 100%">
+                                                                    <tr>
+                                                                        <th>No</th>
+                                                                        <th>Code</th>
+                                                                        <th>Nama</th>
+                                                                        <th>Departemen</th>
+                                                                        <th>Posisi</th>
+                                                                       
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="content-overlay"></div>
+                        </div>
                         <div class="input-field col s12">
                             <div class="row mt-3">
                                 <div class="col s12">
-                                    <table class="bordered centered">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="4">PEGAWAI</th>
-                                                <th colspan="4">ACTION</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Code</th>
-                                                <th>Nama</th>
-                                                <th>Departemen</th>
-                                                <th>Posisi</th>
-                                                <th>Checkbox</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($user as $row)
-                                            <tr>
-                                                <td>{{ $row->employee_no }}</td>
-                                                <td>{{ $row->name }}</td>
-                                                <td>{{ $row->position()->exists() ? $row->position->division->department->name : '-' }}</td>
-                                                <td>{{ $row->position()->exists() ? $row->position->name : '-' }}</td>
-                                                <td class="input-field">
-                                                    <label>
-                                                        <input type="checkbox" name="arr_employee[]" id="checkbox{{ $row->id }}" value="{{ $row->id }}"/>
-                                                        <span>Pilih</span>
-                                                    </label>
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                   
 
                                     <div class="col s12 mt-3">
                                         <button class="btn waves-effect waves-light right submit" onclick="saveMulti();">Simpan <i class="material-icons right">send</i></button>
@@ -444,6 +447,7 @@
 
 
 <script>
+    var table_schedule;
     var tempuser = 0;
     var calendar;
     $(function() {
@@ -520,17 +524,93 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
+        loadDataTableSchedule();
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
                 
             },
             onOpenEnd: function(modal, trigger) { 
-                
+            
                 setTimeout(function () {
                     calendar.render();
                 }, 1500);
-
+                table_schedule = $('#datatable_schedule').DataTable({
+                    "scrollCollapse": true,
+                    "scrollY": '400px',
+                    "responsive": false,
+                    "scrollX": true,
+                    "stateSave": true,
+                    "serverSide": true,
+                    "deferRender": true,
+                    "destroy": true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'asc']],
+                    ajax: {
+                        url: '{{ Request::url() }}/datatable_user_schedule',
+                        type: 'GET',
+                        data: {//smpesini
+                            department_id : $('#department_id').val(),
+                        },
+                        beforeSend: function() {
+                            loadingOpen('#datatable_schedule');
+                        },
+                        complete: function() {
+                            loadingClose('#datatable_schedule');
+                        },
+                        error: function() {
+                            loadingClose('#datatable_schedule');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    columns: [
+                        { name: 'no', searchable: false, className: 'center-align details-control' },
+                        { name: 'name', className: 'center-align' },
+                        
+                        { name: 'user_code', className: 'center-align' },
+                        { name: 'date', className: 'center-align' },
+                        { name: 'action', className: 'center-align' },
+                    ],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi',
+                        selector: 'td:not(.btn-floating)'
+                    },
+                });
+                $('.tabs').tabs({
+                    onShow: function () {
+                        table_schedule.columns.adjust().draw();
+                        
+                    }
+                });
                 
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -548,6 +628,7 @@
         
 
         loadDataTable();
+        
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
         });
@@ -581,17 +662,105 @@
                 
             }
         });
+        $('#shift_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/shift_by_department") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#employee_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+        $('#shift_id_detail').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/shift_by_department") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#employee_id_detail').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
         select2ServerSide('#employee_id', '{{ url("admin/select2/employee") }}');
-        select2ServerSide('#shift_id', '{{ url("admin/select2/shift") }}');
-        select2ServerSide('#shift_id_multi', '{{ url("admin/select2/shift") }}');
+        
+       
         select2ServerSide('#employee_id_detail', '{{ url("admin/select2/employee") }}');
-        select2ServerSide('#shift_id_detail', '{{ url("admin/select2/shift") }}');
-
+    
         
     });
 
-    function setDate(){
-
+    function changeDepartmentToSchedule(){
+        calendar.removeAllEvents();
+        table_schedule.rows().deselect();
+        $('.fc-events-container').empty();
+        loadDataTableSchedule();
+        $.ajax({
+            url: '{{ Request::url() }}/match_department',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id : $('#department_id').val(),
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                $('#table_user').empty();
+                loadingClose('#main');
+                if(response.status == 200) {
+                    $.each(response.shift, function(i, val) {
+                        $('#event_container').append(`
+                            <div class='fc-event' data-id=`+val['id']+` >`+val['name']+`||`+val['code']+`</div>
+                        `);
+                    });
+    
+                }
+                
+                
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        
     }
 
     function loadDataTable() {
@@ -667,6 +836,81 @@
             },
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
+        $('select[name="datatable_serverside_length"]').addClass('browser-default');
+	}
+
+    function loadDataTableSchedule() {
+		table_schedule = $('#datatable_schedule').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
+            "responsive": false,
+            "scrollX": true,
+            "stateSave": true,
+            "serverSide": true,
+            "deferRender": true,
+            "destroy": true,
+            "iDisplayInLength": 10,
+            "order": [[0, 'asc']],
+            ajax: {
+                url: '{{ Request::url() }}/datatable_user_schedule',
+                type: 'GET',
+                data: {//smpesini
+                    department_id : $('#department_id').val(),
+                },
+                beforeSend: function() {
+                    loadingOpen('#datatable_schedule');
+                },
+                complete: function() {
+                    loadingClose('#datatable_schedule');
+                },
+                error: function() {
+                    loadingClose('#datatable_schedule');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            },
+            columns: [
+                { name: 'no', searchable: false, className: 'center-align details-control' },
+                { name: 'name', className: 'center-align' },
+                
+                { name: 'user_code', className: 'center-align' },
+                { name: 'date', className: 'center-align' },
+                { name: 'action', className: 'center-align' },
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                'selectNone'
+            ],
+            "language": {
+                "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan / kosong",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                "infoEmpty": "Data tidak ditemukan / kosong",
+                "infoFiltered": "(disaring dari _MAX_ total data)",
+                "search": "Cari",
+                "paginate": {
+                    first:      "<<",
+                    previous:   "<",
+                    next:       ">",
+                    last:       ">>"
+                },
+                "buttons": {
+                    selectAll: "Pilih semua",
+                    selectNone: "Hapus pilihan"
+                },
+                "select": {
+                    rows: "%d baris terpilih"
+                }
+            },
+            select: {
+                style: 'multi',
+                selector: 'td:not(.btn-floating)'
+            },
+        });
+        $('.dt-buttons').appendTo('#datatable_buttons_schedules');
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -751,6 +995,7 @@
     }
 
     function saveMulti(){
+        
         var formData = new FormData($('#form_data')[0]);
         var employee_shift=[];
         var events = calendar.getEvents();
@@ -758,7 +1003,7 @@
         var startDate = event.start;
         var endDate;
         var newStartDate = new Date(startDate);
-        newStartDate.setDate(newStartDate.getDate() + 1);
+        newStartDate.setDate(startDate.getDate() + 1);
         if(event.end==null){
             endDate = newStartDate;
         }else{
@@ -772,9 +1017,20 @@
                 'shift_id': event.id,
             });
         });
+       
         formData.append('employee_shift',JSON.stringify(employee_shift));
-        console.log(employee_shift);
-
+      
+        var arr_id_temp=[];
+        $.map(table_schedule.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(2)').text().trim();
+            arr_id_temp.push(poin);
+            console.log(poin);
+            console.log(item);
+            formData.append('user_code[]',poin);
+        });
+        
+        
+        
         $.ajax({
             url: '{{ Request::url() }}/create_multi',
             type: 'POST',

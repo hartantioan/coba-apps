@@ -141,10 +141,11 @@ class ShiftController extends Controller
         $min_time_in = strtotime($request->min_time_in);
         $time_out = strtotime($request->time_out);
         $max_time_out = strtotime($request->max_time_out);
-        
+        $query_department= Department::find($request->department_id);
+        $query_place= Place::find($request->place_id);
         $stime_in = date('H:i', strtotime($request->time_in));
         $stime_out = date('H:i', strtotime($request->time_out));
-        $code = $stime_in . ' - ' . $stime_out;
+        $code = $query_place->id.'||'.$query_department->code.$stime_in . ' - ' . $stime_out;
 
         $request->merge(['code' => $code]);
 
@@ -197,8 +198,6 @@ class ShiftController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Shift::find($request->temp);
-
-                    $query->code                = $code;
                     $query->name                = $request->name;
                     $query->edit_id             = session('bo_id');
                     $query->place_id            = $request->place_id;
@@ -220,7 +219,9 @@ class ShiftController extends Controller
                 try {
                     $time_in = date('H:i', strtotime($request->time_in));
                     $time_out = date('H:i', strtotime($request->time_out));
-                    $code = $time_in . ' - ' . $time_out;
+                    $query_department= Department::find($request->department_id);
+                    $query_place= Place::find($request->place_id);
+                    $code = $query_place->id.'||'.$query_department->code.$time_in . '-' . $time_out;
                     $query = Shift::create([
                         'code'              => $code,
                         'name'			    => $request->name,

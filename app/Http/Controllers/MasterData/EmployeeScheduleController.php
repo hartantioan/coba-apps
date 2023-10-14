@@ -4,7 +4,9 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\Controller;
 use App\Imports\ImportEmployeeSchedule;
+use App\Models\Department;
 use App\Models\EmployeeSchedule;
+use App\Models\Position;
 use App\Models\Shift;
 use App\Models\User;
 use App\Models\UserAbsensiMesin;
@@ -22,8 +24,13 @@ class EmployeeScheduleController extends Controller
         $data = [
             'title'         => 'Jadwal Pegawai',
             'content'       => 'admin.master_data.employee_schedule',
-            'user'          => User::where('type','1')->where('status','1')->get(),
-            'shift'         => Shift::where('status',1)->get(),
+            'user'          => User::where('type','1')->where('status','1')->whereHas('position',function($query){
+                                    $query->whereHas('division',function ($query){
+                                        $query->where('department_id',1);
+                                    });
+                                })->get(),
+            'shift'         => Shift::where('status',1)->where('department_id',1)->get(),
+            'department'    => Department::where('status',1)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -285,16 +292,11 @@ class EmployeeScheduleController extends Controller
     {
         $validation = Validator::make($request->all(), [
             'employee_shift'          => 'required',
-            'arr_employee'      => 'required',
+            'user_code'      => 'required',
         ], [
             'employee_shift.required'         => 'Belum ada shift dalam form',
-            'arr_employee.required'     => 'Belum ada pegawai yang dipilih.',
+            'user_code.required'     => 'Belum ada pegawai yang dipilih.',
         ]);
-        $user_data = User::where(function($query) use ( $request) {
-            // if($request->user_id) {
-            //     $query->where('nik', $request->user_id);
-            // }
-        })->get();
         
         if($validation->fails()) {
             $response = [
@@ -302,35 +304,26 @@ class EmployeeScheduleController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            DB::beginTransaction();
-            $employee_shift_decode=json_decode($request->employee_shift);
-        
             
-            try {
+            $employee_shift_decode=json_decode($request->employee_shift);
+            
+            
+            
                 foreach($employee_shift_decode as $shift){
                     
                     $start_date = Carbon::parse($shift->start_date);
                     $end_date = Carbon::parse($shift->end_date);
                     
-                    foreach ($request->arr_employee as $user_id) {
+                    info($request->user_code);
+                    foreach ($request->user_code as $code_user) {
                         $current_date = $start_date->copy(); // Make a copy of the start date to avoid modifying the original date
                         while ($current_date->lte($end_date)) {
-                            // $query = EmployeeSchedule::create([
-                            //     'shift_id'          => $shift->shift_id,
-                            //     'date'	            => $current_date,
-                            //     'user_id'           => $user_id,
-                            // ]);
-                            // foreach($user_data as $row_user){
-                            //     $query = EmployeeSchedule::create([
-                            //         'shift_id'          => $shift->shift_id,
-                            //         'date'	            => $current_date,
-                            //         'user_id'           => $row_user->employee_no,
-                            //     ]);
-                            // }
+                            
                             $query = EmployeeSchedule::create([
                                 'shift_id'          => $shift->shift_id,
                                 'date'	            => $current_date,
-                                'user_id'           => '123017',
+                                'user_id'           => $code_user,
+                                'status'            => '1',
                             ]);
                             
 
@@ -340,10 +333,8 @@ class EmployeeScheduleController extends Controller
                     }
                 }
                 
-                DB::commit();
-            }catch(\Exception $e){
-                DB::rollback();
-            }
+                
+            
                 
                 
             if($query) {               
@@ -362,6 +353,140 @@ class EmployeeScheduleController extends Controller
 
             
 		}
+        return response()->json($response);
+    }
+
+    public function matchDepartment(Request $request){
+        if($request->id){
+            
+            $query_user_depart = User::with(['position.division.department'])
+                ->whereHas('position', function ($query) use ($request) {
+                    $query->whereHas('division', function ($query) use ($request) {
+                        $query->where('department_id', $request->id);
+                    });
+                })
+            ->get();
+           
+            $query_shift_depart = Shift::where('department_id',$request->id)->get();
+            $response = [
+                'shift'   => $query_shift_depart,
+                'status'  => 200,
+                'user'    => $query_user_depart
+            ];
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => "Data failed to save"
+            ];
+        }
+        
+        
+        return response()->json($response);
+    }
+
+    public function datatableSchedule(Request $request){
+        $column = [
+            'employee_no',
+            'position_id',
+            'name',
+            'status',
+            'status',
+        ];
+
+        $start  = $request->start;
+        $length = $request->length;
+        $order  = $column[$request->input('order.0.column')];
+        $dir    = $request->input('order.0.dir');
+        $search = $request->input('search.value');
+
+        $total_data = User::count();
+        info($request->input('search.value'));
+        $query_data = User::where(function($query) use ($search, $request) {
+                if($request->department_id){
+                    $query->whereHas('position', function ($query) use ($request) {
+                        $query->whereHas('division', function ($query) use ($request) {
+                            $query->where('department_id', $request->department_id);
+                        });
+                    });
+                }else{
+                    $query->whereHas('position', function ($query) use ($request) {
+                        $query->whereHas('division', function ($query) use ($request) {
+                            $query->where('department_id', 1);
+                        });
+                    });
+                }
+                
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('name', 'like', "%$search%")
+                            ->orWhere('employee_no','like',"%$search");
+                    });
+                }
+
+            })
+            ->offset($start)
+            ->limit($length)
+            ->orderBy($order, $dir)
+            ->get();
+
+        $total_filtered = User::where(function($query) use ($search, $request) {
+            if($request->department_id){
+                $query->whereHas('position', function ($query) use ($request) {
+                    $query->whereHas('division', function ($query) use ($request) {
+                        $query->where('department_id', $request->department_id);
+                    });
+                });
+            }else{
+                $query->whereHas('position', function ($query) use ($request) {
+                    $query->whereHas('division', function ($query) use ($request) {
+                        $query->where('department_id', 1);
+                    });
+                });
+            }
+            
+            if($search) {
+                $query->where(function($query) use ($search, $request) {
+                    $query->where('name', 'like', "%$search%")
+                        ->orWhere('employee_no','like',"%$search");
+                });
+            }
+
+        })
+        ->count();
+
+        $response['data'] = [];
+        if($query_data <> FALSE) {
+            $nomor = $start + 1;
+            foreach($query_data as $val) {
+              
+                $btn = 
+                '
+                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
+                    <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
+                ';
+                $response['data'][] = [
+                    $nomor,
+                    $val->employee_no ,
+                    $val->name ,
+                    $val->position->division->department->name,
+                    $val->position->name,
+                   
+                ];
+
+                $nomor++;
+            }
+        }
+
+        $response['recordsTotal'] = 0;
+        if($total_data <> FALSE) {
+            $response['recordsTotal'] = $total_data;
+        }
+
+        $response['recordsFiltered'] = 0;
+        if($total_filtered <> FALSE) {
+            $response['recordsFiltered'] = $total_filtered;
+        }
+
         return response()->json($response);
     }
 }

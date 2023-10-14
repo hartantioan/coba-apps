@@ -9,6 +9,8 @@ use App\Http\Controllers\HR\EmployeeTransferController;
 
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Finance\FinanceReportController;
+use App\Http\Controllers\HR\LeaveRequestController;
+use App\Http\Controllers\HR\ShiftRequestController;
 use App\Http\Controllers\Inventory\DeadStockController;
 use App\Http\Controllers\Inventory\GoodScaleController;
 
@@ -22,6 +24,7 @@ use App\Http\Controllers\MasterData\EmployeeController;
 use App\Http\Controllers\MasterData\EmployeeScheduleController;
 use App\Http\Controllers\MasterData\HardwareItemDetailController;
 use App\Http\Controllers\MasterData\HardwareItemGroupController;
+use App\Http\Controllers\MasterData\LeaveTypeController;
 use App\Http\Controllers\MasterData\LevelController;
 use App\Http\Controllers\MasterData\PunishmentController;
 use App\Http\Controllers\Other\MenuIndexController;
@@ -266,6 +269,9 @@ Route::prefix('admin')->group(function () {
                 Route::get('outlet', [Select2Controller::class, 'outlet']);
                 Route::get('position', [Select2Controller::class, 'position']);
                 Route::get('marketing_order_plan', [Select2Controller::class, 'marketingOrderPlan']);
+                Route::get('leave_type', [Select2Controller::class, 'leaveType']);
+                Route::get('schedule', [Select2Controller::class, 'schedule']);
+                Route::get('shift_by_department', [Select2Controller::class, 'shiftByDepartment']);
                 Route::get('production_schedule', [Select2Controller::class, 'productionSchedule']);
                 Route::get('form_user', [Select2Controller::class, 'formUser']);
             });
@@ -604,6 +610,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [AllowanceController::class, 'destroy'])->middleware('operation.access:allowance,delete');
                     });
 
+                    Route::prefix('leave_type')->middleware('operation.access:leave_type,view')->group(function () {
+                        Route::get('/',[LeaveTypeController::class, 'index']);
+                        Route::get('datatable',[LeaveTypeController::class, 'datatable']);
+                        Route::post('show', [LeaveTypeController::class, 'show']);
+                        Route::post('create',[LeaveTypeController::class, 'create'])->middleware('operation.access:leave_type,update');
+                        Route::post('destroy', [LeaveTypeController::class, 'destroy'])->middleware('operation.access:leave_type,delete');
+                    });
+
                     Route::prefix('master_punishment')->middleware('operation.access:master_punishment,view')->group(function () {
                         Route::get('/',[PunishmentController::class, 'index']);
                         Route::get('datatable',[PunishmentController::class, 'datatable']);
@@ -628,6 +642,8 @@ Route::prefix('admin')->group(function () {
                         Route::post('create_single',[EmployeeScheduleController::class, 'createSingle'])->middleware('operation.access:employee_schedule,update');
                         Route::post('destroy', [EmployeeScheduleController::class, 'destroy'])->middleware('operation.access:employee_schedule,delete');
                         Route::get('approval/{id}',[EmployeeScheduleController::class, 'approval'])->withoutMiddleware('direct.access');
+                        Route::post('match_department', [EmployeeScheduleController::class, 'matchDepartment']);
+                        Route::get('datatable_user_schedule', [EmployeeScheduleController::class, 'datatableSchedule']);
                     });
 
                     Route::prefix('employee')->middleware('operation.access:employee,view')->group(function () {
@@ -1225,8 +1241,6 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[EmployeeTransferController::class, 'approval'])->withoutMiddleware('direct.access');
                 });
 
-               
-
                 Route::prefix('shift')->middleware('operation.access:employee,view')->group(function () {
                     Route::get('/',[EmployeeTransferController::class, 'index']);
                     Route::get('datatable',[EmployeeTransferController::class, 'datatable']);
@@ -1284,6 +1298,28 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [AttendancePunishmentController::class, 'destroy'])->middleware('operation.access:employee_transfer,delete');
                         Route::get('approval/{id}',[AttendancePunishmentController::class, 'approval'])->withoutMiddleware('direct.access');
                     });
+                });
+
+                Route::prefix('leave_request')->middleware('operation.access:leave_request,view')->group(function () {
+                    Route::get('/',[LeaveRequestController::class, 'index']);
+                    Route::get('datatable',[LeaveRequestController::class, 'datatable']);
+                    Route::get('row_detail', [LeaveRequestController::class, 'rowDetail']);
+                    Route::post('show', [LeaveRequestController::class, 'show']);
+                    Route::post('create',[LeaveRequestController::class, 'create'])->middleware('operation.access:leave_request,update');
+                    Route::post('destroy', [LeaveRequestController::class, 'destroy'])->middleware('operation.access:leave_request,delete');
+                    Route::post('get_code', [LeaveRequestController::class, 'getCode']);
+                    Route::get('approval/{id}',[LeaveRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                });
+
+                Route::prefix('shift_request')->middleware('operation.access:shift_request,view')->group(function () {
+                    Route::get('/',[ShiftRequestController::class, 'index']);
+                    Route::get('datatable',[ShiftRequestController::class, 'datatable']);
+                    Route::get('row_detail', [ShiftRequestController::class, 'rowDetail']);
+                    Route::post('show', [ShiftRequestController::class, 'show']);
+                    Route::post('create',[ShiftRequestController::class, 'create'])->middleware('operation.access:shift_request,update');
+                    Route::post('destroy', [ShiftRequestController::class, 'destroy'])->middleware('operation.access:shift_request,delete');
+                    Route::post('get_code', [ShiftRequestController::class, 'getCode']);
+                    Route::get('approval/{id}',[ShiftRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                 });
             });
 

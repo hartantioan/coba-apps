@@ -141,7 +141,8 @@ class AttendancePeriodController extends Controller
 
     public function close(Request $request){
         info('mulais');
-        $attendance_period = AttendancePeriod::find($request->id);
+        $attendance_period = AttendancePeriod::find($request->id)->first();
+        
         $start_time = microtime(true);
         $start_date = Carbon::parse($attendance_period->start_date);
         $end_date = Carbon::parse($attendance_period->end_date);
@@ -179,17 +180,17 @@ class AttendancePeriodController extends Controller
                                             ->where('status','1')
                                             ->get();
                 $tipe_punish_counter=[];
-               
+
                 $query_tidak_check_masuk = Punishment::where('place_id',$row_user->place_id)
                                         ->where('type','2')
                                         ->where('status','1')
                                         ->first();
-               
+
                 $query_tidak_check_pulang = Punishment::where('place_id',$row_user->place_id)
                                         ->where('type','3')
                                         ->where('status','1')
                                         ->first();
-                
+             
                 foreach($query_late_punishment as $row_type){
                     $tipe_punish_counter[$row_type->code]['counter']=0;
                     $tipe_punish_counter[$row_type->code]['date']=[]; 
@@ -238,14 +239,14 @@ class AttendancePeriodController extends Controller
                         // $min_time_in = $row_schedule_filter->shift->min_time_in;
                         $time_in = $row_schedule_filter->shift->time_in;
                         $min_time_in = Carbon::parse($time_in)->subHours($row_schedule_filter->shift->tolerant)->toTimeString();
-                        $real_time_in =$date->format('Y-m-d') . ' ' . $time_in;
+                        $real_time_in =$start_date->format('Y-m-d') . ' ' . $time_in;
                         $combinedDateTimeInCarbon = Carbon::parse($real_time_in);
                         $real_min_time_in = $combinedDateTimeInCarbon->copy()->subHours($row_schedule_filter->shift->tolerant);
                         
                         // $max_time_out = $row_schedule_filter->shift->max_time_out;
                         $time_out = $row_schedule_filter->shift->time_out;
                         $max_time_out = Carbon::parse($time_out)->addHours($row_schedule_filter->shift->tolerant)->toTimeString();
-                        $real_time_out =$date->format('Y-m-d') . ' ' . $time_out;
+                        $real_time_out =$start_date->format('Y-m-d') . ' ' . $time_out;
                         $combinedDateTimeOutCarbon = Carbon::parse($real_time_out);
                         $real_max_time_out = $combinedDateTimeOutCarbon->copy()->addHours($row_schedule_filter->shift->tolerant);
                        
@@ -287,6 +288,11 @@ class AttendancePeriodController extends Controller
                                     
                                     $array_masuk[$key]='Lanjutan';
                                     if($key>0){
+                                        // if($row_user->id==1){
+                                        //     info($currentSchedule);
+                                        //     info($previousSchedule);
+                                        //     info("masukkk sini");
+                                        // }
                                         $array_keluar[$key-1]='Lanjutan';
                                         $exact_out[$key-1]=1;
                                     }
@@ -326,6 +332,10 @@ class AttendancePeriodController extends Controller
                         foreach($query_attendance as $row_attendance_filter){
                             $dateAttd = Carbon::parse($row_attendance_filter->date);
                            
+                            if($cleanedNik == '123017' && $date->toDateString() == $dateAttd->toDateString()){
+                                info($date);
+                                info($dateAttd); 
+                            }
                             $timePart = $dateAttd->format('H:i:s');
                             
                                 if(!$masuk_awal  && $date->toDateString() == $dateAttd->toDateString()){
@@ -538,9 +548,6 @@ class AttendancePeriodController extends Controller
                         'nama_shift'=>$nama_shifts,
                         'shift_id'=>$shift_id,
                     ];
-
-                    
-
                     $lanjoet=1;
                     //mencari apakah dia datang tidak checkclock atau pulang tidak checkclock
                     foreach($exact_in as $key=>$row_arrive){
@@ -554,6 +561,7 @@ class AttendancePeriodController extends Controller
                         
                         foreach($exact_out as $row_out){
                             if($row_out==0 && $exact_in[$key] == 1){
+                                info($date);
                                 $date_out_forget[]=Carbon::parse($date)->format('d/m/Y');
                                 break;
                             }
@@ -563,9 +571,6 @@ class AttendancePeriodController extends Controller
                     
                     $date->addDay();
                     
-                }
-                if($cleanedNik == '123017'){
-                    info($attendance_detail);
                 }
                 //melakukan perhitungan datang pulang
                 foreach($all_exact_in as $key=>$row_exact){
@@ -594,8 +599,7 @@ class AttendancePeriodController extends Controller
                 $user_datas[$c]["absent"]=$counter_absent;
                 $user_datas[$c]["out_forget"]=$counter_out_forget;
                 $user_datas[$c]["arrived_forget"]=$counter_arrived_forget;
-                
-                DB::beginTransaction();
+
                 $query = AttendanceMonthlyReport::create([
                     'user_id'                  => $row_user->id,
                     'period_id'			        => $attendance_period->id,
@@ -613,7 +617,7 @@ class AttendancePeriodController extends Controller
                     'out_log_forget'           => $counter_out_forget,
                     'arrived_forget'           => $counter_arrived_forget,
                 ]);
-                
+                DB::beginTransaction();
                 try {
                     $query_close = AttendancePeriod::find($request->id);
                     $query_close->status            = "2";
@@ -739,6 +743,7 @@ class AttendancePeriodController extends Controller
 
             $execution_time = ($end_time - $start_time);
            
+            info($execution_time);
             $response =[
                 'status'   =>200,
                 'message'  =>$attendance_detail,
@@ -1471,6 +1476,8 @@ class AttendancePeriodController extends Controller
                 }
             }
         }
+
+        info($userDetail);
         
         $string_table="";
 
@@ -1662,8 +1669,11 @@ class AttendancePeriodController extends Controller
 		
 		return response()->json($response);
     }
-    public function export(Request $request){        
+    public function export(Request $request){
+		
+        
         $period_id = $request->period_id ? $request->period_id:'';
+        info($request);
 		return Excel::download(new ExportPeriod($period_id), 'period_report'.uniqid().'.xlsx');
     }
 }

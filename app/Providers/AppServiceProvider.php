@@ -78,6 +78,8 @@ class AppServiceProvider extends ServiceProvider
             'production_schedule_details'           => 'App\Models\ProductionScheduleDetail',
             'production_issue_receives'             => 'App\Models\ProductionIssueReceive',
             'production_isseu_receive_details'      => 'App\Models\ProductionIssueReceiveDetail',
+            'leave_requests'                        => 'App\Models\LeaveRequest',
+            'shift_requests'                        => 'App\Models\ShiftRequest',
         ]);
     }
 }

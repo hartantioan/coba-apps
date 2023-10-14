@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\Controller;
-use App\Models\Level;
+use App\Models\LeaveType;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Validator;
 
-class LevelController extends Controller
+class LeaveTypeController extends Controller
 {
     public function index()
     {
         $data = [
-            'title'         => 'Level',
-            'content'       => 'admin.master_data.level',
+            'title'         => 'Tipe Ijin',
+            'content'       => 'admin.master_data.leave_type',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -23,10 +23,10 @@ class LevelController extends Controller
 
     public function datatable(Request $request){
         $column = [
-            'id',
             'code',
             'name',
-            'order',
+            'type',
+            'shift_count',
             'status',
         ];
 
@@ -36,9 +36,9 @@ class LevelController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = Level::count();
+        $total_data = LeaveType::count();
         
-        $query_data = Level::where(function($query) use ($search, $request) {
+        $query_data = LeaveType::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -57,7 +57,7 @@ class LevelController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = Level::where(function($query) use ($search, $request) {
+        $total_filtered = LeaveType::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -88,7 +88,8 @@ class LevelController extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
-                    $val->order,
+                    $val->type(),
+                    $val->shift_count,
                     $val->status(),
                     $btn
                 ];
@@ -113,15 +114,17 @@ class LevelController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			          => $request->temp ? ['required', Rule::unique('levels', 'code')->ignore($request->temp)] : 'required|unique:levels,code',
+            'code'			          => $request->temp ? ['required', Rule::unique('leave_types', 'code')->ignore($request->temp)] : 'required|unique:leave_types,code',
             'name'                    => 'required',
-            'order'                   => 'required',
+            'type'                    => 'required',
+            'shift_count'             => 'required'
 
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah dipakai',
             'name.required'                 => 'Nama tidak boleh kosong.',
-            'order'                         => 'Susunan Level Tidak Boleh kosong',
+            'type.required'                 => 'Tipe Tidak Boleh kosong',
+            'shift_count.required'          => 'Total day / Shift yang diijinkan tidak boleh kosong'
         ]);
 
         if($validation->fails()) {
@@ -133,10 +136,11 @@ class LevelController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = Level::find($request->temp);
+                    $query = LeaveType::find($request->temp);
                     $query->code                = $request->code;
                     $query->name                = $request->name;
-                    $query->order               = $request->order;
+                    $query->type                = $request->type;
+                    $query->shift_count         = $request->shift_count;
                     $query->status              = $request->status ? $request->status : '1';
 
                     $query->save();
@@ -145,15 +149,17 @@ class LevelController extends Controller
                     DB::rollback();
                 }
 			}else{
-                DB::beginTransaction();
+               
                 try {
-                    $query = Level::create([
+                    info($request);
+                    $query = LeaveType::create([
                         'code'                  => $request->code,
                         'name'			        => $request->name,
-                        'order'                 => $request->order,
+                        'type'                  => $request->type,
+                        'shift_count'           => $request->shift_count,
                         'status'                => $request->status ? $request->status : '1',
                     ]);
-                    DB::commit();
+                  
                 }catch(\Exception $e){
                     DB::rollback();
                 }
@@ -177,13 +183,13 @@ class LevelController extends Controller
     }
 
     public function show(Request $request){
-        $Level = Level::find($request->id);
+        $Level = LeaveType::find($request->id);
         				
 		return response()->json($Level);
     }
 
     public function destroy(Request $request){
-        $query = Level::find($request->id);
+        $query = LeaveType::find($request->id);
 		
         if($query->delete()) {
            

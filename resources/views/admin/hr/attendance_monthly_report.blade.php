@@ -158,6 +158,7 @@
             ];
     function thead(){
         $('#thead_shift').empty();
+        column_name = [];
         if($("#period_id").val()){
             if($("#period_id").select2('data')[0].punishment_code.length>0){
                 $.each($("#period_id").select2('data')[0].punishment_code, function(i, value) {
@@ -192,6 +193,7 @@
                 <th>Lupa Check Clock Pulang</th>
                 <th>Lupa Check Clock Datang</th>
             </tr>`;
+            $('#thead_shift').empty();
             $('#thead_shift').append(string);
         // $.ajax({
         //     url: '{{ Request::url() }}/takePlant',

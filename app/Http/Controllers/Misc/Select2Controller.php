@@ -7,6 +7,7 @@ use App\Models\ApprovalStage;
 use App\Models\AttendancePeriod;
 use App\Models\CostDistribution;
 use App\Models\Department;
+use App\Models\EmployeeSchedule;
 use App\Models\FundRequest;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
@@ -15,6 +16,7 @@ use App\Models\HardwareItem;
 use App\Models\HardwareItemGroup;
 use App\Models\InventoryTransferOut;
 use App\Models\ItemStock;
+use App\Models\LeaveType;
 use App\Models\Level;
 use App\Models\Line;
 use App\Models\MarketingOrder;
@@ -2072,6 +2074,94 @@ class Select2Controller extends Controller {
                     'code'          => $d->code,
                 ];
             }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function leaveType(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = LeaveType::where('name', 'like', "%$search%")
+                ->where('code', 'like', "%$search%")
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'data'          => $d,
+                'type'          => $d->type
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function schedule(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+        $account_id = $request->account_id;
+        info($request->shift_request_id);
+        info($request->shift_id);
+        $data = EmployeeSchedule::where(function($query) use($search,$account_id,$request){
+            $query->where(function($query) use ($search,$account_id,$request){
+                $query->WhereHas('user',function($query) use ($account_id){
+                    $query->where('id',$account_id)
+                    ->where('status','1');
+                    
+                });
+                
+                
+            });
+            if($request->shift_request_id){
+                $query->whereNotIn('id',$request->shift_request_id);
+            }
+        })
+        ->whereNotIn('status',['2','3'])
+        ->orderBy('date','DESC')
+        ->get();
+       
+        foreach($data as $d) {
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->date.'||'.$d->shift->name.' Jam:'.$d->shift->time_in.'-'.$d->shift->time_out,
+                    'code'              => $d->code,
+                ];
+            }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function shiftByDepartment(Request $request)
+    {
+        $response = [];
+        info($request);
+        $search     = $request->search;
+        $query_user = User::find($request->account_id);
+        $department_id = $query_user->position->division->department_id;
+        info($query_user->position->division->department_id);
+        $data = Shift::where(function($query) use($search,$department_id){
+            $query->where(function($query) use ($search,$department_id){
+                $query->where('code', 'like', "%$search%")
+                    ->WhereHas('department',function($query) use ($department_id){
+                        $query->where('id',$department_id);
+                    });
+            });
+        })
+        ->where('status','1')->get();
+
+        foreach($data as $d) {
+
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.'-'.$d->name,
+                'code'              => $d->code,
+                
+            ];
+            
         }
 
         return response()->json(['items' => $response]);

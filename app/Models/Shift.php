@@ -21,15 +21,10 @@ class Shift extends Model
         'place_id',
         'department_id',
         'name',
-        't1',
-        't2',
-        't3',
-        't4',
-        'is_next_day',
-        'min_time_in',
+        'tolerant',
         'time_in',
         'time_out',
-        'max_time_out',
+
         'status'
     ];
 

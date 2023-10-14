@@ -17,7 +17,7 @@ class AttendanceMonthlyReportController extends Controller
     {
         $data = [
             'title'         => 'Rekap Periode',
-            'user'          =>  User::join('departments','departments.id','=','users.department_id')->select('departments.name as department_name','users.*')->orderBy('department_name')->get(),
+            'user'          =>  User::where('type','1')->where('status',1)->get(),
             'content'       => 'admin.hr.attendance_monthly_report',
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : ''
         ];

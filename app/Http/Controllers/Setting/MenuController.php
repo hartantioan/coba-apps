@@ -453,7 +453,7 @@ class MenuController extends Controller
         $data = [
             'title'     => 'Pengaturan Akses Transaksi',
             'menu'      => $menu,
-            'user'      => User::join('departments','departments.id','=','users.department_id')->select('departments.name as department_name','users.*')->orderBy('department_name')->get(),
+            'user'      => User::where('status','1')->get(),
             'content'   => 'admin.setting.menu_operation_access'
         ];
 

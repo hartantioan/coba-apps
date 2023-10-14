@@ -187,7 +187,7 @@
                                 console.log(valed);
                                if(valed.nama_shift.length>0){
                                 string_table +=`
-                                    <td colspan="`+valed['nama_shift'].length+`">`+valed.date+`</td>  
+                                    <td colspan="`+valed['nama_shift'].length+`">`+valed.user+`</td>  
                                 `;
                                }
                                 
@@ -201,7 +201,7 @@
                             
                             $.each(val,function(j,valed){
                                 
-                                
+                                console.log(valed.user);
                                 $.each(valed.nama_shift,function(l,val_date){
                                     
                                     string_table +=`

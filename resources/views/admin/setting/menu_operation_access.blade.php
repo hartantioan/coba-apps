@@ -46,7 +46,6 @@
                                                     <tr>
                                                         <th>Code</th>
                                                         <th>Nama</th>
-                                                        <th>Departemen</th>
                                                         <th>Posisi</th>
                                                         <th>View</th>
                                                         <th>Create/Update</th>
@@ -59,8 +58,7 @@
                                                     <tr>
                                                         <td>{{ $row->employee_no }}</td>
                                                         <td>{{ $row->name }}</td>
-                                                        <td>{{ $row->department->name }}</td>
-                                                        <td>{{ $row->position->name }}</td>
+                                                        <td>{{ $row->position->name ?? '' }}</td>
                                                         <td>
                                                             <label>
                                                                 <input type="checkbox" id="checkbox{{ $row->id.'_'.$menu->id }}" value="{{ $row->id.'_'.$menu->id }}" onclick="saveAccess({{ $menu->id }},{{ $row->id }},this,'view');" {{ $row->checkMenu($menu->id,'view') ? 'checked' : '' }}/>

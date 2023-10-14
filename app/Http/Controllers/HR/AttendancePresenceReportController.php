@@ -17,7 +17,7 @@ class AttendancePresenceReportController extends Controller
     {
         $data = [
             'title'         => 'Laporan Presensi',
-            'user'          =>  User::join('departments','departments.id','=','users.department_id')->select('departments.name as department_name','users.*')->orderBy('department_name')->get(),
+            'user'          =>   User::where('type','1')->where('status',1)->get(),
             'content'       => 'admin.hr.attendance_presence_report',
         ];
 
@@ -79,12 +79,19 @@ class AttendancePresenceReportController extends Controller
 
                         $different_masuk[$key]='';
                         $different_keluar[$key]='';
-                        $min_time_in = $row_schedule_filter->shift->min_time_in;
+                        // $min_time_in = $row_schedule_filter->shift->min_time_in;
                         $time_in = $row_schedule_filter->shift->time_in;
-                        
-                        $max_time_out = $row_schedule_filter->shift->max_time_out;
+                        $min_time_in = Carbon::parse($time_in)->subHours($row_schedule_filter->shift->tolerant)->toTimeString();
+                        $real_time_in =$date->format('Y-m-d') . ' ' . $time_in;
+                        $combinedDateTimeInCarbon = Carbon::parse($real_time_in);
+                        $real_min_time_in = $combinedDateTimeInCarbon->copy()->subHours($row_schedule_filter->shift->tolerant);
+                        // $max_time_out = $row_schedule_filter->shift->max_time_out;
                         $time_out = $row_schedule_filter->shift->time_out;
-                       
+                        $max_time_out = Carbon::parse($time_out)->addHours($row_schedule_filter->shift->tolerant)->toTimeString();
+                        $real_time_out =$date->format('Y-m-d') . ' ' . $time_out;
+                        $combinedDateTimeOutCarbon = Carbon::parse($real_time_out);
+                        $real_max_time_out = $combinedDateTimeOutCarbon->copy()->addHours($row_schedule_filter->shift->tolerant);
+                        
                         $array_masuk[$key]='';
                         $array_keluar[$key]='';
                         if($key != 0){// mengetahui apabila shift merupakan yang pertama atau bukan melalui iterasi
@@ -148,176 +155,105 @@ class AttendancePresenceReportController extends Controller
                             
                             //pengurangan apabila lebih besar dari 1 maka shift tidak bersamaan
                         }
-                        
-                       
-                        if($row_schedule_filter->shift->is_next_day == '1'){
-                  
-                            if (count($query_data) < 3) {
-                                foreach($query_data2 as $row_attendance_filter){
-                                    $dateAttd = Carbon::parse($row_attendance_filter->date);
-                                    
-                                    $timePart = $dateAttd->format('H:i:s');
-                                    
-                                        if(!$masuk_awal){
-                                            
-                                            $masuk_awal=$timePart;
-                                            $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
-                                            $minutes = floor($diffInSeconds / 60);
-                                            $seconds = $diffInSeconds % 60;
-                                            
-                                            
-                                            $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
-                                            
-                                        }
-                                    
-                                     
-                                    if ($timePart >= $min_time_in && $timePart <= $time_in) {
-                                        $exact_in[$key]= 1 ;
-                                        
-                                        if(!$login[$key]){
-                                           
-                                            if($masuk_awal==null){
-                                                $masuk_awal=$timePart;
-                                            }elseif($masuk_awal > $timePart){
-                                                $masuk_awal=$timePart;
-                                            }
-                                            $login[$key] = $timePart;
-                                            $array_masuk[$key]=$timePart;
-                                            $different_masuk[$key]='';
-                                            
-                                        }
-                                        
-                                    }elseif($timePart > $time_in && $timePart < $time_out){
-                                        $time1 = new DateTime($time_in);
-                                        $time2 = new DateTime($timePart);
-                                        $timeDifference = $time1->diff($time2);
-
-                                        // Extract the hours from the time difference
-                                        $hoursDifference = $timeDifference->h;
-
-                                        
-                                        if($hoursDifference<2){
-                                            $exact_in [$key]= 2 ;
-                                            $array_masuk[$key]=$timePart;
-                                        }
-                                       
-                                        
-                                       
-                                    }
-                                }
-                            }
-                            $query_nextday = Attendances::where('date', 'like', $date->copy()->addDay()->toDateString()."%")
-                                            ->where('employee_no', $cleanedNik)
-                                            ->get();
-                            
-                            foreach($query_nextday as $row_attendance_filter){
-                                $dateAttd = Carbon::parse($row_attendance_filter->date);
-                                
-                                $timePart = $dateAttd->format('H:i:s');
-                                if ($timePart >= $time_out && $timePart <= $max_time_out) {
-                                    $exact_out [$key]= 1 ;
-                                    if($muleh==null){
-                                        $muleh=$timePart;
-                                    }elseif($muleh < $timePart){
-                                        $muleh=$timePart;
-                                    }
-                                    if(!$logout){
-                                        
-                                        $logout = $timePart;
-                                        $array_keluar[$key]=$timePart;
-                                        $different_keluar[$key]='';
-                                        
-                                    }  
-                                }
-                                
-                            }
-                            
-                        }else{
+                        $query_attendance = Attendances::where(function ($query) use ($date,$cleanedNik) {
+                            $mulaiDate = Carbon::parse($date)->subDays(1)->startOfDay()->toDateTimeString();
+                            $akhirDate = Carbon::parse($date)->addDays(1)->endOfDay()->toDateTimeString();
                            
-                              
-                            $minTimeIn = Carbon::parse($min_time_in);
-                            $maxTimeOut = Carbon::parse($max_time_out);
-                            foreach($query_data2 as $row_attendance_filter){
-                                $dateAttd = Carbon::parse($row_attendance_filter->date);
-                                
-                                $timePart = $dateAttd->format('H:i:s');
-                                
-                                    if(!$masuk_awal){
-                                        
-                                        $masuk_awal=$timePart;
-                                        $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
+                            $query->where('date', '>=', $mulaiDate)
+                                ->where('date', '<=', $akhirDate)
+                                ->where('employee_no',$cleanedNik);
+                        })->orderBy('date')->get();
+                       
+                        foreach($query_attendance as $row_attendance_filter){
+                            $dateAttd = Carbon::parse($row_attendance_filter->date);
+                            
+                           
+                            $timePart = $dateAttd->format('H:i:s');
+                            
+                                if(!$masuk_awal  && $date->toDateString() == $dateAttd->toDateString()){
+                                    
+                                    $masuk_awal=$timePart;
+                                    $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
+                                    $minutes = floor($diffInSeconds / 60);
+                                    $seconds = $diffInSeconds % 60;
+                                    
+                                    $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
+                                    
+                                }
+                                if(!$muleh  && $date->toDateString() == $dateAttd->toDateString()){
+                                    if ($timePart >= $time_out && $timePart > $masuk_awal) 
+                                    {
+                                        $muleh=$timePart;
+                                        $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($max_time_out);
                                         $minutes = floor($diffInSeconds / 60);
                                         $seconds = $diffInSeconds % 60;
-                                      
                                         
-                                        $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
-                                        
-                                    }
-                                    if(!$muleh){
-                                        if ($timePart >= $time_out && $timePart > $masuk_awal) 
-                                        {
-                                            $muleh=$timePart;
-                                            $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($max_time_out);
-                                            $minutes = floor($diffInSeconds / 60);
-                                            $seconds = $diffInSeconds % 60;
-                                            
-                                            $different_keluar[$key]=$minutes." menit  ".$seconds." detik";
-                                        }
-                                    }
-                                if ($timePart >= $min_time_in && $timePart <= $time_in) {
-                                    $exact_in[$key]= 1 ;
-                                    
-                                    if(!$login[$key]){
-                                        
-                                        if($masuk_awal==null){
-                                            $masuk_awal=$timePart;
-                                        }elseif($masuk_awal > $timePart){
-                                            $masuk_awal=$timePart;
-                                        }
-                                        $login[$key] = $timePart;
-                                        $array_masuk[$key]=$timePart;
-                                        $different_masuk[$key]='';
-                                        
-                                    }
-                                    
-                                }elseif($timePart > $time_in && $timePart < $time_out){
-                                    $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($minTimeIn);
-                                    
-                                  
-                                    if($diffHoursTimePartMinIn<=3 && $exact_in[$key] != 1){
-                                        $exact_in[$key]= 2 ;
-                                        
-                                        
-                                        if (count($query_data) == 3 && $key > 0 ) {
-                                            $exact_in[$key]= 1 ;
-                                            
-                                        }
-                                        $array_masuk[$key]=$timePart;
-                                    }                                      
-                                }elseif($timePart > $max_time_out){
-                                    $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($maxTimeOut);
-                                    
-                                    if($diffHoursTimePartMaxOut<=3){
-                                        $array_keluar[$key]=$timePart;
+                                        $different_keluar[$key]=$minutes." menit  ".$seconds." detik";
                                     }
                                 }
-                                if ($timePart >= $time_out && $timePart <= $max_time_out) {
-                                    $exact_out [$key]= 1 ;
-                                    if($muleh==null){
-                                        $muleh=$timePart;
-                                    }elseif($muleh < $timePart){
-                                        $muleh=$timePart;
+                                if($cleanedNik == '123017'){
+                                    info($date);
+                                    info($dateAttd);
+                                    info($real_min_time_in);
+                                    info($real_time_in);
+                                    info('masuk sayang');
+                                }
+                            if ($dateAttd >= $real_min_time_in && $dateAttd <= $real_time_in) {
+                                $exact_in[$key]= 1 ;
+                                
+                                
+                                if(!$login[$key]){
+                                    
+                                    if($masuk_awal==null){
+                                        $masuk_awal=$timePart;
+                                    }elseif($masuk_awal > $timePart){
+                                        $masuk_awal=$timePart;
                                     }
-                                    if(!$logout){
+                                    $login[$key] = $timePart;
+                                    $array_masuk[$key]=$timePart;
+                                    $different_masuk[$key]='';
+                                    
+                                }
+                                
+                            }elseif($dateAttd > $real_time_in && $dateAttd < $real_time_out){
+                                $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($min_time_in);
+                                
+                                
+                                if($diffHoursTimePartMinIn<=3 && $exact_in[$key] != 1){
+                                    $exact_in[$key]= 2 ;
+                                    
+                                    
+                                    if (count($query_data) == 3 && $key > 0 ) {
+                                        $exact_in[$key]= 1 ;
                                         
-                                        $logout = $timePart;
-                                        $array_keluar[$key]=$timePart;
-                                        $different_keluar[$key]='';
-                                        
-                                    }  
+                                    }
+                                    $array_masuk[$key]=$timePart;
+                                }                                      
+                            }elseif($dateAttd > $real_max_time_out){
+                                $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($max_time_out);
+                                
+                                if($diffHoursTimePartMaxOut<=3){
+                                    $array_keluar[$key]=$timePart;
                                 }
                             }
+                            //perhitungan pulang
+                            if ($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out) {
+                                $exact_out [$key]= 1 ;
+                                if($muleh==null){
+                                    $muleh=$timePart;
+                                }elseif($muleh < $timePart){
+                                    $muleh=$timePart;
+                                }
+                                if(!$logout){
+                                    
+                                    $logout = $timePart;
+                                    $array_keluar[$key]=$timePart;
+                                    $different_keluar[$key]='';
+                                    
+                                }  
+                            }
                         }
+                        
                         if(!$exact_in){
                             $exact_in[$key]=0;
                         }
@@ -377,38 +313,10 @@ class AttendancePresenceReportController extends Controller
                         $min_time_ins[]=$min_time_in;
                         $max_time_outs[]=$max_time_out;        
                         $nama_shifts[]=$row_schedule_filter->shift->name;
-                        if($masuk_awal){
-                            $pembandingdate = Carbon::parse($masuk_awal);
-                            $pembanding= $pembandingdate->format('H:i:s');
-                            if($row_schedule_filter->shift->t1){
-                                
-                                if($pembanding > $row_schedule_filter->shift->t1){
-                                    $tipe[$key]='t1';
-                                }
-                            }
-                            if($row_schedule_filter->shift->t2){
-                                
-                                if($pembanding > $row_schedule_filter->shift->t2){
-                                    $tipe[$key]='t2';
-                                }
-                            }
-                            if($row_schedule_filter->shift->t3){
-                                
-                                if($pembanding > $row_schedule_filter->shift->t3){
-                                    $tipe[$key]='t3';
-                                }
-                            }
-                            if($row_schedule_filter->shift->t4){
-                                
-                                if($pembanding > $row_schedule_filter->shift->t4){
-                                    $tipe[$key]='t4';
-                                }
-                            }
-                            
-                        }
+                        
                     }
                   
-                    $attendance_detail[$row_user->nama][]=[
+                    $attendance_detail[(string)$date][]=[
                         'date' => Carbon::parse($date)->format('d/m/Y'),
                         'user_no'=>$row_user->employee_no,
                         'user' =>$row_user->name,

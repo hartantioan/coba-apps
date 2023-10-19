@@ -1864,6 +1864,58 @@ class Select2Controller extends Controller {
                     'balance'           => number_format($d->balanceInvoice(),2,',','.'),
                     'balance_array'     => $arrNominal,
                     'note'              => $d->note,
+                    'tax_no'            => $d->tax_no ? $d->tax_no : '-',
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrderDownPaymentPaid(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+        $account_id = $request->account_id;
+        $data = MarketingOrderDownPayment::where(function($query) use($search,$account_id){
+            $query->where(function($query) use ($search){
+                $query->where('code', 'like', "%$search%")
+                    ->orWhere('note','like',"%$search%")
+                    ->orWhereHas('user',function($query) use ($search){
+                        $query->where('name','like',"%$search%")
+                            ->orWhere('employee_no','like',"%$search%");
+                    });
+            })
+            ->where(function($query) use ($account_id){
+                if($account_id){
+                    $query->where('account_id',$account_id);
+                }
+            });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            if($d->balanceInvoicePaid() > 0){
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->code.' - Cust. '.$d->account->name,
+                    'code'              => $d->code,
+                    'type'              => $d->getTable(),
+                    'is_include_tax'    => $d->is_include_tax,
+                    'percent_tax'       => $d->percent_tax,
+                    'tax_id'            => $d->tax_id ? $d->tax_id : '0',
+                    'post_date'         => date('d/m/y',strtotime($d->post_date)),
+                    'due_date'          => $d->due_date,
+                    'subtotal'          => number_format($d->subtotal,2,',','.'),
+                    'discount'          => number_format($d->discount,2,',','.'),
+                    'total'             => number_format($d->total,2,',','.'),
+                    'tax'               => number_format($d->tax,2,',','.'),
+                    'grandtotal'        => number_format($d->grandtotal,2,',','.'),
+                    'balance'           => number_format($d->balanceInvoicePaid(),2,',','.'),
+                    'note'              => $d->note,
+                    'tax_no'            => $d->tax_no ? $d->tax_no : '-',
                 ];
             }
         }
@@ -1905,6 +1957,9 @@ class Select2Controller extends Controller {
                         'id'                => $row->id,
                         'code'              => $d->code,
                         'type'              => $row->getTable(),
+                        'name'              => $row->lookable->item->name,
+                        'qty'               => number_format($row->lookable->qty,3,',','.'),
+                        'unit'              => $row->lookable->item->sellUnit->code,
                         'is_include_tax'    => $row->is_include_tax,
                         'percent_tax'       => $row->percent_tax,
                         'tax_id'            => $row->tax_id ? $row->tax_id : '0',
@@ -1915,6 +1970,7 @@ class Select2Controller extends Controller {
                         'grandtotal'        => number_format($arrNominal['grandtotal'],2,',','.'),
                         'downpayment'       => number_format($arrNominal['downpayment'],2,',','.'),
                         'balance'           => number_format($arrNominal['balance'],2,',','.'),
+                        'tax_no'            => $d->tax_no ? $d->tax_no : '-',
                     ];
                 }
 
@@ -1925,15 +1981,16 @@ class Select2Controller extends Controller {
                     'type'              => $d->getTable(),
                     'post_date'         => date('d/m/y',strtotime($d->post_date)),
                     'due_date'          => $d->due_date,
-                    'total'             => number_format($arrNominalMain['total'],2,',','.'),
-                    'tax'               => number_format($arrNominalMain['tax'],2,',','.'),
-                    'total_after_tax'   => number_format($arrNominalMain['total_after_tax'],2,',','.'),
-                    'rounding'          => number_format($arrNominalMain['rounding'],2,',','.'),
-                    'grandtotal'        => number_format($arrNominalMain['grandtotal'],2,',','.'),
-                    'downpayment'       => number_format($arrNominalMain['downpayment'],2,',','.'),
+                    'total'             => number_format($d->total,2,',','.'),
+                    'tax'               => number_format($d->tax,2,',','.'),
+                    'total_after_tax'   => number_format($d->total_after_tax,2,',','.'),
+                    'rounding'          => number_format($d->rounding,2,',','.'),
+                    'grandtotal'        => number_format($d->grandtotal,2,',','.'),
+                    'downpayment'       => number_format($d->downpayment,2,',','.'),
                     'balance'           => number_format($arrNominalMain['balance'],2,',','.'),
                     'note'              => $d->note,
                     'details'           => $arrDetail,
+                    'tax_no'            => $d->tax_no ? $d->tax_no : '-',
                 ];
             }
         }

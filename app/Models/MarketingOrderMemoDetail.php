@@ -18,16 +18,13 @@ class MarketingOrderMemoDetail extends Model
         'marketing_order_memo_id',
         'lookable_type',
         'lookable_id',
+        'qty',
         'is_include_tax',
         'percent_tax',
         'tax_id',
         'total',
         'tax',
-        'total_after_tax',
-        'rounding',
         'grandtotal',
-        'downpayment',
-        'balance',
         'note',
     ];
 

@@ -3,24 +3,13 @@
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\Department;
-use App\Models\IncomingPayment;
-use App\Models\Line;
-use App\Models\MarketingOrder;
-use App\Models\MarketingOrderDelivery;
-use App\Models\MarketingOrderDetail;
-use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderHandoverInvoice;
+use App\Models\MarketingOrderHandoverInvoiceDetail;
 use App\Models\MarketingOrderInvoice;
 use App\Models\Place;
-use App\Models\Machine;
-use App\Models\Region;
-use App\Models\Transportation;
-use App\Models\UserData;
 use Illuminate\Http\Request;
-use App\Models\Currency;
 use App\Helpers\CustomHelper;
 use App\Models\User;
-use App\Models\Tax;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -29,7 +18,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 
-class MarketingOrderController extends Controller
+class MarketingHandoverInvoiceController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
 
@@ -41,29 +30,53 @@ class MarketingOrderController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
+    
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'Sales Order',
-            'content'       => 'admin.sales.order',
-            'currency'      => Currency::where('status','1')->get(),
+            'title'         => 'Tanda Terima Invoice',
+            'content'       => 'admin.sales.handover_invoice',
             'company'       => Company::where('status','1')->get(),
-            'transportation'=> Transportation::where('status','1')->get(),
-            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'SORD-'.date('y'),
+            'newcode'       => 'MOHI-'.date('y'),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
     }
 
     public function getCode(Request $request){
-        $code = MarketingOrder::generateCode($request->val);
+        $code = MarketingOrderHandoverInvoice::generateCode($request->val);
         				
 		return response()->json($code);
+    }
+
+    public function getMarketingInvoice(Request $request){
+        $data = MarketingOrderInvoice::whereIn('status',['2','3'])->whereDoesntHave('marketingOrderHandoverInvoiceDetail')->where('balance','>=',0)->get();
+
+        $arr = [];
+        foreach($data as $row){
+            if($row->balancePaymentIncoming() > 0){
+                $arr[] = [
+                    'code'              => $row->code,
+                    'enc_code'          => CustomHelper::encrypt($row->code),
+                    'post_date'         => date('d/m/y',strtotime($row->post_date)),
+                    'customer_name'     => $row->account->name,
+                    'total'             => number_format($row->total,2,',','.'),
+                    'tax'               => number_format($row->tax,2,',','.'),
+                    'total_after_tax'   => number_format($row->total_after_tax,2,',','.'),
+                    'rounding'          => number_format($row->rounding,2,',','.'),
+                    'grandtotal'        => number_format($row->grandtotal,2,',','.'),
+                    'downpayment'       => number_format($row->downpayment,2,',','.'),
+                    'balance'           => number_format($row->balance,2,',','.'),
+                    'type'              => $row->getTable(),
+                ];
+            }
+        }
+
+        return response()->json($arr);
     }
 
     public function datatable(Request $request){
@@ -71,38 +84,9 @@ class MarketingOrderController extends Controller
             'id',
             'code',
             'user_id',
-            'account_id',
+            'company_id',
             'post_date',
-            'valid_date',
-            'project_id',
-            'document',
-            'document_no',
-            'delivery_type',
-            'sender_id',
-            'transportation_id',
-            'delivery_date',
-            'payment_type',
-            'top_internal',
-            'top_customer',
-            'is_guarantee',
-            'billing_address',
-            'outlet_id',
-            'destination_address',
-            'province_id',
-            'city_id',
-            'district_id',
-            'sales_id',
-            'currency_id',
-            'currency_rate',
-            'note_internal',
-            'note_external',
-            'subtotal',
-            'discount',
-            'total',
-            'tax',
-            'grandtotal',
-            'rounding',
-            'balance'
+            'note',
         ];
 
         $start  = $request->start;
@@ -111,29 +95,16 @@ class MarketingOrderController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = MarketingOrder::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = MarketingOrderHandoverInvoice::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
-        $query_data = MarketingOrder::where(function($query) use ($search, $request) {
+        $query_data = MarketingOrderHandoverInvoice::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('document_no', 'like', "%$search%")
-                            ->orWhere('note_internal', 'like', "%$search%")
-                            ->orWhere('note_external', 'like', "%$search%")
-                            ->orWhere('subtotal', 'like', "%$search%")
-                            ->orWhere('discount', 'like', "%$search%")
-                            ->orWhere('total', 'like', "%$search%")
-                            ->orWhere('tax', 'like', "%$search%")
-                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('marketingOrderDetail',function($query) use ($search, $request){
-                                $query->whereHas('item',function($query) use ($search, $request){
-                                    $query->where('code','like',"%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
                             });
                     });
                 }
@@ -151,36 +122,8 @@ class MarketingOrderController extends Controller
                     $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
-                if($request->type){
-                    $query->where('type',$request->type);
-                }
-
-                if($request->delivery_type){
-                    $query->where('type_delivery',$request->delivery_type);
-                }
-
-                if($request->payment_type){
-                    $query->where('payment_type',$request->payment_type);
-                }
-
-                if($request->account_id){
-                    $query->whereIn('account_id',$request->account_id);
-                }
-
-                if($request->sender_id){
-                    $query->whereIn('sender_id',$request->sender_id);
-                }
-
-                if($request->sales_id){
-                    $query->whereIn('sales_id',$request->sales_id);
-                }
-                
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
-                }          
-                
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
                 }
 
             })
@@ -190,27 +133,14 @@ class MarketingOrderController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = MarketingOrder::where(function($query) use ($search, $request) {
+        $total_filtered = MarketingOrderHandoverInvoice::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('document_no', 'like', "%$search%")
-                            ->orWhere('note_internal', 'like', "%$search%")
-                            ->orWhere('note_external', 'like', "%$search%")
-                            ->orWhere('subtotal', 'like', "%$search%")
-                            ->orWhere('discount', 'like', "%$search%")
-                            ->orWhere('total', 'like', "%$search%")
-                            ->orWhere('tax', 'like', "%$search%")
-                            ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            })
-                            ->orWhereHas('marketingOrderDetail',function($query) use ($search, $request){
-                                $query->whereHas('item',function($query) use ($search, $request){
-                                    $query->where('code','like',"%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
                             });
                     });
                 }
@@ -228,36 +158,8 @@ class MarketingOrderController extends Controller
                     $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
-                if($request->type){
-                    $query->where('type',$request->type);
-                }
-
-                if($request->delivery_type){
-                    $query->where('type_delivery',$request->delivery_type);
-                }
-
-                if($request->payment_type){
-                    $query->where('payment_type',$request->payment_type);
-                }
-
-                if($request->account_id){
-                    $query->whereIn('account_id',$request->account_id);
-                }
-
-                if($request->sender_id){
-                    $query->whereIn('sender_id',$request->sender_id);
-                }
-
-                if($request->sales_id){
-                    $query->whereIn('sales_id',$request->sales_id);
-                }
-                
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
-                }          
-                
-                if($request->currency_id){
-                    $query->whereIn('currency_id',$request->currency_id);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -267,54 +169,20 @@ class MarketingOrderController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->account->name,
                     $val->company->name,
-                    $val->type(),
                     date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->valid_date)),
-                    $val->project()->exists() ? $val->project->name : '-',
+                    $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
-                    $val->document_no,
-                    $val->deliveryType(),
-                    $val->sender->name,
-                    $val->transportation->name,
-                    date('d/m/y',strtotime($val->delivery_date)),
-                    $val->paymentType(),
-                    $val->top_internal,
-                    $val->top_customer,
-                    $val->isGuarantee(),
-                    $val->billing_address,
-                    $val->outlet->name,
-                    $val->destination_address,
-                    $val->province->name,
-                    $val->city->name,
-                    $val->district->name,
-                    $val->subdistrict->name,
-                    $val->sales->name,
-                    $val->currency->name,
-                    number_format($val->currency_rate,2,',','.'),
-                    $val->percent_dp,
-                    $val->note_internal,
-                    $val->note_external,
-                    number_format($val->subtotal,2,',','.'),
-                    number_format($val->discount,2,',','.'),
-                    number_format($val->total,2,',','.'),
-                    number_format($val->tax,2,',','.'),
-                    number_format($val->total_after_tax,2,',','.'),
-                    number_format($val->rounding,2,',','.'),
-                    number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">content_copy</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -339,157 +207,37 @@ class MarketingOrderController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('marketing_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_orders,code',
+            'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_handover_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_handover_invoices,code',
             'code_place_id'             => 'required',
-            'account_id' 				=> 'required',
             'company_id'			    => 'required',
-            'type'			            => 'required',
             'post_date'		            => 'required',
-            'valid_date'		        => 'required',
-            'type_delivery'             => 'required',
-            'sender_id'                 => 'required',
-            'delivery_date'             => 'required',
-            'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
-            'outlet_id'                 => 'required',
-            'billing_address'           => 'required',
-            'destination_address'       => 'required',
-            'province_id'               => 'required',
-            'city_id'                   => 'required',
-            'district_id'               => 'required',
-            'subdistrict_id'            => 'required',
-            'payment_type'              => 'required',
-            'top_internal'              => 'required',
-            'top_customer'              => 'required',
-            'is_guarantee'              => 'required',
-            'currency_id'               => 'required',
-            'currency_rate'             => 'required',
-            'percent_dp'                => 'required',
-            'sales_id'                  => 'required',
-            'arr_place'                 => 'required|array',
-            'arr_warehouse'             => 'required|array',
-            'arr_tax_nominal'           => 'required|array',
-            'arr_grandtotal'            => 'required|array',
-            'arr_item'                  => 'required|array',
-            'arr_item_stock'            => 'required|array',
-            'arr_qty'                   => 'required|array',
-            'arr_price'                 => 'required|array',
-            'arr_margin'                => 'required|array',
-            'arr_tax'                   => 'required|array',
-            'arr_is_include_tax'        => 'required|array',
-            'arr_disc1'                 => 'required|array',
-            'arr_disc2'                 => 'required|array',
-            'arr_disc3'                 => 'required|array',
-            'arr_other_fee'             => 'required|array',
-            'arr_final_price'           => 'required|array',
-            'arr_total'                 => 'required|array',
-            'subtotal'                  => 'required',
-            'discount'                  => 'required',
-            'total'                     => 'required',
-            'tax'                       => 'required',
-            'grandtotal'                => 'required',
-            'rounding'                  => 'required',
-            'total_after_tax'           => 'required',
+            'arr_id'                    => 'required|array',
+            'arr_type'                  => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code.string'                       => 'Kode harus dalam bentuk string.',
             'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
-            'account_id.required' 				=> 'Customer tidak boleh kosong.',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'type.required' 			        => 'Tipe Penjualan tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'valid_date.required' 			    => 'Tanggal valid SO tidak boleh kosong.',
-            'type_delivery.required'		    => 'Tipe pengiriman tidak boleh kosong.',
-            'sender_id.required'                => 'Pihak pengirim tidak boleh kosong.',
-            'delivery_date.required'            => 'Tanggal pengiriman estimasi tidak boleh kosong.',
-            'transportation_id.required'        => 'Tipe transportasi tidak boleh kosong.',
-            'outlet_id.required'                => 'Outlet tidak boleh kosong.',
-            'billing_address.required'          => 'Alamat penagihan tidak boleh kosong.',
-            'destination_address.required'      => 'Alamat tujuan tidak boleh kosong.',
-            'province_id.required'              => 'Provinsi tujuan tidak boleh kosong.',
-            'city_id.required'                  => 'Kota tujuan tidak boleh kosong.',
-            'district_id.required'              => 'Kecamatan tujuan tidak boleh kosong.',
-            'subdistrict_id.required'           => 'Kelurahan tidak boleh kosong',
-            'payment_type.required'             => 'Tipe pembayaran tidak boleh kosong.',
-            'top_internal.required'             => 'TOP internal tidak boleh kosong.',
-            'top_customer.required'             => 'TOP customer tidak boleh kosong',
-            'is_guarantee.required'             => 'Garansi atau tidaknya barang tidak boleh kosong.',
-            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
-            'percent_dp.required'               => 'Prosentase DP tidak boleh kosong. Silahkan isi 0 jika memang tidak ada.',
-            'sales_id.required'                 => 'Sales tidak boleh kosong',
-            'arr_place.required'                => 'Plant tidak boleh kosong.',
-            'arr_place.array'                   => 'Plant harus array.',
-            'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
-            'arr_warehouse.array'               => 'Gudang harus array.',
-            'arr_tax_nominal.required'          => 'Tax nominal tidak boleh kosong.',
-            'arr_tax_nominal.array'             => 'Tax nominal harus array.',
-            'arr_grandtotal.required'           => 'Grantotal baris tidak boleh kosong.',
-            'arr_grandtotal.array'              => 'Grandtotal baris harus array.',
-            'arr_item.required'                 => 'Item baris tidak boleh kosong.',
-            'arr_item.array'                    => 'item baris harus array.',
-            'arr_item_stock.required'           => 'Stok item tidak boleh kosong.',
-            'arr_item_stock.array'              => 'Stok item harus array.',
-            'arr_qty.required'                  => 'Baris qty tidak boleh kosong.',
-            'arr_qty.array'                     => 'Baris qty harus array.',
-            'arr_price.required'                => 'Baris harga tidak boleh kosong.',
-            'arr_price.array'                   => 'Baris harga harus array.',
-            'arr_margin.required'               => 'Harga margin tidak boleh kosong.',
-            'arr_margin.array'                  => 'Harga margin baris harus array.',
-            'arr_tax.required'                  => 'Baris pajak tidak boleh kosong.',
-            'arr_tax.array'                     => 'Baris pajak harus array.',
-            'arr_is_include_tax.required'       => 'Baris termasuk pajak tidak boleh kosong.',
-            'arr_is_include_tax.array'          => 'Baris termasuk pajak harus array.',
-            'arr_disc1.required'                => 'Baris diskon 1 tidak boleh kosong.',
-            'arr_disc1.array'                   => 'Baris diskon 1 harus array.',
-            'arr_disc2.required'                => 'Baris diskon 2 tidak boleh kosong.',
-            'arr_disc2.array'                   => 'Baris diskon 2 harus array.',
-            'arr_disc3.required'                => 'Baris diskon 3 tidak boleh kosong.',
-            'arr_disc3.array'                   => 'Baris diskon 3 harus array.',
-            'arr_other_fee.required'            => 'Baris biaya lain tidak boleh kosong.',
-            'arr_other_fee.array'               => 'Baris biaya lain harus array.',
-            'arr_final_price.required'          => 'Baris harga akhir tidak boleh kosong.',
-            'arr_final_price.array'             => 'Baris harga akhir harus array.',
-            'arr_total.required'                => 'Baris total tidak boleh kosong.',
-            'arr_total.array'                   => 'Baris total harus array.',
-            'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
-            'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
-            'total.required'                    => 'Total tidak boleh kosong.',
-            'tax.required'                      => 'PPN tidak boleh kosong.',
-            'grandtotal.required'               => 'Grandtotal tidak boleh kosong.',
-            'rounding.required'                 => 'Rounding tidak boleh kosong.',
-            'total_after_tax.required'          => 'Total setelah pajak tidak boleh kosong.'
+            'arr_id.required'                   => 'AR Invoice tidak boleh kosong.',
+            'arr_id.array'                      => 'AR Invoice harus array.',
+            'arr_type.required'                 => 'Tipe dokumen tidak boleh kosong.',
+            'arr_type.array'                    => 'Tipe dokumen harus array.',
         ]);
 
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
+        DB::beginTransaction();
+        try {
 
-            $passedZero = true;
-            if($request->arr_price){
-                foreach($request->arr_price as $row){
-                    if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
-                        $passedZero = false;
-                    }
-                }
-
-                if(!$passedZero){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Harga item tidak boleh 0.'
-                    ]);
-                }
-            }
-
-            $userData = UserData::find($request->billing_address);
-            
-			if($request->temp){
-                DB::beginTransaction();
-                try {
-                    $query = MarketingOrder::where('code',CustomHelper::decrypt($request->temp))->first();
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
+                
+                if($request->temp){
+                    $query = MarketingOrderHandoverInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -511,244 +259,117 @@ class MarketingOrderController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Sales Order telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Marketing Order Delivery telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
                     if(in_array($query->status,['1','6'])){
-                        if($request->has('document_so')) {
+
+                        if($request->has('document')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('document_so')->store('public/marketing_orders');
+                            $document = $request->file('document')->store('public/marketing_handover_invoices');
                         } else {
                             $document = $query->document;
                         }
 
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
-                        $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
-                        $query->type = $request->type;
                         $query->post_date = $request->post_date;
-                        $query->valid_date = $request->valid_date;
-                        $query->document_no = $request->document_no;
                         $query->document = $document;
-                        $query->project_id = $request->project_id;
-                        $query->type_delivery = $request->type_delivery;
-                        $query->sender_id = $request->sender_id;
-                        $query->delivery_date = $request->delivery_date;
-                        $query->payment_type = $request->payment_type;
-                        $query->top_internal = $request->top_internal;
-                        $query->top_customer = $request->top_customer;
-                        $query->is_guarantee = $request->is_guarantee;
-                        $query->transportation_id = $request->transportation_id;
-                        $query->outlet_id = $request->outlet_id;
-                        $query->user_data_id = $request->billing_address;
-                        $query->billing_address = $userData->title.' '.$userData->content;
-                        $query->destination_address = $request->destination_address;
-                        $query->province_id = $request->province_id;
-                        $query->city_id = $request->city_id;
-                        $query->district_id = $request->district_id;
-                        $query->subdistrict_id = $request->subdistrict_id;
-                        $query->sales_id = $request->sales_id;
-                        $query->currency_id = $request->currency_id;
-                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->percent_dp = str_replace(',','.',str_replace('.','',$request->percent_dp));
-                        $query->note_internal = $request->note_internal;
-                        $query->note_external = $request->note_external;
-                        $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
-                        $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
-                        $query->total = str_replace(',','.',str_replace('.','',$request->total));
-                        $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
-                        $query->total_after_tax = str_replace(',','.',str_replace('.','',$request->total_after_tax));
-                        /* $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding)); */
-                        $query->rounding = 0;
-                        $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                        $query->note = $request->note;
                         $query->status = '1';
 
                         $query->save();
                         
-                        foreach($query->marketingOrderDetail as $row){
+                        foreach($query->marketingOrderHandoverInvoiceDetail as $row){
                             $row->delete();
                         }
-
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status sales order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status Tanda Terima Invoice sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
-                    $query = MarketingOrder::create([
+                }else{
+                    $query = MarketingOrderHandoverInvoice::create([
                         'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
-                        'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
-                        'type'                      => $request->type,
                         'post_date'                 => $request->post_date,
-                        'valid_date'                => $request->valid_date,
-                        'project_id'                => $request->project_id,
-                        'document_no'               => $request->document_no,
-                        'document'                  => $request->file('document_so') ? $request->file('document_so')->store('public/marketing_orders') : NULL,
-                        'type_delivery'             => $request->type_delivery,
-                        'sender_id'                 => $request->sender_id,
-                        'delivery_date'             => $request->delivery_date,
-                        'payment_type'              => $request->payment_type,
-                        'top_internal'              => $request->top_internal,
-                        'top_customer'              => $request->top_customer,
-                        'is_guarantee'              => $request->is_guarantee,
-                        'transportation_id'         => $request->transportation_id,
-                        'outlet_id'                 => $request->outlet_id,
-                        'user_data_id'              => $request->billing_address,
-                        'billing_address'           => $userData->title.' '.$userData->content,
-                        'destination_address'       => $request->destination_address,
-                        'province_id'               => $request->province_id,
-                        'city_id'                   => $request->city_id,
-                        'district_id'               => $request->district_id,
-                        'subdistrict_id'            => $request->subdistrict_id,
-                        'sales_id'                  => $request->sales_id,
-                        'currency_id'               => $request->currency_id,
-                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'percent_dp'                => str_replace(',','.',str_replace('.','',$request->percent_dp)),
-                        'note_internal'             => $request->note_internal,
-                        'note_external'             => $request->note_external,
-                        'subtotal'                  => str_replace(',','.',str_replace('.','',$request->subtotal)),
-                        'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
-                        'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
-                        'tax'                       => str_replace(',','.',str_replace('.','',$request->tax)),
-                        'total_after_tax'           => str_replace(',','.',str_replace('.','',$request->total_after_tax)),
-                        /* 'rounding'                  => str_replace(',','.',str_replace('.','',$request->rounding)), */
-                        'rounding'                  => 0,
-                        'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
+                        'document'                  => $request->file('document') ? $request->file('document')->store('public/marketing_handover_invoices') : NULL,
+                        'note'                      => $request->note,
                         'status'                    => '1',
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
-
-                DB::beginTransaction();
-                try {
-                    
-                    foreach($request->arr_item as $key => $row){
-                        MarketingOrderDetail::create([
-                            'marketing_order_id'            => $query->id,
-                            'item_id'                       => $row,
-                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'price'                         => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                            'margin'                        => str_replace(',','.',str_replace('.','',$request->arr_margin[$key])),
-                            'is_include_tax'                => $request->arr_is_include_tax[$key],
-                            'percent_tax'                   => $request->arr_tax[$key],
-                            'tax_id'                        => $request->arr_tax_id[$key],
-                            'percent_discount_1'            => str_replace(',','.',str_replace('.','',$request->arr_disc1[$key])),
-                            'percent_discount_2'            => str_replace(',','.',str_replace('.','',$request->arr_disc2[$key])),
-                            'discount_3'                    => str_replace(',','.',str_replace('.','',$request->arr_disc3[$key])),
-                            'other_fee'                     => str_replace(',','.',str_replace('.','',$request->arr_other_fee[$key])),
-                            'price_after_discount'          => str_replace(',','.',str_replace('.','',$request->arr_final_price[$key])),
-                            'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                            'tax'                           => $request->arr_tax_nominal[$key],
-                            'grandtotal'                    => $request->arr_grandtotal[$key],
-                            'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
-                            'item_stock_id'                 => $request->arr_item_stock[$key] ? $request->arr_item_stock[$key] : NULL,
-                            'place_id'                      => $request->arr_place[$key],
-                            'warehouse_id'                  => $request->arr_warehouse[$key],
-                        ]);
+                
+                if($query) {
+                        
+                    foreach($request->arr_id as $key => $row){
+                        $moi = null;
+                        $moi = MarketingOrderInvoice::where('code',CustomHelper::decrypt($row))->first();
+                        if($moi){
+                            MarketingOrderHandoverInvoiceDetail::create([
+                                'marketing_order_handover_invoice_id'   => $query->id,
+                                'lookable_type'                         => $request->arr_type[$key],
+                                'lookable_id'                           => $moi->id,
+                            ]);
+                        }
                     }
 
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Tanda Terima Invoice No. '.$query->code,$query->note,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new MarketingOrderHandoverInvoice())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit marketing order handover invoice.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
+            }
 
-                CustomHelper::sendApproval('marketing_orders',$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification('marketing_orders',$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
-
-                activity()
-                    ->performedOn(new MarketingOrder())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit sales order.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        }
 
 		return response()->json($response);
     }
 
     public function show(Request $request){
-        $po = MarketingOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $po = MarketingOrderHandoverInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
-        $po['account_name'] = $po->account->name;
-        $po['sender_name'] = $po->sender->name;
-        $po['sales_name'] = $po->sales->name.' - '.$po->sales->phone.' Pos. '.$po->sales->position->name.' Dep. '.$po->sales->position->division->department->name;
-        $po['province_name'] = $po->province->name;
-        $po['cities'] = $po->province->getCity();
-        $po['subtotal'] = number_format($po->subtotal,2,',','.');
-        $po['discount'] = number_format($po->discount,2,',','.');
-        $po['total'] = number_format($po->total,2,',','.');
-        $po['tax'] = number_format($po->tax,2,',','.');
-        $po['total_after_tax'] = number_format($po->total_after_tax,2,',','.');
-        $po['rounding'] = number_format($po->rounding,2,',','.');
-        $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
-        $po['currency_rate'] = number_format($po->currency_rate,2,',','.');
-        $po['project_name'] = $po->project()->exists() ? $po->project->code.' - '.$po->project->name : '';
-        $po['percent_dp'] = number_format($po->percent_dp,2,',','.');
-        $po['user_data'] = $po->account->getBillingAddress();
-        $po['transportation_name'] = $po->transportation->code.' - '.$po->transportation->name;
-        $po['outlet_name'] = $po->outlet->code.' - '.$po->outlet->name;
 
         $arr = [];
         
-        foreach($po->marketingOrderDetail as $row){
+        foreach($po->marketingOrderHandoverInvoiceDetail as $row){
             $arr[] = [
-                'id'                    => $row->id,
-                'item_id'               => $row->item_id,
-                'item_name'             => $row->item->code.' - '.$row->item->name,
-                'qty'                   => number_format($row->qty,3,',','.'),
-                'unit'                  => $row->item->sellUnit->code,
-                'price'                 => number_format($row->price,2,',','.'),
-                'margin'                => number_format($row->margin,2,',','.'),
-                'is_include_tax'        => $row->is_include_tax ? $row->is_include_tax : '',
-                'percent_tax'           => number_format($row->percent_tax,2,',','.'),
-                'tax_id'                => $row->tax_id,
-                'disc1'                 => number_format($row->percent_discount_1,2,',','.'),
-                'disc2'                 => number_format($row->percent_discount_2,2,',','.'),
-                'disc3'                 => number_format($row->discount_3,2,',','.'),
-                'other_fee'             => number_format($row->other_fee,2,',','.'),
-                'final_price'           => number_format($row->price_after_discount,2,',','.'),
-                'total'                 => number_format($row->total,2,',','.'),
-                'tax'                   => $row->tax,
-                'grandtotal'            => $row->grandtotal,
-                'note'                  => $row->note,
-                'item_stock_id'         => $row->item_stock_id,
-                'item_stock_name'       => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->code,
-                'item_stock_qty'        => number_format($row->itemStock->qty / $row->item->sell_convert,3,',','.'),
-                'list_stock'            => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
-                'place_id'              => $row->place_id,
-                'warehouse_id'          => $row->warehouse_id,
-                'list_warehouse'        => $row->item->warehouseList(),
+                'code'              => $row->lookable->code,
+                'enc_code'          => CustomHelper::encrypt($row->lookable->code),
+                'post_date'         => date('d/m/y',strtotime($row->lookable->post_date)),
+                'customer_name'     => $row->lookable->account->name,
+                'total'             => number_format($row->lookable->total,2,',','.'),
+                'tax'               => number_format($row->lookable->tax,2,',','.'),
+                'total_after_tax'   => number_format($row->lookable->total_after_tax,2,',','.'),
+                'rounding'          => number_format($row->lookable->rounding,2,',','.'),
+                'grandtotal'        => number_format($row->lookable->grandtotal,2,',','.'),
+                'downpayment'       => number_format($row->lookable->downpayment,2,',','.'),
+                'balance'           => number_format($row->lookable->balance,2,',','.'),
+                'type'              => $row->lookable_type,
             ];
         }
 
@@ -757,96 +378,45 @@ class MarketingOrderController extends Controller
 		return response()->json($po);
     }
 
-    public function approval(Request $request,$id){
-        
-        $pr = MarketingOrder::where('code',CustomHelper::decrypt($id))->first();
-                
-        if($pr){
-            $data = [
-                'title'     => 'Print Sales Order',
-                'data'      => $pr
-            ];
-
-            return view('admin.approval.marketing_order', $data);
-        }else{
-            abort(404);
-        }
-    }
-
     public function rowDetail(Request $request)
     {
-        $data   = MarketingOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = MarketingOrderHandoverInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="17">Daftar Item</th>
+                                <th class="center-align" colspan="11">Daftar AR Invoice</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Harga</th>
-                                <th class="center-align">Margin</th>
-                                <th class="center-align">Discount 1 (%)</th>
-                                <th class="center-align">Discount 2 (%)</th>
-                                <th class="center-align">Discount 3 (Rp)</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Ambil dari</th>
-                                <th class="center-align">Biaya lain2</th>
-                                <th class="center-align">Harga Final</th>
+                                <th class="center-align">No.AR Invoice</th>
+                                <th class="center-align">Customer</th>
+                                <th class="center-align">Tgl.Post</th>
                                 <th class="center-align">Total</th>
+                                <th class="center-align">Tax</th>
+                                <th class="center-align">Total Stlh Pajak</th>
+                                <th class="center-align">Pembulatan</th>
+                                <th class="center-align">Grandtotal</th>
+                                <th class="center-align">Downpayment</th>
+                                <th class="center-align">Tagihan</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->marketingOrderDetail as $key => $row){
+        foreach($data->marketingOrderHandoverInvoiceDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->item->sellUnit->code.'</td>
-                <td class="right-align">'.number_format($row->price,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->margin,2,',','.').'</td>
-                <td class="center-align">'.number_format($row->percent_discount_1,2,',','.').'</td>
-                <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
-                <td class="">'.$row->note.'</td>
-                <td class="center-align">'.$row->place->name.' - '.$row->warehouse->name.'</td>
-                <td class="right-align">'.number_format($row->other_fee,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->price_after_discount,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="">'.$row->lookable->code.'</td>
+                <td class="">'.$row->lookable->account->name.'</td>
+                <td class="center-align">'.date('d/m/y',strtotime($row->lookable->post_date)).'</td>
+                <td class="right-align">'.number_format($row->lookable->total,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->total_after_tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->rounding,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->grandtotal,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->downpayment,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->balance,2,',','.').'</td>
             </tr>';
         }
-
-        $string .= '<tr>
-                        <td class="right-align" colspan="13">Subtotal</td>
-                        <td class="right-align">'.number_format($data->subtotal,2,',','.').'</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="13">Diskon</td>
-                        <td class="right-align">'.number_format($data->discount,2,',','.').'</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="13">Total</td>
-                        <td class="right-align">'.number_format($data->total,2,',','.').'</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="13">PPN</td>
-                        <td class="right-align">'.number_format($data->tax,2,',','.').'</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="13">Total Setelah PPN</td>
-                        <td class="right-align">'.number_format($data->total_after_tax,2,',','.').'</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="13">Rounding</td>
-                        <td class="right-align">'.number_format($data->rounding,2,',','.').'</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="13" style="font-size:20px !important;"><b>Grandtotal</b></td>
-                        <td class="right-align" style="font-size:20px !important;"><b>'.number_format($data->grandtotal,2,',','.').'</b></td>
-                    </tr>';
         
         $string .= '</tbody></table></div>';
 
@@ -902,13 +472,29 @@ class MarketingOrderController extends Controller
         return response()->json($string);
     }
 
+    public function approval(Request $request,$id){
+        
+        $mod = MarketingOrderHandoverInvoice::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($mod){
+            $data = [
+                'title'     => 'Tanda Terima Invoice',
+                'data'      => $mod
+            ];
+
+            return view('admin.approval.marketing_order_handover_invoice', $data);
+        }else{
+            abort(404);
+        }
+    }
+
     public function printIndividual(Request $request,$id){
         
-        $pr = MarketingOrder::where('code',CustomHelper::decrypt($id))->first();
+        $pr = MarketingOrderHandoverInvoice::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Print Sales Order',
+                'title'     => 'Tanda Terima Invoice',
                 'data'      => $pr
             ];
 
@@ -925,8 +511,7 @@ class MarketingOrderController extends Controller
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
              
-            $pdf = Pdf::loadView('admin.print.sales.order_individual', $data)->setPaper('a5', 'landscape');
-            // $pdf->render();
+            $pdf = Pdf::loadView('admin.print.sales.handover_invoice_individual', $data)->setPaper('a5', 'landscape');
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -940,112 +525,6 @@ class MarketingOrderController extends Controller
         }else{
             abort(404);
         }
-    }
-
-    public function voidStatus(Request $request){
-        $query = MarketingOrder::where('code',CustomHelper::decrypt($request->id))->first();
-        
-        if($query) {
-            if(in_array($query->status,['4','5'])){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
-                ];
-            }elseif($query->hasChildDocument()){
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data telah digunakan pada form lainnya.'
-                ];
-            }else{
-                $query->update([
-                    'status'    => '5',
-                    'void_id'   => session('bo_id'),
-                    'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
-                ]);
-    
-                activity()
-                    ->performedOn(new MarketingOrder())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Void the sales order data');
-    
-                CustomHelper::sendNotification('marketing_orders',$query->id,'Sales Order No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('marketing_orders',$query->id);
-
-                $response = [
-                    'status'  => 200,
-                    'message' => 'Data closed successfully.'
-                ];
-            }
-        } else {
-            $response = [
-                'status'  => 500,
-                'message' => 'Data failed to delete.'
-            ];
-        }
-
-        return response()->json($response);
-    }
-
-    public function destroy(Request $request){
-        $query = MarketingOrder::where('code',CustomHelper::decrypt($request->id))->first();
-
-        $approved = false;
-        $revised = false;
-
-        if($query->approval()){
-            foreach ($query->approval() as $detail){
-                foreach($detail->approvalMatrix as $row){
-                    if($row->approved){
-                        $approved = true;
-                    }
-
-                    if($row->revised){
-                        $revised = true;
-                    }
-                }
-            }
-        }
-
-        if($approved && !$revised){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
-            ]);
-        }
-
-        if(in_array($query->status,['2','3','4','5'])){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
-            ]);
-        }
-        
-        if($query->delete()) {
-
-            $query->marketingOrderDetail()->delete();
-
-            CustomHelper::removeApproval('marketing_orders',$query->id);
-
-            activity()
-                ->performedOn(new MarketingOrder())
-                ->causedBy(session('bo_id'))
-                ->withProperties($query)
-                ->log('Delete the sales order data');
-
-            $response = [
-                'status'  => 200,
-                'message' => 'Data deleted successfully.'
-            ];
-        } else {
-            $response = [
-                'status'  => 500,
-                'message' => 'Data failed to delete.'
-            ];
-        }
-
-        return response()->json($response);
     }
 
     public function print(Request $request){
@@ -1065,13 +544,12 @@ class MarketingOrderController extends Controller
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
-                $pr = MarketingOrder::where('code',$row)->first();
+                $pr = MarketingOrderHandoverInvoice::where('code',$row)->first();
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Sales Order',
+                        'title'     => 'Tanda Terima Invoice',
                         'data'      => $pr,
-                      
                     ];
                     $img_path = 'website/logo_web_fix.png';
                     $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
@@ -1079,7 +557,7 @@ class MarketingOrderController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.sales.order_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.sales.handover_invoice_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1087,9 +565,10 @@ class MarketingOrderController extends Controller
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
-                    
             }
+
             $merger = new Merger();
+
             foreach ($temp_pdf as $pdfContent) {
                 $merger->addRaw($pdfContent);
             }
@@ -1144,10 +623,10 @@ class MarketingOrderController extends Controller
                     ];
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
-                        $query = MarketingOrder::where('Code', 'LIKE', '%'.$nomor)->first();
+                        $query = MarketingOrderHandoverInvoice::where('Code', 'LIKE', '%'.$nomor)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Sales Order',
+                                'title'     => 'Tanda Terima Invoice',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -1156,7 +635,7 @@ class MarketingOrderController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.sales.order_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.sales.handover_invoice_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1210,10 +689,10 @@ class MarketingOrderController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = MarketingOrder::where('Code', 'LIKE', '%'.$code)->first();
+                        $query = MarketingOrderHandoverInvoice::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Sales Order',
+                                'title'     => 'Tanda Terima Invoice',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -1222,7 +701,7 @@ class MarketingOrderController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.sales.order_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.sales.handover_invoice_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -1253,9 +732,114 @@ class MarketingOrderController extends Controller
         return response()->json($response);
     }
 
+    public function voidStatus(Request $request){
+        $query = MarketingOrderHandoverInvoice::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+            if(in_array($query->status,['4','5'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada form lainnya.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+    
+                activity()
+                    ->performedOn(new MarketingOrderHandoverInvoice())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the marketing order handover invoice data');
+    
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Tanda Terima Invoice No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval($query->getTable(),$query->id);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function destroy(Request $request){
+        $query = MarketingOrderHandoverInvoice::where('code',CustomHelper::decrypt($request->id))->first();
+
+        $approved = false;
+        $revised = false;
+
+        if($query->approval()){
+            foreach ($query->approval() as $detail){
+                foreach($detail->approvalMatrix as $row){
+                    if($row->approved){
+                        $approved = true;
+                    }
+
+                    if($row->revised){
+                        $revised = true;
+                    }
+                }
+            }
+        }
+
+        if($approved && !$revised){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+
+        if(in_array($query->status,['2','3','4','5'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+        
+        if($query->delete()) {
+
+            $query->marketingOrderHandoverInvoiceDetail()->delete();
+
+            CustomHelper::removeApproval($query->getTable(),$query->id);
+
+            activity()
+                ->performedOn(new MarketingOrderHandoverInvoice())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the marketing order delivery data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
 
     public function viewStructureTree(Request $request){
-        $query = MarketingOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = MarketingOrderHandoverInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         
         $data_id_mo=[];
         $data_id_mo_delivery = [];
@@ -1268,9 +852,8 @@ class MarketingOrderController extends Controller
         $data_go_chart=[];
         $data_link=[];
 
-
         if($query){
-            $data_marketing_order = [
+            $data_mo_delivery = [
                 "name"=>$query->code,
                 "key" => $query->code,
                 "color"=>"lightblue",
@@ -1281,14 +864,53 @@ class MarketingOrderController extends Controller
                 'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->code),           
             ];
 
-            $data_go_chart[]= $data_marketing_order;
-            $data_id_mo[]=$query->id;
+            $data_go_chart[]= $data_mo_delivery;
+            $data_id_mo_delivery[]=$query->id;
 
+            if($query->marketingOrder()->exists()){
+                $data_marketing_order = [
+                    "name"=> $query->marketingOrder->code,
+                    "key" => $query->marketingOrder->code,
+                    
+                    'properties'=> [
+                        ['name'=> "Tanggal :".$query->marketingOrder->post_date],
+                        ['name'=> "Nominal : Rp.:".number_format($query->marketingOrder->grandtotal,2,',','.')]
+                     ],
+                    'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->marketingOrder->code),           
+                ];
+    
+                $data_go_chart[]= $data_marketing_order;
+                $data_id_mo[]=$query->marketingOrder->id;
+                
+                $data_link[]=[
+                    'from'=>$query->marketingOrder->code,
+                    'to'=>$query->code,
+                    'string_link'=>$query->marketingOrder->code.$query->code
+                ]; 
+            }
+            if($query->marketingOrderDeliveryProcess()->exists()){
+                $data_mo_de_pro=[
+                    "name"=>$query->marketingOrderDeliveryProcess->code,
+                    "key" => $query->marketingOrderDeliveryProcess->code,
+                    
+                    'properties'=> [
+                        ['name'=> "Tanggal :".$query->marketingOrderDeliveryProcess->post_date],
+                        ['name'=> "Nominal : Rp.:".number_format($query->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
+                     ],
+                    'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->marketingOrderDeliveryProcess->code),                
+                ];
+
+                
+                $data_go_chart[]= $data_mo_de_pro;
+                $data_id_mo_[]=$query->marketingOrderDeliveryProcess->id;
+                
+                $data_link[]=[
+                    'from'=>$query->code,
+                    'to'=>$query->marketingOrderDeliveryProcess->code,
+                    'string_link'=>$query->code.$query->marketingOrderDeliveryProcess->code
+                ]; 
+            }
             $added = true;
-            
-             
-
-
             while($added){
                 $added=false;
                 // mencaari incoming payment
@@ -1661,13 +1283,14 @@ class MarketingOrderController extends Controller
                 'message' => $data_go_chart,
                 'link'    => $data_link
             ];
-        }else {
+
+        }else{
             $response = [
                 'status'  => 500,
                 'message' => 'Data failed to delete.'
             ];
         }
+
         return response()->json($response);
     }
-
 }

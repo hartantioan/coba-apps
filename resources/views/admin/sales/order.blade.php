@@ -8,7 +8,7 @@
     }
 
     .select2-container {
-        height:3.5rem !important;
+        height:3.6rem !important;
     }
 
     .select-wrapper {
@@ -74,6 +74,18 @@
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
                                                         <option value="6">Direvisi</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_type" style="font-size:1rem;">Tipe Penjualan :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_type" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Proyek</option>
+                                                        <option value="2">Retail</option>
+                                                        <option value="3">Khusus</option>
+                                                        <option value="4">Sampel</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -174,6 +186,7 @@
                                                         <th>Petugas</th>
                                                         <th>Customer</th>
                                                         <th>Perusahaan</th>
+                                                        <th>Tipe</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Valid Hingga</th>
                                                         <th>Proyek</th>
@@ -270,6 +283,15 @@
                                             @endforeach
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step6">
+                                        <select class="form-control" id="type" name="type">
+                                            <option value="1">Proyek</option>
+                                            <option value="2">Retail</option>
+                                            <option value="3">Khusus</option>
+                                            <option value="4">Sampel</option>
+                                        </select>
+                                        <label class="" for="type">Tipe Penjualan</label>
                                     </div>
                                     <div class="input-field col m3 s12 step7">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
@@ -1515,6 +1537,7 @@
                 type: 'POST',
                 data: {
                     status : $('#filter_status').val(),
+                    type : $('#filter_type').val(),
                     delivery_type : $('#filter_delivery').val(),
                     payment_type : $('#filter_payment').val(),
                     'account_id[]' : $('#filter_account').val(),
@@ -1549,6 +1572,7 @@
                 { name: 'user_id', className: '' },
                 { name: 'account_id', className: '' },
                 { name: 'company_id', className: '' },
+                { name: 'type', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'valid_date', className: '' },
                 { name: 'project_id', searchable: false, orderable: false, className: '' },
@@ -1824,6 +1848,7 @@
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
                 $('#company_id').val(response.company_id).formSelect();
+                $('#type').val(response.type).formSelect();
                 $('#post_date').val(response.post_date);
                 $('#valid_date').val(response.valid_date);
                 $('#document_no').val(response.document_no);

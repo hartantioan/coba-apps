@@ -211,7 +211,7 @@ class MarketingOrderDeliveryProcessController extends Controller
 				if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
                 }else{
-                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
@@ -533,7 +533,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $balance = $total_after_tax - $downpayment;
                         $code = MarketingOrderInvoice::generateCode('SINV-'.date('y').substr($query->code,7,2));
                         $arrTax = TaxSeries::getTaxCode($query->company_id,$query->post_date);
-                        if($tax > 0){
+                        if($tax > 0 && $balance > 0){
                             if($arrTax['status'] == '200'){
                                 $passedTaxSeries = true;
                             }
@@ -560,7 +560,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 'downpayment'                   => $downpayment,
                                 'balance'                       => $balance,
                                 'document'                      => NULL,
-                                'tax_no'                        => $tax > 0 ? $arrTax['no'] : NULL,
+                                'tax_no'                        => $tax > 0 && $balance > 0 ? $arrTax['no'] : NULL,
                                 'note'                          => 'Dibuat otomatis setelah Surat Jalan No. '.$query->code,
                             ]);
 

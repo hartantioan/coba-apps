@@ -157,20 +157,20 @@
                         </tr>
                         <tr>
                             <td style="margin-top: -2px;">
-                                <small style="font-size:10px">Diajukan:</small>
+                                <small style="font-size:10px">Diproses:</small>
                                 <span style="font-size:10px;">{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">AR Credit Memo</h5>
+                                <h5 style="margin-top: -2px">{{ $title }}</h5>
                             </td>
                         </tr>
                     </td>
-                    <td width="33%" align="right">
+                    <td width="33%" class="right-align">
                     </td>
                     
-                    <td width="34%" align="right">
+                    <td width="34%" class="right-align">
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
                         <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: absolute; top:50px;width:100px;right:75px;" height="10%" />
                     </td>
@@ -188,64 +188,17 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
-                                            Customer
+                                            Perusahaan
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
-                                            {{ $data->account->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Alamat
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->account->address }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Telepon
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->account->phone.' / '.$data->account->office_no }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Tipe
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->type() }}
+                                            {{ $data->company->name }}
                                         </td>
                                     </tr>
                                 </table>
                             </td>
                             <td width="50%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="50%">
-                                            Perusahaan
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="50%">
-                                            {{ $data->company->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            No Seri Pajak
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->tax_no }}
-                                        </td>
-                                    </tr>
-                                    
-                                </table>
+                                
                             </td>
                         </tr>
                     </table>
@@ -254,30 +207,21 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th>No.</th>
-                                    <th>Dokumen</th>
-                                    <th>Item</th>
-                                    <th>Qty</th>
-                                    <th>Satuan</th>
-                                    <th>Total</th>
-                                    <th>PPN</th>
-                                    <th>Grandtotal</th>
+                                    <th align="center">No.</th>
+                                    <th align="center">No.AR Invoice</th>
+                                    <th align="center">Customer</th>
+                                    <th align="center">Tgl.Post</th>
+                                    <th align="center">Tagihan</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($data->marketingOrderMemoDetail as $key => $row)
+                                @foreach($data->marketingOrderHandoverInvoiceDetail as $key => $row)
                                 <tr>
-                                    <td align="center" rowspan="2">{{ ($key + 1) }}</td>
-                                    <td align="center">{{ $row->getCode() }}</td>
-                                    <td align="">{{ $row->lookable->lookable->item->name }}</td>
-                                    <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
-                                    <td align="center">{{ $row->lookable->lookable->item->sellUnit->code }}</td>
-                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="7">Keterangan: {{ $row->note }}</td>
+                                    <td align="center">{{ ($key + 1) }}</td>
+                                    <td class="">{{ $row->lookable->code }}</td>
+                                    <td class="">{{ $row->lookable->account->name }}</td>
+                                    <td align="center">{{ date('d/m/y',strtotime($row->lookable->post_date)) }}</td>
+                                    <td align="right">{{ number_format($row->lookable->balance,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -287,35 +231,17 @@
                     <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
                         <div class="row">
-                        <div class="column1">
-                            <table style="width:100%">
-                                <tr class="break-row">
-                                    <td>
-                                        <div class="mt-3">
-                                            Catatan : {{ $data->note }}
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="column2">
-                            <table style="border-collapse:collapse;" width="74%">
-                                @if($data->tax > 0)
-                                <tr class="break-row">
-                                    <td align="right">Total</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td align="right">PPN</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
-                                </tr>
-                                @endif
-                                <tr class="break-row">
-                                    <td align="right">Grandtotal</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
-                                </tr>
-                            </table>
-                        </div>
+                            <div class="column1">
+                                <table style="width:100%">
+                                    <tr class="break-row">
+                                        <td>
+                                            <div>
+                                                Catatan : {{ $data->note }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -335,6 +261,10 @@
                                     @endif
                                     <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                                     <div class="mt-1">{{ $data->user->position->Level->name.' - '.$data->user->position->division->name }}</div>
+                                </td>
+                                <td width="">
+                                    Diterima Oleh,
+                                    <div style="margin-top:50px;">.........................</div>
                                 </td>
                                 @if($data->approval())
                                     @foreach ($data->approval() as $detail)
@@ -356,5 +286,8 @@
                 </div>
             </div>
         </main>
+       
     </body>
+    
+    
 </html>

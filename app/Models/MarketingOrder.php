@@ -20,6 +20,7 @@ class MarketingOrder extends Model
         'user_id',
         'account_id',
         'company_id',
+        'type',
         'post_date',
         'valid_date',
         'document',
@@ -134,6 +135,18 @@ class MarketingOrder extends Model
         };
 
         return $is;
+    }
+
+    public function type(){
+        $type = match ($this->type) {
+            '1' => 'Proyek',
+            '2' => 'Retail',
+            '3' => 'Khusus',
+            '4' => 'Sampel',
+            default => 'Invalid',
+        };
+
+        return $type;
     }
 
     public function deliveryType(){

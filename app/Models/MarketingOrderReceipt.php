@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class MarketingOrderMemo extends Model
+class MarketingOrderReceipt extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'marketing_order_memos';
+    protected $table = 'marketing_order_receipts';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
@@ -21,22 +21,40 @@ class MarketingOrderMemo extends Model
         'company_id',
         'account_id',
         'post_date',
-        'note',
-        'type',
-        'status',
         'document',
-        'tax_no',
-        'total',
-        'tax',
+        'note',
+        'status',
         'grandtotal',
         'void_id',
         'void_note',
         'void_date',
     ];
 
+    public function attachment() 
+    {
+        if($this->document !== NULL && Storage::exists($this->document)) {
+            $document = asset(Storage::url($this->document));
+        } else {
+            $document = asset('website/empty.png');
+        }
+
+        return $document;
+    }
+
+    public function deleteFile(){
+		if(Storage::exists($this->document)) {
+            Storage::delete($this->document);
+        }
+	}
+
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function account()
+    {
+        return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
     }
 
     public function voidUser()
@@ -44,24 +62,25 @@ class MarketingOrderMemo extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
-    public function account(){
-        return $this->belongsTo('App\Models\User','account_id','id')->withTrashed();
-    }
-
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function marketingOrderMemoDetail()
+    public function marketingOrderReceiptDetail()
     {
-        return $this->hasMany('App\Models\MarketingOrderMemoDetail');
+        return $this->hasMany('App\Models\MarketingOrderReceiptDetail');
+    }
+
+    public function marketingOrderHandoverReceiptDetail()
+    {
+        return $this->hasMany('App\Models\MarketingOrderHandoverReceiptDetail');
     }
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
-    
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
@@ -90,38 +109,10 @@ class MarketingOrderMemo extends Model
         return $status;
     }
 
-    public function type(){
-        $type = match ($this->type) {
-            '1' => 'Potongan Nominal (Invoice)',
-            '2' => 'Potongan Qty (Invoice)',
-            '3' => 'Mandiri',
-            default => 'Invalid',
-        };
-
-        return $type;
-    }
-
-    public function attachment() 
-    {
-        if($this->document !== NULL && Storage::exists($this->document)) {
-            $document = asset(Storage::url($this->document));
-        } else {
-            $document = asset('website/empty.png');
-        }
-
-        return $document;
-    }
-
-    public function deleteFile(){
-		if(Storage::exists($this->document)) {
-            Storage::delete($this->document);
-        }
-	}
-
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = MarketingOrderMemo::selectRaw('RIGHT(code, 8) as code')
+        $query = MarketingOrderReceipt::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
@@ -159,36 +150,6 @@ class MarketingOrderMemo extends Model
         }
 
         return $ada;
-    }
-
-    public function journal(){
-        return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
-    }
-
-    public function incomingPaymentDetail(){
-        return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
-            $query->whereIn('status',['2','3']);
-        });
-    }
-
-    public function balance(){
-        $total = $this->grandtotal;
-
-        foreach($this->incomingPaymentDetail as $row){
-            $total -= $row->total;
-        }
-
-        return $total;
-    }
-
-    public function totalUsed(){
-        $total = 0;
-
-        foreach($this->incomingPaymentDetail as $row){
-            $total += $row->total;
-        }
-
-        return $total;
     }
 
     public function hasChildDocument(){

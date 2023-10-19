@@ -10,10 +10,6 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
-
-    .select2-container {
-        min-width: 0px !important;
-    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -88,12 +84,6 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_account" style="font-size:1rem;">Customer :</label>
-                                                <div class="input-field">
-                                                    <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">Start Date (Tanggal Mulai) :</label>
                                                 <div class="input-field col s12">
                                                 <input type="date" id="start_date" name="start_date"  onchange="loadDataTable()">
@@ -123,16 +113,10 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Pengguna</th>
-                                                        <th>Customer</th>
                                                         <th>Perusahaan</th>
                                                         <th>Tgl.Post</th>
-                                                        <th>Tipe</th>
-                                                        <th>Dokumen</th>
-                                                        <th>No.Seri Pajak</th>
                                                         <th>Keterangan</th>
-                                                        <th>Total</th>
-                                                        <th>PPN</th>
-                                                        <th>Grandtotal</th>
+                                                        <th>Lampiran</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -180,10 +164,6 @@
                                         </select>
                                     </div>
                                     <div class="input-field col m3 s12 step3">
-                                        <select class="browser-default" id="account_id" name="account_id"></select>
-                                        <label class="active" for="account_id">Customer</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="company_id" name="company_id">
                                             @foreach ($company as $rowcompany)
                                                 <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -191,23 +171,11 @@
                                         </select>
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step5">
+                                    <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                         <label class="active" for="post_date">Tgl. Posting</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step6">
-                                        <select class="form-control" id="type" name="type" onchange="resetItem();">
-                                            <option value="1">Potongan Nominal (Invoice)</option>
-                                            <option value="2">Potongan Qty (Invoice)</option>
-                                            <option value="3">Mandiri</option>
-                                        </select>
-                                        <label class="" for="type">Tipe Memo</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step7">
-                                        <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak dari Customer">
-                                        <label class="active" for="tax_no">No. Seri Pajak</label>
-                                    </div>
-                                    <div class="file-field input-field col m3 s12 step8">
+                                    <div class="file-field input-field col m3 s12 step5">
                                         <div class="btn">
                                             <span>Lampiran</span>
                                             <input type="file" name="document" id="document">
@@ -218,82 +186,45 @@
                                     </div>
                                 </fieldset>
                             </div>
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend>2. Dokumen Terpakai</legend>
-                                    <div class="col m3 s12 step9">
-                                        <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="col s12">
-                                <fieldset style="min-width: 100%;overflow:auto;">
-                                    <legend>3. Detail Dokumen Terpakai</legend>
-                                    <div class="row">
-                                        <div class="input-field col m2 step10">
-                                            <select class="browser-default" id="marketing_order_invoice_id" name="marketing_order_invoice_id"></select>
-                                            <label class="active" for="marketing_order_invoice_id">AR Invoice</label>
-                                        </div>
-                                        <div class="col m1 pt-1">
-                                            <a class="btn-floating mb-1 waves-effect waves-light" onclick="getMarketingInvoice();" href="javascript:void(0);">
-                                                <i class="material-icons">add</i>
-                                            </a>
-                                        </div>
-                                        <div class="col m9">
-                                            Untuk tipe Memo : potongan nominal dan potongan qty, maka anda bisa mengambil data dari AR Invoice.
-                                        </div>
-                                    </div> 
-                                    <div class="col m12 s12 step11" style="max-width:2500px !important;" id="table-item">
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered">
+                            <div class="col s12 step6">
+                                <fieldset style="min-width: 100%;">
+                                    <legend>2. Dokumen Detail</legend>
+                                    <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
+                                        <p class="mt-1 mb-2">
+                                            <div id="datatable_buttons_multi"></div>
+                                            <table id="table_item">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">Dokumen</th>
-                                                        <th class="center">Seri Pajak</th>
+                                                        <th class="center">No.AR Invoice</th>
+                                                        <th class="center">Customer</th>
                                                         <th class="center">Tgl.Post</th>
-                                                        <th class="center">Keterangan</th>
-                                                        <th class="center">Item</th>
-                                                        <th class="center">Qty</th>
-                                                        <th class="center">Satuan</th>
                                                         <th class="center">Total</th>
-                                                        <th class="center">PPN</th>
-                                                        <th class="center">Grandtotal (Sisa)</th>
-                                                        <th class="center">Hapus</th>
+                                                        <th class="center">Tax</th>
+                                                        <th class="center">Total Stlh Pajak</th>
+                                                        <th class="center">Pembulatan</th>
+                                                        <th class="center">Grandtotal</th>
+                                                        <th class="center">Downpayment</th>
+                                                        <th class="center">Tagihan</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="body-item">
-                                                    <tr id="last-row-item">
-                                                        <td colspan="11">
-                                                            Silahkan tambahkan AR Invoice
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
+                                                <tbody id="body-item"></tbody>
                                             </table>
                                         </p>
                                     </div>
                                 </fieldset>
                             </div>
-                            <div class="input-field col m4 s12 step12">
+                            <div class="input-field col m4 s12 step7">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m4 s12">
 
                             </div>
-                            <div class="input-field col m4 s12 step13">
-                                <table width="100%" class="bordered">
-                                    <thead>
-                                        <tr>
-                                            <td style="font-size: 15px !important;">Grandtotal</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;" readonly>
-                                            </td>
-                                        </tr>
-                                    </thead>
-                                </table>
+                            <div class="input-field col m4 s12">
+                                
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step8" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -423,59 +354,6 @@
     </div>
 </div>
 
-<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
-        <div class="row" >
-            <div class="col m3 s12">
-                
-            </div>
-            <div class="col m6 s12">
-                <h4 id="title_data" style="text-align:center"></h4>
-                <h5 id="code_data" style="text-align:center"></h5>
-            </div>
-            <div class="col m3 s12 right-align">
-                <img src="{{ url('website/logo_web_fix.png') }}" width="40%" height="60%">
-            </div>
-        </div>
-        <div class="divider mb-1 mt-2"></div>
-        <div class="row">
-            <div class="col" id="user_jurnal">
-            </div>
-            <div class="col" id="post_date_jurnal">
-            </div>
-            <div class="col" id="note_jurnal">
-            </div>
-            <div class="col" id="ref_jurnal">
-            </div>
-        </div>
-        <div class="row mt-2">
-            <table class="bordered Highlight striped">
-                <thead>
-                        <tr>
-                            <th class="center-align">No</th>
-                            <th class="center-align">Coa</th>
-                            <th class="center-align">Perusahaan</th>
-                            <th class="center-align">Partner Bisnis</th>
-                            <th class="center-align">Plant</th>
-                            <th class="center-align">Line</th>
-                            <th class="center-align">Mesin</th>
-                            <th class="center-align">Department</th>
-                            <th class="center-align">Gudang</th>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                        </tr>
-                    
-                </thead>
-                <tbody id="body-journal-table">
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
-    </div>
-</div>
-
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -488,15 +366,16 @@
     </a>
 </div>
 
-<script>
 
+<script>
+    var table_multi;
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',
         });
 
-        $('#datatable_serverside').on('click', 'button,a', function(event) {
+        $('#datatable_serverside').on('click', 'button, select', function(event) {
             event.stopPropagation();
         });
 
@@ -521,7 +400,7 @@
                 $('#post_date').attr('min','{{ $minDate }}');
                 $('#post_date').attr('max','{{ $maxDate }}');
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -531,30 +410,17 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
-                if(!$('#temp').val()){
-                    
-                }
+
+                getMarketingInvoice();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#account_id').empty();
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }else{
-                    $('#body-item').empty().append(`
-                        <tr id="last-row-item">
-                            <td colspan="11">
-                                Silahkan tambahkan AR Invoice
-                            </td>
-                        </tr>
-                    `);
-                }
                 M.updateTextFields();
                 window.onbeforeunload = function() {
                     return null;
                 };
-                countAll();
+                $('#table_item').DataTable().clear().destroy();
             }
         });
 
@@ -600,212 +466,98 @@
                 $('#temp').val('');
             }
         });
-
-        $('#modal6').modal({
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) { 
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#title_data').empty();
-                $('#code_data').empty();             
-                $('#body-journal-table').empty();
-                $('#user_jurnal').empty();
-                $('#note_jurnal').empty();
-                $('#ref_jurnal').empty();
-                $('#post_date_jurnal').empty();
-            }
-        });
-
-        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
-        select2ServerSide('#coa_id', '{{ url("admin/select2/coa") }}');
-
-        $('#marketing_order_invoice_id').select2({
-            placeholder: '-- Kosong --',
-            minimumInputLength: 1,
-            allowClear: true,
-            cache: true,
-            width: 'resolve',
-            dropdownParent: $('body').parent(),
-            ajax: {
-                url: '{{ url("admin/select2/marketing_order_invoice") }}',
-                type: 'GET',
-                dataType: 'JSON',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        account_id: $('#account_id').val(),
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.items
-                    }
-                }
-            }
-        });
-
-        $('#account_id').on('change', function() {
-            if(!$(this).val()){
-                $('#marketing_order_down_payment_id,#marketing_order_delivery_process_id').empty().trigger('change');
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }
-            }
-        });
-
-        $('#body-item').on('click', '.delete-data-item', function() {
-            $(this).closest('tr').remove();
-            countAll();
-            if($('.row_item').length == 0){
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');   
-                }                
-                $('#table-item').animate( { 
-                    scrollLeft: '0' }, 
-                500);
-            }
-        });
     });
 
-    function resetItem(){
-        if($('.data-used').length > 0){
-            $('.data-used').trigger('click');   
-        }
-        $('#body-item').empty().append(`
-            <tr id="last-row-item">
-                <td colspan="11">
-                    Silahkan tambahkan AR Invoice
-                </td>
-            </tr>
-        `);
-        if($('#type').val() == '3'){
-            $('#grandtotal').attr('readonly',false);
-        }else{
-            $('#grandtotal').attr('readonly',true);
-        }
-    }
-
     function getMarketingInvoice(){
-        if($('#marketing_order_invoice_id').val()){
-            if($('.data-used').length > 0){
-                $('.data-used').trigger('click');
-            }
+        $.ajax({
+            url: '{{ Request::url() }}/get_marketing_invoice',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {},
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
 
-            let datakuy = $('#marketing_order_invoice_id').select2('data')[0];
-
-            $.ajax({
-                url: '{{ Request::url() }}/send_used_data',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    id: $('#marketing_order_invoice_id').val(),
-                    type: datakuy.type,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-
-                    if(response.status == 500){
-                        swal({
-                            title: 'Ups!',
-                            text: response.message,
-                            icon: 'warning'
-                        });
-                    }else{
-                        if($('#last-row-item').length > 0){
-                            $('#last-row-item').remove();
-                        }
-
-                        $('#list-used-data').append(`
-                            <div class="chip purple darken-4 gradient-shadow white-text">
-                                ` + datakuy.code + `
-                                <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.type + `','` + $('#marketing_order_invoice_id').val() + `')">close</i>
-                            </div>
-                        `);
-
-                        $.each(datakuy.details, function(i, val) {
-                            var count = makeid(10);
-                            $('#body-item').append(`
-                                <tr class="row_item" data-id="` + $('#marketing_order_invoice_id').val() + `">
-                                    <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.type + `">
-                                    <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.id + `">
-                                    <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="` + val.is_include_tax + `">
-                                    <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="` + val.percent_tax + `">
-                                    <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="` + val.tax_id + `">
-                                    <td>
-                                        ` + val.code + `
-                                    </td>
-                                    <td>
-                                        ` + val.tax_no + `
-                                    </td>
-                                    <td class="center">
-                                        ` + datakuy.post_date + `
-                                    </td>
-                                    <td>
-                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail...">
-                                    </td>
-                                    <td>
-                                        ` + val.name + `
-                                    </td>
-                                    <td>
-                                        <input name="arr_qty[]" id="rowQty` + count + `" type="text" value="` + ($('#type').val() == '2' ? val.qty : '0' ) + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + ($('#type').val() == '2' ? val.qty : '0' ) + `" style="text-align:right;" ` + ($('#type').val() == '1' ? 'readonly' : '') + `>
-                                    </td>
-                                    <td class="center">
-                                        <span>` + val.unit + `</span>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_total[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_total`+ count +`" readonly>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_tax[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_tax`+ count +`" readonly>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + val.balance + `" data-nominal="` + val.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-
-                        $('#marketing_order_invoice_id').empty();
-
-                        countAll();
+                if(response.length > 0){
+                    if(!$('#temp').val()){
+                        $('#body-item').empty();
                     }
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
+                    $.each(response, function(i, val) {
+                        $('#body-item').append(`
+                            <tr class="row_item" data-id="` + val.enc_code + `" data-type="` + val.type + `">
+                                <td>` + val.code + `</td>
+                                <td>` + val.customer_name + `</td>
+                                <td>` + val.post_date + `</td>
+                                <td class="right-align">` + val.total + `</td>
+                                <td class="right-align">` + val.tax + `</td>
+                                <td class="right-align">` + val.total_after_tax + `</td>
+                                <td class="right-align">` + val.rounding + `</td>
+                                <td class="right-align">` + val.grandtotal + `</td>
+                                <td class="right-align">` + val.downpayment + `</td>
+                                <td class="right-align">` + val.balance + `</td>
+                            </tr>
+                        `);
                     });
                 }
-            });
-        }
-    }
 
-    function checkRow(val){
-        var total = parseFloat($('#arr_grandtotal' + val).val().replaceAll(".", "").replaceAll(",",".")), 
-            totalLimit = parseFloat($('#arr_grandtotal' + val).data('nominal').replaceAll(".", "").replaceAll(",","."));
-
-        if(totalLimit > 0){
-            if(total > totalLimit){
-                total = totalLimit;
-                $('#arr_grandtotal' + val).val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
+                table_multi = $('#table_item').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    },
+                    rowCallback: function( row, data ) {
+                        if ($(row).hasClass('selected')) {
+                            this.api().row( row ).select();
+                        }
+                    }
+                });
+                $('#table_item_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('select[name="table_item_length"]').addClass('browser-default');
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
             }
-        }
+        });
     }
     
     function printMultiSelect(){
@@ -1084,45 +836,6 @@
         }
     }
 
-    function removeUsedData(type,id){
-        $.ajax({
-            url: '{{ Request::url() }}/remove_used_data',
-            type: 'POST',
-            dataType: 'JSON',
-            data: { 
-                id : id,
-                type : type,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                
-            },
-            success: function(response) {
-                $('.row_item[data-id="' + id + '"]').remove();
-                if($('.row_item').length == 0){
-                    $('#body-item').empty().append(`
-                        <tr id="last-row-item">
-                            <td colspan="11">
-                                Silahkan tambahkan AR Invoice
-                            </td>
-                        </tr>
-                    `);
-                }
-                
-                countAll();
-            },
-            error: function() {
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
@@ -1171,6 +884,7 @@
                 data: {
                     status : $('#filter_status').val(),
                     'account_id[]' : $('#filter_account').val(),
+                    'marketing_order_id[]' : $('#filter_marketing_order').val(),
                     company_id : $('#filter_company').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
@@ -1194,16 +908,10 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: '' },
                 { name: 'user_id', className: '' },
-                { name: 'account_id', className: '' },
                 { name: 'company_id', className: '' },
                 { name: 'post_date', className: '' },
-                { name: 'type', className: '' },
-                { name: 'document', searchable: false, orderable: false, className: '' },
-                { name: 'tax_no', className: '' },
                 { name: 'note', className: '' },
-                { name: 'total', className: 'right-align' },
-                { name: 'tax', className: 'right-align' },
-                { name: 'grandtotal', className: 'right-align' },
+                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1285,97 +993,85 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
-                if($('#type').val() == '3'){
-                    swal({
-                        title: 'Ups!',
-                        text: 'Untuk AR Memo tipe Mandiri masih belum bisa digunakan ya.',
-                        icon: 'warning'
-                    });
-                }else{
-                    var formData = new FormData($('#form_data')[0]), passedTax = true;
-                
-                    $('input[name^="arr_tax[]"]').each(function(index){
-                        if(parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) > 0){
-                            if(!$('#tax_no').val()){
-                                passedTax = false;
-                            }
-                        }
-                    });
-                    
-                    if(passedTax){
-                        $.ajax({
-                            url: '{{ Request::url() }}/create',
-                            type: 'POST',
-                            dataType: 'JSON',
-                            data: formData,
-                            contentType: false,
-                            processData: false,
-                            cache: true,
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            beforeSend: function() {
-                                $('#validation_alert').hide();
-                                $('#validation_alert').html('');
-                                loadingOpen('.modal-content');
-                            },
-                            success: function(response) {
-                                loadingClose('.modal-content');
-                                if(response.status == 200) {
-                                    success();
-                                    M.toast({
-                                        html: response.message
-                                    });
-                                } else if(response.status == 422) {
-                                    $('#validation_alert').show();
-                                    $('.modal-content').scrollTop(0);
-                                    
-                                    swal({
-                                        title: 'Ups! Validation',
-                                        text: 'Check your form.',
-                                        icon: 'warning'
-                                    });
+                var formData = new FormData($('#form_data')[0]), passed = false;
 
-                                    $.each(response.error, function(i, val) {
-                                        $.each(val, function(i, val) {
-                                            $('#validation_alert').append(`
-                                                <div class="card-alert card red">
-                                                    <div class="card-content white-text">
-                                                        <p>` + val + `</p>
-                                                    </div>
-                                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">×</span>
-                                                    </button>
-                                                </div>
-                                            `);
-                                        });
-                                    });
-                                } else {
-                                    M.toast({
-                                        html: response.message
-                                    });
-                                }
-                            },
-                            error: function() {
+                $.map(table_multi.rows('.selected').nodes(), function (item) {
+                    formData.append('arr_id[]',$(item).data('id'));
+                    formData.append('arr_type[]',$(item).data('type'));
+                    passed = true;
+                });
+
+                if(passed == true){
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
                                 $('.modal-content').scrollTop(0);
-                                loadingClose('.modal-content');
+                                
                                 swal({
-                                    title: 'Ups!',
-                                    text: 'Check your internet connection.',
-                                    icon: 'error'
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
                                 });
                             }
-                        });
-                    }else{
-                        swal({
-                            title: 'Ups!',
-                            text: 'Nomor seri referensi pajak tidak boleh kosong, ketika nominal PPN diatas 0.',
-                            icon: 'warning'
-                        });
-                    }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Silahkan pilih AR Invoice.',
+                        icon: 'warning'
+                    });
                 }
-    
             }
         });
     }
@@ -1401,88 +1097,39 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal1').modal('open');
+                
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
-                $('#account_id').empty();
-                $('#account_id').append(`
-                    <option value="` + response.account_id + `">` + response.account_name + `</option>
-                `);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
-                $('#tax_no').val(response.tax_no);
                 $('#note').val(response.note);
-                $('#grandtotal').val(response.balance);
-                $('#type').val(response.type).formSelect();
-
+                
                 if(response.details.length > 0){
-                    if($('.data-used').length > 0){
-                        $('.data-used').trigger('click');
-                    }
-                    if($('#last-row-item').length > 0){
-                        $('#last-row-item').remove();
-                    }
-                    $.each(response.used, function(i, val) {
-                        $('#list-used-data').append(`
-                            <div class="chip purple darken-4 gradient-shadow white-text">
-                                ` + val.code + `
-                                <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `','` + val.id + `')">close</i>
-                            </div>
-                        `);
-                    });
+                    $('#body-item').empty();
                     $.each(response.details, function(i, val) {
-                        var count = makeid(10);
                         $('#body-item').append(`
-                            <tr class="row_item" data-id="` + val.id + `">
-                                <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.lookable_type + `">
-                                <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.lookable_id + `">
-                                <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="` + val.is_include_tax + `">
-                                <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="` + val.percent_tax + `">
-                                <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="` + val.tax_id + `">
-                                <td>
-                                    ` + val.code + `
-                                </td>
-                                <td>
-                                    ` + val.tax_no + `
-                                </td>
-                                <td class="center">
-                                    ` + val.post_date + `
-                                </td>
-                                <td>
-                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail..." value="` + val.note + `">
-                                </td>
-                                <td>
-                                        ` + val.item_name + `
-                                </td>
-                                <td>
-                                    <input name="arr_qty[]" id="rowQty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;" ` + (response.type == '1' ? 'readonly' : '') + `>
-                                </td>
-                                <td class="center">
-                                    <span>` + val.unit + `</span>
-                                </td>
-                                <td class="center">
-                                    <input name="arr_total[]" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_total`+ count +`" readonly>
-                                </td>
-                                <td class="center">
-                                    <input name="arr_tax[]" class="browser-default" type="text" value="` + val.tax + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_tax`+ count +`" readonly>
-                                </td>
-                                <td class="center">
-                                    <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + val.grandtotal + `" data-nominal="` + val.grandtotal + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `');" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
+                            <tr class="row_item selected" data-id="` + val.enc_code + `" data-type="` + val.type + `">
+                                <td>` + val.code + `</td>
+                                <td>` + val.customer_name + `</td>
+                                <td>` + val.post_date + `</td>
+                                <td class="right-align">` + val.total + `</td>
+                                <td class="right-align">` + val.tax + `</td>
+                                <td class="right-align">` + val.total_after_tax + `</td>
+                                <td class="right-align">` + val.rounding + `</td>
+                                <td class="right-align">` + val.grandtotal + `</td>
+                                <td class="right-align">` + val.downpayment + `</td>
+                                <td class="right-align">` + val.balance + `</td>
                             </tr>
                         `);
                     });
                 }
-                countAll();
+                
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
+
+                $('#modal1').modal('open');
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -1610,12 +1257,6 @@
                 $('#rowQty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
             }
         }
-
-        let bobot = qty / qtylimit;
-        let grandtotal = parseFloat($('#arr_grandtotal' + id).data('nominal').toString().replaceAll(".", "").replaceAll(",","."));
-        let newgrandtotal = grandtotal * bobot;
-        $('#arr_grandtotal' + id).val(formatRupiahIni(newgrandtotal.toFixed(2).toString().replace('.',',')));
-        countAll();
     }
 
     var printService = new WebSocketPrinter({
@@ -1632,65 +1273,13 @@
         },
     });
 
-    function viewJournal(id){
-        $.ajax({
-            url: '{{ Request::url() }}/view_journal/' + id,
-            type:'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            complete: function() {
-                
-            },
-            success: function(data){
-                loadingClose('.modal-content');
-                if(data.status == '500'){
-                    M.toast({
-                        html: data.message
-                    });
-                }else{
-                    $('#modal6').modal('open');
-                    $('#title_data').append(``+data.title+``);
-                    $('#code_data').append(data.message.code);
-                    $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna `+data.user);
-                    $('#note_jurnal').append(`Keterangan `+data.message.note);
-                    $('#ref_jurnal').append(`Referensi `+data.reference);
-                    $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
-                }
-            }
-        });
-    }
-
-    function countAll(){
-        let grandtotal = 0, tax = 0;
-
-        $('input[name^="arr_grandtotal[]"]').each(function(index){
-            let rowgrandtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let percentTax = parseFloat($('input[name^="arr_percent_tax[]"]').eq(index).val());
-            let rowtotal = rowgrandtotal;
-            let rowtax = 0;
-            if(percentTax > 0){
-                rowtotal = rowgrandtotal / ((percentTax + 100) / 100);
-                rowtax = rowtotal * (percentTax / 100);
-            }
-            $('input[name^="arr_total[]"]').eq(index).val(formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',',')));
-            $('input[name^="arr_tax[]"]').eq(index).val(formatRupiahIni(rowtax.toFixed(2).toString().replace('.',',')));
-            grandtotal += rowgrandtotal;
-        });
-
-        $('#grandtotal').val(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
-        );
-    }
-
     function startIntro(){
         introJs().setOptions({
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'AR Credit Memo',
-                    intro : 'Form ini digunakan untuk mengelola data credit memo untuk dokumen AR Invoice dan Piutang Usaha dari sebuah Partner Bisnis.'
+                    title : 'Tanda Terima Invoice',
+                    intro : 'Form ini digunakan untuk mengelola data tanda terima invoice dari Fakturis kepada Admin Penagihan yang dilampirkan beberapa AR Invoice.'
                 },
                 {
                     title : 'Nomor Dokumen',
@@ -1703,63 +1292,33 @@
                     intro : 'Pilih kode plant untuk nomor dokumen bisa secara otomatis ter-generate.'
                 },
                 {
-                    title : 'Customer',
-                    element : document.querySelector('.step3'),
-                    intro : 'Partner bisnis tipe Pelanggan. Silahkan pilih sesuai dengan customer yang ingin ditagihkan invoice. Hati-hati ketika memilih partner bisnis maka, daftar surat jalan akan terfilter sesuai BP ini.' 
-                },
-                {
                     title : 'Perusahaan',
-                    element : document.querySelector('.step4'),
+                    element : document.querySelector('.step3'),
                     intro : 'Perusahaan dimana dokumen ini dibuat.' 
                 },
                 {
                     title : 'Tgl. Posting',
-                    element : document.querySelector('.step5'),
+                    element : document.querySelector('.step4'),
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
                 {
-                    title : 'Tipe Memo',
-                    element : document.querySelector('.step6'),
-                    intro : 'Tipe memo dibagi menjadi 3, yang pertama adalah Tipe Nominal (Invoice) dimana memo akan memotong secara nominal AR Invoice yang terpilih. Tipe kedua adalah Tipe Qty (Invoice) dimana memo akan memotong secara qty dan nominal proporsional sesuai sisa tagihan AR Invoice terpilih. Tipe yang ketiga adalah Tipe Mandiri, yang mana digunakan untuk menerbitkan potongan penjualan untuk beberapa AR Invoice secara nominal rupiah. Khusus untuk tipe ketiga AR Memo bisa ditarik ke Kas / Bank Masuk untuk memotong piutang usaha, dan bisa ditarik ke Payment Request untuk dibayarkan kembali kepada customer.' 
-                },
-                {
-                    title : 'Nomor Seri PPN dari Customer',
-                    element : document.querySelector('.step7'),
-                    intro : 'Nomor seri PPN yang anda dapatkan dari Customer sebagai referensi pemotongan pajak.' 
-                },
-                {
                     title : 'File Lampiran',
-                    element : document.querySelector('.step8'),
-                    intro : 'File bukti lampiran yang ingin digunakan sebagai bukti. Hanya bisa mengupload 1 file saja.' 
+                    element : document.querySelector('.step5'),
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
-                    title : 'Data Dokumen Terpakai',
-                    element : document.querySelector('.step9'),
-                    intro : 'Daftar dokumen terpakai, fungsinya untuk mengunci data agar hanya terpakai pada form dan user aktif saat ini saja. Silahkan hapus jika ingin diakses oleh user lainnya.' 
-                },
-                {
-                    title : 'AR Invoice',
-                    element : document.querySelector('.step10'),
-                    intro : 'Daftar AR Invoice yang ingin ditambahkan untuk dipotong.' 
-                },
-                {
-                    title : 'Tabel Detail',
-                    element : document.querySelector('.step11'),
-                    intro : 'Daftar sementara informasi dokumen / coa yang ditambahkan dari menu sebelumnya.' 
+                    title : 'Dokumen Detail',
+                    element : document.querySelector('.step6'),
+                    intro : 'Data AR Invoice yang tampil disini adalah data Invoice yang memiliki sisa tagihan / piutang usaha dan belum memiliki Tanda Terima Invoice.'
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step12'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
-                },
-                {
-                    title : 'Informasi Nominal',
-                    element : document.querySelector('.step13'),
-                    intro : 'Nominal yang ada disini tidak bisa dirubah, karena otomatis dihitung dari dokumen pada tabel sebelumnya.' 
+                    element : document.querySelector('.step7'),
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step14'),
+                    element : document.querySelector('.step8'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

@@ -185,6 +185,10 @@ class MarketingOrderInvoice extends Model
             }
         }
 
+        if($this->marketingOrderHandoverInvoiceDetail()->exists()){
+            $hasRelation = true;
+        }
+
         return $hasRelation;
     }
 
@@ -197,7 +201,7 @@ class MarketingOrderInvoice extends Model
 
         foreach($this->marketingOrderInvoiceDetail as $row){
             foreach($row->marketingOrderMemoDetail as $momd){
-                $total -= $this->balance;
+                $total -= $this->grandtotal;
             }
         }
 
@@ -209,7 +213,7 @@ class MarketingOrderInvoice extends Model
 
         foreach($this->marketingOrderInvoiceDetail as $row){
             foreach($row->marketingOrderMemoDetail as $momd){
-                $total += $momd->balance;
+                $total += $momd->grandtotal;
             }
         }
 
@@ -223,7 +227,7 @@ class MarketingOrderInvoice extends Model
             foreach($row->marketingOrderMemoDetail()->whereHas('marketingOrderMemo',function($query)use($date){
                 $query->whereDate('post_date','<=',$date);
             })->get() as $momd){
-                $total += $momd->balance;
+                $total += $momd->grandtotal;
             }
         }
 
@@ -243,12 +247,6 @@ class MarketingOrderInvoice extends Model
 
         foreach($this->marketingOrderInvoiceDetail as $row){
             $arrNominal = $row->arrBalanceMemo();
-            $arr['total'] += $arrNominal['total'];
-            $arr['tax'] += $arrNominal['tax'];
-            $arr['total_after_tax'] += $arrNominal['total_after_tax'];
-            $arr['rounding'] += $arrNominal['rounding'];
-            $arr['grandtotal'] += $arrNominal['grandtotal'];
-            $arr['downpayment'] += $arrNominal['downpayment'];
             $arr['balance'] += $arrNominal['balance'];
         }
 
@@ -258,6 +256,12 @@ class MarketingOrderInvoice extends Model
     public function incomingPaymentDetail(){
         return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
             $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function marketingOrderHandoverInvoiceDetail(){
+        return $this->hasMany('App\Models\MarketingOrderHandoverInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderHandoverInvoice',function($query){
+            $query->whereIn('status',['1','2','3']);
         });
     }
 

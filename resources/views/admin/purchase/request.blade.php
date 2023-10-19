@@ -1004,34 +1004,33 @@
             var poin = $(item).find('td:nth-child(3)').text().trim();
             arr_id_temp.push(poin);
         });
-        console.log(arr_id_temp);
-        // $.ajax({
-        //     url: '{{ Request::url() }}/print',
-        //     type: 'POST',
-        //     dataType: 'JSON',
-        //     data: {
-        //         arr_id: arr_id_temp,
-        //     },
-        //     headers: {
-        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //     },
-        //     beforeSend: function() {
-        //     },
-        //     success: function(response) {
-        //         printService.submit({
-        //             'type': 'INVOICE',
-        //             'url': response.message
-        //         });
-        //     },
-        //     error: function() {
-        //         swal({
-        //             title: 'Ups!',
-        //             text: 'Check your internet connection.',
-        //             icon: 'error'
-        //         });
-        //     }
-        // });
-        
+        $.ajax({
+            url: '{{ Request::url() }}/print',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                arr_id: arr_id_temp,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+            
+            },
+            success: function(response) {
+                 printService.submit({
+                     'type': 'INVOICE',
+                     'url': response.message
+                 });
+            },
+            error: function() {
+                swal({
+                     title: 'Ups!',
+                     text: 'Check your internet connection.',
+                     icon: 'error'
+                });
+            }
+        });
     }
 
     function rowDetail(data) {

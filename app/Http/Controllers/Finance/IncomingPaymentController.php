@@ -419,7 +419,7 @@ class IncomingPaymentController extends Controller
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
                 }else{
-                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
@@ -626,18 +626,14 @@ class IncomingPaymentController extends Controller
                             'subtotal'              => $subtotal,
                             'note'                  => $request->arr_note[$key],
                         ]);
-
-                        if($request->arr_type[$key] == 'outgoing_payments' || $request->arr_type[$key] == 'marketing_order_down_payments' || $request->arr_type[$key] == 'marketing_order_invoices' || $request->arr_type[$key] == 'marketing_order_memos'){
-                            CustomHelper::removeCountLimitCredit($query->account_id,$total);
-                        }
                     }
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval('incoming_payments',$query->id,$query->note);
-                CustomHelper::sendNotification('incoming_payments',$query->id,'Kas / Bank Masuk No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Kas / Bank Masuk No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new IncomingPayment())

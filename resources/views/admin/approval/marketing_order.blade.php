@@ -169,7 +169,12 @@
                 <div class="col s8">
                     {{ $data->account->phone.' / '.$data->account->office_no }}
                 </div>
-                
+                <div class="col s4">
+                    Tipe Penjualan
+                </div>
+                <div class="col s8">
+                    {{ $data->type() }}
+                </div>
             </div>
             <div class="col s6 m6 row mt-2">
                 <div class="col s12 center-align">

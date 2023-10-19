@@ -869,15 +869,15 @@
 
     function addItem(){
         var count = makeid(10);
-        if($('.data-used').length > 0){
+        /* if($('.data-used').length > 0){
             $('.data-used').trigger('click');
             $('#account_id').empty();
-        }
+        } */
         $('#last-row-detail').before(`
             <tr class="row_detail">
-                <input type="hidden" name="arr_type[]" value="coas">
+                <input type="hidden" name="arr_type_item[]" value="coas">
                 <td>
-                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                    <select class="browser-default" id="arr_coa_item` + count + `" name="arr_coa_item[]"></select>
                 </td>
                 <td class="center">
                     -
@@ -886,19 +886,19 @@
                     -
                 </td>
                 <td class="center">
-                    <input id="arr_total` + count + `" name="arr_total[]" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                    <input id="arr_total_item` + count + `" name="arr_total_item[]" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
                 </td>
                 <td class="center">
-                    <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                    <input id="arr_rounding_item` + count + `" name="arr_rounding_item[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" readonly>
                 </td>
                 <td class="center">
-                    <input id="arr_subtotal` + count + `" name="arr_subtotal[]" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                    <input id="arr_subtotal_item` + count + `" name="arr_subtotal_item[]" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>
                 </td>
                 <td>
-                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan ...">
+                    <input name="arr_note_item[]" class="materialize-textarea" type="text" placeholder="Keterangan ...">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -907,7 +907,7 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+        select2ServerSide('#arr_coa_item' + count, '{{ url("admin/select2/coa") }}');
         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
         countAll();
     }
@@ -1387,25 +1387,6 @@
 
                 let passed = true;
 
-                if($('select[name^="arr_coa[]"]').length > 0){
-                    $('select[name^="arr_coa[]"]').each(function(index){
-                        formData.append('arr_coa[]',$(this).val());
-                        formData.append('arr_cost_distribution[]',(
-                            $('select[name^="arr_cost_distribution[]"]').eq(index).val() ? $('select[name^="arr_cost_distribution[]"]').eq(index).val() : ''
-                        ));
-                        formData.append('arr_total[]',$('input[name^="arr_total[]"]').eq(index).val());
-                        formData.append('arr_rounding[]',$('input[name^="arr_rounding[]"]').eq(index).val());
-                        formData.append('arr_subtotal[]',$('input[name^="arr_subtotal[]"]').eq(index).val());
-                        formData.append('arr_type[]',$('input[name^="arr_type[]"]').eq(index).val());
-                        formData.append('arr_note[]',(
-                            $('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''
-                        ));
-                        if(!$(this).val() || !$('input[name^="arr_total[]"]').eq(index).val() || !$('input[name^="arr_rounding[]"]').eq(index).val() || !$('input[name^="arr_subtotal[]"]').eq(index).val()){
-                            passed = false;
-                        }
-                    });
-                }
-
                 if($('input[name^="arr_coa[]"]').length > 0){
                     $('input[name^="arr_coa[]"]').each(function(index){
                         formData.append('arr_coa[]',$(this).val());
@@ -1419,6 +1400,26 @@
                             $('input[name^="arr_note"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''
                         ));
                         if(!$(this).val() || !$('input[name^="arr_total[]"]').eq(index).val() || !$('input[name^="arr_rounding[]"]').eq(index).val() || !$('input[name^="arr_subtotal[]"]').eq(index).val()){
+                            passed = false;
+                        }
+                    });
+                }
+
+                if($('select[name^="arr_coa_item[]"]').length > 0){
+                    $('select[name^="arr_coa_item[]"]').each(function(index){
+                        formData.append('arr_coa[]',$(this).val());
+                        formData.append('arr_id[]',$(this).val());
+                        formData.append('arr_cost_distribution[]',(
+                            $('select[name^="arr_cost_distribution[]"]').eq(index).val() ? $('select[name^="arr_cost_distribution[]"]').eq(index).val() : ''
+                        ));
+                        formData.append('arr_total[]',$('input[name^="arr_total_item[]"]').eq(index).val());
+                        formData.append('arr_rounding[]',$('input[name^="arr_rounding_item[]"]').eq(index).val());
+                        formData.append('arr_subtotal[]',$('input[name^="arr_subtotal_item[]"]').eq(index).val());
+                        formData.append('arr_type[]',$('input[name^="arr_type_item[]"]').eq(index).val());
+                        formData.append('arr_note[]',(
+                            $('input[name^="arr_note_item[]"]').eq(index).val() ? $('input[name^="arr_note_item[]"]').eq(index).val() : ''
+                        ));
+                        if(!$(this).val() || !$('input[name^="arr_total_item[]"]').eq(index).val() || !$('input[name^="arr_rounding_item[]"]').eq(index).val() || !$('input[name^="arr_subtotal_item[]"]').eq(index).val()){
                             passed = false;
                         }
                     });
@@ -1563,7 +1564,7 @@
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         let readonly = 'readonly';
-                        let array = ['marketing_order_memos'];
+                        let array = ['marketing_order_memos','coas'];
                         if(array.includes(val.type)){
                             readonly = '';
                         }

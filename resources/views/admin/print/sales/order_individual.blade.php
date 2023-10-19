@@ -215,6 +215,15 @@
                                             {{ $data->account->phone.' / '.$data->account->office_no }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            Tipe Penjualan
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->type() }}
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
                             <td width="25%" class="left-align">

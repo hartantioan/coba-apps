@@ -80,6 +80,9 @@ class AppServiceProvider extends ServiceProvider
             'production_isseu_receive_details'      => 'App\Models\ProductionIssueReceiveDetail',
             'leave_requests'                        => 'App\Models\LeaveRequest',
             'shift_requests'                        => 'App\Models\ShiftRequest',
+            'marketing_order_handover_invoices'     => 'App\Models\MarketingOrderHandoverInvoice',
+            'marketing_order_receipts'              => 'App\Models\MarketingOrderReceipt',
+            'marketing_order_handover_receipts'     => 'App\Models\MarketingOrderHandoverReceipt',
         ]);
     }
 }

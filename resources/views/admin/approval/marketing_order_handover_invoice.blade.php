@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">AR Credit Memo # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ $title }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -134,7 +134,7 @@
         <!-- logo and title -->
         <div class="row mt-1 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">AR Credit Memo</h5>
+                <h5 class="indigo-text">{{ $title }}</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="35%">
@@ -145,35 +145,6 @@
         <div class="row">
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
-                    CUSTOMER
-                </div>
-                <div class="col s4">
-                    Nama
-                </div>
-                <div class="col s8">
-                    {{ $data->account->name }}
-                </div>
-                <div class="col s4">
-                    Alamat
-                </div>
-                <div class="col s8">
-                    {{ $data->account->address }}
-                </div>
-                <div class="col s4">
-                    Telepon
-                </div>
-                <div class="col s8">
-                    {{ $data->account->phone.' / '.$data->account->office_no }}
-                </div>
-                <div class="col s4">
-                    Tipe
-                </div>
-                <div class="col s8">
-                    {{ $data->type() }}
-                </div>
-            </div>
-            <div class="col s6 row mt-2">
-                <div class="col s12 center-align">
                     INFO UTAMA
                 </div>
                 <div class="col s4">
@@ -181,12 +152,6 @@
                 </div>
                 <div class="col s8">
                     {{ $data->company->name }}
-                </div>
-                <div class="col s4">
-                    No. Seri Pajak
-                </div>
-                <div class="col s8">
-                    {!! $data->tax_no ? $data->tax_no : '-' !!}
                 </div>
                 <div class="col s4">
                     Bukti
@@ -202,59 +167,30 @@
                 <thead>
                     <tr>
                         <th class="center-align">No.</th>
-                        <th class="center-align">Dokumen</th>
-                        <th class="center-align">Item</th>
-                        <th class="center-align">Qty</th>
-                        <th class="center-align">Satuan</th>
-                        <th class="center-align">Total</th>
-                        <th class="center-align">PPN</th>
-                        <th class="center-align">Grandtotal</th>
+                        <th class="center-align">No.AR Invoice</th>
+                        <th class="center-align">Customer</th>
+                        <th class="center-align">Tgl.Post</th>
+                        <th class="center-align">Tagihan</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->marketingOrderMemoDetail as $key => $row)
+                    @foreach($data->marketingOrderHandoverInvoiceDetail as $key => $row)
                     <tr>
-                        <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
-                        <td class="center-align">{{ $row->getCode() }}</td>
-                        <td class="">{{ $row->lookable->lookable->item->name }}</td>
-                        <td class="right-align">{{ number_format($row->qty,3,',','.') }}</td>
-                        <td class="center-align">{{ $row->lookable->lookable->item->sellUnit->code }}</td>
-                        <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
+                        <td class="center-align">{{ ($key + 1) }}</td>
+                        <td class="">{{ $row->lookable->code }}</td>
+                        <td class="">{{ $row->lookable->account->name }}</td>
+                        <td class="center-align">{{ date('d/m/y',strtotime($row->lookable->post_date)) }}</td>
+                        <td class="right-align">{{ number_format($row->lookable->balance,2,',','.') }}</td>
                     </tr>
-                    <tr>
-                        <td colspan="7">Keterangan: {{ $row->note }}</td>
-                    </tr>
-                    
                     @endforeach
                     <tr>
-                        <td colspan="5" rowspan="8">
-                            <div class="mt-3">
+                        <td colspan="5">
+                            <div>
                                 Catatan : {{ $data->note }}
                             </div>
                         </td>
                     </tr>
-                    @if($data->tax > 0)
-                    <tr>
-                        <td class="right-align" colspan="2">Total</td>
-                        <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="2">PPN</td>
-                        <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
-                    </tr>
-                    @endif
-                    <tr>
-                        <td class="right-align" colspan="2">Grandtotal</td>
-                        <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
-                    </tr>
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <th colspan="5">Terbilang : <i>{{ CustomHelper::terbilang($data->grandtotal) }}</i></th>
-                    </tr>
-                </tfoot>
             </table>
         </div>
         <!-- invoice subtotal -->

@@ -46,7 +46,7 @@ class MarketingOrderMemoController extends Controller
             'title'         => 'AR Credit Memo',
             'content'       => 'admin.sales.order_memo',
             'company'       => Company::where('status','1')->get(),
-            'place'         => Place::where('status','1')->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -74,16 +74,13 @@ class MarketingOrderMemoController extends Controller
             'account_id',
             'company_id',
             'post_date',
+            'type',
             'document',
             'tax_no',
             'note',
             'total',
             'tax',
-            'total_after_tax',
-            'rounding',
             'grandtotal',
-            'downpayment',
-            'balance'
         ];
 
         $start  = $request->start;
@@ -100,11 +97,7 @@ class MarketingOrderMemoController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
-                            ->orWhere('total_after_tax', 'like', "%$search%")
-                            ->orWhere('rounding', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhere('downpayment', 'like', "%$search%")
-                            ->orWhere('balance', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhere('tax_no', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -151,11 +144,7 @@ class MarketingOrderMemoController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
-                            ->orWhere('total_after_tax', 'like', "%$search%")
-                            ->orWhere('rounding', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
-                            ->orWhere('downpayment', 'like', "%$search%")
-                            ->orWhere('balance', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhere('tax_no', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
@@ -200,7 +189,7 @@ class MarketingOrderMemoController extends Controller
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
                 }else{
-                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
@@ -209,16 +198,13 @@ class MarketingOrderMemoController extends Controller
                     $val->account->name,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
+                    $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->tax_no,
                     $val->note,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
-                    number_format($val->total_after_tax,2,',','.'),
-                    number_format($val->rounding,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
-                    number_format($val->downpayment,2,',','.'),
-                    number_format($val->balance,2,',','.'),
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -278,11 +264,12 @@ class MarketingOrderMemoController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_invoices,code',
+            'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_memos', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_memos,code',
             'code_place_id'                 => 'required',
             'company_id'			        => 'required',
             'account_id'	                => 'required',
             'post_date'		                => 'required',
+            'type'                          => 'required',
             'arr_lookable_id'		        => 'required|array',
             'arr_total'                     => 'required|array',
         ], [
@@ -294,6 +281,7 @@ class MarketingOrderMemoController extends Controller
             'account_id.required' 	                => 'Akun Partner Bisnis tidak boleh kosong.',
             'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
             'post_date.required' 			        => 'Tanggal post tidak boleh kosong.',
+            'type.required'                         => 'Tipe memo tidak boleh kosong.',
             'arr_lookable_id.required'              => 'Item tidak boleh kosong.',
             'arr_lookable_id.array'                 => 'Item harus dalam bentuk array.',
             'arr_total.required'                    => 'Total tidak boleh kosong.',
@@ -309,47 +297,30 @@ class MarketingOrderMemoController extends Controller
 
             $total = 0;
             $tax = 0;
-            $total_after_tax = 0;
-            $rounding = 0;
             $grandtotal = 0;
-            $downpayment = 0;
-            $balance = 0;
             
             $arrNominal = [];
 
-            foreach($request->arr_nominal as $key => $row){
-                $bobot = str_replace(',','.',str_replace('.','',$row)) / str_replace(',','.',str_replace('.','',$request->arr_balance[$key]));
-                $rowtotal = round($bobot * str_replace(',','.',str_replace('.','',$request->arr_total[$key])),2);
-                $rowtax = round($bobot * str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),2);
-                $rowtotalaftertax = round($bobot * str_replace(',','.',str_replace('.','',$request->arr_total_after_tax[$key])),2);
-                $rowrounding = round($bobot * str_replace(',','.',str_replace('.','',$request->arr_rounding[$key])),2);
-                $rowgrandtotal = round($bobot * str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key])),2);
-                $rowdownpayment = round($bobot * str_replace(',','.',str_replace('.','',$request->arr_downpayment[$key])),2);
-                $rowbalance = round($bobot * str_replace(',','.',str_replace('.','',$request->arr_balance[$key])),2);
+            foreach($request->arr_grandtotal as $key => $row){
+                $rowtotal = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
+                $rowtax = str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
+                $rowgrandtotal = str_replace(',','.',str_replace('.','',$row));
                 $arrNominal[] = [
                     'total'             => $rowtotal,
                     'tax'               => $rowtax,
-                    'total_after_tax'   => $rowtotalaftertax,
-                    'rounding'          => $rowrounding,
                     'grandtotal'        => $rowgrandtotal,
-                    'downpayment'       => $rowdownpayment,
-                    'balance'           => $rowbalance,
                 ];
                 $total += $rowtotal;
                 $tax += $rowtax;
-                $total_after_tax += $rowtotalaftertax;
-                $rounding += $rowrounding;
                 $grandtotal += $rowgrandtotal;
-                $downpayment += $rowdownpayment;
-                $balance += $rowbalance;
             }
 
             $bp = User::find($request->account_id);
 
-            if($balance > $bp->count_limit_credit){
+            if($grandtotal > $bp->count_limit_credit){
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'AR Credit Memo tidak bisa diproses karena Saldo Piutang adalah '.number_format($bp->count_limit_credit,2,',','.').', sedangkan nominal yang anda inputkan adalah '.number_format($balance,2,',','.').'.'
+                    'message' => 'AR Credit Memo tidak bisa diproses karena Saldo Piutang adalah '.number_format($bp->count_limit_credit,2,',','.').', sedangkan nominal yang anda inputkan adalah '.number_format($grandtotal,2,',','.').'.'
                 ]);
             }
             
@@ -402,15 +373,12 @@ class MarketingOrderMemoController extends Controller
                         $query->post_date = $request->post_date;
                         $query->status = '1';
                         $query->note = $request->note;
+                        $query->type = $request->type;
                         $query->document = $document;
                         $query->tax_no = $request->tax_no;
                         $query->total = $total;
                         $query->tax = $tax;
-                        $query->total_after_tax = $total_after_tax;
-                        $query->rounding = $rounding;
                         $query->grandtotal = $grandtotal;
-                        $query->downpayment = $downpayment;
-                        $query->balance = $balance;
 
                         $query->save();
                         
@@ -438,16 +406,13 @@ class MarketingOrderMemoController extends Controller
                         'company_id'                    => $request->company_id,
                         'post_date'                     => $request->post_date,
                         'note'                          => $request->note,
+                        'type'                          => $request->type,
                         'status'                        => '1',
                         'document'                      => $request->file('document') ? $request->file('document')->store('public/marketing_order_memos') : NULL,
                         'tax_no'                        => $request->tax_no,
                         'total'                         => $total,
                         'tax'                           => $tax,
-                        'total_after_tax'               => $total_after_tax,
-                        'rounding'                      => $rounding,
                         'grandtotal'                    => $grandtotal,
-                        'downpayment'                   => $downpayment,
-                        'balance'                       => $balance,
                     ]);
 
                     DB::commit();
@@ -463,16 +428,13 @@ class MarketingOrderMemoController extends Controller
                         'marketing_order_memo_id'       => $query->id,
                         'lookable_type'                 => $request->arr_lookable_type[$key],
                         'lookable_id'                   => $row,
+                        'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                         'is_include_tax'                => $request->arr_is_include_tax[$key],
                         'percent_tax'                   => $request->arr_percent_tax[$key],
                         'tax_id'                        => $request->arr_tax_id[$key] > 0 ? $request->arr_tax_id[$key] : NULL,
                         'total'                         => $arrNominal[$key]['total'],
                         'tax'                           => $arrNominal[$key]['tax'],
-                        'total_after_tax'               => $arrNominal[$key]['total_after_tax'],
-                        'rounding'                      => $arrNominal[$key]['rounding'],
                         'grandtotal'                    => $arrNominal[$key]['grandtotal'],
-                        'downpayment'                   => $arrNominal[$key]['downpayment'],
-                        'balance'                       => $arrNominal[$key]['balance'],
                         'note'                          => $request->arr_note[$key],
                     ]);
                 }
@@ -513,14 +475,13 @@ class MarketingOrderMemoController extends Controller
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Dokumen</th>
+                                <th class="center-align">Item</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Satuan</th> 
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
-                                <th class="center-align">Total Stl PPN</th>
-                                <th class="center-align">Pembulatan</th>
                                 <th class="center-align">Grandtotal</th>
-                                <th class="center-align">Downpayment</th>
-                                <th class="center-align">Memo</th>
                             </tr>
                         </thead><tbody>';
         
@@ -528,14 +489,13 @@ class MarketingOrderMemoController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->getCode().'</td>
+                <td class="">'.$row->lookable->lookable->item->name.'</td>
+                <td class="right-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.$row->lookable->lookable->item->sellUnit->code.'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->total_after_tax,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->rounding,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->downpayment,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->balance,2,',','.').'</td>
             </tr>';
         }
         
@@ -894,12 +854,7 @@ class MarketingOrderMemoController extends Controller
         $po = MarketingOrderMemo::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account->code.' - '.$po->account->name;
-        $po['balance'] = number_format($po->balance,2,',','.');
-
-        if($po->tax_no){
-            $newprefix = '011.'.explode('.',$po->tax_no)[1].'.'.explode('.',$po->tax_no)[2];
-            $po['tax_no'] = $newprefix;
-        }
+        $po['balance'] = number_format($po->grandtotal,2,',','.');
 
         $arr = [];
         $arrUsed = [];
@@ -926,18 +881,18 @@ class MarketingOrderMemoController extends Controller
                 'lookable_type'                         => $row->lookable_type,
                 'lookable_id'                           => $row->lookable_id,
                 'is_include_tax'                        => $row->is_include_tax,
+                'item_name'                             => $row->lookable->lookable->item->name,
+                'unit'                                  => $row->lookable->lookable->item->sellUnit->code,
+                'qty'                                   => number_format($row->qty,3,',','.'),
                 'tax_id'                                => $row->tax_id ? $row->tax_id : '0',
                 'percent_tax'                           => $row->percent_tax,
                 'total'                                 => number_format($row->total,2,',','.'),
                 'tax'                                   => number_format($row->tax,2,',','.'),
-                'total_after_tax'                       => number_format($row->total_after_tax,2,',','.'),
-                'rounding'                              => number_format($row->rounding,2,',','.'),
                 'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
-                'downpayment'                           => number_format($row->downpayment,2,',','.'),
-                'balance'                               => number_format($row->balance,2,',','.'),
                 'code'                                  => $code,
                 'post_date'                             => $row->getDate(),
                 'note'                                  => $row->note,
+                'tax_no'                                => $row->lookable_type == 'marketing_order_invoice_details' ? $row->lookable->marketingOrderInvoice->tax_no : ($row->lookable_type == 'marketing_order_down_payments' ? $row->lookable->tax_no : '-'),
             ];
         }
 
@@ -980,14 +935,16 @@ class MarketingOrderMemoController extends Controller
             }else{
                 if(in_array($query->status,['2','3'])){
                     foreach($query->marketingOrderMemoDetail as $row){
-                        if($row->lookable_type == 'marketing_order_invoice_details'){
-                            if($row->downpayment > 0){
-                                CustomHelper::removeDeposit($query->account_id,$row->downpayment);
-                            }
-                        }elseif($row->lookable_type == 'marketing_order_down_payments'){
-                            CustomHelper::addDeposit($query->account_id,$row->balance);
+                        CustomHelper::addCountLimitCredit($query->account_id,$row->grandtotal);
+                        if($query->type == '2'){
+                            CustomHelper::removeCogs($query->getTable(),$query->id);
+                            CustomHelper::removeStock(
+                                $row->lookable->lookable->place_id,
+                                $row->lookable->lookable->warehouse_id,
+                                $row->lookable->lookable->item_id,
+                                $row->qty * $row->lookable->lookable->item->sell_convert
+                            );
                         }
-                        CustomHelper::addCountLimitCredit($query->account_id,$row->balance);
                     }
                 }
 
@@ -1007,7 +964,6 @@ class MarketingOrderMemoController extends Controller
                 CustomHelper::sendNotification($query->getTable(),$query->id,'AR Credit Memo No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
                 CustomHelper::removeJournal($query->getTable(),$query->id);
-                CustomHelper::removeCountLimitCredit($query->account_id,$query->balance);
 
                 $response = [
                     'status'  => 200,

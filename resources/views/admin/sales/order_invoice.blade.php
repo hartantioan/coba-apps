@@ -769,7 +769,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/marketing_order_down_payment") }}',
+                url: '{{ url("admin/select2/marketing_order_down_payment_paid") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 data: function(params) {

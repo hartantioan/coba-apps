@@ -52,21 +52,13 @@ class MarketingOrderInvoiceDetail extends Model
     public function getDownPayment(){
         $bobot = $this->total / $this->marketingOrderInvoice->total;
         $downpayment = $bobot * $this->marketingOrderInvoice->downpayment;
-        return $downpayment - $this->getMemoDownPayment();
-    }
-
-    public function getMemoDownPayment(){
-        $total = 0;
-        foreach($this->marketingOrderMemoDetail as $row){
-            $total += $row->downpayment;
-        }
-        return $total;
+        return $downpayment;
     }
 
     public function getMemo(){
         $total = 0;
         foreach($this->marketingOrderMemoDetail as $row){
-            $total += $row->balance;
+            $total += $row->grandtotal;
         }
         return $total;
     }
@@ -101,13 +93,7 @@ class MarketingOrderInvoiceDetail extends Model
         $arr = [];
 
         foreach($this->marketingOrderMemoDetail as $row){
-            $total -= $row->total;
-            $tax -= $row->tax;
-            $total_after_tax -= $row->total_after_tax;
-            $rounding -= $row->rounding;
-            $grandtotal -= $row->grandtotal;
-            $downpayment -= $row->downpayment;
-            $balance -= $row->balance;           
+            $balance -= $row->grandtotal;           
         }
 
         $arr = [

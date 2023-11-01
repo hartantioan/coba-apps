@@ -67,8 +67,7 @@
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
                                                         <option value="3">Selesai</option>
@@ -155,8 +154,8 @@
                                                         <th rowspan="2">Pemilik Rekening</th>
                                                         <th rowspan="2">Keterangan</th>
                                                         <th rowspan="2">Status</th>
-                                                        <th rowspan="2">Action</th>
                                                         <th rowspan="2">Kas/Bank Keluar</th>
+                                                        <th rowspan="2">Action</th>
                                                     </tr>
                                                     <tr>
                                                         <th>Post</th>
@@ -1702,12 +1701,16 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'asc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val(),
+                    'status[]' : $('#filter_status').val(),
                     'account_id[]' : $('#filter_account').val(),
                     company_id : $('#filter_company').val(),
                     'currency_id[]' : $('#filter_currency').val(),
@@ -1754,8 +1757,8 @@
                 { name: 'account_name', className: 'right-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'cash_bank_out', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
@@ -2346,9 +2349,9 @@
             
         },
         onDisconnect: function () {
-            M.toast({
+            /* M.toast({
                 html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
-            });
+            }); */
         },
         onUpdate: function (message) {
             

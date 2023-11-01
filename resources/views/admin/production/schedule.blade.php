@@ -55,8 +55,7 @@
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
                                                 <div class="input-field col s12">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
                                                         <option value="3">Selesai</option>
@@ -94,8 +93,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Pengguna</th>
                                                         <th>Code</th>
+                                                        <th>Pengguna</th>
                                                         <th>Perusahaan</th>
                                                         <th>Plant</th>
                                                         <th>Mesin</th>
@@ -528,7 +527,32 @@
             $(this).closest('tr').remove();
         });
 
-        select2ServerSide('#marketing_order_plan_id', '{{ url("admin/select2/marketing_order_plan") }}');
+        /* select2ServerSide('#marketing_order_plan_id', '{{ url("admin/select2/marketing_order_plan") }}'); */
+
+        $('#marketing_order_plan_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/marketing_order_plan") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        place_id: $('#place_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     });
 
     function makeTreeOrg(data,link){
@@ -864,6 +888,19 @@
                 }
             });
         }
+        if($('.arr_needed' + val).length > 0){
+            $('.arr_needed' + val).each(function(index){
+                let bobot = qtyUom / qtyMax;
+                let qtyRow = parseFloat($(this).data('qty').toString().replaceAll(".", "").replaceAll(",",".")) * bobot;
+                let qtyStock = parseFloat($(this).data('stock').toString().replaceAll(".", "").replaceAll(",","."));
+                $(this).text(formatRupiahIni(qtyRow.toFixed(3).toString().replace('.',',')));
+                if(qtyRow > qtyStock){
+                    $(this).parent().find('.arr_status').html('<span style="font-weight:800;color:red;">Tidak Cukup</span>');
+                }else{
+                    $(this).parent().find('.arr_status').html('<span style="font-weight:800;color:green;">Cukup</span>');
+                }
+            });
+        }
     }
 
     function getMarketingOrderPlan(){
@@ -874,7 +911,7 @@
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: $('#marketing_order_plan_id').val(),
+                    id: $('#marketing_order_plan_id').val()
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -904,7 +941,14 @@
                         `);
 
                         $.each(mop.details, function(i, val) {
-                            var count = makeid(10);
+                            var count = makeid(10), checkstok = '';
+                            if(val.stock_check){
+                                checkstok += 'Bahan : <ol>';
+                                $.each(val.stock_check, function(i, detail) {
+                                    checkstok += '<li>' + detail.item_name + ' Butuh <b class="arr_needed' + count + '" data-qty="' + detail.qty + '" data-stock="' + detail.stock + '">' + detail.qty + '</b> Stok <b>' + detail.stock + '</b> Status : <b class="arr_status">' + detail.status + '</b></li>';
+                                });
+                                checkstok += '</ol>'
+                            }
                             $('#body-item').append(`
                                 <tr class="row_item" data-id="` + mop.id + `">
                                     <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
@@ -914,11 +958,14 @@
                                     <input type="hidden" name="arr_item_unit[]" id="arr_item_unit` + count + `" value="` + val.unit_uom + `">
                                     <input type="hidden" name="arr_sell_convert[]" id="arr_sell_convert` + count + `" value="` + val.sell_convert + `">
                                     <input type="hidden" name="arr_pallet_convert[]" id="arr_pallet_convert` + count + `" value="` + val.pallet_convert + `">
+                                    <input type="hidden" name="arr_bom[]" id="arr_bom` + count + `" value="` + val.bom_link + `">
                                     <td>
                                         ` + mop.code + `
                                     </td>
                                     <td>
-                                        ` + val.item_name + `
+                                        ` + val.item_name + `<br>
+                                        ` + ( val.bom_link ? '' : '<span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
+                                        ` + ( val.bom_link ? checkstok : '' ) + `
                                     </td>
                                     <td class="right-align">
                                         <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
@@ -1115,12 +1162,16 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'asc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val(),
+                    'status' : $('#filter_status').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
                 },
@@ -1141,8 +1192,8 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'user_id', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
+                { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'plant_id', className: 'center-align' },
                 { name: 'machine_id', className: 'center-align' },
@@ -1609,9 +1660,9 @@
             
         },
         onDisconnect: function () {
-            M.toast({
+            /* M.toast({
                 html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
-            });
+            }); */
         },
         onUpdate: function (message) {
             

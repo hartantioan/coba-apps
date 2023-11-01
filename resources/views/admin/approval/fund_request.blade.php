@@ -285,7 +285,7 @@
             </div>
             <table class="mt-3" width="100%" border="0">
                 <tr>
-                    <td class="center-align">
+                    <td class="">
                         Dibuat oleh,
                         @if($data->user->signature)
                             <div>{!! $data->user->signature() !!}</div>

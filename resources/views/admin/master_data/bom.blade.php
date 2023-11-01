@@ -265,6 +265,7 @@
                 $('#temp').val('');
                 M.updateTextFields();
                 resetDetailForm();
+                $('#item_id').empty();
             }
         });
 
@@ -288,6 +289,15 @@
 
         $('#body-detail').on('click', '.delete-data-detail', function() {
             $(this).closest('tr').remove();
+            if($('.row_detail').length == 0){
+                $('#body-detail').append(`
+                    <tr id="empty-row-detail">
+                        <td colspan="7" class="center">
+                            <i>Silahkan tambahkan bahan / biaya...</i>
+                        </td>
+                    </tr>
+                `);
+            }
         });
     });
 
@@ -295,13 +305,15 @@
         $('.row_detail').each(function(){
             $(this).remove();
         });
-        $('#body-detail').append(`
-            <tr id="empty-row-detail">
-                <td colspan="7" class="center">
-                    <i>Silahkan tambahkan bahan / biaya...</i>
-                </td>
-            </tr>
-        `);
+        if($('.row_detail').length == 0 && $('#empty-row-detail').length == 0){
+            $('#body-detail').append(`
+                <tr id="empty-row-detail">
+                    <td colspan="7" class="center">
+                        <i>Silahkan tambahkan bahan / biaya...</i>
+                    </td>
+                </tr>
+            `);
+        }
     }
 
     function countAll(){
@@ -328,16 +340,16 @@
                     <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `')"></select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiah(this);countAll();">
+                    <input name="arr_qty[]" type="` + (param == 'coas' ? 'hidden' : 'text') + `" value="` + (param == 'items' ? '0' : '1') + `" onkeyup="formatRupiah(this);countAll();">
                 </td>
                 <td class="center">
                     <span id="arr_satuan` + count + `">-</span>
                 </td>
                 <td>
-                    <input name="arr_nominal[]" type="text" value="0" onkeyup="formatRupiah(this);countAll();" ` + (param == 'items' ? 'readonly' : '') + `>
+                    <input name="arr_nominal[]" type="` + (param == 'items' ? 'hidden' : 'text') + `" value="0" onkeyup="formatRupiah(this);countAll();">
                 </td>
                 <td>
-                    <input name="arr_total[]" type="text" value="0" onkeyup="formatRupiah(this);" readonly>
+                    <input name="arr_total[]" type="` + (param == 'items' ? 'hidden' : 'text') + `" value="0" onkeyup="formatRupiah(this);" readonly>
                 </td>
                 <td>
                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material">
@@ -708,9 +720,9 @@
             
         },
         onDisconnect: function () {
-            M.toast({
+            /* M.toast({
                 html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
-            });
+            }); */
         },
         onUpdate: function (message) {
             

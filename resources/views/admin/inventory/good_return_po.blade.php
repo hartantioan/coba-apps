@@ -58,8 +58,7 @@
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
                                                         <option value="3">Selesai</option>
@@ -102,10 +101,10 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
+                                                        <th>Code</th>
                                                         <th>Pengguna</th>
                                                         <th>Supplier/Vendor</th>
                                                         <th>Perusahaan</th>
-                                                        <th>Code</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Keterangan</th>
                                                         <th>Dokumen</th>
@@ -800,12 +799,16 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'asc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val(),
+                    'status' : $('#filter_status').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
                 },
@@ -826,10 +829,10 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
-                { name: 'code', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
@@ -1332,9 +1335,9 @@
             
         },
         onDisconnect: function () {
-            M.toast({
+            /* M.toast({
                 html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
-            });
+            }); */
         },
         onUpdate: function (message) {
             

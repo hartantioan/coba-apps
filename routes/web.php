@@ -83,6 +83,7 @@ use App\Http\Controllers\MasterData\BottomPriceController;
 use App\Http\Controllers\MasterData\PalletController;
 use App\Http\Controllers\MasterData\TransportationController;
 use App\Http\Controllers\MasterData\OutletController;
+use App\Http\Controllers\MasterData\OutletPriceController;
 
 use App\Http\Controllers\Finance\FundRequestController;
 use App\Http\Controllers\Finance\PaymentRequestController;
@@ -119,6 +120,8 @@ use App\Http\Controllers\Sales\MarketingOrderAgingController;
 use App\Http\Controllers\Sales\MarketingOrderDPReportController;
 use App\Http\Controllers\Sales\MarketingHandoverInvoiceController;
 use App\Http\Controllers\Sales\MarketingOrderReceiptController;
+use App\Http\Controllers\Sales\MarketingOrderHandoverReceiptController;
+use App\Http\Controllers\Sales\MarketingHandoverReportController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -263,6 +266,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('place', [Select2Controller::class, 'place']);
                 Route::get('period', [Select2Controller::class, 'period']);
                 Route::get('marketing_order', [Select2Controller::class, 'marketingOrder']);
+                Route::get('marketing_order_form_dp', [Select2Controller::class, 'marketingOrderFormDP']);
                 Route::get('marketing_order_delivery', [Select2Controller::class, 'marketingOrderDelivery']);
                 Route::get('marketing_order_delivery_process', [Select2Controller::class, 'marketingOrderDeliveryProcess']);
                 Route::get('marketing_order_down_payment', [Select2Controller::class, 'marketingOrderDownPayment']);
@@ -507,6 +511,16 @@ Route::prefix('admin')->group(function () {
                         Route::post('import',[BottomPriceController::class, 'import'])->middleware('operation.access:bottom_price,update');
                         Route::post('create',[BottomPriceController::class, 'create'])->middleware('operation.access:bottom_price,update');
                         Route::post('destroy', [BottomPriceController::class, 'destroy'])->middleware('operation.access:bottom_price,delete');
+                    });
+
+                    Route::prefix('outlet_price')->middleware('operation.access:outlet_price,view')->group(function () {
+                        Route::get('/',[OutletPriceController::class, 'index']);
+                        Route::get('datatable',[OutletPriceController::class, 'datatable']);
+                        Route::post('show', [OutletPriceController::class, 'show']);
+                        Route::get('row_detail',[OutletPriceController::class, 'rowDetail']);
+                        Route::post('import',[OutletPriceController::class, 'import'])->middleware('operation.access:outlet_price,update');
+                        Route::post('create',[OutletPriceController::class, 'create'])->middleware('operation.access:outlet_price,update');
+                        Route::post('destroy', [OutletPriceController::class, 'destroy'])->middleware('operation.access:outlet_price,delete');
                     });
                 });
 
@@ -1592,6 +1606,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[MarketingOrderDownPaymentController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderDownPaymentController::class, 'printByRange']);
                     Route::get('viewstructuretree',[MarketingOrderDownPaymentController::class, 'viewStructureTree']);
+                    Route::post('remove_used_data', [MarketingOrderDownPaymentController::class, 'removeUsedData']);
+                    Route::post('send_used_data',[MarketingOrderDownPaymentController::class, 'sendUsedData'])->middleware('operation.access:sales_down_payment,update');
                     Route::get('view_journal/{id}',[MarketingOrderDownPaymentController::class, 'viewJournal'])->middleware('operation.access:sales_down_payment,journal');
                     Route::post('create',[MarketingOrderDownPaymentController::class, 'create'])->middleware('operation.access:sales_down_payment,update');
                     Route::get('approval/{id}',[MarketingOrderDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
@@ -1738,6 +1754,27 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [MarketingOrderReceiptController::class, 'destroy'])->middleware('operation.access:marketing_order_receipt,delete');
                 });
 
+                Route::prefix('marketing_order_handover_receipt')->middleware('operation.access:marketing_order_handover_receipt,view')->group(function () {
+                    Route::get('/',[MarketingOrderHandoverReceiptController::class, 'index']);
+                    Route::get('datatable',[MarketingOrderHandoverReceiptController::class, 'datatable']);
+                    Route::get('row_detail',[MarketingOrderHandoverReceiptController::class, 'rowDetail']);
+                    Route::post('show', [MarketingOrderHandoverReceiptController::class, 'show']);
+                    Route::post('get_code', [MarketingOrderHandoverReceiptController::class, 'getCode']);
+                    Route::post('get_marketing_receipt', [MarketingOrderHandoverReceiptController::class, 'getMarketingReceipt']);
+                    Route::post('print',[MarketingOrderHandoverReceiptController::class, 'print']);
+                    Route::post('print_by_range',[MarketingOrderHandoverReceiptController::class, 'printByRange']);
+                    Route::get('viewstructuretree',[MarketingOrderHandoverReceiptController::class, 'viewStructureTree']);
+                    Route::post('create',[MarketingOrderHandoverReceiptController::class, 'create'])->middleware('operation.access:marketing_order_handover_receipt,update');
+                    Route::get('approval/{id}',[MarketingOrderHandoverReceiptController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::prefix('update_document')->withoutMiddleware('direct.access')->withoutMiddleware('login')->withoutMiddleware('operation.access:marketing_order_handover_receipt,view')->withoutMiddleware('lock')->group(function (){
+                        Route::get('{id}',[MarketingOrderHandoverReceiptController::class, 'courierIndex']);
+                        Route::post('{id}/courier_update',[MarketingOrderHandoverReceiptController::class, 'courierUpdate']);
+                    });
+                    Route::get('print_individual/{id}',[MarketingOrderHandoverReceiptController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [MarketingOrderHandoverReceiptController::class, 'voidStatus'])->middleware('operation.access:marketing_order_handover_receipt,void');
+                    Route::post('destroy', [MarketingOrderHandoverReceiptController::class, 'destroy'])->middleware('operation.access:marketing_order_handover_receipt,delete');
+                });
+
                 Route::prefix('sales_report')->middleware('direct.access')->group(function () {
                     Route::prefix('sales_recap')->middleware('operation.access:sales_recap,view')->group(function () {
                         Route::get('/',[MarketingOrderReportController::class, 'index']);
@@ -1776,6 +1813,14 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[MarketingOrderDPReportController::class, 'index']);
                         Route::post('filter',[MarketingOrderDPReportController::class, 'filter']);
                         Route::get('export',[MarketingOrderDPReportController::class, 'export']);
+                    });
+
+                    Route::prefix('sales_handover_report')->middleware('operation.access:sales_handover_report,view')->group(function () {
+                        Route::get('/',[MarketingHandoverReportController::class, 'index']);
+                        Route::get('datatable',[MarketingHandoverReportController::class, 'datatable']);
+                        Route::get('row_detail',[MarketingHandoverReportController::class, 'rowDetail']);
+                        Route::post('print',[MarketingHandoverReportController::class, 'print']);
+                        Route::get('export',[MarketingHandoverReportController::class, 'export']);
                     });
                 });
             });

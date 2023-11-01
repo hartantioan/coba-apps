@@ -177,7 +177,7 @@ class RegistrationController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->offset($start)
@@ -198,7 +198,7 @@ class RegistrationController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->count();

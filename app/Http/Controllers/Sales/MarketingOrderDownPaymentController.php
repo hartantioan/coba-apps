@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Currency;
 use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderDownPaymentDetail;
 use App\Helpers\CustomHelper;
 use App\Models\User;
 use App\Models\Tax;
@@ -118,7 +119,7 @@ class MarketingOrderDownPaymentController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -172,7 +173,7 @@ class MarketingOrderDownPaymentController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -387,7 +388,7 @@ class MarketingOrderDownPaymentController extends Controller
 
                         $query->save();
 
-                        foreach($query->purchaseDownPaymentDetail as $row){
+                        foreach($query->marketingOrderDownPaymentDetail as $row){
                             $row->delete();
                         }
 
@@ -437,6 +438,15 @@ class MarketingOrderDownPaymentController extends Controller
 			
 			if($query) {
 
+                if($request->arr_id){
+                    foreach($request->arr_id as $key => $row){
+                        MarketingOrderDownPaymentDetail::create([
+                            'marketing_order_down_payment_id'   => $query->id,
+                            'marketing_order_id'                => intval($row),
+                        ]);
+                    }
+                }
+
                 CustomHelper::sendApproval('marketing_order_down_payments',$query->id,$query->note);
                 CustomHelper::sendNotification('marketing_order_down_payments',$query->id,'Pengajuan AR Down Payment No. '.$query->code,$query->note,session('bo_id'));
 
@@ -466,6 +476,36 @@ class MarketingOrderDownPaymentController extends Controller
         $data   = MarketingOrderDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12 mt-1"><table style="min-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="4">Sales Order</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Nomor</th>
+                                <th class="center-align">Tgl.Post</th>
+                                <th class="center-align">Catatan</th>
+                                <th class="center-align">Grandtotal</th>
+                            </tr>
+                        </thead><tbody>';
+
+        if($data->marketingOrderDownPaymentDetail()->exists()){
+            foreach($data->marketingOrderDownPaymentDetail as $row){
+                $string .= '<tr>
+                    <td class="center-align">'.$row->marketingOrder->code.'</td>
+                    <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrder->post_date)).'</td>
+                    <td class="">'.$row->marketingOrder->note_internal.' - '.$row->marketingOrder->note_external.'</td>
+                    <td class="right-align">'.number_format($row->marketingOrder->grandtotal,2,',','.').'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td colspan="4" class="center-align">Data tidak ditemukan.</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>
@@ -788,6 +828,21 @@ class MarketingOrderDownPaymentController extends Controller
         $modp['tax'] = number_format($modp->tax,2,',','.');
         $modp['grandtotal'] = number_format($modp->grandtotal,2,',','.');
         $modp['currency_rate'] = number_format($modp->currency_rate,2,',','.');
+
+        $arr = [];
+
+        foreach($modp->marketingOrderDownPaymentDetail as $row){
+            $arr[] = [
+                'id'   			=> $row->marketingOrder->id,
+                'type'          => $row->marketingOrder->getTable(),
+                'post_date'     => date('d/m/y',strtotime($row->marketingOrder->post_date)),
+                'note'          => $row->marketingOrder->note_internal.' - '.$row->marketingOrder->note_external,
+                'code'          => $row->marketingOrder->code,
+                'grandtotal'    => number_format($row->marketingOrder->grandtotal,2,',','.'),
+            ];
+        }
+
+        $modp['details'] = $arr;
 
         if($modp->tax_no){
             $newprefix = '011.'.explode('.',$modp->tax_no)[1].'.'.explode('.',$modp->tax_no)[2];
@@ -1349,5 +1404,29 @@ class MarketingOrderDownPaymentController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    public function sendUsedData(Request $request){
+        $mo = MarketingOrder::find($request->id);
+
+        if(!$mo->used()->exists()){
+            CustomHelper::sendUsedData($request->type,$request->id,'Form AR Down Payment');
+            return response()->json([
+                'status'    => 200,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Dokumen no. '.$mo->used->lookable->code.' telah dipakai di '.$mo->used->ref.', oleh '.$mo->used->user->name.'.'
+            ]);
+        }
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->type,$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 }

@@ -146,7 +146,7 @@ class InventoryTransferInController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->whereHas('inventoryTransferOut',function($query){
@@ -187,7 +187,7 @@ class InventoryTransferInController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->whereHas('inventoryTransferOut',function($query){

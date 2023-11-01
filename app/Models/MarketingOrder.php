@@ -174,6 +174,12 @@ class MarketingOrder extends Model
         return $this->hasMany('App\Models\MarketingOrderDetail');
     }
 
+    public function marketingOrderDownPaymentDetail(){
+        return $this->hasMany('App\Models\MarketingOrderDownPaymentDetail','marketing_order_id','id')->whereHas('marketingOrderDownPayment',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function marketingOrderDelivery(){
         return $this->hasMany('App\Models\MarketingOrderDelivery','marketing_order_id','id')->whereIn('status',['2','3']);
     }

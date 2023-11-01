@@ -54,8 +54,8 @@ class MarketingOrderPlanController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
-            'user_id',
             'code',
+            'user_id',
             'company_id',
             'place_id',
             'post_date',
@@ -90,7 +90,7 @@ class MarketingOrderPlanController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -131,7 +131,7 @@ class MarketingOrderPlanController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -157,8 +157,8 @@ class MarketingOrderPlanController extends Controller
 				
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->user->name,
                     $val->code,
+                    $val->user->name,
                     $val->company->name,
                     $val->place->name,
                     date('d/m/y',strtotime($val->post_date)),

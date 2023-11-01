@@ -117,7 +117,7 @@ class FundRequestController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->document){
@@ -149,7 +149,7 @@ class FundRequestController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->document){
@@ -168,8 +168,8 @@ class FundRequestController extends Controller
                 $totalReceivableBalance = $totalReceivable - $totalReceivableUsed;
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->user->name,
                     $val->code,
+                    $val->user->name,
                     $val->place->name.' - '.$val->place->company->name,
                     $val->department->name,
                     $val->account->name,
@@ -689,7 +689,7 @@ class FundRequestController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->where('user_id',session('bo_id'))
@@ -709,7 +709,7 @@ class FundRequestController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->where('user_id',session('bo_id'))

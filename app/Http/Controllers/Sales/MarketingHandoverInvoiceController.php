@@ -54,11 +54,14 @@ class MarketingHandoverInvoiceController extends Controller
     }
 
     public function getMarketingInvoice(Request $request){
-        $data = MarketingOrderInvoice::whereIn('status',['2','3'])->whereDoesntHave('marketingOrderHandoverInvoiceDetail')->where('balance','>=',0)->get();
+        $data = MarketingOrderInvoice::whereIn('status',['2','3'])
+                ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+                ->whereDoesntHave('marketingOrderHandoverInvoiceDetail')
+                ->where('balance','>=',0)->get();
 
         $arr = [];
         foreach($data as $row){
-            if($row->balancePaymentIncoming() > 0){
+            /* if($row->balancePaymentIncoming() > 0){ */
                 $arr[] = [
                     'code'              => $row->code,
                     'enc_code'          => CustomHelper::encrypt($row->code),
@@ -71,9 +74,12 @@ class MarketingHandoverInvoiceController extends Controller
                     'grandtotal'        => number_format($row->grandtotal,2,',','.'),
                     'downpayment'       => number_format($row->downpayment,2,',','.'),
                     'balance'           => number_format($row->balance,2,',','.'),
+                    'paid'              => number_format($row->totalPay(),2,',','.'),
+                    'memo'              => number_format($row->totalMemo(),2,',','.'),
+                    'final'             => number_format($row->balancePaymentIncoming(),2,',','.'),
                     'type'              => $row->getTable(),
                 ];
-            }
+            /* } */
         }
 
         return response()->json($arr);
@@ -110,7 +116,7 @@ class MarketingHandoverInvoiceController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -146,7 +152,7 @@ class MarketingHandoverInvoiceController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -259,7 +265,7 @@ class MarketingHandoverInvoiceController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Marketing Order Delivery telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Tanda Terima Invoice telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -369,6 +375,9 @@ class MarketingHandoverInvoiceController extends Controller
                 'grandtotal'        => number_format($row->lookable->grandtotal,2,',','.'),
                 'downpayment'       => number_format($row->lookable->downpayment,2,',','.'),
                 'balance'           => number_format($row->lookable->balance,2,',','.'),
+                'paid'              => number_format($row->totalPay(),2,',','.'),
+                'memo'              => number_format($row->totalMemo(),2,',','.'),
+                'final'             => number_format($row->balancePaymentIncoming(),2,',','.'),
                 'type'              => $row->lookable_type,
             ];
         }
@@ -399,6 +408,9 @@ class MarketingHandoverInvoiceController extends Controller
                                 <th class="center-align">Grandtotal</th>
                                 <th class="center-align">Downpayment</th>
                                 <th class="center-align">Tagihan</th>
+                                <th class="center-align">Terbayar</th>
+                                <th class="center-align">Memo</th>
+                                <th class="center-align">Final</th>
                             </tr>
                         </thead><tbody>';
         
@@ -415,6 +427,9 @@ class MarketingHandoverInvoiceController extends Controller
                 <td class="right-align">'.number_format($row->lookable->grandtotal,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->downpayment,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->balance,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->totalPay(),2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->totalMemo(),2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->balancePaymentIncoming(),2,',','.').'</td>
             </tr>';
         }
         

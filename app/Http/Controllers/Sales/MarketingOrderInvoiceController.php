@@ -125,7 +125,7 @@ class MarketingOrderInvoiceController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->type){
@@ -177,7 +177,7 @@ class MarketingOrderInvoiceController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->type){
@@ -595,6 +595,71 @@ class MarketingOrderInvoiceController extends Controller
                             </tr>
                         </thead></table></div>';
 
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="4">Tracking TT Invoice</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Tgl.TT</th>
+                                <th class="center-align">TT.Invoice</th>
+                                <th class="center-align">Status</th>
+                                <th class="center-align">Keterangan</th>
+                            </tr>
+                        </thead><tbody>';
+
+        if($data->marketingOrderHandoverInvoiceDetail()->exists()){
+            foreach($data->marketingOrderHandoverInvoiceDetail as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.date('d/m/y',strtotime($row->marketingOrderHandoverInvoice->post_date)).'</td>
+                    <td class="">'.$row->marketingOrderHandoverInvoice->code.'</td>
+                    <td class="">'.$row->marketingOrderHandoverInvoice->status().'</td>
+                    <td class="">'.$row->marketingOrderHandoverInvoice->note.'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="4">Data tidak ditemukan</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="6">Tracking TT Kwitansi</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Tgl.Update</th>
+                                <th class="center-align">Kwitansi</th>
+                                <th class="center-align">TT.Kwitansi</th>
+                                <th class="center-align">Collector</th>
+                                <th class="center-align">Status</th>
+                                <th class="center-align">Keterangan</th>
+                            </tr>
+                        </thead><tbody>';
+                        
+        $arrTrackingTT = $data->listTrackingCollector();
+
+        if(count($arrTrackingTT) > 0){
+            foreach($data->listTrackingCollector() as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.$row['date'].'</td>
+                    <td class="">'.$row['receipt'].'</td>
+                    <td class="">'.$row['code'].'</td>
+                    <td class="">'.$row['collector'].'</td>
+                    <td class="">'.$row['status'].'</td>
+                    <td class="">'.$row['note'].'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="5">Data tidak ditemukan</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>

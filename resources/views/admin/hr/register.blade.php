@@ -48,8 +48,7 @@
                                             <div class="col s12 ">
                                                 <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
                                                 <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Ditolak</option>
                                                         <option value="3">Disetujui</option>
@@ -372,12 +371,16 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'asc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val()
+                    'status' : $('#filter_status').val()
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');

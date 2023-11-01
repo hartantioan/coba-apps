@@ -66,8 +66,7 @@
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
                                                         <option value="3">Selesai</option>
@@ -323,7 +322,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step12">
                                         <select class="browser-default" id="sender_id" name="sender_id"></select>
-                                        <label class="active" for="sender_id">Broker</label>
+                                        <label class="active" for="sender_id">Ekspedisi</label>
                                     </div>
                                     <div class="input-field col m3 s12 step13">
                                         <select class="browser-default" id="transportation_id" name="transportation_id"></select>
@@ -499,12 +498,12 @@
                                                 <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        {{-- <tr>
                                             <td>Diskon</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="discount" name="discount" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr>
+                                            <td class="right-align"> --}}
+                                                <input class="browser-default" id="discount" name="discount" type="hidden" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                            {{-- </td>
+                                        </tr> --}}
                                         <tr>
                                             <td>Total</td>
                                             <td class="right-align">
@@ -1290,6 +1289,22 @@
                     }
                 });
             }
+            if($("#arr_item" + nil).select2('data')[0].list_outletprice.length > 0){
+                if($('#account_id').val() && $('#outlet_id').val()){
+                    let enough = false;
+                    $.each($("#arr_item" + nil).select2('data')[0].list_outletprice, function(i, value) {
+                        if(value.account_id == $('#account_id').val() && value.outlet_id == $('#outlet_id').val() && enough == false){
+                            $("#rowPrice" + nil).val(value.price);
+                            $("#rowMargin" + nil).val(value.margin);
+                            $("#rowDisc1" + nil).val(value.percent_discount_1);
+                            $("#rowDisc2" + nil).val(value.percent_discount_2);
+                            $("#rowDisc3" + nil).val(value.discount_3);
+                            $("#arr_final_price" + nil).val(value.final_price);
+                            enough = true;
+                        }
+                    });
+                }
+            }
         }else{
             $('#arr_item_stock' + nil).empty().append(`
                 <option value="">--Silahkan pilih item--</option>
@@ -1297,6 +1312,12 @@
             $("#arr_warehouse" + nil).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
+            $("#rowPrice" + nil).val('0,00');
+            $("#rowMargin" + nil).val('0,00');
+            $("#rowDisc1" + nil).val('0');
+            $("#rowDisc2" + nil).val('0');
+            $("#rowDisc3" + nil).val('0');
+            $("#arr_final_price" + nil).val('0,00');
         }
         $('#arr_item_stock' + nil).trigger('change');
     }
@@ -1501,6 +1522,10 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'asc']],
             dom: 'Blfrtip',
             buttons: [
@@ -1536,7 +1561,7 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'POST',
                 data: {
-                    status : $('#filter_status').val(),
+                    'status[]' : $('#filter_status').val(),
                     type : $('#filter_type').val(),
                     delivery_type : $('#filter_delivery').val(),
                     payment_type : $('#filter_payment').val(),
@@ -2254,9 +2279,9 @@
             
         },
         onDisconnect: function () {
-            M.toast({
+            /* M.toast({
                 html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
-            });
+            }); */
         },
         onUpdate: function (message) {
             
@@ -2322,9 +2347,9 @@
                     intro : 'Ada 2 macam tipe pengiriman, yakni yang pertama adalah Franco adalah biaya pengiriman barang dibebankan pada penjual. Sedangkan Loco, adalah kebalikan dari Franco, dimana biaya pengiriman barang dibebankan kepada customer.'
                 },
                 {
-                    title : 'Broker',
+                    title : 'Ekspedisi',
                     element : document.querySelector('.step12'),
-                    intro : 'Broker adalah pihak ekspedisi pengirim, silahkan tambahkan jika tidak ada, di Menu Master Data - Organisasi - Partner Bisnis.' 
+                    intro : 'Ekspedisi adalah pihak partner bisnis tipe pengirim, silahkan tambahkan jika tidak ada, di Menu Master Data - Organisasi - Partner Bisnis.' 
                 },
                 {
                     title : 'Tipe Transport',

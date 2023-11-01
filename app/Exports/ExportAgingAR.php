@@ -38,7 +38,7 @@ class ExportAgingAR implements FromView , WithEvents
             ),0) AS total_payment,
             IFNULL((
                 SELECT
-                    SUM(momd.balance)
+                    SUM(momd.grandtotal)
                     FROM marketing_order_memo_details momd
                     JOIN marketing_order_memos mom
                         ON mom.id = momd.marketing_order_memo_id
@@ -82,7 +82,7 @@ class ExportAgingAR implements FromView , WithEvents
                 ),0) AS total_payment,
                 IFNULL((
                     SELECT
-                        SUM(momd.balance)
+                        SUM(momd.grandtotal)
                         FROM marketing_order_memo_details momd
                         JOIN marketing_order_memos mom
                             ON mom.id = momd.marketing_order_memo_id

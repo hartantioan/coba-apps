@@ -83,6 +83,17 @@ class MarketingOrderInvoice extends Model
         return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_details');
     }
 
+    public function listDeliveryProcess(){
+        $arr = [];
+        foreach($this->marketingOrderInvoiceDeliveryProcess as $row){
+            if(!in_array($row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code,$arr)){
+                $arr[] = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;
+            }
+        }
+
+        return implode(', ',$arr);
+    }
+
     public function marketingOrderInvoiceDownPayment()
     {
         return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_down_payments');
@@ -189,6 +200,10 @@ class MarketingOrderInvoice extends Model
             $hasRelation = true;
         }
 
+        if($this->marketingOrderReceiptDetail()->exists()){
+            $hasRelation = true;
+        }
+
         return $hasRelation;
     }
 
@@ -263,6 +278,59 @@ class MarketingOrderInvoice extends Model
         return $this->hasMany('App\Models\MarketingOrderHandoverInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderHandoverInvoice',function($query){
             $query->whereIn('status',['1','2','3']);
         });
+    }
+
+    public function marketingOrderReceiptDetail(){
+        return $this->hasMany('App\Models\MarketingOrderReceiptDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('MarketingOrderReceipt',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
+    public function latestHandoverInvoice(){
+        $code = '-';
+        foreach($this->marketingOrderHandoverInvoiceDetail as $row){
+            $code = $row->marketingOrderHandoverInvoice->code;
+        }
+        return $code;
+    }
+
+    public function latestReceipt(){
+        $code = '-';
+        foreach($this->marketingOrderReceiptDetail as $row){
+            $code = $row->marketingOrderReceipt->code;
+        }
+        return $code;
+    }
+
+    public function latestHandoverReceipt(){
+        $code = '-';
+        foreach($this->marketingOrderReceiptDetail as $row){
+            foreach($row->marketingOrderReceipt->marketingOrderHandoverReceiptDetail as $row){
+                $code = $row->marketingOrderHandoverReceipt->code;
+            }
+        }
+        return $code;
+    }
+
+    public function listTrackingCollector(){
+        $arr = [];
+
+        foreach($this->marketingOrderReceiptDetail()->whereHas('marketingOrderReceipt',function($query){
+            $query->whereHas('marketingOrderHandoverReceiptDetail');
+        })->get() as $row){
+            foreach($row->marketingOrderReceipt->marketingOrderHandoverReceiptDetail as $row){
+                $arr[] = [
+                    'code'      => $row->marketingOrderHandoverReceipt->code,
+                    'receipt'   => $row->marketingOrderReceipt->code,
+                    'collector' => $row->marketingOrderHandoverReceipt->account->name,
+                    'status'    => $row->status(),
+                    'note'      => $row->note,
+                    'date'      => $row->updated_at,
+                ];
+            }
+        }
+
+        return $arr;
     }
 
     public function balancePaymentIncoming(){

@@ -91,7 +91,7 @@ class RequestSparepartController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
             })
@@ -105,17 +105,17 @@ class RequestSparepartController extends Controller
             if($search) {
                 $query->where(function($query) use ($search, $request) {
                     $query->where('code', 'like', "%$search%")
-                            ->orWhereHas('user',function($query) use ($search, $request){
-                                $query->where('name','like',"%$search%");
-                            })
-                            ->orWhereHas('workOrder',function($query) use ($search, $request){
-                                $query->where('code','like',"%$search%");
-                            });
+                        ->orWhereHas('user',function($query) use ($search, $request){
+                            $query->where('name','like',"%$search%");
+                        })
+                        ->orWhereHas('workOrder',function($query) use ($search, $request){
+                            $query->where('code','like',"%$search%");
+                        });
                 });
             }
 
             if($request->status){
-                $query->where('status', $request->status);
+                $query->whereIn('status', $request->status);
             }
         })
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

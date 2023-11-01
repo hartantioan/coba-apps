@@ -109,7 +109,7 @@ class OutgoingPaymentController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->account_id){
@@ -160,7 +160,7 @@ class OutgoingPaymentController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->account_id){

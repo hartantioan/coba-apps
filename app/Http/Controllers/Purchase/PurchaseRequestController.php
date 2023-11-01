@@ -75,8 +75,8 @@ class PurchaseRequestController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
-            'user_id',
             'code',
+            'user_id',
             'company_id',
             'post_date',
             'due_date',
@@ -123,7 +123,7 @@ class PurchaseRequestController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -163,7 +163,7 @@ class PurchaseRequestController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -175,8 +175,8 @@ class PurchaseRequestController extends Controller
             foreach($query_data as $val) {
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->user->name,
                     $val->code,
+                    $val->user->name,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
                     date('d/m/y',strtotime($val->due_date)),

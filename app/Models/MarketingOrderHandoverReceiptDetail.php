@@ -35,7 +35,7 @@ class MarketingOrderHandoverReceiptDetail extends Model
         $status = match ($this->status) {
             '1' => 'Diterima Admin Penagihan',
             '2' => 'Diterima Customer',
-            default => 'Invalid',
+            default => 'Dikirim oleh kurir',
         };
 
         return $status;

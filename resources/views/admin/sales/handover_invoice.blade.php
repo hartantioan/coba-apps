@@ -10,6 +10,10 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
+
+    .swal-footer {
+        text-align: center !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -61,8 +65,7 @@
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
                                                         <option value="3">Selesai</option>
@@ -188,10 +191,17 @@
                             </div>
                             <div class="col s12 step6">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>2. Dokumen Detail</legend>
+                                    <legend>2. Antrian Dokumen</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
                                         <p class="mt-1 mb-2">
                                             <div id="datatable_buttons_multi"></div>
+                                            <div class="right">
+                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="refreshMarketingInvoice();">
+                                                    <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                    <span class="hide-on-small-onl">Refresh</span>
+                                                    <i class="material-icons right">refresh</i>
+                                                </a>
+                                            </div>
                                             <table id="table_item">
                                                 <thead>
                                                     <tr>
@@ -205,6 +215,9 @@
                                                         <th class="center">Grandtotal</th>
                                                         <th class="center">Downpayment</th>
                                                         <th class="center">Tagihan</th>
+                                                        <th class="center">Dibayar</th>
+                                                        <th class="center">Memo</th>
+                                                        <th class="center">Sisa</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item"></tbody>
@@ -468,6 +481,33 @@
         });
     });
 
+    function refreshMarketingInvoice(){
+        let passed = true;
+        $.map(table_multi.rows('.selected').nodes(), function (item) {
+            passed = false;
+        });
+        if(passed){
+            $('#table_item').DataTable().clear().destroy();
+            getMarketingInvoice();
+        }else{
+            swal({
+                title: "Apakah anda yakin?",
+                text: "Data yang terpilih akan tereset!",
+                icon: 'warning',
+                dangerMode: true,
+                buttons: {
+                cancel: 'Tidak, jangan!',
+                delete: 'Ya, lanjutkan!'
+                }
+            }).then(function (willDelete) {
+                if (willDelete) {
+                    $('#table_item').DataTable().clear().destroy();
+                    getMarketingInvoice();
+                }
+            });
+        }
+    }
+
     function getMarketingInvoice(){
         $.ajax({
             url: '{{ Request::url() }}/get_marketing_invoice',
@@ -500,6 +540,9 @@
                                 <td class="right-align">` + val.grandtotal + `</td>
                                 <td class="right-align">` + val.downpayment + `</td>
                                 <td class="right-align">` + val.balance + `</td>
+                                <td class="right-align">` + val.paid + `</td>
+                                <td class="right-align">` + val.memo + `</td>
+                                <td class="right-align">` + val.final + `</td>
                             </tr>
                         `);
                     });
@@ -847,6 +890,10 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'asc']],
             dom: 'Blfrtip',
             buttons: [
@@ -882,9 +929,7 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val(),
-                    'account_id[]' : $('#filter_account').val(),
-                    'marketing_order_id[]' : $('#filter_marketing_order').val(),
+                    'status[]' : $('#filter_status').val(),
                     company_id : $('#filter_company').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
@@ -1120,6 +1165,9 @@
                                 <td class="right-align">` + val.grandtotal + `</td>
                                 <td class="right-align">` + val.downpayment + `</td>
                                 <td class="right-align">` + val.balance + `</td>
+                                <td class="right-align">` + val.paid + `</td>
+                                <td class="right-align">` + val.memo + `</td>
+                                <td class="right-align">` + val.final + `</td>
                             </tr>
                         `);
                     });
@@ -1264,9 +1312,9 @@
             
         },
         onDisconnect: function () {
-            M.toast({
+            /* M.toast({
                 html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
-            });
+            }); */
         },
         onUpdate: function (message) {
             
@@ -1309,7 +1357,7 @@
                 {
                     title : 'Dokumen Detail',
                     element : document.querySelector('.step6'),
-                    intro : 'Data AR Invoice yang tampil disini adalah data Invoice yang memiliki sisa tagihan / piutang usaha dan belum memiliki Tanda Terima Invoice.'
+                    intro : 'Data AR Invoice yang tampil disini adalah data Invoice yang memiliki sisa tagihan / piutang usaha, belum memiliki Tanda Terima Invoice, dan yang telah disetujui hingga tingkat paling akhir.'
                 },
                 {
                     title : 'Keterangan',

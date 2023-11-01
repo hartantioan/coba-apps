@@ -294,6 +294,10 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'asc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',

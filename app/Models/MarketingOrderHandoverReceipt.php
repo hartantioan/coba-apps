@@ -23,7 +23,9 @@ class MarketingOrderHandoverReceipt extends Model
         'post_date',
         'document',
         'note',
+        'grandtotal',
         'status',
+        'status_tracking',
         'grandtotal',
         'void_id',
         'void_note',
@@ -104,6 +106,23 @@ class MarketingOrderHandoverReceipt extends Model
         return $status;
     }
 
+    public function statusTracking(){
+        $status = match ($this->status_tracking) {
+            '1'     => 'Telah diupdate Kurir. '.$this->additionalStatus(),
+            default => 'Dalam proses',
+        };
+
+        return $status;
+    }
+
+    public function additionalStatus(){
+        $documentBack = $this->marketingOrderHandoverReceiptDetail()->where('status','1')->count();
+        $documentReceived = $this->marketingOrderHandoverReceiptDetail()->where('status','2')->count();
+        $text = 'Dokumen kembali '.$documentBack.', dokumen diterima customer '.$documentReceived;
+
+        return $text;
+    }
+
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
@@ -151,5 +170,21 @@ class MarketingOrderHandoverReceipt extends Model
         $hasRelation = false;
 
         return $hasRelation;
+    }
+
+    public function totalReceived(){
+        $total = 0;
+        foreach($this->marketingOrderHandoverReceiptDetail->where('status','2') as $row){
+            $total += $row->marketingOrderReceipt->grandtotal;
+        }
+        return number_format($total,2,',','.');
+    }
+
+    public function totalUnreceived(){
+        $total = 0;
+        foreach($this->marketingOrderHandoverReceiptDetail->where('status','1') as $row){
+            $total += $row->marketingOrderReceipt->grandtotal;
+        }
+        return number_format($total,2,',','.');
     }
 }

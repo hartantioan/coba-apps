@@ -78,8 +78,7 @@
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
                                                         <option value="3">Selesai</option>
@@ -202,87 +201,140 @@
                     </div>
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col m2 s12 step1">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                <label class="active" for="code">No. Dokumen</label>
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>1. Informasi Utama</legend>
+                                    <div class="input-field col m2 s12 step1">
+                                        <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                        <label class="active" for="code">No. Dokumen</label>
+                                    </div>
+                                    <div class="input-field col m1 s12 step2">
+                                        <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input type="hidden" id="temp" name="temp">
+                                        <select class="browser-default" id="account_id" name="account_id"></select>
+                                        <label class="active" for="account_id">Partner Bisnis</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step4">
+                                        <select class="form-control" id="type" name="type">
+                                            <option value="1">Cash</option>
+                                            <option value="2">Transfer</option>
+                                            <option value="3">Giro/Check</option>
+                                        </select>
+                                        <label class="" for="type">Tipe</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step5">
+                                        <select class="form-control" id="company_id" name="company_id">
+                                            @foreach ($company as $rowcompany)
+                                                <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="company_id">Perusahaan</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step6">
+                                        <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                        <label class="active" for="post_date">Tgl. Posting</label>
+                                    </div>
+                                    <div class="file-field input-field col m3 s12 step8">
+                                        <div class="btn">
+                                            <span>Lampiran</span>
+                                            <input type="file" name="document" id="document">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="input-field col m3 s12 step9">
+                                        <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
+                                            @foreach ($currency as $row)
+                                                <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="currency_id">Mata Uang</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step10">
+                                        <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                        <label class="active" for="currency_rate">Konversi</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step11">
+                                        <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                            @foreach ($tax as $row)
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="tax_id">PPN</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step12">
+                                        <select class="browser-default" id="is_include_tax" name="is_include_tax" onchange="countAll();">
+                                            <option value="0">--Tidak--</option>
+                                            <option value="1">--Ya--</option>
+                                        </select>
+                                        <label class="active" for="is_include_tax">Termasuk PPN</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step13">
+                                        <input id="tax_no" name="tax_no" type="text" readonly placeholder="Auto generate : pajak > 0">
+                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step14">
+                                        <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                        <label class="active" for="note">Keterangan</label>
+                                    </div>
+                                </fieldset>
                             </div>
-                            <div class="input-field col m1 s12 step2">
-                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                    <option value="">--Pilih--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>2. SO Terpakai</legend>
+                                    <div class="col m3 s12 step15">
+                                        <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
+                                    </div>
+                                </fieldset>
                             </div>
-                            <div class="input-field col m3 s12 step3">
-                                <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id"></select>
-                                <label class="active" for="account_id">Partner Bisnis</label>
-                            </div>
-                            <div class="input-field col m3 s12 step4">
-                                <select class="form-control" id="type" name="type">
-                                    <option value="1">Cash</option>
-                                    <option value="2">Transfer</option>
-                                    <option value="3">Giro/Check</option>
-                                </select>
-                                <label class="" for="type">Tipe</label>
-                            </div>
-                            <div class="input-field col m3 s12 step5">
-                                <select class="form-control" id="company_id" name="company_id">
-                                    @foreach ($company as $rowcompany)
-                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="company_id">Perusahaan</label>
-                            </div>
-                            <div class="input-field col m3 s12 step6">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="file-field input-field col m3 s12 step8">
-                                <div class="btn">
-                                    <span>Lampiran</span>
-                                    <input type="file" name="document" id="document">
-                                </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
-                                </div>
-                            </div>
-                            <div class="input-field col m3 s12 step9">
-                                <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
-                                    @foreach ($currency as $row)
-                                        <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="currency_id">Mata Uang</label>
-                            </div>
-                            <div class="input-field col m3 s12 step10">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                <label class="active" for="currency_rate">Konversi</label>
-                            </div>
-                            <div class="input-field col m3 s12 step11">
-                                <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
-                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                    @foreach ($tax as $row)
-                                        <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="active" for="tax_id">PPN</label>
-                            </div>
-                            <div class="input-field col m3 s12 step12">
-                                <select class="browser-default" id="is_include_tax" name="is_include_tax" onchange="countAll();">
-                                    <option value="0">--Tidak--</option>
-                                    <option value="1">--Ya--</option>
-                                </select>
-                                <label class="active" for="is_include_tax">Termasuk PPN</label>
-                            </div>
-                            <div class="input-field col m3 s12 step13">
-                                <input id="tax_no" name="tax_no" type="text" readonly placeholder="Auto generate : pajak > 0">
-                                <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
-                            </div>
-                            <div class="input-field col m3 s12 step14">
-                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset style="min-width: 100%;">
+                                    <legend>3. Sales Order Detail</legend>
+                                    <div class="input-field col m3 s12 step16">
+                                        <select class="browser-default" id="marketing_order_id" name="marketing_order_id"></select>
+                                        <label class="active" for="marketing_order_id">Sales Order</label>
+                                    </div>
+                                    <div class="col m4 step17">
+                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMarketingOrder();" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Sales Order
+                                        </a>
+                                    </div>
+                                    <div class="col m12 s12 step18" style="overflow:auto;width:100% !important;" id="table-item">
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">No. Sales Order</th>
+                                                        <th class="center">Tgl.Post</th>
+                                                        <th class="center">Keterangan</th>
+                                                        <th class="center">Grandtotal</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-item">
+                                                    <tr id="last-row-item">
+                                                        <td colspan="5">
+                                                            Silahkan pilih Sales Order...
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p>
+                                    </div>
+                                </fieldset>
                             </div>
                         </div>
                         <div class="row">
@@ -293,7 +345,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="input-field col m4 s12 step15">
+                            <div class="input-field col m4 s12 step19">
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
@@ -330,7 +382,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step16" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step20" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -552,6 +604,12 @@
                 if(!$('#temp').val()){
                     loadCurrency();
                 }
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -559,6 +617,13 @@
                 M.updateTextFields();
                 $('#account_id').empty();
                 $('#textTax').hide();
+                $('#marketing_order_id').empty();
+                window.onbeforeunload = function() {
+                    return null;
+                };
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
             }
         });
 
@@ -634,9 +699,165 @@
             }
         });
 
+        $('#body-item').on('click', '.delete-data-item', function() {
+            $('.row_used' + $(this).closest('tr').data('id')).trigger('click');
+            if($('.row_item').length == 0){
+                $('#body-item').empty().append(`
+                    <tr id="last-row-item">
+                        <td colspan="5">
+                            Silahkan pilih Sales Order...
+                        </td>
+                    </tr>
+                `);
+            }
+            $('#marketing_order_id').empty();
+        });
+
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
+        
+        $('#marketing_order_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/marketing_order_form_dp") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     });
 
+    function getMarketingOrder(){
+        if($('#marketing_order_id').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/send_used_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#marketing_order_id').val(),
+                    type: 'marketing_orders',
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                    }else{
+                        if($('#last-row-item').length > 0){
+                            $('#last-row-item').remove();
+                        }
+
+                        let datakuy = $('#marketing_order_id').select2('data')[0];
+
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + datakuy.code + `
+                                <i class="material-icons close data-used row_used` + $('#marketing_order_id').val() + `" onclick="removeUsedData('` + datakuy.type + `','` + $('#marketing_order_id').val() + `')">close</i>
+                            </div>
+                        `);
+
+                        var count = makeid(10);
+                        $('#body-item').append(`
+                            <tr class="row_item" data-id="` + $('#marketing_order_id').val() + `">
+                                <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + $('#marketing_order_id').val() + `">
+                                <td class="center-align">
+                                    ` + datakuy.code + `
+                                </td>
+                                <td class="center-align">
+                                    ` + datakuy.post_date + `
+                                </td>
+                                <td>
+                                    ` + datakuy.note + `
+                                </td>
+                                <td class="right-align">
+                                    ` + datakuy.grandtotal + `
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+
+                        $('#marketing_order_id').empty();
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            
+        }
+    }
+
+    function removeUsedData(type,id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id,
+                type : type,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_item[data-id="' + id + '"]').remove();
+                if($('.row_item').length == 0){
+                    $('#body-item').empty().append(`
+                        <tr id="last-row-item">
+                            <td colspan="5">
+                                Silahkan pilih Sales Order...
+                            </td>
+                        </tr>
+                    `);
+                }
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -1023,6 +1244,10 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'asc']],
             dom: 'Blfrtip',
             buttons: [
@@ -1058,7 +1283,7 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val(),
+                    'status[]' : $('#filter_status').val(),
                     type : $('#filter_type').val(),
                     'account_id[]' : $('#filter_account').val(),
                     company_id : $('#filter_company').val(),
@@ -1283,6 +1508,40 @@
                 }else{
                     $('#is_include_tax').prop( "checked", false);
                 }
+
+                if(response.details.length > 0){
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    if($('#last-row-item').length > 0){
+                        $('#last-row-item').remove();
+                    }
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        $('#body-item').append(`
+                            <tr class="row_item" data-id="` + val.id + `">
+                                <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.id + `">
+                                <td class="center-align">
+                                    ` + val.code + `
+                                </td>
+                                <td class="center-align">
+                                    ` + val.post_date + `
+                                </td>
+                                <td>
+                                    ` + val.note + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.grandtotal + `
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
                 
                 $('#note').val(response.note);
                 $('#grandtotal').val(response.grandtotal);
@@ -1394,9 +1653,9 @@
             
         },
         onDisconnect: function () {
-            M.toast({
+            /* M.toast({
                 html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
-            });
+            }); */
         },
         onUpdate: function (message) {
             
@@ -1507,11 +1766,6 @@
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
                 {
-                    title : 'Tgl. Kadaluarsa',
-                    element : document.querySelector('.step7'),
-                    intro : 'Tanggal berlaku hingga, dari dokumen ini.' 
-                },
-                {
                     title : 'File Lampiran',
                     element : document.querySelector('.step8'),
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
@@ -1547,13 +1801,33 @@
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
-                    title : 'Subtotal & Diskon',
+                    title : 'SO Terpakai',
                     element : document.querySelector('.step15'),
+                    intro : 'Daftar SO Terpakai pada form ini, silahkan hapus agar SO bisa diakses di form lain oleh pengguna lainnya.' 
+                },
+                {
+                    title : 'Sales Order',
+                    element : document.querySelector('.step16'),
+                    intro : 'Silahkan menambahkan Sales Order untuk membuat link dengan Marketing Down Payment.' 
+                },
+                {
+                    title : 'Tombol Tambah Sales Order',
+                    element : document.querySelector('.step17'),
+                    intro : 'Tombol untuk menambahkan Sales Order ke tabel Detail bawah.' 
+                },
+                {
+                    title : 'Detail Sales Order',
+                    element : document.querySelector('.step18'),
+                    intro : 'Tabel sementara data Sales Order yang telah ditambahkan, anda bisa menghapus data yang masuk ke tabel ini.' 
+                },
+                {
+                    title : 'Subtotal & Diskon',
+                    element : document.querySelector('.step19'),
                     intro : 'Silahkan isikan nominal Subtotal langsung untuk menjadi acuan pembuatan dokumen, dan jika ada diskon anda bisa menambahkannya di inputan Discount.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step16'),
+                    element : document.querySelector('.step20'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

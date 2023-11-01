@@ -196,6 +196,37 @@
                 </thead>
             </table>
         </div>
+        <div class="invoice-product-details mt-2" style="overflow:auto;">
+            <table class="bordered">
+                <thead>
+                    <tr>
+                        <th class="center-align" colspan="4">Sales Order</th>
+                    </tr>
+                    <tr>
+                        <th class="center-align">Nomor</th>
+                        <th class="center-align">Tgl.Post</th>
+                        <th class="center-align">Catatan</th>
+                        <th class="center-align">Grandtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if($data->marketingOrderDownPaymentDetail()->exists())
+                        @foreach($data->marketingOrderDownPaymentDetail as $row)
+                        <tr>
+                            <td class="center-align">{{ $row->marketingOrder->code }}</td>
+                            <td class="center-align">{{ date('d/m/y',strtotime($row->marketingOrder->post_date)) }}</td>
+                            <td class="">{{ $row->marketingOrder->note_internal.' - '.$row->marketingOrder->note_external }}</td>
+                            <td class="right-align">{{ number_format($row->marketingOrder->grandtotal,2,',','.') }}</td>
+                        </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="4" class="center-align">Data tidak ditemukan.</td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
+        </div>
         <!-- invoice subtotal -->
         <div class="invoice-subtotal mt-2">
             <div class="row">

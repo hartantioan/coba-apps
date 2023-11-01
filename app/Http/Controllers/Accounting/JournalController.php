@@ -101,7 +101,7 @@ class JournalController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
                 
                 if($request->currency_id){
@@ -136,7 +136,7 @@ class JournalController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->currency_id){

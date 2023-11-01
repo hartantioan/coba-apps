@@ -9046,7 +9046,7 @@ select
 .select-wrapper
 {
     position: relative;
-    height: 3rem !important;
+    height: 3.6rem !important;
 }
 
 .select-wrapper.valid + label,

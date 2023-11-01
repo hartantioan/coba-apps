@@ -72,10 +72,10 @@ class GoodReceiptPOController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
+            'code',
             'user_id',
             'account_id',
             'company_id',
-            'code',
             'receiver_name',
             'post_date',
             'due_date',
@@ -123,7 +123,7 @@ class GoodReceiptPOController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -163,7 +163,7 @@ class GoodReceiptPOController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -180,10 +180,10 @@ class GoodReceiptPOController extends Controller
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    $val->code,
                     $val->user->name,
                     $val->account->name,
                     $val->company->name,
-                    $val->code,
                     $val->receiver_name,
                     date('d M Y',strtotime($val->post_date)),
                     date('d M Y',strtotime($val->due_date)),

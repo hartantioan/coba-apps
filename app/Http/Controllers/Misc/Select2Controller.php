@@ -376,6 +376,7 @@ class Select2Controller extends Controller {
                 'old_prices'        => $d->oldSalePrices($this->dataplaces),
                 'stock_list'        => $d->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
+                'list_outletprice'  => $d->listOutletPrice(),
             ];
         }
 
@@ -1680,8 +1681,60 @@ class Select2Controller extends Controller {
                     'city'          => $d->city->name,
                     'district'      => $d->district->name,
                     'subdistrict'   => $d->subdistrict->name,
+                    'type'          => $d->getTable(),
+                    'post_date'     => date('d/m/y',strtotime($d->post_date)),
+                    'note'          => $d->note_internal.' - '.$d->note_external,
+                    'code'          => $d->code,
+                    'grandtotal'    => number_format($d->grandtotal,2,',','.'),
                 ];
             }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrderFormDP(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = MarketingOrder::where(function($query) use($search,$request){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('note_internal','like',"%$search%")
+                ->orWhere('note_external','like',"%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhereHas('account',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->where(function($query) use($search,$request){
+            if($request->account_id){
+                $query->where('account_id',$request->account_id);
+            }
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' '.$d->account->name,
+                'outlet'        => $d->outlet->name,
+                'address'       => $d->destination_address,
+                'province'      => $d->province->name,
+                'city'          => $d->city->name,
+                'district'      => $d->district->name,
+                'subdistrict'   => $d->subdistrict->name,
+                'type'          => $d->getTable(),
+                'post_date'     => date('d/m/y',strtotime($d->post_date)),
+                'note'          => $d->note_internal.' - '.$d->note_external,
+                'code'          => $d->code,
+                'grandtotal'    => number_format($d->grandtotal,2,',','.'),
+            ];
         }
 
         return response()->json(['items' => $response]);
@@ -2025,7 +2078,7 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $data = Outlet::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
-                    ->orWhere('name', 'like', "%$search%");
+                        ->orWhere('name', 'like', "%$search%");
                 })
                 ->where('status','1')
                 ->get();
@@ -2107,20 +2160,23 @@ class Select2Controller extends Controller {
                 $details = [];
 
                 foreach($d->MarketingOrderPlanDetail as $row){
+                    $cekBom = $row->item->bomPlace($request->place_id);
                     $details[] = [
-                        'mopd_id'       => $row->id,
-                        'item_id'       => $row->item_id,
-                        'item_name'     => $row->item->name,
-                        'qty_in_sell'   => number_format($row->qty,3,',','.'),
-                        'qty_in_uom'    => number_format($row->qty * $row->item->sell_convert,3,',','.'),
-                        'qty_in_pallet' => number_format($row->qty / $row->item->pallet_convert,3,',','.'),
-                        'unit_sell'     => $row->item->sellUnit->code,
-                        'unit_uom'      => $row->item->uomUnit->code,
-                        'unit_pallet'   => $row->item->palletUnit->code,
-                        'sell_convert'  => $row->item->sell_convert,
-                        'pallet_convert'=> $row->item->pallet_convert,
-                        'request_date'  => date('d/m/y',strtotime($row->request_date)),
-                        'note'          => $row->note,
+                        'mopd_id'           => $row->id,
+                        'item_id'           => $row->item_id,
+                        'item_name'         => $row->item->name,
+                        'qty_in_sell'       => number_format($row->qty,3,',','.'),
+                        'qty_in_uom'        => number_format($row->qty * $row->item->sell_convert,3,',','.'),
+                        'qty_in_pallet'     => number_format($row->qty / $row->item->pallet_convert,3,',','.'),
+                        'unit_sell'         => $row->item->sellUnit->code,
+                        'unit_uom'          => $row->item->uomUnit->code,
+                        'unit_pallet'       => $row->item->palletUnit->code,
+                        'sell_convert'      => $row->item->sell_convert,
+                        'pallet_convert'    => $row->item->pallet_convert,
+                        'request_date'      => date('d/m/y',strtotime($row->request_date)),
+                        'note'              => $row->note,
+                        'bom_link'          => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
+                        'stock_check'       => $cekBom->exists() ? $row->item->arrRawStock($request->place_id,$row->qty * $row->item->sell_convert) : '',
                     ];
                 }
                 $response[] = [

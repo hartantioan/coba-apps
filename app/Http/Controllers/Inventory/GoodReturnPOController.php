@@ -61,10 +61,10 @@ class GoodReturnPOController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
+            'code',
             'user_id',
             'account_id',
             'company_id',
-            'code',
             'post_date',
             'note',
         ];
@@ -105,7 +105,7 @@ class GoodReturnPOController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -142,7 +142,7 @@ class GoodReturnPOController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -159,10 +159,10 @@ class GoodReturnPOController extends Controller
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
+                    $val->code,
                     $val->user->name,
                     $val->account->name,
                     $val->company->name,
-                    $val->code,
                     date('d M Y',strtotime($val->post_date)),
                     $val->note,
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',

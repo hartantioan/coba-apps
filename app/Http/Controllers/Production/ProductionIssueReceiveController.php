@@ -57,8 +57,8 @@ class ProductionIssueReceiveController extends Controller
     public function datatable(Request $request){
         $column = [
             'id',
-            'user_id',
             'code',
+            'user_id',
             'company_id',
             'post_date',
         ];
@@ -83,7 +83,7 @@ class ProductionIssueReceiveController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -114,7 +114,7 @@ class ProductionIssueReceiveController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {

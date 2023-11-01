@@ -13,6 +13,7 @@
     <script src="{{ url('app-assets/vendors/data-tables/js/dataTables.select.min.js') }}"></script>
     <script src="{{ url('app-assets/vendors/data-tables/js/dataTables.buttons.min.js') }}"></script>
     <script src="{{ url('app-assets/vendors/data-tables/js/buttons.colVis.min.js') }}"></script>
+    <script src="{{ url('app-assets/js/dataTables.fixedColumns.min.js?v=0') }}"></script>
     <script src="{{ url('app-assets/vendors/formatter/jquery.formatter.min.js?v=2') }}"></script>
 	<script src="{{ url('app-assets/vendors/quill/katex.min.js') }}"></script>
     <script src="{{ url('app-assets/vendors/quill/highlight.min.js') }}"></script>

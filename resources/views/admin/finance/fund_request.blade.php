@@ -51,8 +51,7 @@
                                             <div class="col m3 s6 ">
                                                 <label for="filter_status" style="font-size:1.2rem;">Filter Status Transaksi :</label>
                                                 <div class="input-field col s12">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
                                                         <option value="3">Selesai</option>
@@ -101,8 +100,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th rowspan="2">#</th>
-                                                        <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Code</th>
+                                                        <th rowspan="2">Pengguna</th>
                                                         <th rowspan="2">Plant</th>
                                                         <th rowspan="2">Departemen</th>
                                                         <th rowspan="2">Partner Bisnis</th>
@@ -355,12 +354,16 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "order": [[0, 'asc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val(),
+                    'status[]' : $('#filter_status').val(),
                     document : $('#filter_document').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
@@ -382,8 +385,8 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'user_id', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
+                { name: 'user_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
                 { name: 'department_id', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },

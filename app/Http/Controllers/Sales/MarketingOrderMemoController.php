@@ -121,7 +121,7 @@ class MarketingOrderMemoController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->account_id){
@@ -168,7 +168,7 @@ class MarketingOrderMemoController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
                 
                 if($request->account_id){
@@ -575,7 +575,7 @@ class MarketingOrderMemoController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Print Pengembalian DO',
+                'title'     => 'AR Credit Memo',
                 'data'      => $pr
             ];
 
@@ -630,7 +630,7 @@ class MarketingOrderMemoController extends Controller
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Print Pengembalian DO',
+                        'title'     => 'AR Credit Memo',
                         'data'      => $pr,
                     ];
                     $img_path = 'website/logo_web_fix.png';
@@ -708,7 +708,7 @@ class MarketingOrderMemoController extends Controller
                         $query = MarketingOrderMemo::where('code', 'LIKE', '%'.$nomor)->first();
                         if($query){
                             $data = [
-                                'title'     => 'Print Pengembalian DO',
+                                'title'     => 'AR Credit Memo',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';

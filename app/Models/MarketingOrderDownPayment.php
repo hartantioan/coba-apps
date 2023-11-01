@@ -67,6 +67,11 @@ class MarketingOrderDownPayment extends Model
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
     }
 
+    public function marketingOrderDownPaymentDetail()
+    {
+        return $this->hasMany('App\Models\MarketingOrderDownPaymentDetail');
+    }
+
     public function isIncludeTax(){
         $type = match ($this->is_include_tax) {
           '0' => 'Tidak Termasuk',

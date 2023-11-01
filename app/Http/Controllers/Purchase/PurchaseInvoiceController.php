@@ -399,7 +399,7 @@ class PurchaseInvoiceController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->type){
@@ -460,7 +460,7 @@ class PurchaseInvoiceController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->type){

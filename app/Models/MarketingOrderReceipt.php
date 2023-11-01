@@ -74,7 +74,9 @@ class MarketingOrderReceipt extends Model
 
     public function marketingOrderHandoverReceiptDetail()
     {
-        return $this->hasMany('App\Models\MarketingOrderHandoverReceiptDetail');
+        return $this->hasMany('App\Models\MarketingOrderHandoverReceiptDetail')->whereHas('marketingOrderHandoverReceipt',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function used(){
@@ -155,6 +157,18 @@ class MarketingOrderReceipt extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
+        if($this->marketingOrderHandoverReceiptDetail()->exists()){
+            $hasRelation = true;
+        }
+
         return $hasRelation;
+    }
+
+    public function arrInvoice(){
+        $arrInvoice = [];
+        foreach($this->marketingOrderReceiptDetail as $row){
+            $arrInvoice[] = $row->lookable->code;
+        }
+        return $arrInvoice;
     }
 }

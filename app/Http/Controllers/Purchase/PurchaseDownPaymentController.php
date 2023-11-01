@@ -139,7 +139,7 @@ class PurchaseDownPaymentController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -210,7 +210,7 @@ class PurchaseDownPaymentController extends Controller
                 }
 
                 if($request->status){
-                    $query->where('status', $request->status);
+                    $query->whereIn('status', $request->status);
                 }
 
                 if($request->start_date && $request->finish_date) {

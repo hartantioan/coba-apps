@@ -253,7 +253,7 @@
                         Diterima oleh,
                         <div class="mt-6">{{ $data->receiver_name }}</div>
                     </td>
-                    <td class="center-align">
+                    <td class="">
                         Dibuat oleh,
                         @if($data->user->signature)
                             <div>{!! $data->user->signature() !!}</div>

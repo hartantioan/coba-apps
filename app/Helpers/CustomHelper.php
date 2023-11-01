@@ -349,6 +349,60 @@ class CustomHelper {
 		}
 	}
 
+	public static function sendNotificationWithFrom($table_name = null, $table_id = null, $title = null, $note = null, $from = null, $to = null){
+		
+		$menu = Menu::where('table_name',$table_name)->first();
+
+		$arrUser = [];
+
+		if($menu){
+			foreach($menu->menuUser as $row){
+				$arrUser[] = $row->user_id;
+			}
+
+			$arrUser = array_values(array_unique($arrUser));
+
+			$targets = User::whereIn('id',$arrUser)->where('status','1')->where('type','1')->get();
+
+			$adato = false;
+
+			foreach($targets as $row){
+				if($to){
+					if($row->id == $to){
+						$adato = true;
+					}
+				}
+				Notification::create([
+					'code'				=> Str::random(20),
+					'menu_id'			=> $menu->id,
+					'from_user_id'		=> $from,
+					'to_user_id'		=> $row->id,
+					'lookable_type'		=> $table_name,
+					'lookable_id'		=> $table_id,
+					'title'				=> $title,
+					'note'				=> $note,
+					'status'			=> '1'
+				]);
+			}
+			
+			if($to){
+				if($adato == false){
+					Notification::create([
+						'code'				=> Str::random(20),
+						'menu_id'			=> $menu->id,
+						'from_user_id'		=> $from,
+						'to_user_id'		=> $to,
+						'lookable_type'		=> $table_name,
+						'lookable_id'		=> $table_id,
+						'title'				=> $title,
+						'note'				=> $note,
+						'status'			=> '1'
+					]);
+				}
+			}
+		}
+	}
+
 	public static function sendJournal($table_name = null,$table_id = null,$account_id = null){
 
 		$data = DB::table($table_name)->where('id',$table_id)->first();
@@ -2408,6 +2462,48 @@ class CustomHelper {
 	}
 
 	public static function terbilang($angka) {
+		$arr = explode('.',strval($angka));
+		$angka=intval($arr[0]);
+		$sen = '';
+		if(count($arr) > 1){
+			$sen = self::terbilangSen(intval($arr[1]));
+		}
+		
+		$baca =array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+	  
+		$terbilang="";
+		 if ($angka < 12){
+			 $terbilang= " " . $baca[$angka];
+		 }
+		 else if ($angka < 20){
+			 $terbilang= self::terbilangSen($angka - 10) . " belas";
+		 }
+		 else if ($angka < 100){
+			 $terbilang= self::terbilangSen($angka / 10) . " puluh" . self::terbilangSen($angka % 10);
+		 }
+		 else if ($angka < 200){
+			 $terbilang= " seratus" . self::terbilangSen($angka - 100);
+		 }
+		 else if ($angka < 1000){
+			 $terbilang= self::terbilangSen($angka / 100) . " ratus" . self::terbilang($angka % 100);
+		 }
+		 else if ($angka < 2000){
+			 $terbilang= " seribu" . self::terbilangSen($angka - 1000);
+		 }
+		 else if ($angka < 1000000){
+			 $terbilang= self::terbilangSen($angka / 1000) . " ribu" . self::terbilangSen($angka % 1000);
+		 }
+		 else if ($angka < 1000000000){
+			$terbilang= self::terbilangSen($angka / 1000000) . " juta" . self::terbilangSen($angka % 1000000);
+		 }
+		 else if ($angka < 1000000000000){
+			$terbilang= self::terbilangSen($angka / 1000000000) . " miliar" . self::terbilangSen($angka % 1000000000);
+		 }
+		 
+		 return ucwords($terbilang.(count($arr) > 1 ? ' Koma '.$sen.' Sen' : ''));
+	 }
+
+	 public static function terbilangSen($angka) {
 		$angka=abs($angka);
 		
 		$baca =array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
@@ -2417,28 +2513,28 @@ class CustomHelper {
 			 $terbilang= " " . $baca[$angka];
 		 }
 		 else if ($angka < 20){
-			 $terbilang= self::terbilang($angka - 10) . " belas";
+			 $terbilang= self::terbilangSen($angka - 10) . " belas";
 		 }
 		 else if ($angka < 100){
-			 $terbilang= self::terbilang($angka / 10) . " puluh" . self::terbilang($angka % 10);
+			 $terbilang= self::terbilangSen($angka / 10) . " puluh" . self::terbilangSen($angka % 10);
 		 }
 		 else if ($angka < 200){
-			 $terbilang= " seratus" . self::terbilang($angka - 100);
+			 $terbilang= " seratus" . self::terbilangSen($angka - 100);
 		 }
 		 else if ($angka < 1000){
-			 $terbilang= self::terbilang($angka / 100) . " ratus" . self::terbilang($angka % 100);
+			 $terbilang= self::terbilangSen($angka / 100) . " ratus" . self::terbilangSen($angka % 100);
 		 }
 		 else if ($angka < 2000){
 			 $terbilang= " seribu" . self::terbilang($angka - 1000);
 		 }
 		 else if ($angka < 1000000){
-			 $terbilang= self::terbilang($angka / 1000) . " ribu" . self::terbilang($angka % 1000);
+			 $terbilang= self::terbilangSen($angka / 1000) . " ribu" . self::terbilangSen($angka % 1000);
 		 }
 		 else if ($angka < 1000000000){
-			$terbilang= self::terbilang($angka / 1000000) . " juta" . self::terbilang($angka % 1000000);
+			$terbilang= self::terbilangSen($angka / 1000000) . " juta" . self::terbilangSen($angka % 1000000);
 		 }
 		 else if ($angka < 1000000000000){
-			$terbilang= self::terbilang($angka / 1000000000) . " miliar" . self::terbilang($angka % 1000000000);
+			$terbilang= self::terbilangSen($angka / 1000000000) . " miliar" . self::terbilangSen($angka % 1000000000);
 		 }
 		 
 		 return ucwords($terbilang);

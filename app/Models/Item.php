@@ -242,6 +242,73 @@ class Item extends Model
         return $this->hasMany('App\Models\ItemStock','item_id','id');
     }
 
+    public function outletPriceDetail()
+    {
+        return $this->hasMany('App\Models\OutletPriceDetail','item_id','id')->whereHas('outletPrice',function($query){
+            $query->where('status','1');
+        });
+    }
+
+    public function bomPlace($place_id)
+    {
+        return $this->hasMany('App\Models\Bom','item_id','id')->where('place_id',intval($place_id))->where('status','1');
+    }
+
+    public function arrRawStock($place_id,$qty){
+        $arr = [];
+        $bom = $this->bomPlace($place_id)->orderByDesc('id')->first();
+        if($bom){
+            $bobot = $qty / $bom->qty_output;
+            foreach($bom->bomDetail()->where('lookable_type','items')->get() as $key => $row){
+                $stock = $row->lookable->getStockPlace($place_id);
+                $qtyNeeded = $row->qty * $bobot;
+                $status = '<span style="font-weight:800;color:green;">Cukup</span>';
+                if($qtyNeeded > $stock){
+                    $status = '<span style="font-weight:800;color:red;">Tidak Cukup</span>';
+                }
+
+                $arr[] = [
+                    'item_id'   => $row->lookable_id,
+                    'item_name' => $row->lookable->name,
+                    'qty'       => number_format($qtyNeeded,3,',','.').' '.$row->lookable->uomUnit->code,
+                    'stock'     => number_format($stock,3,',','.').' '.$row->lookable->uomUnit->code,
+                    'status'    => $status,
+                    'not_enough'=> $qtyNeeded > $stock ? '1':'',
+                ];
+            }
+        }
+
+        return $arr;
+    }
+
+    public function listOutletPrice()
+    {
+        $arr = [];
+
+        foreach($this->outletPriceDetail as $detail){
+            $arr[] = [
+                'id'                    => $detail->id,
+                'account_id'            => $detail->outletPrice->account_id,
+                'outlet_id'             => $detail->OutletPrice->outlet_id,
+                'date'                  => $detail->outletPrice->date,
+                'price'                 => number_format($detail->price,2,',','.'),
+                'margin'                => number_format($detail->margin,2,',','.'),
+                'percent_discount_1'    => number_format($detail->percent_discount_1,2,',','.'),
+                'percent_discount_2'    => number_format($detail->percent_discount_2,2,',','.'),
+                'discount_3'            => number_format($detail->discount_3,2,',','.'),
+                'final_price'           => number_format($detail->final_price,2,',','.'),
+            ];
+        }
+
+        if(count($arr) > 0){
+            $collection = collect($arr)->sortByDesc('date')->sortByDesc('id');
+
+            $arr = $collection->values()->all();
+        }
+
+        return $arr;
+    }
+
     public function getStockPlace($place_id){
         $total = $this->itemStock()->where('place_id',$place_id)->sum('qty');
 

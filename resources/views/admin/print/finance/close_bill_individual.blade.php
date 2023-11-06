@@ -248,7 +248,7 @@
                                             Status
                                         </td>
                                         <td width="60%">
-                                            {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d M Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                                            {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
                                         </td>
                                     </tr>
                                 </table>

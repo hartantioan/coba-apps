@@ -83,6 +83,7 @@ class AppServiceProvider extends ServiceProvider
             'marketing_order_handover_invoices'     => 'App\Models\MarketingOrderHandoverInvoice',
             'marketing_order_receipts'              => 'App\Models\MarketingOrderReceipt',
             'marketing_order_handover_receipts'     => 'App\Models\MarketingOrderHandoverReceipt',
+            'closing_journals'                      => 'App\Models\ClosingJournal',
         ]);
     }
 }

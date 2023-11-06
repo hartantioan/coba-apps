@@ -93,17 +93,7 @@
                                         <div class="col s12">
                                             <div class="card-alert card purple">
                                                 <div class="card-content white-text">
-                                                    <p>Info 1 : Data yang anda tambahkan disini akan mempengaruhi nilai saldo buku aset terpilih.</p>
-                                                </div>
-                                            </div>
-                                            <div class="card-alert card cyan">
-                                                <div class="card-content white-text">
-                                                    <p>Info 2 : Aset yang sudah didepresiasi pada bulan terpilih, tidak bisa dipilih kembali pada bulan tersebut.</p>
-                                                </div>
-                                            </div>
-                                            <div class="card-alert card red">
-                                                <div class="card-content white-text">
-                                                    <p>Info 3 : Nilai depresiasi per periode sebelum periode akhir depresiasi dibulatkan normal (tanpa desimal). Pada saat akhir periode depresiasi, nilai akumulasi sisa (jika ada desimal) akan digunakan sebagai nilai akhir depresiasi.</p>
+                                                    <p>Info : Tutup Periode akan menghasilkan membalik biaya dan penjualan. Dimana selisihnya akan menjadi Laba Periode Berjalan.</p>
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>
@@ -115,15 +105,16 @@
                                                         <th>Pengguna</th>
                                                         <th>Perusahaan</th>
                                                         <th>Tgl.Post</th>
-                                                        <th>Periode</th>
+                                                        <th>Bulan</th>
                                                         <th>Keterangan</th>
+                                                        <th>Laba Berjalan</th>
+                                                        <th>Lampiran</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
                                             </table>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -172,35 +163,41 @@
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
                         <div class="input-field col s3 step5">
-                            <input id="period" name="period" type="month" placeholder="Periode depresiasi" value="{{ date('Y-m') }}">
-                            <label class="active" for="period">Periode Depresiasi</label>
+                            <input id="month" name="month" type="month" placeholder="Periode Penutupan" value="{{ date('Y-m') }}">
+                            <label class="active" for="month">Periode Penutupan</label>
                         </div>
-                        <div class="input-field col s3 step6">
+                        <div class="file-field input-field col s3 step6">
+                            <div class="btn">
+                                <span>Lampiran</span>
+                                <input type="file" name="document" id="document">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text">
+                            </div>
+                        </div>
+                        <div class="input-field col s3 step7">
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">Keterangan</label>
                         </div>
-                        <div class="input-field col s3 step7">
+                        <div class="input-field col s3 step8">
                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="preview();" href="javascript:void(0);">
-                                <i class="material-icons left">remove_red_eye</i> Preview
+                                <i class="material-icons left">remove_red_eye</i> Ambil Data
                             </a>
                         </div>
-                        <div class="col s12 step8">
-                            <h5>Preview</h5>
+                        <div class="col s12 step9">
+                            <h5>Preview Jurnal Pembalik Closing</h5>
                             <table class="bordered">
                                 <thead>
                                     <tr>
-                                        <th class="center">No.</th>
-                                        <th class="center">Kode Aset</th>
-                                        <th class="center">Nama Aset</th>
-                                        <th class="center">Plant</th>
-                                        <th class="center">Metode Hitung</th>
-                                        <th class="center">Depresiasi</th>
-                                        <th class="center">Hapus</th>
+                                        <th class="center" width="5%">No.</th>
+                                        <th class="center" width="45%">Coa</th>
+                                        <th class="center" width="25%">Debit</th>
+                                        <th class="center" width="25%">Kredit</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-detail">
                                     <tr id="empty-detail">
-                                        <td colspan="7" class="center">
+                                        <td colspan="4" class="center">
                                             Pilih periode lalu tekan preview untuk melihat...
                                         </td>
                                     </tr>
@@ -208,7 +205,7 @@
                             </table>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit step9" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit step10" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -547,7 +544,7 @@
         });
         $('#body-detail').empty().append(`
             <tr id="empty-detail">
-                <td colspan="7" class="center">
+                <td colspan="4" class="center">
                     Pilih periode lalu tekan preview untuk melihat...
                 </td>
             </tr>
@@ -555,14 +552,14 @@
     }
 
     function preview(){
-        if($('#period').val() && $('#company_id').val()){
+        if($('#month').val() && $('#company_id').val()){
             $.ajax({
                 url: '{{ Request::url() }}/preview',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
                     company_id : $('#company_id').val(),
-                    period : $('#period').val(),
+                    month : $('#month').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -573,45 +570,42 @@
                 success: function(response) {
                     loadingClose('.modal-content');
 
-                    resetDetailForm();
-
-                    $('#empty-detail').remove();
-
-                    if(response.length > 0){
-                        $.each(response, function(i, val) {
-                            var count = makeid(10);
-                            var no = $('.row_detail').length + 1;
-                            $('#body-detail').append(`
-                                <tr class="row_detail">
-                                    <input type="hidden" name="arr_asset_id[]" value="` + val.asset_id + `">
-                                    <td class="center">
-                                        ` + no + `
-                                    </td>
-                                    <td>
-                                        ` + val.asset_code + `
-                                    </td>
-                                    <td>
-                                        ` + val.asset_name + `
-                                    </td>
-                                    <td>
-                                        ` + val.asset_place + `
-                                    </td>
-                                    <td>
-                                        ` + val.method_name + `
-                                    </td>
-                                    <td class="center">
-                                        <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.nominal + `" onkeyup="formatRupiah(this);" readonly>
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    }else{
+                    if(response.status == '200'){
                         resetDetailForm();
+
+                        $('#empty-detail').remove();
+
+                        if(response.result.length > 0){
+                            $.each(response.result, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-detail').append(`
+                                    <tr class="row_detail ` + (i == (response.length - 1) ? 'teal lighten-4' : '') + `">
+                                        <input type="hidden" name="arr_coa_id[]" value="` + val.coa_id + `">
+                                        <input type="hidden" name="arr_nominal[]" value="` + val.nominal + `">
+                                        <td class="center">
+                                            ` + (i + 1) + `
+                                        </td>
+                                        <td>
+                                            ` + val.coa_code + ` - ` + val.coa_name + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + (parseFloat(val.nominal) >= 0 ? formatRupiahIni(parseFloat(val.nominal)) : '0,00' ) + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + (parseFloat(val.nominal) < 0 ? formatRupiahIni(-1 * parseFloat(val.nominal)) : '0,00' ) + `
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        }else{
+                            resetDetailForm();
+                        }
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'info'
+                        });
                     }
 
                     $('.modal-content').scrollTop(0);
@@ -704,11 +698,13 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'place', className: 'center-align' },
+                { name: 'user_id', className: 'center-align' },
+                { name: 'company_id', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
-                { name: 'period', className: 'center-align' },
+                { name: 'month', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
+                { name: 'grandtotal', className: 'right-align' },
+                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -855,7 +851,7 @@
                 $('#code').val(response.code);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
-                $('#period').val(response.period);
+                $('#month').val(response.month);
                 $('#note').val(response.note);
 
                 resetDetailForm();
@@ -864,32 +860,21 @@
 
                 $.each(response.details, function(i, val) {
                     var count = makeid(10);
-                    var no = $('.row_detail').length + 1;
                     $('#body-detail').append(`
-                        <tr class="row_detail">
-                            <input type="hidden" name="arr_asset_id[]" value="` + val.asset_id + `">
+                        <tr class="row_detail ` + (i == (response.details.length - 1) ? 'teal lighten-4' : '') + `">
+                            <input type="hidden" name="arr_coa_id[]" value="` + val.coa_id + `">
+                            <input type="hidden" name="arr_nominal[]" value="` + val.nominal + `">
                             <td class="center">
-                                ` + no + `
+                                ` + (i + 1) + `
                             </td>
                             <td>
-                                ` + val.asset_code + `
+                                ` + val.coa_code + ` - ` + val.coa_name + `
                             </td>
-                            <td>
-                                ` + val.asset_name + `
+                            <td class="right-align">
+                                ` + (parseFloat(val.nominal) >= 0 ? formatRupiahIni(parseFloat(val.nominal)) : '0,00' ) + `
                             </td>
-                            <td>
-                                ` + val.asset_place + `
-                            </td>
-                            <td>
-                                ` + val.method_name + `
-                            </td>
-                            <td class="center">
-                                <input type="text" id="arr_total` + count + `" name="arr_total[]" value="` + val.nominal + `" onkeyup="formatRupiah(this);" readonly>
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
-                                    <i class="material-icons">delete</i>
-                                </a>
+                            <td class="right-align">
+                                ` + (parseFloat(val.nominal) < 0 ? formatRupiahIni(-1 * parseFloat(val.nominal)) : '0,00' ) + `
                             </td>
                         </tr>
                     `);
@@ -1173,8 +1158,8 @@
             exitOnOverlayClick : false,
             steps: [
                 {
-                    title : 'Depresiasi',
-                    intro : 'Untuk menyusutkan Suatu nilai aset barang per periode'
+                    title : 'Penutupan Jurnal',
+                    intro : 'Form ini digunakan untuk menutup jurnal per bulan / periode dengan menjurnal-balikkan coa 4,5,6,7,8 dan menyimpan nilai selisih yang menjadi Laba Rugi Berjalan.'
                 },
                 {
                     title : 'Nomor Dokumen',
@@ -1184,12 +1169,12 @@
                 {
                     title : 'Kode Plant',
                     element : document.querySelector('.step2'),
-                    intro : 'Kode plant yang dipilih diperuntukan grpo yang akan dibuat'
+                    intro : 'Kode plant dimana dokumen dibuat.'
                 },
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step3'),
-                    intro : 'Perusahaan tempat GRPO ini dibuat atau diperuntukkan'
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Tgl. Posting',
@@ -1197,28 +1182,33 @@
                     intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
                 },
                 {
-                    title : 'Periode',
+                    title : 'Periode / Bulan',
                     element : document.querySelector('.step5'),
-                    intro : 'Periode dimana aset itu menyusut' 
+                    intro : 'Periode dimana aset itu menyusut.' 
+                },
+                {
+                    title : 'File lampiran',
+                    element : document.querySelector('.step6'),
+                    intro : 'File lampiran dalam bentuk pdf / gambar.'
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step6'),
+                    element : document.querySelector('.step7'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Preview',
-                    element : document.querySelector('.step7'),
-                    intro : 'Digunakan untuk mengotomasi perhitungan depresiasi asset pada periode yang ditentukan' 
+                    element : document.querySelector('.step8'),
+                    intro : 'Digunakan untuk menarik data coa awalan 4,5,6,7,8 pada jurnal dan periode terpilih.' 
                 },
                 {
                     title : 'List Data',
-                    element : document.querySelector('.step8'),
-                    intro : 'Merupakan List asset yang diotomasi ' 
+                    element : document.querySelector('.step9'),
+                    intro : 'Merupakan List Coa data tarikan dari jurnal pada periode terpilih.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.step10'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

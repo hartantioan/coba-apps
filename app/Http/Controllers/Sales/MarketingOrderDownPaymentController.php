@@ -221,7 +221,7 @@ class MarketingOrderDownPaymentController extends Controller
                     $val->company->name,
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
-                    date('d M Y',strtotime($val->post_date)),
+                    date('d/m/y',strtotime($val->post_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,

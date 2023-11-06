@@ -174,7 +174,7 @@ class GoodScaleController extends Controller
                     $val->user->name,
                     $val->account->name,
                     $val->company->name,
-                    date('d M Y',strtotime($val->post_date)),
+                    date('d/m/y',strtotime($val->post_date)),
                     $val->delivery_no,
                     $val->vehicle_no,
                     $val->driver,

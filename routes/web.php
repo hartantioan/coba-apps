@@ -139,6 +139,9 @@ use App\Http\Controllers\Accounting\DocumentTaxController;
 use App\Http\Controllers\Accounting\DepreciationController;
 use App\Http\Controllers\Accounting\LedgerController;
 use App\Http\Controllers\Accounting\CashBankController;
+use App\Http\Controllers\Accounting\TrialBalanceController;
+use App\Http\Controllers\Accounting\ProfitLossController;
+use App\Http\Controllers\Accounting\ClosingJournalController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -166,7 +169,6 @@ use App\Http\Controllers\Maintenance\RequestSparepartController;
 Route::get('/', function () {
     return redirect('/admin/login');
 });
-
 
 Route::prefix('admin')->group(function () {
     Route::prefix('login')->group(function () {
@@ -2021,6 +2023,24 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [JournalController::class, 'destroy'])->middleware('operation.access:journal,delete');
                 });
 
+                Route::prefix('closing_journal')->middleware('operation.access:closing_journal,view')->group(function () {
+                    Route::get('/',[ClosingJournalController::class, 'index']);
+                    Route::get('datatable',[ClosingJournalController::class, 'datatable']);
+                    Route::get('row_detail',[ClosingJournalController::class, 'rowDetail']);
+                    Route::post('show', [ClosingJournalController::class, 'show']);
+                    Route::post('get_code', [ClosingJournalController::class, 'getCode']);
+                    Route::post('print',[ClosingJournalController::class, 'print']);
+                    Route::get('export',[ClosingJournalController::class, 'export']);
+                    Route::post('print_by_range',[ClosingJournalController::class, 'printByRange']);
+                    Route::post('preview', [ClosingJournalController::class, 'preview']);
+                    Route::get('view_journal/{id}',[ClosingJournalController::class, 'viewJournal'])->middleware('operation.access:closing_journal,journal');
+                    Route::get('print_individual/{id}',[ClosingJournalController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('create',[ClosingJournalController::class, 'create'])->middleware('operation.access:closing_journal,update');
+                    Route::get('approval/{id}',[ClosingJournalController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ClosingJournalController::class, 'voidStatus'])->middleware('operation.access:closing_journal,void');
+                    Route::post('destroy', [ClosingJournalController::class, 'destroy'])->middleware('operation.access:closing_journal,delete');
+                });
+
                 Route::prefix('accounting_report')->middleware('direct.access')->group(function () {
                     Route::prefix('accounting_recap')->middleware('operation.access:accounting_recap,view')->group(function () {
                         Route::get('/',[AccountingReportController::class, 'index']);
@@ -2029,6 +2049,14 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[LedgerController::class, 'index']);
                         Route::get('datatable',[LedgerController::class, 'datatable']);
                         Route::get('row_detail',[LedgerController::class, 'rowDetail']);
+                    });
+                    Route::prefix('trial_balance')->middleware('operation.access:trial_balance,view')->group(function () {
+                        Route::get('/',[TrialBalanceController::class, 'index']);
+                        Route::post('process', [TrialBalanceController::class, 'process']);
+                    });
+                    Route::prefix('profit_loss')->middleware('operation.access:profit_loss,view')->group(function () {
+                        Route::get('/',[ProfitLossController::class, 'index']);
+                        Route::post('process', [ProfitLossController::class, 'process']);
                     });
                     Route::prefix('cash_bank')->middleware('operation.access:cash_bank,view')->group(function () {
                         Route::get('/',[CashBankController::class, 'index']);

@@ -51,7 +51,7 @@
                                                 <select class="browser-default " id="account_id" name="account_id" onchange="loadDataTable()"></select>
                                             </div>
                                             <div class="input-field col m3 s12">
-                                                <label class="active" for="type">ITEM</label>
+                                                <label class="active" for="type">Status</label>
                                                 <select id="type" name="type" onchange="loadDataTable()">
                                                     <option value="">Semua</option>
                                                     <option value="1">Belum TT Invoice</option>

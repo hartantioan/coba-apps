@@ -190,7 +190,7 @@
                                 <fieldset>
                                     <legend>2. MOP Terpakai</legend>
                                     <div class="input-field col m3 s12 step8">
-                                        <select class="browser-default" id="marketing_order_plan_id" name="marketing_order_plan_id"></select>
+                                        <select class="browser-default" id="marketing_order_plan_id" name="marketing_order_plan_id" onchange="checkPlace();"></select>
                                         <label class="active" for="marketing_order_plan_id">Marketing Order Plan</label>
                                     </div>
                                     <div class="col m2 s12 step9">
@@ -230,6 +230,16 @@
                                                         </td>
                                                     </tr>
                                                 </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td class="right-align" colspan="2">
+                                                            Stok RM :
+                                                        </td>
+                                                        <td class="" colspan="6" id="data-foot">
+                                                            Silahkan tambahkan Marketing Order Plan...
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
                                             </table>
                                         </p>
                                     </div>
@@ -509,6 +519,9 @@
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }
+                $('#data-foot').empty().append(`
+                    Silahkan tambahkan Marketing Order Plan...
+                `);
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -525,9 +538,8 @@
 
         $('#body-item-detail').on('click', '.delete-data-item-detail', function() {
             $(this).closest('tr').remove();
+            countStock();
         });
-
-        /* select2ServerSide('#marketing_order_plan_id', '{{ url("admin/select2/marketing_order_plan") }}'); */
 
         $('#marketing_order_plan_id').select2({
             placeholder: '-- Kosong --',
@@ -554,6 +566,17 @@
             }
         });
     });
+
+    function checkPlace(){
+        if(!$('#place_id').val()){
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih Plant untuk menarik data Stok RM.',
+                icon: 'error'
+            });
+            $('#marketing_order_plan_id').empty();
+        }     
+    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -712,9 +735,6 @@
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                
             },
             success: function(response) {
                 $('.row_item[data-id="' + id + '"]').remove();
@@ -888,17 +908,37 @@
                 }
             });
         }
-        if($('.arr_needed' + val).length > 0){
-            $('.arr_needed' + val).each(function(index){
+        countStock();
+    }
+
+    function countStock(){
+        if($('.arr_needed').length > 0){
+            let arrStok = [];
+            $('.arr_stok').each(function(index){
+                arrStok.push({
+                    'item_id'   : $(this).data('item'),
+                    'stock'     : parseFloat($(this).data('stock').replaceAll(".", "").replaceAll(",",".")),
+                });
+            });
+            $('.arr_needed').each(function(index){
+                let qtyUom = parseFloat($('#arr_qty' + $(this).data('id')).val().toString().replaceAll(".", "").replaceAll(",","."));
+                let qtyMax = parseFloat($('#arr_qty' + $(this).data('id')).data('max').toString().replaceAll(".", "").replaceAll(",","."));
                 let bobot = qtyUom / qtyMax;
                 let qtyRow = parseFloat($(this).data('qty').toString().replaceAll(".", "").replaceAll(",",".")) * bobot;
-                let qtyStock = parseFloat($(this).data('stock').toString().replaceAll(".", "").replaceAll(",","."));
-                $(this).text(formatRupiahIni(qtyRow.toFixed(3).toString().replace('.',',')));
+                let indexGas = -1;
+                for(let j=0;j<arrStok.length;j++){
+                    if(arrStok[j]['item_id'] == $(this).data('item')){
+                        indexGas = j;
+                    }
+                }
+                let qtyStock = arrStok[indexGas]['stock'];
+                $(this).text(formatRupiahIni(qtyRow.toFixed(3).toString().replace('.',',')) + ' ' + $(this).data('unit'));
                 if(qtyRow > qtyStock){
                     $(this).parent().find('.arr_status').html('<span style="font-weight:800;color:red;">Tidak Cukup</span>');
                 }else{
                     $(this).parent().find('.arr_status').html('<span style="font-weight:800;color:green;">Cukup</span>');
                 }
+                arrStok[indexGas]['stock'] -= qtyRow;
             });
         }
     }
@@ -939,13 +979,44 @@
                                 <i class="material-icons close data-used" data-id="` + mop.id + `" onclick="removeUsedData('` + mop.table + `','` + $('#marketing_order_plan_id').val() + `')">close</i>
                             </div>
                         `);
-
+                        let arrStok = [];
                         $.each(mop.details, function(i, val) {
                             var count = makeid(10), checkstok = '';
                             if(val.stock_check){
+                                let index = -1;
+                                $.each(val.stock_check, function(i, rowcek) {
+                                    for(let i=0;i<arrStok.length;i++){
+                                        if(arrStok[i]['item_id'] == rowcek.item_id){
+                                            index = i;
+                                        }
+                                    }
+                                    if(index < 0){
+                                        arrStok.push({
+                                            'item_id'   : rowcek.item_id,
+                                            'item_name' : rowcek.item_name,
+                                            'stock'     : rowcek.stock,
+                                            'balance'   : parseFloat(rowcek.stock_raw.replaceAll(".", "").replaceAll(",",".")),
+                                            'stock_raw' : rowcek.stock_raw,
+                                        });
+                                    }
+                                });
+                            }
+                            if(val.stock_check){
                                 checkstok += 'Bahan : <ol>';
                                 $.each(val.stock_check, function(i, detail) {
-                                    checkstok += '<li>' + detail.item_name + ' Butuh <b class="arr_needed' + count + '" data-qty="' + detail.qty + '" data-stock="' + detail.stock + '">' + detail.qty + '</b> Stok <b>' + detail.stock + '</b> Status : <b class="arr_status">' + detail.status + '</b></li>';
+                                    for(let j=0;j<arrStok.length;j++){
+                                        if(arrStok[j]['item_id'] == detail.item_id){
+                                            let qty = parseFloat(detail.qty_raw.replaceAll(".", "").replaceAll(",","."));
+                                            let statusRow = '';
+                                            if(arrStok[j]['balance'] >= qty){
+                                                statusRow = '<span style="font-weight:800;color:green;">Cukup</span>';
+                                            }else{
+                                                statusRow = '<span style="font-weight:800;color:red;">Tidak Cukup</span>';
+                                            }
+                                            checkstok += '<li>' + detail.item_name + ' Butuh <b class="arr_needed" data-id="' + count + '" data-item="' + detail.item_id + '" data-qty="' + detail.qty_raw + '" data-unit="' + detail.unit + '">' + detail.qty + '</b> Status : <b class="arr_status">' + statusRow + '</b></li>';
+                                            arrStok[j]['balance'] -= qty;
+                                        }
+                                    }
                                 });
                                 checkstok += '</ol>'
                             }
@@ -991,7 +1062,15 @@
                                 </tr>
                             `);
                         });
-
+                        if(arrStok.length > 0){
+                            $('#data-foot').empty();
+                            let footer = '<ol>';
+                            for(let j=0;j<arrStok.length;j++){
+                                footer += '<li class="arr_stok" data-stock="' + arrStok[j]['stock_raw'] + '" data-item="' + arrStok[j]['item_id'] + '">Item : ' + arrStok[j]['item_name'] + ' Stok : ' + arrStok[j]['stock'] + '</li>';
+                            }
+                            footer += '</ol>';
+                            $('#data-foot').html(footer);
+                        }
                         $('#marketing_order_plan_id').empty();
                     }
                 },
@@ -1276,7 +1355,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]);
+                var formData = new FormData($('#form_data')[0]), passedQty = true, passedBom = true;
 
                 $('select[name^="arr_item_detail_id[]"]').each(function(index){
                     if($(this).val()){
@@ -1284,69 +1363,95 @@
                     }
                 });
 
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
-
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
-                                });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
+                $('.arr_status').each(function(index){
+                    if($(this).text() !== 'Cukup'){
+                        passedQty = false;
                     }
                 });
+
+                $('input[name^="arr_bom[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passedBom = false;
+                    }
+                });
+
+                if(!passedBom){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Beberapa item target produksi tidak memiliki BOM. Silahkan atur pada Master Data - Produksi - BOM',
+                        icon: 'error'
+                    });
+                }else if(!passedQty){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Beberapa bahan saat ini tidak memiliki stok. Silahkan hubungi pihak Purchasing.',
+                        icon: 'error'
+                    });
+                }else{
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
             }
         });
     }
@@ -1394,8 +1499,49 @@
                         $('#last-row-item').remove();
                     }
 
+                    let arrStok = [];
                     $.each(response.targets, function(i, val) {
-                        var count = makeid(10);
+                        var count = makeid(10), checkstok = '';
+                        if(val.stock_check){
+                            let index = -1;
+                            $.each(val.stock_check, function(i, rowcek) {
+                                for(let i=0;i<arrStok.length;i++){
+                                    if(arrStok[i]['item_id'] == rowcek.item_id){
+                                        index = i;
+                                    }
+                                }
+                                if(index < 0){
+                                    arrStok.push({
+                                        'item_id'   : rowcek.item_id,
+                                        'item_name' : rowcek.item_name,
+                                        'stock'     : rowcek.stock,
+                                        'balance'   : parseFloat(rowcek.stock_raw.replaceAll(".", "").replaceAll(",",".")),
+                                        'stock_raw' : rowcek.stock_raw,
+                                    });
+                                }
+                            });
+                        }
+
+                        if(val.stock_check){
+                            checkstok += 'Bahan : <ol>';
+                            $.each(val.stock_check, function(i, detail) {
+                                for(let j=0;j<arrStok.length;j++){
+                                    if(arrStok[j]['item_id'] == detail.item_id){
+                                        let qty = parseFloat(detail.qty_raw.replaceAll(".", "").replaceAll(",","."));
+                                        let statusRow = '';
+                                        if(arrStok[j]['balance'] >= qty){
+                                            statusRow = '<span style="font-weight:800;color:green;">Cukup</span>';
+                                        }else{
+                                            statusRow = '<span style="font-weight:800;color:red;">Tidak Cukup</span>';
+                                        }
+                                        checkstok += '<li>' + detail.item_name + ' Butuh <b class="arr_needed" data-id="' + count + '" data-item="' + detail.item_id + '" data-qty="' + detail.qty_raw + '" data-unit="' + detail.unit + '">' + detail.qty + '</b> Status : <b class="arr_status">' + statusRow + '</b></li>';
+                                        arrStok[j]['balance'] -= qty;
+                                    }
+                                }
+                            });
+                            checkstok += '</ol>'
+                        }
+
                         $('#body-item').append(`
                             <tr class="row_item" data-id="` + val.id + `">
                                 <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
@@ -1405,17 +1551,20 @@
                                 <input type="hidden" name="arr_item_unit[]" id="arr_item_unit` + count + `" value="` + val.unit + `">
                                 <input type="hidden" name="arr_sell_convert[]" id="arr_sell_convert` + count + `" value="` + val.sell_convert + `">
                                 <input type="hidden" name="arr_pallet_convert[]" id="arr_pallet_convert` + count + `" value="` + val.pallet_convert + `">
+                                <input type="hidden" name="arr_bom[]" id="arr_bom` + count + `" value="` + val.bom_link + `">
                                 <td>
                                     ` + val.code + `
                                 </td>
                                 <td>
-                                    ` + val.item_name + `
+                                    ` + val.item_name + `<br>
+                                    ` + ( val.bom_link ? '' : '<span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
+                                    ` + ( val.bom_link ? checkstok : '' ) + `
                                 </td>
                                 <td class="right-align">
                                     <b id="qty_in_sell` + count + `">` + val.qty_in_sell + `</b> ` + val.unit_sell + `
                                 </td>
                                 <td class="right-align">
-                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);changeQty('`+ count +`')" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_in_uom + `">
+                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty_in_uom + `" onkeyup="formatRupiahNoMinus(this);changeQty('`+ count +`')" required style="width:75%;text-align:right;" data-mopd="` + val.mopd_id + `" data-max="` + val.qty_real + `">
                                     ` + val.unit_uom + `
                                 </td>
                                 <td class="right-align">
@@ -1435,6 +1584,16 @@
                             </tr>
                         `);
                     });
+
+                    if(arrStok.length > 0){
+                        $('#data-foot').empty();
+                        let footer = '<ol>';
+                        for(let j=0;j<arrStok.length;j++){
+                            footer += '<li class="arr_stok" data-stock="' + arrStok[j]['stock_raw'] + '" data-item="' + arrStok[j]['item_id'] + '">Item : ' + arrStok[j]['item_name'] + ' Stok : ' + arrStok[j]['stock'] + '</li>';
+                        }
+                        footer += '</ol>';
+                        $('#data-foot').html(footer);
+                    }
 
                     let arrItem = [];
                     $('input[name^="arr_item_id[]"]').each(function(index){
@@ -1491,6 +1650,10 @@
                             <option value="` + val.shift_id + `">` + val.shift_code + `</option>
                         `);
                         select2ServerSide('#arr_shift' + count, '{{ url("admin/select2/shift") }}');
+                    });
+
+                    $('input[name^="arr_qty[]"]').each(function(index){
+                        $(this).trigger('keyup');
                     });
                 }
                 

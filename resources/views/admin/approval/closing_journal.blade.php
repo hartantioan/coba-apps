@@ -120,7 +120,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Receipt # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">Penutupan Jurnal # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
@@ -128,17 +128,13 @@
                         <small>Diajukan:</small>
                         <span>{{ date('d/m/y',strtotime($data->post_date)) }}</span>
                     </div>
-                    <div class="mr-2">
-                        <small>Hingga:</small>
-                        <span>{{ date('d/m/y',strtotime($data->due_date)) }}</span>
-                    </div>
                 </div>
             </div>
         </div>
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Penerimaan Barang</h5>
+                <h5 class="indigo-text">{{ $title }}</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="40%">
@@ -178,26 +174,26 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Penerima
+                                Perusahaan
                             </td>
                             <td width="60%">
-                                {{ $data->receiver_name }}
+                                {{ $data->company->name }}
                             </td>
                         </tr>
                         <tr>
                             <td width="40%">
-                                Lampiran
+                                Periode / Bulan
                             </td>
                             <td width="60%">
-                                <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
+                                {{ date('F Y',strtotime($data->month)) }}
                             </td>
                         </tr>
                         <tr>
                             <td width="40%">
-                                Status
+                                Catatan
                             </td>
                             <td width="60%">
-                                {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
+                                {{ $data->note }}
                             </td>
                         </tr>
                     </table>
@@ -208,32 +204,20 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">No</th>
-                        <th class="center">Item</th>
-                        <th class="center">Jum.</th>
-                        <th class="center">Sat.</th>
-                        <th class="center">Keterangan 1</th>
-                        <th class="center">Keterangan 2</th>
-                        <th class="center">Remark</th>
-                        <th class="center">Plant</th>
-                        <th class="center">Departemen</th>
-                        <th class="center">Gudang</th>
+                        <th class="center">No.</th>
+                        <th class="center">Coa</th>
+                        <th class="center">Debit</th>
+                        <th class="center">Kredit</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->goodReceiptDetail as $keydetail => $rowdetail)
-                    <tr>
-                        <td class="center">{{ ($keydetail + 1) }}</td>
-                        <td>{{ $rowdetail->item->name }}</td>
-                        <td class="center">{{ $rowdetail->qty }}</td>
-                        <td class="center">{{ $rowdetail->item->buyUnit->code }}</td>
-                        <td>{{ $rowdetail->note }}</td>
-                        <td>{{ $rowdetail->note2 }}</td>
-                        <td>{{ $rowdetail->remark }}</td>
-                        <td class="center">{{ $rowdetail->place->name.' - '.$rowdetail->place->company->name }}</td>
-                        <td class="center">{{ $rowdetail->department->name }}</td>
-                        <td class="center">{{ $rowdetail->warehouse->name }}</td>
-                    </tr>
+                    @foreach($data->closingJournalDetail as $key => $row)
+                        <tr>
+                            <td class="center-align">{{ $key + 1 }}</td>
+                            <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                            <td class="right-align">{{ $row->type == '1' ? number_format($row->nominal,2,',','.') : '0,00' }}</td>
+                            <td class="right-align">{{ $row->type == '2' ? number_format($row->nominal,2,',','.') : '0,00' }}</td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -241,7 +225,7 @@
         <div class="invoice-subtotal mt-3">
             <div class="row">
                 <div class="col m6 s6 l6">
-                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->document_date) !!}
+                    {!! ucwords(strtolower($data->user->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
                     Catatan : {{ $data->note }}
@@ -249,10 +233,6 @@
             </div>
             <table class="mt-3" width="100%" border="0">
                 <tr>
-                    <td class="center-align">
-                        Diterima oleh,
-                        <div class="mt-6">{{ $data->receiver_name }}</div>
-                    </td>
                     <td class="">
                         Dibuat oleh,
                         @if($data->user->signature)

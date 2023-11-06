@@ -272,7 +272,10 @@ class Item extends Model
                     'item_name' => $row->lookable->name,
                     'qty'       => number_format($qtyNeeded,3,',','.').' '.$row->lookable->uomUnit->code,
                     'stock'     => number_format($stock,3,',','.').' '.$row->lookable->uomUnit->code,
+                    'stock_raw' => number_format($stock,3,',','.'),
+                    'qty_raw'   => number_format($qtyNeeded,3,',','.'),
                     'status'    => $status,
+                    'unit'      => $row->lookable->uomUnit->code,
                     'not_enough'=> $qtyNeeded > $stock ? '1':'',
                 ];
             }

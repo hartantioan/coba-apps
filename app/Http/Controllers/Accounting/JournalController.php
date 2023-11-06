@@ -87,7 +87,11 @@ class JournalController extends Controller
                                 $query->where('name', 'like', "%$search%");
                             })
                             ->orWhereHas('journalDetail',function($query) use ($search, $request){
-                                $query->where('nominal', 'like', "%$search%");
+                                $query->where('nominal', 'like', "%$search%")
+                                    ->orWhereHas('coa',function($query) use ($search, $request){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name', 'like', "%$search%");
+                                    });
                             });
                     });
                 }
@@ -121,8 +125,13 @@ class JournalController extends Controller
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name', 'like', "%$search%");
-                            })->orWhereHas('journalDetail',function($query) use ($search, $request){
-                                $query->where('nominal', 'like', "%$search%");
+                            })
+                            ->orWhereHas('journalDetail',function($query) use ($search, $request){
+                                $query->where('nominal', 'like', "%$search%")
+                                    ->orWhereHas('coa',function($query) use ($search, $request){
+                                        $query->where('code', 'like', "%$search%")
+                                            ->orWhere('name', 'like', "%$search%");
+                                    });
                             });
                     });
                 }

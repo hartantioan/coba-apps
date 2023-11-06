@@ -154,7 +154,7 @@ class InventoryRevaluationController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
-                    date('d M Y',strtotime($val->post_date)),
+                    date('d/m/y',strtotime($val->post_date)),
                     $val->note,
                     $val->status(),
                     '

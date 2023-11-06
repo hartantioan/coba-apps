@@ -69,4 +69,77 @@ class Coa extends Model
             $query->whereIn('status',['2','3']);
         });
     }
+
+    public function getTotalMonthFromParent($month,$level){
+        if($level == '1'){
+            $child = $this->getFifthChildFromFirst();
+        }elseif($level == '2'){
+            $child = $this->getFifthChildFromSecond();
+        }elseif($level == '3'){
+            $child = $this->getFifthChildFromThird();
+        }
+        
+
+        $totalDebit = 0;
+        $totalCredit = 0;
+        foreach($child as $row){
+            $totalDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+                $query->whereRaw("post_date LIKE '$month%'");
+            })->sum('nominal');
+    
+            $totalCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+                $query->whereRaw("post_date LIKE '$month%'");
+            })->sum('nominal');
+        }
+
+        $arr = [
+            'totalDebit'    => $totalDebit,
+            'totalCredit'   => $totalCredit,
+            'totalBalance'  => $totalDebit - $totalCredit,
+        ];
+
+        return $arr;
+    }
+
+    public function getFifthChildFromFirst(){
+        $arr = [];
+
+        foreach($this->childSub as $row2){
+            foreach($row2->childSub as $row3){
+                foreach($row3->childSub as $row4){
+                    foreach($row4->childSub as $row5){
+                        $arr[] = $row5;
+                    }
+                }
+            }
+        }
+
+        return $arr;
+    }
+
+    public function getFifthChildFromSecond(){
+        $arr = [];
+
+        foreach($this->childSub as $row3){
+            foreach($row3->childSub as $row4){
+                foreach($row4->childSub as $row5){
+                    $arr[] = $row5;
+                }
+            }
+        }
+
+        return $arr;
+    }
+
+    public function getFifthChildFromThird(){
+        $arr = [];
+
+        foreach($this->childSub as $row4){
+            foreach($row4->childSub as $row5){
+                $arr[] = $row5;
+            }
+        }
+
+        return $arr;
+    }
 }

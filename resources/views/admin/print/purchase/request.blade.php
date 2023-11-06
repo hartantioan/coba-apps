@@ -159,7 +159,7 @@
                                 <ol>
                                 @foreach ($row->purchaseRequestDetail as $detail)
                                     <li>
-                                        {{ $detail->item->name.' qty '.$detail->qty.' '.$detail->item->buyUnit->code.' Ket. '.$detail->note.' Tgl. pakai '.date('d M Y',strtotime($detail->required_date)) }}
+                                        {{ $detail->item->name.' qty '.$detail->qty.' '.$detail->item->buyUnit->code.' Ket. '.$detail->note.' Tgl. pakai '.date('d/m/y',strtotime($detail->required_date)) }}
                                     </li>
                                 @endforeach
                                 </ol>

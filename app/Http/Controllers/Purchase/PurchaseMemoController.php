@@ -281,7 +281,7 @@ class PurchaseMemoController extends Controller
                     $val->user->name,
                     $val->account->name,
                     $val->company->name,
-                    date('d M Y',strtotime($val->post_date)),
+                    date('d/m/y',strtotime($val->post_date)),
                     $val->note,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),

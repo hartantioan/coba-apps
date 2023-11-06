@@ -408,6 +408,7 @@ class ProductionScheduleController extends Controller
         $arrDetail = [];
         
         foreach($po->productionScheduleTarget as $row){
+            $cekBom = $row->marketingOrderPlanDetail->item->bomPlace($po->place_id);
             $arr[] = [
                 'id'                    => $row->marketingOrderPlanDetail->marketingOrderPlan->id,
                 'code'                  => $row->marketingOrderPlanDetail->marketingOrderPlan->code,
@@ -424,6 +425,9 @@ class ProductionScheduleController extends Controller
                 'pallet_convert'        => $row->marketingOrderPlanDetail->item->pallet_convert,
                 'request_date'          => date('d/m/y',strtotime($row->marketingOrderPlanDetail->request_date)),
                 'note'                  => $row->marketingOrderPlanDetail->note,
+                'qty_real'              => number_format($row->marketingOrderPlanDetail->qty * $row->marketingOrderPlanDetail->item->sell_convert,3,',','.'),
+                'bom_link'              => $cekBom->exists() ? $cekBom->orderByDesc('id')->first()->code : '',
+                'stock_check'           => $cekBom->exists() ? $row->marketingOrderPlanDetail->item->arrRawStock($po->place_id,$row->marketingOrderPlanDetail->qty * $row->MarketingOrderPlanDetail->item->sell_convert) : '',
             ];
         }
 

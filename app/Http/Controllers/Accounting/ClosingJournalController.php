@@ -1,28 +1,32 @@
 <?php
 
-namespace App\Http\Controllers\Inventory;
-
+namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
-use App\Models\Currency;
+use App\Models\Coa;
+use App\Models\Company;
+use App\Models\Journal;
+use App\Models\JournalDetail;
 use App\Models\Place;
+use App\Models\User;
+use App\Models\Asset;
+use App\Models\ClosingJournal;
+use App\Models\ClosingJournalDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\GoodReceive;
-use App\Models\GoodReceiveDetail;
-use App\Models\User;
-use App\Models\Company;
-use App\Models\Department;
+use App\Exports\ExportRetirement;
+use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
-use App\Exports\ExportGoodReceive;
 
-class GoodReceiveController extends Controller
+class ClosingJournalController extends Controller
 {
     protected $dataplaces, $dataplacecode;
 
@@ -36,22 +40,20 @@ class GoodReceiveController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'     => 'Barang Masuk',
-            'content'   => 'admin.inventory.good_receive',
-            'company'   => Company::where('status','1')->get(),
-            'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'currency'  => Currency::where('status','1')->get(),
-            'department'=> Department::where('status','1')->get(),
-            'minDate'   => $request->get('minDate'),
-            'maxDate'   => $request->get('maxDate'),
-            'newcode'   => 'GRCV-'.date('y'),
+            'title'         => 'Tutup Periode Jurnal',
+            'content'       => 'admin.accounting.closing_journal',
+            'company'       => Company::where('status','1')->get(),
+            'minDate'       => $request->get('minDate'),
+            'maxDate'       => $request->get('maxDate'),
+            'newcode'       => 'CLJR-'.date('y'),
+            'place'         => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
     }
 
     public function getCode(Request $request){
-        $code = GoodReceive::generateCode($request->val);
+        $code = ClosingJournal::generateCode($request->val);
         				
 		return response()->json($code);
     }
@@ -62,10 +64,10 @@ class GoodReceiveController extends Controller
             'code',
             'user_id',
             'company_id',
-            'post_date',
-            'currency_id',
-            'currency_rate',
+            'date',
+            'month',
             'note',
+            'grandtotal',
         ];
 
         $start  = $request->start;
@@ -74,26 +76,16 @@ class GoodReceiveController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodReceive::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = ClosingJournal::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
-        $query_data = GoodReceive::where(function($query) use ($search, $request) {
+        $query_data = ClosingJournal::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodReceiveDetail', function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            })
-                            ->orWhereHas('user',function($query) use($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
                 }
+                
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('post_date', '>=', $request->start_date)
                         ->whereDate('post_date', '<=', $request->finish_date);
@@ -113,24 +105,14 @@ class GoodReceiveController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = GoodReceive::where(function($query) use ($search, $request) {
+        $total_filtered = ClosingJournal::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodReceiveDetail', function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            })
-                            ->orWhereHas('user',function($query) use($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('employee_no','like',"%$search%");
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
                 }
+                
                 if($request->start_date && $request->finish_date) {
                     $query->whereDate('post_date', '>=', $request->start_date)
                         ->whereDate('post_date', '<=', $request->finish_date);
@@ -139,6 +121,7 @@ class GoodReceiveController extends Controller
                 } else if($request->finish_date) {
                     $query->whereDate('post_date','<=', $request->finish_date);
                 }
+
                 if($request->status){
                     $query->whereIn('status', $request->status);
                 }
@@ -150,7 +133,7 @@ class GoodReceiveController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-                if($val->journal()->exists()){
+				if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
                 }else{
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
@@ -161,9 +144,9 @@ class GoodReceiveController extends Controller
                     $val->user->name,
                     $val->company->name,
                     date('d/m/y',strtotime($val->post_date)),
-                    $val->currency->code,
-                    number_format($val->currency_rate,3,',','.'),
+                    date('F Y',strtotime($val->month)),
                     $val->note,
+                    number_format($val->grandtotal,2,',','.'),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
                     '
@@ -192,76 +175,130 @@ class GoodReceiveController extends Controller
         return response()->json($response);
     }
 
-    public function create(Request $request){
-        $validation = Validator::make($request->all(), [
-            'code'			            => $request->temp ? ['required', Rule::unique('good_receives', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_receives,code',
-            'company_id'                => 'required',
-			'post_date'		            => 'required',
-			'currency_id'		        => 'required',
-            'currency_rate'		        => 'required',
-            'arr_price'                 => 'required|array',
-            'arr_item'                  => 'required|array',
-            'arr_qty'                   => 'required|array',
-            'arr_coa'                   => 'required|array',
-            'arr_warehouse'             => 'required|array',
-		], [
-            'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai',
-            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
-			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
-			'currency_id.required' 				=> 'Tanggal kadaluwarsa tidak boleh kosong.',
-            'Currency_rate.required' 			=> 'Tanggal dokumen tidak boleh kosong.',
-			'warehouse_id.required'				=> 'Gudang tujuan tidak boleh kosong',
-            'arr_price.required'                => 'Harga satuan tidak boleh kosong',
-            'arr_price.array'                   => 'Harga satuan harus dalam bentuk array',
-            'arr_item.required'                 => 'Item tidak boleh kosong',
-            'arr_item.array'                    => 'Item harus dalam bentuk array',
-            'arr_qty.required'                  => 'Qty item tidak boleh kosong',
-            'arr_qty.array'                     => 'Qty item harus dalam bentuk array',
-            'arr_coa.required'                  => 'Coa tidak boleh kosong',
-            'arr_coa.array'                     => 'Coa harus dalam bentuk array',
-            'arr_warehouse.required'            => 'Gudang tidak boleh kosong',
-            'arr_warehouse.array'               => 'Gudang harus dalam bentuk array',
-		]);
+    public function preview(Request $request){
+        
+        $cek = ClosingJournal::where('company_id',$request->company_id)->where('month',$request->month)->whereIn('status',['1','2','3'])->first();
 
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
+        if(!$cek){
+            $data = JournalDetail::whereHas('coa', function($query) use($request){
+                $query->where('company_id',$request->company_id)
+                    ->whereRaw("SUBSTRING(code,1,3) IN ('400','500','600','700','800')")
+                    ->where('level','5');
+            })
+            ->whereHas('journal', function($query)use($request){
+                $query->whereRaw("post_date like '$request->month%'");
+            })
+            ->get();
 
-            $passed = true;
+            $arr = [];
 
-            foreach($request->arr_item as $key => $row){
-                if(isset($request->arr_price[$key]) && isset($request->arr_qty[$key])){
-                    if(str_replace(',','.',str_replace('.','',$request->arr_price[$key])) == 0 || str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) == 0){
-                        $passed = false;
-                    }
+            foreach($data as $row){
+                $cekIndex = $this->checkArray($arr,$row->coa_id);
+                if($cekIndex < 0){
+                    $arr[] = [
+                        'coa_id'    => $row->coa_id,
+                        'coa_code'  => $row->coa->code,
+                        'coa_name'  => $row->coa->name,
+                        'nominal'   => $row->type == '1' ? $row->nominal : -1 * $row->nominal,
+                    ];
                 }else{
-                    $passed = false;
+                    $arr[$cekIndex]['nominal'] += $row->type == '1' ? $row->nominal : -1 * $row->nominal;
                 }
             }
 
-            if(!$passed){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Silahkan cek detail form anda, tidak boleh ada data 0 atau kosong.'
-                ]);
+            $profitLoss = 0;
+
+            foreach($arr as $row){
+                $profitLoss += $row['nominal'];
             }
 
-            $grandtotal = 0;
+            $collection = collect($arr);
 
-            foreach($request->arr_item as $key => $row){
-                $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+            $result = $collection->sortBy('coa_code')->values()->all();
+
+            $coalabarugi = Coa::where('code','300.03.02.01.01')->where('company_id',$request->company_id)->first();
+
+            foreach($result as $key => $row){
+                $result[$key]['nominal'] = -1 * $result[$key]['nominal'];
             }
 
-			if($request->temp){
-                DB::beginTransaction();
-                try {
-                    $query = GoodReceive::where('code',CustomHelper::decrypt($request->temp))->first();
+            $result[] = [
+                'coa_id'    => $coalabarugi->id,
+                'coa_code'  => $coalabarugi->code,
+                'coa_name'  => $coalabarugi->name,
+                'nominal'   => $profitLoss,
+            ];
+
+            $response = [
+                'status'    => 200,
+                'message'   => '',
+                'result'    => $result
+            ];
+
+        }else{
+            $response = [
+                'status'    => 500,
+                'message'   => 'Mohon maaf periode '.date('F Y',strtotime($cek->month)).' untuk perusahaan '.$cek->company->name.' telah ditutup.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    function checkArray($array,$val){
+        $index = -1;
+        foreach($array as $key => $value){
+            if($value['coa_id'] == $val){
+                $index = $key;
+            }
+        }
+        return $index;
+    }
+
+    public function create(Request $request){
+
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'code' 				    => $request->temp ? ['required', Rule::unique('closing_journals', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:closing_journals,code',
+                'post_date'			    => 'required',
+                'company_id'		    => 'required',
+                'month'		            => 'required',
+                'arr_coa_id'            => 'required|array',
+                'arr_nominal'           => 'required|array',
+            ], [
+                'code.required' 				    => 'Kode/No tidak boleh kosong.',
+                'code.string'                       => 'Kode harus dalam bentuk string.',
+                'code.min'                          => 'Kode harus minimal 18 karakter.',
+                'code.unique' 				        => 'Kode/No telah dipakai.',
+                'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
+                'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
+                'month.required' 			        => 'Periode bulan tidak boleh kosong.',
+                'arr_coa_id.required'               => 'Coa tidak boleh kosong',
+                'arr_coa_id.array'                  => 'Coa harus dalam bentuk array.',
+                'arr_nominal.required'              => 'Nominal tidak boleh kosong',
+                'arr_nominal.array'                 => 'Nominal harus dalam bentuk array.',
+            ]);
+
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
+
+                $grandtotal = abs($request->arr_nominal[count($request->arr_nominal)-1]);
+
+                if($grandtotal == 0){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Data tidak bisa disimpan karena nilai laba/rugi adalah 0.',
+                    ]);
+                }
+
+                if($request->temp){
+                    
+                    $query = ClosingJournal::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -283,175 +320,135 @@ class GoodReceiveController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Barang Masuk telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Penutupan Jurnal telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
                     if(in_array($query->status,['1','6'])){
-                        if($request->has('file')) {
+
+                        if($request->has('document')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('file')->store('public/good_receives');
+                            $document = $request->file('document')->store('public/closing_journals');
                         } else {
                             $document = $query->document;
                         }
-                        
+
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
-                        $query->currency_id = $request->currency_id;
-                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->document = $document;
+                        $query->month = $request->month;
                         $query->note = $request->note;
+                        $query->document = $document;
                         $query->grandtotal = $grandtotal;
                         $query->status = '1';
-
                         $query->save();
 
-                        foreach($query->goodReceiveDetail as $row){
+                        foreach($query->closingJournalDetail as $row){
                             $row->delete();
                         }
 
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status barang masuk sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status penutupan jurnal sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
-                    $query = GoodReceive::create([
-                        'code'			        => $request->code,
-                        'user_id'		        => session('bo_id'),
-                        'company_id'		    => $request->company_id,
-                        'post_date'             => $request->post_date,
-                        'currency_id'           => $request->currency_id,
-                        'currency_rate'         => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'document'              => $request->file('document') ? $request->file('document')->store('public/good_receives') : NULL,
-                        'note'                  => $request->note,
-                        'status'                => '1',
-                        'grandtotal'            => $grandtotal
+                }else{
+                    $query = ClosingJournal::create([
+                        'code'			=> $request->code,
+                        'user_id'		=> session('bo_id'),
+                        'company_id'    => $request->company_id,
+                        'post_date'	    => $request->post_date,
+                        'month'         => $request->month,
+                        'document'      => $request->file('document') ? $request->file('document')->store('public/closing_journals') : NULL,
+                        'status'        => '1',
+                        'note'          => $request->note,
+                        'grandtotal'    => $grandtotal
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
-                DB::beginTransaction();
-                try {
-                    foreach($request->arr_item as $key => $row){
-                        
-                        GoodReceiveDetail::create([
-                            'good_receive_id'       => $query->id,
-                            'item_id'               => $row,
-                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                            'total'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'note'                  => $request->arr_note[$key],
-                            'coa_id'                => $request->arr_coa[$key],
-                            'warehouse_id'          => $request->arr_warehouse[$key],
-                            'place_id'              => $request->arr_place[$key],
-                            'department_id'         => isset($request->arr_department[$key]) ? $request->arr_department[$key] : NULL,
+                
+                if($query) {
+                    
+                    foreach($request->arr_coa_id as $key => $row){
+                        ClosingJournalDetail::create([
+                            'closing_journal_id'    => $query->id,
+                            'coa_id'                => $row,
+                            'type'                  => $request->arr_nominal[$key] >= 0 ? '1' : '2',
+                            'nominal'               => abs($request->arr_nominal[$key]),
                         ]);
-
                     }
 
-                    CustomHelper::sendApproval('good_receives',$query->id,$query->note);
-                    CustomHelper::sendNotification('good_receives',$query->id,'Barang Masuk No. '.$query->code,$query->note,session('bo_id'));
-                    
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan penutupan jurnal No. '.$query->code,$query->note,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new ClosingJournal())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit closing journal.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
+            }
 
-                activity()
-                    ->performedOn(new GoodReceive())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit penerimaan barang.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
-		
-		return response()->json($response);
+            DB::commit();
+            
+            return response()->json($response);
+        }catch(\Exception $e){
+            DB::rollback();
+        }
     }
 
     public function rowDetail(Request $request){
-        $data   = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
-                    <table style="min-width:100%;max-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="11">Daftar Item</th>
-                            </tr>
-                            <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="right-align">Harga Satuan</th>
-                                <th class="right-align">Harga Total</th>
-                                <th class="center-align">Keterangan</th>
                                 <th class="center-align">Coa</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Departemen</th>
-                                <th class="center-align">Gudang</th>
+                                <th class="center-align">Debit</th>
+                                <th class="center-align">Kredit</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->goodReceiveDetail as $key => $row){
+        foreach($data->closingJournalDetail as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
-                <td class="center-align">'.$row->item->uomUnit->code.'</td>
-                <td class="center-align">'.number_format($row->price,3,',','.').'</td>
-                <td class="center-align">'.number_format($row->total,3,',','.').'</td>
-                <td class="center-align">'.$row->note.'</td>
-                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
-                <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
-                <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
-                <td class="center-align">'.$row->warehouse->name.'</td>
+                <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '0,00').'</td>
+                <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '0,00').'</td>
             </tr>';
         }
         
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
-        <thead>
-            <tr>
-                <th class="center-align" colspan="4">Approval</th>
-            </tr>
-            <tr>
-                <th class="center-align">Level</th>
-                <th class="center-align">Kepada</th>
-                <th class="center-align">Status</th>
-                <th class="center-align">Catatan</th>
-            </tr>
-        </thead><tbody>';
-
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="4">Approval</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Level</th>
+                                <th class="center-align">Kepada</th>
+                                <th class="center-align">Status</th>
+                                <th class="center-align">Catatan</th>
+                            </tr>
+                        </thead><tbody>';
+        
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -492,37 +489,27 @@ class GoodReceiveController extends Controller
     }
 
     public function show(Request $request){
-        $gr = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
-        $gr['code_place_id'] = substr($gr->code,7,2);
-        $gr['currency_rate'] = number_format($gr->currency_rate,3,',','.');
+        $ret = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
+        $ret['code_place_id'] = substr($ret->code,7,2);
 
         $arr = [];
         
-        foreach($gr->goodReceiveDetail as $row){
+        foreach($ret->closingJournalDetail as $row){
             $arr[] = [
-                'item_id'       => $row->item_id,
-                'item_name'     => $row->item->code.' - '.$row->item->name,
-                'qty'           => number_format($row->qty,3,',','.'),
-                'unit'          => $row->item->uomUnit->code,
-                'price'         => number_format($row->price,3,',','.'),
-                'total'         => number_format($row->total,3,',','.'),
-                'coa_id'        => $row->coa_id,
-                'coa_name'      => $row->coa->code.' - '.$row->coa->name,
-                'place_id'      => $row->place_id,
-                'department_id' => $row->department_id,
-                'warehouse_id'  => $row->warehouse_id,
-                'warehouse_name'=> $row->warehouse->name,
-                'note'          => $row->note,
+                'coa_id'    => $row->coa_id,
+                'coa_code'  => $row->coa->code,
+                'coa_name'  => $row->coa->name,
+                'nominal'   => $row->type == '1' ? $row->nominal : -1 * $row->nominal,
             ];
         }
 
-        $gr['details'] = $arr;
+        $ret['details'] = $arr;
         				
-		return response()->json($gr);
+		return response()->json($ret);
     }
 
     public function voidStatus(Request $request){
-        $query = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(in_array($query->status,['4','5'])){
@@ -537,19 +524,19 @@ class GoodReceiveController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-
-                CustomHelper::removeJournal('good_receives',$query->id);
-                CustomHelper::removeCogs('good_receives',$query->id);
     
                 activity()
-                    ->performedOn(new GoodReceive())
+                    ->performedOn(new ClosingJournal())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the good receive data');
+                    ->log('Void the closing journal data');
     
-                CustomHelper::sendNotification('good_receives',$query->id,'Barang Masuk No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
-                CustomHelper::removeApproval('good_receives',$query->id);
-                
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Penutupan Jurnal No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval($query->getTable(),$query->id);
+                if(in_array($query->status,['2','3'])){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                }
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data closed successfully.'
@@ -566,7 +553,7 @@ class GoodReceiveController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = GoodReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -595,21 +582,23 @@ class GoodReceiveController extends Controller
         if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
                 'status'  => 500,
-                'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
+                'message' => 'Closing Journal sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
         
         if($query->delete()) {
 
-            $query->goodReceiveDetail()->delete();
-
-            CustomHelper::removeApproval('good_receives',$query->id);
+            CustomHelper::removeApproval($query->getTable(),$query->id);
+            
+            foreach($query->closingJournalDetail as $row){
+                $row->delete();
+            }
 
             activity()
-                ->performedOn(new GoodReceive())
+                ->performedOn(new ClosingJournal())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the good receive data');
+                ->log('Delete the closing journal data');
 
             $response = [
                 'status'  => 200,
@@ -625,24 +614,7 @@ class GoodReceiveController extends Controller
         return response()->json($response);
     }
 
-    public function approval(Request $request,$id){
-        
-        $gr = GoodReceive::where('code',CustomHelper::decrypt($id))->first();
-                
-        if($gr){
-            $data = [
-                'title'     => 'Print Goods Receive (Barang Masuk)',
-                'data'      => $gr
-            ];
-
-            return view('admin.approval.good_receive', $data);
-        }else{
-            abort(404);
-        }
-    }
-
     public function print(Request $request){
-
         $validation = Validator::make($request->all(), [
             'arr_id'                => 'required',
         ], [
@@ -659,11 +631,11 @@ class GoodReceiveController extends Controller
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
-                $pr = GoodReceive::where('code',$row)->first();
+                $pr = ClosingJournal::where('code',$row)->first();
                 
                 if($pr){
                     $data = [
-                        'title'     => 'Good Receipt',
+                        'title'     => 'Penutupan Jurnal',
                         'data'      => $pr
                     ];
                     $img_path = 'website/logo_web_fix.png';
@@ -672,7 +644,7 @@ class GoodReceiveController extends Controller
                     $img_base_64 = base64_encode($image_temp);
                     $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                     $data["image"]=$path_img;
-                    $pdf = Pdf::loadView('admin.print.inventory.good_receive_individual', $data)->setPaper('a5', 'landscape');
+                    $pdf = Pdf::loadView('admin.print.accounting.closing_journal_individual', $data)->setPaper('a5', 'landscape');
                     $pdf->render();
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -703,7 +675,6 @@ class GoodReceiveController extends Controller
         
 		
 		return response()->json($response);
-
     }
 
     public function printByRange(Request $request){
@@ -741,10 +712,10 @@ class GoodReceiveController extends Controller
                 }else{   
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $etNumbersArray = explode(',', $request->tabledata);
-                        $query = GoodReceive::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
+                        $query = ClosingJournal::where('Code', 'LIKE', '%'.$etNumbersArray[$nomor-1])->first();
                         if($query){
                             $data = [
-                                'title'     => 'Good Issue',
+                                'title'     => 'Penutupan Journal',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -753,7 +724,7 @@ class GoodReceiveController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.good_receive_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.accounting.closing_journal_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -810,10 +781,10 @@ class GoodReceiveController extends Controller
                 }else{
                     foreach($merged as $code){
                         $etNumbersArray = explode(',', $request->tabledata);
-                        $query = GoodReceive::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
+                        $query = ClosingJournal::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
                             $data = [
-                                'title'     => 'Good Issue',
+                                'title'     => 'Penutupan Jurnal',
                                 'data'      => $query
                             ];
                             $img_path = 'website/logo_web_fix.png';
@@ -822,7 +793,7 @@ class GoodReceiveController extends Controller
                             $img_base_64 = base64_encode($image_temp);
                             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
                             $data["image"]=$path_img;
-                            $pdf = Pdf::loadView('admin.print.inventory.good_receive_individual', $data)->setPaper('a5', 'landscape');
+                            $pdf = Pdf::loadView('admin.print.accounting.closing_journal_individual', $data)->setPaper('a5', 'landscape');
                             $pdf->render();
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -832,8 +803,6 @@ class GoodReceiveController extends Controller
                            
                         }
                     }
-                    
-                    
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
@@ -857,58 +826,30 @@ class GoodReceiveController extends Controller
         return response()->json($response);
     }
 
-    public function printIndividual(Request $request,$id){
-        
-        $pr = GoodReceive::where('code',CustomHelper::decrypt($id))->first();
-        $currentDateTime = Date::now();
-        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
-        if($pr){
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+		return Excel::download(new ExportRetirement($post_date,$end_date), 'retirement_'.uniqid().'.xlsx');
+    }
 
+    public function approval(Request $request,$id){
+        
+        $cap = ClosingJournal::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($cap){
             $data = [
-                'title'     => 'Good Receive',
-                'data'      => $pr
+                'title'     => 'Closing Journal',
+                'data'      => $cap
             ];
 
-            $opciones_ssl=array(
-                "ssl"=>array(
-                "verify_peer"=>false,
-                "verify_peer_name"=>false,
-                ),
-            );
-            $img_path = 'website/logo_web_fix.png';
-            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
-            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
-            $img_base_64 = base64_encode($image_temp);
-            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
-            $data["image"]=$path_img;
-             
-            $pdf = Pdf::loadView('admin.print.inventory.good_receive_individual', $data)->setPaper('a5', 'landscape');
-            $pdf->render();
-    
-            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
-            
-            $content = $pdf->download()->getOriginalContent();
-            
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
-    
-    
-            return $document_po;
+            return view('admin.approval.closing_journal', $data);
         }else{
             abort(404);
         }
     }
 
-    public function export(Request $request){
-        $post_date = $request->start_date? $request->start_date : '';
-        $end_date = $request->end_date ? $request->end_date : '';
-		return Excel::download(new ExportGoodReceive($post_date,$end_date), 'good_receive_'.uniqid().'.xlsx');
-    }
-
     public function viewJournal(Request $request,$id){
-        $query = GoodReceive::where('code',CustomHelper::decrypt($id))->first();
+        $query = ClosingJournal::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $response = [
                 'title'     => 'Journal',
@@ -941,5 +882,48 @@ class GoodReceiveController extends Controller
             ]; 
         }
         return response()->json($response);
+    }
+
+    public function printIndividual(Request $request,$id){
+        
+        $pr = ClosingJournal::where('code',CustomHelper::decrypt($id))->first();
+        $currentDateTime = Date::now();
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
+        if($pr){
+            $data = [
+                'title'     => 'Penutupan Journal',
+                'data'      => $pr
+            ];
+
+            $opciones_ssl=array(
+                "ssl"=>array(
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+                ),
+            );
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+             
+            $pdf = Pdf::loadView('admin.print.accounting.closing_journal_individual', $data)->setPaper('a5', 'landscape');
+            $pdf->render();
+    
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+            
+            $content = $pdf->download()->getOriginalContent();
+            
+            Storage::put('public/pdf/bubla.pdf',$content);
+            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+    
+    
+            return $document_po;
+        }else{
+            abort(404);
+        }
     }
 }

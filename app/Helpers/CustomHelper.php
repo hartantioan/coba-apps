@@ -11,6 +11,7 @@ use App\Models\ApprovalTemplateMenu;
 use App\Models\Asset;
 use App\Models\Capitalization;
 use App\Models\CloseBill;
+use App\Models\ClosingJournal;
 use App\Models\Coa;
 use App\Models\Depreciation;
 use App\Models\EmployeeSchedule;
@@ -2354,6 +2355,30 @@ class CustomHelper {
 			foreach($pir->productionIssueReceiveDetail()->where('type','1')->get() as $row){
 				if($row){
 					
+				}
+			}
+		}elseif($table_name == 'closing_journals'){
+			$cj = ClosingJournal::find($table_id);
+
+			if($cj){
+
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'post_date'		=> $data->post_date,
+					'note'			=> $data->code,
+					'status'		=> '3'
+				]);
+				
+				foreach($cj->closingJournalDetail as $row){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->coa_id,
+						'type'			=> $row->type,
+						'nominal'		=> abs($row->nominal)
+					]);
 				}
 			}
 		}

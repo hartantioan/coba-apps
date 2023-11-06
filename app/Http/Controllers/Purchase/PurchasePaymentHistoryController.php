@@ -261,7 +261,7 @@ class PurchasePaymentHistoryController extends Controller
                 $query->whereHas('outgoingPayment');
             })->get() as $rowpayment){
                 $data_temp[]=[
-                    'post_date' => date('d M Y',strtotime($rowpayment->paymentRequest->outgoingPayment->post_date)),
+                    'post_date' => date('d/m/y',strtotime($rowpayment->paymentRequest->outgoingPayment->post_date)),
                     'code_op' => $rowpayment->paymentRequest->outgoingPayment->code,
                     'code_pyr' => $rowpayment->paymentRequest->code,
                     'nominal' => number_format($rowpayment->nominal,2,',','.'),

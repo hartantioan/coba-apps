@@ -2088,6 +2088,51 @@ class CustomHelper {
 					$tax += $row->tax;
 					$wtax += $row->wtax;
 
+					if($row->tax_id){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->taxMaster->coa_purchase_id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+							'type'			=> '1',
+							'nominal'		=> $row->tax,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+						]);
+					}
+	
+					if($row->wtax_id){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> $row->wtax,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+						]);
+					}
+	
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coahutangusaha,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'account_id'	=> $account_id,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+						'type'			=> '2',
+						'nominal'		=> $row->grandtotal,
+					]);
+
 				}elseif($row->lookable_type == 'purchase_order_details'){
 					$pod = $row->lookable;
 
@@ -2107,6 +2152,51 @@ class CustomHelper {
 					$tax += $row->tax * $pod->purchaseOrder->currency_rate;
 					$wtax += $row->wtax * $pod->purchaseOrder->currency_rate;
 					$currency_rate = $pod->purchaseOrder->currency_rate;
+
+					if($row->tax_id){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->taxMaster->coa_purchase_id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+							'type'			=> '1',
+							'nominal'		=> $row->tax * $pod->purchaseOrder->currency_rate,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+						]);
+					}
+	
+					if($row->wtax_id){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> $row->wtax * $pod->purchaseOrder->currency_rate,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+						]);
+					}
+	
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coahutangusaha,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'account_id'	=> $account_id,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+						'type'			=> '2',
+						'nominal'		=> $row->grandtotal * $pod->purchaseOrder->currency_rate,
+					]);
 
 				}elseif($row->lookable_type == 'landed_cost_details'){
 					$arrCost = $row->lookable->getLocalImportCost();
@@ -2145,6 +2235,51 @@ class CustomHelper {
 					$tax += $row->tax * $row->lookable->landedCost->currency_rate;
 					$wtax += $row->wtax * $row->lookable->landedCost->currency_rate;
 					$currency_rate = $row->lookable->landedCost->currency_rate;
+
+					if($row->tax_id){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->taxMaster->coa_purchase_id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+							'type'			=> '1',
+							'nominal'		=> $row->tax * $row->lookable->landedCost->currency_rate,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+						]);
+					}
+	
+					if($row->wtax_id){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> $row->wtax * $row->lookable->landedCost->currency_rate,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+						]);
+					}
+	
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coahutangusaha,
+						'place_id'		=> $row->place_id ? $row->place_id : NULL,
+						'line_id'		=> $row->line_id ? $row->line_id : NULL,
+						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+						'account_id'	=> $account_id,
+						'department_id'	=> $row->department_id ? $row->department_id : NULL,
+						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+						'type'			=> '2',
+						'nominal'		=> $row->grandtotal * $row->lookable->landedCost->currency_rate,
+					]);
 				}else{
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -2163,28 +2298,42 @@ class CustomHelper {
 					$tax += $row->tax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 					$wtax += $row->wtax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
 					$currency_rate = $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
-				}
 
-				if($row->tax_id){
+					if($row->tax_id){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->taxMaster->coa_purchase_id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+							'type'			=> '1',
+							'nominal'		=> $row->tax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+						]);
+					}
+	
+					if($row->wtax_id){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+							'place_id'		=> $row->place_id ? $row->place_id : NULL,
+							'line_id'		=> $row->line_id ? $row->line_id : NULL,
+							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+							'account_id'	=> $account_id,
+							'department_id'	=> $row->department_id ? $row->department_id : NULL,
+							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> $row->wtax * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
+							'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+						]);
+					}
+	
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->taxMaster->coa_purchase_id,
-						'place_id'		=> $row->place_id ? $row->place_id : NULL,
-						'line_id'		=> $row->line_id ? $row->line_id : NULL,
-						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-						'account_id'	=> $account_id,
-						'department_id'	=> $row->department_id ? $row->department_id : NULL,
-						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
-						'type'			=> '1',
-						'nominal'		=> $tax,
-						'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
-					]);
-				}
-
-				if($row->wtax_id){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
+						'coa_id'		=> $coahutangusaha,
 						'place_id'		=> $row->place_id ? $row->place_id : NULL,
 						'line_id'		=> $row->line_id ? $row->line_id : NULL,
 						'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
@@ -2192,23 +2341,9 @@ class CustomHelper {
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
 						'type'			=> '2',
-						'nominal'		=> $wtax,
-						'note'			=> $row->purchaseInvoice->tax_no.' - '.$row->purchaseInvoice->tax_cut_no.' - '.date('d/m/y',strtotime($row->purchaseInvoice->cut_date)).' - '.$row->purchaseInvoice->spk_no.' - '.$row->purchaseInvoice->invoice_no,
+						'nominal'		=> $row->grandtotal * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
 					]);
 				}
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coahutangusaha,
-					'place_id'		=> $row->place_id ? $row->place_id : NULL,
-					'line_id'		=> $row->line_id ? $row->line_id : NULL,
-					'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-					'account_id'	=> $account_id,
-					'department_id'	=> $row->department_id ? $row->department_id : NULL,
-					'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
-					'type'			=> '2',
-					'nominal'		=> $grandtotal,
-				]);
 			}
 
 			#start journal down payment
@@ -2380,6 +2515,8 @@ class CustomHelper {
 						'nominal'		=> abs($row->nominal)
 					]);
 				}
+
+				self::sendTrialBalance($cj->company_id, $cj->month);
 			}
 		}
 		/* else{
@@ -2426,6 +2563,10 @@ class CustomHelper {
 				}
 			}
 		} */
+	}
+
+	public static function sendTrialBalance($company_id, $month){
+		
 	}
 
 	public static function removeJournal($table_name = null, $table_id = null){

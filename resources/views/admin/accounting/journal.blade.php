@@ -267,7 +267,7 @@
                             <div class="col s12" style="overflow:auto;width:100% !important;">
                                 <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_copas_journal.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
                                 <p class="mt-2 mb-2">
-                                    <table class="bordered" style="min-width:2700px;zoom:0.7;">
+                                    <table class="bordered" style="min-width:2800px;zoom:0.7;">
                                         <thead>
                                             <tr>
                                                 <th class="center">Kode Jurnal</th>
@@ -286,12 +286,13 @@
                                                 <th class="center" style="width:75px;">Gudang</th>
                                                 <th class="center">Debit</th>
                                                 <th class="center">Kredit</th>
+                                                <th class="center">Keterangan</th>
                                                 <th class="center">Hapus</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-coa-multi">
                                             <tr id="last-row-coa-multi">
-                                                <td colspan="17" class="center">
+                                                <td colspan="18" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> Tambah 1 Baris
                                                     </a>
@@ -828,6 +829,9 @@
                 <td>
                     <input type="text" name="arr_multi_kredit[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
                 </td>
+                <td>
+                    <input type="text" name="arr_multi_note_detail[]" placeholder="Keterangan" value="">
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -881,7 +885,7 @@
                 element: "input",
                 attributes: {
                     min: 1,
-                    max: 50,
+                    max: 500,
                     type: "number",
                     value: 1,
                 }
@@ -891,7 +895,7 @@
         .then(() => {
             if ($('.swal-content__input').val() != "" && $('.swal-content__input').val() != null) {
                 count = parseInt($('.swal-content__input').val());
-                if(parseInt(count) > 50){
+                if(parseInt(count) > 500){
                     swal({
                         title: 'Baris tidak boleh lebih dari 50.',
                         icon: 'error'
@@ -947,6 +951,9 @@
                                 </td>
                                 <td>
                                     <input type="text" name="arr_multi_kredit[]" placeholder="Nominal Kredit" value="0" onkeyup="countAllMulti()">
+                                </td>
+                                <td>
+                                    <input type="text" name="arr_multi_note_detail[]" placeholder="Keterangan" value="">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-coa-multi" href="javascript:void(0);">
@@ -1290,6 +1297,7 @@
                 formData.delete("arr_multi_warehouse[]");
                 formData.delete("arr_multi_debit[]");
                 formData.delete("arr_multi_kredit[]");
+                formData.delete("arr_multi_note_detail[]");
 
                 $('input[name^="arr_multi_code"]').each(function(index){
                     if($(this).val()){
@@ -1309,6 +1317,7 @@
                         formData.append('arr_multi_warehouse[]',($('input[name^="arr_multi_warehouse"]').eq(index).val() ? $('input[name^="arr_multi_warehouse"]').eq(index).val() : ''));
                         formData.append('arr_multi_debit[]',($('input[name^="arr_multi_debit"]').eq(index).val() ? $('input[name^="arr_multi_debit"]').eq(index).val() : '0'));
                         formData.append('arr_multi_kredit[]',($('input[name^="arr_multi_kredit"]').eq(index).val() ? $('input[name^="arr_multi_kredit"]').eq(index).val() : '0'));
+                        formData.append('arr_multi_note_detail[]',($('input[name^="arr_multi_note_detail"]').eq(index).val() ? $('input[name^="arr_multi_note_detail"]').eq(index).val() : '-'));
                     }
                 });
 

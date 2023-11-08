@@ -77,6 +77,10 @@ class Coa extends Model
             $child = $this->getFifthChildFromSecond();
         }elseif($level == '3'){
             $child = $this->getFifthChildFromThird();
+        }elseif($level == '4'){
+            $child = $this->getFifthChildFromFourth();
+        }elseif($level == '5'){
+            $child = $this->getFifthChildFromFifth();
         }
         
 
@@ -139,6 +143,22 @@ class Coa extends Model
                 $arr[] = $row5;
             }
         }
+
+        return $arr;
+    }
+
+    public function getFifthChildFromFourth(){
+        $arr = [];
+
+        foreach($this->childSub as $row4){
+            $arr[] = $row4;
+        }
+
+        return $arr;
+    }
+
+    public function getFifthChildFromFifth(){
+        $arr[] = $this;
 
         return $arr;
     }

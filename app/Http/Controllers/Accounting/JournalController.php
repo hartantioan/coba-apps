@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
+use App\Models\Coa;
 use App\Models\Company;
 use App\Models\Currency;
 use App\Models\Department;
@@ -481,6 +482,28 @@ class JournalController extends Controller
                 $totalCredit += floatval($row);
             }
 
+            $cekCoa = true;
+            $coaNotAvailable = [];
+            $coaAvailable = [];
+
+            foreach($request->arr_multi_coa as $key => $row){
+                $coaAda = null;
+                $coaAda = Coa::where('code',$row)->where('status','1')->first();
+                if(!$coaAda){
+                    $cekCoa = false;
+                    $coaNotAvailable[] = $row;
+                }else{
+                    $coaAvailable[] = $coaAda->id;
+                }
+            }
+
+            if($cekCoa == false){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Coa tidak ditemukan '.implode(',',$coaNotAvailable).'.'
+                ]);
+            }            
+
             if($totalDebit - $totalCredit > 0 || $totalDebit - $totalCredit < 0){
                 return response()->json([
                     'status'  => 500,
@@ -531,7 +554,7 @@ class JournalController extends Controller
                         if(floatval($request->arr_multi_debit[$key]) > 0){
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
-                                'coa_id'            => $request->arr_multi_coa[$key],
+                                'coa_id'            => $coaAvailable[$key],
                                 'account_id'        => $request->arr_multi_bp[$key] ? $request->arr_multi_bp[$key] : NULL,
                                 'place_id'          => $request->arr_multi_place[$key] ? $request->arr_multi_place[$key] : NULL,
                                 'line_id'           => $request->arr_multi_line[$key] ? $request->arr_multi_line[$key] : NULL,
@@ -540,13 +563,14 @@ class JournalController extends Controller
                                 'warehouse_id'      => $request->arr_multi_warehouse[$key] ? $request->arr_multi_warehouse[$key] : NULL,
                                 'type'              => '1',
                                 'nominal'           => floatval($request->arr_multi_debit[$key]),
+                                'note'              => $request->arr_multi_note_detail[$key],
                             ]);
                         }
 
                         if(floatval($request->arr_multi_kredit[$key]) > 0){
                             JournalDetail::create([
                                 'journal_id'        => $query->id,
-                                'coa_id'            => $request->arr_multi_coa[$key],
+                                'coa_id'            => $coaAvailable[$key],
                                 'account_id'        => $request->arr_multi_bp[$key] ? $request->arr_multi_bp[$key] : NULL,
                                 'place_id'          => $request->arr_multi_place[$key] ? $request->arr_multi_place[$key] : NULL,
                                 'line_id'           => $request->arr_multi_line[$key] ? $request->arr_multi_line[$key] : NULL,
@@ -554,7 +578,8 @@ class JournalController extends Controller
                                 'department_id'     => $request->arr_multi_department[$key] ? $request->arr_multi_department[$key] : NULL,
                                 'warehouse_id'      => $request->arr_multi_warehouse[$key] ? $request->arr_multi_warehouse[$key] : NULL,
                                 'type'              => '2',
-                                'nominal'           => floatval($request->arr_multi_debit[$key]),
+                                'nominal'           => floatval($request->arr_multi_kredit[$key]),
+                                'note'              => $request->arr_multi_note_detail[$key],
                             ]);
                         }
                     }

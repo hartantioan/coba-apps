@@ -692,8 +692,10 @@ class PurchaseOrderController extends Controller
                 
                                 $rowsubtotal = round($finalpricedisc3 * $qty,2);
 
+                                $bobot = $rowsubtotal / str_replace(',','.',str_replace('.','',$request->savesubtotal));
+
                                 $tax = round(($request->arr_tax[$key] / 100) * $rowsubtotal,2);
-                                $wtax = round(($request->arr_wtax[$key] / 100) * $rowsubtotal,2);
+                                $wtax = round($bobot * str_replace(',','.',str_replace('.','',$request->wtax)),2);
         
                                 $querydetail = PurchaseOrderDetail::create([
                                     'purchase_order_id'             => $query->id,
@@ -750,8 +752,10 @@ class PurchaseOrderController extends Controller
                 
                                 $rowsubtotal = round($finalpricedisc3 * $qty,2);
 
+                                $bobot = $rowsubtotal / str_replace(',','.',str_replace('.','',$request->savesubtotal));
+
                                 $tax = round(($request->arr_tax[$key] / 100) * $rowsubtotal,2);
-                                $wtax = round(($request->arr_wtax[$key] / 100) * $rowsubtotal,2);
+                                $wtax = round($bobot * str_replace(',','.',str_replace('.','',$request->wtax)),2);
         
                                 $querydetail = PurchaseOrderDetail::create([
                                     'purchase_order_id'             => $query->id,

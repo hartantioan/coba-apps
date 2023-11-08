@@ -144,7 +144,7 @@ class PurchaseOrderDetail extends Model
         }
 
         if($this->is_wtax == '1'){
-            $wtax = round($total * ($this->percent_wtax / 100),2);
+            $wtax = $this->wtax;
         }
 
         $grandtotal = $total + $tax - $wtax;

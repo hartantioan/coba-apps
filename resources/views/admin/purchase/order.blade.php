@@ -447,7 +447,9 @@
                                         </tr>
                                         <tr>
                                             <td>PPh</td>
-                                            <td class="right-align"><span id="wtax">0,00</span></td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiah(this);countGrandtotal(this.value);" style="text-align:right;width:100%;">
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Grandtotal</td>
@@ -694,7 +696,7 @@
                     $(this).remove();
                 });
                 M.updateTextFields();
-                $('#subtotal,#total,#tax,#grandtotal,#wtax').text('0,00');
+                $('#subtotal,#total,#tax,#grandtotal').text('0,00');
                 $('#purchase_request_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -1924,7 +1926,7 @@
                 $('#savetotal').val(response.total);
                 $('#tax').text(response.tax);
                 $('#savetax').val(response.tax);
-                $('#wtax').text(response.wtax);
+                $('#wtax').val(response.wtax);
                 $('#savewtax').val(response.wtax);
                 $('#grandtotal').text(response.grandtotal);
                 $('#savegrandtotal').val(response.grandtotal);
@@ -2372,12 +2374,24 @@
         $('#savetax').val(
             (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
         );
-        $('#wtax').text(
+        $('#wtax').val(
             (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
         );
         $('#savewtax').val(
             (wtax >= 0 ? '' : '-') + formatRupiahIni(wtax.toFixed(2).toString().replace('.',','))
         );
+        $('#grandtotal').text(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        );
+        $('#savegrandtotal').val(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        );
+    }
+
+    function countGrandtotal(val){
+        let total = parseFloat($('#savetotal').val().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#savetax').val().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat(val.replaceAll(".", "").replaceAll(",","."));
+        $('#savewtax').val(val);
+        let grandtotal = total + tax - wtax;
         $('#grandtotal').text(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );

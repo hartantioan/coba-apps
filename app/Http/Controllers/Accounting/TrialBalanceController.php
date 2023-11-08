@@ -218,6 +218,168 @@ class TrialBalanceController extends Controller
                 $tempParent1 = $row->parent_id;
                 $tempParent2 = $row->parentSub->parent_id;
             }
+        }elseif($level == '4'){
+            $tempParent1 = 0;
+            $tempParent2 = 0;
+            $tempParent3 = 0;
+            foreach($coas as $keymain => $row){
+                if($tempParent3 !== $row->parentSub->parentSub->parent_id){
+                    $html .= '<tr>
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->parentSub->name.'</b></td>
+                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                    </tr>';
+                    foreach($arrMonth as $key => $rowMonth) {
+                        $arrMonth[$key]['tempDebit'] = 0;
+                        $arrMonth[$key]['tempCredit'] = 0;
+                        $arrMonth[$key]['tempBalance'] = 0;
+                    }
+                }
+                if($tempParent2 !== $row->parentSub->parent_id){
+                    $html .= '<tr>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->name.'</b></td>
+                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                    </tr>';
+                }
+                if($tempParent1 !== $row->parent_id){
+                    $html .= '<tr>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->parentSub->name.'</td>
+                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                    </tr>';
+                }
+                $html .= '<tr>
+                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
+
+                foreach($arrMonth as $key => $rowMonth) {
+                    $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
+                    $html .= '
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalance'],2,',','.').'</td>';
+                    $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
+                    $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
+                    $arrMonth[$key]['totalBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempDebit'] += $val['totalDebit'];
+                    $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
+                    $arrMonth[$key]['tempBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                }
+
+                $html .= '</tr>';
+
+                if(isset($coas[$keymain + 1])){
+                    if($coas[$keymain + 1]->parentSub->parentSub->parent_id !== $row->parentSub->parentSub->parent_id){
+                        $html .= '<tr>
+                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->name.'</b></td>';
+                        
+                        foreach($arrMonth as $key => $rowMonth) {
+                            $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
+                        }
+                        
+                        $html .= '</tr>';
+                    }
+                }else{
+                    $html .= '<tr>
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->name.'</b></td>';
+
+                    foreach($arrMonth as $key => $rowMonth) {
+                        $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
+                    }
+
+                    $html .= '</tr>';
+                }
+
+                $tempParent1 = $row->parent_id;
+                $tempParent2 = $row->parentSub->parent_id;
+                $tempParent3 = $row->parentSub->parentSub->parent_id;
+            }
+        }elseif($level == '5'){
+            $tempParent1 = 0;
+            $tempParent2 = 0;
+            $tempParent3 = 0;
+            $tempParent4 = 0;
+            foreach($coas as $keymain => $row){
+                if($tempParent4 !== $row->parentSub->parentSub->parentSub->parent_id){
+                    $html .= '<tr>
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>'.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>
+                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                    </tr>';
+                    foreach($arrMonth as $key => $rowMonth) {
+                        $arrMonth[$key]['tempDebit'] = 0;
+                        $arrMonth[$key]['tempCredit'] = 0;
+                        $arrMonth[$key]['tempBalance'] = 0;
+                    }
+                }
+                if($tempParent3 !== $row->parentSub->parentSub->parent_id){
+                    $html .= '<tr>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->parentSub->name.'</b></td>
+                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                    </tr>';
+                }
+                if($tempParent2 !== $row->parentSub->parent_id){
+                    $html .= '<tr>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>'.$row->parentSub->parentSub->name.'</b></td>
+                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                    </tr>';
+                }
+                if($tempParent1 !== $row->parent_id){
+                    $html .= '<tr>
+                        <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->parentSub->name.'</td>
+                        <td colspan="'.(count($arrMonth) * 3).'"></td>
+                    </tr>';
+                }
+                $html .= '<tr>
+                    <td style="left: 0px;position: sticky;background-color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$row->name.'</td>';
+
+                foreach($arrMonth as $key => $rowMonth) {
+                    $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
+                    $html .= '
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalance'],2,',','.').'</td>';
+                    $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
+                    $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
+                    $arrMonth[$key]['totalBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                    $arrMonth[$key]['tempDebit'] += $val['totalDebit'];
+                    $arrMonth[$key]['tempCredit'] += $val['totalCredit'];
+                    $arrMonth[$key]['tempBalance'] += $val['totalDebit'] - $val['totalCredit'];
+                }
+
+                $html .= '</tr>';
+
+                if(isset($coas[$keymain + 1])){
+                    if($coas[$keymain + 1]->parentSub->parentSub->parentSub->parent_id !== $row->parentSub->parentSub->parentSub->parent_id){
+                        $html .= '<tr>
+                            <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>';
+                        
+                        foreach($arrMonth as $key => $rowMonth) {
+                            $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
+                            <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
+                        }
+                        
+                        $html .= '</tr>';
+                    }
+                }else{
+                    $html .= '<tr>
+                        <td style="left: 0px;position: sticky;background-color:white;"><b>TOTAL '.$row->parentSub->parentSub->parentSub->parentSub->name.'</b></td>';
+
+                    foreach($arrMonth as $key => $rowMonth) {
+                        $html .= '<td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempDebit'],2,',','.').'</b></td>
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempCredit'],2,',','.').'</b></td>
+                        <td style="min-width:150px !important;" class="right-align"><b>'.number_format($rowMonth['tempBalance'],2,',','.').'</b></td>';
+                    }
+
+                    $html .= '</tr>';
+                }
+
+                $tempParent1 = $row->parent_id;
+                $tempParent2 = $row->parentSub->parent_id;
+                $tempParent3 = $row->parentSub->parentSub->parent_id;
+                $tempParent4 = $row->parentSub->parentSub->parentSub->parent_id;
+            }
         }
 
         $html .= '</tbody><tfoot><tr><th class="right-align" style="left: 0px;position: sticky;background-color:white;">TOTAL</th>';

@@ -30,6 +30,15 @@ class GoodIssueDetail extends Model
         return $this->morphTo();
     }
 
+    public function materialRequestDetail()
+    {
+        if($this->lookable_type == 'material_request_details'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function goodIssue()
     {
         return $this->belongsTo('App\Models\GoodIssue', 'good_issue_id', 'id')->withTrashed();

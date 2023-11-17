@@ -40,6 +40,15 @@ class PurchaseRequestDetail extends Model
         return $this->belongsTo('App\Models\PurchaseRequest', 'purchase_request_id', 'id')->withTrashed();
     }
 
+    public function materialRequestDetail()
+    {
+        if($this->lookable_type == 'material_request_details'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();

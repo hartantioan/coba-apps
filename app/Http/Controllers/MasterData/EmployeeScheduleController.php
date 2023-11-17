@@ -307,14 +307,14 @@ class EmployeeScheduleController extends Controller
             
             $employee_shift_decode=json_decode($request->employee_shift);
             
-            
+            $success=false;
             
                 foreach($employee_shift_decode as $shift){
                     
                     $start_date = Carbon::parse($shift->start_date);
                     $end_date = Carbon::parse($shift->end_date);
                     
-                    info($request->user_code);
+                   
                     foreach ($request->user_code as $code_user) {
                         $current_date = $start_date->copy(); // Make a copy of the start date to avoid modifying the original date
                         while ($current_date->lte($end_date)) {
@@ -326,7 +326,9 @@ class EmployeeScheduleController extends Controller
                                 'status'            => '1',
                             ]);
                             
-
+                            if($query->exists()){
+                                $success = true;
+                            }
                             $current_date->addDay(); // Or use addWeek(), addMonth(), etc., depending on your needs
                         }
                         
@@ -337,7 +339,7 @@ class EmployeeScheduleController extends Controller
             
                 
                 
-            if($query) {               
+            if($success) {               
 
                 $response = [
                     'status'    => 200,

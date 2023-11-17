@@ -30,6 +30,7 @@ class EmployeeTransferController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
+            'employee_code' => $request->employee_code ? CustomHelper::decrypt($request->code) : '',
             'position'      => Position::where('status','1')->get(),
             'content'       => 'admin.hr.employee_transfer'
         ];
@@ -193,10 +194,21 @@ class EmployeeTransferController extends Controller
     
     public function showFromCode(Request $request){
         $line = EmployeeTransfer::where('code',CustomHelper::decrypt($request->id))->first();
+        info($request->id);
         if ($line->manager()->exists()) {
             $line['manager'] = $line->manager;
         }
         $line['user'] = $line->user;
+        $line['position'] = $line->position;			
+		return response()->json($line);
+    }
+
+    public function instantFormwCode(Request $request){
+        $line = User::Find(CustomHelper::decrypt($request->id));
+        info($request->id);
+        if ($line->manager()->exists()) {
+            $line['manager'] = $line->manager;
+        }
         $line['position'] = $line->position;			
 		return response()->json($line);
     }

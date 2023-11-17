@@ -263,6 +263,48 @@
     </div>
 </div>
 
+<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12 m6">
+                <h4 class="card-title">
+                   Report Denda
+                </h4>
+            </div>
+            
+        </div>
+        
+        
+        <div class="row">
+            <div class="col s12 m12" style="overflow: auto">
+                <div class="result" style="width:2500px;">
+                    <table id="report_punishment_table" class="bordered" style="font-size:10px;">
+                        <thead>
+                            <tr>
+                                <th class="center-align fixed">No.</th>
+                                <th class="center-align fixed2">NIK</th>
+                                <th class="center-align fixed1">Nama</th>
+                                <th class="center-align">Periode</th>
+                                <th class="center-align">Tipe Denda</th>
+                                <th class="center-align">Frekuensi</th>
+                                <th class="center-align">Tanggal</th>
+                                <th class="center-align">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="punish_report">
+                            
+                        </tbody>
+                    </table>
+                </div>  
+                
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -320,6 +362,20 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#daily_report').empty();
+                M.updateTextFields();
+            }
+        });
+
+        $('#modal4').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#punish_report').empty();
                 M.updateTextFields();
             }
         });
@@ -543,6 +599,42 @@
                     success();
                     $('#daily_report').append(response.message);
                     $('#modal3').modal('open');
+                    
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function reportPunishment(id){
+        $.ajax({
+            url: '{{ Request::url() }}/punishment_report',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                if(response.status == 200) {
+                    success();
+                    console.log(response.message);
+                    $('#punish_report').append(response.message);
+                    $('#modal4').modal('open');
                     
                 }
             },

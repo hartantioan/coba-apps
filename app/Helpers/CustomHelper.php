@@ -14,6 +14,7 @@ use App\Models\CloseBill;
 use App\Models\ClosingJournal;
 use App\Models\Coa;
 use App\Models\Depreciation;
+use App\Models\EmployeeLeaveQuotas;
 use App\Models\EmployeeSchedule;
 use App\Models\EmployeeTransfer;
 use App\Models\GoodIssue;
@@ -28,6 +29,7 @@ use App\Models\InventoryTransferIn;
 use App\Models\InventoryTransferOut;
 use App\Models\Item;
 use App\Models\ItemGroupWarehouse;
+use App\Models\LeaveRequest;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDownPayment;
@@ -53,6 +55,7 @@ use App\Models\LandedCost;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\UsedData;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
@@ -76,6 +79,7 @@ class CustomHelper {
 
 	public static function updateEmployeeTransfer($transfer){
 		DB::beginTransaction();
+		info($transfer);
 		if(in_array($transfer->status,['2','3'])){
 			$query = User::find($transfer->account_id);
 			$query->place_id         = $transfer->plant_id;
@@ -83,6 +87,22 @@ class CustomHelper {
 			
 			$query->position_id               = $transfer->position_id;
 			$query->save();
+
+			$query_check_employee_transfer = EmployeeTransfer::where('account_id',$query->id)->whereIn('status',['2','3'])->get();
+			info(count($query_check_employee_transfer));
+			$date = Carbon::parse($transfer->post_date);
+			$year_later = Carbon::parse($transfer->post_date)->addYear();
+		
+			if(count($query_check_employee_transfer) == 1){
+				info($year_later->format('Y-m-d'));
+				EmployeeLeaveQuotas::create([
+					'user_id'			=> $query->id,
+					'leave_type_id'		=> 1,
+					'paid_leave_quotas'	=> 0,
+					'start_date'		=> strval($date->format('Y-m-d')),
+					'end_date'			=> strval($year_later->format('Y-m-d')),
+				]);
+			}
 			DB::commit();
 		}
 	}
@@ -514,6 +534,39 @@ class CustomHelper {
 
 				$query_schedule_update->save();
 			}
+			
+			
+		}elseif($table_name == 'leave_requests'){
+			$lr = LeaveRequest::find($table_id);
+			$user= $lr->account;
+			$schedule = [];
+			
+			// Convert the start date to a Carbon instance
+			$currentDate = Carbon::parse($lr->start_date);
+			
+			if($lr->leaveType->furlough_type == 7 ){
+				while (count($schedule) < 90) {
+					info($currentDate);
+					$parse_date = Carbon::parse($currentDate->format('Y-m-d'))->toDateString();
+					$query_schedule_in_date = EmployeeSchedule::where('date',$parse_date)
+					->where('user_id',$user->employee_no)
+					->delete();
+					// Check if the current day is not a Sunday (dayOfWeek 0)
+					if ($currentDate->dayOfWeek != 0) {
+					
+						$schedule[] = $currentDate->toDateString();
+						$query = EmployeeSchedule::create([
+							'user_id' 	=> $user->employee_no,
+							'shift_id' 	=> 4, 
+							'date' 		=> $currentDate,
+							'status'	=> '4',
+						]);
+					}
+		
+					// Move to the next day
+					$currentDate->addDay();
+				}
+			}	
 			
 			
 		}elseif($table_name == 'retirements'){

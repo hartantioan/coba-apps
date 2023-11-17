@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\MasterData;
+namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\LeaveType;
+use App\Models\EmployeeLeaveQuotas;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Validator;
 
-class LeaveTypeController extends Controller
+class EmployeeLeaveQuotasController extends Controller
 {
     public function index()
     {
         $data = [
-            'title'         => 'Tipe Ijin',
-            'content'       => 'admin.master_data.leave_type',
+            'title'         => 'Kuota Ijin Cuti',
+            'content'       => 'admin.master_data.employee_leave_quota',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -23,10 +23,11 @@ class LeaveTypeController extends Controller
 
     public function datatable(Request $request){
         $column = [
-            'code',
-            'name',
-            'type',
-            'shift_count',
+            'user_id',
+            'leave_type_id',
+            'paid_leave_quotas',
+            'start_date',
+            'end_date',
             'status',
         ];
 
@@ -36,13 +37,17 @@ class LeaveTypeController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = LeaveType::count();
+        $total_data = EmployeeLeaveQuotas::count();
         
-        $query_data = LeaveType::where(function($query) use ($search, $request) {
+        $query_data = EmployeeLeaveQuotas::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
-                        $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                        $query->where('start_date', 'like', "%$search%")
+                            ->orWhere('end_date', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
 
@@ -57,11 +62,15 @@ class LeaveTypeController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = LeaveType::where(function($query) use ($search, $request) {
+        $total_filtered = EmployeeLeaveQuotas::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
-                        $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                        $query->where('start_date', 'like', "%$search%")
+                            ->orWhere('end_date', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
                     });
                 }
 
@@ -86,10 +95,11 @@ class LeaveTypeController extends Controller
                       
                 $response['data'][] = [
                     $nomor,
-                    $val->code,
-                    $val->name,
-                    $val->type(),
-                    $val->shift_count,
+                    $val->user->name,
+                    $val->leaveType->name,
+                    $val->paid_leave_quotas,
+                    $val->start_date,
+                    $val->end_date,
                     $val->status(),
                     $btn
                 ];
@@ -114,18 +124,17 @@ class LeaveTypeController extends Controller
     public function create(Request $request){
         
         $validation = Validator::make($request->all(), [
-            'code'			          => $request->temp ? ['required', Rule::unique('leave_types', 'code')->ignore($request->temp)] : 'required|unique:leave_types,code',
-            'name'                    => 'required',
-            'type'                    => 'required',
-            'shift_count'             => 'required',
-            'furlough_type'           => 'required'
+            'user_id'			        => 'required',
+            'leave_type_id'             => 'required',
+            'paid_leave_quotas'         => 'required',
+            'start_date'                => 'required',
+            'end_date'                  => 'required'
         ], [
-            'code.required' 	            => 'Kode tidak boleh kosong.',
-            'code.unique'                   => 'Kode telah dipakai',
-            'name.required'                 => 'Nama tidak boleh kosong.',
-            'type.required'                 => 'Tipe Tidak Boleh kosong',
-            'shift_count.required'          => 'Total day / Shift yang diijinkan tidak boleh kosong',
-            'furlough_type.required'        => 'Tipe Cuti Harus dipilih'
+            'user_id.unique'                   => 'User tidak boleh kosong',
+            'leave_type_id.required'                 => 'Harap Pilih Tipe Cuti.',
+            'paid_leave_quotas.required'                 => 'Kuota Tidak Boleh kosong',
+            'start_date.required'          => 'Tanggal Mulai dari kuota cuti tidak boleh kosong',
+            'end_date.required'        => 'Tanggal expire dari kuota cuti tidak boleh kosong'
         ]);
 
         if($validation->fails()) {
@@ -137,15 +146,13 @@ class LeaveTypeController extends Controller
 			if($request->temp){
                 DB::beginTransaction();
                 try {
-                    $query = LeaveType::find($request->temp);
-                    info($request);
-                    $query->code                = $request->code;
-                    $query->name                = $request->name;
-                    $query->type                = $request->type;
-                    $query->shift_count         = $request->shift_count;
+                    $query = EmployeeLeaveQuotas::find($request->temp);
+                    $query->user_id                = $request->user_id;
+                    $query->leave_type_id                = $request->leave_type_id;
+                    $query->paid_leave_quotas                = $request->paid_leave_quotas;
+                    $query->start_date         = $request->start_date;
                     $query->status              = $request->status ? $request->status : '1';
-                    $query->furlough_type       = $request->furlough_type;
-                    info($query);
+                    $query->end_date       = $request->end_date;
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -154,13 +161,13 @@ class LeaveTypeController extends Controller
 			}else{
                
                 try {
-                    info($request);
-                    $query = LeaveType::create([
-                        'code'                  => $request->code,
-                        'name'			        => $request->name,
-                        'type'                  => $request->type,
-                        'shift_count'           => $request->shift_count,
-                        'furlough_type'         => $request->furlough_type,
+                    
+                    $query = EmployeeLeaveQuotas::create([
+                        'user_id'                  => $request->user_id,
+                        'leave_type_id'			        => $request->leave_type_id,
+                        'paid_leave_quotas'                  => $request->paid_leave_quotas,
+                        'start_date'           => $request->start_date,
+                        'end_date'         => $request->end_date,
                         'status'                => $request->status ? $request->status : '1',
                     ]);
                   
@@ -185,15 +192,14 @@ class LeaveTypeController extends Controller
 		
 		return response()->json($response);
     }
-
     public function show(Request $request){
-        $Level = LeaveType::find($request->id);
+        $Level = EmployeeLeaveQuotas::with('user')->find($request->id);
         				
 		return response()->json($Level);
     }
 
     public function destroy(Request $request){
-        $query = LeaveType::find($request->id);
+        $query = EmployeeLeaveQuotas::find($request->id);
 		
         if($query->delete()) {
            

@@ -126,7 +126,7 @@ class UserController extends Controller
 
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->name,
+                    $val->name .($val->leavequotas()->exists() ? 1 : 0),
                     $val->username,
                     $val->employee_no,
                     $val->type(),

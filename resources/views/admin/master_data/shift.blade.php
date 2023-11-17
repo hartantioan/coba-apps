@@ -67,10 +67,10 @@
                                                         <th>Plant</th>
                                                         <th>Departemen</th>
                                                         <th>Nama</th>
-                                                        <th>Min Time In</th>
+                                                       
                                                         <th>Time In</th>
                                                         <th>Time Out</th>
-                                                        <th>Max Time Out</th>
+                                                        <th>Toleransi</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -104,6 +104,24 @@
                             <input id="name" name="name" type="text" placeholder="Nama Shift">
                             <label class="active" for="name">Nama</label>
                         </div>
+                        
+                        
+                        <div class="input-field col s4">
+                            <input id="time_in" name="time_in" type="text" placeholder="Time in" class="timepicker">
+                            <label class="active" for="time_in">Time In</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <input id="time_out" name="time_out" type="text" placeholder="Time out" class="timepicker">
+                            <label class="active" for="time_out">Time Out</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <input id="tolerant" name="tolerant" type="text" placeholder="Toleransi Waktu(jam)">
+                            <label class="active" for="tolerant">Toleransi</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <input id="total_shift" name="total_shift" type="number" placeholder="Total Shift">
+                            <label class="active" for="total_shift">Total Shift</label>
+                        </div>
                         <div class="input-field col s4">
                             <select class="form-control" id="place_id" name="place_id">
                                 @foreach($place as $b)
@@ -121,21 +139,17 @@
                             <label class="" for="department_id">Departemen</label>
                         </div>
                         <div class="input-field col s4">
-                            <input id="min_time_in" name="min_time_in" type="text" placeholder="Minimum time in" class="timepicker">
-                            <label class="active" for="min_time_in">Minimum Time In</label>
+                            <div class="switch mb-1">
+                                <label for="is_next_day">Next Day</label>
+                                <label class="right">
+                                    Non-Active
+                                    <input  type="checkbox" id="is_next_day" name="is_next_day" value="1">
+                                    <span class="lever"></span>
+                                    Active
+                                </label>
+                            </div>
                         </div>
-                        <div class="input-field col s4">
-                            <input id="time_in" name="time_in" type="text" placeholder="Time in" class="timepicker">
-                            <label class="active" for="time_in">Time In</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <input id="time_out" name="time_out" type="text" placeholder="Time out" class="timepicker">
-                            <label class="active" for="time_out">Time Out</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <input id="max_time_out" name="max_time_out" type="text" placeholder="Maximum time out" class="timepicker">
-                            <label class="active" for="max_time_out">Maximum Time Out</label>
-                        </div>
+                        
                         <div class="input-field col s4">
                             <div class="switch mb-1">
                                 <label for="status">Status</label>
@@ -147,17 +161,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="input-field col s4">
-                            <div class="switch mb-1">
-                                <label for="status">is Next Day</label>
-                                <label class="right">
-                                    Non-Active
-                                    <input type="checkbox" id="is_next_day" name="is_next_day" value="1">
-                                    <span class="lever"></span>
-                                    Active
-                                </label>
-                            </div>
-                        </div>
+                        
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
@@ -301,10 +305,10 @@
                 { name: 'place', className: 'center-align' },
                 { name: 'department', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'min_time_in', className: 'center-align' },
+               
                 { name: 'time_in', className: 'center-align' },
                 { name: 'time_out', className: 'center-align' },
-                { name: 'max_time_out', className: 'center-align' },
+                { name: 'Toleransi', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -438,10 +442,10 @@
                 $('#name').val(response.name);
                 $('#place_id').val(response.place_id).formSelect();
                 $('#department_id').val(response.department_id).formSelect();
-                $('#min_time_in').val(response.min_time_in);
+                $('#tolerant').val(response.tolerant);
                 $('#time_in').val(response.time_in);
                 $('#time_out').val(response.time_out);
-                $('#max_time_out').val(response.max_time_out);
+             
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

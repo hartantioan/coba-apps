@@ -234,7 +234,7 @@
                         Department
                     </td>
                     <td width="60%">
-                        {{ $data->account->department->name }} -> {{ $data->department->name }}
+                        {{ $data->account->position->division->department->name }} -> {{ $data->position->division->department->name }}
                     </td>
                 </tr>
             </table>

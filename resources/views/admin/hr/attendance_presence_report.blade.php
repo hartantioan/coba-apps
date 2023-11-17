@@ -220,9 +220,9 @@
                             $.each(val,function(j,valed){
                                 
                                 $.each(valed.nama_shift,function(l,val_date){
-                                    /* console.log(valed.in[l]);
+                                    console.log(valed.in[l]);
                                     console.log(valed.out[l]);
-                                    console.log(l); */
+                                    console.log(l);
                                     if(valed.in[l] == 1 && valed.out[l] == 1 ){
                                         
                                         string_table +=`
@@ -253,6 +253,16 @@
                                         string_table +=`
                                             <td style="color: blue;    font-weight: 700;"> <i class="material-icons right">check</i></td>
                                         `;
+                                    }if(valed.in[l] == 3 && valed.out[l] == 3 ){
+                                       
+                                       string_table +=`
+                                           <td style="color: hotpink;    font-weight: 700;"> <i class="material-icons right">pregnant_woman</i></td>
+                                       `;
+                                    }if(valed.in[l] == 4 && valed.out[l] == 4 ){
+                                       
+                                       string_table +=`
+                                           <td style="color: gold;    font-weight: 700;"> <i class="material-icons right">announcement</i></td>
+                                       `;
                                     }    
                                     
                                     

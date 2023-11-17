@@ -195,7 +195,7 @@
                                     <div class="col s12 ">
                                         <div id="card-stats" class="row">
                                             @foreach($machine as $key=>$row)
-                                                @if (intval($row->log_counts) > 10000)
+                                                @if (intval($row->log_counts) > 10000 && intval($row->log_counts) < 20000)
                                                 <div class="col s12 m6 xl3">
                                                     <div class="card">
                                                         <div class="card-content orange lighten-1 white-text" style="height: 8rem">

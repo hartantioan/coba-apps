@@ -207,10 +207,10 @@
                     if(responseDataLength > 0){
                         $.each(response.message,function(i,val){
                             $.each(val,function(j,valed){
-                                console.log(valed);
+                                
                                 var itung=0;
                                 $.each(valed.nama_shift,function(k,isi){
-                                    console.log(k);
+                                   
                                     let perbedaanJamMasuk = valed.perbedaan_jam_masuk[k];
                                     if (typeof perbedaan_jam_masuk === 'undefined'||typeof perbedaan_jam_masuk === '') {
                                         if(valed.in[k]==1){
@@ -225,6 +225,7 @@
                                         }
                                        
                                     }
+                                  
                                     $('#detail_kehadiran').append(`
                                         <tr>
                                             

@@ -114,6 +114,7 @@
                     
                     <div class="col s12">
                         <input type="hidden" id="temp" name="temp">
+                        <input type="hidden" id="temp_schedule" name="temp_schedule">
                         <div class="input-field col m2 s12">
                             <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                             <label class="active" for="code">No. Dokumen</label>
@@ -127,10 +128,13 @@
                             </select>
                         </div>
                         <div class="input-field col s6">
-                            <select class="select2 browser-default" id="account_id" name="account_id" >
+                            <select class="select2 browser-default" id="account_id" name="account_id" onchange="getQuotas()">
                                 <option value="">--Pilih ya--</option>
                             </select>
                             <label class="active" for="account_id">Select Employee</label>
+                        </div>
+                        <div class="input-field col m3 s6">
+                            <div id="total_cuti_sementara"></div>
                         </div>
                         <div class="input-field col s6">
                             <select  class="select2 browser-default" id="leave_type_id" name="leave_type_id" onchange="changeIjin()">
@@ -148,29 +152,65 @@
                             </select>
                             <label for="company_id">Perusahaan</label>
                         </div>
+                        <div class="input-field col s6" >
+                            <input id="start_date" name="start_date"  type="date" placeholder="Tanggal Mulai" onchange="resetSchedule()">
+                            <label class="active" for="start_date">Tanggal Awal</label>
+                        </div>
+                        <div class="input-field col s6" id="end_date_field">
+                            <input id="end_date" name="end_date"   type="date" placeholder="Tanggal Akhir">
+                            <label class="active" for="end_date">Tanggal Akhir</label>
+                        </div>
                         <div class="input-field col s6" id="start_time_div" hidden>
-                            <input id="start_time" name="start_time"   type="time" placeholder="Jam Mulai">
+                            <input id="start_time" name="start_time"   type="time" placeholder="Jam Mulai" >
                             <label class="active" for="start_time">Jam Awal</label>
                         </div>
                         <div class="input-field col s6" id="end_time_div" hidden>
                             <input id="end_time" name="end_time"  type="time" placeholder="Jam Akhir">
                             <label class="active" for="end_time">Jam Akhir</label>
                         </div>
-                        <div class="input-field col s6" >
-                            <input id="start_date" name="start_date"  type="date" placeholder="Tanggal Mulai">
-                            <label class="active" for="start_date">Tanggal mulai</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="end_date" name="end_date"   type="date" placeholder="Tanggal Akhir">
-                            <label class="active" for="end_date">Tanggal Akhir</label>
-                        </div>
+                        
                         <div class="file-field input-field col m3 s12 step16">
                             <input id="post_date" name="post_date"   type="date" placeholder="Tanggal Post">
                             <label class="active" for="post_date">Tanggal Post</label>
                         </div>
+                        <div class="col m12 s12 step9" style="overflow:auto;width:100% !important;" id="table_schedule" hidden>
+                            <p class="mt-2 mb-2">
+                                <h4>Detail Jadwal Yang ingin diganti</h4>
+                                <table class="bordered" style="width:1800px;" >
+                                    <thead>
+                                        <tr>
+                                            <th class="center">Schedule</th>
+                                            <th class="center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body_item">
+                                        <tr class="row_item" id="first_item">
+                                           
+                                            <td>
+                                                <select class="browser-default item-array" id="arr_schedule0" name="arr_schedule[]"></select>
+                                            </td>
+                                            
+                                            <td class="center">
+                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr id="last-row-item">
+                                            <td colspan="3" id="delete_row">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Tambah 1
+                                                </a>
+                                               
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </p>
+                        </div>
                         <div class="input-field col s6">
                             <input id="note" name="note" type="text" placeholder="">
-                            <label class="active" for="note">Keterangan Transfer</label>
+                            <label class="active" for="note">Keterangan</label>
                         </div>
                         <div class="file-field input-field col m3 s12 step16">
                             <div class="btn">
@@ -285,7 +325,9 @@
 
 <!-- END: Page Main-->
 <script>
+    var total = 1;
     var tempuser = 0;
+    var temp_shift_count = null;
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
@@ -295,18 +337,28 @@
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+                select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
+                select2ServerSide('#leave_type_id', '{{ url("admin/select2/leave_type") }}');
+        
             },
             onOpenEnd: function(modal, trigger) { 
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
+                console.log(temp_shift_count);
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
+                $('#table_schedule').hide();
+                temp_shift_count=null;
+                console.log(temp_shift_count);
+                resetSchedule();
                 $('#temp').val('');
                 $('#start_time_div, #end_time_div').hide();
                 M.updateTextFields();
+                $("#leave_type_id").empty();
+                $("#account_id").empty();
+        
             }
         });
         
@@ -343,10 +395,275 @@
                 
             }
         });
-        select2ServerSide('#account_id', '{{ url("admin/select2/employee") }}');
-        select2ServerSide('#leave_type_id', '{{ url("admin/select2/leave_type") }}');
-        
+
+        $('#body_item').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
+            total--;
+            console.log(total);
+        });
+
+       
+         $('#arr_schedule0').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/schedule_by_date") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    let schedule_id = [];
+                    $('select[name^="arr_schedule[]"]').each(function(index){
+                        if($(this).val()){
+                            schedule_id.push($(this).val());
+                        }
+                    });
+                   
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                        date: $('#start_date').val(),
+                        end_date:$('#end_date').val(),
+                        shift_request_id: schedule_id,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
     });
+    
+    function addItem(){
+
+        var select2Data = $("#leave_type_id").select2('data');
+
+        if (select2Data && select2Data[0] && select2Data[0].data && select2Data[0].data['shift_count'] !== undefined) {
+            if(parseInt($("#leave_type_id").select2('data')[0].data['shift_count'], 10) == 0){
+                    var count = makeid(10);
+                    $('#last-row-item').before(`
+                        <tr class="row_item">
+                            <td>
+                                <select class="browser-default item-array" id="arr_schedule`+count+`" name="arr_schedule[]"></select>
+                            </td>
+                            
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+                
+                    
+                    $('#arr_schedule'+count).select2({
+                        placeholder: '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear: true,
+                        cache: true,
+                        width: 'resolve',
+                        dropdownParent: $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/schedule_by_date") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                let schedule_id = [];
+                                $('select[name^="arr_schedule[]"]').each(function(index){
+                                    if($(this).val()){
+                                        schedule_id.push($(this).val());
+                                    }
+                                });
+                                return {
+                                    search: params.term,
+                                    account_id: $('#account_id').val(),
+                                    date:  $('#start_date').val(),
+                                    end_date:$('#end_date').val(),
+                                    shift_request_id: schedule_id,
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+            }else{
+            
+                if(total < parseInt($("#leave_type_id").select2('data')[0].data['shift_count']) ){
+                    
+                    console.log(total);
+                    console.log($("#leave_type_id").select2('data')[0].data['shift_count']);
+                    var count = makeid(10);
+                    $('#last-row-item').before(`
+                        <tr class="row_item">
+                            <td>
+                                <select class="browser-default item-array" id="arr_schedule`+count+`" name="arr_schedule[]"></select>
+                            </td>
+                            
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+                
+                    
+                    $('#arr_schedule'+count).select2({
+                        placeholder: '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear: true,
+                        cache: true,
+                        width: 'resolve',
+                        dropdownParent: $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/schedule_by_date") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                let schedule_id = [];
+                                $('select[name^="arr_schedule[]"]').each(function(index){
+                                    if($(this).val()){
+                                        schedule_id.push($(this).val());
+                                    }
+                                });
+                                return {
+                                    search: params.term,
+                                    account_id: $('#account_id').val(),
+                                    date:  $('#start_date').val(),
+                                    end_date:$('#end_date').val(),
+                                    shift_request_id: schedule_id,
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+                    total++;
+                }
+            }   
+        }
+        else{
+            if(temp_shift_count == 0){
+                var count = makeid(10);
+                $('#last-row-item').before(`
+                    <tr class="row_item">
+                        <td>
+                            <select class="browser-default item-array" id="arr_schedule`+count+`" name="arr_schedule[]"></select>
+                        </td>
+                        
+                        <td class="center">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                `);
+            
+                
+                $('#arr_schedule'+count).select2({
+                    placeholder: '-- Kosong --',
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    cache: true,
+                    width: 'resolve',
+                    dropdownParent: $('body').parent(),
+                    ajax: {
+                        url: '{{ url("admin/select2/schedule_by_date") }}',
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: function(params) {
+                            let schedule_id = [];
+                            $('select[name^="arr_schedule[]"]').each(function(index){
+                                if($(this).val()){
+                                    schedule_id.push($(this).val());
+                                }
+                            });
+                            return {
+                                search: params.term,
+                                account_id: $('#account_id').val(),
+                                date:  $('#start_date').val(),
+                                end_date:$('#end_date').val(),
+                                shift_request_id: schedule_id,
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.items
+                            }
+                        }
+                    }
+                });
+            }else{
+                if(total < temp_shift_count){
+                    var count = makeid(10);
+                    $('#last-row-item').before(`
+                        <tr class="row_item">
+                            <td>
+                                <select class="browser-default item-array" id="arr_schedule`+count+`" name="arr_schedule[]"></select>
+                            </td>
+                            
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+                
+                    
+                    $('#arr_schedule'+count).select2({
+                        placeholder: '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear: true,
+                        cache: true,
+                        width: 'resolve',
+                        dropdownParent: $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/schedule_by_date") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                let schedule_id = [];
+                                $('select[name^="arr_schedule[]"]').each(function(index){
+                                    if($(this).val()){
+                                        schedule_id.push($(this).val());
+                                    }
+                                });
+                                return {
+                                    search: params.term,
+                                    account_id: $('#account_id').val(),
+                                    date:  $('#start_date').val(),
+                                    end_date:$('#end_date').val(),
+                                    shift_request_id: schedule_id,
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+                    total++;   
+                }
+            }
+        }
+        
+
+        
+    }
 
     function getCode(val){
         if(val){
@@ -387,15 +704,106 @@
     }
 
     function changeIjin(){
+        $('#table_schedule').show();
+        resetSchedule();
         if($("#leave_type_id").val()){
             if($("#leave_type_id").select2('data')[0].type=='1'){
+                $('#start_time_div, #end_time_div , #end_date_field').hide();
+            }if($("#leave_type_id").select2('data')[0].type=='2'){
+                $(' #end_time_div , #end_date_field').hide();
+                $('#start_time_div').show();
+            }
+            if($("#leave_type_id").select2('data')[0].type=='3'){
                 $('#start_time_div, #end_time_div').hide();
-            }else{
+                $('#end_date_field').show();
+            }
+            if($("#leave_type_id").select2('data')[0].type=='4'){
+                $('#end_date_field').hide();
                 $('#start_time_div, #end_time_div').show();
             }
+            if($("#leave_type_id").select2('data')[0].type=='7'){
+                $('#end_date_field').hide();
+                $('#start_time_div, #end_time_div').hide();
+                $('#table_schedule').hide();
+            }
         }else{
-            $('#start_time_div, #end_time_div').hide();
+            $('#start_time_div, #end_time_div,#table_schedule , #end_date_field').hide();
         }
+    }
+
+    function getQuotas(){
+        resetSchedule();
+        
+        $("#total_cuti_sementara").empty();
+        if($("#account_id").val()){
+            tempTerm = $("#account_id").select2('data')[0].leave_quotas_yearly;
+        }else{
+            tempTerm = 0;
+            $("#total_cuti_sementara").empty();
+        }
+        $("#total_cuti_sementara").append(' sisa cuti:' + tempTerm);
+
+    }
+
+    function resetSchedule(){
+        total = 1;
+        $('#body_item').empty();
+        $('#body_item').append(`
+            <tr class="row_item" id="first_item">
+                                            
+                <td>
+                    <select class="browser-default item-array" id="arr_schedule0" name="arr_schedule[]"></select>
+                </td>
+                
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+            <tr id="last-row-item">
+                <td colspan="3" id="delete_row">
+                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                        <i class="material-icons left">add</i> Tambah 1
+                    </a>
+                    
+                </td>
+            </tr>
+        `);
+        $('#arr_schedule0').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/schedule_by_date") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    let schedule_id = [];
+                    $('select[name^="arr_schedule[]"]').each(function(index){
+                        if($(this).val()){
+                            schedule_id.push($(this).val());
+                        }
+                    });
+                   
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                        date: $('#start_date').val(),
+                        end_date:$('#end_date').val(),
+                        shift_request_id: schedule_id,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function voidStatus(id){
@@ -615,10 +1023,11 @@
             },
             success: function(response) {
                 loadingClose('#main');
+                $('#table_schedule').show();
                 $('#modal1').modal('open');
 
                 $('#temp').val(id);
-               
+                temp_shift_count=response.leaveType.shift_count;
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account.name + `</option>
                 `);
@@ -626,16 +1035,27 @@
                 $('#code').val(response.code);
 
                 $('#leave_type_id').empty().append(`
-                    <option value="` + response.leave_type_id + `">` + response.leaveType.name + `</option>
+                    <option value="` + response.leave_type_id + `"  data-shift-count="`+response.leaveType.shift_count+`" >` + response.leaveType.name + `</option>
                 `);
 
-                if($("#leave_type_id").val()){
-                    if($("#leave_type_id").select2('data')[0].type=='1'){
-                        $('#start_time_div, #end_time_div').hide();
-                    }else{
-                        $('#start_time_div, #end_time_div').show();
-                    }
+                $('#temp_schedule').val(response.count);
+                
+                if(response.leaveType.type=='1'){
+                    $('#start_time_div, #end_time_div , #end_date_field').hide();
+                }if(response.leaveType.type=='2'){
+                    $(' #end_time_div , #end_date_field').hide();
+                    $('#start_time_div').show();
                 }
+                if(response.leaveType.type=='3'){
+                    $('#start_time_div, #end_time_div').hide();
+                    $('#end_date_field').show();
+                }
+                if(response.leaveType.type=='4'){
+                   
+                    $('#end_date_field').hide();
+                    $('#start_time_div, #end_time_div').show();
+                }
+                
                 
                 $('#start_time').val(response.start_item);
                 $('#end_time').val(response.end_item);
@@ -649,6 +1069,74 @@
                 
                 $('.modal-content').scrollTop(0);
                 $('#name').focus();
+
+
+                $('#body_item').empty();
+
+                $.each(response.details, function(i, val) {
+                    console.log(val);
+                    var count = makeid(10);
+                    $('#body_item').append(`
+                        <tr class="row_item" id="first_item">                   
+                            <td>
+                                <select class="browser-default item-array" id="arr_schedule` + count +`" name="arr_schedule[]">
+                                    <option value="`+val['employee_schedule_id']+`">`+val['employee_schedule_shift']+`</option>
+                                </select>
+                            </td>
+                            
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+
+                    $('#arr_schedule'+count).select2({
+                        placeholder: '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear: true,
+                        cache: true,
+                        width: 'resolve',
+                        dropdownParent: $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/schedule_by_date") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                let schedule_id = [];
+                                $('select[name^="arr_schedule[]"]').each(function(index){
+                                    if($(this).val()){
+                                        schedule_id.push($(this).val());
+                                    }
+                                });
+                                return {
+                                    search: params.term,
+                                    account_id: $('#account_id').val(),
+                                    date:  $('#start_date').val(),
+                                    end_date:$('#end_date').val(),
+                                    shift_request_id: schedule_id,
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+                    
+                });
+
+                $('#body_item').append(`
+                <tr id="last-row-item">
+                    <td colspan="3" id="delete_row">
+                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                            <i class="material-icons left">add</i> Tambah 1
+                        </a>
+                        
+                    </td>
+                </tr>`);
                 
             },
             error: function() {

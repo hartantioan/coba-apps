@@ -15,26 +15,43 @@ class AttendanceMonthlyReportController extends Controller
 {
     public function index(Request $request)
     {
+        $code =  $request->code ? CustomHelper::decrypt($request->code) : '';
+        
         $data = [
             'title'         => 'Rekap Periode',
             'user'          =>  User::where('type','1')->where('status',1)->get(),
             'content'       => 'admin.hr.attendance_monthly_report',
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : ''
         ];
+        if($code){
+            $attendance_period = AttendancePeriod::find($code);
+            if($attendance_period->getPunishment()){
+                $data['period_id'] = $attendance_period->id;
+                $data['punishment_name'] = $attendance_period->code .' - ' . $attendance_period->name;
+                $data['punishment_code'] = $attendance_period->getPunishment();   
+            }
+        }
 
         return view('admin.layouts.index', ['data' => $data]); 
     }
     public function datatable(Request $request){
-        $query_period = AttendancePeriod::find($request->period_id);
+        if($request->temp){
+           
+            $query_period = AttendancePeriod::find($request->temp);
+        }else{
+            $query_period = AttendancePeriod::find($request->period_id);
+        }
+        
         $query_punish = Punishment::where('place_id',$query_period->plant_id)
                         ->where('type','1')
                         ->get();
+        
         $column = [
             'user_id',
             'period_id',
             'effective_day',
         ];
-        
+        $array_nama = [];
         foreach ($query_punish as $row_punish) {
             $array_nama[] = $row_punish->code;
         }
@@ -48,6 +65,8 @@ class AttendanceMonthlyReportController extends Controller
             'dispen',
             'alpha',           // tidak masuk
             'wfh',
+            'late',
+            'leave_early',
             'arrived_on_time',
             'out_on_time',
             'out_log_forget',
@@ -118,13 +137,16 @@ class AttendanceMonthlyReportController extends Controller
                 $entry[$row_punish]=0;
             }
             $entry["absent"] = $row_data->absent;
-            $entry["sick"] = $row_data->sick;
             $entry["special_occasion"] = $row_data->special_occasion;
+            $entry["sick"] = $row_data->sick;
+            
             $entry["outstation"] = $row_data->outstation;
             $entry["furlough"] = $row_data->furlough;
             $entry["dispen"] = $row_data->dispen;
             $entry["alpha"] = $row_data->alpha;
             $entry["wfh"] = $row_data->wfh;
+            $entry["late"] = $row_data->late;
+            $entry["leave_early"] = $row_data->leave_early;
             $entry["arrived_on_time"] = $row_data->arrived_on_time;
             $entry["out_on_time"] = $row_data->out_on_time;
             $entry["out_log_forget"] = $row_data->out_log_forget;
@@ -132,8 +154,9 @@ class AttendanceMonthlyReportController extends Controller
             
             $array[] = $entry;
         }
-
-        $query_attendance_punish = AttendancePunishment::where('period_id',$request->period_id)->get();
+        
+        $query_attendance_punish = AttendancePunishment::where('period_id',$request->period_id)
+                                ->orWhere('period_id',$request->temp)->get();
         foreach($query_attendance_punish as $row_punish){
            foreach($array as $key_array=>$row_array){
                 if($row_array["user_id"]==$row_punish->user_id){

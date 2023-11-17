@@ -7,40 +7,30 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 
-class AttendanceMonthlyReport extends Model
+class EmployeeLeaveQuotas extends Model
 {
+    use HasFactory;
+
     use HasFactory, SoftDeletes, Notifiable;
-    protected $table = 'attendance_monthly_reports';
+    protected $table = 'employee_leave_quotas';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
 
-    protected $fillable = [    
+    protected $fillable = [
         'user_id',
-        'late',
-        'leave_early',
-        'period_id',
-        'effective_day',
-        'absent',//masuk
-        'special_occasion',
-        'sick',
-        'outstation',//dinas keluar
-        'furlough',//cuti
-        'dispen',
-        'permit',
-        'shift_exchange',
-        'alpha',//tidak masuk
-        'wfh',
-        'arrived_on_time',
-        'out_on_time',
-        'out_log_forget',
-        'arrived_forget',
+        'leave_type_id',
+        'paid_leave_quotas',
+        'start_date',
+        'end_date',
+        'status',
     ];
 
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
-    
-
+    public function leaveType(){
+        return $this->belongsTo('App\Models\LeaveType','leave_type_id','id')->withTrashed();
+    }
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',

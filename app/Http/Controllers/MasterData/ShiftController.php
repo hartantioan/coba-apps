@@ -107,10 +107,9 @@ class ShiftController extends Controller
                     $val->place->name,
                     $val->department->name,
                     $val->name,
-                    $val->min_time_in,
                     $val->time_in,
                     $val->time_out,
-                    $val->max_time_out,
+                    $val->tolerant,
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -138,9 +137,8 @@ class ShiftController extends Controller
     public function create(Request $request){
         
         $time_in = strtotime($request->time_in);
-        $min_time_in = strtotime($request->min_time_in);
-        $time_out = strtotime($request->time_out);
-        $max_time_out = strtotime($request->max_time_out);
+    
+       
         $query_department= Department::find($request->department_id);
         $query_place= Place::find($request->place_id);
         $stime_in = date('H:i', strtotime($request->time_in));
@@ -154,10 +152,11 @@ class ShiftController extends Controller
             'name'           => 'required',
             'place_id'       => 'required',
             'department_id'  => 'required',
-            'min_time_in'    => 'required',
             'time_in'        => 'required',
             'time_out'       => 'required',
-            'max_time_out'   => 'required',
+            'tolerant'          => 'required',
+            'total_shift'   => 'required',
+            
             
         ], [
             'code.required' 	     => 'Kode tidak boleh kosong.',
@@ -165,11 +164,11 @@ class ShiftController extends Controller
             'name.required'          => 'Nama Shift tidak boleh kosong.',
             'place_id.required'      => 'Plant tidak boleh kosong.',
             'department_id.required' => 'Departemen tidak boleh kosong',
-            'min_time_in.required'   => 'Minimum jam masuk tidak boleh kosong',
+          
             'time_in.required'       => 'Jam masuk tidak boleh kosong',
             'time_out.required'      => 'Jam pulang tidak boleh kosong',
-            'max_time_out.required'  => 'Maksimum jam pulang tidak boleh kosong',
-            
+            'tolerant.required'      => 'toleransi keterlambatan tidak boleh kosong',
+            'total_shift'            => 'Total Shift perlu diisi minimal 1' 
         ]);
         
 
@@ -185,14 +184,14 @@ class ShiftController extends Controller
                     'status'    => 500,
                     'message'   => 'Jam masuk tidak boleh kurang dari minimum jam masuk.',
                 ]);
-            }
+            } */
 
-            if($max_time_out < $time_out){
+            if($request->total_shift < 0){
                 return response()->json([
                     'status'    => 500,
-                    'message'   => 'Jam maksimum pulang tidak boleh kurang dari jam pulang.',
+                    'message'   => 'Total Shift kurang dari 1',
                 ]);
-            } */
+            }
 
 			if($request->temp){
                 DB::beginTransaction();
@@ -203,10 +202,11 @@ class ShiftController extends Controller
                     $query->place_id            = $request->place_id;
                     $query->department_id       = $request->department_id;
                     $query->name                = $request->name;
-                    $query->min_time_in         = $request->min_time_in;
+                    $query->is_next_day         = $request->is_next_day;
+                    $query->total_shift         = $request->total_shift;
                     $query->time_in             = $request->time_in;
                     $query->time_out            = $request->time_out;
-                    $query->max_time_out        = $request->max_time_out;
+                    $query->tolerant            = $request->tolerant;
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
 
@@ -228,11 +228,11 @@ class ShiftController extends Controller
                         'user_id'           => session('bo_id'),
                         'place_id'          => $request->place_id,
                         'department_id'     => $request->department_id,
-                        'min_time_in'       => $request->min_time_in,
+                        'total_shift'       => $request->total_shift,
                         'time_in'           => $request->time_in,
                         'time_out'          => $request->time_out,
                         'is_next_day'       => $request->is_next_day ?? 0,
-                        'max_time_out'      => $request->max_time_out,
+                        'tolerant'          => $request->tolerant,
                         'status'            => $request->status ? $request->status : '2',
                     ]);
                     DB::commit();

@@ -11,7 +11,7 @@ class LeaveRequestShift extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'leave_request_shift';
+    protected $table = 'leave_request_shifts';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [

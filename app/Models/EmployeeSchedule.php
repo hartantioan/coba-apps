@@ -28,4 +28,10 @@ class EmployeeSchedule extends Model
     public function shift(){
         return $this->belongsTo('App\Models\Shift','shift_id','id')->withTrashed();
     }
+
+    public function leaveRequestShift(){
+        return $this->hasMany('App\Models\LeaveRequestShift')->whereHas('leaveRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
 }

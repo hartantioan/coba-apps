@@ -4,10 +4,9 @@
             <th>No</th>
             <th>Nama</th>
             <th>Jumlah Shift</th>
-            <th>t1</th>
-            <th>t2</th>
-            <th>t3</th>
-            <th>t4</th>
+            @foreach ($punish as $row)
+                <th>{{$row->code}}</th>
+            @endforeach
             <th>Tepat Waktu</th>
             <th>Ijin Khusus</th>
             <th>Sakit</th>
@@ -16,6 +15,8 @@
             <th>Dispen</th>
             <th>Alpha</th>
             <th>WFH</th>
+            <th>Ijin Datang Telat</th>
+            <th>Ijin Pulang Cepat</th>
             <th>Datang Tepat Waktu</th>
             <th>Pulang Tepat Waktu</th>
             <th>Lupa Check Clock Pulang</th>
@@ -23,28 +24,30 @@
         </tr>
     </thead>
     <tbody>
-        @foreach ($data as $key => $row)
-        <tr>
-            <td style="background-color:#adaaaa;">{{ $key+1 }}.</td>
-            <td style="background-color:#adaaaa;">{{ $row->user->name }}</td> 
-            <td style="background-color:#adaaaa;">{{  $row->effective_day }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->t1}}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->t2}}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->t3}}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->t4}}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->absent }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->special_occasion }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->sick }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->outstation }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->furlough }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->dispen }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->alpha }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->wfh }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->arrived_on_time }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->out_on_time }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->out_log_forget }}.</td>
-            <td style="background-color:#adaaaa;">{{  $row->arrived_forget }}.</td>
+        @foreach ($data as $key => $row_detail)
+        <tr>      
+            <td class='center-align'>{{$key+1}}</td>       
+            <td class='center-align'>{{$row_detail['username']}}</td>
+            <td class='center-align'>{{$row_detail['effective_day']}}</td>
+            @foreach ($punish as $row)
+            <td class='center-align'>{{$row_detail[$row->code]}}</td>
+            @endforeach
+            <td class='center-align'>{{$row_detail['absent']}}</td>
+            <td class='center-align'>{{$row_detail['special_occasion']}}</td>
+            <td class='center-align'>{{$row_detail['sick']}}</td>
+            <td class='center-align'>{{$row_detail['outstation']}}</td>
+            <td class='center-align'>{{$row_detail['furlough']}}</td>
+            <td class='center-align'>{{$row_detail['dispen']}}</td>
+            <td class='center-align'>{{$row_detail['alpha']}}</td>
+            <td class='center-align'>{{$row_detail['wfh']}}</td>
+            <td class='center-align'>{{$row_detail['late']}}</td>
+            <td class='center-align'>{{$row_detail['leave_early']}}</td>
+            <td class='center-align'>{{$row_detail['arrived_on_time']}}</td>
+            <td class='center-align'>{{$row_detail['out_on_time']}}</td>
+            <td class='center-align'>{{$row_detail['out_log_forget']}}</td>
+            <td class='center-align'>{{$row_detail['arrived_forget']}}</td>
         </tr>
+            
         @endforeach
     </tbody>
 </table>

@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('leavequotas:renew')
+                ->everyMinute()->withoutOverlapping();
         // $schedule->command('inspire')->hourly();
         /* $schedule->command('queue:work')->everyMinute()->withoutOverlapping()->runInBackground(); */
         $schedule->command('queue:work --stop-when-empty')->everyMinute()->withoutOverlapping();
@@ -29,6 +31,8 @@ class Kernel extends ConsoleKernel
     protected function commands()
     {
         $this->load(__DIR__.'/Commands');
+
+        Commands\LeaveQuotaRenew::class;
 
         require base_path('routes/console.php');
     }

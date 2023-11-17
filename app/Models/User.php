@@ -394,6 +394,17 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\UserWarehouse');
     }
 
+    public function leaveQuotas(){
+        
+        return $this->hasMany('App\Models\EmployeeLeaveQuotas');
+    }
+
+    public function getQuotasUser($year){
+        $return = $this->leaveQuotas()->where('start_date','like',$year."%")->first();
+       
+        return $return->paid_leave_quotas??0;
+    }
+
     public function userWarehouseArray(){
         $arr = [];
         foreach($this->userWarehouse as $row){

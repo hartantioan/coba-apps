@@ -338,6 +338,7 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
+        const employee_code = urlParams.get('employee_code');
         const selectedCode = $('#selectedCode').val();
         console.log(selectedCode);
 
@@ -395,6 +396,60 @@
             });
            /*  $('#employee_id').val(selectedCode).trigger('change'); // Trigger 'change' event to update Select2 UI */
         }
+
+        if (employee_code) {
+           
+           $.ajax({
+               url: '{{ Request::url() }}/instant_form_code',
+               type: 'POST',
+               dataType: 'JSON',
+               data: {
+                   id: employee_code
+               },
+               headers: {
+                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+               },
+               beforeSend: function() {
+                   loadingOpen('#main');
+               },
+               success: function(response) {
+                   loadingClose('#main');
+                   $('#modal1').modal('open');
+                   $('#employee_id').empty().append(`
+                       <option value="` + response.id + `">` + response.name + `</option>
+                   `);
+                   if(response.manager != null){
+                       $('#manager_id').empty().append(`
+                           <option value="` + response.manager_id + `">` + response.manager.name + `</option>
+                       `);
+                   }
+                   if(response.position != null){
+                       $('#position_id').empty().append(`
+                           <option value="` + response.position_id + `">` + response.position.name + `</option>
+                       `);
+                   }
+                   console.log(response);
+                 
+                   $('#plant_id').val(response.place_id).formSelect();
+                   $('#post_date').val(response.post_date);
+                   $('#valid_date').val(response.valid_date);
+                   $('#note').val(response.note);
+                   $('.modal-content').scrollTop(0);
+                   $('#name').focus();
+                   
+               },
+               error: function() {
+                   $('.modal-content').scrollTop(0);
+                   loadingClose('#main');
+                   swal({
+                       title: 'Ups!',
+                       text: 'Check your internet connection.',
+                       icon: 'error'
+                   });
+               }
+           });
+          /*  $('#employee_id').val(selectedCode).trigger('change'); // Trigger 'change' event to update Select2 UI */
+       }
         
     });
 

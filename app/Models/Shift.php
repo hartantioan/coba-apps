@@ -24,7 +24,8 @@ class Shift extends Model
         'tolerant',
         'time_in',
         'time_out',
-
+        'total_shift',
+        'is_next_day',
         'status'
     ];
 

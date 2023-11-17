@@ -20,7 +20,7 @@ class AttendanceController extends Controller
         foreach(AttendanceMachine::where('status','1')->get() as $machine){
             $output = [];
             $exitCode = 0;
-            $command = "node C:\Users\windy\absen2\logCount.js " . $machine->ip_address.' '.$machine->id;
+            $command = "node D:\absen_node\logCount.js " . $machine->ip_address.' '.$machine->id;
             exec($command, $output, $exitCode);            
         }
 
@@ -161,7 +161,7 @@ class AttendanceController extends Controller
                     $nomor,
                     $val->code,
                     $val->employee_no,
-                    $val->employee_no,
+                    $val->user->name ?? $val->employee_no,
                     $val->date,
                     $val->verifyType(),
                     $val->location,

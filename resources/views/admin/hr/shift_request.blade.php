@@ -421,7 +421,7 @@
     function addItem(){
         var count = makeid(10);
         $('#last-row-item').before(`
-            <tr class="row_item">
+        <tr class="row_item">
                 <td>
                     <select class="browser-default item-array" id="arr_schedule` + count + `" name="arr_schedule[]"></select>
                 </td>

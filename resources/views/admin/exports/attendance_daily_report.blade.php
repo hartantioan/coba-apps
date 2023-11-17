@@ -1,4 +1,19 @@
 <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th>NIK</th>
+            <th>Nama</th>
+            <th>Tanggal</th>
+            <th>Shift</th>
+            <th>Min Time in</th>
+            <th>Time In</th>
+            <th>Check Clock Masuk</th>
+            <th>Time Out</th>
+            <th>Check Clock Pulang</th>
+            <th>Max Time Out</th>
+            <th>Status</th>
+        </tr>
+    </thead>
     <tbody>
         @foreach($data as $key => $row_detail)
             @foreach ($row_detail as $key_daily=>$row_daily)

@@ -31,6 +31,10 @@
                         <td style='color: black;    font-weight: 700;'>Absen</td>
                     @elseif ($row_status=='7')
                         <td style='color: black;    font-weight: 700;'>Tidak Ada Shift Pada Tanggal Ini</td>
+                    @elseif ($row_status=='8')
+                        <td style='color: black;    font-weight: 700;'>Ada Ijin</td>
+                    @elseif ($row_status=='9')
+                        <td style='color: black;    font-weight: 700;'>Cuti Melahirkan</td>
                     @endif
                 @endforeach
             @endforeach

@@ -63,10 +63,11 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Kode</th>
                                                         <th>Nama</th>
-                                                        <th>Type</th>
-                                                        <th>Hari Yang Diperbolehkan</th>
+                                                        <th>Tipe Cuti</th>
+                                                        <th>Kuota Cuti</th>
+                                                        <th>Tanggal Mulai</th>
+                                                        <th>Tanggal Akhir</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -89,39 +90,20 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Shift</h4>
+                <h4>Tambah/Edit Kuota Ijin</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s4">
-                           
-                            <input id="code" name="code" type="text" placeholder="Code">
-                            <label class="active" for="code">Kode</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <input type="hidden" id="temp" name="temp">
-                            <input id="name" name="name" type="text" placeholder="Nama">
-                            <label class="active" for="name">Nama</label>
-                        </div>
-                        <div class="input-field col s4">
-                            
-                            <input id="shift_count" name="shift_count" type="number" placeholder="Total Days / Shift">
-                            <label class="active" for="shift_count">Total Shift / Hari</label>
-                        </div>
-                        <div class="input-field col s4">
-                            <select class="form-control" id="type" name="type"> 
-                                <option value="1">Tanggal</option>
-                                <option value="2">Tanggal & Jam</option>
-                                <option value="3">Tanggal Range</option>
-                                <option value="4">Tanggal & Multi Jam</option>
-                                <option value="7">Melahirkan</option>
+                        <div class="input-field col s12">
+                            <select class="select2 browser-default" id="user_id" name="user_id">
+                                <option value="">--Pilih ya--</option>
                             </select>
-                            <label class="" for="type">Tipe Pemakaian</label>
+                            <label class="active" for="user_id">Select Employee</label>
                         </div>
-                        <div class="input-field col s4">
-                            <select class="form-control" id="furlough_type" name="furlough_type"> 
+                        <div class="input-field col s6">
+                            <select class="form-control" id="leave_type_id" name="leave_type_id"> 
                                 <option value="1">Cuti</option>
                                 <option value="2">Sakit</option>
                                 <option value="3">Cuti Khusus</option>
@@ -132,7 +114,21 @@
                                 <option value="8">Ijin</option>
                                 <option value="9">Telat</option>
                             </select>
-                            <label class="" for="furlough_type">Tipe</label>
+                            <label class="" for="leave_type_id">Tipe</label>
+                        </div>
+                        <div class="input-field col s6">
+                            
+                            <input id="paid_leave_quotas" name="paid_leave_quotas" type="number" placeholder="Total Days / Shift">
+                            <label class="active" for="paid_leave_quotas">Kuota Cuti Shift / Hari</label>
+                        </div>
+                       
+                        <div class="input-field col s6" >
+                            <input id="start_date" name="start_date"  type="date" placeholder="Tanggal Mulai" onchange="resetSchedule()">
+                            <label class="active" for="start_date">Tanggal Awal</label>
+                        </div>
+                        <div class="input-field col s6" id="end_date_field">
+                            <input id="end_date" name="end_date"   type="date" placeholder="Tanggal Akhir">
+                            <label class="active" for="end_date">Tanggal Akhir</label>
                         </div>
                        
                         <div class="input-field col s4">
@@ -159,7 +155,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -182,7 +178,7 @@
 <script>
     $(function() {
         
-        
+        select2ServerSide('#user_id', '{{ url("admin/select2/employee") }}');
         loadDataTable();
 
         $('#datatable_serverside').on('click', 'button', function(event) {
@@ -259,11 +255,12 @@
                 }
             },
             columns: [
-                { name: 'id', searchable: false, className: 'center-align' },
-                { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'type', className: 'center-align' },
-                { name: 'shift_count', className: 'center-align' },
+                { name: 'nomor', searchable: false, className: 'center-align' },
+                { name: 'user_id', searchable: false, className: 'center-align' },
+                { name: 'leave_type_id', className: 'center-align' },
+                { name: 'paid_leave_quotas', className: 'center-align' },
+                { name: 'start_date', className: 'center-align' },
+                { name: 'end_date', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -394,12 +391,14 @@
                 $('#modal1').modal('open');
                 
                 $('#temp').val(id);
-                $('#name').val(response.name);
-                $('#type').val(response.type).formSelect();
-                $('#furlough_type').val(response.furlough_type).formSelect();
-                $('#code').val(response.code);
-                $('#shift_count').val(response.shift_count);
-
+                
+                $('#leave_type_id').val(response.leave_type_id).formSelect();
+                $('#paid_leave_quotas').val(response.paid_leave_quotas);
+                $('#start_date').val(response.start_date);
+                $('#end_date').val(response.end_date);
+                $('#user_id').empty().append(`
+                    <option value="` + response.user_id + `">` + response.user['name'] + `</option>
+                `);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
@@ -407,7 +406,7 @@
                 }
 
                 $('.modal-content').scrollTop(0);
-                $('#name').focus();
+              
                 M.updateTextFields();
             },
             error: function() {

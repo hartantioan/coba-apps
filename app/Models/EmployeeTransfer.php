@@ -38,7 +38,7 @@ class EmployeeTransfer extends Model
     }
 
     public function manager(){
-        return $this->belongsTo('App\Models\User','manager_id','id')->withTrashed();
+        return $this->belongsTo('App\Models\User','manager_id','id');
     }
 
     public function place(){

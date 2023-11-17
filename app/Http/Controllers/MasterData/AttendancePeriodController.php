@@ -11,11 +11,13 @@ use App\Models\AttendancePeriod;
 use App\Models\AttendancePunishment;
 use App\Models\Attendances;
 use App\Models\EmployeeSchedule;
+use App\Models\LeaveRequest;
 use App\Models\Place;
 use App\Models\PresenceReport;
 use App\Models\Punishment;
 use App\Models\User;
 use App\Models\UserAbsensiMesin;
+use App\Models\UserSpecial;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
@@ -29,7 +31,7 @@ class AttendancePeriodController extends Controller
     public function index()
     {
         $data = [
-            'title'         => 'Aset',
+            'title'         => 'Periode Absen',
             'content'       => 'admin.master_data.attendance_period',
             'place'         => Place::where('status','1')->get(),
         ];
@@ -99,6 +101,7 @@ class AttendancePeriodController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Harian" onclick="reportDaily(' . $val->id . ')"><i class="material-icons dp48" style="color:black">assignment</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2 btn-small" data-popup="tooltip" title="Laporan Presensi" onclick="reportPresence(' . $val->id . ')"><i class="material-icons dp48" style="color:black">directions_walk</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Monthly" onclick="goToMonth(`'.CustomHelper::encrypt($val->id).'`)"><i class="material-icons dp48" style="color:black">event</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Laporan Denda" onclick="reportPunishment(`'.CustomHelper::encrypt($val->id).'`)"><i class="material-icons dp48" style="color:black">money_off</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light yellow darken-2  btn-small" data-popup="tooltip" title="Excel" onclick="exportExcel(`'.$val->id.'`)"><i class="material-icons dp48" style="color:black">view_list</i></button>
                     ';
                       
@@ -140,7 +143,7 @@ class AttendancePeriodController extends Controller
     }
 
     public function close(Request $request){
-        info('mulais');
+        
         $attendance_period = AttendancePeriod::find($request->id);
         $start_time = microtime(true);
         $start_date = Carbon::parse($attendance_period->start_date);
@@ -148,10 +151,9 @@ class AttendancePeriodController extends Controller
         
         $user_data = User::where(function($query) use ( $request) {
             $query->where('type','1');
-            // $query->whereIn('nik', [' 123034']);
                 
             })->get();
-        $user_datas = [];
+      
         $attendance_detail = [];
         $user_counter_effective_day = [];
         $user_counter_absent=[];
@@ -161,6 +163,8 @@ class AttendancePeriodController extends Controller
             foreach($user_data as $c=>$row_user){
                 $user_id = $row_user->employee_no;
                 $date = $start_date->copy();
+                $date_leave_req = $start_date->copy();
+                $date_special = $start_date->copy();
                 $counter_effective_day=0;
                 $counter_absent=0;
                 $counter_alpha=0;
@@ -168,6 +172,19 @@ class AttendancePeriodController extends Controller
                 $counter_arrived_forget=0;
                 $counter_out_on_time=0;
                 $counter_out_forget=0;
+
+                $counter_late=0;
+                $counter_leave_early = 0;
+
+                $counter_cuti = 0;
+                $counter_sakit= 0;
+                $counter_ijin = 0;
+                $counter_dinas_luar = 0;
+                $counter_cuti_kusus = 0;
+                $counter_lain_lain = 0;
+                $counter_dispen = 0;
+                $counter_wfh = 0;
+
                 $date_out_forget=[];
                 $date_arrived_forget=[];
 
@@ -178,6 +195,7 @@ class AttendancePeriodController extends Controller
                                             ->where('type','1')
                                             ->where('status','1')
                                             ->get();
+                
                 $tipe_punish_counter=[];
                
                 $query_tidak_check_masuk = Punishment::where('place_id',$row_user->place_id)
@@ -189,6 +207,8 @@ class AttendancePeriodController extends Controller
                                         ->where('type','3')
                                         ->where('status','1')
                                         ->first();
+
+               
                 
                 foreach($query_late_punishment as $row_type){
                     $tipe_punish_counter[$row_type->code]['counter']=0;
@@ -198,13 +218,22 @@ class AttendancePeriodController extends Controller
                     $tipe_punish_counter[$row_type->code]['price']=$row_type->price;   
                 }  
                 while ($date->lte($end_date)) {
-                    $user_datas[$c]['user_name']=$row_user->nama;
-                    $query_data = EmployeeSchedule::whereDate('date', $date->toDateString())
-                              ->where('user_id',$row_user->employee_no)
-                              ->get();
+              
+                    
+
+                    $query_data = EmployeeSchedule::join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
+                        ->whereDate('employee_schedules.date', $date->toDateString())
+                        ->where('employee_schedules.user_id', $row_user->employee_no)
+                        ->whereIn('employee_schedules.status', [1, 4])
+                        ->orderBy('shifts.time_in') // Order by next_day (1 comes last)
+                        ->select('employee_schedules.*') // Select the columns you need
+                        ->get();
+                   
+                             
                     $cleanedNik = str_replace(' ', '', $row_user->employee_no);
                     
-                 
+                    
+             
                     
                     //diloop per user untuk mendapatkan schedule yang dibuat untuk peruser masing masing
                     $array_masuk=[];
@@ -224,239 +253,287 @@ class AttendancePeriodController extends Controller
                     $different_masuk=[];
                     $different_keluar=[];
                     $tipe=[];
-                    foreach($query_data as $key=> $row_schedule_filter){
-                        $exact_in[$key]=0;
-                        $exact_out[$key]=0;
-                        $counter_effective_day++;
-                        $login[$key]=null;
-                        $logout=null;
-                        $tipe[$key]='';
-                        
 
-                        $different_masuk[$key]='';
-                        $different_keluar[$key]='';
-                        // $min_time_in = $row_schedule_filter->shift->min_time_in;
+                    $cuti = 0 ;
+                    
+                    
+                    //perhitungan schedule biasa dari user pada tanggal yang ada di loop
+                    foreach($query_data as $key=> $row_schedule_filter){
                         $time_in = $row_schedule_filter->shift->time_in;
                         $min_time_in = Carbon::parse($time_in)->subHours($row_schedule_filter->shift->tolerant)->toTimeString();
                         $real_time_in =$date->format('Y-m-d') . ' ' . $time_in;
                         $combinedDateTimeInCarbon = Carbon::parse($real_time_in);
                         $real_min_time_in = $combinedDateTimeInCarbon->copy()->subHours($row_schedule_filter->shift->tolerant);
-                        
-                        // $max_time_out = $row_schedule_filter->shift->max_time_out;
+                       
                         $time_out = $row_schedule_filter->shift->time_out;
                         $max_time_out = Carbon::parse($time_out)->addHours($row_schedule_filter->shift->tolerant)->toTimeString();
-                        $real_time_out =$date->format('Y-m-d') . ' ' . $time_out;
-                        $combinedDateTimeOutCarbon = Carbon::parse($real_time_out);
-                        $real_max_time_out = $combinedDateTimeOutCarbon->copy()->addHours($row_schedule_filter->shift->tolerant);
-                       
-                        $array_masuk[$key]='';
-                        $array_keluar[$key]='';
-                        if($key != 0){// mengetahui apabila shift merupakan yang pertama atau bukan melalui iterasi
-                            $currentSchedule = $query_data[$key];
-                            $previousSchedule = $query_data[$key - 1];
+                        if($time_in>$time_out){
+                            $tambah1hari=$date->copy()->addDay();
+                         
+                            $real_time_out =$tambah1hari->format('Y-m-d'). ' ' . $time_out;
                             
-                            $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
-                            $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
-                            
-                            $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
-                           
-                            if($timeDifference>2 && $key <= 2){
-                                
-                                $exact_in[$key]=0;
-                                $exact_out[$key]=0;
-                                if(count(($query_data))==3){
-                                    $exact_out[$key-1]=1;
-                                }
-                            }elseif($key===2){
-                                
-                                if($login[0] !=null){
-                                    $exact_in[$key]=1;
-                                    $exact_out[$key]=0;
-                                    $array_masuk[$key]='Lanjutan';
-                                }else{
-                                    $exact_in[$key]=0;
-                                    $exact_out[$key]=0;
-                                }
-                               
-                                
-                            }elseif($timeDifference <= 2 && $key < 2 && count($query_data) !=3){
-                                
-                                if($login[0]!=null){//utk melihat shift ke 2 dalam shift yang totalnya ada 2
-                                    
-                                    $exact_in[$key]=1;
-                                    
-                                    $array_masuk[$key]='Lanjutan';
-                                    if($key>0){
-                                        $array_keluar[$key-1]='Lanjutan';
-                                        $exact_out[$key-1]=1;
-                                    }
-                                    
-                                }else{
-                                    $exact_in[$key]=0;
-                                    $exact_out[$key]=0; 
-                                }
-                                
-                            }elseif($timeDifference <= 2 && $key <= 2 && count($query_data) ==3){
-                                
-                                if($login[0]!=null){
-                           
-                                    $exact_in[$key]=1;
-                                    $exact_out[$key]=1;
-                                    $array_masuk[$key]='Lanjutan';
-                                    $array_keluar[$key]='Lanjutan';
-                                }else{
-                                   
-                                    $exact_in[$key]=0;
-                                    $exact_out[$key]=0; 
-                                }
-                            }
-                            
-                            //pengurangan apabila lebih besar dari 1 maka shift tidak bersamaan
+                        }else{
+                            $real_time_out =$date->format('Y-m-d') . ' ' . $time_out;
                         }
                         
-                        $query_attendance = Attendances::where(function ($query) use ($date,$cleanedNik) {
-                            $mulaiDate = Carbon::parse($date)->subDays(1)->startOfDay()->toDateTimeString();
-                            $akhirDate = Carbon::parse($date)->addDays(1)->endOfDay()->toDateTimeString();
-                           
-                            $query->where('date', '>=', $mulaiDate)
-                                ->where('date', '<=', $akhirDate)
-                                ->where('employee_no',$cleanedNik);
-                        })->orderBy('date')->get();
-
-                        foreach($query_attendance as $row_attendance_filter){
-                            $dateAttd = Carbon::parse($row_attendance_filter->date);
-                           
-                            $timePart = $dateAttd->format('H:i:s');
+                        $combinedDateTimeOutCarbon = Carbon::parse($real_time_out);
+                        
+                        $real_max_time_out = $combinedDateTimeOutCarbon->copy()->addHours($row_schedule_filter->shift->tolerant);
+                        if($time_in>$time_out){
                             
-                                if(!$masuk_awal  && $date->toDateString() == $dateAttd->toDateString()){
+                            $real_max_time_out->addDay();
+                        }
+                       
+                        if($row_schedule_filter->status == 4){
+                            $counter_effective_day++;
+                            $exact_in[$key]=3;
+                            $exact_out[$key]=3;
+                            $different_masuk[$key]='';
+                            $different_keluar[$key]='';
+                            $login[$key]=null;
+                            $logout=null;
+                                
+                            $array_masuk[$key]='Cuti Melahirkan';
+                            $array_keluar[$key]='Cuti Melahirkan';
+                        }else{
+                            $exact_in[$key]=0;
+                            $exact_out[$key]=0;
+                            $counter_effective_day++;
+                            $login[$key]=null;
+                            $logout=null;
+                        
+                            
+
+                            $different_masuk[$key]='';
+                            $different_keluar[$key]='';
+                            
+
+                            $array_masuk[$key]='';
+                            $array_keluar[$key]='';
+                            if($key != 0){// mengetahui apabila shift merupakan yang pertama atau bukan melalui iterasi
+                                $currentSchedule = $query_data[$key];
+                                $previousSchedule = $query_data[$key - 1];
+                                
+                                $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
+                                $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
+                                
+                                $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
+                            
+                                if($timeDifference>2 && $key <= 2){
                                     
-                                    $masuk_awal=$timePart;
-                                    $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
-                                    $minutes = floor($diffInSeconds / 60);
-                                    $seconds = $diffInSeconds % 60;
+                                    $exact_in[$key]=0;
+                                    $exact_out[$key]=0;
+                                    if(count(($query_data))==3){
+                                        $exact_out[$key-1]=1;
+                                    }
+                                }elseif($key===2){
                                     
+                                    if($login[0] !=null){
+                                        
+                                        $exact_in[$key]=1;
+                                        $exact_out[$key]=0;
+                                        $array_masuk[$key]='Lanjutan';
+                                    }else{
+                                        $exact_in[$key]=0;
+                                        $exact_out[$key]=0;
+                                    }
+                                
                                     
-                                    $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
+                                }elseif($timeDifference <= 2 && $key < 2 && count($query_data) !=3){
                                     
+                                    if($login[0]!=null){//utk melihat shift ke 2 dalam shift yang totalnya ada 2
+                                        
+                                        $exact_in[$key]=1;
+                                        
+                                        $array_masuk[$key]='Lanjutan';
+                                        if($key>0){
+                                            $array_keluar[$key-1]='Lanjutan';
+                                            $exact_out[$key-1]=1;
+                                        }
+                                        
+                                    }else{
+                                        $exact_in[$key]=1;
+                                        $exact_out[$key]=0; 
+                                    }
+                                    
+                                }elseif($timeDifference <= 2 && $key <= 2 && count($query_data) ==3){
+                                    
+                                    if($login[0]!=null){
+                            
+                                        $exact_in[$key]=1;
+                                        $exact_out[$key]=1;
+                                        $array_masuk[$key]='Lanjutan';
+                                        $array_keluar[$key]='Lanjutan';
+                                    }else{
+                                    
+                                        $exact_in[$key]=0;
+                                        $exact_out[$key]=0; 
+                                    }
                                 }
-                                if(!$muleh  && $date->toDateString() == $dateAttd->toDateString()){
-                                    if ($timePart >= $time_out && $timePart > $masuk_awal) 
-                                    {
-                                        $muleh=$timePart;
-                                        $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($max_time_out);
+                                
+                                //pengurangan apabila lebih besar dari 1 maka shift tidak bersamaan
+                            }
+                            
+                            $query_attendance = Attendances::where(function ($query) use ($date,$cleanedNik) {
+                                $mulaiDate = Carbon::parse($date)->subDays(1)->startOfDay()->toDateTimeString();
+                                $akhirDate = Carbon::parse($date)->addDays(1)->endOfDay()->toDateTimeString();
+                            
+                                $query->where('date', '>=', $mulaiDate)
+                                    ->where('date', '<=', $akhirDate)
+                                    ->where('employee_no',$cleanedNik);
+                            })->orderBy('date')->get();
+                            
+                            //
+                            foreach($query_attendance as $row_attendance_filter){
+                                $dateAttd = Carbon::parse($row_attendance_filter->date);
+                                
+                                $timePart = $dateAttd->format('H:i:s');
+                               
+                                    if(!$masuk_awal  && $date->toDateString() == $dateAttd->toDateString()){
+                                        
+                                        
+                                        $masuk_awal=$timePart;
+                                        $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
                                         $minutes = floor($diffInSeconds / 60);
                                         $seconds = $diffInSeconds % 60;
                                         
-                                        $different_keluar[$key]=$minutes." menit  ".$seconds." detik";
-                                    }
-                                }
-                            if ($dateAttd >= $real_min_time_in && $dateAttd <= $real_time_in) {
-                                $exact_in[$key]= 1 ;
-                                
-                                if(!$login[$key]){
-                                    
-                                    if($masuk_awal==null){
-                                        $masuk_awal=$timePart;
-                                    }elseif($masuk_awal > $timePart){
-                                        $masuk_awal=$timePart;
-                                    }
-                                    $login[$key] = $timePart;
-                                    $array_masuk[$key]=$timePart;
-                                    $different_masuk[$key]='';
-                                    
-                                }
-                                
-                            }elseif($dateAttd > $real_time_in && $dateAttd < $real_time_out){
-                                $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($min_time_in);
-                                
-                                
-                                if($diffHoursTimePartMinIn<=3 && $exact_in[$key] != 1){
-                                    $exact_in[$key]= 2 ;
-                                    
-                                    
-                                    if (count($query_data) == 3 && $key > 0 ) {
-                                        $exact_in[$key]= 1 ;
+                                        
+                                        $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
                                         
                                     }
-                                    $array_masuk[$key]=$timePart;
-                                }                                      
-                            }elseif($dateAttd > $real_max_time_out){
-                                $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($max_time_out);
+                                    if(!$muleh  && $date->toDateString() == $dateAttd->toDateString()){
+                                        if ($timePart >= $time_out && $timePart > $masuk_awal) 
+                                        {
+                                            $muleh=$timePart;
+                                            $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($max_time_out);
+                                            $minutes = floor($diffInSeconds / 60);
+                                            $seconds = $diffInSeconds % 60;
+                                            
+                                            $different_keluar[$key]=$minutes." menit  ".$seconds." detik";
+                                        }
+                                    }
+                                if ($dateAttd >= $real_min_time_in && $dateAttd <= $real_time_in) {
+                                    $exact_in[$key]= 1 ;
+                                    
+                                    if(!$login[$key]){
+                                        
+                                        if($masuk_awal==null){
+                                            $masuk_awal=$timePart;
+                                        }elseif($masuk_awal > $timePart){
+                                            $masuk_awal=$timePart;
+                                        }
+                                        $login[$key] = $timePart;
+                                        $array_masuk[$key]=$timePart;
+                                        $different_masuk[$key]='';
+                                        
+                                    }
+                                    
+                                }if($dateAttd > $real_time_in && $dateAttd < $real_time_out){
+                                    $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($time_in);
+                                    
+                                    
+                                    //mengetahui apabila jam yang ada melebihi toleransi pada shift.
+                                    if($diffHoursTimePartMinIn<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1){
+                                        $exact_in[$key]= 2 ;
+                                        
+                                        $login[$key]= $timePart;
+                                        if (count($query_data) == 3 && $key > 0 ) {
+                                            $exact_in[$key]= 1 ;
+                                            $login[$key]= $timePart;
+                                        }
+                                        $array_masuk[$key]=$timePart;
+                                    }                                      
+                                }elseif($dateAttd > $real_max_time_out){
+                                    $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($max_time_out);
+                                    
+                                    if($diffHoursTimePartMaxOut<=$row_schedule_filter->shift->tolerant){
+                                        $array_keluar[$key]=$timePart;
+                                    }
+                                }
+                                //perhitungan pulang
                                 
-                                if($diffHoursTimePartMaxOut<=3){
-                                    $array_keluar[$key]=$timePart;
+                                if ($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out) {
+                                    
+                                    $exact_out [$key]= 1 ;
+                                    if($muleh==null){
+                                        $muleh=$timePart;
+                                    }elseif($muleh < $timePart){
+                                        $muleh=$timePart;
+                                    }
+                                    if(!$logout){
+                                        
+                                        $logout = $timePart;
+                                        $array_keluar[$key]=$timePart;
+                                        $different_keluar[$key]='';
+                                        
+                                    }  
                                 }
                             }
-                            //perhitungan pulang
-                            if ($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out) {
-                                $exact_out [$key]= 1 ;
-                                if($muleh==null){
-                                    $muleh=$timePart;
-                                }elseif($muleh < $timePart){
-                                    $muleh=$timePart;
-                                }
-                                if(!$logout){
-                                    
-                                    $logout = $timePart;
-                                    $array_keluar[$key]=$timePart;
-                                    $different_keluar[$key]='';
-                                    
-                                }  
-                            }
-                        }
 
-                        if(!$exact_in){
-                            $exact_in[$key]=0;
-                        }
-                        if($key==0){// melakukan pengecekan saat pertama kali looping schedule untuk memberikan keterangan masuk / tidaknya atau berupa lanjutan atau tidak
-                            
-                           
-                            if (count($query_data) === 3) {
-                                if($login[$key]==null){
-                                    $exact_in[$key]=0;
-                                    $exact_out[$key]= 0 ;
-                                }
-                                
-                                if($login[$key]!=null){
-                                    
-                                    $exact_out[$key]= 1 ;
-                                }
-                            }else{
-                                if($login[$key] == null && $masuk_awal == null){
-                                    
-                                    $exact_in[$key]= 0 ;
-                                    $exact_out[$key]= 0 ;
-                                    if($logout!=null){
-                                        $exact_out[$key]=1;
+                            if(!$exact_in){
+                                $exact_in[$key]=0;
+                            }
+
+                            if(count($exact_in) == 3){
+                                if($exact_in[0] == 0 && $exact_out[2] == 0){
+                                    foreach($exact_in as $key=>$row){
+                                        $exact_in[$key]=0;
+                                        $exact_out[$key]= 0;
                                     }
                                 }
                                 
-                                if($logout != null ){
-                                    $exact_out[$key]=1;
+                            }
+                            if($key==0){// melakukan pengecekan saat pertama kali looping schedule untuk memberikan keterangan masuk / tidaknya atau berupa lanjutan atau tidak
+                                
+                            
+                                if (count($query_data) === 3) {
+                                    if($login[$key]==null){
+                                        $exact_in[$key]=0;
+                                        $exact_out[$key]= 0 ;
+                                    }
+                                    
+                                    if($login[$key]!=null){
+                                        
+                                        $exact_out[$key]= 1 ;
+                                    }
                                 }else{
-                                    $exact_out[$key]= 0 ;
+                                    if($login[$key] == null && $masuk_awal == null){
+                                        
+                                        $exact_in[$key]= 0 ;
+                                        $exact_out[$key]= 0 ;
+                                        if($logout!=null){
+                                            $exact_out[$key]=1;
+                                        }
+                                    }
+                                    
+                                    if($logout != null ){
+                                        $exact_out[$key]=1;
+                                    }else{
+                                        $exact_out[$key]= 0 ;
+                                    }
+                                    
                                 }
                                 
                             }
-                            
-                        }
-                        if($key == 1 &&  count($query_data) == 2){//mengecek saat schedule yang di tengah dan jumlahnya dua dan mengecek kalau dia itu tidak check saat masuk dan check saat pulang
-                            if($exact_out[$key]==1){
-                                $exact_out[$key-1]=1;
-                               
+                            if($key == 1 &&  count($query_data) == 2){//mengecek saat schedule yang di tengah dan jumlahnya dua dan mengecek kalau dia itu tidak check saat masuk dan check saat pulang
+                                if($exact_out[$key]==1){
+                                    $exact_out[$key-1]=1;
+                                
+                                }
+                            }if($key==2 && $exact_in[0]==null && $exact_out[$key]==1){
+                                $exact_out[0]=1;
+                                $exact_in[1]=1;
+                                $exact_out[1]=1;
+                                $array_keluar[0]="Lanjutan";
+                                $array_masuk[1]="Lanjutan";
+                                $array_keluar[1]="Lanjutan";
+                            }if($key==2 && $exact_in[0]!=null){
+                                $exact_in[2]=1;
+                                $array_masuk[2]="Lanjutan";
+                                $array_keluar[1]="Lanjutan";
+                                $array_keluar[0]="Lanjutan";
                             }
-                        }if($key==2 && $exact_in[0]==null && $exact_out[$key]==1){
-                            $exact_out[0]=1;
-                            $exact_in[1]=0;
-                            $exact_out[1]=1;
-                            $array_keluar[0]="Lanjutan";
-                            $array_masuk[1]="Lanjutan";
-                            $array_keluar[1]="Lanjutan";
-                        }if($key==2 && $exact_in[0]!=null){
-                            $exact_in[2]=1;
-                            $array_masuk[2]="Lanjutan";
-                            $array_keluar[1]="Lanjutan";
-                            $array_keluar[0]="Lanjutan";
+                        
                         }
                         
                         $time_ins[]=$time_in;
@@ -466,17 +543,31 @@ class AttendancePeriodController extends Controller
                         $nama_shifts[]=$row_schedule_filter->shift->name;
                         $shift_id[]=$row_schedule_filter->shift->id;
                        
-                        if($masuk_awal){
+                        if($masuk_awal){//perhitungan toleransi okeeeeey?
                             $pembandingdate = Carbon::parse($masuk_awal);
+                            if(count($query_data)==2 && $key == 1){
+                                $currentSchedule = $query_data[1];
+                                $previousSchedule = $query_data[0];
+                                
+                                $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
+                                $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
+                                
+                                $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
+                                if($timeDifference >= 2){
+                                    $pembandingdate = Carbon::parse($login[1]);
+                                }
+                            }
+                            
                             $pembanding= $pembandingdate->format('H:i:s');
                             $carbonTimeIn = Carbon::parse($time_in);
                             
                             if($pembanding > $time_in ){
-                                if($query_late_punishment){
-                                    
-                                    
-                                    
+                                info("kambingasdf atass");
+                                info($pembanding);
+                                if(count($query_late_punishment)> 0){
+                                   
                                     if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
+                                 
                                         $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
                                         $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');  
                                     }else{
@@ -485,8 +576,9 @@ class AttendancePeriodController extends Controller
                                             if($key !=0 ){
                                                 
                                                 if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
-                                                    $tipe_punish_counter[$query_late_punishment[$key-1]->code]['counter']++;
-                                                    $tipe_punish_counter[$query_late_punishment[$key-1]->code]['date'][]=$date->format('d/M/y');
+                                                   
+                                                    $tipe_punish_counter[$query_late_punishment[$key]->code]['counter']++;
+                                                    $tipe_punish_counter[$query_late_punishment[$key]->code]['date'][]=$date->format('d/M/y');
                                                     break;
                                                 }
                                             }
@@ -511,13 +603,7 @@ class AttendancePeriodController extends Controller
 
                     }
                     
-                    foreach($exact_in as $key=>$row_exact){
-                     
-                        $all_exact_in[]=$row_exact;
-                        $all_exact_out[]=$exact_out[$key];
-                    }
-                    
-                    $attendance_detail[$row_user->name][]=[
+                    $attendance_detail[$row_user->id][]=[
                         'date' => Carbon::parse($date)->format('d/m/Y'),
                         'user_no'=>$row_user->id,
                         'user' =>$row_user->name,
@@ -538,22 +624,39 @@ class AttendancePeriodController extends Controller
                         'nama_shift'=>$nama_shifts,
                         'shift_id'=>$shift_id,
                     ];
-
+                    //perhitungan cuti atau ijin
                     
-
+                    foreach($exact_in as $key=>$row_exact){
+                        
+                        $all_exact_in[]=$row_exact;
+                        $all_exact_out[]=$exact_out[$key];
+                    }
+                    
                     $lanjoet=1;
-                    //mencari apakah dia datang tidak checkclock atau pulang tidak checkclock
+                    
                     foreach($exact_in as $key=>$row_arrive){
+                       
+
                         if($row_arrive == 0 && $exact_out[$key] == 1){
+                            if($row_user->id == '21'){
+                                info('pon atas'.$row_arrive.' DAN '. $exact_out[$key]);
+                                info($key.' ini index gan');
+                            }    
                             $date_arrived_forget[]=Carbon::parse($date)->format('d/m/Y');
-                            $lanjoet=0;
-                            break;
+                            
                         }
                     }
+                    
+                   
                     if($lanjoet==1){
-                        
-                        foreach($exact_out as $row_out){
-                            if($row_out==0 && $exact_in[$key] == 1){
+                          
+                        foreach($exact_out as $key3=>$row_out){
+                            if($row_user->id == '21'){
+                                info('pon bawah'.$row_out.' DAN '. $exact_in[$key3]);
+                                info($key3.' ini index gan');
+                            }  
+                            if($row_out==0 && $exact_in[$key3] == 1){
+                                
                                 $date_out_forget[]=Carbon::parse($date)->format('d/m/Y');
                                 break;
                             }
@@ -561,24 +664,457 @@ class AttendancePeriodController extends Controller
                     }
                     
                     
+                    
                     $date->addDay();
                     
                 }
-                if($cleanedNik == '123017'){
-                    info($attendance_detail);
+                $counter_ps= 0;
+                
+                while($date_leave_req->lte($end_date)){
+                    $exact_in=[];
+                    $exact_out=[];
+                    $parse_date = Carbon::parse($date_leave_req->format('Y-m-d'))->toDateString();
+                   
+                    $query_data_leaveRequest = LeaveRequest::whereRaw("'$parse_date' BETWEEN start_date AND end_date ")
+                                    ->where('account_id',$row_user->id)
+                                    ->whereHas('leaveRequestShift', function($query) use($parse_date){
+                                        $query->whereHas('employeeSchedule', function($query) use($parse_date){
+                                            // $query->where('date',$parse_date);
+                                        });
+                                    })
+                                    ->get();
+                   
+                    foreach($query_data_leaveRequest as $key=>$row_leave_request){
+                        foreach($row_leave_request->leaveRequestShift as $key2=>$schedule_leave_request){
+                           
+                            if($schedule_leave_request->employeeSchedule->date == $parse_date){
+                                
+                                if($row_leave_request->leaveType->furlough_type == 1){
+                                   
+                                    $counter_cuti++;
+                                    $counter_effective_day++;
+    
+                                    $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
+                                    $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
+                                    $max_time_out = Carbon::parse($time_out)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $exact_in[]='4';
+                                    $exact_out[]= '4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['in'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['out'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_in'][]=$time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_out'][]=$time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['min_time_in'][]=$min_time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['max_time_out'][]=$max_time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['nama_shift'][]=$schedule_leave_request->employeeSchedule->shift->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['shift_id'][]=$schedule_leave_request->employeeSchedule->shift->id;
+                                    $attendance_detail[$row_user->id][$counter_ps]['login']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['logout']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$row_leave_request->leaveType->name;
+                                    
+                                }
+                                if($row_leave_request->leaveType->furlough_type == 2){
+                                    $counter_sakit++;
+                                    $counter_effective_day++;
+                                    
+                                    $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
+                                    $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
+                                    $max_time_out = Carbon::parse($time_out)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $exact_in[]='4';
+                                    $exact_out[]= '4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['in'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['out'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_in'][]=$time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_out'][]=$time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['min_time_in'][]=$min_time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['max_time_out'][]=$max_time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['nama_shift'][]=$schedule_leave_request->employeeSchedule->shift->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['shift_id'][]=$schedule_leave_request->employeeSchedule->shift->id;
+                                    $attendance_detail[$row_user->id][$counter_ps]['login']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['logout']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$row_leave_request->leaveType->name;
+                                }
+                                if($row_leave_request->leaveType->furlough_type == 3){
+                                    $counter_cuti_kusus++;
+                                    $counter_effective_day++;
+                                    
+                                    $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
+                                    $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
+                                    $max_time_out = Carbon::parse($time_out)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $exact_in[]='4';
+                                    $exact_out[]= '4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['in'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['out'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_in'][]=$time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_out'][]=$time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['min_time_in'][]=$min_time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['max_time_out'][]=$max_time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['nama_shift'][]=$schedule_leave_request->employeeSchedule->shift->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['shift_id'][]=$schedule_leave_request->employeeSchedule->shift->id;
+                                    $attendance_detail[$row_user->id][$counter_ps]['login']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['logout']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$row_leave_request->leaveType->name;
+                                }
+                                if($row_leave_request->leaveType->furlough_type == 4){
+                                    $counter_dinas_luar++;
+                                    $counter_effective_day++;
+                                }//no 4 dan 5 dinas dan wfh perlu dibuat sign in
+                                if($row_leave_request->leaveType->furlough_type == 5){
+                                    $counter_wfh++;
+                                    $counter_effective_day++;
+                                }
+                                if($row_leave_request->leaveType->furlough_type == 6){
+                                    $counter_dispen++;
+                                    $counter_effective_day++;
+                                  
+                                    $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
+                                    $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
+                                    $max_time_out = Carbon::parse($time_out)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $exact_in[]='4';
+                                    $exact_out[]= '4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['in'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['out'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_in'][]=$time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_out'][]=$time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['min_time_in'][]=$min_time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['max_time_out'][]=$max_time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['nama_shift'][]=$schedule_leave_request->employeeSchedule->shift->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['shift_id'][]=$schedule_leave_request->employeeSchedule->shift->id;
+                                    $attendance_detail[$row_user->id][$counter_ps]['login']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['logout']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$row_leave_request->leaveType->name;
+                                }
+                                if($row_leave_request->leaveType->furlough_type == 8){
+                                    $counter_ijin++;
+                                    $counter_effective_day++;
+                                    $exact_in[]='4';
+                                    $exact_out[]= '4';
+                                    $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
+                                    $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
+                                    $max_time_out = Carbon::parse($time_out)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+    
+                                    $attendance_detail[$row_user->id][$counter_ps]['in'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['out'][]='4';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_in'][]=$time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_out'][]=$time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['min_time_in'][]=$min_time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['max_time_out'][]=$max_time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['nama_shift'][]=$schedule_leave_request->employeeSchedule->shift->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['shift_id'][]=$schedule_leave_request->employeeSchedule->shift->id;
+                                    $attendance_detail[$row_user->id][$counter_ps]['login']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['logout']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$row_leave_request->leaveType->name;
+                                }
+                                if($row_leave_request->leaveType->furlough_type == 9){
+                                    $counter_effective_day++;
+                                    $time_in = $schedule_leave_request->employeeSchedule->shift->time_in;
+                                    $time_out = $schedule_leave_request->employeeSchedule->shift->time_out;
+                                    $startTime = Carbon::createFromFormat('H:i', $row_leave_request->start_time);
+                                
+                                    $temp_is_late = $startTime->format('H:i:s');
+                                   
+                                    $diffWithTimeIn = $startTime->diffInHours($time_in);
+                                    
+                                    $diffWithTimeOut = $startTime->diffInHours($time_out);
+                                    if($diffWithTimeIn>$diffWithTimeOut){
+                                        $time_out=$temp_is_late;
+                                        $counter_leave_early++;
+                                    }else{
+                                        $time_in = $temp_is_late;
+                                        $counter_late++;
+                                    }
+
+                                    $min_time_in = Carbon::parse($time_in)->subHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $real_time_in =$date_leave_req->format('Y-m-d') . ' ' . $time_in;
+                                    $combinedDateTimeInCarbon = Carbon::parse($real_time_in);
+                                    $real_min_time_in = $combinedDateTimeInCarbon->copy()->subHours($schedule_leave_request->employeeSchedule->shift->tolerant);
+                                    
+                                  
+                                    $max_time_out = Carbon::parse($time_out)->addHours($schedule_leave_request->employeeSchedule->shift->tolerant)->toTimeString();
+                                    $real_time_out =$date_leave_req->format('Y-m-d') . ' ' . $time_out;
+                                    $combinedDateTimeOutCarbon = Carbon::parse($real_time_out);
+                                    $real_max_time_out = $combinedDateTimeOutCarbon->copy()->addHours($schedule_leave_request->employeeSchedule->shift->tolerant);
+                                    //perhitungan baru utk jam masuk yng berubah
+                                   
+
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]='';
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_in'][]=$time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['time_out'][]=$time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['min_time_in'][]=$min_time_in;
+                                    $attendance_detail[$row_user->id][$counter_ps]['max_time_out'][]=$max_time_out;
+                                    $attendance_detail[$row_user->id][$counter_ps]['nama_shift'][]=$schedule_leave_request->employeeSchedule->shift->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['shift_id'][]=$schedule_leave_request->employeeSchedule->shift->id;
+                                    $attendance_detail[$row_user->id][$counter_ps]['login']=$row_leave_request->leaveType->name;
+                                    $attendance_detail[$row_user->id][$counter_ps]['logout']=$row_leave_request->leaveType->name;
+                                    
+
+
+                                    $query_attendance = Attendances::where(function ($query) use ($date_leave_req,$cleanedNik) {
+                                        $mulaiDate = Carbon::parse($date_leave_req)->subDays(1)->startOfDay()->toDateTimeString();
+                                        $akhirDate = Carbon::parse($date_leave_req)->addDays(1)->endOfDay()->toDateTimeString();
+                                        
+                                        $query->where('date', '>=', $mulaiDate)
+                                            ->where('date', '<=', $akhirDate)
+                                            ->where('employee_no',$cleanedNik);
+                                    })->orderBy('date')->get();
+                                   
+                                    $masuk_awal = null;
+                                    $muleh = null;
+                                    $perlu_nambah = true;
+                                    $ada_pulang = false;
+                                    
+                                    foreach($query_attendance as $row_attendance_filter){
+                                        $dateAttd = Carbon::parse($row_attendance_filter->date);
+                                     
+                                        $timePart = $dateAttd->format('H:i:s');
+                                 
+                                        if ($dateAttd >= $real_min_time_in && $dateAttd <= $real_time_in) {
+                                            $exact_in[]='1';
+                                            
+                                            $attendance_detail[$row_user->id][$counter_ps]['in'][]='1';
+                                         
+                                            if($masuk_awal==null){
+                                                $masuk_awal =$timePart;
+                                                $attendance_detail[$row_user->id][$counter_ps]['login']=$timePart;
+                                            }elseif($masuk_awal > $timePart){
+                                                $attendance_detail[$row_user->id][$counter_ps]['login']=$timePart;
+                                                $masuk_awal =$timePart;
+                                            }
+                                           
+                                            $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$min_time_in.' | '.$timePart .' | '.$time_in;
+                                            $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_masuk'][]='';
+                                            
+                                            
+                                        }elseif($dateAttd > $real_time_in && $dateAttd < $real_time_out){
+                                            $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($time_in);
+                                            if($masuk_awal==null){
+                                                $masuk_awal=$timePart;
+                                            }
+                                            $perlu_nambah = false;
+                                            if($diffHoursTimePartMinIn<=$schedule_leave_request->employeeSchedule->shift->tolerant){
+                                                $exact_in[]='2';
+                                                
+                                                $attendance_detail[$row_user->id][$counter_ps]['in'][]='2';
+                                                $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]=$min_time_in.' | '.$timePart .' | '.$time_in;
+                                            }elseif($perlu_nambah != false && $diffHoursTimePartMinIn>=$schedule_leave_request->employeeSchedule->shift->tolerant){
+                                                $exact_in[]='0';
+                                                $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]='';
+                                                $attendance_detail[$row_user->id][$counter_ps]['in'][]='0';
+                                            }                                      
+                                        }elseif($dateAttd > $real_max_time_out){
+                                            $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($max_time_out);
+
+                                            if($diffHoursTimePartMaxOut<=$schedule_leave_request->employeeSchedule->shift->tolerant){
+                                                $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$time_out.' | '.$timePart .' | '.$max_time_out;
+                                                $ada_pulang=true;
+                                            }
+                                        }
+
+
+                                        //perhitungan pulang
+                                        if ($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out) {
+                                            $attendance_detail[$row_user->id][$counter_ps]['out'][]=1;
+                                            $exact_out[]='1';
+                                         
+                                            $ada_pulang=true;
+                                            if($muleh==null){
+                                                $muleh=$timePart;
+                                                $attendance_detail[$row_user->id][$counter_ps]['logout']=$timePart;
+                                                $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]=$time_out.' | '.$timePart .' | '.$max_time_out;
+                                                $attendance_detail[$row_user->id][$counter_ps]['perbedaan_jam_keluar'][]=''; 
+                                            }elseif($muleh < $timePart){
+                                                $muleh=$timePart;
+                                                $attendance_detail[$row_user->id][$counter_ps]['logout']=$timePart;
+                                            }
+                                             
+                                        }
+                                    }
+                                    if($masuk_awal){//perhitungan toleransi untuk ijin telat?
+                                        $pembandingdate = Carbon::parse($masuk_awal);
+                                        info($masuk_awal. ' lostd');
+                                        $pembanding= $pembandingdate->format('H:i:s');
+                                        $carbonTimeIn = Carbon::parse($time_in);
+                                        
+                                        if($pembanding > $time_in ){
+                                            info("kambingasdf yang bawa");
+                                            info($pembanding);
+                                            if(count($query_late_punishment)> 0){
+                                               
+                                                if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
+                                                    $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
+                                                    $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');  
+                                                }else{
+                                                    foreach($query_late_punishment as $key=>$row_punish_type){
+                                                        $newCarbonTime = Carbon::parse($time_in)->addMinutes($row_punish_type->minutes)->format('H:i:s');
+                                                        if($key !=0 ){
+                                                            
+                                                            if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
+                                                                $tipe_punish_counter[$query_late_punishment[$key-1]->code]['counter']++;
+                                                                $tipe_punish_counter[$query_late_punishment[$key-1]->code]['date'][]=$date->format('d/M/y');
+                                                                break;
+                                                            }
+                                                        }
+                                                        if($key == count($query_late_punishment)-1){
+                                                            if($pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
+                                                                $tipe_punish_counter[$row_punish_type->code]['counter']++;
+                                                                $tipe_punish_counter[$row_punish_type->code]['date'][]=$date->format('d/M/y');
+                                                            }else{
+                                                                $tipe_punish_counter['over_t']['counter']++;
+                                                                $tipe_punish_counter['over_t']['date'][]=$date->format('d/M/y');
+                                                            }
+                                                        }
+                                                        
+                                                    }
+                                                }
+                                                
+                                            }
+                                            
+                                        }
+                                        
+                                    }else{//hanya utk telat di ijin
+                                        if($perlu_nambah == true){
+                                            $exact_in[]=0;
+                                            $attendance_detail[$row_user->id][$counter_ps]['in'][]='0';
+                                            $attendance_detail[$row_user->id][$counter_ps]['jam_masuk'][]='';
+                                    
+                                        }
+                                    }
+                                    if($ada_pulang == false){
+                                        $exact_out[]='0';
+                                        $attendance_detail[$row_user->id][$counter_ps]['out'][]='0';
+                                        $attendance_detail[$row_user->id][$counter_ps]['jam_keluar'][]='';
+                                    }
+                               
+                                   
+                                }
+                            }  
+                        }
+                    }
+                    $lanjoet=1;
+                    
+                    foreach($exact_in as $key=>$row_exact){
+                      
+                        $all_exact_in[]=$row_exact;
+                        $all_exact_out[]=$exact_out[$key];
+                    }
+                    foreach($exact_in as $key=>$row_arrive){
+                        if($row_arrive == 0 && $exact_out[$key] == 1){
+                            $date_arrived_forget[]=Carbon::parse($date_leave_req)->format('d/m/Y');
+                            
+                        }
+                    }
+                    if($lanjoet==1){
+                        
+                        foreach($exact_out as $row_out){
+                            if($row_out==0 && $exact_in[$key] == 1){
+                                $date_out_forget[]=Carbon::parse($date_leave_req)->format('d/m/Y');
+                                break;
+                            }
+                        }
+                    }
+                    $counter_ps++;
+                    $date_leave_req->addDay();
                 }
+                $count_day_for_special = 0;
+                $count_for_allexact = 0;
+
+                // while($date_special->lte($end_date)){
+                //     $query_special = UserSpecial::where('user_id',$row_user->id)
+                //                 ->where('start_date','<=', $date_special)
+                //                 ->where('end_date','>=',$date_special)
+                //                 ->first();
+                //     if($query_special){
+                //         if(count($attendance_detail[$row_user->id][$count_day_for_special]['in'])>0){
+                            
+                //             if($query_special->type == 1){
+                //                 foreach($attendance_detail[$row_user->id][$count_day_for_special]['in'] as $key_att=>$row_in){
+                //                     $attendance_detail[$row_user->id][$count_day_for_special]['in'][$key_att]=1;
+                //                     $attendance_detail[$row_user->id][$count_day_for_special]['out'][$key_att]=1;
+                                  
+                //                     $all_exact_in[$count_for_allexact] = 1;
+                //                     $all_exact_out[$count_for_allexact] = 1;
+                //                     $count_for_allexact++;
+                //                     //menghilangkan array date yang terhubung
+                //                     $index_arrive = array_search(Carbon::parse($date_special)->format('d/m/Y'),$date_arrived_forget);
+                //                     if ($index_arrive !== false) {
+                //                         array_splice($date_arrived_forget, $index_arrive, 1);
+                //                     }
+                //                     $index_out = array_search(Carbon::parse($date_special)->format('d/m/Y'),$date_out_forget);
+                //                     if ($index_out !== false) {
+                //                         array_splice($date_out_forget, $index_out, 1);
+                //                     }
+                                  
+                //                 }
+                //             }
+                //             if($query_special->type == 2){
+                //                 if( $attendance_detail[$row_user->id][$count_day_for_special]['in'][0] == '1' ||  $attendance_detail[$row_user->id][$count_day_for_special]['out'][count( $attendance_detail[$row_user->id][$count_day_for_special]['out'])-1]==1 ||  $attendance_detail[$row_user->id][$count_day_for_special]['login'] != '' ||  $attendance_detail[$row_user->id][$count_day_for_special]['logout'] != ''){
+                //                     foreach($attendance_detail[$row_user->id][$count_day_for_special]['in'] as $key_att=>$row_in){
+                //                         $attendance_detail[$row_user->id][$count_day_for_special]['in'][$key_att]=1;
+                //                         $attendance_detail[$row_user->id][$count_day_for_special]['out'][$key_att]=1;
+                //                         $all_exact_in[$count_for_allexact] = 1;
+                //                         $all_exact_out[$count_for_allexact] = 1;
+                //                         $count_for_allexact++;
+
+                //                          //menghilangkan array date yang terhubung
+                //                         $index_arrive = array_search($date_special,$date_arrived_forget);
+                //                         if ($index_arrive !== false) {
+                //                             array_splice($date_arrived_forget, $index_arrive, 1);
+                //                         }
+                //                         $index_out = array_search($date_special,$date_out_forget);
+                //                         if ($index_out !== false) {
+                //                             array_splice($date_out_forget, $index_out, 1);
+                //                         }
+                //                     }
+                //                 }
+                //             }
+                //         }   
+                //     }
+                //     $count_day_for_special++;
+                //     $date_special->addDay();
+                // }
+                
+                
+
+                
+                //mencari apakah dia datang tidak checkclock atau pulang tidak checkclock salah tol
+                
+                
                 //melakukan perhitungan datang pulang
+                
                 foreach($all_exact_in as $key=>$row_exact){
-                    
-                    
+             
                     if($row_exact==1){
+
                         $counter_arrived_on_time++;
-                    }if($row_exact != 1 && $all_exact_out[$key] == 1){
+                    }if($row_exact == 0 && $all_exact_out[$key] == 1){
+                        
                         $counter_arrived_forget++;
                     }
                     if($all_exact_out[$key]==1){
                         $counter_out_on_time++;
-                    }if($all_exact_out[$key] != 1 && $row_exact == 1){
+                    }if($all_exact_out[$key] == 0 && $row_exact == 1){
+                       
+                        
                         $counter_out_forget++;
                     }
                     if($row_exact==1 && $all_exact_out[$key] == 1){
@@ -587,31 +1123,28 @@ class AttendancePeriodController extends Controller
                         $counter_alpha++;
                     }
                 }
-                $user_datas[$c]["arrived_on_time"]=$counter_arrived_on_time;
-                $user_datas[$c]["out_on_time"]=$counter_out_on_time;
-                $user_datas[$c]["effective_day"]=$counter_effective_day;
-                $user_datas[$c]["alpha"]=$counter_alpha;
-                $user_datas[$c]["absent"]=$counter_absent;
-                $user_datas[$c]["out_forget"]=$counter_out_forget;
-                $user_datas[$c]["arrived_forget"]=$counter_arrived_forget;
+
                 
                 DB::beginTransaction();
                 $query = AttendanceMonthlyReport::create([
-                    'user_id'                  => $row_user->id,
+                    'user_id'                   => $row_user->id,
                     'period_id'			        => $attendance_period->id,
+                    'late'                      => $counter_late,
+                    'leave_early'               => $counter_leave_early,
+                    // 'permit'                    => $counter_permit,
+                    'special_occasion'          => $counter_cuti_kusus,
                     'effective_day'             => $counter_effective_day,
-                    'absent'           => $counter_absent,
-                    // 'special_occasion'           => $request->plant_id,
-                    // 'sick'           => $request->plant_id,
-                    // 'outstation'           => $request->plant_id,
-                    // 'furlough'           => $request->plant_id,
-                    // 'dispen'           => $request->plant_id,
-                    // 'alpha'           => $request->plant_id,
-                    // 'wfh'           => $request->plant_id,
+                    'absent'                    => $counter_absent,
+                    'furlough'                  => $counter_cuti,
+                    'sick'                      => $counter_sakit,
+                    'outstation'                => $counter_dinas_luar,
+                    'dispen'                    => $counter_dispen,
+                    'alpha'                     => $counter_alpha,
+                    'wfh'                       => $counter_wfh,
                     'arrived_on_time'           => $counter_arrived_on_time,
-                    'out_on_time'           => $counter_out_on_time,
-                    'out_log_forget'           => $counter_out_forget,
-                    'arrived_forget'           => $counter_arrived_forget,
+                    'out_on_time'               => $counter_out_on_time,
+                    'out_log_forget'            => $counter_out_forget,
+                    'arrived_forget'            => $counter_arrived_forget,
                 ]);
                 
                 try {
@@ -623,36 +1156,45 @@ class AttendancePeriodController extends Controller
                     DB::rollback();
                 }
                 $counter_user_monthly[$row_user->employee_no]=$tipe_punish_counter;
+                
                //memasukkan data saat user memiliki kelupaan cecklclok masuk
                 if(count($date_arrived_forget) != 0){
-              
-                    $query_presence_report = AttendancePunishment::create([
-                        'user_id'                  => $row_user->id,
-                        'period_id'                => $request->id,
-                        'employee_id'              => session('bo_id'),
-                        'punishment_id'            => $query_tidak_check_masuk->id,
-                        'frequent'                 => $counter_arrived_forget,
-                        'total'                    => $counter_arrived_forget*$query_tidak_check_masuk->price,
-                        'dates'                    => implode(',',$date_arrived_forget)
-                    ]);
+                    
+                    if($query_tidak_check_masuk){
+                        
+                        $query_presence_report = AttendancePunishment::create([
+                            'user_id'                  => session('bo_id'),
+                            'period_id'                => $request->id,
+                            'employee_id'              => $row_user->id,
+                            'punishment_id'            => $query_tidak_check_masuk->id,
+                            'frequent'                 => $counter_arrived_forget,
+                            'total'                    => $counter_arrived_forget*$query_tidak_check_masuk->price,
+                            'dates'                    => implode(',',$date_arrived_forget)
+                        ]);
+                    }
                 }
                  //memasukkan data saat user memiliki kelupaan cecklclok keluar
                 if(count($date_out_forget) != 0){
-                    $query_presence_report = AttendancePunishment::create([
-                        'user_id'                  => $row_user->id,
-                        'period_id'                => $request->id,
-                        'employee_id'              => session('bo_id'),
-                        'punishment_id'            => $query_tidak_check_pulang->id,
-                        'frequent'                 => $counter_out_forget,
-                        'total'                    => $counter_out_forget*$query_tidak_check_pulang->price,
-                        'dates'                    => implode(',',$date_out_forget)
-                    ]);
+                    if($query_tidak_check_pulang){
+                      
+                        $query_presence_report = AttendancePunishment::create([
+                            'user_id'                  => session('bo_id'),
+                            'period_id'                => $request->id,
+                            'employee_id'              => $row_user->id,
+                            'punishment_id'            => $query_tidak_check_pulang->id,
+                            'frequent'                 => $counter_out_forget,
+                            'total'                    => $counter_out_forget*$query_tidak_check_pulang->price,
+                            'dates'                    => implode(',',$date_out_forget)
+                        ]);
+                    }
                 }
 
 
             }
            
             $end_time = microtime(true);
+            
+            
             foreach($attendance_detail as $row_attd){
                 foreach($row_attd as $row_attd_detail){
                    if (is_array($row_attd_detail['nama_shift']) && empty(($row_attd_detail['nama_shift']))) {
@@ -667,15 +1209,15 @@ class AttendancePeriodController extends Controller
                     //membuat data harian kehadiran laporan dimana user tidak masuk dan pulang // absen
                     $query_daily_report= AttendanceDailyReports::create([
                         'user_id'                  => $row_attd_detail['user_no'],
-                        'masuk'                    => '',
-                        'pulang'                   => '',
+                        'masuk'                    => 'tidak check clock',
+                        'pulang'                   => 'tidak check clock',
                         'period_id'                => $attendance_period->id,
                         'status'                   => '7',
                         'date'                     => $row_attd_detail['date'],
                     ]);
                 } else {
                    foreach($row_attd_detail['in'] as $key_masuk=>$row_masuk){
-                 
+                    
                     $status='';
                         if($row_masuk == '1' && $row_attd_detail['out'][$key_masuk] == '1'){
                             $status = '1';
@@ -694,6 +1236,12 @@ class AttendancePeriodController extends Controller
                         }
                         if($row_masuk == '0' && $row_attd_detail['out'][$key_masuk] == '0'){
                             $status = '6';
+                        }
+                        if($row_masuk == '4' && $row_attd_detail['out'][$key_masuk] == '4'){
+                            $status = '8';
+                        }
+                        if($row_masuk == '3' && $row_attd_detail['out'][$key_masuk] == '3'){
+                            $status = '9';
                         }
                         //saat user masuk membuat report yang seperti ini
                         $query_presence_report = PresenceReport::create([
@@ -718,16 +1266,17 @@ class AttendancePeriodController extends Controller
                 }
                 
             }
-            
+            info('counter strike');
+            info($counter_user_monthly);
             //untuk menghitung denda terlambat
             foreach($counter_user_monthly as $row_user){
                 foreach($row_user as $row_counter){
                     $string_date = implode(',',$row_counter['date']);
                     if($row_counter['counter']!='0'){
                         $query_presence_report = AttendancePunishment::create([
-                            'user_id'                  => $row_counter['uid'],
+                            'user_id'                  => session('bo_id'),
                             'period_id'                => $request->id,
-                            'employee_id'              => session('bo_id'),
+                            'employee_id'              => $row_counter['uid'],
                             'punishment_id'            => $row_counter['punish_id'],
                             'frequent'                 => $row_counter['counter'],
                             'total'                    => $row_counter['counter']*$row_counter['price'],
@@ -752,693 +1301,9 @@ class AttendancePeriodController extends Controller
         }
         return response()->json($response);
     }
-
-    // public function close(Request $request){
-    //     info('mulais');
-    //     $attendance_period = AttendancePeriod::find($request->id)->first();
-        
-    //     $start_time = microtime(true);
-    //     $start_date = Carbon::parse($attendance_period->start_date);
-    //     $end_date = Carbon::parse($attendance_period->end_date);
-        
-    //     $user_data = User::where(function($query) use ( $request) {
-    //         $query->where('type','1');
-    //         // $query->whereIn('nik', [' 123034']);
-                
-    //         })->get();
-    //     $user_datas = [];
-    //     $attendance_detail = [];
-    //     $user_counter_effective_day = [];
-    //     $user_counter_absent=[];
-    //     $user_counter_arrived_on_time=[];
-    //     $user_counter_out_on_time=[];
-    //     if($start_date && $end_date){
-    //         foreach($user_data as $c=>$row_user){
-    //             $user_id = $row_user->employee_no;
-    //             $date = $start_date->copy();
-    //             $counter_effective_day=0;
-    //             $counter_absent=0;
-    //             $counter_alpha=0;
-    //             $counter_arrived_on_time=0;
-    //             $counter_arrived_forget=0;
-    //             $counter_out_on_time=0;
-    //             $counter_out_forget=0;
-    //             $date_out_forget=[];
-    //             $date_arrived_forget=[];
-
-
-    //             $all_exact_in=[];
-    //             $all_exact_out=[];  
-    //             $query_late_punishment = Punishment::where('place_id',$row_user->place_id)
-    //                                         ->where('type','1')
-    //                                         ->where('status','1')
-    //                                         ->get();
-    //             $tipe_punish_counter=[];
-
-    //             $query_tidak_check_masuk = Punishment::where('place_id',$row_user->place_id)
-    //                                     ->where('type','2')
-    //                                     ->where('status','1')
-    //                                     ->first();
-
-    //             $query_tidak_check_pulang = Punishment::where('place_id',$row_user->place_id)
-    //                                     ->where('type','3')
-    //                                     ->where('status','1')
-    //                                     ->first();
-             
-    //             foreach($query_late_punishment as $row_type){
-    //                 $tipe_punish_counter[$row_type->code]['counter']=0;
-    //                 $tipe_punish_counter[$row_type->code]['date']=[]; 
-    //                 $tipe_punish_counter[$row_type->code]['uid']=$row_user->id;
-    //                 $tipe_punish_counter[$row_type->code]['punish_id']=$row_type->id;
-    //                 $tipe_punish_counter[$row_type->code]['price']=$row_type->price;   
-    //             }  
-    //             while ($date->lte($end_date)) {
-    //                 $user_datas[$c]['user_name']=$row_user->nama;
-    //                 $query_data = EmployeeSchedule::whereDate('date', $date->toDateString())
-    //                           ->where('user_id',$row_user->employee_no)
-    //                           ->get();
-    //                 $cleanedNik = str_replace(' ', '', $row_user->employee_no);
-                    
-    //                 $query_data2 = Attendances::where('date','like',$date->toDateString()."%")
-    //                             ->where('employee_no',$cleanedNik)
-    //                             ->get();
-                           
-                    
-    //                 //diloop per user untuk mendapatkan schedule yang dibuat untuk peruser masing masing
-    //                 $array_masuk=[];
-    //                 $array_keluar=[];
-    //                 $muleh=null;
-                    
-    //                 $exact_in  = [];
-    //                 $exact_out = [];
-    //                 $masuk_awal = null;
-
-    //                 $time_ins=[];
-    //                 $time_outs=[];
-    //                 $min_time_ins=[];
-    //                 $max_time_outs=[];
-    //                 $nama_shifts=[];
-    //                 $shift_id=[];
-    //                 $different_masuk=[];
-    //                 $different_keluar=[];
-    //                 $tipe=[];
-    //                 foreach($query_data as $key=> $row_schedule_filter){
-    //                     $exact_in[$key]=0;
-    //                     $exact_out[$key]=0;
-    //                     $counter_effective_day++;
-    //                     $login[$key]=null;
-    //                     $logout=null;
-    //                     $tipe[$key]='';
-                        
-
-    //                     $different_masuk[$key]='';
-    //                     $different_keluar[$key]='';
-    //                     $min_time_in = $row_schedule_filter->shift->min_time_in;
-    //                     $time_in = $row_schedule_filter->shift->time_in;
-                        
-    //                     $max_time_out = $row_schedule_filter->shift->max_time_out;
-    //                     $time_out = $row_schedule_filter->shift->time_out;
-                       
-    //                     $array_masuk[$key]='';
-    //                     $array_keluar[$key]='';
-    //                     if($key != 0){// mengetahui apabila shift merupakan yang pertama atau bukan melalui iterasi
-    //                         $currentSchedule = $query_data[$key];
-    //                         $previousSchedule = $query_data[$key - 1];
-                            
-    //                         $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
-    //                         $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
-                            
-    //                         $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
-                           
-    //                         if($timeDifference>2 && $key <= 2){
-                                
-    //                             $exact_in[$key]=0;
-    //                             $exact_out[$key]=0;
-    //                             if(count(($query_data))==3){
-    //                                 $exact_out[$key-1]=1;
-    //                             }
-    //                         }elseif($key===2){
-                                
-    //                             if($login[0] !=null){
-    //                                 $exact_in[$key]=1;
-    //                                 $exact_out[$key]=0;
-    //                                 $array_masuk[$key]='Lanjutan';
-    //                             }else{
-    //                                 $exact_in[$key]=0;
-    //                                 $exact_out[$key]=0;
-    //                             }
-                               
-                                
-    //                         }elseif($timeDifference <= 2 && $key < 2 && count($query_data) !=3){
-                                
-    //                             if($login[0]!=null){//utk melihat shift ke 2 dalam shift yang totalnya ada 2
-                                    
-    //                                 $exact_in[$key]=1;
-                                    
-    //                                 $array_masuk[$key]='Lanjutan';
-    //                                 if($key>0){
-    //                                     // if($row_user->id==1){
-    //                                     //     info($currentSchedule);
-    //                                     //     info($previousSchedule);
-    //                                     //     info("masukkk sini");
-    //                                     // }
-    //                                     $array_keluar[$key-1]='Lanjutan';
-    //                                     $exact_out[$key-1]=1;
-    //                                 }
-                                    
-    //                             }else{
-    //                                 $exact_in[$key]=0;
-    //                                 $exact_out[$key]=0; 
-    //                             }
-                                
-    //                         }elseif($timeDifference <= 2 && $key <= 2 && count($query_data) ==3){
-                                
-    //                             if($login[0]!=null){
-                           
-    //                                 $exact_in[$key]=1;
-    //                                 $exact_out[$key]=1;
-    //                                 $array_masuk[$key]='Lanjutan';
-    //                                 $array_keluar[$key]='Lanjutan';
-    //                             }else{
-                                   
-    //                                 $exact_in[$key]=0;
-    //                                 $exact_out[$key]=0; 
-    //                             }
-    //                         }
-                            
-    //                         //pengurangan apabila lebih besar dari 1 maka shift tidak bersamaan
-    //                     }
-
-    //                     if($row_schedule_filter->shift->is_next_day == '1'){
-                  
-    //                         if (count($query_data) < 3) {
-    //                             foreach($query_data2 as $row_attendance_filter){
-    //                                 $dateAttd = Carbon::parse($row_attendance_filter->date);
-                                    
-    //                                 $timePart = $dateAttd->format('H:i:s');
-                                    
-    //                                     if(!$masuk_awal){
-                                            
-    //                                         $masuk_awal=$timePart;
-    //                                         $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
-    //                                         $minutes = floor($diffInSeconds / 60);
-    //                                         $seconds = $diffInSeconds % 60;
-                                            
-                                            
-    //                                         $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
-                                            
-    //                                     }
-                                    
-                                     
-    //                                 if ($timePart >= $min_time_in && $timePart <= $time_in) {
-    //                                     $exact_in[$key]= 1 ;
-                                        
-    //                                     if(!$login[$key]){
-                                           
-    //                                         if($masuk_awal==null){
-    //                                             $masuk_awal=$timePart;
-    //                                         }elseif($masuk_awal > $timePart){
-    //                                             $masuk_awal=$timePart;
-    //                                         }
-    //                                         $login[$key] = $timePart;
-    //                                         $array_masuk[$key]=$timePart;
-    //                                         $different_masuk[$key]='';
-                                            
-    //                                     }
-                                        
-    //                                 }elseif($timePart > $time_in && $timePart < $time_out){
-    //                                     $time1 = new DateTime($time_in);
-    //                                     $time2 = new DateTime($timePart);
-    //                                     $timeDifference = $time1->diff($time2);
-
-    //                                     // Extract the hours from the time difference
-    //                                     $hoursDifference = $timeDifference->h;
-
-                                        
-    //                                     if($hoursDifference<2){
-    //                                         $exact_in [$key]= 2 ;
-    //                                         $array_masuk[$key]=$timePart;
-    //                                     }
-                                       
-                                        
-                                       
-    //                                 }
-    //                             }
-    //                         }
-    //                         $query_nextday = Attendances::where('date', 'like', $date->copy()->addDay()->toDateString()."%")
-    //                                         ->where('employee_no', $cleanedNik)
-    //                                         ->get();
-                            
-    //                         foreach($query_nextday as $row_attendance_filter){
-    //                             $dateAttd = Carbon::parse($row_attendance_filter->date);
-                                
-    //                             $timePart = $dateAttd->format('H:i:s');
-    //                             if ($timePart >= $time_out && $timePart <= $max_time_out) {
-    //                                 $exact_out [$key]= 1 ;
-    //                                 if($muleh==null){
-    //                                     $muleh=$timePart;
-    //                                 }elseif($muleh < $timePart){
-    //                                     $muleh=$timePart;
-    //                                 }
-    //                                 if(!$logout){
-                                        
-    //                                     $logout = $timePart;
-    //                                     $array_keluar[$key]=$timePart;
-    //                                     $different_keluar[$key]='';
-                                        
-    //                                 }  
-    //                             }
-                                
-    //                         }
-                            
-    //                     }else{
-                           
-                              
-    //                         $minTimeIn = Carbon::parse($min_time_in);
-    //                         $maxTimeOut = Carbon::parse($max_time_out);
-    //                         foreach($query_data2 as $row_attendance_filter){
-    //                             $dateAttd = Carbon::parse($row_attendance_filter->date);
-                                
-    //                             $timePart = $dateAttd->format('H:i:s');
-                                
-    //                                 if(!$masuk_awal){
-                                        
-    //                                     $masuk_awal=$timePart;
-    //                                     $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($time_in);
-    //                                     $minutes = floor($diffInSeconds / 60);
-    //                                     $seconds = $diffInSeconds % 60;
-                                      
-                                        
-    //                                     $different_masuk[$key]=$minutes." menit  ".$seconds." detik";
-                                        
-    //                                 }
-    //                                 if(!$muleh){
-    //                                     if ($timePart >= $time_out && $timePart > $masuk_awal) 
-    //                                     {
-    //                                         $muleh=$timePart;
-    //                                         $diffInSeconds = Carbon::parse($timePart)->diffInSeconds($max_time_out);
-    //                                         $minutes = floor($diffInSeconds / 60);
-    //                                         $seconds = $diffInSeconds % 60;
-                                            
-    //                                         $different_keluar[$key]=$minutes." menit  ".$seconds." detik";
-    //                                     }
-    //                                 }
-    //                             if ($timePart >= $min_time_in && $timePart <= $time_in) {
-    //                                 $exact_in[$key]= 1 ;
-                                    
-    //                                 if(!$login[$key]){
-                                        
-    //                                     if($masuk_awal==null){
-    //                                         $masuk_awal=$timePart;
-    //                                     }elseif($masuk_awal > $timePart){
-    //                                         $masuk_awal=$timePart;
-    //                                     }
-    //                                     $login[$key] = $timePart;
-    //                                     $array_masuk[$key]=$timePart;
-    //                                     $different_masuk[$key]='';
-                                        
-    //                                 }
-                                    
-    //                             }elseif($timePart > $time_in && $timePart < $time_out){
-    //                                 $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($minTimeIn);
-                                    
-                                  
-    //                                 if($diffHoursTimePartMinIn<=3 && $exact_in[$key] != 1){
-    //                                     $exact_in[$key]= 2 ;
-                                        
-                                        
-    //                                     if (count($query_data) == 3 && $key > 0 ) {
-    //                                         $exact_in[$key]= 1 ;
-                                            
-    //                                     }
-    //                                     $array_masuk[$key]=$timePart;
-    //                                 }                                      
-    //                             }elseif($timePart > $max_time_out){
-    //                                 $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($maxTimeOut);
-                                    
-    //                                 if($diffHoursTimePartMaxOut<=3){
-    //                                     $array_keluar[$key]=$timePart;
-    //                                 }
-    //                             }
-    //                             if ($timePart >= $time_out && $timePart <= $max_time_out) {
-    //                                 $exact_out [$key]= 1 ;
-    //                                 if($muleh==null){
-    //                                     $muleh=$timePart;
-    //                                 }elseif($muleh < $timePart){
-    //                                     $muleh=$timePart;
-    //                                 }
-    //                                 if(!$logout){
-                                        
-    //                                     $logout = $timePart;
-    //                                     $array_keluar[$key]=$timePart;
-    //                                     $different_keluar[$key]='';
-                                        
-    //                                 }  
-    //                             }
-    //                         }
-    //                     }
-
-    //                     if(!$exact_in){
-    //                         $exact_in[$key]=0;
-    //                     }
-    //                     if($key==0){// melakukan pengecekan saat pertama kali looping schedule untuk memberikan keterangan masuk / tidaknya atau berupa lanjutan atau tidak
-                            
-                           
-    //                         if (count($query_data) === 3) {
-    //                             if($login[$key]==null){
-    //                                 $exact_in[$key]=0;
-    //                                 $exact_out[$key]= 0 ;
-    //                             }
-                                
-    //                             if($login[$key]!=null){
-                                    
-    //                                 $exact_out[$key]= 1 ;
-    //                             }
-    //                         }else{
-    //                             if($login[$key] == null && $masuk_awal == null){
-                                    
-    //                                 $exact_in[$key]= 0 ;
-    //                                 $exact_out[$key]= 0 ;
-    //                                 if($logout!=null){
-    //                                     $exact_out[$key]=1;
-    //                                 }
-    //                             }
-                                
-    //                             if($logout != null ){
-    //                                 $exact_out[$key]=1;
-    //                             }else{
-    //                                 $exact_out[$key]= 0 ;
-    //                             }
-                                
-    //                         }
-                            
-    //                     }
-    //                     if($key == 1 &&  count($query_data) == 2){//mengecek saat schedule yang di tengah dan jumlahnya dua dan mengecek kalau dia itu tidak check saat masuk dan check saat pulang
-    //                         if($exact_out[$key]==1){
-    //                             $exact_out[$key-1]=1;
-                               
-    //                         }
-    //                     }if($key==2 && $exact_in[0]==null && $exact_out[$key]==1){
-    //                         $exact_out[0]=1;
-    //                         $exact_in[1]=0;
-    //                         $exact_out[1]=1;
-    //                         $array_keluar[0]="Lanjutan";
-    //                         $array_masuk[1]="Lanjutan";
-    //                         $array_keluar[1]="Lanjutan";
-    //                     }if($key==2 && $exact_in[0]!=null){
-    //                         $exact_in[2]=1;
-    //                         $array_masuk[2]="Lanjutan";
-    //                         $array_keluar[1]="Lanjutan";
-    //                         $array_keluar[0]="Lanjutan";
-    //                     }
-                        
-    //                     $time_ins[]=$time_in;
-    //                     $time_outs[]=$time_out;
-    //                     $min_time_ins[]=$min_time_in;
-    //                     $max_time_outs[]=$max_time_out;        
-    //                     $nama_shifts[]=$row_schedule_filter->shift->name;
-    //                     $shift_id[]=$row_schedule_filter->shift->id;
-                       
-    //                     if($masuk_awal){
-    //                         $pembandingdate = Carbon::parse($masuk_awal);
-    //                         $pembanding= $pembandingdate->format('H:i:s');
-    //                         $carbonTimeIn = Carbon::parse($time_in);
-                            
-    //                         if($pembanding > $time_in ){
-    //                             if($query_late_punishment){
-                                    
-                                    
-                                    
-    //                                 if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
-    //                                     $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
-    //                                     $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');  
-    //                                 }else{
-    //                                     foreach($query_late_punishment as $key=>$row_punish_type){
-    //                                         $newCarbonTime = Carbon::parse($time_in)->addMinutes($row_punish_type->minutes)->format('H:i:s');
-    //                                         if($key !=0 ){
-                                                
-    //                                             if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
-    //                                                 $tipe_punish_counter[$query_late_punishment[$key-1]->code]['counter']++;
-    //                                                 $tipe_punish_counter[$query_late_punishment[$key-1]->code]['date'][]=$date->format('d/M/y');
-    //                                                 break;
-    //                                             }
-    //                                         }
-    //                                         if($key == count($query_late_punishment)){
-    //                                             if($pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
-    //                                                 $tipe_punish_counter[$row_punish_type->code]['counter']++;
-    //                                                 $tipe_punish_counter[$row_punish_type->code]['date'][]=$date->format('d/M/y');
-    //                                             }else{
-    //                                                 $tipe_punish_counter['over_t']['counter']++;
-    //                                                 $tipe_punish_counter['over_t']['date'][]=$date->format('d/M/y');
-    //                                             }
-    //                                         }
-                                            
-    //                                     }
-    //                                 }
-                                    
-    //                             }
-                                
-    //                         }
-                            
-    //                     }
-
-    //                 }
-                    
-    //                 foreach($exact_in as $key=>$row_exact){
-                     
-    //                     $all_exact_in[]=$row_exact;
-    //                     $all_exact_out[]=$exact_out[$key];
-    //                 }
-                    
-    //                 $attendance_detail[$row_user->name][]=[
-    //                     'date' => Carbon::parse($date)->format('d/m/Y'),
-    //                     'user_no'=>$row_user->id,
-    //                     'user' =>$row_user->name,
-    //                     'in'   => $exact_in,
-    //                     'out'  => $exact_out,
-    //                     'login'=> $masuk_awal,
-    //                     'logout'=>$muleh,
-    //                     'tipe' => $tipe,
-    //                     'punish_type'=>$tipe_punish_counter,
-    //                     'jam_masuk'=>$array_masuk,
-    //                     'jam_keluar'=>$array_keluar,
-    //                     'perbedaan_jam_masuk'=>$different_masuk,
-    //                     'perbedaan_jam_keluar'=>$different_keluar,
-    //                     'time_in'=>$time_ins,
-    //                     'time_out'=>$time_outs,
-    //                     'min_time_in'=>$min_time_ins,
-    //                     'max_time_out'=>$max_time_outs,
-    //                     'nama_shift'=>$nama_shifts,
-    //                     'shift_id'=>$shift_id,
-    //                 ];
-    //                 $lanjoet=1;
-                    
-    //                 foreach($exact_in as $key=>$row_arrive){
-    //                     if($row_arrive == 0 && $exact_out[$key] == 1){
-    //                         $date_arrived_forget[]=Carbon::parse($date)->format('d/m/Y');
-    //                         $lanjoet=0;
-    //                         break;
-    //                     }
-    //                 }
-    //                 if($lanjoet==1){
-                        
-    //                     foreach($exact_out as $row_out){
-    //                         if($row_out==0 && $exact_in[$key] == 1){
-    //                             info($date);
-    //                             $date_out_forget[]=Carbon::parse($date)->format('d/m/Y');
-    //                             break;
-    //                         }
-    //                     }
-    //                 }
-                    
-                    
-    //                 $date->addDay();
-                    
-    //             }
-               
-    //             foreach($all_exact_in as $key=>$row_exact){
-                    
-                    
-    //                 if($row_exact==1){
-    //                     $counter_arrived_on_time++;
-    //                 }if($row_exact != 1 && $all_exact_out[$key] == 1){
-    //                     $counter_arrived_forget++;
-    //                 }
-    //                 if($all_exact_out[$key]==1){
-    //                     $counter_out_on_time++;
-    //                 }if($all_exact_out[$key] != 1 && $row_exact == 1){
-    //                     $counter_out_forget++;
-    //                 }
-    //                 if($row_exact==1 && $all_exact_out[$key] == 1){
-    //                     $counter_absent++;
-    //                 }if($row_exact == 0 && $all_exact_out[$key] ==0){
-    //                     $counter_alpha++;
-    //                 }
-    //             }
-    //             $user_datas[$c]["arrived_on_time"]=$counter_arrived_on_time;
-    //             $user_datas[$c]["out_on_time"]=$counter_out_on_time;
-    //             $user_datas[$c]["effective_day"]=$counter_effective_day;
-    //             $user_datas[$c]["alpha"]=$counter_alpha;
-    //             $user_datas[$c]["absent"]=$counter_absent;
-    //             $user_datas[$c]["out_forget"]=$counter_out_forget;
-    //             $user_datas[$c]["arrived_forget"]=$counter_arrived_forget;
-
-    //             $query = AttendanceMonthlyReport::create([
-    //                 'user_id'                  => $row_user->id,
-    //                 'period_id'			        => $attendance_period->id,
-    //                 'effective_day'             => $counter_effective_day,
-    //                 'absent'           => $counter_absent,
-    //                 // 'special_occasion'           => $request->plant_id,
-    //                 // 'sick'           => $request->plant_id,
-    //                 // 'outstation'           => $request->plant_id,
-    //                 // 'furlough'           => $request->plant_id,
-    //                 // 'dispen'           => $request->plant_id,
-    //                 // 'alpha'           => $request->plant_id,
-    //                 // 'wfh'           => $request->plant_id,
-    //                 'arrived_on_time'           => $counter_arrived_on_time,
-    //                 'out_on_time'           => $counter_out_on_time,
-    //                 'out_log_forget'           => $counter_out_forget,
-    //                 'arrived_forget'           => $counter_arrived_forget,
-    //             ]);
-    //             DB::beginTransaction();
-    //             try {
-    //                 $query_close = AttendancePeriod::find($request->id);
-    //                 $query_close->status            = "2";
-    //                 $query_close->save();
-    //                 DB::commit();
-    //             }catch(\Exception $e){
-    //                 DB::rollback();
-    //             }
-    //             $counter_user_monthly[$row_user->employee_no]=$tipe_punish_counter;
-               
-    //             if(count($date_arrived_forget) != 0){
-              
-    //                 $query_presence_report = AttendancePunishment::create([
-    //                     'user_id'                  => $row_user->id,
-    //                     'period_id'                => $request->id,
-    //                     'employee_id'              => session('bo_id'),
-    //                     'punishment_id'            => $query_tidak_check_masuk->id,
-    //                     'frequent'                 => $counter_arrived_forget,
-    //                     'total'                    => $counter_arrived_forget*$query_tidak_check_masuk->price,
-    //                     'dates'                    => implode(',',$date_arrived_forget)
-    //                 ]);
-    //             }
-    //             if(count($date_out_forget) != 0){
-    //                 $query_presence_report = AttendancePunishment::create([
-    //                     'user_id'                  => $row_user->id,
-    //                     'period_id'                => $request->id,
-    //                     'employee_id'              => session('bo_id'),
-    //                     'punishment_id'            => $query_tidak_check_pulang->id,
-    //                     'frequent'                 => $counter_out_forget,
-    //                     'total'                    => $counter_out_forget*$query_tidak_check_pulang->price,
-    //                     'dates'                    => implode(',',$date_out_forget)
-    //                 ]);
-    //             }
-
-
-    //         }
-           
-    //         $end_time = microtime(true);
-    //         foreach($attendance_detail as $row_attd){
-    //             foreach($row_attd as $row_attd_detail){
-    //                if (is_array($row_attd_detail['nama_shift']) && empty(($row_attd_detail['nama_shift']))) {
-    //                 $query_presence_report = PresenceReport::create([
-    //                     'user_id'                  => $row_attd_detail['user_no'],
-    //                     'period_id'                => $attendance_period->id,
-    //                     'date'                     => $row_attd_detail['date'],
-    //                     'late_status'              => '7',
-    //                     'status'                   => '1',
-    //                 ]);
-    //                 $query_daily_report= AttendanceDailyReports::create([
-    //                     'user_id'                  => $row_attd_detail['user_no'],
-    //                     'masuk'                    => '',
-    //                     'pulang'                   => '',
-    //                     'period_id'                => $attendance_period->id,
-    //                     'status'                   => '7',
-    //                     'date'                     => $row_attd_detail['date'],
-    //                 ]);
-    //             } else {
-    //                foreach($row_attd_detail['in'] as $key_masuk=>$row_masuk){
-                 
-    //                 $status='';
-    //                     if($row_masuk == '1' && $row_attd_detail['out'][$key_masuk] == '1'){
-    //                         $status = '1';
-    //                     }
-    //                     if($row_masuk == '0' && $row_attd_detail['out'][$key_masuk] == '1'){
-    //                         $status = '2';
-    //                     }
-    //                     if($row_masuk == '1' && $row_attd_detail['out'][$key_masuk] == '0'){
-    //                         $status = '3';
-    //                     }
-    //                     if($row_masuk == '2' && $row_attd_detail['out'][$key_masuk] == '1'){
-    //                         $status = '4';
-    //                     }
-    //                     if($row_masuk == '2' && $row_attd_detail['out'][$key_masuk] == '0'){
-    //                         $status = '5';
-    //                     }
-    //                     if($row_masuk == '0' && $row_attd_detail['out'][$key_masuk] == '0'){
-    //                         $status = '6';
-    //                     }
-    //                     $query_presence_report = PresenceReport::create([
-    //                         'user_id'                  => $row_attd_detail['user_no'],
-    //                         'nama_shift'               => $row_attd_detail['nama_shift'][$key_masuk],
-    //                         'period_id'                => $attendance_period->id,
-    //                         'date'                     => $row_attd_detail['date'],
-    //                         'late_status'              => $status,
-    //                         'status'                   => '1',
-    //                     ]);
-    //                     $query_daily_report= AttendanceDailyReports::create([
-    //                         'user_id'                  => $row_attd_detail['user_no'],
-    //                         'masuk'                    => $row_attd_detail['jam_masuk'][$key_masuk],
-    //                         'pulang'                   => $row_attd_detail['jam_keluar'][$key_masuk],
-    //                         'status'                   => $status,
-    //                         'period_id'                => $attendance_period->id,
-    //                         'date'                     => $row_attd_detail['date'],
-    //                         'shift_id'                 => $row_attd_detail['shift_id'][$key_masuk],
-    //                     ]);
-    //                }
-    //             }
-    //             }
-                
-    //         }
-            
-    //         //untuk menghitung denda terlambat
-    //         foreach($counter_user_monthly as $row_user){
-    //             foreach($row_user as $row_counter){
-    //                 $string_date = implode(',',$row_counter['date']);
-    //                 if($row_counter['counter']!='0'){
-    //                     $query_presence_report = AttendancePunishment::create([
-    //                         'user_id'                  => $row_counter['uid'],
-    //                         'period_id'                => $request->id,
-    //                         'employee_id'              => session('bo_id'),
-    //                         'punishment_id'            => $row_counter['punish_id'],
-    //                         'frequent'                 => $row_counter['counter'],
-    //                         'total'                    => $row_counter['counter']*$row_counter['price'],
-    //                         'dates'                    => implode(',',$row_counter['date'])
-    //                     ]);
-    //                 }
-    //             }
-    //         }
-
-    //         $execution_time = ($end_time - $start_time);
-           
-    //         info($execution_time);
-    //         $response =[
-    //             'status'   =>200,
-    //             'message'  =>$attendance_detail,
-    //             'punishment' => $counter_user_monthly,
-    //         ];
-    //     }else{
-    //         $response =[
-    //             'status'  =>500,
-    //             'message' =>'ada yang error'
-    //         ];
-    //     }
-    //     return response()->json($response);
-    // }
     public function presenceReport(Request $request){
         $distinctUserIds = PresenceReport::where('period_id',$request->id)->groupBy('user_id')->pluck('user_id')->toArray();
-    
+        
         $distinctDates = PresenceReport::where('period_id', $request->id)
                 ->groupBy('date')
                 ->pluck('date')
@@ -1524,6 +1389,12 @@ class AttendancePeriodController extends Controller
                     if($row_status=='7'){
                         $string_table.="<td style='color: black;    font-weight: 700;'>Tidak Ada Shift Pada Tanggal Ini</td>";
                     }
+                    if($row_status=='8'){
+                        $string_table.="<td style='color: black;    font-weight: 700;'>Ada Ijin</td>";
+                    }
+                    if($row_status=='9'){
+                        $string_table.="<td style='color: pink;    font-weight: 700;'>Cuti Melahirkan</td>";
+                    }
 
                 }
             }
@@ -1545,12 +1416,24 @@ class AttendancePeriodController extends Controller
         foreach($distinctDates as $key_date=>$row_dates){
             foreach($dailyReports as $key_daily=>$row_daily){
                 if($row_daily['date']==$row_dates){
+                   
+                    if($row_daily->shift()->exists()){
+                        $time_in = $row_daily->shift->time_in;
+                        $min_time_in = Carbon::parse($time_in)->subHours($row_daily->shift->tolerant)->toTimeString();
+                        $time_out = $row_daily->shift->time_out;
+                        $max_time_out = Carbon::parse($time_out)->addHours($row_daily->shift->tolerant)->toTimeString();
+                    }else{
+                       
+                        $min_time_in = "";
+                        
+                        $max_time_out ="";
+                    }
                     $attendanceDetail[$key_date][]=[
                         'user_id'=>$row_daily->user->employee_no??'',
                         'user_name'=>$row_daily->user->name??'',
                         'nama_shift'=>$row_daily->shift->name ?? 'tidak ada shift',
-                        'min_masuk'=>$row_daily->shift->min_time_in ?? 'tidak ada shift',
-                        'max_keluar'=>$row_daily->shift->max_time_out ?? 'tidak ada shift',
+                        'min_masuk'=>$min_time_in ?? '',
+                        'max_keluar'=>$max_time_out ?? '',
                         'limit_masuk'=>$row_daily->shift->time_in ?? 'tidak ada shift',
                         'limit_keluar'=>$row_daily->shift->time_out ?? 'tidak ada shift',
                         'masuk'=>$row_daily->masuk,
@@ -1581,6 +1464,57 @@ class AttendancePeriodController extends Controller
                     <td class='center-align'>".$row_daily['pulang']."</td>
                     <td class='center-align'>".$row_daily['max_keluar']."</td>
                     <td class='center-align'>".$row_daily['status']."</td>
+                </tr>
+                ";
+            }
+        }
+        $response = [
+            'status'    => 200,
+            'message'   => $string_table,
+        ];
+        return response()->json($response);
+    }
+
+    public function punishmentReport(Request $request){
+        $dailyReports  = AttendancePunishment::where('period_id',CustomHelper::decrypt($request->id))
+                      
+        ->get();
+        
+        $distinctUserIds = $dailyReports->pluck('employee_id')->unique()->toArray();
+
+        $attendanceDetail=[];
+      
+            foreach($dailyReports as $key_daily=>$row_punishment){
+                
+                $attendanceDetail[$key_daily][]=[
+                    'user_id'=>$row_punishment->employee->employee_no??'',
+                    'user_name'=>$row_punishment->employee->name??'',
+                    'nama_periode'=>$row_punishment->period->name ?? 'tidak ada shift',
+                    'tipe_punish'=>$row_punishment->punishment->name ?? '',
+                    'frequent'=>$row_punishment->frequent ?? '',
+                    'date'=>$row_punishment->dates,
+                    'total'=> $row_punishment->total,
+                ];
+        
+            }
+         
+
+        $string_table="";
+        $iterasi=0;
+        foreach($attendanceDetail as $row_detail){
+            info($row_detail);
+            foreach($row_detail as $key_daily=>$row_punish){
+                $iterasi++;
+                $string_table.="
+                <tr>      
+                    <td class='center-align'>".$iterasi."</td>
+                    <td class='center-align'>".$row_punish['user_id']."</td>
+                    <td class='center-align'>".$row_punish['user_name']."</td>
+                    <td class='center-align'>".$row_punish['nama_periode']."</td>
+                    <td class='center-align'>".$row_punish['tipe_punish']."</td>
+                    <td class='center-align'>".$row_punish['frequent']."</td>
+                    <td class='center-align'>".$row_punish['date']."</td>
+                    <td class='center-align'>".$row_punish['total']."</td>
                 </tr>
                 ";
             }

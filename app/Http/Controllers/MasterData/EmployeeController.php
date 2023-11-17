@@ -102,14 +102,14 @@ class EmployeeController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-                $url=request()->root()."/admin/hr/employee_transfer?code=".CustomHelper::encrypt($val->id);
+                $url=request()->root()."/admin/hr/employee_transfer?employee_code=".CustomHelper::encrypt($val->id);
 				
                 $btn = 
                 '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Education" onclick="showEducation(' . $val->id . ')"><i class="material-icons dp48">local_library</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Work Experience" onclick="showExperience(' . $val->id . ')"><i class="material-icons dp48">location_city</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Family" onclick="showFamily(' . $val->id . ')"><i class="material-icons dp48">recent_actors</i></button>
-                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light light-blue darken-3 white-text btn-small" data-popup="tooltip" title="Lihat Jadwal" onclick="getSchedule(' . $val->employee_no . ')"><i class="material-icons dp48">event</i></button>
-                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-orange accent-1 white-text btn-small" data-popup="tooltip" title="Copy Schedule" onclick="openCopy(' . $val->employee_no . ')"><i class="material-icons dp48">content_copy</i></button>
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light light-blue darken-3 white-text btn-small" data-popup="tooltip" title="Lihat Jadwal" onclick="getSchedule(`' . $val->employee_no . '`)"><i class="material-icons dp48">event</i></button>
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light deep-orange accent-1 white-text btn-small" data-popup="tooltip" title="Copy Schedule" onclick="openCopy(`' . $val->employee_no . '`)"><i class="material-icons dp48">content_copy</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-text btn-small" data-popup="tooltip" title="Employee Transfer" onclick="goto(\'' . $url . '\')"><i class="material-icons dp48">settings_ethernet</i></button>';
                 
                 $response['data'][] = [

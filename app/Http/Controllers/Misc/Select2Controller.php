@@ -57,6 +57,7 @@ use App\Models\Equipment;
 use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class Select2Controller extends Controller {
@@ -296,6 +297,8 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
+        $today = Carbon::now();
+        $todayWithoutDayMonth = $today->format('Y');
         $data = User::where(function($query) use($search){
                     $query->where('name', 'like', "%$search%")
                     ->orWhere('employee_no', 'like', "%$search%")
@@ -313,7 +316,8 @@ class Select2Controller extends Controller {
                 'limit_credit'  => $d->limit_credit,
                 'count_limit'   => $d->count_limit_credit,
                 'balance_limit' => $d->limit_credit - $d->count_limit_credit,
-                'arrinfo'       => $d
+                'arrinfo'       => $d,
+                'leave_quotas_yearly' => $d->getQuotasUser($todayWithoutDayMonth) ?? 0,
             ];
         }
 
@@ -2277,12 +2281,13 @@ class Select2Controller extends Controller {
                     ->where('status','1');
                     
                 });
-                
+              
                 
             });
             if($request->shift_request_id){
                 $query->whereNotIn('id',$request->shift_request_id);
             }
+            
         })
         ->whereNotIn('status',['2','3'])
         ->orderBy('date','DESC')
@@ -2306,7 +2311,7 @@ class Select2Controller extends Controller {
         $search     = $request->search;
         $query_user = User::find($request->account_id);
         $department_id = $query_user->position->division->department_id;
-        info($query_user->position->division->department_id);
+       
         $data = Shift::where(function($query) use($search,$department_id){
             $query->where(function($query) use ($search,$department_id){
                 $query->where('code', 'like', "%$search%")
@@ -2331,6 +2336,48 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function scheduleByDate(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+        $account_id = $request->account_id;
+        $date       = $request->date;
+        $data = EmployeeSchedule::where(function($query) use($search,$account_id,$request){
+            $query->where(function($query) use ($search,$account_id,$request){
+                $query->WhereHas('user',function($query) use ($account_id){
+                    $query->where('id',$account_id)
+                    ->where('status','1');
+                    
+                });
+                $query->whereDoesntHave('leaveRequestShift');
+               
+                if($request->end_date){
+                    info('masuk sini');
+                    $query->where('date','>=',$request->date);
+                    $query->where('date','<=',$request->end_date);
+                }else{
+                    info('masuk');
+                    $query->where('date',$request->date);
+                }
+            });
+            if($request->shift_request_id){
+                $query->whereNotIn('id',$request->shift_request_id);
+            }
+        })
+        ->whereNotIn('status',['2','3'])
+        ->orderBy('date','DESC')
+        ->get();
+       
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->date.'||'.$d->shift->name.' Jam:'.$d->shift->time_in.'-'.$d->shift->time_out,
+                'code'              => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
     public function productionSchedule(Request $request)
     {
         $response = [];

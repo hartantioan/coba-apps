@@ -5,6 +5,7 @@ use App\Http\Controllers\HR\AttendanceLatenessReportController;
 use App\Http\Controllers\HR\AttendanceMonthlyReportController;
 use App\Http\Controllers\HR\AttendancePresenceReportController;
 use App\Http\Controllers\HR\AttendancePunishmentController;
+use App\Http\Controllers\HR\EmployeeLeaveQuotasController;
 use App\Http\Controllers\HR\EmployeeTransferController;
 
 use App\Http\Controllers\Accounting\AccountingReportController;
@@ -285,6 +286,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('leave_type', [Select2Controller::class, 'leaveType']);
                 Route::get('schedule', [Select2Controller::class, 'schedule']);
                 Route::get('shift_by_department', [Select2Controller::class, 'shiftByDepartment']);
+                Route::get('schedule_by_date', [Select2Controller::class, 'scheduleByDate']);
                 Route::get('production_schedule', [Select2Controller::class, 'productionSchedule']);
                 Route::get('form_user', [Select2Controller::class, 'formUser']);
                 Route::get('coa_subsidiary_ledger', [Select2Controller::class, 'coaSubsidiaryLedger']);
@@ -628,6 +630,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('create',[ShiftController::class, 'create'])->middleware('operation.access:shift,update');
                         Route::post('destroy', [ShiftController::class, 'destroy'])->middleware('operation.access:shift,delete');
                     });
+
+                    Route::prefix('employee_leave_quota')->middleware('operation.access:employee_leave_quota,view')->group(function () {
+                        Route::get('/',[EmployeeLeaveQuotasController::class, 'index']);
+                        Route::get('datatable',[EmployeeLeaveQuotasController::class, 'datatable']);
+                        Route::post('show', [EmployeeLeaveQuotasController::class, 'show']);
+                        Route::post('create',[EmployeeLeaveQuotasController::class, 'create'])->middleware('operation.access:employee_leave_quota,update');
+                        Route::post('destroy', [EmployeeLeaveQuotasController::class, 'destroy'])->middleware('operation.access:employee_leave_quota,delete');
+                    });
                     
                     Route::prefix('allowance')->middleware('operation.access:allowance,view')->group(function () {
                         Route::get('/',[AllowanceController::class, 'index']);
@@ -704,6 +714,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('show',[AttendancePeriodController::class, 'show']);
                         Route::post('lateness_report',[AttendancePeriodController::class, 'latenessReport']);
                         Route::post('presence_report',[AttendancePeriodController::class, 'presenceReport']);
+                        Route::post('punishment_report',[AttendancePeriodController::class, 'punishmentReport']);
                         Route::post('daily_report',[AttendancePeriodController::class, 'dailyReport']);
                         Route::post('close',[AttendancePeriodController::class, 'close'])->middleware('operation.access:attendance_period,update');
                         Route::get('export',[AttendancePeriodController::class, 'export'])->middleware('operation.access:attendance_period,view');
@@ -1260,6 +1271,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail', [EmployeeTransferController::class, 'rowDetail']);
                     Route::post('show', [EmployeeTransferController::class, 'show']);
                     Route::post('show_from_code', [EmployeeTransferController::class, 'showFromCode']);
+                    Route::post('instant_form_code', [EmployeeTransferController::class, 'instantFormwCode']);
                     Route::post('print',[EmployeeTransferController::class, 'print']);
                     Route::get('export',[EmployeeTransferController::class, 'export']);
                     Route::post('print_by_range',[EmployeeTransferController::class, 'printByRange']);
@@ -1328,6 +1340,8 @@ Route::prefix('admin')->group(function () {
                         Route::get('approval/{id}',[AttendancePunishmentController::class, 'approval'])->withoutMiddleware('direct.access');
                     });
                 });
+
+                
 
                 Route::prefix('leave_request')->middleware('operation.access:leave_request,view')->group(function () {
                     Route::get('/',[LeaveRequestController::class, 'index']);

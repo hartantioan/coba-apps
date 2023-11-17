@@ -20,6 +20,7 @@ class LeaveType extends Model
         'type',
         'status',
         'shift_count',
+        'furlough_type',
     ];
 
     public function leaveRequest(){
@@ -71,6 +72,43 @@ class LeaveType extends Model
         }
 
         return $type;
+    }
+
+    public function furloughType(){
+        switch($this->furlough_type) {
+            case '1':
+                $furlough_type = 'Cuti';
+                break;
+            case '2':
+                $furlough_type = 'Sakit';
+                break;
+            case '3':
+                $furlough_type = 'Cuti Khusus';
+                break;
+            case '4':
+                $furlough_type = 'Dinas';
+                break;
+            case '5':
+                $furlough_type = 'WFH';
+                break;
+            case '6':
+                $furlough_type = 'Dispen';
+                break;
+            case '7':
+                $furlough_type = 'Melahirkan';
+                break;
+            case '8':
+                $furlough_type = 'Ijin';
+                break;
+            case '9':
+                $furlough_type = 'Telat';
+                break;
+            default:
+                $furlough_type = '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>';
+                break;
+        }
+
+        return $furlough_type;
     }
 
     

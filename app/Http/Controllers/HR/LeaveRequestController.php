@@ -5,11 +5,16 @@ namespace App\Http\Controllers\HR;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\EmployeeLeaveQuotas;
+use App\Models\EmployeeSchedule;
+use App\Models\EmployeeTransfer;
 use App\Models\LeaveRequest;
+use App\Models\LeaveRequestShift;
 use App\Models\LeaveType;
 use App\Models\Place;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Validator;
@@ -141,22 +146,21 @@ class LeaveRequestController extends Controller
     }
 
     public function create(Request $request){
-        
+
         if($request->leave_type_id){
            
             $query_pengambil_tipe = LeaveType::find($request->leave_type_id);
           
-            if($query_pengambil_tipe->type == '1'){
+            if($query_pengambil_tipe->type == '1'){         
                 $validation = Validator::make($request->all(), [
                     'code'			           => $request->temp ? ['required', Rule::unique('leave_requests', 'code')->ignore($request->temp)] : 'required|unique:leave_requests,code',
                     'company_id'               => 'required',
                     'account_id'               => 'required',
                     'leave_type_id'            => 'required',
                     'post_date'                => 'required',
-                    
-                    'end_date'                 => 'required',
                     'start_date'               => 'required',
                     'note'                     => 'required',
+                    'arr_schedule'         => 'required',
                 ], [
                     'code.required' 	            => 'Kode tidak boleh kosong.',
                     'code.unique'                   => 'Kode telah dipakai',
@@ -164,9 +168,9 @@ class LeaveRequestController extends Controller
                     'account_id.required'                 => 'Pegawai tidak boleh kosong.',
                     'post_date.required'                => 'Tanggal Post Tidak Boleh kosong',
                     'leave_type_id.required'                 => 'Tipe Ijin tidak boleh kosong.',
-                    'end_date.required'                 => 'Tanggal Akhir tidak boleh kosong.',
                     'start_date.required'                 => 'Tanggal Awal tidak boleh kosong.',
                     'note.required'                 => 'Catatan tidak boleh kosong.',
+                    'arr_schedule.required'                  =>'Harap pilih Schedule'
                 ]);
             } if($query_pengambil_tipe->type == '2'){
                 $validation = Validator::make($request->all(), [
@@ -176,7 +180,33 @@ class LeaveRequestController extends Controller
                     'account_id'               => 'required',
                     'leave_type_id'            => 'required',
                     'start_time'               => 'required',
-                    'end_time'                 => 'required',
+                    
+                    
+                    'start_date'               => 'required',
+                    'note'                     => 'required',
+                    'arr_schedule'         => 'required',
+                ], [
+                    'code.required' 	            => 'Kode tidak boleh kosong.',
+                    'code.unique'                   => 'Kode telah dipakai',
+                    'company_id.required'                 => 'Perusahaan tidak boleh kosong.',
+                    'account_id.required'                 => 'Pegawai tidak boleh kosong.',
+                    'start_time.required'                 => 'Jam Awal tidak boleh kosong.',
+                    
+                    'post_date.required'                => 'Tanggal Post Tidak Boleh kosong',
+                    'leave_type_id.required'                 => 'Tipe Ijin tidak boleh kosong.',
+                    
+                    'start_date.required'                 => 'Tanggal Awal tidak boleh kosong.',
+                    'note.required'                 => 'Catatan tidak boleh kosong.',
+                    'arr_schedule.required'                  =>'Harap pilih Schedule'
+                ]);
+            }if($query_pengambil_tipe->type == '3'){
+                $validation = Validator::make($request->all(), [
+                    'code'			           => $request->temp ? ['required', Rule::unique('leave_requests', 'code')->ignore($request->temp)] : 'required|unique:leave_requests,code',
+                    'post_date'                => 'required',
+                    'company_id'               => 'required',
+                    'account_id'               => 'required',
+                    'leave_type_id'            => 'required',
+                    'arr_schedule'         => 'required',
                     'end_date'                 => 'required',
                     'start_date'               => 'required',
                     'note'                     => 'required',
@@ -185,13 +215,58 @@ class LeaveRequestController extends Controller
                     'code.unique'                   => 'Kode telah dipakai',
                     'company_id.required'                 => 'Perusahaan tidak boleh kosong.',
                     'account_id.required'                 => 'Pegawai tidak boleh kosong.',
-                    'start_time.required'                 => 'Jam Awal tidak boleh kosong.',
-                    'end_time.required'                 => 'Jam Awal tidak boleh kosong.',
+                    'arr_schedule.required'                  =>'Harap pilih Schedule',
                     'post_date.required'                => 'Tanggal Post Tidak Boleh kosong',
                     'leave_type_id.required'                 => 'Tipe Ijin tidak boleh kosong.',
                     'end_date.required'                 => 'Tanggal Akhir tidak boleh kosong.',
                     'start_date.required'                 => 'Tanggal Awal tidak boleh kosong.',
                     'note.required'                 => 'Catatan tidak boleh kosong.',
+                ]);
+            }if($query_pengambil_tipe->type == '4'){
+                $validation = Validator::make($request->all(), [
+                    'code'			           => $request->temp ? ['required', Rule::unique('leave_requests', 'code')->ignore($request->temp)] : 'required|unique:leave_requests,code',
+                    'post_date'                => 'required',
+                    'company_id'               => 'required',
+                    'account_id'               => 'required',
+                    'leave_type_id'            => 'required',
+                    'start_time'               => 'required',
+                    'end_time'                 => 'required',
+                    'start_date'               => 'required',
+                    'note'                     => 'required',
+                    'arr_schedule'         => 'required',
+                ], [
+                    'code.required' 	            => 'Kode tidak boleh kosong.',
+                    'arr_schedule.required'                  =>'Harap pilih Schedule',
+                    'code.unique'                   => 'Kode telah dipakai',
+                    'company_id.required'                 => 'Perusahaan tidak boleh kosong.',
+                    'account_id.required'                 => 'Pegawai tidak boleh kosong.',
+                    'start_time.required'                 => 'Jam Awal s tidak boleh kosong.',
+                    'end_time.required'                 => 'Jam Awal tidak boleh kosong.',
+                    'post_date.required'                => 'Tanggal Post Tidak Boleh kosong',
+                    'leave_type_id.required'                 => 'Tipe Ijin tidak boleh kosong.',
+                    'start_date.required'                 => 'Tanggal Awal tidak boleh kosong.',
+                    'note.required'                 => 'Catatan tidak boleh kosong.',
+                ]);
+            }if($query_pengambil_tipe->type == '7'){         
+                $validation = Validator::make($request->all(), [
+                    'code'			           => $request->temp ? ['required', Rule::unique('leave_requests', 'code')->ignore($request->temp)] : 'required|unique:leave_requests,code',
+                    'company_id'               => 'required',
+                    'account_id'               => 'required',
+                    'leave_type_id'            => 'required',
+                    'post_date'                => 'required',
+                    'start_date'               => 'required',
+                    'note'                     => 'required',
+                   
+                ], [
+                    'code.required' 	            => 'Kode tidak boleh kosong.',
+                    'code.unique'                   => 'Kode telah dipakai',
+                    'company_id.required'                 => 'Perusahaan tidak boleh kosong.',
+                    'account_id.required'                 => 'Pegawai tidak boleh kosong.',
+                    'post_date.required'                => 'Tanggal Post Tidak Boleh kosong',
+                    'leave_type_id.required'                 => 'Tipe Ijin tidak boleh kosong.',
+                    'start_date.required'                 => 'Tanggal Awal tidak boleh kosong.',
+                    'note.required'                 => 'Catatan tidak boleh kosong.',
+                   
                 ]);
             }
             if($validation->fails()) {
@@ -200,74 +275,146 @@ class LeaveRequestController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
-                if($request->temp){
-                    DB::beginTransaction();
-                    
-                    try {
-                        $query = LeaveRequest::find($request->temp);
-                        if(in_array($query->status,['1','6'])){
-                            if($request->has('document')) {
-                                if($query->document){
-                                    if(Storage::exists($query->document)){
-                                        Storage::delete($query->document);
-                                    }
-                                }
-                                $document = $request->file('document')->store('public/purchase_invoices');
-                            } else {
-                                $document = $query->document;
-                            }
+                if (in_array($query_pengambil_tipe->furlough_type, ['4', '5'])) {
+                    if($query_pengambil_tipe->furloughType == '1'){
+                        $dateFromRequest = Carbon::parse($request->start_date);
+                        $today = Carbon::today();
+                        if ($dateFromRequest->isAfter($today) || $dateFromRequest->isSameDay($today)) {
                             
-                            $query->user_id               = $request->user_id;
-                            $query->company_id              = $request->company_id;
-                            $query->account_id               = $request->account_id;
-                            $query->leave_type_id               = $request->leave_type_id;
-                            $query->start_time               = $request->start_time;
-                            $query->end_time               = $request->end_time;
-                            $query->end_date               = $request->end_date;
-                            $query->post_date               = $request->post_date;
-                            $query->start_date               = $request->start_date;
-                            $query->note               = $request->note;
-                            $query->status               = $request->status ? $request->status : '1';
-                            $query->save();
-                            DB::commit();
-                        }else{
-                            return response()->json([
+                        } else {
+                            $response = [
                                 'status'  => 500,
-                                'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
-                            ]);
+                                'message' => 'Tanggal Kurang dari tanggal hari ini.'
+                            ];
                         }
-                        
-                    }catch(\Exception $e){
-                        DB::rollback();
-                    }
-                }else{
-                    DB::beginTransaction();
-                    try {
-                        $query = LeaveRequest::create([
-                            'code'                  => LeaveRequest::generateCode($request->code),
-                            'user_id'                 => session('bo_id'),
-                            'company_id'                 => $request->company_id,
-                            'account_id'                 => $request->account_id,
-                            'leave_type_id'                 => $request->leave_type_id,
-                            'start_time'                 => $request->start_time,
-                            'end_time'                 => $request->end_time,
-                            'end_date'                 => $request->end_date,
-                            'post_date'                 => $request->post_date,
-                            'start_date'                 => $request->start_date,
-                            'note'                 => $request->note,
-                            'document'               => $request->file('document') ? $request->file('document')->store('public/leave_request') : NULL,
-                            'status'                => $request->status ? $request->status : '1',
-                        ]);
-                        DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
                     }
                 }
                 
+                
+                $query_employee_leave_q = EmployeeLeaveQuotas::where('user_id',$request->account_id)->where('start_date','like',date('Y')."%")->first();
+                
+                if($query_employee_leave_q || $query_pengambil_tipe->furlough_type != '1'){
+                    if( $query_pengambil_tipe->furlough_type != '1' || count($request->arr_schedule)  <= $query_employee_leave_q->paid_leave_quotas){
+                        if($request->temp){
+                            DB::beginTransaction();
+                            
+                            try {
+                                $query = LeaveRequest::find($request->temp);
+                                if(in_array($query->status,['1','6'])){
+                                    //perhitungan kuota cuti pertama mengambil total lalu menambahkan dulu baru mengurangi dengan shift total terbaru
+                                    if($query_pengambil_tipe->furlough_type != '1'){
+                                        $total = $request->temp_schedule + $query_employee_leave_q->paid_leave_quotas - count($request->arr_schedule);
+                                        $query_employee_leave_q->paid_leave_quotas = $total;
+                                        $query_employee_leave_q->save();
+                                    }
+                                    
+                                    
+                                    $query->user_id               = session('bo_id');
+                                    $query->company_id              = $request->company_id;
+                                    $query->account_id               = $request->account_id;
+                                    $query->leave_type_id               = $request->leave_type_id;
+                                    $query->start_time               = $request->start_time;
+                                    $query->end_time               = $request->end_time;
+                                    $query->end_date               = $request->end_date ?? $request->start_date;
+                                    $query->post_date               = $request->post_date;
+                                    $query->start_date               = $request->start_date;
+                                    $query->note               = $request->note;
+                                    $query->status               = $request->status ? $request->status : '1';
+                                    $query->save();
+    
+                                    foreach($query->leaveRequestShift as $row){
+                                        $query_schedule = EmployeeSchedule::find($row->employee_schedule_id);
+                                        $query_schedule->status = 1;
+                                        $query_schedule->save();
+                                        $row->delete();
+                                    }
+                                    DB::commit();
+                                }else{
+                                    return response()->json([
+                                        'status'  => 500,
+                                        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                                    ]);
+                                }
+                                
+                            }catch(\Exception $e){
+                                DB::rollback();
+                            }
+                        }else{
+                            DB::beginTransaction();
+                            try {
+                                $query = LeaveRequest::create([
+                                    'code'                  => LeaveRequest::generateCode($request->code),
+                                    'user_id'                 => session('bo_id'),
+                                    'company_id'                 => $request->company_id,
+                                    'account_id'                 => $request->account_id,
+                                    'leave_type_id'                 => $request->leave_type_id,
+                                    'start_time'                 => $request->start_time,
+                                    'end_time'                 => $request->end_time,
+                                    'end_date'                 => $request->end_date ?? $request->start_date,
+                                    'post_date'                 => $request->post_date,
+                                    'start_date'                 => $request->start_date,
+                                    'note'                 => $request->note,
+                                    'document'               => $request->file('document') ? $request->file('document')->store('public/leave_request') : NULL,
+                                    'status'                => $request->status ? $request->status : '1',
+                                ]);
+                                //pengurangan kuota
+                                if($query_pengambil_tipe->furlough_type == '1'){
+                                    $total =$query_employee_leave_q->paid_leave_quotas - count($request->arr_schedule);
+                                    
+                                    $query_employee_leave_q->paid_leave_quotas = $total;
+                                    $query_employee_leave_q->save();
+                                }
+
+                                DB::commit();
+                            }catch(\Exception $e){
+                                DB::rollback();
+                            }
+                        }
+                    }else{
+                        $response = [
+                            'status'  => 500,
+                            'message' => 'Melebihi Kuota Cuti Harap ganti ke tipe ijin'
+                        ];
+                        return response()->json($response);
+                    }
+                }else{
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Masih Belum memiliki kuota cuti mohon melakukan permintaan untuk membuat kuota cuti'
+                    ];
+                    return response()->json($response);
+                }
+                
+                
+                
+                
                 if($query) {
+                    if(in_array($query->leaveType->furlough_type,['1','2','3','8','9'])){
+                        foreach($request->arr_schedule as $row_schedule) {
+                            $query_leave_shift = LeaveRequestShift::create([
+                                'leave_request_id'=>$query->id,
+                                'employee_schedule_id'=>$row_schedule
+                            ]);
+                            $query_schedule = EmployeeSchedule::find($row_schedule);
+                            $query_schedule->status = 3;
+                            $query_schedule->save();
+                           
+                        }
+                    }elseif($query->leaveType->furlough_type == '7'){
+                        
+                    }else{
+                        foreach($request->arr_schedule as $row_schedule) {
+                            $query_leave_shift = LeaveRequestShift::create([
+                                'leave_request_id'=>$query->id,
+                                'employee_schedule_id'=>$row_schedule
+                            ]);
+                        }
+                    }
+                    
+
                     CustomHelper::sendApproval('leave_requests',$query->id,$query->note);
                     CustomHelper::sendNotification('leave_requests',$query->id,'Pengajuan Permohonan Dana No. '.$query->code,$query->note,session('bo_id'));
-    
+                    
                     activity()
                         ->performedOn(new LeaveRequest())
                         ->causedBy(session('bo_id'))
@@ -291,6 +438,8 @@ class LeaveRequestController extends Controller
                 'message' => 'Data failed to save.'
             ];
         }
+        
+        
 		
 		return response()->json($response);
     }
@@ -314,7 +463,17 @@ class LeaveRequestController extends Controller
     public function show(Request $request){
         $Level = LeaveRequest::find($request->id);
         $Level['leaveType']=$Level->leaveType;
-        $Level['account']=$Level->account;				
+        $Level['account']=$Level->account;
+        $arr=[];
+        foreach($Level->leaveRequestShift as $row){
+            $arr[] = [
+                'leave_request_id'                    => $row->leave_request_id,
+                'employee_schedule_id'                => $row->employee_schedule_id,
+                'employee_schedule_shift'             => $row->employeeSchedule->date.'|'.$row->employeeSchedule->shift->name.' Jam:'.$row->employeeSchedule->shift->time_in.' - '.$row->employeeSchedule->shift->time_out,
+            ];
+        }
+        $Level['details'] = $arr;
+        $Level['count'] = count($arr);				
 		return response()->json($Level);
     }
 
@@ -380,7 +539,7 @@ class LeaveRequestController extends Controller
 
     public function getCode(Request $request){
         $code = LeaveRequest::generateCode($request->val);
-        				
+       
 		return response()->json($code);
     }
 }

@@ -387,7 +387,6 @@
     }
 
     function approve(){
-		
         swal({
             title: "Apakah anda yakin?",
             text: "Anda tidak bisa mengembalikan data yang tersetujui!",
@@ -400,6 +399,13 @@
         }).then(function (willApprove) {
             if (willApprove) {
                 var formData = new FormData($('#form_data')[0]);
+                if($('input[name^="arr_status_material_request[]"]').length > 0){
+                    $('input[name^="arr_status_material_request[]"]').each(function(index){
+                        if($(this).is(':checked')){
+                            formData.append('arr_status_material_request[]',$(this).val());
+                        }
+                    });
+                }
                 $.ajax({
                     url: '{{ Request::url() }}/approve',
                     type: 'POST',

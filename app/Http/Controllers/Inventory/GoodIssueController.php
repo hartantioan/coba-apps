@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\Journal;
+use App\Models\MaterialRequest;
 use App\Models\Place;
 use App\Models\PurchaseOrder;
 use App\Models\ApprovalMatrix;
@@ -204,6 +205,8 @@ class GoodIssueController extends Controller
             'arr_item_stock'            => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_coa'                   => 'required|array',
+            'arr_lookable_type'         => 'required|array',
+            'arr_lookable_id'           => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code.string'                       => 'Kode harus dalam bentuk string.',
@@ -218,6 +221,10 @@ class GoodIssueController extends Controller
             'arr_qty.array'                     => 'Qty item harus dalam bentuk array',
             'arr_coa.required'                  => 'Coa tidak boleh kosong',
             'arr_coa.array'                     => 'Coa harus dalam bentuk array',
+            'arr_lookable_type.required'        => 'Tipe referensi tidak boleh kosong',
+            'arr_lookable_type.array'           => 'Tipe referensi harus dalam bentuk array',
+            'arr_lookable_id.required'          => 'Id referensi tidak boleh kosong',
+            'arr_lookable_id.array'             => 'Id referensi harus dalam bentuk array',
 		]);
 
         if($validation->fails()) {
@@ -371,6 +378,8 @@ class GoodIssueController extends Controller
                             'total'                 => $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
                             'coa_id'                => $request->arr_coa[$key],
+                            'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
+                            'lookable_id'           => $request->arr_lookable_id[$key] ? $request->arr_lookable_id[$key] : NULL,
                         ]);
                     }
 
@@ -410,7 +419,7 @@ class GoodIssueController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="8">Daftar Item</th>
+                                <th class="center-align" colspan="9">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -421,6 +430,7 @@ class GoodIssueController extends Controller
                                 <th class="center-align">Coa</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Gudang</th>
+                                <th class="center-align">Area</th>
                             </tr>
                         </thead><tbody>';
         
@@ -434,6 +444,7 @@ class GoodIssueController extends Controller
                 <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
                 <td class="center-align">'.$row->itemStock->place->name.'</td>
                 <td class="center-align">'.$row->itemStock->warehouse->name.'</td>
+                <td class="center-align">'.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').'</td>
             </tr>';
         }
         
@@ -508,6 +519,9 @@ class GoodIssueController extends Controller
                 'coa_id'            => $row->coa_id,
                 'coa_name'          => $row->coa->code.' - '.$row->coa->name,
                 'note'              => $row->note,
+                'lookable_type'     => $row->lookable_type ? $row->lookable_type : '',
+                'lookable_id'       => $row->lookable_id ? $row->lookable_id : '',
+                'reference_id'      => $row->lookable_type ? $row->lookable->materialRequest->id : '',
             ];
         }
 
@@ -940,4 +954,28 @@ class GoodIssueController extends Controller
         return response()->json($response);
     }
 
+    public function sendUsedData(Request $request){
+
+        $data = MaterialRequest::find($request->id);
+       
+        if(!$data->used()->exists()){
+            CustomHelper::sendUsedData($request->type,$request->id,'Form Good Issue / Barang Keluar');
+            return response()->json([
+                'status'    => 200,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Dokumen no. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.'
+            ]);
+        }
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->type,$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
+    }
 }

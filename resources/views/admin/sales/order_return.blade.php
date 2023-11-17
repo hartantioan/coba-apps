@@ -230,13 +230,14 @@
                                                         <th class="center">Satuan</th>
                                                         <th class="center">Plant Tujuan</th>
                                                         <th class="center">Gudang Tujuan</th>
+                                                        <th class="center">Area Tujuan</th>
                                                         <th class="center">Keterangan</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="9">
+                                                        <td colspan="10">
                                                             Silahkan tambahkan Surat Jalan...
                                                         </td>
                                                     </tr>
@@ -271,7 +272,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -284,7 +285,7 @@
     </div>
 </div>
 
-<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_structure">
@@ -299,7 +300,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -387,7 +388,7 @@
     </div>
 </div>
 
-<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
@@ -602,7 +603,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="9">
+                        <td colspan="10">
                             Silahkan tambahkan Surat Jalan...
                         </td>
                     </tr>
@@ -656,6 +657,11 @@
 
                         $.each($('#marketing_order_delivery_process_id').select2('data')[0].details, function(i, val) {
                             var count = makeid(10);
+                            let divArea = `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">`;
+                            $.each($('#marketing_order_delivery_process_id').select2('data')[0].list_area, function(i, valarea) {
+                                divArea += `<option value="` + valarea.id + `">` + valarea.name + `</option>`;
+                            });
+                            divArea += `</select>`;
                             $('#body-item').append(`
                                 <tr class="row_item" data-id="` + $('#marketing_order_delivery_process_id').val() + `">
                                     <input type="hidden" name="arr_modd[]" id="arr_modd` + count + `" value="` + val.id + `">
@@ -684,6 +690,9 @@
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
+                                    </td>
+                                    <td class="center">
+                                        ` + divArea + `
                                     </td>
                                     <td>
                                         <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan...">
@@ -1013,7 +1022,7 @@
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="9">
+                            <td colspan="10">
                                 Silahkan tambahkan Surat Jalan...
                             </td>
                         </tr>
@@ -1192,7 +1201,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]), passed = true;
-
+                
                 $('input[name^="arr_qty"]').each(function(index){
                     if(parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) == 0){
                         passed = false;
@@ -1324,6 +1333,11 @@
                     });
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
+                        let divArea = `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">`;
+                            $.each(response.list_area, function(i, valarea) {
+                                divArea += `<option value="` + valarea.id + `">` + valarea.name + `</option>`;
+                            });
+                            divArea += `</select>`;
                         $('#body-item').append(`
                             <tr class="row_item" data-id="` + val.marketing_order_delivery_process_id + `">
                                 <input type="hidden" name="arr_modd[]" id="arr_modd` + count + `" value="` + val.marketing_order_delivery_detail_id + `">
@@ -1353,6 +1367,9 @@
                                 <td class="center">
                                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                                 </td>
+                                <td class="center">
+                                    ` + divArea + `
+                                </td>
                                 <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan..." value="` + val.note + `">
                                 </td>
@@ -1370,6 +1387,7 @@
                         });
                         $('#arr_warehouse' + count).val(val.warehouse_id);
                         $('#arr_place' + count).val(val.place_id);
+                        $('#arr_area' + count).val(val.area_id);
                     });
                 }
                 

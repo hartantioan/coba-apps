@@ -64,6 +64,12 @@ class Coa extends Model
         });
     }
 
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','coa_id','id')->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function journalCredit(){
         return $this->hasMany('App\Models\JournalDetail','coa_id','id')->where('type','2')->whereHas('journal',function($query){
             $query->whereIn('status',['2','3']);
@@ -88,11 +94,55 @@ class Coa extends Model
         $totalCredit = 0;
         foreach($child as $row){
             $totalDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
-                $query->whereRaw("post_date LIKE '$month%'");
+                $query->whereIn('status',['2','3'])->whereRaw("post_date LIKE '$month%'");
             })->sum('nominal');
     
             $totalCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
-                $query->whereRaw("post_date LIKE '$month%'");
+                $query->whereIn('status',['2','3'])->whereRaw("post_date LIKE '$month%'");
+            })->sum('nominal');
+        }
+
+        $arr = [
+            'totalDebit'    => $totalDebit,
+            'totalCredit'   => $totalCredit,
+            'totalBalance'  => $totalDebit - $totalCredit,
+        ];
+
+        return $arr;
+    }
+
+    public function getTotalMonthFromParentExceptClosing($month,$level){
+        if($level == '1'){
+            $child = $this->getFifthChildFromFirst();
+        }elseif($level == '2'){
+            $child = $this->getFifthChildFromSecond();
+        }elseif($level == '3'){
+            $child = $this->getFifthChildFromThird();
+        }elseif($level == '4'){
+            $child = $this->getFifthChildFromFourth();
+        }elseif($level == '5'){
+            $child = $this->getFifthChildFromFifth();
+        }
+
+        $totalDebit = 0;
+        $totalCredit = 0;
+        foreach($child as $row){
+            $totalDebit += $row->journalDebit()->whereHas('journal',function($query)use($month){
+                $query->whereIn('status',['2','3'])
+                    ->whereRaw("post_date LIKE '$month%'")
+                    ->where(function($query){
+                        $query->where('lookable_type','!=','closing_journals')
+                            ->orWhereNull('lookable_type');
+                    });
+            })->sum('nominal');
+
+            $totalCredit += $row->journalCredit()->whereHas('journal',function($query)use($month){
+                $query->whereIn('status',['2','3'])
+                    ->whereRaw("post_date LIKE '$month%'")
+                    ->where(function($query){
+                        $query->where('lookable_type','!=','closing_journals')
+                            ->orWhereNull('lookable_type');
+                    });
             })->sum('nominal');
         }
 

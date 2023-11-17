@@ -40,7 +40,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
     <!-- END: Page Level CSS-->
     <!-- BEGIN: Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css?v=61') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/custom.css?v=63') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('app-assets/css/custom/waitMe.min.css') }}">
     <!-- END: Custom CSS-->
 	<script src="{{ url('app-assets/js/vendors.min.js') }}"></script>

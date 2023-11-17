@@ -15,6 +15,7 @@ class ItemStock extends Model
     protected $fillable = [
         'place_id',
         'warehouse_id',
+        'area_id',
         'item_id',
         'qty'
     ];
@@ -27,8 +28,13 @@ class ItemStock extends Model
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
 
+
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
+    }
+
+    public function area(){
+        return $this->belongsTo('App\Models\Area','area_id','id')->withTrashed();
     }
 
     public function valueNow(){

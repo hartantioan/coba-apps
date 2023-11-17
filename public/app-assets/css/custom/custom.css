@@ -182,3 +182,14 @@ legend {
 textarea.materialize-textarea {
 	margin:0 0 0px 0 !important;
 }
+
+.modal {
+	left: 63px;
+	width: -webkit-calc(100% - 65px) !important;
+    width:    -moz-calc(100% - 65px) !important;
+    width:         calc(100% - 65px) !important;
+}
+
+.sidenav-main {
+	z-index: 9999;
+}

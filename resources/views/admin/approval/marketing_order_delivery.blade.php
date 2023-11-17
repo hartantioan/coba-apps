@@ -208,12 +208,6 @@
                     {{ date('d/m/y',strtotime($data->delivery_date)) }}
                 </div>
                 <div class="col s4">
-                    Almt Kirim
-                </div>
-                <div class="col s8">
-                    {{ $data->marketingOrder->shipment_address }}
-                </div>
-                <div class="col s4">
                     Almt Tujuan
                 </div>
                 <div class="col s8">
@@ -238,7 +232,7 @@
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item->name }}</td>
-                        <td class="">{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name }}</td>
+                        <td class="">{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name }}</td>
                         <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="center-align">{{ $row->item->sellUnit->code }}</td>
                     </tr>

@@ -26,8 +26,14 @@ class PurchaseRequestDetail extends Model
         'machine_id',
         'department_id',
         'warehouse_id',
+        'lookable_type',
+        'lookable_id',
         'status',
     ];
+
+    public function lookable(){
+        return $this->morphTo();
+    }
 
     public function purchaseRequest()
     {

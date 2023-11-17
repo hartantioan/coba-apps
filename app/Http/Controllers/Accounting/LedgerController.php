@@ -87,29 +87,13 @@ class LedgerController extends Controller
             foreach($query_data as $val) {
 				
                 if($request->start_date && $request->finish_date) {
-					$before = "DATE(post_date) < '$request->start_date'";
                     $periode = "DATE(post_date) >= '$request->start_date' AND DATE(post_date) <= '$request->finish_date'";
                 } else if($request->start_date) {
-					$before = "DATE(post_date) < '$request->start_date'";
                     $periode = "DATE(post_date) >= '$request->start_date' AND DATE(post_date) <= CURDATE()";
                 } else if($request->finish_date) {
-					$before = "DATE(post_date) < CURDATE()";
                     $periode = "DATE(post_date) >= CURDATE() AND DATE(post_date) <= '$request->finish_date'";
                 } else {
-					$before = "";
                     $periode = "";
-                }
-
-                $beginning_debit  = $val->journalDebit()->whereHas('journal',function($query)use($before){
-                    $query->whereRaw($before);
-                })->sum('nominal');
-                $beginning_credit = $val->journalCredit()->whereHas('journal',function($query)use($before){
-                    $query->whereRaw($before);
-                })->sum('nominal');
-                if(!$request->start_date && !$request->finish_date) {
-                    $beginning_total = 0;
-                } else {
-                    $beginning_total = $beginning_debit - $beginning_credit;
                 }
 
                 $ending_debit  = $val->journalDebit()->whereHas('journal',function($query)use($periode){
@@ -124,10 +108,9 @@ class LedgerController extends Controller
                     '<button class="btn-floating green btn-small" style="padding: 0 0 !important;" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code.' - '.$val->name,
                     $val->company->name,
-                    number_format($beginning_total, 2, ',', '.'),
                     number_format($ending_debit, 2, ',', '.'),
                     number_format($ending_credit, 2, ',', '.'),
-                    number_format($beginning_total + $ending_total, 2, ',', '.')
+                    number_format($ending_total, 2, ',', '.')
                 ];
 
                 $nomor++;
@@ -170,32 +153,8 @@ class LedgerController extends Controller
                                 <th class="center-align">Saldo</th>
                             </tr>
                         </thead><tbody>';
-
-        if($request->start_date) {
-            $before = "DATE(post_date) < '$request->start_date'";
-        } else {
-            $before = "DATE(post_date) < CURDATE()";
-        }
         
-        $beginning_debit  = $coa->journalDebit()->whereHas('journal',function($query)use($before){
-            $query->whereRaw($before);
-        })->sum('nominal');
-        $beginning_credit = $coa->journalCredit()->whereHas('journal',function($query)use($before){
-            $query->whereRaw($before);
-        })->sum('nominal');
-        
-        if(!$request->start_date && !$request->finish_date) {
-            $beginning_total = 0;
-        } else {
-            $beginning_total = $beginning_debit - $beginning_credit;
-        }
-
-        $string .= '<tr>
-            <td class="center-align">1</td>
-            <td class="center-align red-text text-darken-2" colspan="13">Saldo Periode Sebelumnya</td>
-            <td class="right-align blue-text text-darken-2"><b>'.number_format($beginning_total,2,',','.').'</b></td>
-        </tr>';
-        
+        $beginning_total = 0;
         $no = 2;
         foreach(JournalDetail::where('coa_id',$coa->id)->whereHas('journal',function($query)use($request){
             if($request->start_date && $request->finish_date) {

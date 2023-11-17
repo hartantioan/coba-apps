@@ -105,7 +105,7 @@ class CustomHelper {
 		}
 	}
 
-	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null){
+	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null){
 		$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
 		if($type == 'IN'){
 			ItemCogs::create([
@@ -114,6 +114,7 @@ class CustomHelper {
 				'company_id'	=> $company_id,
 				'place_id'		=> $place_id,
 				'warehouse_id'	=> $warehouse_id,
+				'area_id'		=> $area_id,
 				'item_id'		=> $item_id,
 				'qty_in'		=> $qty,
 				'price_in'		=> $qty > 0 ? $total / $qty : 0,
@@ -137,6 +138,7 @@ class CustomHelper {
 						'company_id'	=> $company_id,
 						'place_id'		=> $place_id,
 						'warehouse_id'	=> $warehouse_id,
+						'area_id'		=> $area_id,
 						'item_id'		=> $item_id,
 						'qty_out'		=> $qty,
 						'price_out'		=> $priceout,
@@ -158,6 +160,7 @@ class CustomHelper {
 						'company_id'	=> $company_id,
 						'place_id'		=> $place_id,
 						'warehouse_id'	=> $warehouse_id,
+						'area_id'		=> $area_id,
 						'item_id'		=> $item_id,
 						'qty_out'		=> $qty,
 						'price_out'		=> $priceeach,
@@ -175,8 +178,8 @@ class CustomHelper {
 		ResetCogs::dispatch($date,$place_id,$item_id);
 	}
 
-	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null){
-		$old_data = ItemStock::where('place_id',$place_id)->where('item_id',$item_id)->where('warehouse_id',$warehouse_id)->first();
+	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null, $area_id = null){
+		$old_data = ItemStock::where('place_id',$place_id)->where('item_id',$item_id)->where('warehouse_id',$warehouse_id)->where('area_id',$area_id)->first();
 		if($old_data){
 			$old_data->update([
 				'qty' => $type == 'IN' ? $old_data->qty + $qty : $old_data->qty - $qty,
@@ -185,6 +188,7 @@ class CustomHelper {
 			ItemStock::create([
 				'place_id'		=> $place_id,
 				'warehouse_id'	=> $warehouse_id,
+				'area_id'		=> $area_id,
 				'item_id'		=> $item_id,
 				'qty'			=> $type == 'IN' ? $qty : 0 - $qty,
 			]);
@@ -414,6 +418,8 @@ class CustomHelper {
 
 			$arrdata = json_decode(json_encode($gr), true);
 
+			$arrNote = [];
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
@@ -429,6 +435,11 @@ class CustomHelper {
 			$coa_credit = Coa::where('code','200.01.03.01.02')->where('company_id',$gr->company_id)->first();
 
 			foreach($gr->goodReceiptDetail as $rowdetail){
+
+				if(self::checkArrayRaw($arrNote,$rowdetail->purchaseOrderDetail->purchaseOrder->code) < 0){
+					$arrNote[] = $rowdetail->purchaseOrderDetail->purchaseOrder->code;
+				}
+
 				$rowtotal = $rowdetail->getRowTotal() * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate;
 
 				JournalDetail::create([
@@ -468,7 +479,8 @@ class CustomHelper {
 					$rowdetail->qtyConvert(),
 					$rowtotal,
 					'IN',
-					$gr->post_date
+					$gr->post_date,
+					NULL,
 				);
 
 				self::sendStock(
@@ -476,9 +488,14 @@ class CustomHelper {
 					$rowdetail->warehouse_id,
 					$rowdetail->item_id,
 					$rowdetail->qtyConvert(),
-					'IN'
+					'IN',
+					NULL,
 				);
 			}
+
+			$journal = Journal::find($query->id);
+			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
+			$journal->save();
 		}elseif($table_name == 'shift_requests'){
 			$sr = ShiftRequest::find($table_id);
 			
@@ -595,6 +612,8 @@ class CustomHelper {
 				'note'			=> $ip->code,
 				'status'		=> '3'
 			]);
+
+			$arrNote = [];
 			
 			if($ip){
 				if($ip->wtax > 0){
@@ -668,6 +687,9 @@ class CustomHelper {
 							'note'			=> $row->note,
 						]);
 						CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->total * $ip->currency_rate);
+						if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
+							$arrNote[] = $row->lookable->code;
+						}
 					}elseif($row->lookable_type == 'marketing_order_invoices' || $row->lookable_type == 'marketing_order_down_payments' || $row->lookable_type == 'marketing_order_memos'){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -679,8 +701,10 @@ class CustomHelper {
 						]);
 						if($row->lookable_type == 'marketing_order_down_payments'){
 							self::addDeposit($row->lookable->account_id,$row->total * $ip->currency_rate);
-						}else{
-							CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->total * $ip->currency_rate);
+						}
+						CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->total * $ip->currency_rate);
+						if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
+							$arrNote[] = $row->lookable->code;
 						}
 					}else{
 						
@@ -696,6 +720,10 @@ class CustomHelper {
 						]);
 					}
 				}
+
+				$journal = Journal::find($query->id);
+				$journal->note = $journal->note.' - '.implode(', ',$arrNote);
+				$journal->save();
 			}
 
 		}elseif($table_name == 'payment_requests'){
@@ -799,7 +827,14 @@ class CustomHelper {
 			$totalReal = 0;
 			$totalMustPay = 0;
 
+			$arrNote = [];
+
 			foreach($op->paymentRequest->paymentRequestDetail as $row){
+
+				if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
+					$arrNote[] = $row->lookable->code;
+				}
+
 				$mustpay = 0;
 				$balanceReal = 0;
 
@@ -947,6 +982,10 @@ class CustomHelper {
 				'nominal'		=> $totalPay,
 			]);
 
+			$journal = Journal::find($query->id);
+			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
+			$journal->save();
+
 		}elseif($table_name == 'good_receives'){
 
 			$gr = GoodReceive::find($table_id);
@@ -972,6 +1011,7 @@ class CustomHelper {
 					'warehouse_id'	=> $row->warehouse_id,
 					'type'			=> '1',
 					'nominal'		=> $row->total,
+					'item_id'		=> $row->item_id,
 				]);
 
 				JournalDetail::create([
@@ -982,6 +1022,7 @@ class CustomHelper {
 					'warehouse_id'	=> $row->warehouse_id,
 					'type'			=> '2',
 					'nominal'		=> $row->total,
+					'item_id'		=> $row->item_id,
 				]);
 
 				self::sendCogs('good_receives',
@@ -993,7 +1034,8 @@ class CustomHelper {
 					$row->qty,
 					$row->total,
 					'IN',
-					$gr->post_date
+					$gr->post_date,
+					$row->area_id,
 				);
 
 				self::sendStock(
@@ -1001,7 +1043,8 @@ class CustomHelper {
 					$row->warehouse_id,
 					$row->item_id,
 					$row->qty,
-					'IN'
+					'IN',
+					$row->area_id,
 				);
 			}
 		}elseif($table_name == 'marketing_order_returns'){
@@ -1054,7 +1097,8 @@ class CustomHelper {
 					$row->qty * $row->item->sell_convert,
 					$hpp,
 					'IN',
-					$mor->post_date
+					$mor->post_date,
+					NULL,
 				);
 
 				self::sendStock(
@@ -1062,13 +1106,16 @@ class CustomHelper {
 					$row->warehouse_id,
 					$row->item_id,
 					$row->qty * $row->item->sell_convert,
-					'IN'
+					'IN',
+					NULL,
 				);
 			}
 
 		}elseif($table_name == 'good_returns'){
 
 			$gr = GoodReturnPO::find($table_id);
+
+			$arrNote = [];
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -1083,6 +1130,10 @@ class CustomHelper {
 			$coa_credit = Coa::where('code','200.01.03.01.02')->where('company_id',$gr->company_id)->first();
 
 			foreach($gr->goodReturnPODetail as $row){
+				if(self::checkArrayRaw($arrNote,$row->goodReceiptDetail->goodReceipt->code) < 0){
+					$arrNote[] = $row->goodReceiptDetail->goodReceipt->code;
+				}
+
 				$rowtotal = $row->getRowTotal() * $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_rate;
 
 				JournalDetail::create([
@@ -1120,7 +1171,8 @@ class CustomHelper {
 					$row->qtyConvert(),
 					$rowtotal,
 					'OUT',
-					$gr->post_date
+					$gr->post_date,
+					NULL,
 				);
 
 				self::sendStock(
@@ -1128,71 +1180,17 @@ class CustomHelper {
 					$row->goodReceiptDetail->warehouse_id,
 					$row->item_id,
 					$row->qtyConvert(),
-					'OUT'
+					'OUT',
+					NULL,
 				);
 			}
+
+			$journal = Journal::find($query->id);
+			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
+			$journal->save();
 		}elseif($table_name == 'marketing_order_delivery_processes'){
 
-			$modp = MarketingOrderDeliveryProcess::find($table_id);
 			
-			$query = Journal::create([
-				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
-				'lookable_type'	=> 'marketing_order_delivery_processes',
-				'lookable_id'	=> $modp->id,
-				'post_date'		=> $modp->post_date,
-				'note'			=> $modp->code,
-				'status'		=> '3'
-			]);
-			
-			$coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$modp->company_id)->first()->id;
-
-			foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
-
-				$hpp = $row->getHpp();
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
-					'coa_id'		=> $coahpp,
-					'place_id'		=> $row->place_id,
-					'item_id'		=> $row->item_id,
-					'warehouse_id'	=> $row->warehouse_id,
-					'type'			=> '1',
-					'nominal'		=> $hpp,
-				]);
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
-					'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
-					'place_id'		=> $row->place_id,
-					'item_id'		=> $row->item_id,
-					'warehouse_id'	=> $row->warehouse_id,
-					'type'			=> '2',
-					'nominal'		=> $hpp,
-				]);
-
-				self::sendCogs('marketing_order_delivery_processes',
-					$modp->id,
-					$row->place->company_id,
-					$row->place_id,
-					$row->warehouse_id,
-					$row->item_id,
-					$row->qty * $row->item->sell_convert,
-					$hpp,
-					'OUT',
-					$modp->post_date
-				);
-
-				self::sendStock(
-					$row->place_id,
-					$row->warehouse_id,
-					$row->item_id,
-					$row->qty * $row->item->sell_convert,
-					'OUT'
-				);
-			}
 
 		}elseif($table_name == 'good_issues'){
 
@@ -1239,7 +1237,8 @@ class CustomHelper {
 					$row->qty,
 					$row->total,
 					'OUT',
-					$gr->post_date
+					$gr->post_date,
+					$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
 				);
 
 				self::sendStock(
@@ -1247,7 +1246,8 @@ class CustomHelper {
 					$row->itemStock->warehouse_id,
 					$row->itemStock->item_id,
 					$row->qty,
-					'OUT'
+					'OUT',
+					$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
 				);
 			}
 			
@@ -1256,6 +1256,8 @@ class CustomHelper {
 			$lc = LandedCost::find($data->id);
 			
 			if($lc){
+				$arrNote = [];
+
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
 					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
@@ -1280,7 +1282,8 @@ class CustomHelper {
 								0,
 								$rowdetail->nominal * $lc->currency_rate,
 								'IN',
-								$lc->post_date
+								$lc->post_date,
+								NULL,
 							);
 
 							JournalDetail::create([
@@ -1371,7 +1374,8 @@ class CustomHelper {
 						0,
 						$rowdetail->nominal,
 						'IN',
-						$ir->post_date
+						$ir->post_date,
+						NULL,
 					);
 					
 					if($rowdetail->nominal < 0){
@@ -1507,7 +1511,8 @@ class CustomHelper {
 					$rowdetail->qty,
 					$nominal,
 					'OUT',
-					$ito->post_date
+					$ito->post_date,
+					NULL
 				);
 
 				self::sendStock(
@@ -1515,7 +1520,8 @@ class CustomHelper {
 					$rowdetail->itemStock->warehouse_id,
 					$rowdetail->item_id,
 					$rowdetail->qty,
-					'OUT'
+					'OUT',
+					NULL,
 				);
 			}
 		}elseif($table_name == 'inventory_transfer_ins'){
@@ -1565,7 +1571,7 @@ class CustomHelper {
 					$rowdetail->qty,
 					$rowdetail->total,
 					'IN',
-					$iti->post_date
+					NULL
 				);
 
 				self::sendStock(
@@ -1573,7 +1579,8 @@ class CustomHelper {
 					$iti->inventoryTransferOut->warehouse_to,
 					$rowdetail->item_id,
 					$rowdetail->qty,
-					'IN'
+					'IN',
+					NULL,
 				);
 			}
 
@@ -1806,6 +1813,8 @@ class CustomHelper {
 			$coapenjualan = Coa::where('code','400.01.01.01.01')->where('company_id',$moi->company_id)->first()->id;
 			$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$moi->company_id)->first()->id;
 
+			$arrNote = [];
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
@@ -1861,6 +1870,10 @@ class CustomHelper {
 				$tax += $rowtax;
 				$total_after_tax += $rowaftertax;
 				$rounding += $rowrounding;
+
+				if(self::checkArrayRaw($arrNote,$row->lookable->marketingOrderDelivery->code) < 0){
+					$arrNote[] = $row->lookable->marketingOrderDelivery->code;
+				}
 			}
 
 			$grandtotal = ($total_after_tax + $rounding);
@@ -1912,6 +1925,10 @@ class CustomHelper {
 			}
 
 			CustomHelper::addCountLimitCredit($moi->account_id,$balance);
+
+			$journal = Journal::find($query->id);
+			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
+			$journal->save();
 
 		}elseif($table_name == 'marketing_order_memos'){
 
@@ -2023,7 +2040,8 @@ class CustomHelper {
 							$row->qty * $row->lookable->lookable->item->sell_convert,
 							$hpp,
 							'IN',
-							$mom->post_date
+							$mom->post_date,
+							NULL
 						);
 	
 						self::sendStock(
@@ -2031,7 +2049,8 @@ class CustomHelper {
 							$row->lookable->lookable->warehouse_id,
 							$row->lookable->lookable->item_id,
 							$row->qty * $row->lookable->lookable->item->sell_convert,
-							'IN'
+							'IN',
+							NULL,
 						);
 					}
 				}
@@ -2066,6 +2085,8 @@ class CustomHelper {
 			$tax = 0;
 			$wtax = 0;
 			$currency_rate = 1;
+
+			$arrNote = [];
 
 			foreach($pi->purchaseInvoiceDetail as $row){
 				
@@ -2198,6 +2219,10 @@ class CustomHelper {
 						'nominal'		=> $row->grandtotal * $pod->purchaseOrder->currency_rate,
 					]);
 
+					if(self::checkArrayRaw($arrNote,$pod->purchaseOrder->code) < 0){
+						$arrNote[] = $pod->purchaseOrder->code;
+					}
+
 				}elseif($row->lookable_type == 'landed_cost_details'){
 					$arrCost = $row->lookable->getLocalImportCost();
 				
@@ -2280,6 +2305,10 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal * $row->lookable->landedCost->currency_rate,
 					]);
+
+					if(self::checkArrayRaw($arrNote,$row->lookable->landedCost->code) < 0){
+						$arrNote[] = $row->lookable->landedCost->code;
+					}
 				}else{
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -2343,6 +2372,10 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal * $row->lookable->purchaseOrderDetail->purchaseOrder->currency_rate,
 					]);
+
+					if(self::checkArrayRaw($arrNote,$row->lookable->goodReceipt->code) < 0){
+						$arrNote[] = $row->lookable->goodReceipt->code;
+					}
 				}
 			}
 
@@ -2388,6 +2421,10 @@ class CustomHelper {
 					'nominal'		=> abs($pi->rounding * $currency_rate),
 				]);
 			}
+
+			$journal = Journal::find($query->id);
+			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
+			$journal->save();
 
 		}elseif($table_name == 'marketing_order_down_payments'){
 
@@ -2516,7 +2553,7 @@ class CustomHelper {
 					]);
 				}
 
-				self::sendTrialBalance($cj->company_id, $cj->month);
+				self::sendTrialBalance($cj->company_id, $cj->month, $cj);
 			}
 		}
 		/* else{
@@ -2565,8 +2602,80 @@ class CustomHelper {
 		} */
 	}
 
-	public static function sendTrialBalance($company_id, $month){
-		
+	public static function sendTrialBalance($company_id, $month, $closingJournal){
+		$dt = strtotime($month);
+		$nextmonth = date("Y-m", strtotime("+1 month", $dt));
+		$journals = JournalDetail::whereHas('coa',function($query)use($company_id,$month){
+			$query->where('company_id',$company_id)
+				->whereRaw("SUBSTRING(code,1,1) IN ('1','2','3')");
+		})->whereHas('journal',function($query)use($company_id,$month){
+			$query->whereIn('status',['2','3'])
+				->whereRaw("post_date LIKE '$month%'");
+		})->get();
+
+		$arr = [];
+		foreach($journals as $row){
+			$index = self::checkArray($arr,$row->coa_id);
+			if($index < 0){
+				$arr[] = [
+					'coa_id'	=> $row->coa_id,
+					'coa_code'	=> $row->coa->code,
+					'balance'	=> $row->type == '1' ? $row->nominal : -1 * $row->nominal,
+				];
+			}else{
+				if($row->type == '1'){
+					$arr[$index]['balance'] += $row->nominal;
+				}elseif($row->type == '2'){
+					$arr[$index]['balance'] -= $row->nominal;
+				}
+			}
+		}
+
+		$collection = collect($arr)->sortBy('coa_code')->values()->all();
+
+		if(count($collection) > 0){
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($nextmonth)).'00'),
+				'lookable_type'	=> $closingJournal->getTable(),
+				'lookable_id'	=> $closingJournal->id,
+				'post_date'		=> $nextmonth.'-01',
+				'note'			=> $closingJournal->code,
+				'status'		=> '3'
+			]);
+
+			foreach($collection as $row){
+				if($row['balance'] !== 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row['coa_id'],
+						'type'			=> $row['balance'] >= 0 ? '1' : '2',
+						'nominal'		=> abs($row['balance']),
+						'note'			=> 'Saldo bulan '.date('F Y',strtotime($month)),
+					]);
+				}
+			}
+		}
+	}
+
+	public static function checkArray($arr,$val){
+		$index = -1;
+		foreach($arr as $key => $row){
+			if($row['coa_id'] == $val){
+				$index = $key;
+			}
+		}
+		return $index;
+	}
+
+	public static function checkArrayRaw($arr,$val){
+		$index = -1;
+		foreach($arr as $key => $row){
+			if($row == $val){
+				$index = $key;
+			}
+		}
+		return $index;
 	}
 
 	public static function removeJournal($table_name = null, $table_id = null){
@@ -2596,13 +2705,14 @@ class CustomHelper {
 				$item_id = $row->item_id;
 				$place_id = $row->place_id;
 				$warehouse_id = $row->warehouse_id;
+				$area_id = $row->area_id ? $row->area_id : NULL;
 				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				
 				$row->delete();
 
 				ResetCogs::dispatch($row->date,$place_id,$item_id);
-				ResetStock::dispatch($place_id,$warehouse_id,$item_id,$qty,$type);
+				ResetStock::dispatch($place_id,$warehouse_id,$area_id,$item_id,$qty,$type);
 			}
 		}
 	}

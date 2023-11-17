@@ -183,6 +183,43 @@ class Item extends Model
         return $arrData;
     }
 
+    public function currentStockPurchase($dataplaces,$datawarehouses){
+        $arrData = [];
+
+        $data = ItemStock::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->whereIn('warehouse_id',$datawarehouses)->get();
+        foreach($data as $detail){
+            $arrData[] = [
+                'id'            => $detail->id,
+                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name,
+                'warehouse_id'  => $detail->warehouse_id,
+                'place_id'      => $detail->place_id,
+                'qty'           => number_format($detail->qty / $detail->item->buy_convert,3,',','.').' '.$this->sellUnit->code,
+                'qty_raw'       => number_format($detail->qty / $detail->item->buy_convert,3,',','.'),
+            ];
+        }
+        
+        return $arrData;
+    }
+
+    public function currentStockPurchasePlaceWarehouse($place,$warehouse){
+        $arrData = [];
+
+        $data = ItemStock::where('item_id',$this->id)->where('place_id',$place)->where('warehouse_id',$warehouse)->get();
+        foreach($data as $detail){
+            $arrData[] = [
+                'id'            => $detail->id,
+                'warehouse'     => $detail->place->code.' - '.$detail->warehouse->name,
+                'warehouse_id'  => $detail->warehouse_id,
+                'place_id'      => $detail->place_id,
+                'qty'           => number_format($detail->qty / $detail->item->buy_convert,3,',','.').' '.$this->sellUnit->code,
+                'qty_raw'       => number_format($detail->qty / $detail->item->buy_convert,3,',','.'),
+                'qty_rawfull'   => $detail->qty / $detail->item->buy_convert,
+            ];
+        }
+        
+        return $arrData;
+    }
+
     public function currentStockSales($dataplaces,$datawarehouses){
         $arrData = [];
 
@@ -193,6 +230,8 @@ class Item extends Model
                 'id'            => $detail->id,
                 'warehouse'     => $detail->place->name.' - '.$detail->warehouse->name,
                 'warehouse_id'  => $detail->warehouse_id,
+                'area'          => $detail->area()->exists() ? $detail->area->name : '',
+                'area_id'       => $detail->area_id ? $detail->area_id : '',
                 'place_id'      => $detail->place_id,
                 'qty'           => number_format(($detail->qty / $detail->item->sell_convert) - $qtyUnapproved,3,',','.').' '.$this->uomUnit->code,
                 'qty_raw'       => number_format(($detail->qty / $detail->item->sell_convert) - $qtyUnapproved,3,',','.'),

@@ -136,70 +136,102 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="row">
-                            <div class="input-field col m2 s12 step1">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                <label class="active" for="code">No. Dokumen</label>
-                            </div>
-                            <div class="input-field col m1 s12 step2">
-                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                    <option value="">--Pilih--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="input-field col m3 s12 step3">
-                                <input type="hidden" id="temp" name="temp">
-                                <select class="form-control" id="company_id" name="company_id">
-                                    @foreach ($company as $rowcompany)
-                                        <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="company_id">Perusahaan</label>
-                            </div>
-                            
-                            <div class="input-field col m3 s12 step4">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Post</label>
-                            </div>
-                            <div class="file-field input-field col m3 s12 step5">
-                                <div class="btn">
-                                    <span>Lampiran Bukti</span>
-                                    <input type="file" name="document" id="document">
+                        <fieldset>
+                            <legend>1. Informasi Utama</legend>
+                            <div class="row">
+                                <div class="input-field col m2 s12 step1">
+                                    <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                    <label class="active" for="code">No. Dokumen</label>
                                 </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
+                                <div class="input-field col m1 s12 step2">
+                                    <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                        <option value="">--Pilih--</option>
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                            </div>
-                            <div class="col m12 s12 step6">
-                                <p class="mt-2 mb-2">
-                                    <h5>Detail Produk</h5>
-                                    Coa debit mengikuti coa pada masing-masing grup item.
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" style="width:100%;">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">Stok Item (Stok saat ini)</th>
-                                                    <th class="center">Qty</th>
-                                                    <th class="center">Keterangan</th>
-                                                    <th class="center">Coa Debit</th>
-                                                    <th class="center">Hapus</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-item">
-                                                <tr id="last-row-item">
-                                                    <td colspan="5" class="center">
-                                                        <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Tambah Item
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                <div class="input-field col m3 s12 step3">
+                                    <input type="hidden" id="temp" name="temp">
+                                    <select class="form-control" id="company_id" name="company_id">
+                                        @foreach ($company as $rowcompany)
+                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="company_id">Perusahaan</label>
+                                </div>
+                                
+                                <div class="input-field col m3 s12 step4">
+                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                    <label class="active" for="post_date">Tgl. Post</label>
+                                </div>
+                                <div class="file-field input-field col m3 s12 step5">
+                                    <div class="btn">
+                                        <span>Lampiran Bukti</span>
+                                        <input type="file" name="document" id="document">
                                     </div>
-                                </p>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
+                                    </div>
+                                </div>
                             </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>2. Material Request (Jika Ada)</legend>
+                            <div class="mt-1 mb-1">
+                                <b>Tarik data dari Material Request - qty yang muncul diambil dari selisih jumlah qty Material Request dikurangi stok saat ini. Jika selisih > 0, maka qty yang digunakan adalah qty stok. Jika selisih kurang <= 0, maka qty yang digunakan adalah qty Material Request. Hanya item yang telah disetujui akan masuk disini.</b>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col m5 step9">
+                                    <select class="browser-default" id="material_request_id" name="material_request_id"></select>
+                                    <label class="active" for="material_request_id">Daftar Material Request</label>
+                                </div>
+                                <div class="col m4 step10">
+                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMaterialRequest();" href="javascript:void(0);">
+                                        <i class="material-icons left">add</i> Material Request
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col m12 s12 step11">
+                                    <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>3. Detail Produk</legend>
+                            <div class="row">
+                                <div class="col m12 s12 step6">
+                                    <p class="mt-2 mb-2">
+                                        <h5>Detail Produk</h5>
+                                        Coa debit mengikuti coa pada masing-masing grup item.
+                                        <div style="overflow:auto;">
+                                            <table class="bordered" style="width:100%;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Stok Item (Stok saat ini)</th>
+                                                        <th class="center">Qty</th>
+                                                        <th class="center">Keterangan</th>
+                                                        <th class="center">Coa Debit</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-item">
+                                                    <tr id="last-row-item">
+                                                        <td colspan="5" class="center">
+                                                            <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah Item
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </p>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="row">
                             <div class="input-field col m4 s12 step7">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
@@ -219,7 +251,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -232,7 +264,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -320,7 +352,7 @@
     </div>
 </div>
 
-<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
@@ -426,6 +458,9 @@
                 $('#validation_alert').html('');
                 M.updateTextFields();
                 window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
                     return 'You will lose all changes made since your last save';
                 };
             },
@@ -433,11 +468,13 @@
                 $("#form_data :input").prop("disabled", false);
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('.row_item').each(function(){
-                    $(this).remove();
-                });
                 M.updateTextFields();
-                $('#list-used-data').empty();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }else{
+                    $('.row_item').remove();
+                }
+                $('#material_request_id').empty();
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -493,6 +530,8 @@
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
         });
+
+        select2ServerSide('#material_request_id', '{{ url("admin/select2/material_request_gi") }}');
     });
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -661,11 +700,149 @@
         });
 	}
 
+    function getMaterialRequest(){
+        if($('#material_request_id').val()){
+            let datakuy = $('#material_request_id').select2('data')[0];
+            $.ajax({
+                url: '{{ Request::url() }}/send_used_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#material_request_id').val(),
+                    type: datakuy.table,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                    }else{
+
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + datakuy.code + `
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.table + `','` + $('#material_request_id').val() + `')">close</i>
+                            </div>
+                        `);
+
+                        $('.row_item[data-id=""]').remove();
+
+                        $.each(datakuy.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#last-row-item').before(`
+                                <tr class="row_item" data-id="` + $('#material_request_id').val() + `">
+                                    <input type="hidden" id="tempQty` + count + `" value="0">
+                                    <input type="hidden" name="arr_lookable_type[]" value="` + val.type + `">
+                                    <input type="hidden" name="arr_lookable_id[]" value="` + val.id + `">
+                                    <td>
+                                        <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
+                                    </td>
+                                    <td>
+                                        <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiah(this);setStock('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                    </td>
+                                    <td>
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="`+ val.note +`">
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                            $('#arr_item_stock' + count).select2({
+                                placeholder: '-- Pilih stok item --',
+                                minimumInputLength: 1,
+                                allowClear: true,
+                                cache: true,
+                                width: 'resolve',
+                                dropdownParent: $('body').parent(),
+                                ajax: {
+                                    url: '{{ url("admin/select2/item_stock_material_request") }}',
+                                    type: 'GET',
+                                    dataType: 'JSON',
+                                    data: function(params) {
+                                        return {
+                                            search: params.term,
+                                            place_id: val.place_id,
+                                            warehouse_id: val.warehouse_id,
+                                            item_id: val.item_id,
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.items
+                                        }
+                                    }
+                                }
+                            });
+                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
+                        });
+
+                        $('#material_request_id').empty();
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
+    function removeUsedData(type,id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id,
+                type : type,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_item[data-id="' + id + '"]').remove();
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function addItem(){
         var count = makeid(10);
         $('#last-row-item').before(`
-            <tr class="row_item">
+            <tr class="row_item" data-id="">
                 <input type="hidden" id="tempQty` + count + `" value="0">
+                <input type="hidden" name="arr_lookable_type[]" value="">
+                <input type="hidden" name="arr_lookable_id[]" value="">
                 <td>
                     <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
                 </td>
@@ -691,7 +868,6 @@
 
     function setStock(val){
         if($('#arr_item_stock' + val).val()){
-
             let passed = true;
 
             $('select[name^="arr_item_stock"]').each(function(){
@@ -891,8 +1067,10 @@
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#last-row-item').before(`
-                            <tr class="row_item">
+                            <tr class="row_item" data-id="` + val.reference_id + `">
                                 <input type="hidden" id="tempQty` + count + `" value="` + val.qtyraw + `">
+                                <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                                <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                 <td>
                                     <select class="browser-default item-array" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `')"></select>
                                 </td>

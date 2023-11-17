@@ -9,6 +9,17 @@
     table.bordered th {
         padding: 5px !important;
     }
+
+    .loader-progress {
+        width:100%;
+        height:100%;
+        background-color: rgb(195, 243, 203);
+        position: absolute;;
+        z-index: 99999;
+        top:0;
+        left:0;
+        display: none;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -127,7 +138,118 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="loader-progress">
+        <div class="center" style="margin-top:15%;">
+            <div class="row">
+                <div class="col s4">
+                    <div class="col s12 p3" style="padding:25px;font-weight:800;">
+                        MENGECEK JURNAL PERSEDIAAN PERIODE TERPILIH
+                    </div>
+                    <div class="col s12">
+                        <div class="card-alert card gradient-45deg-amber-amber" id="checkstock-progress">
+                            <div class="card-content white-text">
+                                <p>
+                                    <i class="material-icons">hourglass_empty</i> PROSES - MOHON TUNGGU
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card-alert card gradient-45deg-green-teal" style="display:none;" id="checkstock-success">
+                            <div class="card-content white-text">
+                                <p>
+                                    <i class="material-icons">check</i> SUKSES : PROSES AKAN DILANJUTKAN
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card-alert card gradient-45deg-red-pink" style="display:none;" id="checkstock-fail">
+                            <div class="card-content white-text left-align">
+                                <p>
+                                    <i class="material-icons">error</i> MAAF : TERDAPAT STOK MINUS PADA PERIODE TERPILIH
+                                </p>
+                                <p>
+                                    Berikut datanya : <br><b id="detail-fail-stock"></b>
+                                </p>
+                            </div>
+                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close" onclick="$('.loader-progress').hide('fast');">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s4">
+                    <div class="col s12 p3" style="padding:25px;font-weight:800;">
+                        MENGECEK JURNAL KAS BANK PERIODE TERPILIH
+                    </div>
+                    <div class="col s12">
+                        <div class="card-alert card gradient-45deg-amber-amber" id="checkcash-progress">
+                            <div class="card-content white-text">
+                                <p>
+                                    <i class="material-icons">hourglass_empty</i> PROSES - MOHON TUNGGU
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card-alert card gradient-45deg-green-teal" style="display:none;" id="checkcash-success">
+                            <div class="card-content white-text">
+                                <p>
+                                    <i class="material-icons">check</i> SUKSES : PROSES AKAN DILANJUTKAN
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card-alert card gradient-45deg-red-pink" style="display:none;" id="checkcash-fail">
+                            <div class="card-content white-text left-align">
+                                <p>
+                                    <i class="material-icons">error</i> MAAF : TERDAPAT KAS / BANK MINUS PADA PERIODE TERPILIH
+                                </p>
+                                <p>
+                                    Berikut datanya : <br><b id="detail-fail-cash"></b>
+                                </p>
+                            </div>
+                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close" onclick="$('.loader-progress').hide('fast');">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s4">
+                    <div class="col s12 p3" style="padding:25px;font-weight:800;">
+                        MENGECEK QTY ITEM PERIODE TERPILIH
+                    </div>
+                    <div class="col s12">
+                        <div class="card-alert card gradient-45deg-amber-amber" id="checkqty-progress">
+                            <div class="card-content white-text">
+                                <p>
+                                    <i class="material-icons">hourglass_empty</i> PROSES - MOHON TUNGGU
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card-alert card gradient-45deg-green-teal" style="display:none;" id="checkqty-success">
+                            <div class="card-content white-text">
+                                <p>
+                                    <i class="material-icons">check</i> SUKSES : PROSES AKAN DILANJUTKAN
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card-alert card gradient-45deg-red-pink" style="display:none;" id="checkqty-fail">
+                            <div class="card-content white-text left-align">
+                                <p>
+                                    <i class="material-icons">error</i> MAAF : TERDAPAT QTY MINUS PADA PERIODE TERPILIH
+                                </p>
+                                <p>
+                                    Berikut datanya : <br><b id="detail-fail-qty"></b>
+                                </p>
+                            </div>
+                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close" onclick="$('.loader-progress').hide('fast');">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <div id="countdown" style="font-weight:800;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -163,7 +285,7 @@
                             <label class="active" for="post_date">Tgl. Posting</label>
                         </div>
                         <div class="input-field col s3 step5">
-                            <input id="month" name="month" type="month" placeholder="Periode Penutupan" value="{{ date('Y-m') }}">
+                            <input id="month" name="month" type="month" placeholder="Periode Penutupan" value="{{ date('Y-m') }}" onchange="resetDetailForm();">
                             <label class="active" for="month">Periode Penutupan</label>
                         </div>
                         <div class="file-field input-field col s3 step6">
@@ -218,7 +340,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -231,7 +353,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -319,7 +441,7 @@
     </div>
 </div>
 
-<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
@@ -589,10 +711,10 @@
                                             ` + val.coa_code + ` - ` + val.coa_name + `
                                         </td>
                                         <td class="right-align">
-                                            ` + (parseFloat(val.nominal) >= 0 ? formatRupiahIni(parseFloat(val.nominal)) : '0,00' ) + `
+                                            ` + (parseFloat(val.nominal) >= 0 ? val.nominal : '0,00' ) + `
                                         </td>
                                         <td class="right-align">
-                                            ` + (parseFloat(val.nominal) < 0 ? formatRupiahIni(-1 * parseFloat(val.nominal)) : '0,00' ) + `
+                                            ` + (parseFloat(val.nominal) < 0 ? -1 * val.nominal : '0,00' ) + `
                                         </td>
                                     </tr>
                                 `);
@@ -742,6 +864,155 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
+    async function checkStock(){
+        var statusStock = '';
+        await $.ajax({
+            url: '{{ Request::url() }}/check_stock',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                company_id : $('#company_id').val(),
+                month : $('#month').val(),
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#detail-fail-stock').empty();
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                statusStock = response.status;
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    $('#checkstock-progress').hide();
+                    $('#checkstock-success').show();
+                    
+                } else {
+                    $('#checkstock-progress').hide();
+                    $('#checkstock-fail').show();
+                    
+                    $.each(response.data, function(i, val) {
+                        if(val.passed == '0'){
+                            $('#detail-fail-stock').append(`
+                                Coa : ` + val.coa_name + ` pada tanggal ` + val.errors[0].date + ` kode jurnal ` + val.errors[0].code + ` dengan catatan  ` + val.errors[0].note + ` nominal ` + val.errors[0].balance + `.<br>
+                            `);
+                        }
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        
+        return statusStock;
+    }
+
+    async function checkCash(){
+        var statusCash = '';
+        await $.ajax({
+            url: '{{ Request::url() }}/check_cash',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                company_id : $('#company_id').val(),
+                month : $('#month').val(),
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+                $('#detail-fail-cash').empty();
+            },
+            success: function(response) {
+                statusCash = response.status;
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    $('#checkcash-progress').hide();
+                    $('#checkcash-success').show();
+                } else {
+                    $('#checkcash-progress').hide();
+                    $('#checkcash-fail').show();
+
+                    $.each(response.data, function(i, val) {
+                        if(val.passed == '0'){
+                            $('#detail-fail-cash').append(`
+                                Coa : ` + val.coa_name + ` pada tanggal ` + val.errors[0].date + ` kode jurnal ` + val.errors[0].code + ` dengan catatan  ` + val.errors[0].note + ` nominal ` + val.errors[0].balance + `.<br>
+                            `);
+                        }
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        return statusCash;
+    };
+
+    async function checkQty(){
+        var statusQty = '';
+        await $.ajax({
+            url: '{{ Request::url() }}/check_qty',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                company_id : $('#company_id').val(),
+                month : $('#month').val(),
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+                $('#detail-fail-qty').empty();
+            },
+            success: function(response) {
+                statusQty = response.status;
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    $('#checkqty-progress').hide();
+                    $('#checkqty-success').show();
+                } else {
+                    $('#checkqty-progress').hide();
+                    $('#checkqty-fail').show();
+
+                    $.each(response.data, function(i, val) {
+                        if(val.passed == '0'){
+                            $('#detail-fail-qty').append(`
+                                Item : ` + val.item_name + ` pada tanggal ` + val.date + ` kode dokumen ` + val.code + ` dengan catatan  ` + val.note + ` jumlah ` + val.balance + `.<br>
+                            `);
+                        }
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        return statusQty;
+    };
+
     function save(){
 		swal({
             title: "Apakah anda yakin ingin simpan?",
@@ -752,72 +1023,101 @@
             cancel: 'Tidak, jangan!',
             delete: 'Ya, lanjutkan!'
             }
-        }).then(function (willDelete) {
+        }).then(async function (willDelete) {
             if (willDelete) {
-
-                var formData = new FormData($('#form_data')[0]);
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
-
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
-                                });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
+                $('.loader-progress').show();
+                let cekstock = await checkStock();
+                let cekcash = await checkCash();
+                let cekqty = await checkQty();
+                $("#countdown").html("");
+                if(cekstock == '200' && cekcash == '200' && cekqty == '200'){
+                    setTimeout(function(){
+                        $('.loader-progress').hide( "fast", function() {
+                            $('#checkstock-progress').show();
+                            $('#checkstock-success').hide();
+                            $('#checkcash-progress').show();
+                            $('#checkcash-success').hide();
+                            $('#checkqty-progress').show();
+                            $('#checkqty-success').hide();
                         });
-                    }
+                        submit();
+                    }, 4000);
+                    var timeleft = 3;
+                    var downloadTimer = setInterval(function(){
+                        if(timeleft <= 0){
+                            clearInterval(downloadTimer);
+                        } else {
+                            $("#countdown").html(timeleft + " detik notifikasi akan ditutup.");
+                        }
+                        timeleft -= 1;
+                    }, 1000);
+                }
+            }
+        });
+    }
+
+    function submit(){
+        var formData = new FormData($('#form_data')[0]);
+        $.ajax({
+            url: '{{ Request::url() }}/create',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    success();
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alert').show();
+                    $('.modal-content').scrollTop(0);
+                    
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
                 });
             }
         });
@@ -1159,7 +1459,7 @@
             steps: [
                 {
                     title : 'Penutupan Jurnal',
-                    intro : 'Form ini digunakan untuk menutup jurnal per bulan / periode dengan menjurnal-balikkan coa 4,5,6,7,8 dan menyimpan nilai selisih yang menjadi Laba Rugi Berjalan.'
+                    intro : 'Form ini digunakan untuk menutup jurnal per bulan / periode dengan menjurnal-balikkan coa 4,5,6,7,8 dan menyimpan nilai selisih yang menjadi Laba Rugi Berjalan. Selanjutnya akan membuat saldo coa awalan 1,2,3 untuk periode berikutnya di tanggal 1.'
                 },
                 {
                     title : 'Nomor Dokumen',

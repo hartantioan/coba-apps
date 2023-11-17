@@ -22,11 +22,17 @@ class GoodIssueDetail extends Model
         'total',
         'note',
         'coa_id',
+        'lookable_type',
+        'lookable_id',
     ];
+
+    public function lookable(){
+        return $this->morphTo();
+    }
 
     public function goodIssue()
     {
-        return $this->belongsTo('App\Models\GoodReceive', 'good_issue_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\GoodIssue', 'good_issue_id', 'id')->withTrashed();
     }
 
     public function itemStock()

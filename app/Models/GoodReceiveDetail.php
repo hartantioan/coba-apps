@@ -24,7 +24,8 @@ class GoodReceiveDetail extends Model
         'coa_id',
         'place_id',
         'department_id',
-        'warehouse_id'
+        'warehouse_id',
+        'area_id',
     ];
 
     public function goodReceive()
@@ -40,6 +41,11 @@ class GoodReceiveDetail extends Model
     public function warehouse()
     {
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function area()
+    {
+        return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
     }
 
     public function place()

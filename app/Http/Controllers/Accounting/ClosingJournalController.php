@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
 use App\Models\Coa;
 use App\Models\Company;
+use App\Models\ItemCogs;
 use App\Models\Journal;
 use App\Models\JournalDetail;
 use App\Models\Place;
@@ -182,7 +183,7 @@ class ClosingJournalController extends Controller
         if(!$cek){
             $data = JournalDetail::whereHas('coa', function($query) use($request){
                 $query->where('company_id',$request->company_id)
-                    ->whereRaw("SUBSTRING(code,1,3) IN ('400','500','600','700','800')")
+                    ->whereRaw("SUBSTRING(code,1,1) IN ('4','5','6','7','8')")
                     ->where('level','5');
             })
             ->whereHas('journal', function($query)use($request){
@@ -212,6 +213,8 @@ class ClosingJournalController extends Controller
                 $profitLoss += $row['nominal'];
             }
 
+            $profitLoss = round($profitLoss,2);
+
             $collection = collect($arr);
 
             $result = $collection->sortBy('coa_code')->values()->all();
@@ -219,7 +222,7 @@ class ClosingJournalController extends Controller
             $coalabarugi = Coa::where('code','300.03.02.01.01')->where('company_id',$request->company_id)->first();
 
             foreach($result as $key => $row){
-                $result[$key]['nominal'] = -1 * $result[$key]['nominal'];
+                $result[$key]['nominal'] = -1 * round($result[$key]['nominal'],2);
             }
 
             $result[] = [
@@ -228,6 +231,8 @@ class ClosingJournalController extends Controller
                 'coa_name'  => $coalabarugi->name,
                 'nominal'   => $profitLoss,
             ];
+
+            info($result);
 
             $response = [
                 'status'    => 200,
@@ -925,5 +930,152 @@ class ClosingJournalController extends Controller
         }else{
             abort(404);
         }
+    }
+
+    public function checkStock(Request $request){
+        $company_id = $request->company_id;
+        $month = $request->month;
+
+        $coas = Coa::where('company_id',$company_id)->where('status','1')->where('level','5')->whereRaw("SUBSTRING(code,1,9) IN ('100.01.04','100.01.05')")->get();
+
+        $arr = [];
+        $passed = 1;
+        foreach($coas as $key => $row){
+            $arrError = [];
+            $data = $row->journalDetail()->whereHas('journal',function($query)use($month){
+                $query->where('post_date','like',"$month%");
+            })->get();
+            $balance = 0;
+            foreach($data as $detail){
+                $balance += ($detail->type == '1' ? $detail->nominal : -1 * $detail->nominal);
+                if($balance < 0){
+                    $arrError[] = [
+                        'date'      => date('d/m/y',strtotime($detail->journal->post_date)),
+                        'code'      => $detail->journal->code,
+                        'note'      => $detail->journal->note.' - '.$detail->note,
+                        'balance'   => number_format($balance,2,',','.'),
+                    ];
+                }
+            }
+            if($balance < 0){
+                $passed = 0;
+            }
+            $arr[] = [
+                'coa_id'    => $row->id,
+                'coa_code'  => $row->code,
+                'coa_name'  => $row->name,
+                'balance'   => number_format($balance,2,',','.'),
+                'errors'    => $arrError,
+                'passed'    => $passed,
+            ];
+        }
+
+        if($passed == 1){
+            $response = [
+                'status'    => 200,
+                'message'   => ''
+            ];
+        }else{
+            $response = [
+                'status'    => 422,
+                'message'   => '',
+                'data'      => $arr
+            ];
+        }
+        
+        return response()->json($response);
+    }
+
+    public function checkCash(Request $request){
+        $company_id = $request->company_id;
+        $month = $request->month;
+        
+        $coas = Coa::where('company_id',$company_id)->where('status','1')->where('level','5')->whereRaw("SUBSTRING(code,1,9) = '100.01.01'")->get();
+
+        $arr = [];
+        $passed = 1;
+        foreach($coas as $key => $row){
+            $arrError = [];
+            $data = $row->journalDetail()->whereHas('journal',function($query)use($month){
+                $query->where('post_date','like',"$month%");
+            })->get();
+            $balance = 0;
+            foreach($data as $detail){
+                $balance += ($detail->type == '1' ? $detail->nominal : -1 * $detail->nominal);
+                if($balance < 0){
+                    $arrError[] = [
+                        'date'      => date('d/m/y',strtotime($detail->journal->post_date)),
+                        'code'      => $detail->journal->code,
+                        'note'      => $detail->journal->note.' - '.$detail->note,
+                        'balance'   => number_format($balance,2,',','.'),
+                    ];
+                }
+            }
+            if($balance < 0){
+                $passed = 0;
+            }
+            $arr[] = [
+                'coa_id'    => $row->id,
+                'coa_code'  => $row->code,
+                'coa_name'  => $row->name,
+                'balance'   => number_format($balance,2,',','.'),
+                'errors'    => $arrError,
+                'passed'    => $passed,
+            ];
+        }
+
+        if($passed == 1){
+            $response = [
+                'status'    => 200,
+                'message'   => ''
+            ];
+        }else{
+            $response = [
+                'status'    => 422,
+                'message'   => '',
+                'data'      => $arr
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function checkQty(Request $request){
+        $company_id = $request->company_id;
+        $month = $request->month;
+        
+        $itemcogs = ItemCogs::where('company_id',$company_id)->where('date','like',"$month%")->get();
+
+        $arr = [];
+        $passed = 1;
+        foreach($itemcogs as $key => $row){
+            if($row->qty_final < 0){
+                $passed = 0;
+                $arr[] = [
+                    'item_name'         => $row->item->code.' - '.$row->item->name,
+                    'place_name'        => $row->place->code,
+                    'warehouse_code'    => $row->warehouse->code,
+                    'date'              => date('d/m/y',strtotime($row->date)),
+                    'code'              => $row->lookable->code,
+                    'note'              => $row->lookable->note,
+                    'balance'           => number_format($row->qty_final,2,',','.'),
+                ];
+            }
+        }
+
+        if($passed == 1){
+            $response = [
+                'status'    => 200,
+                'message'   => ''
+            ];
+        }else{
+            $response = [
+                'status'    => 422,
+                'message'   => '',
+                'data'      => $arr
+            ];
+        }
+
+        return response()->json($response);
     }
 }

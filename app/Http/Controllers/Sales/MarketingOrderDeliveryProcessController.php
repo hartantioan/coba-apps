@@ -475,142 +475,6 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'status'                                => '1',
                 ]);
 
-                #linkkan ke AR Invoice
-                if($query->marketingOrderDelivery->marketingOrder->account->is_ar_invoice){
-                    $total = 0;
-                    $tax = 0;
-                    $total_after_tax = 0;
-                    $downpayment = 0;
-                    $arrDownPayment = [];
-                    $passedDp = false;
-                    $passedTaxSeries = false;
-                    
-                    foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
-                        $total += $row->getTotal();
-                        $tax += $row->getTax();
-                        $total_after_tax += $row->getGrandtotal();
-                    }
-
-                    if($query->marketingOrderDelivery->marketingOrder->percent_dp > 0){
-                        $tempDownpayment = $total_after_tax * ($query->marketingOrderDelivery->marketingOrder->percent_dp / 100);
-                        $tempBalance = $tempDownpayment;
-                        foreach($query->marketingOrderDelivery->marketingOrder->account->marketingOrderDownPayment()->orderBy('code')->get() as $row){
-                            if($tempBalance > 0){
-                                $balanceInvoice = $row->balanceInvoice();
-                                if($balanceInvoice > 0){
-                                    $nominal = 0;
-                                    if($tempBalance > $balanceInvoice){
-                                        $nominal = $balanceInvoice;
-                                    }else{
-                                        $nominal = $tempBalance;
-                                    }
-                                    $arrDownPayment[] = [
-                                        'id'            => $row->id,
-                                        'type'          => $row->getTable(),
-                                        'code'          => $row->code,
-                                        'is_include_tax'=> $row->is_include_tax,
-                                        'percent_tax'   => $row->percent_tax,
-                                        'tax_id'        => $row->tax_id,
-                                        'total'         => $nominal / (1 + ($row->percent_tax / 100)),
-                                        'tax'           => ($nominal / (1 + ($row->percent_tax / 100))) * ($row->percent_tax / 100),
-                                        'grandtotal'    => $nominal,
-                                    ];
-                                    $downpayment += $nominal;
-                                    $tempBalance -= $nominal;
-                                }
-                            }
-                        }
-                        if($tempBalance > 0){
-                            $passedDp = false;
-                        }else{
-                            $passedDp = true;
-                        }
-                    }else{
-                        $passedDp = true;
-                    }
-
-                    if($passedDp){
-                        $balance = $total_after_tax - $downpayment;
-                        $code = MarketingOrderInvoice::generateCode('SINV-'.date('y').substr($query->code,7,2));
-                        $arrTax = TaxSeries::getTaxCode($query->company_id,$query->post_date);
-                        if($tax > 0 && $balance > 0){
-                            if($arrTax['status'] == '200'){
-                                $passedTaxSeries = true;
-                            }
-                        }else{
-                            $passedTaxSeries = true;
-                        }
-                        if($passedTaxSeries){
-                            $dueDate = date('Y-m-d', strtotime($query->post_date. ' + '.$query->marketingOrderDelivery->marketingOrder->account->top.' days'));
-                            $querymoi = MarketingOrderInvoice::create([
-                                'code'			                => $code,
-                                'user_id'		                => session('bo_id'),
-                                'account_id'                    => $query->marketingOrderDelivery->marketingOrder->account_id,
-                                'company_id'                    => $query->company_id,
-                                'post_date'                     => $query->post_date,
-                                'due_date'                      => $dueDate,
-                                'document_date'                 => $query->post_date,
-                                'status'                        => '1',
-                                'type'                          => $query->marketingOrderDelivery->marketingOrder->payment_type,
-                                'total'                         => $total,
-                                'tax'                           => $tax,
-                                'total_after_tax'               => $total_after_tax,
-                                'rounding'                      => 0,
-                                'grandtotal'                    => $total_after_tax,
-                                'downpayment'                   => $downpayment,
-                                'balance'                       => $balance,
-                                'document'                      => NULL,
-                                'tax_no'                        => $tax > 0 && $balance > 0 ? $arrTax['no'] : NULL,
-                                'note'                          => 'Dibuat otomatis setelah Surat Jalan No. '.$query->code,
-                            ]);
-
-                            foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $rowdata){
-                                MarketingOrderInvoiceDetail::create([
-                                    'marketing_order_invoice_id'    => $querymoi->id,
-                                    'lookable_type'                 => $rowdata->getTable(),
-                                    'lookable_id'                   => $rowdata->id,
-                                    'qty'                           => $rowdata->qty,
-                                    'price'                         => $rowdata->marketingOrderDetail->realPriceAfterGlobalDiscount(),
-                                    'is_include_tax'                => $rowdata->marketingOrderDetail->is_include_tax,
-                                    'percent_tax'                   => $rowdata->marketingOrderDetail->percent_tax,
-                                    'tax_id'                        => $rowdata->marketingOrderDetail->tax_id,
-                                    'total'                         => $rowdata->getTotal(),
-                                    'tax'                           => $rowdata->getTax(),
-                                    'grandtotal'                    => $rowdata->getGrandtotal(),
-                                    'note'                          => $rowdata->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDelivery->code.' - '.$query->code,
-                                ]);
-                            }
-
-                            foreach($arrDownPayment as $rowdata){
-                                MarketingOrderInvoiceDetail::create([
-                                    'marketing_order_invoice_id'    => $querymoi->id,
-                                    'lookable_type'                 => $rowdata['type'],
-                                    'lookable_id'                   => $rowdata['id'],
-                                    'qty'                           => 1,
-                                    'price'                         => $rowdata['total'],
-                                    'is_include_tax'                => $rowdata['is_include_tax'],
-                                    'percent_tax'                   => $rowdata['percent_tax'],
-                                    'tax_id'                        => $rowdata['tax_id'],
-                                    'total'                         => $rowdata['total'],
-                                    'tax'                           => $rowdata['tax'],
-                                    'grandtotal'                    => $rowdata['grandtotal'],
-                                    'note'                          => $rowdata['code'],
-                                ]);
-                            }
-            
-                            CustomHelper::sendApproval($querymoi->getTable(),$querymoi->id,$querymoi->note_internal.' - '.$querymoi->note_external);
-                            CustomHelper::sendNotification($querymoi->getTable(),$querymoi->id,'Pengajuan AR Invoice No. '.$querymoi->code,$querymoi->note_internal.' - '.$querymoi->note_external,session('bo_id'));
-            
-                            activity()
-                                ->performedOn(new MarketingOrderInvoice())
-                                ->causedBy(session('bo_id'))
-                                ->withProperties($querymoi)
-                                ->log('Add / edit AR Invoice.');
-                        }
-                    }
-                }
-                #end linkkan ke AR Invoice
-
                 CustomHelper::sendApproval('marketing_order_delivery_processes',$query->id,$query->note_internal.' - '.$query->note_external);
                 CustomHelper::sendNotification('marketing_order_delivery_processes',$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
@@ -993,20 +857,24 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
             ];
             $string='';
-            foreach($query->journal->journalDetail()->orderBy('id')->get() as $key => $row){
-                $string .= '<tr>
-                    <td class="center-align">'.($key + 1).'</td>
-                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
-                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
-                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
-                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
-                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
-                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
-                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
-                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
-                </tr>';
+            $no = 1;
+            foreach($query->journal as $rowmain){
+                foreach($rowmain->journalDetail()->orderBy('id')->get() as $key => $row){
+                    $string .= '<tr>
+                        <td class="center-align">'.$no.'</td>
+                        <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="center-align">'.$row->coa->company->name.'</td>
+                        <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                        <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                        <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                        <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                        <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                        <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    </tr>';
+                    $no++;
+                }
             }
             $response["tbody"] = $string; 
         }else{
@@ -1098,6 +966,12 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+            if($request->status_tracking == '5'){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Status kembali hanya bisa diisi melalui form disamping kanan / Surat Jalan Kembali.'
+                ]);
+            }
             $data   = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->tempTracking))->first();
             $cek = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$data->id)->where('status',$request->status_tracking)->first();
             if($cek){
@@ -1111,6 +985,12 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'status'                                => $request->status_tracking,
                 ]);
             }
+
+            if($request->status_tracking == '2'){
+                $data->createJournalSentDocument();
+            }
+
+            CustomHelper::sendNotification($data->getTable(),$data->id,'Status Pengiriman Surat Jalan No. '.$data->code.' telah diupdate','Status Pengiriman Surat Jalan No. '.$data->code.' telah diupdate.',$data->user_id);
 
             $response = [
                 'status'    => 200,
@@ -1172,6 +1052,15 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'status'                                => '5',
                     ]);
                 }
+
+                $datakuy = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->tempTracking))->first();
+
+                if($datakuy){
+                    $datakuy->createJournalReceiveDocument();
+                    $datakuy->createInvoice();
+                }
+
+                CustomHelper::sendNotification($datakuy->getTable(),$datakuy->id,'Dokumen Surat Jalan No. '.$datakuy->code.' telah kembali','Dokumen Surat Jalan No. '.$datakuy->code.' telah kembali.',session('bo_id'));
 
                 $response = [
                     'status'    => 200,

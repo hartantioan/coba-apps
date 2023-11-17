@@ -366,6 +366,7 @@ class MarketingOrderController extends Controller
             'percent_dp'                => 'required',
             'sales_id'                  => 'required',
             'arr_place'                 => 'required|array',
+            'arr_area'                  => 'required|array',
             'arr_warehouse'             => 'required|array',
             'arr_tax_nominal'           => 'required|array',
             'arr_grandtotal'            => 'required|array',
@@ -420,6 +421,8 @@ class MarketingOrderController extends Controller
             'sales_id.required'                 => 'Sales tidak boleh kosong',
             'arr_place.required'                => 'Plant tidak boleh kosong.',
             'arr_place.array'                   => 'Plant harus array.',
+            'arr_area.required'                 => 'Area tidak boleh kosong.',
+            'arr_area.array'                    => 'Area harus array.',
             'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
             'arr_warehouse.array'               => 'Gudang harus array.',
             'arr_tax_nominal.required'          => 'Tax nominal tidak boleh kosong.',
@@ -665,6 +668,7 @@ class MarketingOrderController extends Controller
                             'item_stock_id'                 => $request->arr_item_stock[$key] ? $request->arr_item_stock[$key] : NULL,
                             'place_id'                      => $request->arr_place[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key],
+                            'area_id'                       => $request->arr_area[$key],
                         ]);
                     }
 
@@ -673,8 +677,8 @@ class MarketingOrderController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval('marketing_orders',$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification('marketing_orders',$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
                 activity()
                     ->performedOn(new MarketingOrder())
@@ -748,6 +752,8 @@ class MarketingOrderController extends Controller
                 'list_stock'            => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'place_id'              => $row->place_id,
                 'warehouse_id'          => $row->warehouse_id,
+                'area_id'               => $row->area_id,
+                'area_name'             => $row->area->name,
                 'list_warehouse'        => $row->item->warehouseList(),
             ];
         }
@@ -812,7 +818,7 @@ class MarketingOrderController extends Controller
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="center-align">'.$row->place->name.' - '.$row->warehouse->name.'</td>
+                <td class="center-align">'.$row->place->name.' - '.$row->warehouse->name.' - '.$row->area->name.'</td>
                 <td class="right-align">'.number_format($row->other_fee,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->price_after_discount,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>

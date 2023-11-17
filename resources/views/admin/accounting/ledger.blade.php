@@ -97,7 +97,6 @@
                                                         <th>#</th>
                                                         <th>Coa</th>
                                                         <th>Perusahaan</th>
-                                                        <th>Awal</th>
                                                         <th>Debit</th>
                                                         <th>Kredit</th>
                                                         <th>Akhir</th>
@@ -146,7 +145,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="data_detail">
@@ -262,7 +261,6 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'coa', className: '' },
                 { name: 'company', className: '' },
-                { name: 'beginning', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'debit', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'credit', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'final', searchable: false, orderable: false, className: 'right-align' },

@@ -259,6 +259,8 @@ class MarketingOrderDeliveryController extends Controller
                         'place_name'    => $row->place->name,
                         'warehouse_id'  => $row->warehouse_id,
                         'warehouse_name'=> $row->warehouse->name,
+                        'area_id'       => $row->area_id,
+                        'area_name'     => $row->area->name,
                         'list_stock'    => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                         'qty'           => number_format($row->balanceQtyMod(),3,',','.'),
                         'unit'          => $row->item->sellUnit->code,
@@ -300,6 +302,7 @@ class MarketingOrderDeliveryController extends Controller
             'arr_item_stock'            => 'required|array',
             'arr_place'                 => 'required|array',
             'arr_warehouse'             => 'required|array',
+            'arr_area'                  => 'required|array',
             'arr_qty'                   => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -323,6 +326,8 @@ class MarketingOrderDeliveryController extends Controller
             'arr_place.array'                   => 'Baris plant harus array.',
             'arr_warehouse.required'            => 'Baris gudang tidak boleh kosong.',
             'arr_warehouse.array'               => 'Baris gudang harus array.',
+            'arr_area.required'                 => 'Baris area tidak boleh kosong.',
+            'arr_area.array'                    => 'Baris area harus array.',
         ]);
 
         if($validation->fails()) {
@@ -516,6 +521,7 @@ class MarketingOrderDeliveryController extends Controller
                             'item_stock_id'                 => $request->arr_item_stock[$key],
                             'place_id'                      => $request->arr_place[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key],
+                            'area_id'                       => $request->arr_area[$key],
                         ]);
                     }
 
@@ -526,8 +532,8 @@ class MarketingOrderDeliveryController extends Controller
 
                 $query->updateGrandtotal();
 
-                CustomHelper::sendApproval('marketing_order_deliveries',$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification('marketing_order_deliveries',$query->id,'Pengajuan Marketing Order Delivery No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Marketing Order Delivery No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
                 activity()
                     ->performedOn(new MarketingOrderDelivery())
@@ -578,8 +584,10 @@ class MarketingOrderDeliveryController extends Controller
                 'list_stock'            => $row->item->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'place_id'              => $row->place_id,
                 'warehouse_id'          => $row->warehouse_id,
+                'area_id'               => $row->area_id,
                 'place_name'            => $row->place->name,
                 'warehouse_name'        => $row->warehouse->name,
+                'area_name'             => $row->area->name,
             ];
         }
 
@@ -613,7 +621,7 @@ class MarketingOrderDeliveryController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->name.'</td>
-                <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.'</td>
+                <td class="center-align">'.$row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name.'</td>
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>
                 <td class="">'.$row->note.'</td>

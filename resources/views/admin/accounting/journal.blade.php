@@ -132,7 +132,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;min-width:100%;max-width:100%;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -321,7 +321,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -334,7 +334,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -885,7 +885,7 @@
                 element: "input",
                 attributes: {
                     min: 1,
-                    max: 500,
+                    max: 50,
                     type: "number",
                     value: 1,
                 }
@@ -895,7 +895,7 @@
         .then(() => {
             if ($('.swal-content__input').val() != "" && $('.swal-content__input').val() != null) {
                 count = parseInt($('.swal-content__input').val());
-                if(parseInt(count) > 500){
+                if(parseInt(count) > 50){
                     swal({
                         title: 'Baris tidak boleh lebih dari 50.',
                         icon: 'error'

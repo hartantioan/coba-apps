@@ -209,12 +209,13 @@
                                                     <th class="center">Plant</th>
                                                     <th class="center">Departemen</th>
                                                     <th class="center">Gudang</th>
+                                                    <th class="center">Area</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="12" class="center">
+                                                    <td colspan="13" class="center">
                                                         <button class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </button>
@@ -244,7 +245,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -257,7 +258,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -345,7 +346,7 @@
     </div>
 </div>
 
-<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
@@ -581,6 +582,7 @@
     function getRowUnit(val){
         $('#tempPrice' + val).empty();
         $("#arr_warehouse" + val).empty();
+        $('#area' + val).empty();
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
             if($("#arr_item" + val).select2('data')[0].price_list.length){
@@ -609,12 +611,21 @@
                     <option value="">--Gudang tidak diatur di master data Grup Item--</option>
                 `);
             }
+            if($("#arr_item" + val).select2('data')[0].is_sales_item){
+                $('#area' + val).append(`
+                    <select class="browser-default" id="arr_area` + val + `" name="arr_area[]"></select>
+                `);
+                select2ServerSide('#arr_area' + val, '{{ url("admin/select2/area") }}');
+            }else{
+                $('#area' + val).append(` - `);
+            }
         }else{
             $('#tempPrice' + val).empty();
             $('#arr_stock' + val).text('-');
             $("#arr_warehouse" + val).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
+            $('#area' + val).append(` - `);
         }
     }
 
@@ -737,7 +748,7 @@
             <tr class="row_item">
                 <input type="hidden" name="arr_purchase[]" value="0">
                 <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
                 </td>
                 <td class="center">
                     <span id="arr_stock` + count + `">-</span>
@@ -781,6 +792,9 @@
                         <option value="">--Silahkan pilih item--</option>    
                     </select>
                 </td>
+                <td class="center" id="area` + count + `">
+                    -
+                </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -818,6 +832,12 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]);
+
+                formData.delete("arr_area[]");
+
+                $('select[name^="arr_item[]"]').each(function(index){
+                    formData.append('arr_area[]',($('#arr_area' + $(this).data('id')).length > 0 ? ($('#arr_area' + $(this).data('id')).val() ? $('#arr_area' + $(this).data('id')).val() : '' )  : ''));
+                });
         
                 $.ajax({
                     url: '{{ Request::url() }}/create',
@@ -931,7 +951,7 @@
                             <tr class="row_item">
                                 <input type="hidden" name="arr_purchase[]" value="0">
                                 <td>
-                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
                                 </td>
                                 <td class="center">
                                     <span id="arr_stock` + count + `">-</span>
@@ -973,6 +993,9 @@
                                 <td class="center">
                                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
                                 </td>
+                                <td class="center" id="area` + count + `">
+                                    ` + ( val.area_id ? '<select class="browser-default" id="arr_area' + count + '" name="arr_area[]"></select>' : '-' ) + `
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -993,6 +1016,12 @@
                         select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa") }}');
                         $('#arr_place' + count).val(val.place_id).formSelect();
                         $('#arr_department' + count).val(val.department_id).formSelect();
+                        if(val.area_id){
+                            $('#arr_area' + count).append(`
+                                <option value="` + val.area_id + `">` + val.area_name + `</option>
+                            `);
+                            select2ServerSide('#arr_area' + count, '{{ url("admin/select2/area") }}');
+                        }
                     });
                 }
                 

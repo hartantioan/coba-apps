@@ -123,7 +123,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="min-width:100%;max-height: 100% !important;height: 100% !important;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -133,155 +133,188 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
+                        <fieldset>
+                            <legend>1. Informasi Utama</legend>
+                            <div class="row">
+                                <div class="input-field col m3 s12 step1">
+                                    <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
+                                    <label class="active" for="code">No. Dokumen</label>
+                                </div>
+                                <div class="input-field col m1 s12 step2">
+                                    <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                        <option value="">--Pilih--</option>
+                                        @foreach ($place as $rowplace)
+                                            <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="input-field col m4 s12 step3">
+                                    <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                                    <label class="active" for="post_date">Tgl. Posting</label>
+                                </div>
+                                <div class="input-field col m4 s12 step4">
+                                    <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
+                                    <label class="active" for="due_date">Tgl. Kadaluwarsa</label>
+                                </div>
+                                <div class="input-field col m4 s12 step5">
+                                    <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
+                                    <label class="active" for="required_date">Tgl. Dipakai</label>
+                                </div>
+                                <div class="file-field input-field col m4 s12 step6">
+                                    <div class="btn">
+                                        <span>File</span>
+                                        <input type="file" name="file" id="file">
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
+                                    </div>
+                                </div>
+                                <div class="input-field col m4 s12 step7">
+                                    <select class="form-control" id="company_id" name="company_id">
+                                        @foreach ($company as $row)
+                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="company_id">Perusahaan</label>
+                                </div>
+                                <div class="input-field col m4 s12 step8">
+                                    <select class="browser-default" id="project_id" name="project_id"></select>
+                                    <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>2. Material Request (Jika Ada)</legend>
+                            <div class="mt-1 mb-1">
+                                <b>Tarik data dari Material Request - jika ada stok yang tidak mencukupi maka qty akan diisi dengan selisih permintaan material stok dengan stok saat ini. Hanya item yang telah disetujui akan masuk disini.</b>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col m5 step9">
+                                    <select class="browser-default" id="material_request_id" name="material_request_id"></select>
+                                    <label class="active" for="material_request_id">Daftar Material Request</label>
+                                </div>
+                                <div class="col m4 step10">
+                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMaterialRequest();" href="javascript:void(0);">
+                                        <i class="material-icons left">add</i> Material Request
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col m12 s12 step11">
+                                    <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset style="min-width: 100%;overflow:auto;">
+                            <legend>3. Detail Produk</legend>
+                            <div class="row">
+                                <div class="col m12 s12 step12">
+                                    <p class="mt-2 mb-2">
+                                        <table class="bordered" style="width:1800px;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">Item</th>
+                                                    <th class="center">Qty</th>
+                                                    <th class="center">Satuan PO</th>
+                                                    <th class="center">Keterangan 1</th>
+                                                    <th class="center">Keterangan 2</th>
+                                                    <th class="center">Tgl.Dipakai</th>
+                                                    <th class="center">Plant</th>
+                                                    <th class="center">Line</th>
+                                                    <th class="center">Mesin</th>
+                                                    <th class="center">Gudang Tujuan</th>
+                                                    <th class="center">Departemen</th>
+                                                    <th class="center">Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-item">
+                                                <tr class="row_item" data-id="">
+                                                    <input type="hidden" name="arr_lookable_type[]" value="">
+                                                    <input type="hidden" name="arr_lookable_id[]" value="">
+                                                    <td>
+                                                        <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
+                                                    </td>
+                                                    <td class="center">
+                                                        <span id="arr_satuan0">-</span>
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_place0" name="arr_place[]">
+                                                            @foreach ($place as $rowplace)
+                                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                            @endforeach
+                                                        </select>    
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_line0" name="arr_line[]" onchange="changePlace(this);">
+                                                            <option value="">--Kosong--</option>
+                                                            @foreach ($line as $rowline)
+                                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                                            @endforeach
+                                                        </select>    
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_machine0" name="arr_machine[]" onchange="changeLine(this);">
+                                                            <option value="">--Kosong--</option>
+                                                            @foreach ($machine as $row)
+                                                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                            @endforeach    
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]">\
+                                                            <option value="">--Silahkan pilih item--</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_department0" name="arr_department[]">
+                                                            <option value="">--Kosong--</option>
+                                                            @foreach ($department as $rowdept)
+                                                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                                            @endforeach
+                                                        </select>    
+                                                    </td>
+                                                    <td class="center">
+                                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                            <i class="material-icons">delete</i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <tr id="last-row-item">
+                                                    <td colspan="12">
+                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                            <i class="material-icons left">add</i> Tambah 1
+                                                        </a>
+                                                        <a class="waves-effect waves-light green btn-small mb-1 mr-1" onclick="addItemFromStock()" href="javascript:void(0);">
+                                                            <i class="material-icons left">add</i> Tambah Dari Stok
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </p>
+                                </div>
+                            </div>
+                        </fieldset>
                         <div class="row">
-                            <div class="input-field col m3 s12 step1">
-                                <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                <label class="active" for="code">No. Dokumen</label>
-                            </div>
-                            <div class="input-field col m1 s12 step2">
-                                <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                    <option value="">--Pilih--</option>
-                                    @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="input-field col m4 s12 step3">
-                                <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Posting</label>
-                            </div>
-                            <div class="input-field col m4 s12 step4">
-                                <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                <label class="active" for="due_date">Tgl. Kadaluwarsa</label>
-                            </div>
-                            <div class="input-field col m4 s12 step5">
-                                <input id="required_date" name="required_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. posting">
-                                <label class="active" for="required_date">Tgl. Dipakai</label>
-                            </div>
-                            <div class="file-field input-field col m4 s12 step6">
-                                <div class="btn">
-                                    <span>File</span>
-                                    <input type="file" name="file" id="file">
-                                </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
-                                </div>
-                            </div>
-                            <div class="input-field col m4 s12 step7">
-                                <select class="form-control" id="company_id" name="company_id">
-                                    @foreach ($company as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
-                                <label class="" for="company_id">Perusahaan</label>
-                            </div>
-                            <div class="input-field col m4 s12 step8">
-                                <select class="browser-default" id="project_id" name="project_id"></select>
-                                <label for="project_id" class="active">Link Proyek (Jika ada) :</label>
-                            </div>
-                            <div class="col m12 s12 step9" style="overflow:auto;width:100% !important;">
-                                <p class="mt-2 mb-2">
-                                    <h4>Detail Produk</h4>
-                                    <table class="bordered" style="width:1800px;">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">Item</th>
-                                                <th class="center">Qty</th>
-                                                <th class="center">Satuan</th>
-                                                <th class="center">Keterangan 1</th>
-                                                <th class="center">Keterangan 2</th>
-                                                <th class="center">Tgl.Dipakai</th>
-                                                <th class="center">Plant</th>
-                                                <th class="center">Line</th>
-                                                <th class="center">Mesin</th>
-                                                <th class="center">Gudang Tujuan</th>
-                                                <th class="center">Departemen</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-item">
-                                            <tr class="row_item">
-                                                <td>
-                                                    <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)"></select>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)">
-                                                </td>
-                                                <td class="center">
-                                                    <span id="arr_satuan0">-</span>
-                                                </td>
-                                                <td>
-                                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang 1...">
-                                                </td>
-                                                <td>
-                                                    <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
-                                                </td>
-                                                <td>
-                                                    <input name="arr_required_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_place0" name="arr_place[]">
-                                                        @foreach ($place as $rowplace)
-                                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                                        @endforeach
-                                                    </select>    
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_line0" name="arr_line[]" onchange="changePlace(this);">
-                                                        <option value="">--Kosong--</option>
-                                                        @foreach ($line as $rowline)
-                                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                                        @endforeach
-                                                    </select>    
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_machine0" name="arr_machine[]" onchange="changeLine(this);">
-                                                        <option value="">--Kosong--</option>
-                                                        @foreach ($machine as $row)
-                                                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                                        @endforeach    
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_warehouse0" name="arr_warehouse[]">\
-                                                        <option value="">--Silahkan pilih item--</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <select class="browser-default" id="arr_department0" name="arr_department[]">
-                                                        <option value="">--Kosong--</option>
-                                                        @foreach ($department as $rowdept)
-                                                            <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                                                        @endforeach
-                                                    </select>    
-                                                </td>
-                                                <td class="center">
-                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                                        <i class="material-icons">delete</i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr id="last-row-item">
-                                                <td colspan="12">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah 1
-                                                    </a>
-                                                    <a class="waves-effect waves-light green btn-small mb-1 mr-1" onclick="addItemFromStock()" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah Dari Stok
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                            </div>
-                            <div class="input-field col m4 s12 step10">
+                            <div class="input-field col m4 s12 step13">
                                 <input type="hidden" id="temp" name="temp">
                                 <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step11" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step14" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -295,7 +328,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -307,7 +340,7 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
-<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_structure">
@@ -324,7 +357,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -412,7 +445,7 @@
     </div>
 </div>
 
-<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -448,7 +481,7 @@
     </div>
 </div>
 
-<div id="modal7" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal7" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -599,6 +632,12 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
+                    return 'You will lose all changes made since your last save';
+                };
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -606,6 +645,13 @@
                 M.updateTextFields();
                 $('#project_id,#warehouse_id').empty();
                 $('.row_item').remove();
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
+                $('#material_request_id').empty();
+                window.onbeforeunload = function() {
+                    return null;
+                };
             }
         });
 
@@ -615,6 +661,7 @@
 
         $('#arr_place0,#arr_department0').formSelect();
         select2ServerSide('#arr_item0', '{{ url("admin/select2/purchase_item") }}');
+        select2ServerSide('#material_request_id', '{{ url("admin/select2/material_request_pr") }}');
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
     });
 
@@ -745,7 +792,7 @@
         var formData = new FormData($('#form_data_print_multi')[0]);
         var table = $('#datatable_serverside').DataTable();
         var data = table.data().toArray();
-        var etNumbers = data.map(item => item[2]);
+        var etNumbers = data.map(item => item[1]);
         formData.append('tabledata',etNumbers);
         $.ajax({
             url: '{{ Request::url() }}/print_by_range',
@@ -1004,7 +1051,7 @@
     function printData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(3)').text().trim();
+            var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
         });
         $.ajax({
@@ -1290,7 +1337,9 @@
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         $('#last-row-item').before(`
-                            <tr class="row_item">
+                            <tr class="row_item" data-id="` + val.reference_id + `">
+                                <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                                <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                 <td>
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
@@ -1432,7 +1481,9 @@
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
                                 $('#last-row-item').before(`
-                                    <tr class="row_item">
+                                    <tr class="row_item" data-id="` + val.reference_id + `">
+                                        <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                                        <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                         <td>
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                         </td>
@@ -1548,6 +1599,167 @@
         }
     }
 
+    function getMaterialRequest(){
+        if($('#material_request_id').val()){
+            let datakuy = $('#material_request_id').select2('data')[0];
+            $.ajax({
+                url: '{{ Request::url() }}/send_used_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#material_request_id').val(),
+                    type: datakuy.table,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                    }else{
+
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + datakuy.code + `
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.table + `','` + $('#material_request_id').val() + `')">close</i>
+                            </div>
+                        `);
+
+                        $('.row_item[data-id=""]').remove();
+
+                        $.each(datakuy.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#last-row-item').before(`
+                                <tr class="row_item" data-id="` + $('#material_request_id').val() + `">
+                                    <input type="hidden" name="arr_lookable_type[]" value="` + val.type + `">
+                                    <input type="hidden" name="arr_lookable_id[]" value="` + val.id + `">
+                                    <td>
+                                        <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                                    </td>
+                                    <td>
+                                        <input name="arr_qty[]" type="text" value="` + val.qty_balance + `" onkeyup="formatRupiahNoMinus(this)">
+                                    </td>
+                                    <td class="center">
+                                        <span id="arr_satuan` + count + `">` + val.unit + `</span>
+                                    </td>
+                                    <td>
+                                        <input name="arr_note[]" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                    </td>
+                                    <td>
+                                        <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2...">
+                                    </td>
+                                    <td>
+                                        <input name="arr_required_date[]" type="date" value="` + val.date + `">
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($line as $rowline)
+                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($machine as $row)
+                                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                            @endforeach    
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                            <option value="">--Silahkan pilih item--</option>    
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                            <option value="">--Kosong--</option>
+                                            @foreach ($department as $rowdept)
+                                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                            @endforeach
+                                        </select>    
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                            $('#arr_place' + count).val(val.place_id);
+                            $('#arr_warehouse' + count).empty();
+                            $.each(val.list_warehouse, function(j, value) {
+                                $('#arr_warehouse' + count).append(`
+                                    <option value="` + value.id + `" ` + (value.id == val.warehouse_id ? 'selected' : '') + `>` + value.name + `</option>
+                                `);
+                            });
+                            $('#arr_item' + count).append(`
+                                <option value="` + val.item_id + `">` + val.item_name + `</option>
+                            `);
+                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
+                        });
+
+                        $('#material_request_id').empty();
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
+    function removeUsedData(type,id){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id,
+                type : type,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+                $('.row_item[data-id="' + id + '"]').remove();
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function destroy(id){
         swal({
             title: "Apakah anda yakin?",
@@ -1594,7 +1806,9 @@
     function addItem(){
         var count = makeid(10);
         $('#last-row-item').before(`
-            <tr class="row_item">
+            <tr class="row_item" data-id="">
+                <input type="hidden" name="arr_lookable_type[]" value="">
+                <input type="hidden" name="arr_lookable_id[]" value="">
                 <td>
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                 </td>
@@ -2044,18 +2258,33 @@
                     intro : 'Jika Purchase Request memiliki hubungan dengan proyek, maka silahkan tentukan disini.' 
                 },
                 {
-                    title : 'Detail produk',
+                    title : 'Daftar Material Request',
                     element : document.querySelector('.step9'),
+                    intro : 'Jika Purchase Request memiliki hubungan dengan Material Request, maka silahkan pilih untuk dimasukkan ke dalam Detail Produk. Anda bisa memasukkan lebih dari satu Material Request ke dalam Purchase Request.' 
+                },
+                {
+                    title : 'Tombol tambah Material Request',
+                    element : document.querySelector('.step10'),
+                    intro : 'Tekan tombol setelah memilih Material Request untuk mengambil data Material Request ke dalam tabel detail produk.' 
+                },
+                {
+                    title : 'Dafter dokumen Material Request Terpakai (Kunci dokumen)',
+                    element : document.querySelector('.step11'),
+                    intro : 'Material Request yang terpakai pada form ini akan ditampilkan disini, silahkan tekan tombol X (hapus) agar bisa diakses oleh pengguna lainnya.' 
+                },
+                {
+                    title : 'Detail produk',
+                    element : document.querySelector('.step12'),
                     intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Hati-hati dalam menentukan Plant, dan Gudang Tujuan, karena itu nantinya akan menentukan dimana barang ketika diterima.' 
                 },
                 {
                     title : 'Keterangan',
-                    element : document.querySelector('.step10'),
+                    element : document.querySelector('.step13'),
                     intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step11'),
+                    element : document.querySelector('.step14'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

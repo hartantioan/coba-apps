@@ -256,7 +256,7 @@
                                 <th class="center">Catatan 1</th>
                                 <th class="center">Catatan 2</th>
                                 <th class="center">Tgl.Dipakai</th>
-                                <th class="center">Site</th>
+                                <th class="center">Plant</th>
                                 <th class="center">Gudang</th>
                                 <th class="center">Departemen</th>
                             </tr>
@@ -265,7 +265,7 @@
                             @foreach($data->purchaseRequestDetail as $row)
                             <tr>
                                 <td>{{ $row->item->name }}</td>
-                                <td class="center">{{ $row->qty }}</td>
+                                <td class="center" align="right">{{ $row->qty }}</td>
                                 <td class="center">{{ $row->item->buyUnit->code }}</td>
                                 <td>{{ $row->note }}</td>
                                 <td>{{ $row->note2 }}</td>

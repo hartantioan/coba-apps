@@ -204,8 +204,8 @@ class UserDateController extends Controller
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
 
-                    $query->userDateMenu()->whereNotIn('menu_id',$request->checkBoxMenu)->delete();
-                    $query->userDateUser()->whereNotIn('user_id',$request->checkBoxUser)->delete();
+                    $query->userDateMenu()->delete();
+                    $query->userDateUser()->delete();
                 }else{
                     $query = UserDate::create([
                         'code'              => $request->code,
@@ -225,29 +225,17 @@ class UserDateController extends Controller
 			if($query) {
 
                 foreach($request->checkBoxMenu as $key => $row){
-                    $cek = $query->whereHas('userDateMenu',function($query)use($row){
-                        $query->where('menu_id',$row);
-                    })->count();
-
-                    if($cek == 0){
-                        UserDateMenu::create([
-                            'user_date_id'  => $query->id,
-                            'menu_id'       => $row,
-                        ]);
-                    }
+                    UserDateMenu::create([
+                        'user_date_id'  => $query->id,
+                        'menu_id'       => $row,
+                    ]);
                 }
 
                 foreach($request->checkBoxUser as $key => $row){
-                    $cek = $query->whereHas('userDateUser',function($query)use($row){
-                        $query->where('user_id',$row);
-                    })->count();
-
-                    if($cek == 0){
-                        UserDateUser::create([
-                            'user_date_id'  => $query->id,
-                            'user_id'       => $row,
-                        ]);
-                    }
+                    UserDateUser::create([
+                        'user_date_id'  => $query->id,
+                        'user_id'       => $row,
+                    ]);
                 }
 
                 activity()

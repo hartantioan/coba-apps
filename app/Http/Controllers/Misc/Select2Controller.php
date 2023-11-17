@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Misc;
 
 use App\Helpers\CustomHelper;
 use App\Models\ApprovalStage;
+use App\Models\Area;
 use App\Models\AttendancePeriod;
 use App\Models\CostDistribution;
 use App\Models\Department;
@@ -25,6 +26,8 @@ use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
 use App\Models\MarketingOrderPlan;
+use App\Models\MarketingOrderReturn;
+use App\Models\MaterialRequest;
 use App\Models\Menu;
 use App\Models\MenuUser;
 use App\Models\Outlet;
@@ -68,6 +71,27 @@ class Select2Controller extends Controller {
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
     
+    public function area(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Area::where(function($query)use($search){
+                $query->where('name', 'like', "%$search%")
+                    ->orWhere('code','like',"%$search%");
+            })
+            ->where('status','1')
+            ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function city(Request $request)
     {
         $response = [];
@@ -186,6 +210,7 @@ class Select2Controller extends Controller {
                 'price_list'        => $d->currentCogs($this->dataplaces),
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
+                'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
             ];
         }
 
@@ -346,6 +371,7 @@ class Select2Controller extends Controller {
                 'buy_unit'          => $d->buyUnit->code,
                 'old_prices'        => $d->oldPrices($this->dataplaces),
                 'list_warehouse'    => $d->warehouseList(),
+                'stock_list'        => $d->currentStockPurchase($this->dataplaces,$this->datawarehouses),
             ];
         }
 
@@ -377,6 +403,7 @@ class Select2Controller extends Controller {
                 'stock_list'        => $d->currentStockSales($this->dataplaces,$this->datawarehouses),
                 'list_warehouse'    => $d->warehouseList(),
                 'list_outletprice'  => $d->listOutletPrice(),
+                'list_area'         => Area::where('status','1')->get(),
             ];
         }
 
@@ -998,7 +1025,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->approval->name,
+                'text' 			=> $d->code.' - '.$d->approval->name.' - '.$d->textApprover(),
             ];
         }
         return response()->json(['items' => $response]);
@@ -1505,7 +1532,27 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
-                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' Item '.$d->item->name.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
+                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' - '.($d->area()->exists() ? $d->area->name : '').' Item '.$d->item->name.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
+                'qty'               => $d->qty,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function itemStockMaterialRequest(Request $request)
+    {
+        $response   = [];
+        $search     = $request->search;
+        $data = ItemStock::where('item_id',$request->item_id)
+                    ->where('place_id',$request->place_id)
+                    ->where('warehouse_id',$request->warehouse_id)
+                    ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->place->code.' - '.$d->warehouse->code.' - '.($d->area()->exists() ? $d->area->name : '').' Item '.$d->item->name.' Qty. '.number_format($d->qty,3,',','.').' '.$d->item->uomUnit->code,
                 'qty'               => $d->qty,
             ];
         }
@@ -1800,6 +1847,9 @@ class Select2Controller extends Controller {
                 }
             });
         })
+        ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+            $query->where('status','5');
+        })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2','3'])->get();
@@ -1825,7 +1875,7 @@ class Select2Controller extends Controller {
                     $arrDetail[] = [
                         'id'                => $row->id,
                         'item_id'           => $row->item_id,
-                        'item_name'         => $row->item->name.' - '.$row->itemStock->place->code.' - '.$row->itemStock->warehouse->code,
+                        'item_name'         => $row->item->name.' - '.$row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name,
                         'item_warehouse'    => $row->item->warehouseList(),
                         'unit'              => $row->item->sellUnit->code,
                         'code'              => $d->code,
@@ -1865,6 +1915,7 @@ class Select2Controller extends Controller {
                     'type'              => $d->getTable(),
                     'due_date'          => $d->marketingOrderDelivery->marketingOrder->valid_date,
                     'days_due'          => $d->marketingOrderDelivery->marketingOrder->account->top,
+                    'list_area'         => Area::where('status','1')->get(), 
                 ];
             }
         }
@@ -2349,6 +2400,150 @@ class Select2Controller extends Controller {
                 'id'   			=> $d->table_name,
                 'text' 			=> $d->name,
             ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function coaSubsidiaryLedger(Request $request)
+    {   
+        $response = [];
+        $search   = $request->search;
+        $data = Coa::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('prefix', 'like', "%$search%");
+                 })
+                ->where('status','1')
+                ->where('company_id',$request->company_id)
+                ->orderBy('code')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->code,
+                'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function materialRequestPR(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = MaterialRequest::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('note','like',"%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhereHas('materialRequestDetail',function($query)use($search){
+                    $query->whereHas('item',function($query)use($search){
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name','like',"%$search%");
+                    });
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])
+        ->get();
+
+        foreach($data as $d) {
+            if($d->hasBalanceQtyPr()){
+                $details = [];
+
+                foreach($d->materialRequestDetail()->where('status','1')->get() as $row){
+                    if($row->balancePr() > 0){
+                        $details[] = [
+                            'id'            => $row->id,
+                            'item_id'       => $row->item_id,
+                            'item_name'     => $row->item->code.' - '.$row->item->name,
+                            'qty'           => number_format($row->qty,3,',','.'),
+                            'unit'          => $row->item->buyUnit->code,
+                            'note'          => $row->note,
+                            'date'          => $row->required_date,
+                            'place_id'      => $row->place_id,
+                            'warehouse_id'  => $row->warehouse_id,
+                            'qty_balance'   => number_format($row->balancePr(),3,',','.'),
+                            'type'          => $row->getTable(),
+                            'list_warehouse'=> $row->item->warehouseList(),
+                        ];
+                    }
+                }
+
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' Tgl. Post : '.date('d/m/y',strtotime($d->post_date)).' Keterangan : '.$d->note,
+                    'code'          => $d->code,
+                    'table'         => $d->getTable(),
+                    'details'       => $details,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function materialRequestGI(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = MaterialRequest::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('note','like',"%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhereHas('materialRequestDetail',function($query)use($search){
+                    $query->whereHas('item',function($query)use($search){
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name','like',"%$search%");
+                    });
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])
+        ->get();
+
+        foreach($data as $d) {
+            if($d->hasBalanceQtyGi()){
+                $details = [];
+
+                foreach($d->materialRequestDetail()->where('status','1')->get() as $row){
+                    info($row->balanceGi());
+                    if($row->balanceGi() > 0){
+                        $details[] = [
+                            'id'            => $row->id,
+                            'item_id'       => $row->item_id,
+                            'item_name'     => $row->item->code.' - '.$row->item->name,
+                            'qty'           => number_format($row->qty,3,',','.'),
+                            'unit'          => $row->item->buyUnit->code,
+                            'note'          => $row->note,
+                            'date'          => $row->required_date,
+                            'place_id'      => $row->place_id,
+                            'warehouse_id'  => $row->warehouse_id,
+                            'qty_balance'   => number_format($row->balanceGi(),3,',','.'),
+                            'type'          => $row->getTable(),
+                            'list_warehouse'=> $row->item->warehouseList(),
+                            'item_stock'    => $row->item->currentStockPurchasePlaceWarehouse($row->place_id,$row->warehouse_id),
+                        ];
+                    }
+                }
+
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' Tgl. Post : '.date('d/m/y',strtotime($d->post_date)).' Keterangan : '.$d->note,
+                    'code'          => $d->code,
+                    'table'         => $d->getTable(),
+                    'details'       => $details,
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);

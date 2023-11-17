@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -131,6 +132,16 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
+    public function statusTrackingRaw(){
+        $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
+
+        if($status){
+            return $status->status;
+        }else{
+            return 'Status tracking tidak ditemukan.';
+        }
+    }
+
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
@@ -227,7 +238,7 @@ class MarketingOrderDeliveryProcess extends Model
     }
 
     public function journal(){
-        return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+        return $this->hasMany('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
 
     public function balanceInvoice(){
@@ -238,5 +249,254 @@ class MarketingOrderDeliveryProcess extends Model
         }
 
         return $total;
+    }
+
+    public function createInvoice(){
+        #linkkan ke AR Invoice
+        $query = $this;
+        $passed = true;
+        foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+            if($row->marketingOrderInvoiceDetail()->exists()){
+                $passed = false;
+            }
+        }
+        if($passed){
+            if($query->marketingOrderDelivery->marketingOrder->account->is_ar_invoice){
+                $total = 0;
+                $tax = 0;
+                $total_after_tax = 0;
+                $downpayment = 0;
+                $arrDownPayment = [];
+                $passedDp = false;
+                $passedTaxSeries = false;
+                
+                foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+                    $total += $row->getTotal();
+                    $tax += $row->getTax();
+                    $total_after_tax += $row->getGrandtotal();
+                }
+
+                if($query->marketingOrderDelivery->marketingOrder->percent_dp > 0){
+                    $tempDownpayment = $total_after_tax * ($query->marketingOrderDelivery->marketingOrder->percent_dp / 100);
+                    $tempBalance = $tempDownpayment;
+                    foreach($query->marketingOrderDelivery->marketingOrder->account->marketingOrderDownPayment()->orderBy('code')->get() as $row){
+                        if($tempBalance > 0){
+                            $balanceInvoice = $row->balanceInvoice();
+                            if($balanceInvoice > 0){
+                                $nominal = 0;
+                                if($tempBalance > $balanceInvoice){
+                                    $nominal = $balanceInvoice;
+                                }else{
+                                    $nominal = $tempBalance;
+                                }
+                                $arrDownPayment[] = [
+                                    'id'            => $row->id,
+                                    'type'          => $row->getTable(),
+                                    'code'          => $row->code,
+                                    'is_include_tax'=> $row->is_include_tax,
+                                    'percent_tax'   => $row->percent_tax,
+                                    'tax_id'        => $row->tax_id,
+                                    'total'         => $nominal / (1 + ($row->percent_tax / 100)),
+                                    'tax'           => ($nominal / (1 + ($row->percent_tax / 100))) * ($row->percent_tax / 100),
+                                    'grandtotal'    => $nominal,
+                                ];
+                                $downpayment += $nominal;
+                                $tempBalance -= $nominal;
+                            }
+                        }
+                    }
+                    if($tempBalance > 0){
+                        $passedDp = false;
+                    }else{
+                        $passedDp = true;
+                    }
+                }else{
+                    $passedDp = true;
+                }
+
+                if($passedDp){
+                    $balance = $total_after_tax - $downpayment;
+                    $code = MarketingOrderInvoice::generateCode('SINV-'.date('y',strtotime($query->return_date)).substr($query->code,7,2));
+                    $dueDate = date('Y-m-d', strtotime($query->return_date. ' + '.$query->marketingOrderDelivery->marketingOrder->account->top.' days'));
+                    $querymoi = MarketingOrderInvoice::create([
+                        'code'			                => $code,
+                        'user_id'		                => $query->user_id,
+                        'account_id'                    => $query->marketingOrderDelivery->marketingOrder->account_id,
+                        'company_id'                    => $query->company_id,
+                        'post_date'                     => $query->return_date,
+                        'due_date'                      => $dueDate,
+                        'document_date'                 => $query->return_date,
+                        'status'                        => '1',
+                        'type'                          => $query->marketingOrderDelivery->marketingOrder->payment_type,
+                        'total'                         => $total,
+                        'tax'                           => $tax,
+                        'total_after_tax'               => $total_after_tax,
+                        'rounding'                      => 0,
+                        'grandtotal'                    => $total_after_tax,
+                        'downpayment'                   => $downpayment,
+                        'balance'                       => $balance,
+                        'document'                      => NULL,
+                        'note'                          => 'Dibuat otomatis setelah Surat Jalan No. '.$query->code,
+                    ]);
+
+                    foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $rowdata){
+                        MarketingOrderInvoiceDetail::create([
+                            'marketing_order_invoice_id'    => $querymoi->id,
+                            'lookable_type'                 => $rowdata->getTable(),
+                            'lookable_id'                   => $rowdata->id,
+                            'qty'                           => $rowdata->qty,
+                            'price'                         => $rowdata->marketingOrderDetail->realPriceAfterGlobalDiscount(),
+                            'is_include_tax'                => $rowdata->marketingOrderDetail->is_include_tax,
+                            'percent_tax'                   => $rowdata->marketingOrderDetail->percent_tax,
+                            'tax_id'                        => $rowdata->marketingOrderDetail->tax_id,
+                            'total'                         => $rowdata->getTotal(),
+                            'tax'                           => $rowdata->getTax(),
+                            'grandtotal'                    => $rowdata->getGrandtotal(),
+                            'note'                          => $rowdata->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDelivery->code.' - '.$query->code,
+                        ]);
+                    }
+
+                    foreach($arrDownPayment as $rowdata){
+                        MarketingOrderInvoiceDetail::create([
+                            'marketing_order_invoice_id'    => $querymoi->id,
+                            'lookable_type'                 => $rowdata['type'],
+                            'lookable_id'                   => $rowdata['id'],
+                            'qty'                           => 1,
+                            'price'                         => $rowdata['total'],
+                            'is_include_tax'                => $rowdata['is_include_tax'],
+                            'percent_tax'                   => $rowdata['percent_tax'],
+                            'tax_id'                        => $rowdata['tax_id'],
+                            'total'                         => $rowdata['total'],
+                            'tax'                           => $rowdata['tax'],
+                            'grandtotal'                    => $rowdata['grandtotal'],
+                            'note'                          => $rowdata['code'],
+                        ]);
+                    }
+    
+                    CustomHelper::sendApproval($querymoi->getTable(),$querymoi->id,$querymoi->note_internal.' - '.$querymoi->note_external);
+                    CustomHelper::sendNotification($querymoi->getTable(),$querymoi->id,'Pengajuan AR Invoice No. '.$querymoi->code,$querymoi->note_internal.' - '.$querymoi->note_external,$query->user_id);
+    
+                    activity()
+                        ->performedOn(new MarketingOrderInvoice())
+                        ->causedBy($query->user_id)
+                        ->withProperties($querymoi)
+                        ->log('Add / edit AR Invoice.');
+                }
+            }
+            #end linkkan ke AR Invoice
+        }
+    }
+
+    public function createJournalSentDocument(){
+        $modp = $this;
+			
+        $query = Journal::create([
+            'user_id'		=> $modp->user_id,
+            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->post_date)).'00'),
+            'lookable_type'	=> 'marketing_order_delivery_processes',
+            'lookable_id'	=> $modp->id,
+            'post_date'		=> $modp->post_date,
+            'note'			=> $modp->code,
+            'status'		=> '3'
+        ]);
+        
+        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first()->id;
+
+        foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+
+            $hpp = $row->getHpp();
+
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
+                'coa_id'		=> $coabdp,
+                'place_id'		=> $row->place_id,
+                'item_id'		=> $row->item_id,
+                'warehouse_id'	=> $row->warehouse_id,
+                'type'			=> '1',
+                'nominal'		=> $hpp,
+                'note'          => 'Item dikirimkan / keluar dari gudang.'
+            ]);
+
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
+                'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+                'place_id'		=> $row->place_id,
+                'item_id'		=> $row->item_id,
+                'warehouse_id'	=> $row->warehouse_id,
+                'type'			=> '2',
+                'nominal'		=> $hpp,
+                'note'          => 'Item dikirimkan / keluar dari gudang.'
+            ]);
+
+            CustomHelper::sendCogs('marketing_order_delivery_processes',
+                $modp->id,
+                $row->place->company_id,
+                $row->place_id,
+                $row->warehouse_id,
+                $row->item_id,
+                $row->qty * $row->item->sell_convert,
+                $hpp,
+                'OUT',
+                $modp->post_date,
+                $row->area_id,
+            );
+
+            CustomHelper::sendStock(
+                $row->place_id,
+                $row->warehouse_id,
+                $row->item_id,
+                $row->qty * $row->item->sell_convert,
+                'OUT',
+                $row->area_id,
+            );
+        }
+    }
+
+    public function createJournalReceiveDocument(){
+        $modp = $this;
+			
+        $query = Journal::create([
+            'user_id'		=> $modp->user_id,
+            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->return_date)).'00'),
+            'lookable_type'	=> 'marketing_order_delivery_processes',
+            'lookable_id'	=> $modp->id,
+            'post_date'		=> $modp->return_date,
+            'note'			=> $modp->code,
+            'status'		=> '3'
+        ]);
+        
+        $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first()->id;
+        $coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$modp->company_id)->first()->id;
+
+        foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+
+            $hpp = $row->getHpp();
+
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
+                'coa_id'		=> $coahpp,
+                'place_id'		=> $row->place_id,
+                'item_id'		=> $row->item_id,
+                'warehouse_id'	=> $row->warehouse_id,
+                'type'			=> '1',
+                'nominal'		=> $hpp,
+                'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
+            ]);
+
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'account_id'	=> $modp->marketingOrderDelivery->marketingOrder->account_id,
+                'coa_id'		=> $coabdp,
+                'place_id'		=> $row->place_id,
+                'item_id'		=> $row->item_id,
+                'warehouse_id'	=> $row->warehouse_id,
+                'type'			=> '2',
+                'nominal'		=> $hpp,
+                'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
+            ]);
+        }
     }
 }

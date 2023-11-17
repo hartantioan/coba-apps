@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
+use App\Models\Item;
 use App\Models\Place;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
@@ -224,6 +225,8 @@ class GoodReceiveController extends Controller
             'arr_coa.array'                     => 'Coa harus dalam bentuk array',
             'arr_warehouse.required'            => 'Gudang tidak boleh kosong',
             'arr_warehouse.array'               => 'Gudang harus dalam bentuk array',
+            'arr_area.required'                 => 'Area tidak boleh kosong',
+            'arr_area.array'                    => 'Area harus dalam bentuk array',
 		]);
 
         if($validation->fails()) {
@@ -234,6 +237,7 @@ class GoodReceiveController extends Controller
         } else {
 
             $passed = true;
+            $passedArea = true;
 
             foreach($request->arr_item as $key => $row){
                 if(isset($request->arr_price[$key]) && isset($request->arr_qty[$key])){
@@ -243,12 +247,25 @@ class GoodReceiveController extends Controller
                 }else{
                     $passed = false;
                 }
+                $item = Item::find(intval($row));
+                if($item->is_sales_item){
+                    if(!$request->arr_area[$key]){
+                        $passedArea = false;
+                    }
+                }
             }
 
             if(!$passed){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Silahkan cek detail form anda, tidak boleh ada data 0 atau kosong.'
+                ]);
+            }
+
+            if(!$passedArea){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Salah satu / lebih item adalah item penjualan dan harus memiliki area.'
                 ]);
             }
 
@@ -364,6 +381,7 @@ class GoodReceiveController extends Controller
                             'warehouse_id'          => $request->arr_warehouse[$key],
                             'place_id'              => $request->arr_place[$key],
                             'department_id'         => isset($request->arr_department[$key]) ? $request->arr_department[$key] : NULL,
+                            'area_id'               => $request->arr_area[$key] ? $request->arr_area[$key] : NULL,
                         ]);
 
                     }
@@ -404,7 +422,7 @@ class GoodReceiveController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="11">Daftar Item</th>
+                                <th class="center-align" colspan="12">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -418,6 +436,7 @@ class GoodReceiveController extends Controller
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Departemen</th>
                                 <th class="center-align">Gudang</th>
+                                <th class="center-align">Area</th>
                             </tr>
                         </thead><tbody>';
         
@@ -434,6 +453,7 @@ class GoodReceiveController extends Controller
                 <td class="center-align">'.$row->place->name.' - '.$row->place->company->name.'</td>
                 <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
                 <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.($row->area()->exists() ? $row->area->name : '').'</td>
             </tr>';
         }
         
@@ -500,19 +520,21 @@ class GoodReceiveController extends Controller
         
         foreach($gr->goodReceiveDetail as $row){
             $arr[] = [
-                'item_id'       => $row->item_id,
-                'item_name'     => $row->item->code.' - '.$row->item->name,
-                'qty'           => number_format($row->qty,3,',','.'),
-                'unit'          => $row->item->uomUnit->code,
-                'price'         => number_format($row->price,3,',','.'),
-                'total'         => number_format($row->total,3,',','.'),
-                'coa_id'        => $row->coa_id,
-                'coa_name'      => $row->coa->code.' - '.$row->coa->name,
-                'place_id'      => $row->place_id,
-                'department_id' => $row->department_id,
-                'warehouse_id'  => $row->warehouse_id,
-                'warehouse_name'=> $row->warehouse->name,
-                'note'          => $row->note,
+                'item_id'           => $row->item_id,
+                'item_name'         => $row->item->code.' - '.$row->item->name,
+                'qty'               => number_format($row->qty,3,',','.'),
+                'unit'              => $row->item->uomUnit->code,
+                'price'             => number_format($row->price,3,',','.'),
+                'total'             => number_format($row->total,3,',','.'),
+                'coa_id'            => $row->coa_id,
+                'coa_name'          => $row->coa->code.' - '.$row->coa->name,
+                'place_id'          => $row->place_id,
+                'department_id'     => $row->department_id,
+                'warehouse_id'      => $row->warehouse_id,
+                'warehouse_name'    => $row->warehouse->name,
+                'area_id'           => $row->area_id ? $row->area_id : '',
+                'area_name'         => $row->area()->exists() ? $row->area->name : '',
+                'note'              => $row->note,
             ];
         }
 

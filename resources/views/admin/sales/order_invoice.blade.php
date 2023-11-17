@@ -421,7 +421,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -434,7 +434,7 @@
     </div>
 </div>
 
-<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_structure">
@@ -449,7 +449,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -537,7 +537,7 @@
     </div>
 </div>
 
-<div id="modal6" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
@@ -1583,11 +1583,11 @@
                     }
                 });
 
-                if(parseFloat($('#tax').val().replaceAll(".", "").replaceAll(",",".")) > 0){
+                /* if(parseFloat($('#tax').val().replaceAll(".", "").replaceAll(",",".")) > 0){
                     if(!$('#tax_no').val()){
                         passedTax = false;
                     }
-                }
+                } */
                 
                 if(passed){
                     if(passedTax){
@@ -2057,13 +2057,13 @@
             (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
         );
 
-        if(tax > 0){
+        /* if(tax > 0){
             $('#textTax').show();
             getTaxSeries();
         }else{
             $('#textTax').hide();
             $('#tax_no').val('');
-        }
+        } */
     }
 
     function startIntro(){

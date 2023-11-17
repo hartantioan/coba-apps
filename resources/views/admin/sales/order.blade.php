@@ -437,6 +437,7 @@
                                                         <th class="center">Stock</th>
                                                         <th class="center">Plant</th>
                                                         <th class="center">Gudang</th>
+                                                        <th class="center">Area</th>
                                                         <th class="center">Qty Skrg</th>
                                                         <th class="center">Qty Sementara</th>
                                                         <th class="center">Qty Pesanan</th>
@@ -463,7 +464,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="20">
+                                                        <td colspan="21">
                                                             Silahkan tambahkan baris ...
                                                         </td>
                                                     </tr>
@@ -552,7 +553,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -565,7 +566,7 @@
     </div>
 </div>
 
-<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_structure">
@@ -580,7 +581,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -746,7 +747,7 @@
                 if($('.row_item').length == 0 && $('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="20">
+                            <td colspan="21">
                                 Silahkan tambahkan baris ...
                             </td>
                         </tr>
@@ -819,7 +820,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="20">
+                        <td colspan="21">
                             Silahkan tambahkan baris ...
                         </td>
                     </tr>
@@ -1248,10 +1249,10 @@
         $("#arr_warehouse" + nil).empty();
         if($("#arr_item" + nil).val()){
             $('#arr_item_stock' + nil).empty();
-            if($("#arr_item" + nil).select2('data')[0].stock_list.length){
+            if($("#arr_item" + nil).select2('data')[0].stock_list.length > 0){
                 $.each($("#arr_item" + nil).select2('data')[0].stock_list, function(i, value) {
                     $('#arr_item_stock' + nil).append(`
-                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                        <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="` + value.area_id + `" data-aname="` + value.area + `">` + value.warehouse + ` - ` + value.qty + `</option>
                     `);
                 });
             }else{
@@ -1326,6 +1327,9 @@
         if($(element).val()){
             $('#arr_place' + nil).val($(element).find(':selected').data('p'));
             $('#arr_warehouse' + nil).val($(element).find(':selected').data('w'));
+            $('#arr_area' + nil).empty().append(`
+                <option value="` + $(element).find(':selected').data('a') + `">` + $(element).find(':selected').data('aname') + `</option>
+            `);
             $("#arr_qty_now" + nil).text($(element).find(':selected').data('qty'));
             let balance = formatRupiahIni((parseFloat($(element).find(':selected').data('qty').replaceAll(".", "").replaceAll(",",".")) - parseFloat($(element).find(':selected').data('qtycom').replaceAll(".", "").replaceAll(",","."))).toFixed(3).toString().replace('.',','));
             $("#rowQty" + nil).attr('data-qty',balance);
@@ -1333,6 +1337,9 @@
         }else{
             $('#arr_place' + nil).val($("#arr_place" + nil + " option:first").val());
             $('#arr_warehouse' + nil).val($("#arr_warehouse" + nil + " option:first").val());
+            $('#arr_area' + nil).empty().append(`
+                <option value="">--Silahkan pilih item--</option>
+            `);
             $("#arr_qty_now" + nil).text('0,000');
             $("#arr_qty_temporary" + nil).text('0,000');
             $("#rowQty" + nil).attr('data-qty','0');
@@ -1363,6 +1370,11 @@
                 </td>
                 <td class="center-align">
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                        <option value="">--Silahkan pilih item--</option>
+                    </select>    
+                </td>
+                <td class="center-align">
+                    <select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
                         <option value="">--Silahkan pilih item--</option>
                     </select>    
                 </td>
@@ -1715,6 +1727,7 @@
                 var formData = new FormData($('#form_data')[0]), passed = true;
 
                 formData.delete("arr_place[]");
+                formData.delete("arr_area[]");
                 formData.delete("arr_warehouse[]");
                 formData.delete("arr_tax_nominal[]");
                 formData.delete("arr_grandtotal[]");
@@ -1736,6 +1749,7 @@
                 if($('select[name^="arr_place[]"]').length > 0){
                     $('select[name^="arr_place[]"]').each(function(index){
                         formData.append('arr_place[]',$(this).val());
+                        formData.append('arr_area[]',$('select[name^="arr_area[]"]').eq(index).val());
                         formData.append('arr_warehouse[]',$('select[name^="arr_warehouse"]').eq(index).val());
                         formData.append('arr_tax_nominal[]',$('input[name^="arr_tax_nominal"]').eq(index).val());
                         formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"]').eq(index).val());
@@ -1761,6 +1775,9 @@
                             passed = false;
                         }
                         if(!$('select[name^="arr_warehouse"]').eq(index).val()){
+                            passed = false;
+                        }
+                        if(!$('select[name^="arr_area"]').eq(index).val()){
                             passed = false;
                         }
                     });
@@ -1835,7 +1852,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Item / stok / plant / gudang tidak boleh kosong.',
+                        text: 'Item / stok / plant / gudang / area tidak boleh kosong.',
                         icon: 'warning'
                     });
                 }
@@ -1980,6 +1997,9 @@
                                 <td class="center-align">
                                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>    
                                 </td>
+                                <td class="center-align">
+                                    <select class="browser-default" id="arr_area` + count + `" name="arr_area[]"></select>    
+                                </td>
                                 <td class="right-align" id="arr_qty_now` + count + `">` + val.item_stock_qty + `</td>
                                 <td class="right-align" id="arr_qty_temporary` + count + `">` + val.item_stock_qty + `</td>
                                 <td>
@@ -2045,11 +2065,14 @@
                         });
                         $.each(val.list_stock, function(i, value) {
                             $('#arr_item_stock' + count).append(`
-                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-qtycom="` + value.qty_commited + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="`+ value.area_id +`">` + value.warehouse + ` - ` + value.qty + `</option>
                             `);
                         });
                         $('#arr_item_stock' + count).val(val.item_stock_id).formSelect();
                         $('#arr_place' + count).val(val.place_id);
+                        $('#arr_area' + count).append(`
+                            <option value="` + val.area_id + `">` + val.area_name + `</option>
+                        `);
                         $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
                         if(val.is_include_tax){
                             $('#arr_is_include_tax' + count).prop( "checked", true);

@@ -12,6 +12,7 @@ use App\Models\Item;
 use App\Models\Line;
 use App\Models\LandedCost;
 use App\Models\Machine;
+use App\Models\MaterialRequest;
 use App\Models\PaymentRequest;
 use App\Models\PaymentRequestCross;
 use App\Models\PurchaseDownPayment;
@@ -471,7 +472,9 @@ class PurchaseRequestController extends Controller
             'company_id'                => 'required',
             'arr_warehouse'             => 'required|array',
             'arr_place'                 => 'required|array',
-            'arr_department'            => 'required|array'
+            'arr_department'            => 'required|array',
+            'arr_lookable_type'         => 'required|array',
+            'arr_lookable_id'           => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code.string'                       => 'Kode harus dalam bentuk string.',
@@ -489,7 +492,11 @@ class PurchaseRequestController extends Controller
             'arr_place.required'                => 'Penempatan tujuan tidak boleh kosong.',
             'arr_place.array'                   => 'Penempatan harus dalam bentuk array.',
             'arr_department.required'           => 'Departemen tujuan tidak boleh kosong.',
-            'arr_department.array'              => 'Departemen harus dalam bentuk array.'
+            'arr_department.array'              => 'Departemen harus dalam bentuk array.',
+            'arr_lookable_type.required'        => 'Referensi tipe tidak boleh kosong.',
+            'arr_lookable_type.array'           => 'Referensi tipe harus dalam bentuk array.',
+            'arr_lookable_id.required'          => 'Referensi id tidak boleh kosong.',
+            'arr_lookable_id.array'             => 'Referensi id harus dalam bentuk array.',
 		]);
 
         if($validation->fails()) {
@@ -603,7 +610,9 @@ class PurchaseRequestController extends Controller
                             'line_id'               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
                             'department_id'         => $request->arr_department[$key],
-                            'warehouse_id'          => $request->arr_warehouse[$key]
+                            'warehouse_id'          => $request->arr_warehouse[$key],
+                            'lookable_type'         => $request->arr_lookable_type[$key] ? $request->arr_lookable_type[$key] : NULL,
+                            'lookable_id'           => $request->arr_lookable_id[$key] ? $request->arr_lookable_id[$key] : NULL,
                         ]);
                     }
                     DB::commit();
@@ -611,8 +620,8 @@ class PurchaseRequestController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval('purchase_requests',$query->id,$query->note);
-                CustomHelper::sendNotification('purchase_requests',$query->id,'Pengajuan Purchase Request No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Request No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new PurchaseRequest())
@@ -657,7 +666,10 @@ class PurchaseRequestController extends Controller
                 'place_id'          => $row->place_id,
                 'line_id'           => $row->line_id,
                 'machine_id'        => $row->machine_id,
-                'department_id'     => $row->department_id
+                'department_id'     => $row->department_id,
+                'lookable_type'     => $row->lookable_type ? $row->lookable_type : '',
+                'lookable_id'       => $row->lookable_id ? $row->lookable_id : '',
+                'reference_id'      => $row->lookable_type ? $row->lookable->materialRequest->id : '',
             ];
         }
 
@@ -2233,5 +2245,30 @@ class PurchaseRequestController extends Controller
         }
         				
 		return response()->json($response);
+    }
+
+    public function sendUsedData(Request $request){
+
+        $data = MaterialRequest::find($request->id);
+       
+        if(!$data->used()->exists()){
+            CustomHelper::sendUsedData($request->type,$request->id,'Form Purchase Request');
+            return response()->json([
+                'status'    => 200,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Dokumen no. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.'
+            ]);
+        }
+    }
+
+    public function removeUsedData(Request $request){
+        CustomHelper::removeUsedData($request->type,$request->id);
+        return response()->json([
+            'status'    => 200,
+            'message'   => ''
+        ]);
     }
 }

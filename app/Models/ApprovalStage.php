@@ -53,4 +53,14 @@ class ApprovalStage extends Model
 
         return $list;
     }
+
+    public function textApprover(){
+        $list = [];
+        
+        foreach($this->approvalStageDetail as $row){
+            $list[] = $row->user->name;
+        }
+
+        return implode(', ',$list);
+    }
 }

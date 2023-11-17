@@ -131,6 +131,7 @@ use App\Http\Controllers\Inventory\GoodReceiveController;
 use App\Http\Controllers\Inventory\GoodIssueController;
 use App\Http\Controllers\Inventory\InventoryRevaluationController;
 use App\Http\Controllers\Inventory\StockMovementController;
+use App\Http\Controllers\Inventory\MaterialRequestController;
 
 use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
@@ -142,6 +143,7 @@ use App\Http\Controllers\Accounting\CashBankController;
 use App\Http\Controllers\Accounting\TrialBalanceController;
 use App\Http\Controllers\Accounting\ProfitLossController;
 use App\Http\Controllers\Accounting\ClosingJournalController;
+use App\Http\Controllers\Accounting\SubsidiaryLedgerController;
 
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -209,6 +211,7 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('select2')->group(function() {
                 Route::get('city', [Select2Controller::class, 'city']);
+                Route::get('area', [Select2Controller::class, 'area']);
                 Route::get('district', [Select2Controller::class, 'district']);
                 Route::get('subdistrict', [Select2Controller::class, 'subdistrict']);
                 Route::get('province', [Select2Controller::class, 'province']);
@@ -259,6 +262,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_for_hardware_item', [Select2Controller::class, 'itemForHardware']);
                 Route::get('inventory_transfer_out', [Select2Controller::class, 'inventoryTransferOut']);
                 Route::get('item_stock', [Select2Controller::class, 'itemStock']);
+                Route::get('item_stock_material_request', [Select2Controller::class, 'itemStockMaterialRequest']);
                 Route::get('department', [Select2Controller::class, 'department']);
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
@@ -283,6 +287,10 @@ Route::prefix('admin')->group(function () {
                 Route::get('shift_by_department', [Select2Controller::class, 'shiftByDepartment']);
                 Route::get('production_schedule', [Select2Controller::class, 'productionSchedule']);
                 Route::get('form_user', [Select2Controller::class, 'formUser']);
+                Route::get('coa_subsidiary_ledger', [Select2Controller::class, 'coaSubsidiaryLedger']);
+                Route::get('marketing_order_return', [Select2Controller::class, 'marketingOrderReturn']);
+                Route::get('material_request_pr', [Select2Controller::class, 'materialRequestPR']);
+                Route::get('material_request_gi', [Select2Controller::class, 'materialRequestGI']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -1069,6 +1077,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[PurchaseRequestController::class, 'print']);
                     Route::get('export',[PurchaseRequestController::class, 'export']);
                     Route::post('print_by_range',[PurchaseRequestController::class, 'printByRange']);
+                    Route::post('send_used_data',[PurchaseRequestController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [PurchaseRequestController::class, 'removeUsedData']);
                     Route::get('print_individual/{id}',[PurchaseRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[PurchaseRequestController::class, 'viewStructureTree']);
                     Route::post('create',[PurchaseRequestController::class, 'create'])->middleware('operation.access:purchase_request,update');
@@ -1471,6 +1481,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_code', [GoodIssueController::class, 'getCode']);
                     Route::post('print',[GoodIssueController::class, 'print']);
                     Route::post('print_by_range',[GoodIssueController::class, 'printByRange']);
+                    Route::post('send_used_data',[GoodIssueController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [GoodIssueController::class, 'removeUsedData']);
                     Route::get('print_individual/{id}',[GoodIssueController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[GoodIssueController::class, 'export']);
                     Route::get('view_journal/{id}',[GoodIssueController::class, 'viewJournal'])->middleware('operation.access:good_issue,journal');
@@ -1495,6 +1507,27 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[InventoryRevaluationController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [InventoryRevaluationController::class, 'voidStatus'])->middleware('operation.access:revaluation,void');
                     Route::post('destroy', [InventoryRevaluationController::class, 'destroy'])->middleware('operation.access:revaluation,delete');
+                });
+
+                Route::prefix('material_request')->middleware('operation.access:material_request,view')->group(function () {
+                    Route::get('/',[MaterialRequestController::class, 'index']);
+                    Route::get('datatable',[MaterialRequestController::class, 'datatable']);
+                    Route::get('row_detail',[MaterialRequestController::class, 'rowDetail']);
+                    Route::post('show', [MaterialRequestController::class, 'show']);
+                    Route::post('get_items', [MaterialRequestController::class, 'getItems']);
+                    Route::post('get_code', [MaterialRequestController::class, 'getCode']);
+                    Route::post('get_outstanding', [MaterialRequestController::class, 'getOutstanding']);
+                    Route::post('get_items_from_stock', [MaterialRequestController::class, 'getItemFromStock']);
+                    Route::post('print',[MaterialRequestController::class, 'print']);
+                    Route::get('export',[MaterialRequestController::class, 'export']);
+                    Route::post('print_by_range',[MaterialRequestController::class, 'printByRange']);
+                    Route::get('print_individual/{id}',[MaterialRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('viewstructuretree',[MaterialRequestController::class, 'viewStructureTree']);
+                    Route::post('create',[MaterialRequestController::class, 'create'])->middleware('operation.access:material_request,update');
+                    Route::post('create_done',[MaterialRequestController::class, 'createDone'])->middleware('operation.access:material_request,update');
+                    Route::post('void_status', [MaterialRequestController::class, 'voidStatus'])->middleware('operation.access:material_request,void');
+                    Route::get('approval/{id}',[MaterialRequestController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::post('destroy', [MaterialRequestController::class, 'destroy'])->middleware('operation.access:material_request,delete');
                 });
 
                 Route::prefix('inventory_report')->middleware('direct.access')->group(function () {
@@ -2033,6 +2066,9 @@ Route::prefix('admin')->group(function () {
                     Route::get('export',[ClosingJournalController::class, 'export']);
                     Route::post('print_by_range',[ClosingJournalController::class, 'printByRange']);
                     Route::post('preview', [ClosingJournalController::class, 'preview']);
+                    Route::post('check_stock', [ClosingJournalController::class, 'checkStock']);
+                    Route::post('check_cash', [ClosingJournalController::class, 'checkCash']);
+                    Route::post('check_qty', [ClosingJournalController::class, 'checkQty']);
                     Route::get('view_journal/{id}',[ClosingJournalController::class, 'viewJournal'])->middleware('operation.access:closing_journal,journal');
                     Route::get('print_individual/{id}',[ClosingJournalController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('create',[ClosingJournalController::class, 'create'])->middleware('operation.access:closing_journal,update');
@@ -2044,6 +2080,10 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('accounting_report')->middleware('direct.access')->group(function () {
                     Route::prefix('accounting_recap')->middleware('operation.access:accounting_recap,view')->group(function () {
                         Route::get('/',[AccountingReportController::class, 'index']);
+                    });
+                    Route::prefix('subsidiary_ledger')->middleware('operation.access:subsidiary_ledger,view')->group(function () {
+                        Route::get('/',[SubsidiaryLedgerController::class, 'index']);
+                        Route::post('process', [SubsidiaryLedgerController::class, 'process']);
                     });
                     Route::prefix('ledger')->middleware('operation.access:ledger,view')->group(function () {
                         Route::get('/',[LedgerController::class, 'index']);

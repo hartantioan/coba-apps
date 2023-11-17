@@ -83,7 +83,9 @@ class ResetCogs implements ShouldQueue
 						if($row->lookable_type == 'good_issues'){
 							$gi = GoodIssue::find($row->lookable_id);
 							$journal = Journal::where('lookable_type',$row->lookable_type)->where('lookable_id',$row->lookable_id)->first();
-							foreach($gi->goodIssueDetail()->where('item_id',$row->item_id)->get() as $rowgid){
+							foreach($gi->goodIssueDetail()->whereHas('itemStock',function($query)use($row){ 
+								$query->where('item_id',$row->item_id);
+							})->get() as $rowgid){
 								$rowgid->update([
 									'price'	=> $prevprice,
 									'total'	=> $prevprice * $rowgid->qty,

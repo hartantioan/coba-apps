@@ -265,15 +265,6 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="30%">
-                                            Almt Kirim
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="70%">
-                                            {{ $data->marketingOrder->shipment_address }}
-                                        </td>
-                                    </tr>
-                                    <tr>
                                         <td>
                                             Almt Tujuan
                                         </td>
@@ -303,7 +294,7 @@
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
                                     <td>{{ $row->item->name }}</td>
-                                    <td>{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name }}</td>
+                                    <td>{{ $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name }}</td>
                                     <td align="right">{{ number_format($row->qty,3,',','.') }}</td>
                                     <td align="center">{{ $row->item->sellUnit->code }}</td>
                                 </tr>

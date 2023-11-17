@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FundRequest;
 use App\Models\GoodReceipt;
 use App\Models\LandedCost;
+use App\Models\MaterialRequestDetail;
 use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
 use App\Models\PurchaseDownPayment;
@@ -318,9 +319,10 @@ class ApprovalController extends Controller
         $response['data'] = [];
         if($query_data <> FALSE) {
             $nomor = $start + 1;
+            $special = ['material_requests'];
             foreach($query_data as $val) {
                 $response['data'][] = [
-                    $val->status == '1' ? '<span class="pick" data-id="'.CustomHelper::encrypt($val->code).'">'.$nomor.'</span>' : $nomor,
+                    $val->status == '1' && !in_array($val->approvalSource->lookable_type,$special) ? '<span class="pick" data-id="'.CustomHelper::encrypt($val->code).'">'.$nomor.'</span>' : $nomor,
                     $val->code,
                     date('d M Y H:i:s',strtotime($val->date_request)),
                     $val->approvalSource->user->name,
@@ -394,6 +396,15 @@ class ApprovalController extends Controller
                                     break;
                                 }
                             }
+                        }
+                    }
+                }
+                if($query->approvalSource->lookable_type == 'material_requests'){
+                    if($request->arr_status_material_request){
+                        foreach($request->arr_status_material_request as $key => $row){
+                            MaterialRequestDetail::find(intval($row))->update([
+                                'status'    => '1'
+                            ]);
                         }
                     }
                 }

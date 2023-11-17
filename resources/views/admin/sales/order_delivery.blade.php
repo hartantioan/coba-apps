@@ -298,7 +298,7 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
@@ -311,7 +311,7 @@
     </div>
 </div>
 
-<div id="modal3" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_structure">
@@ -326,7 +326,7 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_detail">
@@ -651,6 +651,7 @@
                                         <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                         <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
+                                        <input type="hidden" name="arr_area[]" id="arr_area` + count + `" value="` + val.area_id + `">
                                         <td>
                                             ` + val.item_name + `
                                         </td>
@@ -658,7 +659,7 @@
                                             <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" style="width:100% !important;" onchange="getPlaceWarehouse(this,'` + count + `');"></select>
                                         </td>
                                         <td id="arr_warehouse_name` + count + `">
-                                            ` + val.place_name + ` - ` + val.warehouse_name + `
+                                            ` + val.place_name + ` - ` + val.warehouse_name + ` - ` + val.area_name + `
                                         </td>
                                         <td>
                                             <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100%;" id="rowQty`+ count +`">
@@ -683,7 +684,7 @@
                                     `);
                                     $.each(val.list_stock, function(i, value) {
                                         $('#arr_item_stock' + count).append(`
-                                            <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                            <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="` + value.area_id + `" data-aname="` + value.area + `">` + value.warehouse + ` - ` + value.qty + `</option>
                                         `);
                                     });
 
@@ -948,10 +949,12 @@
         if($(element).val()){
             $('#arr_place' + nil).val($(element).find(':selected').data('p'));
             $('#arr_warehouse' + nil).val($(element).find(':selected').data('w'));
-            $("#arr_warehouse_name" + nil).text($(element).find(':selected').data('warehouse'));
+            $('#arr_area' + nil).val($(element).find(':selected').data('a'));
+            $("#arr_warehouse_name" + nil).text($(element).find(':selected').data('warehouse') + ' - ' + $(element).find(':selected').data('aname'));
         }else{
             $('#arr_place' + nil).val('');
             $('#arr_warehouse' + nil).val('');
+            $('#arr_area' + nil).val('');
             $("#arr_warehouse_name" + nil).text('-');
         }
     }
@@ -1221,6 +1224,7 @@
                 formData.delete("arr_item[]");
                 formData.delete("arr_place[]");
                 formData.delete("arr_warehouse[]");
+                formData.delete("arr_area[]");
                 formData.delete("arr_item_stock[]");
                 formData.delete("arr_qty[]");
                 formData.delete("arr_note[]");
@@ -1231,6 +1235,7 @@
                         formData.append('arr_item[]',$('input[name^="arr_item"]').eq(index).val());
                         formData.append('arr_place[]',$('input[name^="arr_place"]').eq(index).val());
                         formData.append('arr_warehouse[]',$('input[name^="arr_warehouse"]').eq(index).val());
+                        formData.append('arr_area[]',$('input[name^="arr_area[]"]').eq(index).val());
                         formData.append('arr_item_stock[]',$('select[name^="arr_item_stock"]').eq(index).val());
                         formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
                         formData.append('arr_note[]',$('input[name^="arr_note"]').eq(index).val());
@@ -1380,6 +1385,7 @@
                                 <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                 <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
+                                <input type="hidden" name="arr_area[]" id="arr_area` + count + `" value="` + val.area_id + `">
                                 <td>
                                     ` + val.item_name + `
                                 </td>
@@ -1387,7 +1393,7 @@
                                     <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" style="width:100% !important;" onchange="getPlaceWarehouse(this,'` + count + `');"></select>
                                 </td>
                                 <td id="arr_warehouse_name` + count + `">
-                                    ` + val.place_name + ` - ` + val.warehouse_name + `
+                                    ` + val.place_name + ` - ` + val.warehouse_name + ` - ` + val.area_name + `
                                 </td>
                                 <td>
                                     <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100%;" id="rowQty`+ count +`">
@@ -1408,7 +1414,7 @@
 
                         $.each(val.list_stock, function(i, value) {
                             $('#arr_item_stock' + count).append(`
-                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `">` + value.warehouse + ` - ` + value.qty + `</option>
+                                <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="` + value.area_id + `" data-aname="` + value.area + `">` + value.warehouse + ` - ` + value.qty + `</option>
                             `);
                         });
 

@@ -19,6 +19,7 @@ class ItemCogs extends Model
         'company_id',
         'place_id',
         'warehouse_id',
+        'area_id',
         'item_id',
         'qty_in',
         'price_in',
@@ -51,5 +52,9 @@ class ItemCogs extends Model
 
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function area(){
+        return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
     }
 }

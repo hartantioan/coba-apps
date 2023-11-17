@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
+use App\Models\Area;
 use App\Models\Company;
 use App\Models\ItemStock;
 use App\Models\MarketingOrderDeliveryDetail;
@@ -251,6 +252,9 @@ class MarketingOrderReturnController extends Controller
             'account_id'	                => 'required',
             'post_date'		                => 'required',
             'arr_item'		                => 'required|array',
+            'arr_place'		                => 'required|array',
+            'arr_warehouse'		            => 'required|array',
+            'arr_area'		                => 'required|array',
         ], [
             'code.required' 	                    => 'Kode tidak boleh kosong.',
             'code.string'                           => 'Kode harus dalam bentuk string.',
@@ -262,6 +266,12 @@ class MarketingOrderReturnController extends Controller
             'post_date.required' 			        => 'Tanggal posting tidak boleh kosong.',
             'arr_item.required'                     => 'Item tidak boleh kosong.',
             'arr_item.array'                        => 'Item harus dalam bentuk array.',
+            'arr_place.required'                    => 'Plant tidak boleh kosong.',
+            'arr_place.array'                       => 'Plant harus dalam bentuk array.',
+            'arr_warehouse.required'                => 'Gudang tidak boleh kosong.',
+            'arr_warehouse.array'                   => 'Gudang harus dalam bentuk array.',
+            'arr_area.required'                     => 'Area tidak boleh kosong.',
+            'arr_area.array'                        => 'Area harus dalam bentuk array.',
         ]);
 
         if($validation->fails()) {
@@ -397,7 +407,8 @@ class MarketingOrderReturnController extends Controller
                         'qty'                                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                         'note'                                  => $request->arr_note[$key],
                         'place_id'                              => $request->arr_place[$key],
-                        'warehouse_id'                          => $request->arr_warehouse[$key], 
+                        'warehouse_id'                          => $request->arr_warehouse[$key],
+                        'area_id'                               => $request->arr_area[$key],
                     ]);
                 }
 
@@ -814,6 +825,7 @@ class MarketingOrderReturnController extends Controller
         $po = MarketingOrderReturn::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account->code.' - '.$po->account->name;
+        $po['list_area'] = Area::all()->withTrashed();
 
         $arr = [];
         $arrUsed = [];
@@ -834,6 +846,8 @@ class MarketingOrderReturnController extends Controller
                 'place_name'                            => $row->place->name,
                 'warehouse_id'                          => $row->warehouse_id,
                 'warehouse_name'                        => $row->warehouse->name,
+                'area_id'                               => $row->area_id,
+                'area_name'                             => $row->area->name,
                 'qty_sent'                              => number_format($row->marketingOrderDeliveryDetail->getBalanceQtySentMinusReturn(),3,',','.'),
                 'qty'                                   => number_format($row->qty,3,',','.'),
                 'unit'                                  => $row->item->sellUnit->code,

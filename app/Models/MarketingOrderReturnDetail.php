@@ -22,6 +22,7 @@ class MarketingOrderReturnDetail extends Model
         'note',
         'place_id',
         'warehouse_id',
+        'area_id',
     ];
 
     public function marketingOrderDeliveryDetail()
@@ -44,6 +45,10 @@ class MarketingOrderReturnDetail extends Model
 
     public function warehouse(){
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
+    }
+    
+    public function area(){
+        return $this->belongsTo('App\Models\Area','area_id','id')->withTrashed();
     }
 
     public function getGrandtotal(){

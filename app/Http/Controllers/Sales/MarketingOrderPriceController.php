@@ -99,6 +99,7 @@ class MarketingOrderPriceController extends Controller
                     $val->marketingOrder->account->name,
                     $val->marketingOrder->code,
                     date('d/m/y',strtotime($val->marketingOrder->post_date)),
+                    $val->place->code,
                     number_format($val->price,2,',','.'),
                     number_format($val->margin,2,',','.'),
                     number_format($finalpricedisc1,2,',','.'),

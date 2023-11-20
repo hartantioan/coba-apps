@@ -21,7 +21,7 @@ class MarketingOrderAgingController extends Controller
     {
         
         $data = [
-            'title'     => 'Laporan Aging AP',
+            'title'     => 'Laporan Aging AR',
             'content'   => 'admin.sales.aging_ar',
         ];
 
@@ -117,6 +117,32 @@ class MarketingOrderAgingController extends Controller
             'date3' => $date,
         ));
 
+        $countPeriod = 1;
+        $column = intval($request->column);
+        $countPeriod += $column + 1;
+        $interval = intval($request->interval);
+        $totalDays = $column * $interval;
+        $arrColumn = [];
+        $arrColumn[] = [
+            'name'                          => 'Belum jatuh tempo',
+            'start'                         => -999999999999999999,
+            'end'                           => 0,
+        ];
+        for($i=1;$i<=$column;$i++){
+            $end = $i * $interval;
+            $start = ($end - $interval) + 1;
+            $arrColumn[] = [
+                'name'                          => 'Periode '.$start.' - '.$end.' hari',
+                'start'                         => $start,
+                'end'                           => $end,
+            ];
+        }
+        $arrColumn[] = [
+            'name'                          => 'Diatas '.$totalDays.' hari',
+            'start'                         => $totalDays + 1,
+            'end'                           => 999999999999999999,
+        ];
+
         $newData = []; 
 
         foreach($results as $row){
@@ -125,38 +151,50 @@ class MarketingOrderAgingController extends Controller
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
                 if($index >= 0){
-                    $newData[$index]['balance0'] = $daysDiff <= 0 ? $newData[$index]['balance0'] + $balance : $newData[$index]['balance0'];
+                    /* $newData[$index]['balance0'] = $daysDiff <= 0 ? $newData[$index]['balance0'] + $balance : $newData[$index]['balance0'];
                     $newData[$index]['balance30'] = $daysDiff <= 30 && $daysDiff > 0 ? $newData[$index]['balance30'] + $balance : $newData[$index]['balance30'];
                     $newData[$index]['balance60'] = $daysDiff <= 60 && $daysDiff > 30 ? $newData[$index]['balance60'] + $balance : $newData[$index]['balance60'];
                     $newData[$index]['balance90'] = $daysDiff <= 90 && $daysDiff > 60 ? $newData[$index]['balance90'] + $balance : $newData[$index]['balance90'];
                     $newData[$index]['balanceOver'] = $daysDiff > 90 ? $newData[$index]['balanceOver'] + $balance : $newData[$index]['balanceOver'];
-                    $newData[$index]['total'] = $newData[$index]['total'] + $balance;
-                    $newData[$index]['arrInvoiceBalance0'][] = $daysDiff <= 0 ? $row->code : null;
-                    $newData[$index]['arrInvoiceBalance30'][] = $daysDiff <= 30 && $daysDiff > 0 ? $row->code : null;
-                    $newData[$index]['arrInvoiceBalance60'][] = $daysDiff <= 60 && $daysDiff > 30 ? $row->code : null;
-                    $newData[$index]['arrInvoiceBalance90'][] = $daysDiff <= 90 && $daysDiff > 60 ? $row->code : null;
-                    $newData[$index]['arrInvoiceBalanceOver'][] = $daysDiff > 90 ? $row->code : null;
+                    $newData[$index]['total'] = $newData[$index]['total'] + $balance; */
+                    foreach($newData[$index]['data'] as $key => $rowdata){
+                        if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
+                            $newData[$index]['data'][$key]['balance'] += $balance;
+                            $newData[$index]['total'] += $balance;
+                        }
+                    }
                 }else{
+                    $arrDetail = [];
+                    foreach($arrColumn as $rowcolumn){
+                        if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                            $arrDetail[] = [
+                                'name'      => $rowcolumn['name'],
+                                'start'     => $rowcolumn['start'],
+                                'end'       => $rowcolumn['end'],
+                                'balance'   => $balance
+                            ];
+                        }else{
+                            $arrDetail[] = [
+                                'name'      => $rowcolumn['name'],
+                                'start'     => $rowcolumn['start'],
+                                'end'       => $rowcolumn['end'],
+                                'balance'   => 0
+                            ];
+                        }
+                    }
                     $newData[] = [
                         'customer_code'         => $row->account_code,
                         'customer_name'         => $row->account_name,
-                        'balance0'              => $daysDiff <= 0 ? $balance : 0,
-                        'balance30'             => $daysDiff <= 30 && $daysDiff > 0 ? $balance : 0,
-                        'balance60'             => $daysDiff <= 60 && $daysDiff > 30 ? $balance : 0,
-                        'balance90'             => $daysDiff <= 90 && $daysDiff > 60 ? $balance : 0,
-                        'balanceOver'           => $daysDiff > 90 ? $balance : 0,
+                        'data'                  => $arrDetail,
                         'total'                 => $balance,
-                        'arrInvoiceBalance0'    => $daysDiff <= 0 ? array($row->code) : [],
-                        'arrInvoiceBalance30'   => $daysDiff <= 30 && $daysDiff > 0 ? array($row->code) : [],
-                        'arrInvoiceBalance60'   => $daysDiff <= 60 && $daysDiff > 30 ? array($row->code) : [],
-                        'arrInvoiceBalance90'   => $daysDiff <= 90 && $daysDiff > 60 ? array($row->code) : [],
-                        'arrInvoiceBalanceOver' => $daysDiff > 90 ? array($row->code) : [],
                     ];
                 }
             }
         }
 
-        foreach($results2 as $row){
+        info($newData);
+
+        /* foreach($results2 as $row){
             $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
@@ -193,13 +231,35 @@ class MarketingOrderAgingController extends Controller
             }
         }
 
+        $html = '<table class="bordered" style="font-size:10px;">
+        <thead id="head_detail">
+            <tr>
+                <th rowspan="2" class="center-align">No.</th>
+                <th rowspan="2" class="center-align">Supplier</th>
+                <th colspan="'.$countPeriod.'" class="center-align">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Tenggat)</th>
+                <th rowspan="2" class="center-align">Total</th>
+            </tr>
+            <tr>
+                <th class="center-align">Belum Jatuh Tempo</th>
+                <th class="center-align">1-30 Hari</th>
+                <th class="center-align">31-60 Hari</th>
+                <th class="center-align">61-90 Hari</th>
+                <th class="center-align">Diatas 90 Hari</th>
+            </tr>
+        </thead>
+        <tbody>';
+
+
+
+        $html .= '</tbody></table>' */
+
         $end_time = microtime(true);
         
         $execution_time = ($end_time - $start_time);
         
         $response =[
             'status'            => 200,
-            'content'           => $newData,
+            'content'           => '',
             'execution_time'    => $execution_time,
         ];
 

@@ -7,6 +7,7 @@
             <th class="center-align">Customer</th>
             <th class="center-align">Dokumen</th>
             <th class="center-align">Tgl.Post</th>
+            <th class="center-align">Plant</th>
             <th class="center-align">Harga</th>
             <th class="center-align">Margin</th>
             <th class="center-align">Diskon 1</th>
@@ -23,12 +24,13 @@
             <td align="center">{{$row['customer']}}</td>
             <td align="center">{{$row['code']}}</td>
             <td align="center">{{$row['date']}}</td>
-            <td align="center">{{$row['price']}}</td>
-            <td align="center">{{$row['margin']}}</td>
-            <td align="center">{{$row['disc1']}}</td>
-            <td align="center">{{$row['disc2']}}</td>
-            <td align="center">{{$row['disc3']}}</td>
-            <td align="center">{{$row['final_price']}}</td>
+            <td align="center">{{$row['place']}}</td>
+            <td align="right">{{$row['price']}}</td>
+            <td align="right">{{$row['margin']}}</td>
+            <td align="right">{{$row['disc1']}}</td>
+            <td align="right">{{$row['disc2']}}</td>
+            <td align="right">{{$row['disc3']}}</td>
+            <td align="right">{{$row['final_price']}}</td>
         </tr>
         @endforeach
         @if(count($data) == 0)

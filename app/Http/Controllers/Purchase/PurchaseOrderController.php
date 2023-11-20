@@ -37,6 +37,7 @@ use App\Helpers\CustomHelper;
 use App\Exports\ExportPurchaseOrder;
 use App\Models\User;
 use App\Models\Tax;
+use App\Models\Coa;
 use Milon\Barcode\DNS2D;
 use Milon\Barcode\Facades\DNS2DFacade;
 
@@ -558,6 +559,26 @@ class PurchaseOrderController extends Controller
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Harga item tidak boleh 0.'
+                    ]);
+                }
+            }
+
+            if($request->inventory_type == '2'){
+                $passedProfitLoss = true;
+                if($request->arr_coa){
+                    foreach($request->arr_coa as $key => $row){
+                        $coa = Coa::find(intval($row));
+                        if(in_array(substr($coa->code,0,1),['4','5','6','7','8'])){
+                            if(!isset($request->arr_department[$key])){
+                                $passedProfitLoss = false;
+                            }
+                        }
+                    }
+                }
+                if(!$passedProfitLoss){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Untuk Coa terpilih harus memiliki Departemen. Silahkan pilih departemen.'
                     ]);
                 }
             }

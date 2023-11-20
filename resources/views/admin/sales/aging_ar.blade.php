@@ -45,6 +45,14 @@
                                                         <label for="date" style="font-size:1rem;">Tanggal Batas :</label>
                                                         <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}">
                                                     </div>
+                                                    <div class="col m2 s6 ">
+                                                        <label for="interval" style="font-size:1rem;">Interval (Ex: 30 hari) :</label>
+                                                        <input type="number" id="interval" name="interval" value="0">
+                                                    </div>
+                                                    <div class="col m2 s6 ">
+                                                        <label for="column" style="font-size:1rem;">Jumlah Kolom :</label>
+                                                        <input type="number" id="column" name="column" value="0">
+                                                    </div>
                                                     <div class="col m4 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
                                                             <i class="material-icons hide-on-med-and-up">search</i>
@@ -80,28 +88,7 @@
                                 <div class="row">
                                     <div class="col s12 m12" style="overflow: auto">
                                         <div class="result">
-                                            <table class="bordered" style="font-size:10px;">
-                                                <thead id="head_detail">
-                                                    <tr>
-                                                        <th rowspan="2" class="center-align">No.</th>
-                                                        <th rowspan="2" class="center-align">Supplier</th>
-                                                        <th colspan="5" class="center-align">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Tenggat)</th>
-                                                        <th rowspan="2" class="center-align">Total</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="center-align">Belum Jatuh Tempo</th>
-                                                        <th class="center-align">1-30 Hari</th>
-                                                        <th class="center-align">31-60 Hari</th>
-                                                        <th class="center-align">61-90 Hari</th>
-                                                        <th class="center-align">Diatas 90 Hari</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="detail-result">
-                                                    <tr>
-                                                        <td class="center-align" colspan="8">Silahkan pilih tanggal dan tekan tombol filter.</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                            Silahkan pilih tanggal dan tekan tombol filter.
                                         </div>  
                                     </div>
                                 </div>
@@ -191,45 +178,9 @@
             success: function(response) {
                 loadingClose('#main-display');
                 if(response.status == 200) {
-                    $('#detail-result').html('');
-                    if(response.content.length > 0){
-                        let balance0 = 0, balance30 = 0, balance60 = 0, balance90 = 0, balanceOver = 0, grandtotal = 0;
-                        $.each(response.content, function(i, val) {
-                            $('#detail-result').append(`
-                                <tr class="row_detail">
-                                    <td class="center-align">` + (i+1) + `</td>
-                                    <td>` + val.customer_name + `</td>
-                                    <td class="right-align ` + (val.balance0 > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '') + `" onclick="detailShow(this)" data-invoice="` + val.arrInvoiceBalance0.filter(Boolean).join() + `">` + formatRupiahIni(val.balance0.toFixed(2).toString().replace('.',',')) + `</td>
-                                    <td class="right-align ` + (val.balance30 > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '') + `" onclick="detailShow(this)" data-invoice="` + val.arrInvoiceBalance30.filter(Boolean).join() + `">` + formatRupiahIni(val.balance30.toFixed(2).toString().replace('.',',')) + `</td>
-                                    <td class="right-align ` + (val.balance60 > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '') + `" onclick="detailShow(this)" data-invoice="` + val.arrInvoiceBalance60.filter(Boolean).join() + `">` + formatRupiahIni(val.balance60.toFixed(2).toString().replace('.',',')) + `</td>
-                                    <td class="right-align ` + (val.balance90 > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '') + `" onclick="detailShow(this)" data-invoice="` + val.arrInvoiceBalance90.filter(Boolean).join() + `">` + formatRupiahIni(val.balance90.toFixed(2).toString().replace('.',',')) + `</td>
-                                    <td class="right-align ` + (val.balanceOver > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '') + `" onclick="detailShow(this)" data-invoice="` + val.arrInvoiceBalanceOver.filter(Boolean).join() + `">` + formatRupiahIni(val.balanceOver.toFixed(2).toString().replace('.',',')) + `</td>
-                                    <td class="right-align">` + formatRupiahIni(val.total.toFixed(2).toString().replace('.',',')) + `</td>
-                                </tr>
-                            `);
-                            balance0 += val.balance0;
-                            balance30 += val.balance30;
-                            balance60 += val.balance60;
-                            balance90 += val.balance90;
-                            balanceOver += val.balanceOver;
-                            grandtotal += val.total;
-                        });
-                        $('#detail-result').append(`
-                            <tr id="text-grandtotal">
-                                <td class="right-align" colspan="2">Total</td>
-                                <td class="right-align">` + formatRupiahIni(balance0.toFixed(2).toString().replace('.',',')) + `</td>
-                                <td class="right-align">` + formatRupiahIni(balance30.toFixed(2).toString().replace('.',',')) + `</td>
-                                <td class="right-align">` + formatRupiahIni(balance60.toFixed(2).toString().replace('.',',')) + `</td>
-                                <td class="right-align">` + formatRupiahIni(balance90.toFixed(2).toString().replace('.',',')) + `</td>
-                                <td class="right-align">` + formatRupiahIni(balanceOver.toFixed(2).toString().replace('.',',')) + `</td>
-                                <td class="right-align">` + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',',')) + `</td>
-                            </tr>
-                        `);
-                        $('#detail-result').append(`
-                            <tr id="text-grandtotal">
-                                <td class="center-align" colspan="8">Waktu proses : ` + response.execution_time  + ` detik</td>
-                            </tr>
-                        `);
+                    $('#result').html('');
+                    if(response.content > 0){
+                        $('#result').html(response.content);
                     }else{
                         $('#detail-result').append(`
                             <tr>

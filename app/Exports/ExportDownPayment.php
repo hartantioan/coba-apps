@@ -72,19 +72,19 @@ class ExportDownPayment implements FromView , WithEvents
                         'post_date'     => date('d/m/y',strtotime($row_invoice->post_date)),
                         'due_date'      => date('d/m/y',strtotime($row_invoice->due_date)),
                         'note'          => $row_invoice->note,
-                        'subtotal'      => number_format($row_invoice->subtotal,2,',','.'),
-                        'discount'      => number_format($row_invoice->discount,2,',','.'),
-                        'total'         => number_format($row_invoice->total,2,',','.'),
-                        'used'          => number_format($row_invoice->total_used,2,',','.'),
-                        'memo'          => number_format($row_invoice->total_memo,2,',','.'),
-                        'balance'       => number_format($balance,2,',','.'),
+                        'subtotal'      => round($row_invoice->subtotal,2),
+                        'discount'      => round($row_invoice->discount,2),
+                        'total'         => round($row_invoice->total,2),
+                        'used'          => round($row_invoice->total_used,2),
+                        'memo'          => round($row_invoice->total_memo,2),
+                        'balance'       => round($balance,2),
                     ];
                     $totalbalance += $balance;
                 }
             }  
         return view('admin.exports.down_payment', [
             'data'      => $array_filter,
-            'totalall'  => number_format($totalbalance,2,',','.')
+            'totalall'  => round($totalbalance,2)
         ]);
     }
 

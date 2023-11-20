@@ -586,7 +586,7 @@
     </div>
 </div>
 
-<div id="modal6" class="modal modal-fixed-footer" style="min-width:100%;max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-header ml-2">
         <h5>Daftar Tunggakan Dokumen <b id="account_name"></b></h5>
     </div>

@@ -164,7 +164,7 @@ class ExportAgingAR implements FromView , WithEvents
 
         return view('admin.exports.aging_ar', [
             'data'      => $newData,
-            'totalall'  => number_format($totalAll,2,',','.')
+            'totalall'  => $totalAll
         ]);
     }
 

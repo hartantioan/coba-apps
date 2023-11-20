@@ -14,16 +14,18 @@ class ExportMarketingRecapitulation implements FromView , WithEvents
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct(string $date)
+    public function __construct(string $start_date, string $end_date)
     {
-        $this->date = $date ? $date : '';
-		
+        $this->start_date = $start_date ? $start_date : '';
+		$this->end_date = $end_date ? $end_date : '';
     }
     public function view(): View
     {
         $totalAll=0;
         $array_filter = [];
-        $mo = MarketingOrder::whereIn('status',['2','3'])->whereDate('post_date','<=',$this->date)->get();
+        $mo = MarketingOrder::whereIn('status',['2','3'])
+                ->whereDate('post_date', '>=', $this->start_date)
+                ->whereDate('post_date', '<=', $this->end_date)->get();
             
         foreach($mo as $row){
             $totalInvoice = $row->totalInvoice();
@@ -36,20 +38,20 @@ class ExportMarketingRecapitulation implements FromView , WithEvents
                 'post_date'         => date('d/m/y',strtotime($row->post_date)),
                 'top'               => $row->top_customer,
                 'note'              => $row->note,
-                'subtotal'          => number_format($row->subtotal,2,',','.'),
-                'discount'          => number_format($row->discount,2,',','.'),
-                'total'             => number_format($row->total,2,',','.'),
-                'tax'               => number_format($row->tax,2,',','.'),
-                'total_after_tax'   => number_format($row->total_after_tax,2,',','.'),
-                'rounding'          => number_format($row->rounding,2,',','.'),
-                'grandtotal'        => number_format($row->grandtotal,2,',','.'),
-                'schedule'          => number_format($row->totalMod(),2,',','.'),
-                'sent'              => number_format($row->totalModProcess(),2,',','.'),
-                'return'            => number_format($row->totalReturn(),2,',','.'),
-                'invoice'           => number_format($totalInvoice,2,',','.'),
-                'memo'              => number_format($totalMemo,2,',','.'),
-                'payment'           => number_format($totalPayment,2,',','.'),
-                'balance'           => number_format($balance,2,',','.'),
+                'subtotal'          => round($row->subtotal,2),
+                'discount'          => round($row->discount,2),
+                'total'             => round($row->total,2),
+                'tax'               => round($row->tax,2),
+                'total_after_tax'   => round($row->total_after_tax,2),
+                'rounding'          => round($row->rounding,2),
+                'grandtotal'        => round($row->grandtotal,2),
+                'schedule'          => round($row->totalMod(),2),
+                'sent'              => round($row->totalModProcess(),2),
+                'return'            => round($row->totalReturn(),2),
+                'invoice'           => round($totalInvoice,2),
+                'memo'              => round($totalMemo,2),
+                'payment'           => round($totalPayment,2),
+                'balance'           => round($balance,2),
             ];            
         }
 

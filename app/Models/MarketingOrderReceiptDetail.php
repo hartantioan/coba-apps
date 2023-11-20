@@ -29,4 +29,13 @@ class MarketingOrderReceiptDetail extends Model
     public function lookable(){
         return $this->morphTo();
     }
+
+    public function marketingOrderInvoice()
+    {
+        if($this->lookable_type == 'marketing_order_invoices'){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

@@ -49,12 +49,13 @@ class ExportMarketingPrice implements FromView
                 'customer'      => $val->marketingOrder->account->name,
                 'code'          => $val->marketingOrder->code,
                 'date'          => date('d/m/y',strtotime($val->marketingOrder->post_date)),
-                'price'         => number_format($val->price,2,',','.'),
-                'margin'        => number_format($val->margin,2,',','.'),
-                'disc1'         => number_format($finalpricedisc1,2,',','.'),
-                'disc2'         => number_format($finalpricedisc2,2,',','.'),
-                'disc3'         => number_format($val->discount_3,2,',','.'),
-                'final_price'   => number_format($val->price_after_discount,2,',','.'),
+                'place'         => $val->place->code, 
+                'price'         => round($val->price,2),
+                'margin'        => round($val->margin,2),
+                'disc1'         => round($finalpricedisc1,2),
+                'disc2'         => round($finalpricedisc2,2),
+                'disc3'         => round($val->discount_3,2),
+                'final_price'   => round($val->price_after_discount,2),
             ];
             
         }

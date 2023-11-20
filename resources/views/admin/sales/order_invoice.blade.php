@@ -2019,7 +2019,7 @@
             tax += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
-        tax = Math.floor(tax);
+        /* tax = Math.floor(tax); */
 
         $('input[name^="arr_total_after_tax[]"]').each(function(index){
             total_after_tax += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));

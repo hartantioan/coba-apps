@@ -66,6 +66,7 @@
                                                         <th>Customer</th>
                                                         <th>Dokumen</th>
                                                         <th>Tanggal</th>
+                                                        <th>Plant</th>
                                                         <th>Harga</th>
                                                         <th>Margin</th>
                                                         <th>Discount 1</th>
@@ -173,6 +174,7 @@
                 { name: 'account_id', className: '', searchable: false, orderable: false },
                 { name: 'code', className: '', searchable: false, orderable: false },
                 { name: 'date', className: 'center-align', searchable: false, orderable: false },
+                { name: 'place_id', className: 'center-align' },
                 { name: 'price', className: 'right-align' },
                 { name: 'margin', className: 'right-align' },
                 { name: 'percent_discount_1', className: 'right-align', searchable: false, orderable: false },

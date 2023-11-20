@@ -625,6 +625,25 @@ class PaymentRequestController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+
+            if($request->arr_coa_cost){
+                $passedProfitLoss = true;
+                foreach($request->arr_coa_cost as $key => $row){
+                    $coa = Coa::find(intval($row));
+                    if(in_array(substr($coa->code,0,1),['4','5','6','7','8'])){
+                        if(!isset($request->arr_cost_distribution_cost[$key])){
+                            $passedProfitLoss = false;
+                        }
+                    }
+                }
+
+                if(!$passedProfitLoss){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Untuk Coa Biaya harus memiliki Distribusi Biaya.'
+                    ]);
+                }
+            }
             
 			if($request->temp){
                 DB::beginTransaction();

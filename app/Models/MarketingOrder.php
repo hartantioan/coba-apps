@@ -321,7 +321,11 @@ class MarketingOrder extends Model
         $total = 0;
         foreach($this->marketingOrderDetail as $row){
             foreach($row->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
-                $query->whereHas('marketingOrderDeliveryProcess');
+                $query->whereHas('marketingOrderDeliveryProcess',function($query){
+                    $query->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                        $query->where('status','5');
+                    });
+                });
             })->get() as $rowmodd){
                 $total += $rowmodd->getGrandtotal();
                 /* foreach($rowmodd->marketingOrderReturnDetail as $rowreturn){

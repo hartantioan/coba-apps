@@ -38,9 +38,9 @@
                     <td align="center">{{ $key1 + 1 }}</td>
                     <td align="center">{{ $rowdetail->asset->code.' - '.$rowdetail->asset->name }}</td>
                     <td align="center">{{ date('d/m/y',strtotime($rowdetail->asset->date)) }}</td>
-                    <td align="right">{{ number_format($rowdetail->asset->nominal,2,',','.') }}</td>
+                    <td align="right">{{ round($rowdetail->asset->nominal,2) }}</td>
                     <td align="center">{{ $rowdetail->depreciationNumber().' / '.$rowdetail->asset->assetGroup->depreciation_period }}</td>
-                    <td align="right">{{ number_format($rowdetail->nominal,2,',','.') }}</td>
+                    <td align="right">{{ round($rowdetail->nominal,2) }}</td>
                 </tr>
             @endforeach
         @endforeach

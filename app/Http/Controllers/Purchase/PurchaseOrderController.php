@@ -9,6 +9,7 @@ use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
 use App\Models\LandedCost;
 use App\Models\Line;
+use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\PaymentRequest;
 use App\Models\PaymentRequestCross;
 use App\Models\Place;
@@ -345,6 +346,8 @@ class PurchaseOrderController extends Controller
             $data = PurchaseRequest::where('id',$request->id)->whereIn('status',['2','3'])->first();
         }elseif($request->type == 'gi'){
             $data = GoodIssue::where('id',$request->id)->whereIn('status',['2','3'])->first();
+        }elseif($request->type == 'sj'){
+            $data = MarketingOrderDeliveryProcess::where('id',$request->id)->whereIn('status',['2','3'])->first();
         }
 
         if($data->used()->exists()){
@@ -354,6 +357,9 @@ class PurchaseOrderController extends Controller
             }elseif($request->type == 'gi'){
                 $data['status'] = '500';
                 $data['message'] = 'Goods Issue / Barang Keluar '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
+            }elseif($request->type == 'sj'){
+                $data['status'] = '500';
+                $data['message'] = 'Surat Jalan Penjualan '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
             }
         }else{
             $passed = true;
@@ -362,6 +368,7 @@ class PurchaseOrderController extends Controller
             }
             
             if($passed){
+                $data['account_name'] = $data->account->name;
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
                 $details = [];
 
@@ -405,6 +412,10 @@ class PurchaseOrderController extends Controller
                             'department_id'                 => '',
                         ];
                     }
+                }elseif($request->type == 'sj'){
+                    $details[] = [
+                        'reference_id'                  => $data->id,
+                    ];
                 }
 
                 $data['details'] = $details;
@@ -758,30 +769,31 @@ class PurchaseOrderController extends Controller
                                 $wtax = round($bobot * str_replace(',','.',str_replace('.','',$request->wtax)),2);
         
                                 $querydetail = PurchaseOrderDetail::create([
-                                    'purchase_order_id'             => $query->id,
-                                    'coa_id'                        => $row,
-                                    'qty'                           => $qty,
-                                    'price'                         => $price,
-                                    'percent_discount_1'            => $disc1,
-                                    'percent_discount_2'            => $disc2,
-                                    'discount_3'                    => $disc3,
-                                    'subtotal'                      => $rowsubtotal,
-                                    'tax'                           => $tax,
-                                    'wtax'                          => $wtax,
-                                    'grandtotal'                    => $rowsubtotal + $tax - $wtax,
-                                    'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
-                                    'note2'                         => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
-                                    'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
-                                    'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
-                                    'percent_tax'                   => $request->arr_tax[$key],
-                                    'is_wtax'                       => $request->arr_wtax[$key] > 0 ? '1' : NULL,
-                                    'percent_wtax'                  => $request->arr_wtax[$key],
-                                    'tax_id'                        => $request->arr_tax_id[$key],
-                                    'wtax_id'                       => $request->arr_wtax_id[$key],
-                                    'place_id'                      => $request->arr_place[$key],
-                                    'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
-                                    'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
-                                    'department_id'                 => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
+                                    'purchase_order_id'                     => $query->id,
+                                    'marketing_order_delivery_process_id'   => $request->arr_type[$key] == 'sj' ? $request->arr_data[$key] : NULL,
+                                    'coa_id'                                => $row,
+                                    'qty'                                   => $qty,
+                                    'price'                                 => $price,
+                                    'percent_discount_1'                    => $disc1,
+                                    'percent_discount_2'                    => $disc2,
+                                    'discount_3'                            => $disc3,
+                                    'subtotal'                              => $rowsubtotal,
+                                    'tax'                                   => $tax,
+                                    'wtax'                                  => $wtax,
+                                    'grandtotal'                            => $rowsubtotal + $tax - $wtax,
+                                    'note'                                  => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
+                                    'note2'                                 => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
+                                    'is_tax'                                => $request->arr_tax[$key] > 0 ? '1' : NULL,
+                                    'is_include_tax'                        => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
+                                    'percent_tax'                           => $request->arr_tax[$key],
+                                    'is_wtax'                               => $request->arr_wtax[$key] > 0 ? '1' : NULL,
+                                    'percent_wtax'                          => $request->arr_wtax[$key],
+                                    'tax_id'                                => $request->arr_tax_id[$key],
+                                    'wtax_id'                               => $request->arr_wtax_id[$key],
+                                    'place_id'                              => $request->arr_place[$key],
+                                    'line_id'                               => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                                    'machine_id'                            => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                                    'department_id'                         => $request->arr_department[$key] ? $request->arr_department[$key] : NULL,
                                 ]);
                             }
                         }
@@ -792,8 +804,8 @@ class PurchaseOrderController extends Controller
                     DB::rollback();
                 }
 
-                CustomHelper::sendApproval('purchase_orders',$query->id,$query->note);
-                CustomHelper::sendNotification('purchase_orders',$query->id,'Pengajuan Purchase Order No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Order No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new PurchaseOrder())
@@ -2525,6 +2537,8 @@ class PurchaseOrderController extends Controller
             CustomHelper::removeUsedData('purchase_requests',$request->id);
         }elseif($request->type == 'gi'){
             CustomHelper::removeUsedData('good_issues',$request->id);
+        }elseif($request->type == 'sj'){
+            CustomHelper::removeUsedData('marketing_order_delivery_processes',$request->id);
         }
         
         return response()->json([

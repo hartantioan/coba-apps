@@ -239,6 +239,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text btn-small" data-popup="tooltip" title="Switch ke MOD lain" onclick="switchDocument(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">call_split</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Update Tracking" onclick="getTracking(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_shipping</i></button>
                         <a href="delivery_order/driver/'.CustomHelper::encrypt($val->code).'?d='.CustomHelper::encrypt($val->driver_name).'&p='.CustomHelper::encrypt($val->driver_hp).'" class="btn-floating btn-small mb-1 btn-flat waves-effect waves-light indigo accent-1 white-text" data-popup="tooltip" title="Driver Update Tracking" target="_blank"><i class="material-icons dp48">streetview</i></a>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -392,14 +393,54 @@ class MarketingOrderDeliveryProcessController extends Controller
                         }
                     }
 
-                    if($approved && !$revised){
+                    if($approved && !$revised && !$request->tempSwitch){
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Surat jalan telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
-                    if(in_array($query->status,['1','6'])){
+                    if($request->tempSwitch){
+                        $error = [];
+                        if($mod->account_id !== $query->marketingOrderDelivery->account_id){
+                            $error[] = 'Ekspeditor MOD baru dan ekspeditor MOD lama tidak sama.';
+                        }
+                        foreach($mod->marketingOrderDeliveryDetail as $key => $detail){
+                            $cekquery = null;
+                            $cekquery = $query->marketingOrderDelivery->marketingOrderDeliveryDetail()->where('item_id',$detail->item_id)->get();
+                            if($cekquery->count() > 0){
+                                foreach($cekquery as $key => $rowcek){
+                                    if($detail->qty !== $rowcek->qty){
+                                        $error[] = 'Produk '.$detail->item->name.' memiliki selisih qty. Jumlah qty harus sama untuk MOD lama dan baru.';
+                                    }   
+                                }
+                            }else{
+                                $error[] = 'Produk '.$detail->item->name.' tidak ditemukan pada MOD lama.';
+                            }
+                        }
+                        if(count($error) > 0){
+                            return response()->json([
+                                'status'  => 500,
+                                'message' => implode(', ',$error)
+                            ]);
+                        }else{
+                            $query->marketingOrderDelivery->marketingOrder->update([
+                                'status'        => '5',
+                                'void_id'       => session('bo_id'),
+                                'void_note'     => 'Ditutup oleh switch dari MOD nomor '.$query->marketingOrderDelivery->code.'.',
+                                'void_date'     => date('Y-m-d H:i:s'),
+                            ]);
+
+                            $query->marketingOrderDelivery->update([
+                                'status'        => '5',
+                                'void_id'       => session('bo_id'),
+                                'void_note'     => 'Ditutup oleh switch dari MOD nomor '.$query->marketingOrderDelivery->code.'.',
+                                'void_date'     => date('Y-m-d H:i:s'),
+                            ]);
+                        }
+                    }
+
+                    if(in_array($query->status,['1','6']) || $request->tempSwitch){
 
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
@@ -414,17 +455,18 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $query->vehicle_no = $request->vehicle_no;
                         $query->note_internal = $request->note_internal;
                         $query->note_external = $request->note_external;
-                        $query->status = '1';
-                        $query->status_tracking = '1';
+                        $query->status = $request->tempSwitch ? $query->status : '1';
                         $query->total = $mod->getTotal();
                         $query->tax = $mod->getTax();
                         $query->rounding = $mod->getRounding();
                         $query->grandtotal = $mod->getGrandtotal();
 
                         $query->save();
-                        
-                        foreach($query->marketingOrderDeliveryProcessTrack as $row){
-                            $row->delete();
+
+                        if(!$request->tempSwitch){
+                            foreach($query->marketingOrderDeliveryProcessTrack as $row){
+                                $row->delete();
+                            }
                         }
 
                         DB::commit();
@@ -469,14 +511,29 @@ class MarketingOrderDeliveryProcessController extends Controller
 			
 			if($query) {
 
-                MarketingOrderDeliveryProcessTrack::create([
-                    'user_id'                               => session('bo_id'),
-                    'marketing_order_delivery_process_id'   => $query->id,
-                    'status'                                => '1',
-                ]);
+                if(!$request->tempSwitch){
+                    MarketingOrderDeliveryProcessTrack::create([
+                        'user_id'                               => session('bo_id'),
+                        'marketing_order_delivery_process_id'   => $query->id,
+                        'status'                                => '1',
+                    ]);
+                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                }
+                
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
-                CustomHelper::sendApproval('marketing_order_delivery_processes',$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification('marketing_order_delivery_processes',$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
+                if($request->tempSwitch){
+                    $mod = MarketingOrderDelivery::find(intval($request->marketing_order_delivery_id));
+                    if($query->journal()->exists()){
+                        foreach($query->journal as $row){
+                            foreach($row->journalDetail as $rowdetail){ 
+                                $rowdetail->update([
+                                    'account_id'    => $mod->marketingOrder->account_id,
+                                ]);
+                            }
+                        }
+                    }
+                }
 
                 activity()
                     ->performedOn(new MarketingOrderDeliveryProcess())
@@ -859,7 +916,12 @@ class MarketingOrderDeliveryProcessController extends Controller
             $string='';
             $no = 1;
             foreach($query->journal as $rowmain){
-                foreach($rowmain->journalDetail()->orderBy('id')->get() as $key => $row){
+                foreach($rowmain->journalDetail()->where(function($query){
+            $query->whereHas('coa',function($query){
+                $query->orderBy('code');
+            })
+            ->orderBy('type');
+        })->get() as $key => $row){
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
                         <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -888,6 +950,15 @@ class MarketingOrderDeliveryProcessController extends Controller
 
     public function show(Request $request){
         $po = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->id))->first();
+        if($request->type){
+            if(in_array($po->statusTrackingRaw(),['1','3','4','5'])){
+                return response()->json([
+                    'responseStatus'    => 500,
+                    'message'           => 'Fitur switch hanya untuk status *Barang telah dikirimkan*.'
+                ]);
+            }
+        }
+        $po['responseStatus'] = 200;
         $po['code_place_id'] = substr($po->code,7,2);
         $po['marketing_order_delivery_code'] = $po->marketingOrderDelivery->code;
         $po['outlet'] = $po->marketingOrderDelivery->marketingOrder->outlet->name;

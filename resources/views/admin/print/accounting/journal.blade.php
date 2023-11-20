@@ -170,7 +170,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($row->journalDetail()->orderBy('id')->get() as $rowdetail)
+                                        @foreach($row->journalDetail()->where(function($query){
+            $query->whereHas('coa',function($query){
+                $query->orderBy('code');
+            })
+            ->orderBy('type');
+        })->get() as $rowdetail)
                                             <tr>
                                                 <td>{{ $rowdetail->coa->name }}</td>
                                                 <td align="center"></td>

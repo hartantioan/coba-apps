@@ -940,7 +940,12 @@ class GoodReceiveController extends Controller
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
             ];
             $string='';
-            foreach($query->journal->journalDetail()->orderBy('id')->get() as $key => $row){
+            foreach($query->journal->journalDetail()->where(function($query){
+            $query->whereHas('coa',function($query){
+                $query->orderBy('code');
+            })
+            ->orderBy('type');
+        })->get() as $key => $row){
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>

@@ -40,8 +40,12 @@
                                             <div class="col s12">
                                                 <div class="row">
                                                     <div class="col m3 s6 ">
-                                                        <label for="date" style="font-size:1rem;">Tanggal Posting :</label>
-                                                        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}">
+                                                        <label for="start_date" style="font-size:1rem;">Tanggal Mulai Posting :</label>
+                                                        <input type="date" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
+                                                    </div>
+                                                    <div class="col m3 s6 ">
+                                                        <label for="end_date" style="font-size:1rem;">Tanggal Akhir Posting :</label>
+                                                        <input type="date" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m4 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
@@ -133,8 +137,8 @@
 
 <script>
     function exportExcel(){
-        var date = $('#date').val();
-        window.location = "{{ Request::url() }}/export?date=" + date;
+        var start_date = $('#start_date').val(), end_date = $('#end_date').val();
+        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + end_date;
     }
     function filterByDate(){
         var formData = new FormData($('#form_data_filter')[0]);

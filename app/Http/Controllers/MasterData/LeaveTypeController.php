@@ -138,14 +138,12 @@ class LeaveTypeController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = LeaveType::find($request->temp);
-                    info($request);
                     $query->code                = $request->code;
                     $query->name                = $request->name;
                     $query->type                = $request->type;
                     $query->shift_count         = $request->shift_count;
                     $query->status              = $request->status ? $request->status : '1';
                     $query->furlough_type       = $request->furlough_type;
-                    info($query);
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -154,7 +152,6 @@ class LeaveTypeController extends Controller
 			}else{
                
                 try {
-                    info($request);
                     $query = LeaveType::create([
                         'code'                  => $request->code,
                         'name'			        => $request->name,

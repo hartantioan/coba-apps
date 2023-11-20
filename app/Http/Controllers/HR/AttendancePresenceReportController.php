@@ -27,7 +27,6 @@ class AttendancePresenceReportController extends Controller
     }
 
     public function filterByDate(Request $request){
-        info('mulais');
         $start_time = microtime(true);
         $start_date = Carbon::parse($request->start_date);
         $end_date = Carbon::parse($request->end_date);
@@ -229,11 +228,7 @@ class AttendancePresenceReportController extends Controller
                                         }
                                     }
                                     if($cleanedNik == '123017'){
-                                        // info($date);
-                                        // info($dateAttd);
-                                        // info($real_min_time_in);
-                                        // info($real_time_in);
-                                        // info('masuk sayang');
+
                                     }
                                 if ($dateAttd >= $real_min_time_in && $dateAttd <= $real_time_in) {
                                     $exact_in[$key]= 1 ;
@@ -255,11 +250,9 @@ class AttendancePresenceReportController extends Controller
                                 }elseif($dateAttd > $real_time_in && $dateAttd < $real_time_out){
                                     $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($time_in);
                                     
-                                    info($diffHoursTimePartMinIn);
                                     //mengetahui apabila jam yang ada melebihi toleransi pada shift.
                                     if($diffHoursTimePartMinIn<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1){
                                         $exact_in[$key]= 2 ;
-                                        info($masuk_awal);
                                         $login[$key]= $timePart;
                                         if (count($query_data) == 3 && $key > 0 ) {
                                             $exact_in[$key]= 1 ;
@@ -610,10 +603,6 @@ class AttendancePresenceReportController extends Controller
                                             }                                      
                                         }elseif($dateAttd > $real_max_time_out){
                                             $diffHoursTimePartMaxOut = Carbon::parse($timePart)->diffInHours($max_time_out);
-                                            info('masuk');
-                                            info($dateAttd);
-                                            info($diffHoursTimePartMaxOut.' time out');
-                                            
                                         
                                             if($diffHoursTimePartMaxOut<=$schedule_leave_request->employeeSchedule->shift->tolerant){
                                                 $array_keluar[$key]=$timePart;
@@ -742,7 +731,6 @@ class AttendancePresenceReportController extends Controller
         
             $execution_time = ($end_time - $start_time);
       
-            info($execution_time);
             $response =[
                 'status'=>200,
                 'message'  =>$attendance_detail,

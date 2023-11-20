@@ -293,6 +293,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_return', [Select2Controller::class, 'marketingOrderReturn']);
                 Route::get('material_request_pr', [Select2Controller::class, 'materialRequestPR']);
                 Route::get('material_request_gi', [Select2Controller::class, 'materialRequestGI']);
+                Route::get('marketing_order_delivery_process_po', [Select2Controller::class, 'marketingOrderDeliveryProcessPO']);
             });
 
             Route::prefix('menu')->group(function () {

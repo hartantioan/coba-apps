@@ -101,6 +101,7 @@ class TaxSeries extends Model
                         'no'        => $no,
                     ];
                 }else{
+                    info('kambing');
                     $response = [
                         'status'  => 500,
                         'message' => 'Nomor seri baru di luar batas seri pajak yang ada. Silahkan tambahkan data terbaru.'

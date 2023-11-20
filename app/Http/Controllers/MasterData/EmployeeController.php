@@ -908,7 +908,6 @@ class EmployeeController extends Controller
             // ->whereDate('date', '>', $currentDate)
             // ->whereDate('date', '<', $oneMonthFromNow)
             ->get();
-        info($query_shift);
         $schedules=[];
         foreach($query_shift as $schedule){
             $schedules[]=[

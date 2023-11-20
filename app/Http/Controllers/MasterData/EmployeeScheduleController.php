@@ -402,7 +402,6 @@ class EmployeeScheduleController extends Controller
         $search = $request->input('search.value');
 
         $total_data = User::count();
-        info($request->input('search.value'));
         $query_data = User::where(function($query) use ($search, $request) {
                 if($request->department_id){
                     $query->whereHas('position', function ($query) use ($request) {

@@ -234,7 +234,6 @@ class AttendanceLatenessReportController extends Controller
                                     }elseif($dateAttd > $real_time_in && $dateAttd < $real_time_out){
                                         $diffHoursTimePartMinIn = Carbon::parse($timePart)->diffInHours($time_in);
                                     
-                                        info($diffHoursTimePartMinIn);
                                         //mengetahui apabila jam yang ada melebihi toleransi pada shift.
                                         if($diffHoursTimePartMinIn<=$row_schedule_filter->shift->tolerant && $exact_in[$key] != 1){
                                             $exact_in[$key]= 2 ;
@@ -623,11 +622,6 @@ class AttendanceLatenessReportController extends Controller
                                                 $ada_pulang=true;
                                             }
                                         }
-                                        info('time in '.$time_in);
-                                        info('time out '.$time_out);
-                                        info('time in min '.$min_time_in);
-                                        info('time out max '.$max_time_out);
-                                        info($dateAttd.'pembanding || timeout :'. $real_time_out. ' || max_timeout : '. $real_max_time_out );
                                         //perhitungan pulang
                                         if ($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out) {
                                             $attendance_detail[(string)$date][$c]['out'][]=1;

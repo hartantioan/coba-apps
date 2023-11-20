@@ -194,7 +194,6 @@ class EmployeeTransferController extends Controller
     
     public function showFromCode(Request $request){
         $line = EmployeeTransfer::where('code',CustomHelper::decrypt($request->id))->first();
-        info($request->id);
         if ($line->manager()->exists()) {
             $line['manager'] = $line->manager;
         }
@@ -205,7 +204,6 @@ class EmployeeTransferController extends Controller
 
     public function instantFormwCode(Request $request){
         $line = User::Find(CustomHelper::decrypt($request->id));
-        info($request->id);
         if ($line->manager()->exists()) {
             $line['manager'] = $line->manager;
         }

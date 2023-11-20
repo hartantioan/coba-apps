@@ -40,7 +40,12 @@
                 <th>Debit</th>
                 <th>Kredit</th>
             </tr>
-            @foreach($row->journalDetail()->orderBy('id')->get() as $rowdetail)
+            @foreach($row->journalDetail()->where(function($query){
+            $query->whereHas('coa',function($query){
+                $query->orderBy('code');
+            })
+            ->orderBy('type');
+        })->get() as $rowdetail)
                 <tr>
                     <td></td>
                     <td>{{ $rowdetail->coa->name }}</td>

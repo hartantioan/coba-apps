@@ -17,6 +17,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('leavequotas:renew')
                 ->everyMinute()->withoutOverlapping();
+        $schedule->command('salestaxseries:set')
+                ->everyMinute()->withoutOverlapping();
         // $schedule->command('inspire')->hourly();
         /* $schedule->command('queue:work')->everyMinute()->withoutOverlapping()->runInBackground(); */
         $schedule->command('queue:work --stop-when-empty')->everyMinute()->withoutOverlapping();

@@ -133,8 +133,8 @@
                         <thead>
                             <tr>
                                 <th width="5%">No</th>
-                                <th width="20%">Nama</th>
                                 <th width="20%">Kwitansi</th>
+                                <th width="20%">Nama</th>
                                 <th width="10%">Tanggal</th>
                                 <th width="15%">Grandtotal</th>
                                 <th width="10%">Status</th>
@@ -145,8 +145,8 @@
                             @foreach($data->marketingOrderHandoverReceiptDetail as $key => $row)
                                 <tr>
                                     <td align="center">{{ ($key + 1)  }}</td>
-                                    <td>{{ $row->marketingOrderReceipt->account->name }}</td>
                                     <td>{{ $row->marketingOrderReceipt->code }}</td>
+                                    <td>{{ $row->marketingOrderReceipt->account->name }}</td>
                                     <td align="center">{{ date('d/m/y',strtotime($row->marketingOrderReceipt->post_date)) }}</td>
                                     <td align="right">{{ number_format($row->marketingOrderReceipt->grandtotal,2,',','.') }}</td>
                                     <td align="center">{{ $row->status() }}</td>

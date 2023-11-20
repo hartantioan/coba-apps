@@ -2272,8 +2272,6 @@ class Select2Controller extends Controller {
         $response = [];
         $search     = $request->search;
         $account_id = $request->account_id;
-        info($request->shift_request_id);
-        info($request->shift_id);
         $data = EmployeeSchedule::where(function($query) use($search,$account_id,$request){
             $query->where(function($query) use ($search,$account_id,$request){
                 $query->WhereHas('user',function($query) use ($account_id){
@@ -2307,7 +2305,6 @@ class Select2Controller extends Controller {
     public function shiftByDepartment(Request $request)
     {
         $response = [];
-        info($request);
         $search     = $request->search;
         $query_user = User::find($request->account_id);
         $department_id = $query_user->position->division->department_id;
@@ -2352,11 +2349,9 @@ class Select2Controller extends Controller {
                 $query->whereDoesntHave('leaveRequestShift');
                
                 if($request->end_date){
-                    info('masuk sini');
                     $query->where('date','>=',$request->date);
                     $query->where('date','<=',$request->end_date);
                 }else{
-                    info('masuk');
                     $query->where('date',$request->date);
                 }
             });
@@ -2563,7 +2558,6 @@ class Select2Controller extends Controller {
                 $details = [];
 
                 foreach($d->materialRequestDetail()->where('status','1')->get() as $row){
-                    info($row->balanceGi());
                     if($row->balanceGi() > 0){
                         $details[] = [
                             'id'            => $row->id,
@@ -2589,6 +2583,108 @@ class Select2Controller extends Controller {
                     'code'          => $d->code,
                     'table'         => $d->getTable(),
                     'details'       => $details,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrderDeliveryProcessPO(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+        $account_id = $request->account_id;
+        $data = MarketingOrderDeliveryProcess::where(function($query) use($search,$account_id){
+            $query->where(function($query) use ($search){
+                $query->where('code', 'like', "%$search%")
+                    ->orWhere('note_internal','like',"%$search%")
+                    ->orWhere('note_external','like',"%$search%")
+                    ->orWhereHas('user',function($query) use ($search){
+                        $query->where('name','like',"%$search%")
+                            ->orWhere('employee_no','like',"%$search%");
+                    });
+            })
+            ->where(function($query) use ($account_id){
+                if($account_id){
+                    $query->whereHas('marketingOrderDelivery',function($query) use($account_id){
+                        $query->whereHas('marketingOrder',function($query) use($account_id){
+                            $query->where('account_id',$account_id);
+                        });
+                    });
+                }
+            });
+        })
+        ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+            $query->where('status','5');
+        })
+        ->whereDoesntHave('used')
+        ->whereDoesntHave('purchaseOrderDetail')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2','3'])->get();
+
+        foreach($data as $d) {
+            if($d->balanceInvoice() > 0){
+                $totalAll = 0;
+                $taxAll = 0;
+                $grandtotalAll = 0;
+
+                $arrDetail = [];
+
+                foreach($d->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+                    $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
+                    $total = $price * $row->getBalanceQtySentMinusReturn();
+                    if($row->marketingOrderDetail->tax_id > 0){
+                        if($row->marketingOrderDetail->is_include_tax == '1'){
+                            $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
+                        }
+                    }
+                    $tax = $total * ($row->marketingOrderDetail->percent_tax / 100);
+                    $grandtotal = $total + $tax;
+                    $arrDetail[] = [
+                        'id'                => $row->id,
+                        'item_id'           => $row->item_id,
+                        'item_name'         => $row->item->name.' - '.$row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.$row->itemStock->area->name,
+                        'item_warehouse'    => $row->item->warehouseList(),
+                        'unit'              => $row->item->sellUnit->code,
+                        'code'              => $d->code,
+                        'qty_sent'          => number_format($row->getBalanceQtySentMinusReturn(),3,',','.'),
+                        'place_id'          => $row->place_id,
+                        'warehouse_id'      => $row->warehouse_id,
+                        'tax_id'            => $row->marketingOrderDetail->tax_id,
+                        'is_include_tax'    => $row->marketingOrderDetail->is_include_tax,
+                        'percent_tax'       => number_format($row->marketingOrderDetail->percent_tax,2,',','.'),
+                        'total'             => number_format($total,2,',','.'),
+                        'tax'               => number_format($tax,2,',','.'),
+                        'grandtotal'        => number_format($grandtotal,2,',','.'),
+                        'lookable_type'     => $row->getTable(),
+                        'lookable_id'       => $row->id,
+                        'qty_do'            => number_format($row->qty,3,',','.'),
+                        'qty_return'        => number_format($row->qtyReturn(),3,',','.'),
+                        'price'             => number_format($price,2,',','.'),
+                        'note'              => $row->note,
+                    ];
+                    $totalAll += $total;
+                    $taxAll += $tax;
+                    $grandtotalAll += $grandtotal;
+                }
+
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->code.' - Ven : '.$d->account->name. ' - Cust. '.$d->marketingOrderDelivery->marketingOrder->account->name,
+                    'code'              => $d->code,
+                    'details'           => $arrDetail,
+                    'total'             => $d->marketingOrderDelivery->marketingOrder->total,
+                    'tax'               => $d->marketingOrderDelivery->marketingOrder->tax,
+                    'rounding'          => $d->marketingOrderDelivery->marketingOrder->rounding,
+                    'grandtotal'        => $d->marketingOrderDelivery->marketingOrder->grandtotal,
+                    'real_total'        => number_format($totalAll,2,',','.'),
+                    'real_tax'          => number_format($taxAll,2,',','.'),
+                    'real_grandtotal'   => number_format($grandtotalAll,2,',','.'),
+                    'type'              => $d->getTable(),
+                    'due_date'          => $d->marketingOrderDelivery->marketingOrder->valid_date,
+                    'days_due'          => $d->marketingOrderDelivery->marketingOrder->account->top,
+                    'list_area'         => Area::where('status','1')->get(), 
                 ];
             }
         }

@@ -73,8 +73,8 @@
                                             <div class="col m6 s6 ">
                                                 <label for="filter_type" style="font-size:1.2rem;">Filter Tipe :</label>
                                                 <div class="input-field">
-                                                    <select class="select2 browser-default" multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
-                                                        <option value="" disabled>Semua</option>
+                                                    <select multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
+                                                        <option value="" selected>Semua</option>
                                                         <option value="1">Akun Rahasia</option>
                                                         <option value="2">Akun Kontrol</option>
                                                         <option value="3">Akun Kas</option>

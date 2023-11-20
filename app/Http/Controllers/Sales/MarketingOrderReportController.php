@@ -34,9 +34,12 @@ class MarketingOrderReportController extends Controller
     public function filterByDate(Request $request){
         $start_time = microtime(true);
         
-        $date = $request->date;
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
 
-        $mo = MarketingOrder::whereIn('status',['2','3'])->whereDate('post_date','<=',$date)->get();
+        $mo = MarketingOrder::whereIn('status',['2','3'])
+                ->whereDate('post_date', '>=', $start_date)
+                ->whereDate('post_date', '<=', $end_date)->get();
         
         $newData = [];
 

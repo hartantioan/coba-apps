@@ -79,7 +79,6 @@ class CustomHelper {
 
 	public static function updateEmployeeTransfer($transfer){
 		DB::beginTransaction();
-		info($transfer);
 		if(in_array($transfer->status,['2','3'])){
 			$query = User::find($transfer->account_id);
 			$query->place_id         = $transfer->plant_id;
@@ -89,12 +88,10 @@ class CustomHelper {
 			$query->save();
 
 			$query_check_employee_transfer = EmployeeTransfer::where('account_id',$query->id)->whereIn('status',['2','3'])->get();
-			info(count($query_check_employee_transfer));
 			$date = Carbon::parse($transfer->post_date);
 			$year_later = Carbon::parse($transfer->post_date)->addYear();
 		
 			if(count($query_check_employee_transfer) == 1){
-				info($year_later->format('Y-m-d'));
 				EmployeeLeaveQuotas::create([
 					'user_id'			=> $query->id,
 					'leave_type_id'		=> 1,
@@ -546,7 +543,6 @@ class CustomHelper {
 			
 			if($lr->leaveType->furlough_type == 7 ){
 				while (count($schedule) < 90) {
-					info($currentDate);
 					$parse_date = Carbon::parse($currentDate->format('Y-m-d'))->toDateString();
 					$query_schedule_in_date = EmployeeSchedule::where('date',$parse_date)
 					->where('user_id',$user->employee_no)
@@ -1900,6 +1896,9 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coapenjualan,
 						'account_id'	=> $moi->account_id,
+						'place_id'		=> $row->lookable->place_id,
+						'warehouse_id'	=> $row->lookable->warehouse_id,
+						'item_id'		=> $row->lookable->item_id,
 						'type'			=> '2',
 						'nominal'		=> $rowtotal,
 					]);

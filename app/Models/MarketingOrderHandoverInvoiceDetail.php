@@ -25,6 +25,15 @@ class MarketingOrderHandoverInvoiceDetail extends Model
     {
         return $this->belongsTo('App\Models\MarketingOrderHandoverInvoice', 'marketing_order_handover_invoice_id', 'id')->withTrashed();
     }
+
+    public function marketingOrderInvoice()
+    {
+        if($this->lookable_type == 'marketing_order_invoices'){
+            return true;
+        }else{
+            return false;
+        }
+    }
     
     public function lookable(){
         return $this->morphTo();

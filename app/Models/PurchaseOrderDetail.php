@@ -18,6 +18,7 @@ class PurchaseOrderDetail extends Model
         'purchase_order_id',
         'purchase_request_detail_id',
         'good_issue_detail_id',
+        'marketing_order_delivery_process_id',
         'item_id',
         'coa_id',
         'qty',
@@ -179,6 +180,11 @@ class PurchaseOrderDetail extends Model
     public function goodIssueDetail()
     {
         return $this->belongsTo('App\Models\GoodIssueDetail','good_issue_detail_id','id');
+    }
+
+    public function marketingOrderDeliveryProcess()
+    {
+        return $this->belongsTo('App\Models\MarketingOrderDeliveryProcess','marketing_order_delivery_process_id','id');
     }
 
     public function purchaseInvoiceDetail()

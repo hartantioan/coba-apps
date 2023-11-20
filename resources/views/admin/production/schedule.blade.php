@@ -119,7 +119,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="min-width:100%;max-height: 100% !important;height: 100% !important;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">

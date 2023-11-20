@@ -187,6 +187,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step3">
                                         <input type="hidden" id="temp" name="temp">
+                                        <input type="hidden" id="tempSwitch" name="tempSwitch">
                                         <select class="browser-default" id="marketing_order_delivery_id" name="marketing_order_delivery_id" onchange="getMarketingOrderDelivery()"></select>
                                         <label class="active" for="marketing_order_delivery_id">Jadwal Kirim</label>
                                     </div>
@@ -685,7 +686,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
-                $('#temp').val('');
+                $('#temp,#tempSwitch').val('');
                 $('#marketing_order_delivery_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -892,7 +893,11 @@
             if($('.data-used').length > 0){
                 $('.data-used').trigger('click');
             }
+            $('#user_driver_id').empty().append(`
+                <option value="">--Kosong / Tambah baru--</option>
+            `);
             $('#post_date').val('{{ date("Y-m-d") }}');
+            $('#info-sender,#info-outlet,#info-address,#info-province,#info-city,#info-district,#info-subdistrict').text('-');
         }
     }
 
@@ -2025,6 +2030,116 @@
                     $('#ref_jurnal').append(`Referensi `+data.reference);
                     $('#post_date_jurnal').append(`Tanggal `+data.message.post_date);
                 }
+            }
+        });
+    }
+
+    function switchDocument(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id,
+                type: 'switch',
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                if(response.responseStatus == 200){
+                    $('#modal1').modal('open');
+                    $('#temp').val(id);
+                    $('#tempSwitch').val('1');
+                    $('#code_place_id').val(response.code_place_id).formSelect();
+                    $('#code').val(response.code);
+                    $('#marketing_order_delivery_id').empty();
+                    $('#marketing_order_delivery_id').append(`
+                        <option value="` + response.marketing_order_delivery_id + `">` + response.marketing_order_delivery_code + `</option>
+                    `);
+                    $('#company_id').val(response.company_id).formSelect();
+                    $('#post_date').val(response.post_date);
+                    $('#note_internal').val(response.note_internal);
+                    $('#note_external').val(response.note_external);
+                    $('#vehicle_name').val(response.vehicle_name);
+                    $('#vehicle_no').val(response.vehicle_no);
+                    $('#info-sender').text(response.sender);
+                    $('#info-outlet').text(response.outlet);
+                    $('#info-address').text(response.address);
+                    $('#info-province').text(response.province);
+                    $('#info-city').text(response.city);
+                    $('#info-district').text(response.district);
+                    $('#info-subdistrict').text(response.subdistrict);
+
+                    if(response.drivers.length > 0){
+                        $('#user_driver_id').empty().append(`
+                            <option value="">--Kosong / Tambah baru--</option>
+                        `);
+                        $.each(response.drivers, function(i, val) {
+                            $('#user_driver_id').append(`
+                                <option value="` + val.id + `" data-driver="` + val.name + `" data-hp="` + val.hp + `">` + val.name + ` - ` + val.hp + `</value>
+                            `);
+                        });
+                        $('#user_driver_id').trigger('change');
+                    }
+
+                    $('#user_driver_id').val(response.user_driver_id).trigger('change');
+
+                    $('#driver_name').val(response.driver_name);
+                    $('#driver_hp').val(response.driver_hp);
+                    
+                    if(response.details.length > 0){
+                        $('#last-row-item').remove();
+
+                        $('.row_item').each(function(){
+                            $(this).remove();
+                        });
+
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-item').append(`
+                                <tr class="row_item" data-id="` + response.id + `">
+                                    <td>
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td id="arr_warehouse_name` + count + `">
+                                        ` + val.place_name + ` - ` + val.warehouse_name + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.qty + `
+                                    </td>
+                                    <td class="center-align">
+                                        <span id="arr_unit` + count + `">` + val.unit + `</span>
+                                    </td>
+                                    <td>
+                                        ` + val.note + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                    
+                    $('.modal-content').scrollTop(0);
+                    $('#note').focus();
+                    M.updateTextFields();
+                }else{
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
             }
         });
     }

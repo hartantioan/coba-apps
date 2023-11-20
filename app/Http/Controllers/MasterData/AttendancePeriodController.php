@@ -562,8 +562,6 @@ class AttendancePeriodController extends Controller
                             $carbonTimeIn = Carbon::parse($time_in);
                             
                             if($pembanding > $time_in ){
-                                info("kambingasdf atass");
-                                info($pembanding);
                                 if(count($query_late_punishment)> 0){
                                    
                                     if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
@@ -639,8 +637,7 @@ class AttendancePeriodController extends Controller
 
                         if($row_arrive == 0 && $exact_out[$key] == 1){
                             if($row_user->id == '21'){
-                                info('pon atas'.$row_arrive.' DAN '. $exact_out[$key]);
-                                info($key.' ini index gan');
+
                             }    
                             $date_arrived_forget[]=Carbon::parse($date)->format('d/m/Y');
                             
@@ -652,8 +649,7 @@ class AttendancePeriodController extends Controller
                           
                         foreach($exact_out as $key3=>$row_out){
                             if($row_user->id == '21'){
-                                info('pon bawah'.$row_out.' DAN '. $exact_in[$key3]);
-                                info($key3.' ini index gan');
+
                             }  
                             if($row_out==0 && $exact_in[$key3] == 1){
                                 
@@ -951,13 +947,10 @@ class AttendancePeriodController extends Controller
                                     }
                                     if($masuk_awal){//perhitungan toleransi untuk ijin telat?
                                         $pembandingdate = Carbon::parse($masuk_awal);
-                                        info($masuk_awal. ' lostd');
                                         $pembanding= $pembandingdate->format('H:i:s');
                                         $carbonTimeIn = Carbon::parse($time_in);
                                         
                                         if($pembanding > $time_in ){
-                                            info("kambingasdf yang bawa");
-                                            info($pembanding);
                                             if(count($query_late_punishment)> 0){
                                                
                                                 if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
@@ -1266,8 +1259,6 @@ class AttendancePeriodController extends Controller
                 }
                 
             }
-            info('counter strike');
-            info($counter_user_monthly);
             //untuk menghitung denda terlambat
             foreach($counter_user_monthly as $row_user){
                 foreach($row_user as $row_counter){
@@ -1502,7 +1493,6 @@ class AttendancePeriodController extends Controller
         $string_table="";
         $iterasi=0;
         foreach($attendanceDetail as $row_detail){
-            info($row_detail);
             foreach($row_detail as $key_daily=>$row_punish){
                 $iterasi++;
                 $string_table.="

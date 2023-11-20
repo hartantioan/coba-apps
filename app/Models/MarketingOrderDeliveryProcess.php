@@ -176,6 +176,11 @@ class MarketingOrderDeliveryProcess extends Model
         return $this->hasMany('App\Models\MarketingOrderDeliveryProcessTrack','marketing_order_delivery_process_id','id');
     }
 
+    public function purchaseOrderDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseOrderDetail');
+    }
+
     public function getArrStatusTracking(){
         $arr = $this->marketingOrderDeliveryProcessTrack()->orderBy('status')->pluck('status')->toArray();
 
@@ -498,5 +503,11 @@ class MarketingOrderDeliveryProcess extends Model
                 'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
             ]);
         }
+    }
+
+    public function hasBalance(){
+        $status = true;
+
+        return $status;
     }
 }

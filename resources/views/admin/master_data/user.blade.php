@@ -351,14 +351,21 @@
                                     <table class="bordered">
                                         <thead>
                                             <tr>
-                                                <th width="30%" class="center">Judul</th>
-                                                <th width="60%" class="center">Keterangan</th>
-                                                <th width="10%" class="center">Hapus</th>
+                                                <th class="center">Judul</th>
+                                                <th class="center">Keterangan</th>
+                                                <th class="center">NPWP</th>
+                                                <th class="center">Alamat</th>
+                                                <th class="center">Negara</th>
+                                                <th class="center">Provinsi</th>
+                                                <th class="center">Kota</th>
+                                                <th class="center">Kecamatan</th>
+                                                <th class="center">Kelurahan</th>
+                                                <th width="5%" class="center">Hapus</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-info">
                                             <tr id="last-row-info">
-                                                <td colspan="3" class="center">
+                                                <td colspan="10" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addInfo()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> Tambah Alamat
                                                     </a>
@@ -1451,6 +1458,27 @@
                 </td>
                 <td class="center">
                     <input name="arr_content[]" type="text" placeholder="Isi informasi tambahan">
+                </td>
+                <td class="center">
+                    <input name="arr_npwp[]" type="text" placeholder="Nomor NPWP">
+                </td>
+                <td class="center">
+                    <input name="arr_address[]" type="text" placeholder="Alamat Kantor">
+                </td>
+                <td class="center">
+                    
+                </td>
+                <td class="center">
+                    
+                </td>
+                <td class="center">
+                    
+                </td>
+                <td class="center">
+                    
+                </td>
+                <td class="center">
+                    
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-info" href="javascript:void(0);">

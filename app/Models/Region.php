@@ -17,6 +17,7 @@ class Region extends Model
     protected $fillable = [
         'code',
         'name',
+        'country_id'
     ];
 
     public function getDistrict(){
@@ -76,5 +77,10 @@ class Region extends Model
         }
 
         return $text;
+    }
+
+    public function country()
+    {
+        return $this->belongsTo('App\Models\Country', 'country_id', 'id')->withTrashed();
     }
 }

@@ -1874,7 +1874,7 @@ class Select2Controller extends Controller {
                             $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
                         }
                     }
-                    $tax = $total * ($row->marketingOrderDetail->percent_tax / 100);
+                    $tax = round($total * ($row->marketingOrderDetail->percent_tax / 100),2);
                     $grandtotal = $total + $tax;
                     $arrDetail[] = [
                         'id'                => $row->id,

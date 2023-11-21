@@ -1135,6 +1135,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('aging_ap')->middleware('operation.access:aging_ap,view')->group(function () {
                         Route::get('/',[AgingAPController::class, 'index']);
                         Route::post('filter',[AgingAPController::class, 'filter']);
+                        Route::post('filter_detail',[AgingAPController::class, 'filterDetail']);
                         Route::post('show_detail',[AgingAPController::class, 'showDetail']);
                         Route::get('export',[AgingAPController::class, 'export']);
                     });
@@ -1855,6 +1856,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('sales_aging')->middleware('operation.access:sales_aging,view')->group(function () {
                         Route::get('/',[MarketingOrderAgingController::class, 'index']);
                         Route::post('filter',[MarketingOrderAgingController::class, 'filter']);
+                        Route::post('filter_detail',[MarketingOrderAgingController::class, 'filterDetail']);
                         Route::post('show_detail',[MarketingOrderAgingController::class, 'showDetail']);
                         Route::get('export',[MarketingOrderAgingController::class, 'export']);
                     });

@@ -65,7 +65,7 @@ class MarketingOrderAgingController extends Controller
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM marketing_order_invoices moi
-                LEFT JOIN users u
+                JOIN users u
                     ON u.id = moi.account_id
                 WHERE 
                     moi.post_date <= :date3
@@ -105,7 +105,7 @@ class MarketingOrderAgingController extends Controller
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM marketing_order_down_payments modp
-                LEFT JOIN users u
+                JOIN users u
                     ON u.id = modp.account_id
                 WHERE 
                     modp.post_date <= :date3
@@ -127,20 +127,23 @@ class MarketingOrderAgingController extends Controller
             'name'                          => 'Belum jatuh tempo',
             'start'                         => -999999999999999999,
             'end'                           => 0,
+            'total'                         => 0,
         ];
         for($i=1;$i<=$column;$i++){
             $end = $i * $interval;
             $start = ($end - $interval) + 1;
             $arrColumn[] = [
-                'name'                          => 'Periode '.$start.' - '.$end.' hari',
+                'name'                          => ''.$start.'-'.$end.' hari',
                 'start'                         => $start,
                 'end'                           => $end,
+                'total'                         => 0,
             ];
         }
         $arrColumn[] = [
             'name'                          => 'Diatas '.$totalDays.' hari',
             'start'                         => $totalDays + 1,
             'end'                           => 999999999999999999,
+            'total'                         => 0,
         ];
 
         $newData = []; 
@@ -151,34 +154,33 @@ class MarketingOrderAgingController extends Controller
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
                 if($index >= 0){
-                    /* $newData[$index]['balance0'] = $daysDiff <= 0 ? $newData[$index]['balance0'] + $balance : $newData[$index]['balance0'];
-                    $newData[$index]['balance30'] = $daysDiff <= 30 && $daysDiff > 0 ? $newData[$index]['balance30'] + $balance : $newData[$index]['balance30'];
-                    $newData[$index]['balance60'] = $daysDiff <= 60 && $daysDiff > 30 ? $newData[$index]['balance60'] + $balance : $newData[$index]['balance60'];
-                    $newData[$index]['balance90'] = $daysDiff <= 90 && $daysDiff > 60 ? $newData[$index]['balance90'] + $balance : $newData[$index]['balance90'];
-                    $newData[$index]['balanceOver'] = $daysDiff > 90 ? $newData[$index]['balanceOver'] + $balance : $newData[$index]['balanceOver'];
-                    $newData[$index]['total'] = $newData[$index]['total'] + $balance; */
                     foreach($newData[$index]['data'] as $key => $rowdata){
                         if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
                             $newData[$index]['data'][$key]['balance'] += $balance;
                             $newData[$index]['total'] += $balance;
+                            $arrColumn[$key]['total'] += $balance;
+                            $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
                         }
                     }
                 }else{
                     $arrDetail = [];
-                    foreach($arrColumn as $rowcolumn){
+                    foreach($arrColumn as $key => $rowcolumn){
                         if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
                             $arrDetail[] = [
-                                'name'      => $rowcolumn['name'],
-                                'start'     => $rowcolumn['start'],
-                                'end'       => $rowcolumn['end'],
-                                'balance'   => $balance
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => $balance,
+                                'list_invoice'  => array($row->code),
                             ];
+                            $arrColumn[$key]['total'] += $balance;
                         }else{
                             $arrDetail[] = [
-                                'name'      => $rowcolumn['name'],
-                                'start'     => $rowcolumn['start'],
-                                'end'       => $rowcolumn['end'],
-                                'balance'   => 0
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => 0,
+                                'list_invoice'  => [],
                             ];
                         }
                     }
@@ -192,75 +194,363 @@ class MarketingOrderAgingController extends Controller
             }
         }
 
-        info($newData);
-
-        /* foreach($results2 as $row){
+        foreach($results2 as $row){
             $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
                 if($index >= 0){
-                    $newData[$index]['balance0'] = $daysDiff <= 0 ? $newData[$index]['balance0'] + $balance : $newData[$index]['balance0'];
-                    $newData[$index]['balance30'] = $daysDiff <= 30 && $daysDiff > 0 ? $newData[$index]['balance30'] + $balance : $newData[$index]['balance30'];
-                    $newData[$index]['balance60'] = $daysDiff <= 60 && $daysDiff > 30 ? $newData[$index]['balance60'] + $balance : $newData[$index]['balance60'];
-                    $newData[$index]['balance90'] = $daysDiff <= 90 && $daysDiff > 60 ? $newData[$index]['balance90'] + $balance : $newData[$index]['balance90'];
-                    $newData[$index]['balanceOver'] = $daysDiff > 90 ? $newData[$index]['balanceOver'] + $balance : $newData[$index]['balanceOver'];
-                    $newData[$index]['total'] = $newData[$index]['total'] + $balance;
-                    $newData[$index]['arrInvoiceBalance0'][] = $daysDiff <= 0 ? $row->code : null;
-                    $newData[$index]['arrInvoiceBalance30'][] = $daysDiff <= 30 && $daysDiff > 0 ? $row->code : null;
-                    $newData[$index]['arrInvoiceBalance60'][] = $daysDiff <= 60 && $daysDiff > 30 ? $row->code : null;
-                    $newData[$index]['arrInvoiceBalance90'][] = $daysDiff <= 90 && $daysDiff > 60 ? $row->code : null;
-                    $newData[$index]['arrInvoiceBalanceOver'][] = $daysDiff > 90 ? $row->code : null;
+                    foreach($newData[$index]['data'] as $key => $rowdata){
+                        if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
+                            $newData[$index]['data'][$key]['balance'] += $balance;
+                            $newData[$index]['total'] += $balance;
+                            $arrColumn[$key]['total'] += $balance;
+                            $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
+                        }
+                    }
                 }else{
+                    $arrDetail = [];
+                    foreach($arrColumn as $key => $rowcolumn){
+                        if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                            $arrDetail[] = [
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => $balance,
+                                'list_invoice'  => array($row->code),
+                            ];
+                            $arrColumn[$key]['total'] += $balance;
+                        }else{
+                            $arrDetail[] = [
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => 0,
+                                'list_invoice'  => [],
+                            ];
+                        }
+                    }
                     $newData[] = [
                         'customer_code'         => $row->account_code,
                         'customer_name'         => $row->account_name,
-                        'balance0'              => $daysDiff <= 0 ? $balance : 0,
-                        'balance30'             => $daysDiff <= 30 && $daysDiff > 0 ? $balance : 0,
-                        'balance60'             => $daysDiff <= 60 && $daysDiff > 30 ? $balance : 0,
-                        'balance90'             => $daysDiff <= 90 && $daysDiff > 60 ? $balance : 0,
-                        'balanceOver'           => $daysDiff > 90 ? $balance : 0,
+                        'data'                  => $arrDetail,
                         'total'                 => $balance,
-                        'arrInvoiceBalance0'    => $daysDiff <= 0 ? array($row->code) : [],
-                        'arrInvoiceBalance30'   => $daysDiff <= 30 && $daysDiff > 0 ? array($row->code) : [],
-                        'arrInvoiceBalance60'   => $daysDiff <= 60 && $daysDiff > 30 ? array($row->code) : [],
-                        'arrInvoiceBalance90'   => $daysDiff <= 90 && $daysDiff > 60 ? array($row->code) : [],
-                        'arrInvoiceBalanceOver' => $daysDiff > 90 ? array($row->code) : [],
                     ];
                 }
             }
         }
 
-        $html = '<table class="bordered" style="font-size:10px;">
+        $html = '<table class="bordered" style="font-size:10px;min-width:100% !important;">
         <thead id="head_detail">
             <tr>
                 <th rowspan="2" class="center-align">No.</th>
-                <th rowspan="2" class="center-align">Supplier</th>
-                <th colspan="'.$countPeriod.'" class="center-align">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Tenggat)</th>
-                <th rowspan="2" class="center-align">Total</th>
+                <th rowspan="2" class="center-align" style="min-width:250px !important;">Supplier</th>
+                <th rowspan="2" class="center-align" style="min-width:175px !important;">Total Piutang</th>
+                <th colspan="'.$countPeriod.'">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Tenggat)</th>
             </tr>
-            <tr>
-                <th class="center-align">Belum Jatuh Tempo</th>
-                <th class="center-align">1-30 Hari</th>
-                <th class="center-align">31-60 Hari</th>
-                <th class="center-align">61-90 Hari</th>
-                <th class="center-align">Diatas 90 Hari</th>
-            </tr>
+            <tr>';
+                
+        foreach($arrColumn as $row){
+            $html .= '<th class="center-align" style="min-width:175px !important;">'.$row['name'].'</th>';
+        }
+            
+        $html .= '</tr>
         </thead>
         <tbody>';
 
+        foreach($newData as $key => $row){
+            $html .= '<tr class="row_detail"><td class="center-align">'.($key + 1).'</td><td>'.$row['customer_name'].'</td>';
 
+            $html .= '<td class="right-align">'.number_format($row['total'],2,',','.').'</td>';
 
-        $html .= '</tbody></table>' */
+            foreach($row['data'] as $rowdetail){
+                $html .= '<td class="right-align '.($rowdetail['balance'] > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '').'" onclick="detailShow(this)" data-invoice="'.implode(',',$rowdetail['list_invoice']).'">'.number_format($rowdetail['balance'],2,',','.').'</td>';
+            }
+
+            $html .= '</tr>';
+        }
+
+        $grandtotal = 0;
+
+        foreach($arrColumn as $row){
+            $grandtotal += $row['total'];
+        }
+
+        $html .= '<tr id="text-grandtotal">
+                    <td class="right-align" colspan="2">Total</td>
+                    <td class="right-align">'.number_format($grandtotal,2,',','.').'</td>';
+
+        foreach($arrColumn as $row){
+            $html .= '<td class="right-align">'.number_format($row['total'],2,',','.').'</td>';
+            $grandtotal += $row['total'];
+        }
+
+        $html .= '</tr>';
 
         $end_time = microtime(true);
         
         $execution_time = ($end_time - $start_time);
+
+        $html .= '<tr id="text-grandtotal">
+                    <td colspan="'.($countPeriod + 3).'">Waktu proses : '.$execution_time.' detik</td>
+                </tr>';
+
+        $html .= '</tbody></table>';
         
         $response =[
             'status'            => 200,
-            'content'           => '',
-            'execution_time'    => $execution_time,
+            'content'           => count($newData) > 0 ? $html : '',
+        ];
+
+        return response()->json($response);
+    }
+
+    public function filterDetail(Request $request){
+        
+        $start_time = microtime(true);
+        
+        $date = $request->date;
+
+        $results = DB::select("
+            SELECT 
+                *,
+                IFNULL((SELECT 
+                    SUM(ipd.total) 
+                    FROM incoming_payment_details ipd 
+                    JOIN incoming_payments ip
+                        ON ip.id = ipd.incoming_payment_id
+                    WHERE 
+                        ipd.lookable_id = moi.id 
+                        AND ipd.lookable_type = 'marketing_order_invoices'
+                        AND ip.post_date <= :date1
+                        AND ip.status IN ('2','3')
+                ),0) AS total_payment,
+                IFNULL((
+                    SELECT
+                        SUM(momd.grandtotal)
+                        FROM marketing_order_memo_details momd
+                        JOIN marketing_order_memos mom
+                            ON mom.id = momd.marketing_order_memo_id
+                        JOIN marketing_order_invoice_details midd
+                            ON midd.marketing_order_invoice_id = moi.id
+                            AND midd.id = momd.lookable_id
+                        WHERE momd.lookable_type = 'marketing_order_invoice_details'
+                        AND mom.post_date <= :date2
+                        AND mom.status IN ('2','3')
+                ),0) AS total_memo,
+                u.name AS account_name,
+                u.employee_no AS account_code
+                FROM marketing_order_invoices moi
+                JOIN users u
+                    ON u.id = moi.account_id
+                WHERE 
+                    moi.post_date <= :date3
+                    AND moi.balance > 0
+                    AND moi.status IN ('2','3')
+        ", array(
+            'date1' => $date,
+            'date2' => $date,
+            'date3' => $date,
+        ));
+
+        $results2 = DB::select("
+            SELECT 
+                *,
+                IFNULL((SELECT 
+                    SUM(ipd.total)
+                    FROM incoming_payment_details ipd 
+                    JOIN incoming_payments ip
+                        ON ip.id = ipd.incoming_payment_id
+                    WHERE 
+                        ipd.lookable_id = modp.id 
+                        AND ipd.lookable_type = 'marketing_order_down_payments'
+                        AND ip.post_date <= :date1
+                        AND ip.status IN ('2','3')
+                ),0) AS total_payment,
+                IFNULL((
+                    SELECT
+                        SUM(momd.grandtotal)
+                        FROM marketing_order_memo_details momd
+                        JOIN marketing_order_memos mom
+                            ON mom.id = momd.marketing_order_memo_id
+                        WHERE momd.lookable_type = 'marketing_order_down_payments'
+                        AND momd.lookable_id = modp.id
+                        AND mom.post_date <= :date2
+                        AND mom.status IN ('2','3')
+                ),0) AS total_memo,
+                u.name AS account_name,
+                u.employee_no AS account_code
+                FROM marketing_order_down_payments modp
+                JOIN users u
+                    ON u.id = modp.account_id
+                WHERE 
+                    modp.post_date <= :date3
+                    AND modp.grandtotal > 0
+                    AND modp.status IN ('2','3')
+        ", array(
+            'date1' => $date,
+            'date2' => $date,
+            'date3' => $date,
+        ));
+
+        $countPeriod = 1;
+        $column = intval($request->column);
+        $countPeriod += $column + 1;
+        $interval = intval($request->interval);
+        $totalDays = $column * $interval;
+        $arrColumn = [];
+        $arrColumn[] = [
+            'name'                          => 'Belum jatuh tempo',
+            'start'                         => -999999999999999999,
+            'end'                           => 0,
+            'total'                         => 0,
+        ];
+        for($i=1;$i<=$column;$i++){
+            $end = $i * $interval;
+            $start = ($end - $interval) + 1;
+            $arrColumn[] = [
+                'name'                          => ''.$start.'-'.$end.' hari',
+                'start'                         => $start,
+                'end'                           => $end,
+                'total'                         => 0,
+            ];
+        }
+        $arrColumn[] = [
+            'name'                          => 'Diatas '.$totalDays.' hari',
+            'start'                         => $totalDays + 1,
+            'end'                           => 999999999999999999,
+            'total'                         => 0,
+        ];
+
+        $newData = []; 
+
+        foreach($results as $row){
+            $balance = $row->balance - $row->total_payment - $row->total_memo;
+            if($balance > 0){
+                $daysDiff = $this->dateDiffInDays($row->due_date,$date);
+                $arrDetail = [];
+                foreach($arrColumn as $key => $rowcolumn){
+                    if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                        $arrDetail[] = [
+                            'name'          => $rowcolumn['name'],
+                            'start'         => $rowcolumn['start'],
+                            'end'           => $rowcolumn['end'],
+                            'balance'       => $balance,
+                        ];
+                        $arrColumn[$key]['total'] += $balance;
+                    }else{
+                        $arrDetail[] = [
+                            'name'          => $rowcolumn['name'],
+                            'start'         => $rowcolumn['start'],
+                            'end'           => $rowcolumn['end'],
+                            'balance'       => 0,
+                        ];
+                    }
+                }
+                $newData[] = [
+                    'customer_code'         => $row->account_code,
+                    'customer_name'         => $row->account_name,
+                    'invoice'               => $row->code,
+                    'data'                  => $arrDetail,
+                    'total'                 => $balance,
+                ];
+            }
+        }
+
+        foreach($results2 as $row){
+            $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+            if($balance > 0){
+                $daysDiff = $this->dateDiffInDays($row->due_date,$date);
+                $arrDetail = [];
+                foreach($arrColumn as $key => $rowcolumn){
+                    if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                        $arrDetail[] = [
+                            'name'          => $rowcolumn['name'],
+                            'start'         => $rowcolumn['start'],
+                            'end'           => $rowcolumn['end'],
+                            'balance'       => $balance,
+                        ];
+                        $arrColumn[$key]['total'] += $balance;
+                    }else{
+                        $arrDetail[] = [
+                            'name'          => $rowcolumn['name'],
+                            'start'         => $rowcolumn['start'],
+                            'end'           => $rowcolumn['end'],
+                            'balance'       => 0,
+                        ];
+                    }
+                }
+                $newData[] = [
+                    'customer_code'         => $row->account_code,
+                    'customer_name'         => $row->account_name,
+                    'invoice'               => $row->code,
+                    'data'                  => $arrDetail,
+                    'total'                 => $balance,
+                ];
+            }
+        }
+
+        $html = '<table class="bordered" style="font-size:10px;min-width:100% !important;">
+        <thead id="head_detail">
+            <tr>
+                <th rowspan="2" class="center-align">No.</th>
+                <th rowspan="2" class="center-align" style="min-width:250px !important;">Supplier</th>
+                <th rowspan="2" class="center-align" style="min-width:250px !important;">Invoice</th>
+                <th rowspan="2" class="center-align" style="min-width:175px !important;">Nominal</th>
+                <th colspan="'.$countPeriod.'">Nominal Jatuh Tempo (Dari Tgl. Posting dan Tgl. Tenggat)</th>
+                
+            </tr>
+            <tr>';
+                
+        foreach($arrColumn as $row){
+            $html .= '<th class="center-align" style="min-width:175px !important;">'.$row['name'].'</th>';
+        }
+            
+        $html .= '</tr>
+        </thead>
+        <tbody>';
+
+        foreach($newData as $key => $row){
+            $html .= '<tr class="row_detail"><td class="center-align">'.($key + 1).'</td><td>'.$row['customer_name'].'</td><td>'.$row['invoice'].'</td>';
+
+            $html .= '<td class="right-align">'.number_format($row['total'],2,',','.').'</td>';
+
+            foreach($row['data'] as $rowdetail){
+                $html .= '<td class="right-align '.($rowdetail['balance'] > 0 ? 'gradient-45deg-yellow-teal blue-text text-darken-2' : '').'">'.number_format($rowdetail['balance'],2,',','.').'</td>';
+            }
+
+            $html .= '</tr>';
+        }
+
+        $grandtotal = 0;
+
+        foreach($arrColumn as $row){
+            $grandtotal += $row['total'];
+        }
+
+        $html .= '<tr id="text-grandtotal">
+                    <td class="right-align" colspan="3">Total</td>
+                    <td class="right-align">'.number_format($grandtotal,2,',','.').'</td>';
+
+        foreach($arrColumn as $row){
+            $html .= '<td class="right-align">'.number_format($row['total'],2,',','.').'</td>';
+        }
+
+        $html .= '</tr>';
+
+        $end_time = microtime(true);
+        
+        $execution_time = ($end_time - $start_time);
+
+        $html .= '<tr id="text-grandtotal">
+                    <td colspan="'.($countPeriod + 3).'">Waktu proses : '.$execution_time.' detik</td>
+                </tr>';
+
+        $html .= '</tbody></table>';
+        
+        $response =[
+            'status'            => 200,
+            'content'           => count($newData) > 0 ? $html : '',
         ];
 
         return response()->json($response);
@@ -326,7 +616,7 @@ class MarketingOrderAgingController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportAgingAR($request->date), 'aging_ar_'.uniqid().'.xlsx');
+		return Excel::download(new ExportAgingAR($request->date,$request->interval,$request->column,$request->type), 'aging_ar_'.uniqid().'.xlsx');
     }
 
     function findDuplicate($value,$array){

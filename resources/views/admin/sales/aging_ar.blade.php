@@ -41,7 +41,7 @@
                                         <form class="row" id="form_data_filter" onsubmit="return false;">
                                             <div class="col s12">
                                                 <div class="row">
-                                                    <div class="col m3 s6 ">
+                                                    <div class="col m2 s6 ">
                                                         <label for="date" style="font-size:1rem;">Tanggal Batas :</label>
                                                         <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}">
                                                     </div>
@@ -52,6 +52,13 @@
                                                     <div class="col m2 s6 ">
                                                         <label for="column" style="font-size:1rem;">Jumlah Kolom :</label>
                                                         <input type="number" id="column" name="column" value="0">
+                                                    </div>
+                                                    <div class="col m2 s6 ">
+                                                        <label for="type" style="font-size:1rem;">Tipe Laporan :</label>
+                                                        <select id="type" name="type">
+                                                            <option value="1">Rekap</option>
+                                                            <option value="2">Detail</option>
+                                                        </select>
                                                     </div>
                                                     <div class="col m4 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
@@ -86,9 +93,9 @@
                                 </h4>
                                 <h6>Untuk melihat detail tagihan pada masing-masing nominal, silahkan klik/tap kotak nominal berwarna <span class="blue-text text-darken-2">biru</span>.</h6>
                                 <div class="row">
-                                    <div class="col s12 m12" style="overflow: auto">
-                                        <div class="result">
-                                            Silahkan pilih tanggal dan tekan tombol filter.
+                                    <div class="col s12 m12">
+                                        <div class="result" style="overflow: auto !important;width:100% !important;">
+                                            Silahkan pilih tanggal, interval, jumlah kolom dan tekan tombol filter.
                                         </div>  
                                     </div>
                                 </div>
@@ -144,24 +151,33 @@
                 $('#show_detail').empty();
             }
         });
+
+        $('#type').formSelect();
     });
 
     function exportExcel(){
         if($('.row_detail').length > 0){
-            var date = $('#date').val();
-            window.location = "{{ Request::url() }}/export?date=" + date;
+            var date = $('#date').val(), interval = $('#interval').val(), column = $('#column').val(), type = $('#type').val();
+            window.location = "{{ Request::url() }}/export?date=" + date + "&interval=" + interval + "&column=" + column + "&type=" + type;
         }else{
             swal({
                 title: 'Ups!',
-                text: 'Silahkan filter laporan terlebih dahulu ges.',
+                text: 'Silahkan filter laporan terlebih dahulu ya.',
                 icon: 'warning'
             });
         }
     }
+    
     function filterByDate(){
         var formData = new FormData($('#form_data_filter')[0]);
+        let urlgas = '';
+        if($('#type').val() == '1'){
+            urlgas = '{{ Request::url() }}/filter';
+        }else{
+            urlgas = '{{ Request::url() }}/filter_detail';
+        }
         $.ajax({
-            url: '{{ Request::url() }}/filter',
+            url: urlgas,
             type: 'POST',
             dataType: 'JSON',
             data: formData,
@@ -178,14 +194,12 @@
             success: function(response) {
                 loadingClose('#main-display');
                 if(response.status == 200) {
-                    $('#result').html('');
-                    if(response.content > 0){
-                        $('#result').html(response.content);
+                    $('.result').html('');
+                    if(response.content){
+                        $('.result').html(response.content);
                     }else{
-                        $('#detail-result').append(`
-                            <tr>
-                                <td class="center-align" colspan="8">Data tidak ditemukan.</td>
-                            </tr>
+                        $('.result').append(`
+                            Silahkan pilih tanggal, interval, jumlah kolom dan tekan tombol filter.
                         `);
                     }
                     M.toast({
@@ -277,10 +291,8 @@
 
     function reset(){
         $('#form_data_filter')[0].reset();
-        $('#detail-result').html('').append(`
-            <tr>
-                <td class="center-align" colspan="8">Silahkan pilih tanggal dan tekan tombol filter.</td>
-            </tr>
+        $('.result').html('').append(`
+            Silahkan pilih tanggal, interval, jumlah kolom dan tekan tombol filter.
         `);
     }
 </script>

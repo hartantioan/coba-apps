@@ -15,10 +15,12 @@ class ExportAgingAP implements FromView , WithEvents
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct(string $date)
+    public function __construct(string $date, int $interval, int $column, int $type)
     {
         $this->date = $date ? $date : '';
-		
+        $this->interval = $interval ? $interval : 0;
+		$this->column = $column ? $column : 0;
+        $this->type = $type ? $type : 1;
     }
     public function view(): View
     {
@@ -110,66 +112,214 @@ class ExportAgingAP implements FromView , WithEvents
                 'date3' => $this->date,
             ));
 
-        foreach($query_data as $row){
-            $balance = $row->balance - $row->total_payment - $row->total_memo;
-            if($balance > 0){
-                $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
-                $index = $this->findDuplicate($row->account_code,$newData);
-                if($index >= 0){
-                    $newData[$index]['balance0'] = $daysDiff <= 0 ? $newData[$index]['balance0'] + $balance : $newData[$index]['balance0'];
-                    $newData[$index]['balance30'] = $daysDiff <= 30 && $daysDiff > 0 ? $newData[$index]['balance30'] + $balance : $newData[$index]['balance30'];
-                    $newData[$index]['balance60'] = $daysDiff <= 60 && $daysDiff > 30 ? $newData[$index]['balance60'] + $balance : $newData[$index]['balance60'];
-                    $newData[$index]['balance90'] = $daysDiff <= 90 && $daysDiff > 60 ? $newData[$index]['balance90'] + $balance : $newData[$index]['balance90'];
-                    $newData[$index]['balanceOver'] = $daysDiff > 90 ? $newData[$index]['balanceOver'] + $balance : $newData[$index]['balanceOver'];
-                    $newData[$index]['total'] = $newData[$index]['total'] + $balance;
-                }else{
-                    $newData[] = [
-                        'supplier_code'         => $row->account_code,
-                        'supplier_name'         => $row->account_name,
-                        'balance0'              => $daysDiff <= 0 ? $balance : 0,
-                        'balance30'             => $daysDiff <= 30 && $daysDiff > 0 ? $balance : 0,
-                        'balance60'             => $daysDiff <= 60 && $daysDiff > 30 ? $balance : 0,
-                        'balance90'             => $daysDiff <= 90 && $daysDiff > 60 ? $balance : 0,
-                        'balanceOver'           => $daysDiff > 90 ? $balance : 0,
-                        'total'                 => $balance,
-                    ];
-                }
-                $totalAll += $balance;
-            }
+        $countPeriod = 1;
+        $column = intval($this->column);
+        $countPeriod += $column + 1;
+        $interval = intval($this->interval);
+        $totalDays = $column * $interval;
+        $arrColumn = [];
+        $arrColumn[] = [
+            'name'      => 'Belum jatuh tempo',
+            'start'     => -999999999999999999,
+            'end'       => 0,
+            'total'     => 0,
+        ];
+        for($i=1;$i<=$column;$i++){
+            $end = $i * $interval;
+            $start = ($end - $interval) + 1;
+            $arrColumn[] = [
+                'name'   => ''.$start.'-'.$end.' hari',
+                'start'  => $start,
+                'end'    => $end,
+                'total'  => 0,
+            ];
         }
-        
-        foreach($query_data2 as $row){
-            $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
-            if($balance > 0){
-                $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
-                $index = $this->findDuplicate($row->account_code,$newData);
-                if($index >= 0){
-                    $newData[$index]['balance0'] = $daysDiff <= 0 ? $newData[$index]['balance0'] + $balance : $newData[$index]['balance0'];
-                    $newData[$index]['balance30'] = $daysDiff <= 30 && $daysDiff > 0 ? $newData[$index]['balance30'] + $balance : $newData[$index]['balance30'];
-                    $newData[$index]['balance60'] = $daysDiff <= 60 && $daysDiff > 30 ? $newData[$index]['balance60'] + $balance : $newData[$index]['balance60'];
-                    $newData[$index]['balance90'] = $daysDiff <= 90 && $daysDiff > 60 ? $newData[$index]['balance90'] + $balance : $newData[$index]['balance90'];
-                    $newData[$index]['balanceOver'] = $daysDiff > 90 ? $newData[$index]['balanceOver'] + $balance : $newData[$index]['balanceOver'];
-                    $newData[$index]['total'] = $newData[$index]['total'] + $balance;
-                }else{
-                    $newData[] = [
-                        'supplier_code'         => $row->account_code,
-                        'supplier_name'         => $row->account_name,
-                        'balance0'              => $daysDiff <= 0 ? $balance : 0,
-                        'balance30'             => $daysDiff <= 30 && $daysDiff > 0 ? $balance : 0,
-                        'balance60'             => $daysDiff <= 60 && $daysDiff > 30 ? $balance : 0,
-                        'balance90'             => $daysDiff <= 90 && $daysDiff > 60 ? $balance : 0,
-                        'balanceOver'           => $daysDiff > 90 ? $balance : 0,
-                        'total'                 => $balance,
-                    ];
-                }
-                $totalAll += $balance;
-            }
-        }
+        $arrColumn[] = [
+            'name'      => 'Diatas '.$totalDays.' hari',
+            'start'     => $totalDays + 1,
+            'end'       => 999999999999999999,
+            'total'     => 0,
+        ];
 
-        return view('admin.exports.aging_ap', [
-            'data'      => $newData,
-            'totalall'  => $totalAll
-        ]);
+        $newData = [];
+
+        if($this->type == 1){
+            foreach($query_data as $row){
+                $balance = $row->balance - $row->total_payment - $row->total_memo;
+                if($balance > 0){
+                    $totalAll += $balance;
+                    $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
+                    $index = $this->findDuplicate($row->account_code,$newData);
+                    if($index >= 0){
+                        foreach($newData[$index]['data'] as $key => $rowdata){
+                            if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
+                                $newData[$index]['data'][$key]['balance'] += $balance;
+                                $newData[$index]['total'] += $balance;
+                                $arrColumn[$key]['total'] += $balance;
+                                $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
+                            }
+                        }
+                    }else{
+                        $arrDetail = [];
+                        foreach($arrColumn as $key => $rowcolumn){
+                            if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                                $arrDetail[] = [
+                                    'name'          => $rowcolumn['name'],
+                                    'start'         => $rowcolumn['start'],
+                                    'end'           => $rowcolumn['end'],
+                                    'balance'       => $balance,
+                                    'list_invoice'  => array($row->code),
+                                ];
+                                $arrColumn[$key]['total'] += $balance;
+                            }else{
+                                $arrDetail[] = [
+                                    'name'          => $rowcolumn['name'],
+                                    'start'         => $rowcolumn['start'],
+                                    'end'           => $rowcolumn['end'],
+                                    'balance'       => 0,
+                                    'list_invoice'  => [],
+                                ];
+                            }
+                        }
+                        $newData[] = [
+                            'supplier_code'         => $row->account_code,
+                            'supplier_name'         => $row->account_name,
+                            'data'                  => $arrDetail,
+                            'total'                 => $balance,
+                        ];
+                    }
+                }
+            }
+    
+            foreach($query_data2 as $row){
+                $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+                if($balance > 0){
+                    $totalAll += $balance;
+                    $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
+                    $index = $this->findDuplicate($row->account_code,$newData);
+                    if($index >= 0){
+                        foreach($newData[$index]['data'] as $key => $rowdata){
+                            if($daysDiff <= $rowdata['end'] && $daysDiff >= $rowdata['start']){
+                                $newData[$index]['data'][$key]['balance'] += $balance;
+                                $newData[$index]['total'] += $balance;
+                                $arrColumn[$key]['total'] += $balance;
+                                $newData[$index]['data'][$key]['list_invoice'][] = $row->code;
+                            }
+                        }
+                    }else{
+                        $arrDetail = [];
+                        foreach($arrColumn as $key => $rowcolumn){
+                            if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                                $arrDetail[] = [
+                                    'name'          => $rowcolumn['name'],
+                                    'start'         => $rowcolumn['start'],
+                                    'end'           => $rowcolumn['end'],
+                                    'balance'       => $balance,
+                                    'list_invoice'  => array($row->code),
+                                ];
+                                $arrColumn[$key]['total'] += $balance;
+                            }else{
+                                $arrDetail[] = [
+                                    'name'          => $rowcolumn['name'],
+                                    'start'         => $rowcolumn['start'],
+                                    'end'           => $rowcolumn['end'],
+                                    'balance'       => 0,
+                                    'list_invoice'  => [],
+                                ];
+                            }
+                        }
+                        $newData[] = [
+                            'supplier_code'         => $row->account_code,
+                            'supplier_name'         => $row->account_name,
+                            'data'                  => $arrDetail,
+                            'total'                 => $balance,
+                        ];
+                    }
+                }
+            }
+    
+            return view('admin.exports.aging_ap', [
+                'data'          => $newData,
+                'column'        => $arrColumn,
+                'countPeriod'   => $countPeriod,
+                'totalall'      => $totalAll
+            ]);
+        }else{
+            foreach($query_data as $row){
+                $balance = $row->balance - $row->total_payment - $row->total_memo;
+                if($balance > 0){
+                    $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
+                    $arrDetail = [];
+                    $totalAll += $balance;
+                    foreach($arrColumn as $key => $rowcolumn){
+                        if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                            $arrDetail[] = [
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => $balance,
+                            ];
+                            $arrColumn[$key]['total'] += $balance;
+                        }else{
+                            $arrDetail[] = [
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => 0,
+                            ];
+                        }
+                    }
+                    $newData[] = [
+                        'supplier_name'         => $row->account_code,
+                        'supplier_code'         => $row->account_name,
+                        'invoice'               => $row->code,
+                        'data'                  => $arrDetail,
+                        'total'                 => $balance,
+                    ];
+                }
+            }
+    
+            foreach($query_data2 as $row){
+                $balance = $row->grandtotal - $row->total_payment - $row->total_memo;
+                if($balance > 0){
+                    $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
+                    $arrDetail = [];
+                    $totalAll += $balance;
+                    foreach($arrColumn as $key => $rowcolumn){
+                        if($daysDiff <= $rowcolumn['end'] && $daysDiff >= $rowcolumn['start']){
+                            $arrDetail[] = [
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => $balance,
+                            ];
+                            $arrColumn[$key]['total'] += $balance;
+                        }else{
+                            $arrDetail[] = [
+                                'name'          => $rowcolumn['name'],
+                                'start'         => $rowcolumn['start'],
+                                'end'           => $rowcolumn['end'],
+                                'balance'       => 0,
+                            ];
+                        }
+                    }
+                    $newData[] = [
+                        'supplier_code'         => $row->account_code,
+                        'supplier_name'         => $row->account_name,
+                        'invoice'               => $row->code,
+                        'data'                  => $arrDetail,
+                        'total'                 => $balance,
+                    ];
+                }
+            }
+    
+            return view('admin.exports.aging_ap_detail', [
+                'data'          => $newData,
+                'column'        => $arrColumn,
+                'countPeriod'   => $countPeriod,
+                'totalall'      => $totalAll
+            ]);
+        }
     }
 
     public function registerEvents(): array

@@ -86,4 +86,20 @@ class MarketingOrderMemoDetail extends Model
 
         return $type;
     }
+
+    public function marketingOrderDownPayment(){
+        if($this->lookable_type == 'marketing_order_down_payments'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function marketingOrderInvoiceDetail(){
+        if($this->lookable_type == 'marketing_order_invoice_details'){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

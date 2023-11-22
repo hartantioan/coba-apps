@@ -22,7 +22,7 @@ class Region extends Model
 
     public function getDistrict(){
         $arr = [];
-        $data = Region::where('code', 'like', "$this->code%")->whereRaw("CHAR_LENGTH(code) = 8")->get();
+        $data = Region::where('code','like',"$this->code%")->whereRaw("CHAR_LENGTH(code) = 8")->get();
         foreach($data as $row){
             $arr[] = [
                 'id'            => $row->id,
@@ -36,7 +36,7 @@ class Region extends Model
 
     public function getSubdistrict(){
         $arr = [];
-        $data = Region::where('code', 'like', "$this->code%")->whereRaw("CHAR_LENGTH(code) = 13")->get();
+        $data = Region::where('code','like',"$this->code%")->whereRaw("CHAR_LENGTH(code) = 13")->get();
         foreach($data as $row){
             $arr[] = [
                 'id'    => $row->id,
@@ -49,7 +49,7 @@ class Region extends Model
 
     public function getCity(){
         $arr = [];
-        $data = Region::where('code', 'like', "$this->code%")->whereRaw("CHAR_LENGTH(code) = 5")->get();
+        $data = Region::where('code','like',"$this->code%")->whereRaw("CHAR_LENGTH(code) = 5")->get();
         foreach($data as $row){
             $arr[] = [
                 'id'            => $row->id,
@@ -57,6 +57,19 @@ class Region extends Model
                 'name'          => $row->name,
                 'district'      => $row->getDistrict(),
                 'subdistrict'   => $row->getSubdistrict(),
+            ];
+        }
+        return $arr;
+    }
+
+    public function getCityOnly(){
+        $arr = [];
+        $data = Region::where('code','like',"$this->code%")->whereRaw("CHAR_LENGTH(code) = 5")->get();
+        foreach($data as $row){
+            $arr[] = [
+                'id'            => $row->id,
+                'code'          => $row->code,
+                'name'          => $row->name,
             ];
         }
         return $arr;

@@ -29,6 +29,7 @@ use App\Models\Position;
 use App\Models\Menu;
 use App\Models\MenuUser;
 use App\Models\Group;
+use App\Models\Region;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportUser;
 use App\Helpers\CustomHelper;
@@ -47,6 +48,8 @@ class UserController extends Controller
             'position'      => Position::where('status','1')->get(),
             'group'         => Group::where('status','1')->get(['id','name','type'])->toArray(),
             'menu'          => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
+            'province'      => Region::whereRaw("LENGTH(code) = 2")->get(),
+            'city'          => Region::whereRaw("LENGTH(code) = 5")->get(),
             'content'       => 'admin.master_data.user'
         ];
 
@@ -258,7 +261,12 @@ class UserController extends Controller
         }
 
         foreach($data->userData as $row){
-            $infos[] = $row->title.' '.$row->content;
+            $country = $row->country()->exists() ? $row->country->name : '';
+            $province = $row->province()->exists() ? $row->province->name : '';
+            $city = $row->city()->exists() ? $row->city->name : '';
+            $district = $row->district()->exists() ? $row->district->name : '';
+            $subdistrict = $row->subdistrict()->exists() ? $row->subdistrict->name : '';
+            $infos[] = $row->title.' '.$row->content.' '.$row->npwp.' '.$row->address.' - '.$subdistrict.' - '.$district.' - '.$city.' - '.$province.' - '.$country;
         }
 
         foreach($data->userDriver as $row){
@@ -637,13 +645,27 @@ class UserController extends Controller
                         if($request->arr_id_data[$key]){
                             UserData::find(intval($request->arr_id_data[$key]))->update([
                                 'title'         => $row,
-                                'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL
+                                'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL,
+                                'npwp'          => $request->arr_npwp[$key] ? $request->arr_npwp[$key] : NULL,
+                                'address'       => $request->arr_address[$key] ? $request->arr_address[$key] : NULL,
+                                'country_id'    => $request->arr_country[$key] ? $request->arr_country[$key]: NULL,
+                                'province_id'   => $request->arr_province[$key] ? $request->arr_province[$key] : NULL,
+                                'city_id'       => $request->arr_city[$key] ? $request->arr_city[$key] : NULL,
+                                'district_id'   => $request->arr_district[$key] ? $request->arr_district[$key] : NULL,
+                                'subdistrict_id'=> $request->arr_subdistrict[$key] ? $request->arr_subdistrict[$key] : NULL,
                             ]);
                         }else{
                             UserData::create([
                                 'user_id'	    => $query->id,
                                 'title'         => $row,
-                                'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL
+                                'content'       => isset($request->arr_content[$key]) ? $request->arr_content[$key] : NULL,
+                                'npwp'          => $request->arr_npwp[$key] ? $request->arr_npwp[$key] : NULL,
+                                'address'       => $request->arr_address[$key] ? $request->arr_address[$key] : NULL,
+                                'country_id'    => $request->arr_country[$key] ? $request->arr_country[$key]: NULL,
+                                'province_id'   => $request->arr_province[$key] ? $request->arr_province[$key] : NULL,
+                                'city_id'       => $request->arr_city[$key] ? $request->arr_city[$key] : NULL,
+                                'district_id'   => $request->arr_district[$key] ? $request->arr_district[$key] : NULL,
+                                'subdistrict_id'=> $request->arr_subdistrict[$key] ? $request->arr_subdistrict[$key] : NULL,
                             ]);
                         }
                     }
@@ -1024,9 +1046,20 @@ class UserController extends Controller
 
         foreach($user->userData as $row){
 			$datas[] = [
-                'id'        => $row->id,
-                'title'     => $row->title,
-                'content'   => $row->content
+                'id'                => $row->id,
+                'title'             => $row->title,
+                'content'           => $row->content,
+                'npwp'              => $row->npwp,
+                'address'           => $row->address,
+                'country_id'        => $row->country_id,
+                'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
+                'province_id'       => $row->province_id,
+                'city_id'           => $row->city_id,
+                'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
+                'district_id'       => $row->district_id,
+                'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
+                'subdistrict_id'    => $row->subdistrict_id,
+                'subdistrict_name'  => $row->subdistrict()->exists() ? $row->subdistrict->code.' - '.$row->subdistrict->name : '',
             ];
 		}
 		

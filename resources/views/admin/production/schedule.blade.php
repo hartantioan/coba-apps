@@ -515,7 +515,7 @@
                 $('#temp').val('');
                 M.updateTextFields();
                 $('#project_id,#warehouse_id').empty();
-                $('.row_item').remove();
+                $('.row_item,.row_item_detail').remove();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }

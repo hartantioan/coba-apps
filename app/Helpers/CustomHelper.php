@@ -1926,6 +1926,10 @@ class CustomHelper {
 				if(self::checkArrayRaw($arrNote,$row->lookable->marketingOrderDelivery->code) < 0){
 					$arrNote[] = $row->lookable->marketingOrderDelivery->code;
 				}
+
+				if(self::checkArrayRaw($arrNote,$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code) < 0){
+					$arrNote[] = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;
+				}
 			}
 
 			$grandtotal = ($total_after_tax + $rounding);

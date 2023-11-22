@@ -656,6 +656,8 @@
 </div>
 
 <script>
+    var mode = '';
+
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
@@ -722,6 +724,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                mode = '';
             }
         });
 
@@ -786,6 +789,9 @@
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             countAll();
+            if($('.row_item').length == 0){
+                mode = '';
+            }
         });
 
         select2ServerSide('#supplier_id,#filter_supplier', '{{ url("admin/select2/supplier") }}');
@@ -1128,6 +1134,20 @@
             nil = $('#marketing_order_delivery_process_id').val();
             $('#inventory_type').val('2').trigger('change').formSelect();
         }
+
+        if(mode){
+            if(type !== mode){
+                $('#purchase_request_id,#good_issue_id,#marketing_order_delivery_process_id').empty();
+                swal({
+                    title: 'Ups!',
+                    text: 'Satu PO tidak boleh memiliki PR GI dan Surat Jalan bersamaan.',
+                    icon: 'error'
+                });
+                return false;
+            }
+        }
+
+        mode = type;
 
         if(nil){
             $.ajax({
@@ -1715,6 +1735,9 @@
             success: function(response) {
                 $('.row_item[data-id="' + id + '"]').remove();
                 countAll();
+                if($('.row_item').length == 0){
+                    mode = '';
+                }
             },
             error: function() {
                 swal({

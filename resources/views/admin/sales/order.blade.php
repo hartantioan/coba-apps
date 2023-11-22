@@ -915,7 +915,7 @@
             if($('#account_id').select2('data')[0].billing_address.length > 0){
                 $.each($('#account_id').select2('data')[0].billing_address, function(i, val) {
                     $('#billing_address').append(`
-                        <option value="` + val.id + `">` + val.title + ` ` + val.content + `</option>
+                        <option value="` + val.id + `">` + val.npwp + ` ` + val.address + `</option>
                     `);
                 });
             }else{
@@ -1906,7 +1906,7 @@
                 $('#billing_address').empty();
                 $.each(response.user_data, function(i, val) {
                     $('#billing_address').append(`
-                        <option value="` + val.id + `" ` + (val.id == response.user_data_id ? 'selected' : '') + `>` + val.title + ` ` + val.content + `</option>
+                        <option value="` + val.id + `" ` + (val.id == response.user_data_id ? 'selected' : '') + `>` + val.npwp + ` ` + val.address + `</option>
                     `);
                 });
                 $('#destination_address').val(response.destination_address);

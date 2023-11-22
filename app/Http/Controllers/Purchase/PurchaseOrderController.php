@@ -369,7 +369,7 @@ class PurchaseOrderController extends Controller
             }
             
             if($passed){
-                $data['account_name'] = $data->account->name;
+                $data['account_name'] = $request->type == 'sj' ? $data->account->name : '';
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Purchase Order');
                 $details = [];
 

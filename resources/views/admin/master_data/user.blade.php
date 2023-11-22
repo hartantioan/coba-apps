@@ -127,7 +127,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow-x: hidden !important;">
         <div class="row">
             <div class="col s12">
                 <h4>Tambah/Edit {{ $title }}</h4>
@@ -345,10 +345,10 @@
                                     </table>
                                 </p>
                             </div>
-                            <div id="dataform" class="col s12">
+                            <div id="dataform" class="col s12" style="overflow:auto;min-width:100%;">
                                 <h5 class="center">Daftar Alamat Penagihan</h5>
                                 <p class="mt-2 mb-2">
-                                    <table class="bordered">
+                                    <table class="bordered" style="min-width:100%;">
                                         <thead>
                                             <tr>
                                                 <th class="center">Judul</th>
@@ -1450,35 +1450,41 @@
     }
 
     function addInfo(){
+        var count = makeid(10);
         $('#last-row-info').before(`
             <tr class="row_info">
                 <input type="hidden" name="arr_id_data[]" value="">
                 <td>
-                    <input name="arr_title[]" type="text" placeholder="Judul informasi tambahan">
+                    <input name="arr_title[]" type="text" placeholder="Judul informasi tambahan" style="width:200px !important;">
                 </td>
                 <td class="center">
-                    <input name="arr_content[]" type="text" placeholder="Isi informasi tambahan">
+                    <input name="arr_content[]" type="text" placeholder="Isi informasi tambahan" style="width:200px !important;">
                 </td>
                 <td class="center">
-                    <input name="arr_npwp[]" type="text" placeholder="Nomor NPWP">
+                    <input name="arr_npwp[]" type="text" placeholder="Nomor NPWP" style="width:200px !important;">
                 </td>
                 <td class="center">
-                    <input name="arr_address[]" type="text" placeholder="Alamat Kantor">
+                    <input name="arr_address[]" type="text" placeholder="Alamat Kantor" style="width:200px !important;">
                 </td>
                 <td class="center">
-                    
+                    <select class="browser-default" id="arr_country` + count + `" name="arr_country[]"></select>
                 </td>
                 <td class="center">
-                    
+                    <select class="browser-default select2" id="arr_province` + count + `" name="arr_province[]">
+                        <option value="">--Silahkan pilih--</option>
+                        @foreach($province as $row)
+                            <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                        @endforeach
+                    </select>
                 </td>
                 <td class="center">
-                    
+                    <select class="browser-default" id="arr_city` + count + `" name="arr_city[]"></select>
                 </td>
                 <td class="center">
-                    
+                    <select class="browser-default" id="arr_district` + count + `" name="arr_district[]"></select>
                 </td>
                 <td class="center">
-                    
+                    <select class="browser-default" id="arr_subdistrict` + count + `" name="arr_subdistrict[]"></select>
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-info" href="javascript:void(0);">
@@ -1487,6 +1493,98 @@
                 </td>
             </tr>
         `);
+        select2ServerSide('#arr_country' + count, '{{ url("admin/select2/country") }}');
+        $('#arr_province' + count).select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+        $('#arr_city'+ count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/city_by_province") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        province: $('#arr_province' + count).select2().find(":selected").data("code"),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        $('#arr_city'+ count).bind('change', function() {
+            if(!$(this).val()){
+                $('#arr_district'+ count).empty();
+                $('#arr_subdistrict'+ count).empty();
+            }
+        });
+
+        $('#arr_district'+ count).bind('change', function() {
+            if(!$(this).val()){
+                $('#arr_subdistrict'+ count).empty();
+            }
+        });
+
+        $('#arr_district'+ count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/district_by_city") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        city: $('#arr_city' + count).select2('data')[0].code,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        $('#arr_subdistrict'+ count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/subdistrict_by_district") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        district: $('#arr_district' + count).select2('data')[0].code,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function addDriver(){
@@ -1609,6 +1707,15 @@
         formData.delete('arr_id_data[]');
         formData.delete('arr_id_bank[]');
         formData.delete('arr_id_driver[]');
+        formData.delete('arr_title[]');
+        formData.delete('arr_content[]');
+        formData.delete('arr_npwp[]');
+        formData.delete('arr_address[]');
+        formData.delete('arr_country[]');
+        formData.delete('arr_province[]');
+        formData.delete('arr_city[]');
+        formData.delete('arr_district[]');
+        formData.delete('arr_subdistrict[]');
 
         $('input[name^="arr_id_data[]"]').each(function(){
             formData.append('arr_id_data[]',
@@ -1626,6 +1733,20 @@
             formData.append('arr_id_driver[]',
                 $(this).val() ? $(this).val() : ''
             );
+        });
+
+        $('input[name^="arr_title[]"]').each(function(index){
+            formData.append('arr_title[]',
+                $(this).val() ? $(this).val() : ''
+            );
+            formData.append('arr_content[]',($('input[name^="arr_content[]"]').eq(index).val() ? $('input[name^="arr_content[]"]').eq(index).val() : ''));
+            formData.append('arr_npwp[]',($('input[name^="arr_npwp[]"]').eq(index).val() ? $('input[name^="arr_npwp[]"]').eq(index).val() : ''));
+            formData.append('arr_address[]',($('input[name^="arr_address[]"]').eq(index).val() ? $('input[name^="arr_address[]"]').eq(index).val() : ''));
+            formData.append('arr_country[]',($('select[name^="arr_country[]"]').eq(index).val() ? $('select[name^="arr_country[]"]').eq(index).val() : ''));
+            formData.append('arr_province[]',($('select[name^="arr_province[]"]').eq(index).val() ? $('select[name^="arr_province[]"]').eq(index).val() : ''));
+            formData.append('arr_city[]',($('select[name^="arr_city[]"]').eq(index).val() ? $('select[name^="arr_city[]"]').eq(index).val() : ''));
+            formData.append('arr_district[]',($('select[name^="arr_district[]"]').eq(index).val() ? $('select[name^="arr_district[]"]').eq(index).val() : ''));
+            formData.append('arr_subdistrict[]',($('select[name^="arr_subdistrict[]"]').eq(index).val() ? $('select[name^="arr_subdistrict[]"]').eq(index).val() : ''));
         });
         
         $.ajax({
@@ -1839,14 +1960,41 @@
 
                 if(response.datas.length > 0){
                     $.each(response.datas, function(i, val) {
+                        var count = makeid(10);
                         $('#last-row-info').before(`
                             <tr class="row_info">
                                 <input type="hidden" name="arr_id_data[]" value="` + val.id + `">
                                 <td>
-                                    <input name="arr_title[]" type="text" placeholder="Judul informasi tambahan" value="` + val.title + `">
+                                    <input name="arr_title[]" type="text" placeholder="Judul informasi tambahan" style="width:200px !important;" value="` + val.title + `">
                                 </td>
                                 <td class="center">
-                                    <input name="arr_content[]" type="text" placeholder="Isi informasi tambahan" value="` + val.content + `">
+                                    <input name="arr_content[]" type="text" placeholder="Isi informasi tambahan" style="width:200px !important;" value="` + val.content + `">
+                                </td>
+                                <td class="center">
+                                    <input name="arr_npwp[]" type="text" placeholder="Nomor NPWP" style="width:200px !important;" value="` + val.npwp + `">
+                                </td>
+                                <td class="center">
+                                    <input name="arr_address[]" type="text" placeholder="Alamat Kantor" style="width:200px !important;" value="` + val.address + `">
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_country` + count + `" name="arr_country[]"></select>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default select2" id="arr_province` + count + `" name="arr_province[]">
+                                        <option value="">--Silahkan pilih--</option>
+                                        @foreach($province as $row)
+                                            <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_city` + count + `" name="arr_city[]"></select>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_district` + count + `" name="arr_district[]"></select>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_subdistrict` + count + `" name="arr_subdistrict[]"></select>
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-info" href="javascript:void(0);">
@@ -1855,6 +2003,126 @@
                                 </td>
                             </tr>
                         `);
+                        if(val.country_id){
+                            $('#arr_country' + count).append(`
+                                <option value="` + val.country_id + `">` + val.country_name + `</option>
+                            `);
+                        }
+                        select2ServerSide('#arr_country' + count, '{{ url("admin/select2/country") }}');
+                        $('#arr_province' + count).select2({
+                            dropdownAutoWidth: true,
+                            width: '100%',
+                        });
+
+                        if(val.province_id){
+                            $('#arr_province' + count).val(val.province_id).trigger('change');
+                        }
+
+                        if(val.city_id){
+                            $('#arr_city' + count).append(`
+                                <option value="` + val.city_id + `">` + val.city_name + `</option>
+                            `);
+                        }
+
+                        $('#arr_city'+ count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/city_by_province") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        province: $('#arr_province' + count).select2().find(":selected").data("code"),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
+
+                        $('#arr_city'+ count).bind('change', function() {
+                            if(!$(this).val()){
+                                $('#arr_district'+ count).empty();
+                                $('#arr_subdistrict'+ count).empty();
+                            }
+                        });
+
+                        $('#arr_district'+ count).bind('change', function() {
+                            if(!$(this).val()){
+                                $('#arr_subdistrict'+ count).empty();
+                            }
+                        });
+
+                        if(val.district_id){
+                            $('#arr_district' + count).append(`
+                                <option value="` + val.district_id + `">` + val.district_name + `</option>
+                            `);
+                        }
+
+                        $('#arr_district'+ count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/district_by_city") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        city: $('#arr_city' + count).select2('data')[0].code,
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
+
+                        if(val.subdistrict_id){
+                            $('#arr_subdistrict' + count).append(`
+                                <option value="` + val.subdistrict_id + `">` + val.subdistrict_name + `</option>
+                            `);
+                        }
+
+                        $('#arr_subdistrict'+ count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/subdistrict_by_district") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        district: $('#arr_district' + count).select2('data')[0].code,
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
                     });
                 }
 

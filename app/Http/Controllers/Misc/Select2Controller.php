@@ -159,6 +159,57 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function cityByProvince(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Region::where('name', 'like', "%$search%")->whereRaw("CHAR_LENGTH(code) = 5 AND SUBSTRING(code,1,2) = '$request->province'")->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function districtByCity(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Region::where('name', 'like', "%$search%")->whereRaw("CHAR_LENGTH(code) = 8 AND SUBSTRING(code,1,5) = '$request->city'")->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function subdistrictByDistrict(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Region::where('name', 'like', "%$search%")->whereRaw("CHAR_LENGTH(code) = 13 AND SUBSTRING(code,1,8) = '$request->district'")->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function region(Request $request)
     {
         $response = [];

@@ -212,6 +212,9 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('select2')->group(function() {
                 Route::get('city', [Select2Controller::class, 'city']);
+                Route::get('city_by_province', [Select2Controller::class, 'cityByProvince']);
+                Route::get('district_by_city', [Select2Controller::class, 'districtByCity']);
+                Route::get('subdistrict_by_district', [Select2Controller::class, 'subdistrictByDistrict']);
                 Route::get('area', [Select2Controller::class, 'area']);
                 Route::get('district', [Select2Controller::class, 'district']);
                 Route::get('subdistrict', [Select2Controller::class, 'subdistrict']);

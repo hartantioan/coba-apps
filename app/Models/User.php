@@ -247,10 +247,15 @@ class User extends Authenticatable
     public function getBillingAddress(){
         $arr = [];
         foreach($this->userData as $row){
+            $country = $row->country()->exists() ? $row->country->name : '';
+            $province = $row->province()->exists() ? $row->province->name : '';
+            $city = $row->city()->exists() ? $row->city->name : '';
+            $district = $row->district()->exists() ? $row->district->name : '';
+            $subdistrict = $row->subdistrict()->exists() ? $row->subdistrict->name : '';
             $arr[] = [
                 'id'        => $row->id,
-                'title'     => $row->title,
-                'content'   => $row->content,
+                'npwp'      => $row->npwp,
+                'address'   => $row->address.' - '.$subdistrict.' - '.$district.' - '.$city.' - '.$province.' - '.$country,
             ];
         }
         return $arr;

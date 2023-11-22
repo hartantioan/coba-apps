@@ -22,7 +22,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportRetirement;
 use App\Helpers\CustomHelper;
 
-class ClosingJournalController extends Controller
+class LockPeriodController extends Controller
 {
     protected $dataplaces, $dataplacecode;
 
@@ -36,12 +36,12 @@ class ClosingJournalController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'Tutup Periode Jurnal',
-            'content'       => 'admin.accounting.closing_journal',
+            'title'         => 'Kunci Periode',
+            'content'       => 'admin.accounting.lock_period',
             'company'       => Company::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
-            'newcode'       => 'CLJR-'.date('y'),
+            'newcode'       => 'LOPR-'.date('y'),
             'place'         => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
         ];
 

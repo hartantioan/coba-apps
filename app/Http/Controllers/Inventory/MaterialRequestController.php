@@ -3,16 +3,25 @@
 namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
 use App\Models\GoodReturnPO;
+use App\Models\GoodScale;
+use App\Models\InventoryTransferOut;
 use App\Models\Item;
-use App\Models\ItemStock;
+use App\Models\Line;
 use App\Models\LandedCost;
+use App\Models\Machine;
+use App\Models\MaterialRequest;
 use App\Models\PaymentRequest;
 use App\Models\PaymentRequestCross;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
+use App\Models\PurchaseOrderDetail;
+
+use App\Models\ItemStock;
+
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
 use App\Models\UserDateUser;
@@ -25,7 +34,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\MaterialRequest;
+
 use App\Models\MaterialRequestDetail;
 use App\Models\User;
 use App\Models\Place;
@@ -658,16 +667,32 @@ class MaterialRequestController extends Controller
             ];
         $data_go_chart[]=$pr;
 
+        $data_id_good_scale = [];
+        $data_id_good_issue = [];
+        $data_id_mr = [];
         $data_id_dp=[];
         $data_id_po = [];
         $data_id_gr = [];
         $data_id_invoice=[];
         $data_id_pyrs=[];
         $data_id_lc=[];
+        $data_id_inventory_transfer_out=[];
         $data_id_greturns=[];
         $data_id_pr=[];
         $data_id_memo=[];
         $data_id_pyrcs=[];
+
+        $data_id_mo=[];
+        $data_id_mo_delivery = [];
+        $data_id_mo_dp=[];
+        $data_id_hand_over_invoice = [];
+        $data_id_mo_return=[];
+        $data_id_mo_invoice=[];
+        $data_id_mo_memo=[];
+        $data_id_mo_delivery_process=[];
+        $data_id_mo_receipt = [];
+        $data_incoming_payment=[];
+        $data_id_hand_over_receipt=[];
         
         if($query) {
 

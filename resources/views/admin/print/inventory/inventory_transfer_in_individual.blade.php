@@ -273,21 +273,24 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
+                                    <th colspan="5">Dari {{ $data->inventoryTransferOut->placeFrom->code.' - '.$data->inventoryTransferOut->warehouseFrom->name }} -- KE -- {{ $data->inventoryTransferOut->placeTo->code.' - '.$data->inventoryTransferOut->warehouseTo->name }}</th>
+                                </tr>
+                                <tr>
                                     <th>Item</th>
-                                    <th>Gudang</th>
                                     <th>Qty</th>
                                     <th>Satuan</th>
                                     <th>Keterangan</th>
+                                    <th>Area Tujuan</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($data->inventoryTransferOut->inventoryTransferOutDetail as $key1 => $rowdetail)
                                 <tr align="center">
-                                    <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
-                                    <td>{{ $rowdetail->itemStock->place->name.' - '.$rowdetail->itemStock->warehouse->name}}</td>
+                                    <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '') }}</td>
                                     <td>{{ number_format($rowdetail->qty,3,',','.') }}</td>
                                     <td>{{ $rowdetail->item->uomUnit->code }}</td>
                                     <td>{{ $rowdetail->note }}</td>
+                                    <td>{{ $rowdetail->area()->exists() ? $rowdetail->area->name : '' }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

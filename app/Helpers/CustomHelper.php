@@ -4,6 +4,7 @@ namespace App\Helpers;
 use App\Jobs\ResetCogs;
 use App\Jobs\ResetStock;
 use App\Models\ApprovalMatrix;
+use App\Models\LockPeriod;
 use App\Models\ApprovalStage;
 use App\Models\ApprovalSource;
 use App\Models\ApprovalTemplate;
@@ -1507,20 +1508,52 @@ class CustomHelper {
 				}
 			}
 		}elseif($table_name == 'inventory_transfer_outs'){
-
+			
 			$ito = InventoryTransferOut::find($table_id);
 
-			$query = Journal::create([
-				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-				'post_date'		=> $data->post_date,
-				'note'			=> $data->code,
-				'status'		=> '3'
-			]);
-
-			$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$ito->company_id)->first();
+			if($ito->place_from !== $ito->place_to){
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'post_date'		=> $data->post_date,
+					'note'			=> $data->code,
+					'status'		=> '3'
+				]);
+	
+				$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$ito->company_id)->first();
+	
+				foreach($ito->inventoryTransferOutDetail as $rowdetail){
+					$priceout = $rowdetail->item->priceNow($rowdetail->itemStock->place_id,$ito->post_date);
+					$nominal = round($rowdetail->qty * $priceout,2);
+	
+					$rowdetail->update([
+						'price'	=> $priceout,
+						'total'	=> $nominal,
+					]);
+					
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coabdp ? $coabdp->id : NULL,
+						'place_id'		=> $rowdetail->itemStock->place_id,
+						'item_id'		=> $rowdetail->item_id,
+						'warehouse_id'	=> $rowdetail->itemStock->warehouse_id,
+						'type'			=> '1',
+						'nominal'		=> $nominal,
+					]);
+	
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+						'place_id'		=> $rowdetail->itemStock->place_id,
+						'item_id'		=> $rowdetail->item_id,
+						'warehouse_id'	=> $rowdetail->itemStock->warehouse_id,
+						'type'			=> '2',
+						'nominal'		=> $nominal,
+					]);
+				}
+			}
 
 			foreach($ito->inventoryTransferOutDetail as $rowdetail){
 				$priceout = $rowdetail->item->priceNow($rowdetail->itemStock->place_id,$ito->post_date);
@@ -1529,26 +1562,6 @@ class CustomHelper {
 				$rowdetail->update([
 					'price'	=> $priceout,
 					'total'	=> $nominal,
-				]);
-				
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coabdp ? $coabdp->id : NULL,
-					'place_id'		=> $rowdetail->itemStock->place_id,
-					'item_id'		=> $rowdetail->item_id,
-					'warehouse_id'	=> $rowdetail->itemStock->warehouse_id,
-					'type'			=> '1',
-					'nominal'		=> $nominal,
-				]);
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
-					'place_id'		=> $rowdetail->itemStock->place_id,
-					'item_id'		=> $rowdetail->item_id,
-					'warehouse_id'	=> $rowdetail->itemStock->warehouse_id,
-					'type'			=> '2',
-					'nominal'		=> $nominal,
 				]);
 
 				self::sendCogs('inventory_transfer_outs',
@@ -1561,7 +1574,7 @@ class CustomHelper {
 					$nominal,
 					'OUT',
 					$ito->post_date,
-					NULL
+					$rowdetail->itemStock->area_id,
 				);
 
 				self::sendStock(
@@ -1570,47 +1583,52 @@ class CustomHelper {
 					$rowdetail->item_id,
 					$rowdetail->qty,
 					'OUT',
-					NULL,
+					$rowdetail->itemStock->area_id,
 				);
 			}
+			
 		}elseif($table_name == 'inventory_transfer_ins'){
 
 			$iti = InventoryTransferIn::find($table_id);
 
-			$query = Journal::create([
-				'user_id'		=> session('bo_id'),
-				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-				'post_date'		=> $data->post_date,
-				'note'			=> $data->code,
-				'status'		=> '3'
-			]);
-
-			$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$iti->company_id)->first();
+			if($iti->inventoryTransferOut->place_from !== $iti->InventoryTransferOut->place_to){
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'post_date'		=> $data->post_date,
+					'note'			=> $data->code,
+					'status'		=> '3'
+				]);
+	
+				$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$iti->company_id)->first();
+	
+				foreach($iti->inventoryTransferOut->inventoryTransferOutDetail as $rowdetail){
+	
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
+						'place_id'		=> $iti->inventoryTransferOut->place_to,
+						'item_id'		=> $rowdetail->item_id,
+						'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_to,
+						'type'			=> '1',
+						'nominal'		=> $rowdetail->total,
+					]);
+	
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coabdp ? $coabdp->id : NULL,
+						'place_id'		=> $iti->inventoryTransferOut->place_from,
+						'item_id'		=> $rowdetail->item_id,
+						'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_from,
+						'type'			=> '2',
+						'nominal'		=> $rowdetail->total,
+					]);
+				}
+			}
 
 			foreach($iti->inventoryTransferOut->inventoryTransferOutDetail as $rowdetail){
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
-					'place_id'		=> $iti->inventoryTransferOut->place_to,
-					'item_id'		=> $rowdetail->item_id,
-					'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_to,
-					'type'			=> '1',
-					'nominal'		=> $rowdetail->total,
-				]);
-
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coabdp ? $coabdp->id : NULL,
-					'place_id'		=> $iti->inventoryTransferOut->place_from,
-					'item_id'		=> $rowdetail->item_id,
-					'warehouse_id'	=> $iti->inventoryTransferOut->warehouse_from,
-					'type'			=> '2',
-					'nominal'		=> $rowdetail->total,
-				]);
-
 				self::sendCogs('inventory_transfer_ins',
 					$iti->id,
 					$iti->company_id,
@@ -1620,7 +1638,8 @@ class CustomHelper {
 					$rowdetail->qty,
 					$rowdetail->total,
 					'IN',
-					NULL
+					$iti->post_date,
+					$rowdetail->area_id,
 				);
 
 				self::sendStock(
@@ -1629,7 +1648,7 @@ class CustomHelper {
 					$rowdetail->item_id,
 					$rowdetail->qty,
 					'IN',
-					NULL,
+					$rowdetail->area_id,
 				);
 			}
 
@@ -2735,11 +2754,37 @@ class CustomHelper {
 	}
 
 	public static function removeJournal($table_name = null, $table_id = null){
-		$data = Journal::where('lookable_type',$table_name)->where('lookable_id',$table_id)->first();
+		$data = Journal::where('lookable_type',$table_name)->where('lookable_id',$table_id)->get();
 
-		if($data){
-			$data->journalDetail()->delete();
-			$data->delete();
+		foreach($data as $row){
+			$row->journalDetail()->delete();
+			$row->delete();
+		}
+	}
+
+	public static function checkLockAcc($date = null){
+		$month = date('Y-m',strtotime($date));
+		$cekLock = LockPeriod::where('month',$month)->whereIn('status',['2','3'])->first();
+		if($cekLock){
+			$passedSpecial = false;
+
+			if($cekLock->status_closing == '2'){
+				foreach($cekLock->lockPeriodDetail as $row){
+					if($row->user_id == session('bo_id')){
+						$passedSpecial = true;
+					}
+				}
+			}elseif($cekLock->status_closing == '1'){
+				$passedSpecial = true;
+			}
+
+			if($passedSpecial){
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			return true;
 		}
 	}
 

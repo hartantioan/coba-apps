@@ -500,6 +500,14 @@ class OutgoingPaymentController extends Controller
         $query = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
+
+            if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            }
+
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,

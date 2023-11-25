@@ -29,11 +29,7 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
-                            <i class="material-icons hide-on-med-and-up">refresh</i>
-                            <span class="hide-on-small-onl">Refresh</span>
-                            <i class="material-icons right">refresh</i>
-                        </a>
+                        
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">Print</span>
@@ -112,6 +108,11 @@
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
+                                                <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <i class="material-icons right">refresh</i>
+                                            </a>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
@@ -215,11 +216,12 @@
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
                                                     <th class="center">Keterangan</th>
+                                                    <th class="center">Area</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="5" class="center">
+                                                    <td colspan="6" class="center">
                                                         Silahkan pilih Inventori Transfer Keluar
                                                     </td>
                                                 </tr>
@@ -440,6 +442,9 @@
                 $('#validation_alert').html('');
                 M.updateTextFields();
                 window.onbeforeunload = function() {
+                    if($('.data-used').length > 0){
+                        $('.data-used').trigger('click');
+                    }
                     return 'You will lose all changes made since your last save';
                 };
             },
@@ -448,7 +453,7 @@
                 $('#temp').val('');
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td colspan="5" class="center">
+                        <td colspan="6" class="center">
                             Silahkan pilih Inventori Transfer Keluar
                         </td>
                     </tr>
@@ -772,6 +777,7 @@
                                     <td class="center-align">` + val.qty + `</td>
                                     <td>` + val.unit + `</td>
                                     <td>` + val.note + `</td>
+                                    <td>` + val.area + `</td>
                                 </tr
                             `);
                         });
@@ -790,7 +796,7 @@
         }else{
             $('#body-item').empty().append(`
                 <tr id="last-row-item">
-                    <td colspan="5" class="center">
+                    <td colspan="6" class="center">
                         Silahkan pilih Inventori Transfer Keluar
                     </td>
                 </tr>
@@ -818,7 +824,7 @@
             success: function(response) {
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td colspan="5" class="center">
+                        <td colspan="6" class="center">
                             Silahkan pilih Inventori Transfer Keluar
                         </td>
                     </tr>

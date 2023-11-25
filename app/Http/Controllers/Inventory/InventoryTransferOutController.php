@@ -233,6 +233,7 @@ class InventoryTransferOutController extends Controller
             'arr_item_stock'            => 'required|array',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
+            'arr_area'                  => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code.string'                       => 'Kode harus dalam bentuk string.',
@@ -250,6 +251,8 @@ class InventoryTransferOutController extends Controller
             'arr_item.array'                    => 'Item harus dalam bentuk array',
             'arr_qty.required'                  => 'Qty item tidak boleh kosong',
             'arr_qty.array'                     => 'Qty item harus dalam bentuk array',
+            'arr_area.required'                 => 'Area item tidak boleh kosong',
+            'arr_area.array'                    => 'Area item harus dalam bentuk array',
 		]);
 
         if($validation->fails()) {
@@ -438,6 +441,7 @@ class InventoryTransferOutController extends Controller
                             'item_id'                   => $row,
                             'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                      => $request->arr_note[$key],
+                            'area_id'                   => $request->arr_area[$key] ? $request->arr_area[$key] : NULL,
                         ]);
 
                     }
@@ -478,7 +482,7 @@ class InventoryTransferOutController extends Controller
                     <table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="11">Daftar Item</th>
+                                <th class="center-align" colspan="6">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -486,6 +490,7 @@ class InventoryTransferOutController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Area Tujuan</th>
                             </tr>
                         </thead><tbody>';
         
@@ -496,6 +501,7 @@ class InventoryTransferOutController extends Controller
                 <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="center-align">'.$row->note.'</td>
+                <td class="center-align">'.($row->area()->exists() ? $row->area->name : '').'</td>
             </tr>';
         }
         
@@ -567,7 +573,9 @@ class InventoryTransferOutController extends Controller
                 'qty'           => number_format($row->qty,3,',','.'),
                 'unit'          => $row->item->uomUnit->code,
                 'note'          => $row->note,
-                'stock_list'    => $row->item->currentStock($this->dataplaces,$this->datawarehouses)
+                'stock_list'    => $row->item->currentStock($this->dataplaces,$this->datawarehouses),
+                'area_id'       => $row->area_id ? $row->area_id : '',
+                'area_name'     => $row->area()->exists() ? $row->area->name : '',
             ];
         }
 
@@ -580,6 +588,14 @@ class InventoryTransferOutController extends Controller
         $query = InventoryTransferOut::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
+
+            if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            }
+
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,

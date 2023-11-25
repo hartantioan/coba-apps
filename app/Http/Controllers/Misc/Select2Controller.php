@@ -1508,6 +1508,7 @@ class Select2Controller extends Controller {
                 'price_list'        => $d->currentCogs($this->dataplaces),
                 'stock_list'        => $d->currentStockPlaceWarehouse($place,$warehouse),
                 'list_warehouse'    => $d->warehouseList(),
+                'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
             ];
         }
 
@@ -1552,10 +1553,11 @@ class Select2Controller extends Controller {
                 foreach($d->inventoryTransferOutDetail as $row){
                     $details[] = [
                         'name'      => $row->item->name,
-                        'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name,
+                        'origin'    => $row->itemStock->place->name.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area->exists() ? $row->itemStock->area->name : ''),
                         'qty'       => number_format($row->qty,3,',','.'),
                         'unit'      => $row->item->uomUnit->code,
                         'note'      => $row->note,
+                        'area'      => $row->area->exists() ? $row->area->name : '-',
                     ];
                 }
     

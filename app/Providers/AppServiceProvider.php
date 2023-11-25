@@ -86,6 +86,7 @@ class AppServiceProvider extends ServiceProvider
             'closing_journals'                      => 'App\Models\ClosingJournal',
             'material_requests'                     => 'App\Models\MaterialRequest',
             'material_request_details'              => 'App\Models\MaterialRequestDetail',
+            'lock_periods'                          => 'App\Models\LockPeriod',
         ]);
     }
 }

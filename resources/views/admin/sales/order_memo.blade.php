@@ -35,11 +35,7 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
-                            <i class="material-icons hide-on-med-and-up">refresh</i>
-                            <span class="hide-on-small-onl">Refresh</span>
-                            <i class="material-icons right">refresh</i>
-                        </a>
+                        
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">Print</span>
@@ -116,6 +112,11 @@
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
+                                                <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <i class="material-icons right">refresh</i>
+                                            </a>
                                             <table id="datatable_serverside">
                                                 <thead>
                                                     <tr>

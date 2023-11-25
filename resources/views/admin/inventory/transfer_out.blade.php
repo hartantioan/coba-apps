@@ -33,11 +33,7 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
-                            <i class="material-icons hide-on-med-and-up">refresh</i>
-                            <span class="hide-on-small-onl">Refresh</span>
-                            <i class="material-icons right">refresh</i>
-                        </a>
+                        
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">Print</span>
@@ -101,6 +97,11 @@
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
+                                                <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <i class="material-icons right">refresh</i>
+                                            </a>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
@@ -237,12 +238,13 @@
                                                     <th class="center">Qty</th>
                                                     <th class="center">Satuan UOM</th>
                                                     <th class="center">Keterangan</th>
+                                                    <th class="center">Area Tujuan</th>
                                                     <th class="center">Hapus</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="6" class="center">
+                                                    <td colspan="7" class="center">
                                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                             <i class="material-icons left">add</i> Tambah Item
                                                         </a>
@@ -603,6 +605,7 @@
 
     function getRowUnit(val){
         $("#arr_warehouse" + val).empty();
+        $('#area' + val).empty();
         if($("#arr_itemkuy" + val).val()){
             if($("#arr_itemkuy" + val).select2('data')[0].stock_list.length){
                 $('#arr_item_stock' + val).empty();
@@ -621,10 +624,19 @@
 
             $('#arr_unit' + val).text($("#arr_itemkuy" + val).select2('data')[0].uom);
 
+            if($("#arr_itemkuy" + val).select2('data')[0].is_sales_item){
+                $('#area' + val).append(`
+                    <select class="browser-default" id="arr_area` + val + `" name="arr_area[]"></select>
+                `);
+                select2ServerSide('#arr_area' + val, '{{ url("admin/select2/area") }}');
+            }else{
+                $('#area' + val).append(` - `);
+            }
         }else{
             $('#arr_item_stock' + val).empty().append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
+            $('#area' + val).append(` - `);
         }
     }
 
@@ -683,6 +695,9 @@
                 </td>
                 <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
+                </td>
+                <td class="center" id="area` + count + `">
+                    -
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -848,7 +863,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
 
-                var place_from = $('#place_from').val(), warehouse_from = $('#warehouse_from').val(), place_to = $('#place_to').val(), warehouse_to = $('#warehouse_to').val();
+                /* var place_from = $('#place_from').val(), warehouse_from = $('#warehouse_from').val(), place_to = $('#place_to').val(), warehouse_to = $('#warehouse_to').val();
 
                 if(place_from == place_to && warehouse_from == warehouse_to){
                     swal({
@@ -856,7 +871,7 @@
                         text: 'Plant Asal dan Tujuan, dan Gudang Asal dan Tujuan tidak boleh sama.',
                         icon: 'warning'
                     });
-                }else{
+                }else{ */
 
                     var formData = new FormData($('#form_data')[0]);
 
@@ -864,13 +879,16 @@
                     formData.delete("arr_item_stock[]");
                     formData.delete("arr_qty[]");
                     formData.delete("arr_note[]");
+                    formData.delete("arr_area[]");
 
                     $('select[name^="arr_itemkuy"]').each(function(index){
                         if($(this).val()){
+                            let code = $(this).data('code');
                             formData.append('arr_item[]',$(this).val());
                             formData.append('arr_item_stock[]',$('select[name^="arr_item_stock"]').eq(index).val());
                             formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
                             formData.append('arr_note[]',$('input[name^="arr_note"]').eq(index).val());
+                            formData.append('arr_area[]',($('#arr_area' + code).length > 0 ? ($('#arr_area' + code).val() ? $('#arr_area' + code).val() : '' ) : ''));
                         }
                     });
                     
@@ -937,7 +955,7 @@
                             });
                         }
                     });
-                }
+                /* } */
             }
         });
     }
@@ -1001,6 +1019,9 @@
                             <td>
                                 <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
                             </td>
+                            <td class="center" id="area` + count + `">
+                                ` + ( val.area_id ? '<select class="browser-default" id="arr_area' + count + '" name="arr_area[]"></select>' : '-' ) + `
+                            </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                     <i class="material-icons">delete</i>
@@ -1048,6 +1069,13 @@
 
                             $('#arr_item_stock' + count).formSelect();
                             $('#arr_item_stock' + count).val(val.item_stock_id).formSelect();
+                        }
+
+                        if(val.area_id){
+                            $('#arr_area' + count).append(`
+                                <option value="` + val.area_id + `">` + val.area_name + `</option>
+                            `);
+                            select2ServerSide('#arr_area' + count, '{{ url("admin/select2/area") }}');
                         }
                     });
                 }

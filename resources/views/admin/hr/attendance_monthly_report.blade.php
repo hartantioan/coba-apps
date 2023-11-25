@@ -81,6 +81,11 @@
                                 <div class="row">
                                     <div class="col s12" id="table_monthly">
                                         <div id="datatable_buttons"></div>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
+                                                <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <i class="material-icons right">refresh</i>
+                                            </a>
                                         <table id="datatable_serverside" class="display responsive-table wrap">
                                             <thead id="thead_shift">
                                                 <tr>
@@ -298,6 +303,11 @@
             $('#table_monthly').empty();
             $('#table_monthly').append(`
                 <div id="datatable_buttons"></div>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
+                                                <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <i class="material-icons right">refresh</i>
+                                            </a>
                 <table id="datatable_serverside" class="display responsive-table wrap">
                     <thead id="thead_shift">
                         

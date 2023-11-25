@@ -269,8 +269,8 @@ class InventoryTransferInController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            DB::beginTransaction();
-            try {
+            /* DB::beginTransaction();
+            try { */
                 if($request->temp){
                     
                     $query = InventoryTransferIn::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -368,10 +368,10 @@ class InventoryTransferInController extends Controller
                     ];
                 }
                 
-                DB::commit();
+                /* DB::commit();
             }catch(\Exception $e){
                 DB::rollback();
-            }
+            } */
 		}
 		
 		return response()->json($response);
@@ -380,7 +380,36 @@ class InventoryTransferInController extends Controller
     public function rowDetail(Request $request){
         $data   = InventoryTransferIn::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">
+                    <table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="6">Daftar Item</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Item</th>
+                                <th class="center-align">Qty</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Area Tujuan</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        foreach($data->inventoryTransferOut->inventoryTransferOutDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->item->name.'</td>
+                <td class="center-align">'.number_format($row->qty,3,',','.').'</td>
+                <td class="center-align">'.$row->item->uomUnit->code.'</td>
+                <td class="center-align">'.$row->note.'</td>
+                <td class="center-align">'.($row->area()->exists() ? $row->area->name : '').'</td>
+            </tr>';
+        }
+        
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>
@@ -393,14 +422,33 @@ class InventoryTransferInController extends Controller
                             </tr>
                         </thead><tbody>';
         
-        if($data->approval()){                
-            foreach($data->approval()->approvalMatrix as $key => $row){
+        if($data->approval() && $data->hasDetailMatrix()){
+            foreach($data->approval() as $detail){
                 $string .= '<tr>
-                    <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
-                    <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
-                    <td class="center-align">'.($row->status == '1' ? '<i class="material-icons">hourglass_empty</i>' : ($row->approved ? '<i class="material-icons">thumb_up</i>' : ($row->rejected ? '<i class="material-icons">thumb_down</i>' : '<i class="material-icons">hourglass_empty</i>'))).'<br></td>
-                    <td class="center-align">'.$row->note.'</td>
+                    <td class="center-align" colspan="4"><h6>'.$detail->getTemplateName().'</h6></td>
                 </tr>';
+                foreach($detail->approvalMatrix as $key => $row){
+                    $icon = '';
+    
+                    if($row->status == '1' || $row->status == '0'){
+                        $icon = '<i class="material-icons">hourglass_empty</i>';
+                    }elseif($row->status == '2'){
+                        if($row->approved){
+                            $icon = '<i class="material-icons">thumb_up</i>';
+                        }elseif($row->rejected){
+                            $icon = '<i class="material-icons">thumb_down</i>';
+                        }elseif($row->revised){
+                            $icon = '<i class="material-icons">border_color</i>';
+                        }
+                    }
+    
+                    $string .= '<tr>
+                        <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
+                        <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
+                        <td class="center-align">'.$icon.'<br></td>
+                        <td class="center-align">'.$row->note.'</td>
+                    </tr>';
+                }
             }
         }else{
             $string .= '<tr>
@@ -480,6 +528,14 @@ class InventoryTransferInController extends Controller
         $query = InventoryTransferIn::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
+
+            if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            }
+
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,

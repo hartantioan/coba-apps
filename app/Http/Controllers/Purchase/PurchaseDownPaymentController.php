@@ -664,6 +664,14 @@ class PurchaseDownPaymentController extends Controller
         $query = PurchaseDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
+
+            if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            }
+
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
@@ -1462,7 +1470,7 @@ class PurchaseDownPaymentController extends Controller
                                     'to'=>$query_invoice->code,
                                     'string_link'=>$row_po->code.$query_invoice->code
                                 ]; 
-                                $data_id_po[]= $purchase_order_detail->purchaseOrder->id;  
+                                $data_id_po[]= $row_po->id;  
                                       
                                 foreach($row_po->purchaseOrderDetail as $po_detail){
                                     if($po_detail->goodReceiptDetail()->exists()){
@@ -2282,7 +2290,7 @@ class PurchaseDownPaymentController extends Controller
                     $query_po = PurchaseOrder::find($po_id);
                    
                     foreach($query_po->purchaseOrderDetail as $purchase_order_detail){
-                        info("masukkasdf");
+                        
                         if($purchase_order_detail->purchaseRequestDetail()->exists()){
                         
                             $pr_tempura=[

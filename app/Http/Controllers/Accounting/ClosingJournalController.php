@@ -512,6 +512,14 @@ class ClosingJournalController extends Controller
         $query = ClosingJournal::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
+
+            if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            }
+
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
@@ -859,25 +867,27 @@ class ClosingJournalController extends Controller
                 'reference' =>  $query->lookable_id ? $query->lookable->code : '-',
             ];
             $string='';
-            foreach($query->journal->journalDetail()->where(function($query){
-            $query->whereHas('coa',function($query){
-                $query->orderBy('code');
-            })
-            ->orderBy('type');
-        })->get() as $key => $row){
-                $string .= '<tr>
-                    <td class="center-align">'.($key + 1).'</td>
-                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.$row->coa->company->name.'</td>
-                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                    <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
-                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
-                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
-                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
-                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
-                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
-                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
-                </tr>';
+            foreach($query->journal as $rowmain){
+                foreach($rowmain->journalDetail()->where(function($query){
+                    $query->whereHas('coa',function($query){
+                        $query->orderBy('code');
+                    })
+                    ->orderBy('type');
+                })->get() as $key => $row){
+                    $string .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="center-align">'.$row->coa->company->name.'</td>
+                        <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                        <td class="center-align">'.($row->place_id ? $row->place->name : '-').'</td>
+                        <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                        <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                        <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                        <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    </tr>';
+                }
             }
             $response["tbody"] = $string; 
         }else{

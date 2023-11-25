@@ -370,8 +370,16 @@ class ApprovalController extends Controller
         } else {
             $work_orders_rp = 0;
             $query = ApprovalMatrix::where('code',CustomHelper::decrypt($request->temp))->where('status','1')->first();
-            
+            $message = '';
             if($query){
+                
+                if(!CustomHelper::checkLockAcc($query->approvalSource->lookable->post_date)){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+
                 if($query->approvalSource->lookable_type == 'work_orders'){
                     if($query->approvalSource->lookable->requestSparepartALL()->exists()){
                         foreach($query->approvalSource->lookable->requestSparepartALL as $row){
@@ -543,6 +551,17 @@ class ApprovalController extends Controller
             foreach($arrMulti as $row){
                 $query = ApprovalMatrix::where('code',CustomHelper::decrypt($row))->where('status','1')->first();
                 $work_orders_rp = 0;
+                $message = '';
+                
+                if($query){
+                    if(!CustomHelper::checkLockAcc($query->approvalSource->lookable->post_date)){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Transaksi no '.$query->approvalSource->lookable->code.' pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+                }
+
                 if($query->approvalSource->lookable_type == 'work_orders'){
                     if($query->approvalSource->lookable->requestSparepartALL()->exists()){
                         foreach($query->approvalSource->lookable->requestSparepartALL as $row){

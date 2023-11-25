@@ -216,6 +216,7 @@
                     <th class="center">Jum.</th>
                     <th class="center">Sat.</th>
                     <th class="center">Keterangan</th>
+                    <th class="center">Area Tujuan</th>
                 </tr>
             </thead>
             <tbody>
@@ -225,6 +226,7 @@
                     <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                     <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                     <td>{{ $row->note }}</td>
+                    <td>{{ $row->area()->exists() ? $row->area->name : '' }}</td>
                 </tr>
                 @endforeach
             </tbody>

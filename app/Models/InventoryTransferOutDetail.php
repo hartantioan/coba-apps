@@ -22,6 +22,7 @@ class InventoryTransferOutDetail extends Model
         'price',
         'total',
         'note',
+        'area_id',
     ];
 
     public function inventoryTransferOut()
@@ -32,6 +33,11 @@ class InventoryTransferOutDetail extends Model
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
+    }
+
+    public function area()
+    {
+        return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
     }
 
     public function itemStock()

@@ -617,9 +617,15 @@ class CapitalizationController extends Controller
 
             $result = $merger->merge();
 
+            $randomString = Str::random(10); 
 
-            Storage::put('public/pdf/bubla.pdf',$result);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $result);
+            
+            $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;
 
             $response =[
@@ -699,8 +705,15 @@ class CapitalizationController extends Controller
                     $result = $merger->merge();
 
 
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+        
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
         
                     $response =[
@@ -768,8 +781,15 @@ class CapitalizationController extends Controller
                     $result = $merger->merge();
     
     
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
         
                     $response =[
@@ -836,10 +856,17 @@ class CapitalizationController extends Controller
             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
             
             $content = $pdf->download()->getOriginalContent();
+  
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
             
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
-    
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+           
     
             return $document_po;
         }else{

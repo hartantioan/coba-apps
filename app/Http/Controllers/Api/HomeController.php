@@ -7,10 +7,11 @@ use App\Models\Weight;
 use App\Models\AttendanceTemp;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+
 
 class HomeController extends Controller
 {

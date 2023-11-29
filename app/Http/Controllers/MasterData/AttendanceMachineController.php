@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-
+use Illuminate\Support\Str;
 class AttendanceMachineController extends Controller
 {
     public function index()
@@ -250,8 +250,15 @@ class AttendanceMachineController extends Controller
             $content = $pdf->download()->getOriginalContent();
 
 
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;
 
             $response =[

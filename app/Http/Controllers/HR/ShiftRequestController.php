@@ -9,11 +9,11 @@ use App\Models\Place;
 use App\Models\ShiftRequest;
 use App\Models\ShiftRequestDetail;
 use App\Models\User;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Storage;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 class ShiftRequestController extends Controller
 {

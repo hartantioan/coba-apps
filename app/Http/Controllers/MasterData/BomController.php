@@ -15,7 +15,7 @@ use App\Models\Place;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportBom;
-
+use Illuminate\Support\Str;
 class BomController extends Controller
 {
     public function index()
@@ -393,8 +393,15 @@ class BomController extends Controller
             $content = $pdf->download()->getOriginalContent();
 
 
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;
 
             $response =[

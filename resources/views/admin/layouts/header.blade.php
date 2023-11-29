@@ -63,6 +63,9 @@
                                 </span> --}}
                             </a>
                         </li>
+                        <li>
+                            <a class="grey-text text-darken-1" href="{{ url('admin/personal/check_in') }}"><i class="material-icons">person_pin_circle</i> Absensi </a>
+                        </li>
                         <li class="divider" tabindex="0"></li>
                         <li><a class="grey-text text-darken-1" href="{{ url('admin/lock/enable') }}"><i class="material-icons">lock_outline</i> Kunci</a></li>
                         <li><a class="grey-text text-darken-1" href="{{ url('admin/logout') }}"><i class="material-icons">keyboard_tab</i> Logout</a></li>

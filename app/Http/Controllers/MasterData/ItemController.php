@@ -428,8 +428,15 @@ class ItemController extends Controller
             $content = $pdf->download()->getOriginalContent();
 
 
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;
 
             $response =[
@@ -480,8 +487,15 @@ class ItemController extends Controller
             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
             $content = $pdf->download()->getOriginalContent();
 
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
             $var_link=$document_po;
 
             $response =[

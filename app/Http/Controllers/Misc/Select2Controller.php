@@ -34,6 +34,7 @@ use App\Models\Outlet;
 use App\Models\PaymentRequest;
 use App\Models\Position;
 use App\Models\ProductionSchedule;
+use App\Models\Punishment;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrderDetail;
@@ -2521,6 +2522,63 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->code,
                 'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function punishmentByPlant(Request $request)
+    {
+        $response = [];
+
+        $search     = $request->search;
+        $plant      = $request->plant;
+        info($request);
+        $data = Punishment::where(function($query) use($search,$plant,$request){
+            $query->where(function($query) use ($search,$plant,$request){
+                $query->where('place_id',$plant);
+              
+            });
+
+        })
+        ->whereNotIn('status',['2','3'])
+        ->get();
+        info($data);
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.'||'.$d->name,
+                'code'              => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function punishmentByUserPlant(Request $request)
+    {
+        $response = [];
+
+        $search     = $request->search;
+        $user      = $request->user_id;
+        $query_user = User::find($user);
+
+        $data = Punishment::where(function($query) use($search,$query_user,$request){
+            $query->where(function($query) use ($search,$query_user,$request){
+                $query->where('place_id',$query_user->place_id);
+              
+            });
+
+        })
+        ->whereNotIn('status',['2','3'])
+        ->get();
+        info($data);
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.'||'.$d->name,
+                'code'              => $d->code,
             ];
         }
 

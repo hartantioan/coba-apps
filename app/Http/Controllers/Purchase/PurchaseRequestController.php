@@ -451,9 +451,16 @@ class PurchaseRequestController extends Controller
             $result = $merger->merge();
 
 
-            Storage::put('public/pdf/bubla.pdf',$result);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
-            $var_link=$document_po;
+            $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
 
             $response =[
                 'status'=>200,
@@ -1089,7 +1096,7 @@ class PurchaseRequestController extends Controller
                                     'to'=>$query_invoice->code,
                                     'string_link'=>$row_po->code.$query_invoice->code
                                 ]; 
-                                $data_id_po[]= $purchase_order_detail->purchaseOrder->id;  
+                                $data_id_po[]= $row_po->id;  
                                       
                                 foreach($row_po->purchaseOrderDetail as $po_detail){
                                     if($po_detail->goodReceiptDetail()->exists()){
@@ -2235,8 +2242,16 @@ class PurchaseRequestController extends Controller
             
             $content = $pdf->download()->getOriginalContent();
             
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
     
     
             return $document_po;
@@ -2311,8 +2326,15 @@ class PurchaseRequestController extends Controller
                     $result = $merger->merge();
 
 
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
         
                     $response =[
@@ -2379,8 +2401,15 @@ class PurchaseRequestController extends Controller
                     $result = $merger->merge();
     
     
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
         
                     $response =[

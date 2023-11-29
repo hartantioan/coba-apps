@@ -17,7 +17,7 @@ use App\Models\MarketingOrderMemo;
 use App\Models\MarketingOrderReceipt;
 use App\Models\MarketingOrderReturn;
 use App\Models\MarketingOrderHandoverInvoiceDetail;
-
+use Illuminate\Support\Str;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
@@ -545,8 +545,16 @@ class MarketingHandoverInvoiceController extends Controller
             
             $content = $pdf->download()->getOriginalContent();
             
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
     
             return $document_po;
         }else{
@@ -602,9 +610,16 @@ class MarketingHandoverInvoiceController extends Controller
 
             $result = $merger->merge();
 
-            Storage::put('public/pdf/bubla.pdf',$result);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
-            $var_link=$document_po;
+            $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
 
             $response =[
                 'status'=>200,
@@ -679,8 +694,15 @@ class MarketingHandoverInvoiceController extends Controller
 
                     $result = $merger->merge();
 
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
         
                     $response =[
@@ -745,8 +767,15 @@ class MarketingHandoverInvoiceController extends Controller
     
                     $result = $merger->merge();
 
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
         
                     $response =[
@@ -1112,9 +1141,9 @@ class MarketingHandoverInvoiceController extends Controller
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
                             $data_link[]=[
-                                'from'=>$query_invoice->code,
+                                'from'=>$query_mo_receipt->code,
                                 'to'=>$row_mo_receipt_detail->lookable->code,
-                                'string_link'=>$query_invoice->code.$row_mo_receipt_detail->lookable->code,
+                                'string_link'=>$query_mo_receipt->code.$row_mo_receipt_detail->lookable->code,
                             ];
                             if(!in_array($row_mo_receipt_detail->lookable->id, $data_id_mo_invoice)){
                                 $data_id_mo_invoice[] = $row_mo_receipt_detail->lookable->id;
@@ -1171,9 +1200,9 @@ class MarketingHandoverInvoiceController extends Controller
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
                             $data_link[]=[
-                                'from'=>$query_invoice->code,
+                                'from'=>$query_handover_receipt->code,
                                 'to'=>$row_mo_h_receipt_detail->lookable->code,
-                                'string_link'=>$query_invoice->code.$row_mo_h_receipt_detail->lookable->code,
+                                'string_link'=>$query_handover_receipt->code.$row_mo_h_receipt_detail->lookable->code,
                             ];
                             if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
                                 $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
@@ -1198,9 +1227,9 @@ class MarketingHandoverInvoiceController extends Controller
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
                             $data_link[]=[
-                                'from'=>$query_invoice->code,
+                                'from'=>$query_handover_invoice->code,
                                 'to'=>$row_mo_h_receipt_detail->lookable->code,
-                                'string_link'=>$query_invoice->code.$row_mo_h_receipt_detail->lookable->code,
+                                'string_link'=>$query_handover_invoice->code.$row_mo_h_receipt_detail->lookable->code,
                             ];
                             if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
                                 $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
@@ -1380,7 +1409,7 @@ class MarketingHandoverInvoiceController extends Controller
                         $data_link[]=[
                             'from'=>$query_mo_memo->code,
                             'to'=>$ip_detail->incomingPayment->code,
-                            'string_link'=>$query_mo_delivery->code.$ip_detail->incomingPayment->code,
+                            'string_link'=>$query_mo_memo->code.$ip_detail->incomingPayment->code,
                         ];
                         if(!in_array($ip_detail->incomingPayment->id, $data_incoming_payment)){
                             $data_incoming_payment[]=$ip_detail->incomingPayment->id;

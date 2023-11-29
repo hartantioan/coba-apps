@@ -359,6 +359,7 @@
                 console.log(temp_shift_count);
                 resetSchedule();
                 $('#temp').val('');
+                $('#start_date,#end_time,#start_time,#end_date').val('');
                 $('#start_time_div, #end_time_div').hide();
                 M.updateTextFields();
                 $("#leave_type_id").empty();
@@ -711,6 +712,7 @@
     function changeIjin(){
         $('#table_schedule').show();
         resetSchedule();
+        $('#start_date,#end_time,#start_time,#end_date').val('');
         if($("#leave_type_id").val()){
             if($("#leave_type_id").select2('data')[0].type=='1'){
                 $('#start_time_div, #end_time_div , #end_date_field').hide();

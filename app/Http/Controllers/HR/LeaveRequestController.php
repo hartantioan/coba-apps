@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\HR;
-
+use Illuminate\Support\Facades\Validator;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
@@ -12,12 +12,11 @@ use App\Models\LeaveRequest;
 use App\Models\LeaveRequestShift;
 use App\Models\LeaveType;
 use App\Models\Place;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use Validator;
 
 class LeaveRequestController extends Controller
 {

@@ -4,10 +4,11 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\Controller;
 use App\Models\Level;
-use DB;
+
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class LevelController extends Controller
 {

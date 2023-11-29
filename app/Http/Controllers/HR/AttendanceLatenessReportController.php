@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\HR;
-
+use App\Models\Punishment;
 use App\Http\Controllers\Controller;
 use App\Models\Attendances;
 use App\Models\EmployeeSchedule;
@@ -51,7 +51,35 @@ class AttendanceLatenessReportController extends Controller
             $date = $start_date->copy();
             while ($date->lte($end_date)) {
                 foreach($user_data as $c=>$row_user){
-                   
+                    $query_late_punishment = Punishment::where('place_id',$row_user->place_id)
+                                        ->where('type','1')
+                                        ->where('status','1')
+                                        ->orderBy('minutes')
+                                        ->get();
+
+                    $tipe_punish_counter=[];
+                    
+
+                    foreach($query_late_punishment as $row_type){
+                        $tipe_punish_counter[$row_type->code]['counter']=0;
+                        $tipe_punish_counter[$row_type->code]['date']=[]; 
+                        $tipe_punish_counter[$row_type->code]['uid']=$row_user->id;
+                        $tipe_punish_counter[$row_type->code]['punish_id']=$row_type->id;
+                        $tipe_punish_counter[$row_type->code]['price']=$row_type->price;   
+                    } 
+                    $query_special_1_forLimit = UserSpecial::where('user_id',$row_user->id)
+                        ->where('start_date','<=', $date)->first();
+                    $limit = $query_special_1_forLimit->limit ?? 999;
+                    $limit_temp = 0;
+                    $max_punish_id = $query_special_1_forLimit->punishment->id ?? null;
+                    $key_id_punish = null;
+                    if($max_punish_id){
+                        foreach($query_late_punishment as $key_mod=>$row_punishment){
+                            if($max_punish_id == $row_punishment->id){
+                                $key_id_punish=$key_mod;
+                            }
+                        }
+                    }
                     $query_data = EmployeeSchedule::join('shifts', 'employee_schedules.shift_id', '=', 'shifts.id')
                         ->whereDate('employee_schedules.date', $date->toDateString())
                         ->where('employee_schedules.user_id', $row_user->employee_no)
@@ -352,7 +380,171 @@ class AttendanceLatenessReportController extends Controller
                             $min_time_ins[]=$min_time_in;
                             $max_time_outs[]=$max_time_out;        
                             $nama_shifts[]=$row_schedule_filter->shift->name;
-                        
+                            
+                            if($query_special){
+                                if($query_special->type == 1){
+                                    foreach($exact_in as  $key_in=>$row_exact_in){
+                                        $exact_in[$key_in]=1;
+                                        $exact_out[$key_in]=1;
+                                    }
+                                    
+                                } if($query_special->type == 2){
+                                    if($exact_in[0] == 1 || $exact_out[count($exact_out)-1]== 1){
+                                        foreach($exact_in as  $key_in=>$row_exact_in){
+                                            $exact_in[$key_in]=1;
+                                            $exact_out[$key_in]=1;
+                                        }
+                                         
+                                    }
+                                }else{
+                                    if($masuk_awal){//perhitungan toleransi punya specialll?
+    
+                                        $pembandingdate = Carbon::parse($masuk_awal);
+                                        if(count($query_data)==2 && $key == 1){
+                                            $currentSchedule = $query_data[1];
+                                            $previousSchedule = $query_data[0];
+                                            
+                                            $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
+                                            $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
+                                            
+                                            $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
+                                            if($timeDifference >= 2){
+                                                $pembandingdate = Carbon::parse($login[1]);
+                                            }
+                                        }
+                                        
+                                        $pembanding= $pembandingdate->format('H:i:s');
+                                        $carbonTimeIn = Carbon::parse($time_in);
+                                        
+                                        if($pembanding > $time_in ){
+                                            if(count($query_late_punishment)> 0){
+                                          
+                                                if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
+                                                    if (($max_punish_id != null && $limit > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[0]->code]['punish_id'] && ($key_id_punish!=null && $key <= $key_id_punish) ) ) {
+                                                        $limit--;
+                                                        
+                                                        foreach ($exact_in as $key_in => $row_ins) {
+                                                            $exact_in[$key_in] = 1;
+                                                        }
+                                                        break;  
+                                                    }
+                                                    else{
+                                                        $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
+                                                        $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');  
+                                                    }
+                                                }else{
+                                                    foreach($query_late_punishment as $key=>$row_punish_type){
+                                                        $newCarbonTime = Carbon::parse($time_in)->addMinutes($row_punish_type->minutes)->format('H:i:s');
+                                                        if($key !=0 ){
+                                                            
+                                                            if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
+                                                                if (($max_punish_id != null && $limit > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
+                                                                    $limit--;
+                                                                    
+                                                                    foreach ($exact_in as $key_in => $row_ins) {
+                                                                        $exact_in[$key_in] = 1;
+                                                                    }
+                                                                    break;  
+                                                                }
+                                                                else{
+                                                                    
+                                                                    $tipe_punish_counter[$query_late_punishment[$key]->code]['counter']++;
+                                                                    $tipe_punish_counter[$query_late_punishment[$key]->code]['date'][]=$date->format('d/M/y');
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                        if($key == count($query_late_punishment)){
+                                                            if($pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
+                                                                if (($max_punish_id != null && $limit > 0 && $max_punish_id != $tipe_punish_counter[$query_late_punishment[$key]->code]['punish_id']&&($key_id_punish!=null && $key <= $key_id_punish))) {
+                                                                    $limit--;
+                                                                    
+                                                                    foreach ($exact_in as $key_in => $row_ins) {
+                                                                        $exact_in[$key_in] = 1;
+                                                                    }
+                                                                    break;  
+                                                                }
+                                                                else{
+                                                                    $tipe_punish_counter[$row_punish_type->code]['counter']++;
+                                                                    $tipe_punish_counter[$row_punish_type->code]['date'][]=$date->format('d/M/y');
+                                                                    break;  
+                                                                }
+                                                            }else{
+                                                                $tipe_punish_counter['over_t']['counter']++;
+                                                                $tipe_punish_counter['over_t']['date'][]=$date->format('d/M/y');
+                                                            }
+                                                        }
+                                                        
+                                                    }
+                                                }
+                                                
+                                            }
+                                            
+                                        }
+                                        
+                                    }
+                                }
+                            }else{
+                                if($limit_temp == 0){
+                                    $limit_temp = $limit_temp+$limit;
+                                }
+                                $limit =0;
+                                if($masuk_awal){//perhitungan toleransi okeeeeey?
+                                    $pembandingdate = Carbon::parse($masuk_awal);
+                                    if(count($query_data)==2 && $key == 1){
+                                        $currentSchedule = $query_data[1];
+                                        $previousSchedule = $query_data[0];
+                                        
+                                        $currentTimeIn = Carbon::parse($currentSchedule->shift->time_in);
+                                        $previousTimeIn = Carbon::parse($previousSchedule->shift->time_out);
+                                        
+                                        $timeDifference = $currentTimeIn->diffInHours($previousTimeIn);
+                                        if($timeDifference >= 2){
+                                            $pembandingdate = Carbon::parse($login[1]);
+                                        }
+                                    }
+                                    
+                                    $pembanding= $pembandingdate->format('H:i:s');
+                                    $carbonTimeIn = Carbon::parse($time_in);
+                                    
+                                    if($pembanding > $time_in ){
+                                        if(count($query_late_punishment)> 0){
+                                           
+                                            if($pembanding > $time_in && $pembanding <= Carbon::parse($time_in)->addMinutes($query_late_punishment[0]->minutes)->format('H:i:s')){
+                                         
+                                                $tipe_punish_counter[$query_late_punishment[0]->code]['counter']++;
+                                                $tipe_punish_counter[$query_late_punishment[0]->code]['date'][]=Carbon::parse($date)->format('d/M/y');  
+                                            }else{
+                                                foreach($query_late_punishment as $key=>$row_punish_type){
+                                                    $newCarbonTime = Carbon::parse($time_in)->addMinutes($row_punish_type->minutes)->format('H:i:s');
+                                                    if($key !=0 ){
+                                                        
+                                                        if($pembanding < Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s') && $pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key-1]->minutes)->format('H:i:s')){
+                                                           
+                                                            $tipe_punish_counter[$query_late_punishment[$key]->code]['counter']++;
+                                                            $tipe_punish_counter[$query_late_punishment[$key]->code]['date'][]=$date->format('d/M/y');
+                                                            break;
+                                                        }
+                                                    }
+                                                    if($key == count($query_late_punishment)){
+                                                        if($pembanding > Carbon::parse($time_in)->addMinutes($query_late_punishment[$key]->minutes)->format('H:i:s')&&$pembanding<Carbon::parse($time_in)->addHours(2)->format('H:i:s')){
+                                                            $tipe_punish_counter[$row_punish_type->code]['counter']++;
+                                                            $tipe_punish_counter[$row_punish_type->code]['date'][]=$date->format('d/M/y');
+                                                        }else{
+                                                            $tipe_punish_counter['over_t']['counter']++;
+                                                            $tipe_punish_counter['over_t']['date'][]=$date->format('d/M/y');
+                                                        }
+                                                    }
+                                                    
+                                                }
+                                            }
+                                            
+                                        }
+                                        
+                                    }
+                                    
+                                }
+                            }
                             
                             
                         }
@@ -696,23 +888,6 @@ class AttendanceLatenessReportController extends Controller
                         }
                     }
                     
-                   
-                    //special user previlegessss itunggg
-                    foreach($attendance_detail[(string)$date][$c]['in'] as $j=>$row_data){
-                        if($query_special){
-                            if($query_special->type == 1){
-                                $attendance_detail[(string)$date][$c]['in'][$j] = 1;
-                                $attendance_detail[(string)$date][$c]['out'][$j] = 1;
-                            }
-                            if($query_special->type == 2){
-                                if( $attendance_detail[(string)$date][$c]['in'][0] == '1' ||  $attendance_detail[(string)$date][$c]['out'][count( $attendance_detail[(string)$date][$c]['out'])-1]==1 ||  $attendance_detail[(string)$date][$c]['login'] != '' ||  $attendance_detail[(string)$date][$c]['logout'] != ''){
-                                    $attendance_detail[(string)$date][$c]['in'][$j] = 1;
-                                    $attendance_detail[(string)$date][$c]['out'][$j] = 1;  
-                                }
-                            }
-    
-                        }
-                    }
                     
                 }
                     

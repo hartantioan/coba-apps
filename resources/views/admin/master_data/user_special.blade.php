@@ -59,21 +59,17 @@
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
-                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
-                                                <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
-                                                <i class="material-icons right">refresh</i>
-                                            </a>
                                             <table id="datatable_serverside" class="display responsive-table wrap">
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
                                                         <th>Nama</th>
-                                                        <th>Nominal</th>
-                                                        <th>Menit</th>
-                                                        <th>Penempatan</th>
+                                                        <th>User</th>
                                                         <th>Tipe</th>
+                                                        <th>Start Date</th>
+                                                        <th>End Date</th>
+                                                        <th>Limit</th>
+                                                        <th>Batas Max Hukuman</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -103,45 +99,40 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
-                            <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode">
-                            <label class="active" for="code">Kode</label>
+                        <div class="input-field col s6" >
+                            <select class="select2 browser-default" id="user_id" name="user_id">
+                                
+                            </select>
+                            <label class="active" for="user_id">Select Employee</label>
                         </div>
                         <div class="input-field col s6">
                             <input id="name" name="name" type="text" placeholder="Nama">
-                            <label class="active" for="name">Nama</label>
+                            <label class="active" for="name">Nama Super</label>
                         </div>
+                        <input type="hidden" id="temp" name="temp">
+                        
                         <div class="input-field col s6">
-                            <input id="price" name="price" type="number" placeholder="Nominal Rp">
-                            <label class="active" for="price">Nominal</label>
+                            <input id="type" name="type" type="number" placeholder="Menit" >
+                            <label class="active" for="type">Tipe</label>
                         </div>
                         <div class="input-field col s6" style="min-height: 4rem">
-                            <input id="minute" name="minute" type="number" placeholder="Menit" >
-                            <label class="active" for="minute">Menit</label>
+                            <input id="limit" name="limit" type="number" placeholder="Berapa Kali (Tidak ada berarti Tidak ada limit)" >
+                            <label class="active" for="limit">Limit</label>
                         </div>
-                        <div class="input-field col s6 employee_inputs">
-                            <select class="form-control" id="place_id" name="place_id">
-                                @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="place_id">Plant </label>
+                        <div class="input-field col s6" >
+                            <input id="start_date" name="start_date" type="date" placeholder="Tanggal Awal">
+                            <label class="active" for="start_date">Tanggal Awal</label>
                         </div>
+                        <div class="input-field col s6" >
+                            <input id="end_date" name="end_date" type="date" placeholder="Tanggal Akhir">
+                            <label class="active" for="end_date">Tanggal Akhir</label>
+                        </div>
+                       
                         <div class="input-field col s6 employee_inputs">
                             <select class="browser-default item-array" id="punishment_id" name="punishment_id">
                                
                             </select>
                             <label class="active" for="punishment_id">Batas Maksimal Hukuman</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <select class="form-control" id="type" name="type" onchange="seeType()">
-                                <option value="">-</option>
-                                <option value="1">Terlambat</option>
-                                <option value="2">Tidak Check Masuk</option>
-                                <option value="3">Tidak Check Pulang</option>
-                            </select>
-                            <label for="type" style="font-size:1.2rem;">Tipe Denda :</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -181,7 +172,7 @@
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
         });
-
+        select2ServerSide('#user_id', '{{ url("admin/select2/employee") }}');
         $('#punishment_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
@@ -190,14 +181,14 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/punishment_by_plant") }}',
+                url: '{{ url("admin/select2/punishment_by_user_plant") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 data: function(params) {
-                   console.log($('#place_id').val());
+                   
                     return {
                         search: params.term,
-                        plant: $('#place_id').val(),
+                        user_id: $('#user_id').val(),
                     };
                 },
                 processResults: function(data) {
@@ -262,12 +253,13 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'price', className: '' },
-                { name: 'minutes', className: '' },
-                { name: 'place_id', className: 'center-align' },
+                { name: 'start_date', className: '' },
+                { name: 'end_date', className: '' },
+                { name: 'limit', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
+                { name: 'punishment_id', className: 'center-align' },
+                { name: 'user_id', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -443,18 +435,7 @@
         $('#modal1').modal('close');
     }
 
-    function seeType(){
-        if($('#type').val()=='2'||$('#type').val()=='3'){
-            $('#minute').val('0');
-            document.getElementById('minute').style.display = 'none';
-            document.getElementById('minute').nextElementSibling.style.display = 'none';
-        }else{
-            document.getElementById('minute').style.display = 'block'; 
-            document.getElementById('minute').nextElementSibling.style.display = 'block';
-            
-        }
-        console.log($('#type').val());
-    }
+
 
     function show(id){
         $.ajax({
@@ -474,12 +455,17 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#price').val(response.price);
-                $('#minute').val(response.minutes);
-                $('#type').val(response.type).formSelect();
-               
+                $('#start_date').val(response.start_date);
+                $('#end_date').val(response.end_date);
+                $('#type').val(response.type);
+                $('#limit').val(response.limit);
+                $('#user_id').append(`
+                    <option value="` + response.user_id + `">` + response.user_name + `</option>
+                `);
+                $('#punishment_id').append(`
+                    <option value="` + response.punishment_id + `">` + response.punishment + `</option>
+                `);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

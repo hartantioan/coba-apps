@@ -28,7 +28,10 @@ use App\Http\Controllers\MasterData\HardwareItemGroupController;
 use App\Http\Controllers\MasterData\LeaveTypeController;
 use App\Http\Controllers\MasterData\LevelController;
 use App\Http\Controllers\MasterData\PunishmentController;
+use App\Http\Controllers\MasterData\UserSpecialController;
 use App\Http\Controllers\Other\MenuIndexController;
+use App\Http\Controllers\Personal\Check_In_Controller;
+use App\Http\Controllers\Personal\CheckInController;
 use App\Http\Controllers\Purchase\OutStandingAPController;
 use App\Http\Controllers\Purchase\PriceHistoryPOController;
 use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
@@ -291,6 +294,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('schedule', [Select2Controller::class, 'schedule']);
                 Route::get('shift_by_department', [Select2Controller::class, 'shiftByDepartment']);
                 Route::get('schedule_by_date', [Select2Controller::class, 'scheduleByDate']);
+                Route::get('punishment_by_plant', [Select2Controller::class, 'punishmentByPlant']);
+                Route::get('punishment_by_user_plant', [Select2Controller::class, 'punishmentByUserPlant']);
                 Route::get('production_schedule', [Select2Controller::class, 'productionSchedule']);
                 Route::get('form_user', [Select2Controller::class, 'formUser']);
                 Route::get('coa_subsidiary_ledger', [Select2Controller::class, 'coaSubsidiaryLedger']);
@@ -315,6 +320,11 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('chat')->group(function () {
                     Route::get('/',[ChatController::class, 'index']);
+                });
+
+                Route::prefix('check_in')->group(function () {
+                    Route::get('/',[CheckInController::class, 'index']);
+                    Route::post('create',[CheckInController::class, 'create']);
                 });
 
                 Route::prefix('notification')->group(function () {
@@ -643,6 +653,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('create',[ShiftController::class, 'create'])->middleware('operation.access:shift,update');
                         Route::post('destroy', [ShiftController::class, 'destroy'])->middleware('operation.access:shift,delete');
                     });
+                    
+                    Route::prefix('user_specials')->middleware('operation.access:user_specials,view')->group(function () {
+                        Route::get('/',[UserSpecialController::class, 'index']);
+                        Route::get('datatable',[UserSpecialController::class, 'datatable']);
+                        Route::post('show', [UserSpecialController::class, 'show']);
+                        Route::post('create',[UserSpecialController::class, 'create'])->middleware('operation.access:user_specials,update');
+                        Route::post('destroy', [UserSpecialController::class, 'destroy'])->middleware('operation.access:user_specials,delete');
+                    });
 
                     Route::prefix('employee_leave_quota')->middleware('operation.access:employee_leave_quota,view')->group(function () {
                         Route::get('/',[EmployeeLeaveQuotasController::class, 'index']);
@@ -752,9 +770,11 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[HardwareItemDetailController::class, 'index']);
                         Route::get('datatable',[HardwareItemDetailController::class, 'datatable']);
                         Route::post('show', [HardwareItemDetailController::class, 'show']);
-                        Route::post('create',[HardwareItemDetailController::class, 'create'])->middleware('operation.access:allowance,update');
-                        Route::post('destroy', [HardwareItemDetailController::class, 'destroy'])->middleware('operation.access:allowance,delete');
+                        Route::post('create',[HardwareItemDetailController::class, 'create'])->middleware('operation.access:hardware_item_detail,update');
+                        Route::post('destroy', [HardwareItemDetailController::class, 'destroy'])->middleware('operation.access:hardware_item_detail,delete');
                     });
+
+                    
 
                     Route::prefix('hardware_item_group')->middleware('operation.access:hardware_item_group,view')->group(function () {
                         Route::get('/',[HardwareItemGroupController::class, 'index']);

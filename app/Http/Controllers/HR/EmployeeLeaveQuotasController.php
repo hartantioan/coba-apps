@@ -4,10 +4,10 @@ namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\EmployeeLeaveQuotas;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 class EmployeeLeaveQuotasController extends Controller
 {

@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Usage;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssetUsage;
+use App\Models\DocumentTax;
+use App\Models\DocumentTaxDetail;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 
 class AssetUsageController extends Controller
 {    public function index()

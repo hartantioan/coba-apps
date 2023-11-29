@@ -3,6 +3,11 @@
 namespace App\Http\Controllers\Production;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\IncomingPayment;
+use App\Models\MarketingOrder;
+use App\Models\MarketingOrderDelivery;
+use App\Models\MarketingOrderDownPayment;
+use App\Models\MarketingOrderInvoice;
 use App\Models\MarketingOrderPlan;
 use App\Models\MarketingOrderPlanDetail;
 use App\Models\MarketingOrderInvoice;
@@ -21,7 +26,7 @@ use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
-
+use Illuminate\Support\Str;
 class MarketingOrderPlanController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -525,8 +530,16 @@ class MarketingOrderPlanController extends Controller
             
             $content = $pdf->download()->getOriginalContent();
             
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $randomString = Str::random(10); 
+
+    
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
     
             return $document_po;
         }else{
@@ -695,9 +708,16 @@ class MarketingOrderPlanController extends Controller
 
             $result = $merger->merge();
 
-            Storage::put('public/pdf/bubla.pdf',$result);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
-            $var_link=$document_po;
+            $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
 
             $response =[
                 'status'=>200,
@@ -772,8 +792,15 @@ class MarketingOrderPlanController extends Controller
 
                     $result = $merger->merge();
 
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
         
                     $response =[
@@ -838,8 +865,15 @@ class MarketingOrderPlanController extends Controller
     
                     $result = $merger->merge();
 
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
         
                     $response =[

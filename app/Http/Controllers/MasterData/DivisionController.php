@@ -5,10 +5,10 @@ namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Division;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 class DivisionController extends Controller
 {

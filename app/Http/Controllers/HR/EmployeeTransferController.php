@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\HR;
-
+use Illuminate\Support\Str;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 class EmployeeTransferController extends Controller
 {
@@ -499,9 +499,16 @@ class EmployeeTransferController extends Controller
             $result = $merger->merge();
 
 
-            Storage::put('public/pdf/bubla.pdf',$result);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
-            $var_link=$document_po;
+            $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
+                    $var_link=$document_po;
 
             $response =[
                 'status'=>200,
@@ -581,14 +588,16 @@ class EmployeeTransferController extends Controller
                     $result = $merger->merge();
 
 
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
-        
-                    $response =[
-                        'status'=>200,
-                        'message'  =>$var_link
-                    ];
                 } 
 
             }
@@ -652,8 +661,15 @@ class EmployeeTransferController extends Controller
                     $result = $merger->merge();
     
     
-                    Storage::put('public/pdf/bubla.pdf',$result);
-                    $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+                    $randomString = Str::random(10); 
+
+         
+                    $filePath = 'public/pdf/' . $randomString . '.pdf';
+                    
+
+                    Storage::put($filePath, $result);
+                    
+                    $document_po = asset(Storage::url($filePath));
                     $var_link=$document_po;
         
                     $response =[
@@ -700,8 +716,15 @@ class EmployeeTransferController extends Controller
             
             $content = $pdf->download()->getOriginalContent();
             
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $randomString = Str::random(10); 
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+         
     
     
             return $document_po;

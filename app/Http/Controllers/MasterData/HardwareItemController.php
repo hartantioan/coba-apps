@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-
+use Illuminate\Support\Str;
 class HardwareItemController extends Controller
 {
     protected $dataplaces;
@@ -452,8 +452,16 @@ class HardwareItemController extends Controller
 
             $pdf = Pdf::loadView('admin.print.usage.hardware_item_barcode', $data);
             $content = $pdf->download()->getOriginalContent();
-            Storage::put('public/pdf/bubla.pdf',$content);
-            $document_po = asset(Storage::url('public/pdf/bubla.pdf'));
+            $randomString = Str::random(10); 
+
+         
+            $filePath = 'public/pdf/' . $randomString . '.pdf';
+            
+
+            Storage::put($filePath, $content);
+            
+            $document_po = asset(Storage::url($filePath));
+            $var_link=$document_po;
 
             return $document_po;
         }else{

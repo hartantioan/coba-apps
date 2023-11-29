@@ -361,7 +361,7 @@ class ApprovalController extends Controller
             'temp.required' => 'Approval tidak boleh kosong.',
             'note.required' => 'Keterangan tidak boleh kosong.'
         ]);
-
+        $message="";
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -543,7 +543,7 @@ class ApprovalController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
+            $message="";
             $arrMulti = explode(',',$request->tempMulti);
 
             $success = true;

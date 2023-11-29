@@ -34,6 +34,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportUser;
 use App\Helpers\CustomHelper;
 use App\Imports\ImportUser;
+use App\Models\NonStaffCompany;
 
 class UserController extends Controller
 {
@@ -54,6 +55,24 @@ class UserController extends Controller
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function companyIndex(Request $request)
+    {
+        $employee = User::where('employee_type','2')->where('employee_no',CustomHelper::decrypt($request->id))->where('status','1')->first();
+
+        if($employee){
+            $data = [
+                'title'         => 'Induk Perusahaan Pegawai Non-Staff - '.$employee->employee_no.' - '.$employee->name,
+                'content'       => 'admin.master_data.user_company',
+                'employee'      => $employee,
+                'code'          => $request->id,
+            ];
+
+            return view('admin.layouts.index', ['data' => $data]);
+        }else{
+            abort(404);
+        }
     }
 
     public function datatable(Request $request){
@@ -123,13 +142,15 @@ class UserController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
 				
-                $btn = ($val->type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Atur Akses Menu/Form" onclick="access(' . $val->id . ',`'.$val->name.'`)"><i class="material-icons dp48">folder_shared</i></button> ' : '').'<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Upload lampiran" onclick="attachment(' . $val->id . ')"><i class="material-icons dp48">perm_media</i></button>
+                $btn = $val->employee_type == '2' ? '<a href="user/parent_company/'.CustomHelper::encrypt($val->employee_no).'" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Atur Perusahaan Induk"><i class="material-icons dp48">account_balance</i></a> ' : '';
+
+                $btn .= ($val->type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Atur Akses Menu/Form" onclick="access(' . $val->id . ',`'.$val->name.'`)"><i class="material-icons dp48">folder_shared</i></button> ' : '').'<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Upload lampiran" onclick="attachment(' . $val->id . ')"><i class="material-icons dp48">perm_media</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>';
 
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->name .($val->leavequotas()->exists() ? 1 : 0),
+                    $val->name,
                     $val->username,
                     $val->employee_no,
                     $val->type(),
@@ -1222,5 +1243,225 @@ class UserController extends Controller
             ];
             return response()->json($response);
         }
+    }
+
+    public function companyDatatable(Request $request){
+        $employee_no = CustomHelper::decrypt($request->employee);
+
+        $column = [
+            'id',
+            'code',
+            'vendor_id',
+            'post_date',
+            'document_no',
+            'note',
+        ];
+
+        $start  = $request->start;
+        $length = $request->length;
+        $order  = $column[$request->input('order.0.column')];
+        $dir    = $request->input('order.0.dir');
+        $search = $request->input('search.value');
+
+        $total_data = NonStaffCompany::whereHas('account',function($query)use($employee_no){
+            $query->where('employee_no',$employee_no);
+        })->count();
+        
+        $query_data = NonStaffCompany::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('document_no', 'like', "%$search%")
+                            ->orWhere('note','like',"%$search%")
+                            ->orWhereHas('vendor',function($query)use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+            })
+            ->whereHas('account',function($query)use($employee_no){
+                $query->where('employee_no',$employee_no);
+            })
+            ->offset($start)
+            ->limit($length)
+            ->orderBy($order, $dir)
+            ->get();
+
+        $total_filtered = NonStaffCompany::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('document_no', 'like', "%$search%")
+                            ->orWhere('note','like',"%$search%")
+                            ->orWhereHas('vendor',function($query)use($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            });
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+            })
+            ->whereHas('account',function($query)use($employee_no){
+                $query->where('employee_no',$employee_no);
+            })
+            ->count();
+
+        $response['data'] = [];
+        if($query_data <> FALSE) {
+            $nomor = $start + 1;
+            foreach($query_data as $val) {
+				
+                $response['data'][] = [
+                    $nomor,
+                    $val->code,
+                    $val->vendor->employee_no.' - '.$val->vendor->name,
+                    date('d/m/y',strtotime($val->post_date)),
+                    $val->document_no,
+                    $val->note,
+                    $val->status(),
+                    '
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
+					'
+                ];
+
+                $nomor++;
+            }
+        }
+
+        $response['recordsTotal'] = 0;
+        if($total_data <> FALSE) {
+            $response['recordsTotal'] = $total_data;
+        }
+
+        $response['recordsFiltered'] = 0;
+        if($total_filtered <> FALSE) {
+            $response['recordsFiltered'] = $total_filtered;
+        }
+
+        return response()->json($response);
+    }
+
+    public function createCompany(Request $request){
+        $validation = Validator::make($request->all(), [
+            'vendor_id'             => 'required',
+            'user_code'             => 'required',
+            'date'                  => 'required',
+        ], [
+            'vendor_id.required'    => 'Vendor tidak boleh kosong.',
+            'user_code.required'    => 'Pengguna tidak boleh kosong.',
+            'date.required'         => 'Tanggal tidak boleh kosong.',
+        ]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $employee = User::where('employee_no',CustomHelper::decrypt($request->user_code))->first();
+
+            if(!$employee){
+                return response()->json([
+                    'status'	=> 500,
+                    'message'	=> 'Picture not found.'
+                ]);
+            }
+
+			if($request->temp){
+                DB::beginTransaction();
+                try {
+                    $query = NonStaffCompany::find($request->temp);
+                    $query->user_id	        = session('bo_id');
+                    $query->account_id      = $employee->id;
+                    $query->vendor_id       = $request->vendor_id;
+                    $query->post_date       = $request->date;
+                    $query->document_no     = $request->document_no;
+                    $query->note            = $request->note;
+                    $query->status          = $request->status ? $request->status : '2';
+                    $query->save();
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}else{
+                DB::beginTransaction();
+                try {
+                    $query = NonStaffCompany::create([
+                        'code'          => strtoupper(Str::random(15)),
+                        'user_id'       => session('bo_id'),
+                        'account_id'    => $employee->id,
+                        'vendor_id'     => $request->vendor_id,
+                        'post_date'     => $request->date,
+                        'document_no'   => $request->document_no,
+                        'note'			=> $request->note,
+                        'status'        => $request->status ? $request->status : '2'
+                    ]);
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}
+			
+			if($query) {
+
+                activity()
+                    ->performedOn(new NonStaffCompany())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit company non-staff.');
+
+				$response = [
+					'status'  => 200,
+					'message' => 'Data successfully saved.'
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+		
+		return response()->json($response);
+    }
+
+    public function showCompany(Request $request){
+        $nsc = NonStaffCompany::find($request->id);
+        $nsc['vendor_name'] = $nsc->vendor->name;
+        				
+		return response()->json($nsc);
+    }
+
+    public function destroyCompany(Request $request){
+        $query = NonStaffCompany::find($request->id);
+		
+        if($query->delete()) {
+            activity()
+                ->performedOn(new NonStaffCompany())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the non staff company');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
     }
 }

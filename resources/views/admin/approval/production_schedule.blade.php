@@ -176,12 +176,6 @@
                 <div class="col s8">
                     {{ date('d/m/y',strtotime($data->post_date)) }}
                 </div>
-                <div class="col s4">
-                    Mesin
-                </div>
-                <div class="col s8">
-                    {{ $data->machine->name }}
-                </div>
             </div>
         </div>
         

@@ -277,16 +277,45 @@
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m2 s12">
 
                             </div>
-                            <div class="input-field col m4 s12 step13">
+                            <div class="input-field col m6 s12 step13">
                                 <table width="100%" class="bordered">
                                     <thead>
-                                        <tr>
-                                            <td style="font-size: 15px !important;">Grandtotal</td>
+                                        <tr class="row-mandiri" style="display:none;">
+                                            <td style="font-size: 15px !important;" width="20%">Total</td>
+                                            <td colspan="2" width="40%">
+                                                <input class="browser-default" id="temptotal" name="temptotal" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;border: 2px solid rgb(1, 184, 25);border-radius: 4px;" onkeyup="formatRupiah(this);countAll();">
+                                            </td>
+                                            <td class="right-align" width="40%">
+                                                <input class="browser-default" id="total" name="total" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;" readonly onkeyup="formatRupiah(this);countAll();">
+                                            </td>
+                                        </tr>
+                                        <tr class="row-mandiri" style="display:none;">
+                                            <td style="font-size: 15px !important;">PPN</td>
+                                            <td style="font-size: 15px !important;">
+                                                <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
+                                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                                    @foreach ($tax as $row)
+                                                        <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td style="font-size: 15px !important;">
+                                                <label>
+                                                    <input type="checkbox" id="is_include_tax" name="is_include_tax[]" value="1" onclick="countAll();">
+                                                    <span>Incl.PPN</span>
+                                                </label>
+                                            </td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;" readonly>
+                                                <input class="browser-default" id="tax" name="tax" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;" readonly onkeyup="formatRupiah(this);">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size: 15px !important;" colspan="3">Grandtotal</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;" readonly onkeyup="formatRupiah(this);">
                                             </td>
                                         </tr>
                                     </thead>
@@ -554,6 +583,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('.row-mandiri').hide();
                 countAll();
             }
         });
@@ -681,117 +711,130 @@
             </tr>
         `);
         if($('#type').val() == '3'){
-            $('#grandtotal').attr('readonly',false);
+            $('.row-mandiri').show();
+            $(".modal-content").animate({ scrollTop: $("#temptotal").height() + 500 }, "fast");
+            /* $('#grandtotal').attr('readonly',false); */
+
         }else{
-            $('#grandtotal').attr('readonly',true);
+            $('.row-mandiri').hide();
+            /* $('#grandtotal').attr('readonly',true); */
         }
     }
 
     function getMarketingInvoice(){
-        if($('#marketing_order_invoice_id').val()){
-            if($('.data-used').length > 0){
-                $('.data-used').trigger('click');
-            }
+        if($('#type').val() !== '3'){
+            if($('#marketing_order_invoice_id').val()){
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
 
-            let datakuy = $('#marketing_order_invoice_id').select2('data')[0];
+                let datakuy = $('#marketing_order_invoice_id').select2('data')[0];
 
-            $.ajax({
-                url: '{{ Request::url() }}/send_used_data',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    id: $('#marketing_order_invoice_id').val(),
-                    type: datakuy.type,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
+                $.ajax({
+                    url: '{{ Request::url() }}/send_used_data',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        id: $('#marketing_order_invoice_id').val(),
+                        type: datakuy.type,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
 
-                    if(response.status == 500){
+                        if(response.status == 500){
+                            swal({
+                                title: 'Ups!',
+                                text: response.message,
+                                icon: 'warning'
+                            });
+                        }else{
+                            if($('#last-row-item').length > 0){
+                                $('#last-row-item').remove();
+                            }
+
+                            $('#list-used-data').append(`
+                                <div class="chip purple darken-4 gradient-shadow white-text">
+                                    ` + datakuy.code + `
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.type + `','` + $('#marketing_order_invoice_id').val() + `')">close</i>
+                                </div>
+                            `);
+
+                            $.each(datakuy.details, function(i, val) {
+                                var count = makeid(10);
+                                $('#body-item').append(`
+                                    <tr class="row_item" data-id="` + $('#marketing_order_invoice_id').val() + `">
+                                        <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.type + `">
+                                        <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.id + `">
+                                        <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="` + val.is_include_tax + `">
+                                        <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="` + val.percent_tax + `">
+                                        <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="` + val.tax_id + `">
+                                        <td>
+                                            ` + val.code + `
+                                        </td>
+                                        <td>
+                                            ` + val.tax_no + `
+                                        </td>
+                                        <td class="center">
+                                            ` + datakuy.post_date + `
+                                        </td>
+                                        <td>
+                                            <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail...">
+                                        </td>
+                                        <td>
+                                            ` + val.name + `
+                                        </td>
+                                        <td>
+                                            <input name="arr_qty[]" id="rowQty` + count + `" type="text" value="` + ($('#type').val() == '2' ? val.qty : '0' ) + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + ($('#type').val() == '2' ? val.qty : '0' ) + `" style="text-align:right;" ` + ($('#type').val() == '1' ? 'readonly' : '') + `>
+                                        </td>
+                                        <td class="center">
+                                            <span>` + val.unit + `</span>
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_total[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_total`+ count +`" readonly>
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_tax[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_tax`+ count +`" readonly>
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + val.balance + `" data-nominal="` + val.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
+                                        </td>
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+
+                            $('#marketing_order_invoice_id').empty();
+
+                            countAll();
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
                         swal({
                             title: 'Ups!',
-                            text: response.message,
-                            icon: 'warning'
+                            text: 'Check your internet connection.',
+                            icon: 'error'
                         });
-                    }else{
-                        if($('#last-row-item').length > 0){
-                            $('#last-row-item').remove();
-                        }
-
-                        $('#list-used-data').append(`
-                            <div class="chip purple darken-4 gradient-shadow white-text">
-                                ` + datakuy.code + `
-                                <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.type + `','` + $('#marketing_order_invoice_id').val() + `')">close</i>
-                            </div>
-                        `);
-
-                        $.each(datakuy.details, function(i, val) {
-                            var count = makeid(10);
-                            $('#body-item').append(`
-                                <tr class="row_item" data-id="` + $('#marketing_order_invoice_id').val() + `">
-                                    <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.type + `">
-                                    <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.id + `">
-                                    <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="` + val.is_include_tax + `">
-                                    <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="` + val.percent_tax + `">
-                                    <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="` + val.tax_id + `">
-                                    <td>
-                                        ` + val.code + `
-                                    </td>
-                                    <td>
-                                        ` + val.tax_no + `
-                                    </td>
-                                    <td class="center">
-                                        ` + datakuy.post_date + `
-                                    </td>
-                                    <td>
-                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail...">
-                                    </td>
-                                    <td>
-                                        ` + val.name + `
-                                    </td>
-                                    <td>
-                                        <input name="arr_qty[]" id="rowQty` + count + `" type="text" value="` + ($('#type').val() == '2' ? val.qty : '0' ) + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + ($('#type').val() == '2' ? val.qty : '0' ) + `" style="text-align:right;" ` + ($('#type').val() == '1' ? 'readonly' : '') + `>
-                                    </td>
-                                    <td class="center">
-                                        <span>` + val.unit + `</span>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_total[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_total`+ count +`" readonly>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_tax[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_tax`+ count +`" readonly>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + val.balance + `" data-nominal="` + val.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-
-                        $('#marketing_order_invoice_id').empty();
-
-                        countAll();
                     }
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
+                });
+            }
+        }else{
+            $('#marketing_order_invoice_id').empty();
+            swal({
+                title: 'Ups!',
+                text: 'Mohon maaf, tipe mandiri tidak dapat menambahkan AR Invoice.',
+                icon: 'warning'
             });
         }
     }
@@ -1290,13 +1333,13 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                if($('#type').val() == '3'){
+                /* if($('#type').val() == '3'){
                     swal({
                         title: 'Ups!',
                         text: 'Untuk AR Memo tipe Mandiri masih belum bisa digunakan ya.',
                         icon: 'warning'
                     });
-                }else{
+                }else{ */
                     var formData = new FormData($('#form_data')[0]), passedTax = true;
                 
                     $('input[name^="arr_tax[]"]').each(function(index){
@@ -1306,6 +1349,8 @@
                             }
                         }
                     });
+
+                    formData.append('real_tax',($('#type').val() == '3' ? ($('#tax_id').val() ? $('#tax_id').find(':selected').data('id') : '' ) : ''));
                     
                     if(passedTax){
                         $.ajax({
@@ -1378,7 +1423,7 @@
                             icon: 'warning'
                         });
                     }
-                }
+                /* } */
     
             }
         });
@@ -1418,6 +1463,14 @@
                 $('#tax_no').val(response.tax_no);
                 $('#note').val(response.note);
                 $('#grandtotal').val(response.balance);
+                if(response.type == '3'){
+                    $('#temptotal,#total').val(response.total);
+                    $('#tax').val(response.tax);
+                    $('.row-mandiri').show();
+                    if(response.tax_id){
+                        $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
+                    }
+                }
                 $('#type').val(response.type).formSelect();
 
                 if(response.details.length > 0){
@@ -1669,19 +1722,37 @@
     function countAll(){
         let grandtotal = 0, tax = 0;
 
-        $('input[name^="arr_grandtotal[]"]').each(function(index){
-            let rowgrandtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let percentTax = parseFloat($('input[name^="arr_percent_tax[]"]').eq(index).val());
-            let rowtotal = rowgrandtotal;
-            let rowtax = 0;
-            if(percentTax > 0){
-                rowtotal = rowgrandtotal / ((percentTax + 100) / 100);
-                rowtax = rowtotal * (percentTax / 100);
+        if($('#type').val() == '3'){
+            let total = parseFloat($('#temptotal').val().replaceAll(".", "").replaceAll(",","."));
+            if($('#tax_id').val() !== '0'){
+                let percent_tax = parseFloat($('#tax_id').val());
+                if($('#is_include_tax').is(':checked')){
+                    total = total / (1 + (percent_tax / 100));
+                }
+                tax = total * (percent_tax / 100);
             }
-            $('input[name^="arr_total[]"]').eq(index).val(formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',',')));
-            $('input[name^="arr_tax[]"]').eq(index).val(formatRupiahIni(rowtax.toFixed(2).toString().replace('.',',')));
-            grandtotal += rowgrandtotal;
-        });
+            $('#total').val(
+                (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+            );
+            $('#tax').val(
+                (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
+            );
+            grandtotal = total + tax;
+        }else{
+            $('input[name^="arr_grandtotal[]"]').each(function(index){
+                let rowgrandtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                let percentTax = parseFloat($('input[name^="arr_percent_tax[]"]').eq(index).val());
+                let rowtotal = rowgrandtotal;
+                let rowtax = 0;
+                if(percentTax > 0){
+                    rowtotal = rowgrandtotal / ((percentTax + 100) / 100);
+                    rowtax = rowtotal * (percentTax / 100);
+                }
+                $('input[name^="arr_total[]"]').eq(index).val(formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',',')));
+                $('input[name^="arr_tax[]"]').eq(index).val(formatRupiahIni(rowtax.toFixed(2).toString().replace('.',',')));
+                grandtotal += rowgrandtotal;
+            });
+        }
 
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))

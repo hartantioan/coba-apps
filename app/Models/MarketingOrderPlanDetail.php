@@ -20,6 +20,7 @@ class MarketingOrderPlanDetail extends Model
         'qty',
         'request_date',
         'note',
+        'is_urgent',
     ];
 
     public function marketingOrderPlan()
@@ -36,6 +37,15 @@ class MarketingOrderPlanDetail extends Model
         return $this->hasMany('App\Models\ProductionScheduleDetail')->whereHas('productionSchedule',function($query){
             $query->whereIn('status',['2','3']);
         });
+    }
+
+    public function isUrgent(){
+        $is_urgent = match ($this->is_urgent) {
+            '1' => 'Ya',
+            default => 'Tidak',
+        };
+
+        return $is_urgent;
     }
 
     public function totalScheduled()

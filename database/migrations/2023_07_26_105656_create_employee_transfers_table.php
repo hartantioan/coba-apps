@@ -30,7 +30,7 @@ return new class extends Migration
             $table->bigInteger('void_id')->nullable();
             $table->string('void_note')->nullable();
             $table->timestamp('void_date')->nullable();
-            $table->softDeletes('deleted_at');  
+            $table->softDeletes('deleted_at');
             $table->timestamps();
         });
     }

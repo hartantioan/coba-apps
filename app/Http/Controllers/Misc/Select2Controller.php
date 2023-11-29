@@ -57,6 +57,7 @@ use App\Models\Equipment;
 use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\DeliveryCost;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -119,7 +120,8 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name
+                'text' 			=> $d->code.' - '.$d->name,
+                'subdistrict'   => $d->getSubdistrict(),
             ];
         }
 
@@ -152,6 +154,7 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
                 'cities'        => $d->getCity(),
             ];
         }
@@ -363,7 +366,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' => $d->name.' - '.$d->phone.' Pos. '.($d->position ? $d->position->name : 'N/A'),
+                'text'          => $d->employee_no.' - '.$d->name.' - '.$d->phone.' Pos. '.($d->position ? $d->position->name : 'N/A'),
                 'limit_credit'  => $d->limit_credit,
                 'count_limit'   => $d->count_limit_credit,
                 'balance_limit' => $d->limit_credit - $d->count_limit_credit,
@@ -2289,7 +2292,7 @@ class Select2Controller extends Controller {
                 }
                 $response[] = [
                     'id'   			=> $d->id,
-                    'text' 			=> $d->code.' Periode '.date('d/m/y',strtotime($d->start_date)).' - '.date('d/m/y',strtotime($d->end_date)),
+                    'text' 			=> $d->code.' Tgl. '.date('d/m/y',strtotime($d->post_date)),
                     'table'         => $d->getTable(),
                     'details'       => $details,
                     'code'          => $d->code,
@@ -2740,6 +2743,59 @@ class Select2Controller extends Controller {
                     'list_area'         => Area::where('status','1')->get(), 
                 ];
             }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function deliveryCost(Request $request)
+    {
+        $response = [];
+
+        $subdistrict_from = $request->subdistrict_from;
+        $subdistrict_to = $request->subdistrict_to;
+
+        $search   = $request->search;
+        $data = DeliveryCost::where(function($query)use($search){
+                        $query->whereHas('account',function($query)use($search){
+                            $query->where('name', 'like', "%$search%")
+                                ->orWhere('employee_no', 'like', "%$search%");
+                        })
+                        ->orWhereHas('fromCity',function($query)use($search){
+                            $query->where('name', 'like', "%$search%");
+                        })
+                        ->orWhereHas('fromSubdistrict',function($query)use($search){
+                            $query->where('name', 'like', "%$search%");
+                        })
+                        ->orWhereHas('toCity',function($query)use($search){
+                            $query->where('name', 'like', "%$search%");
+                        })
+                        ->orWhereHas('toSubdistrict',function($query)use($search){
+                            $query->where('name', 'like', "%$search%");
+                        });
+                    })
+                    ->where(function($query)use($subdistrict_from,$subdistrict_to){
+                        if($subdistrict_from){
+                            $query->where('from_subdistrict_id',$subdistrict_from);
+                        }
+
+                        if($subdistrict_to){
+                            $query->where('to_subdistrict_id',$subdistrict_to);
+                        }
+                    })
+                    ->whereDate('valid_from','<=',date('Y-m-d'))
+                    ->whereDate('valid_to','>=',date('Y-m-d'))
+                    ->where('status','1')
+                    ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->account->name.' Dari '.$d->fromCity->name.' - '.$d->fromSubdistrict->name.' -- Ke -- '.$d->toCity->name.' - '.$d->toSubdistrict->name.' Tonase : '.$d->tonnage.' Nominal : '.number_format($d->nominal,2,',','.'),
+                'tonnage'       => number_format($d->tonnage,2,',','.'),
+                'nominal'       => number_format($d->nominal,2,',','.'),
+                'name'          => $d->code.' - tonase '.number_format($d->tonnage,2,',','.'),
+            ];
         }
 
         return response()->json(['items' => $response]);

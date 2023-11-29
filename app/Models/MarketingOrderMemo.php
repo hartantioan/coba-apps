@@ -26,6 +26,9 @@ class MarketingOrderMemo extends Model
         'status',
         'document',
         'tax_no',
+        'is_include_tax',
+        'percent_tax',
+        'tax_id',
         'total',
         'tax',
         'grandtotal',
@@ -33,6 +36,21 @@ class MarketingOrderMemo extends Model
         'void_note',
         'void_date',
     ];
+
+    public function isIncludeTax(){
+        $type = match ($this->is_include_tax) {
+          '0' => 'Tidak',
+          '1' => 'Termasuk',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function taxMaster()
+    {
+        return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
+    }
 
     public function user()
     {
@@ -167,7 +185,13 @@ class MarketingOrderMemo extends Model
 
     public function incomingPaymentDetail(){
         return $this->hasMany('App\Models\IncomingPaymentDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('incomingPayment',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
+    public function paymentRequestDetail(){
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
         });
     }
 
@@ -175,7 +199,11 @@ class MarketingOrderMemo extends Model
         $total = $this->grandtotal;
 
         foreach($this->incomingPaymentDetail as $row){
-            $total -= $row->total;
+            $total += $row->total;
+        }
+
+        foreach($this->paymentRequestDetail as $row){
+            $total -= $row->nominal;
         }
 
         return $total;
@@ -185,7 +213,11 @@ class MarketingOrderMemo extends Model
         $total = 0;
 
         foreach($this->incomingPaymentDetail as $row){
-            $total += $row->total;
+            $total -= $row->total;
+        }
+
+        foreach($this->paymentRequestDetail as $row){
+            $total += $row->nominal;
         }
 
         return $total;
@@ -193,6 +225,14 @@ class MarketingOrderMemo extends Model
 
     public function hasChildDocument(){
         $hasRelation = false;
+
+        if($this->incomingPaymentDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->paymentRequestDetail()->exists()){
+            $hasRelation = true;
+        }
 
         return $hasRelation;
     }

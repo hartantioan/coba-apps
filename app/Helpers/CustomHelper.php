@@ -741,16 +741,27 @@ class CustomHelper {
 							$arrNote[] = $row->lookable->code;
 						}
 					}elseif($row->lookable_type == 'marketing_order_invoices' || $row->lookable_type == 'marketing_order_down_payments' || $row->lookable_type == 'marketing_order_memos'){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coapiutangusaha,
-							'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
-							'type'			=> '2',
-							'nominal'		=> $row->total * $ip->currency_rate,
-							'note'			=> $row->note,
-						]);
-						if($row->lookable_type == 'marketing_order_down_payments'){
-							self::addDeposit($row->lookable->account_id,$row->total * $ip->currency_rate);
+						if($row->lookable_type == 'marketing_order_memos'){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coapiutangusaha,
+								'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
+								'type'			=> '1',
+								'nominal'		=> abs($row->total * $ip->currency_rate),
+								'note'			=> $row->note,
+							]);
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coapiutangusaha,
+								'account_id'	=> $ip->account_id ? $ip->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> $row->total * $ip->currency_rate,
+								'note'			=> $row->note,
+							]);
+							if($row->lookable_type == 'marketing_order_down_payments'){
+								self::addDeposit($row->lookable->account_id,$row->total * $ip->currency_rate);
+							}
 						}
 						CustomHelper::removeCountLimitCredit($row->lookable->account_id,$row->total * $ip->currency_rate);
 						if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
@@ -900,6 +911,10 @@ class CustomHelper {
 				}elseif($row->lookable_type == 'purchase_down_payments'){
 					$mustpay = $row->lookable->balancePaidExcept($row->id);
 					$balanceReal = $row->lookable->balancePaidExcept($row->id) * $row->lookable->currency_rate;
+				}elseif($row->lookable_type == 'marketing_order_memos'){
+					$rowtotal = $row->lookable->balance();
+					$mustpay = $rowtotal;
+					$balanceReal = $rowtotal;
 				}
 				
 				$totalMustPay += $mustpay;
@@ -940,6 +955,9 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $balanceReal,
 					]);
+					if($row->lookable_type == 'marketing_order_memos'){
+						CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);
+					}
 				}
 			}
 
@@ -2116,7 +2134,7 @@ class CustomHelper {
 							$hpp,
 							'IN',
 							$mom->post_date,
-							NULL
+							$row->lookable->lookable->area_id,
 						);
 	
 						self::sendStock(
@@ -2125,12 +2143,43 @@ class CustomHelper {
 							$row->lookable->lookable->item_id,
 							$row->qty * $row->lookable->lookable->item->sell_convert,
 							'IN',
-							NULL,
+							$row->lookable->lookable->area_id,
 						);
 					}
 				}
 
 				CustomHelper::removeCountLimitCredit($mom->account_id,$row->grandtotal);
+			}
+
+			if($mom->type == '3'){
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coapotonganpenjualan,
+					'account_id'	=> $mom->account_id,
+					'type'			=> '1',
+					'nominal'		=> $mom->total,
+				]);
+
+				if($mom->tax > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $mom->taxMaster->coa_sale_id,
+						'account_id'	=> $mom->account_id,
+						'type'			=> '1',
+						'nominal'		=> $mom->tax,
+					]);
+				}
+	
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coapiutang,
+					'account_id'	=> $account_id,
+					'type'			=> '2',
+					'nominal'		=> $mom->grandtotal,
+				]);
+
+				CustomHelper::removeCountLimitCredit($mom->account_id,$mom->grandtotal);
 			}
 			
 		}elseif($table_name == 'purchase_invoices'){

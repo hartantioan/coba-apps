@@ -22,7 +22,9 @@ class Place extends Model
         'type',
         'province_id',
         'city_id',
+        'district_id',
         'subdistrict_id',
+        'capacity',
         'status'
     ];
 
@@ -46,6 +48,10 @@ class Place extends Model
 
     public function subdistrict(){
         return $this->belongsTo('App\Models\Region','subdistrict_id','id')->withTrashed();
+    }
+
+    public function district(){
+        return $this->belongsTo('App\Models\Region','district_id','id')->withTrashed();
     }
 
     public function city(){

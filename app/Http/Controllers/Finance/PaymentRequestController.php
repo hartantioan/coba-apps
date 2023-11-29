@@ -37,6 +37,7 @@ use App\Exports\ExportPaymentRequest;
 use App\Models\Place;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\MarketingOrderMemo;
 use App\Models\OutgoingPayment;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -427,6 +428,32 @@ class PaymentRequestController extends Controller
                     ];
                 }
             }
+
+            foreach($data->marketingOrderMemo()->where('type','3')->get() as $row){
+                if(!$row->used()->exists() && $row->balance() > 0){
+                    $memo = $row->totalUsed();
+                    $final = $row->grandtotal - $memo;
+                    $details[] = [
+                        'id'            => $row->id,
+                        'type'          => 'marketing_order_memos',
+                        'code'          => CustomHelper::encrypt($row->code),
+                        'rawcode'       => $row->code,
+                        'rawdate'       => $row->post_date,
+                        'post_date'     => date('d/m/y',strtotime($row->post_date)),
+                        'due_date'      => date('d/m/y',strtotime($row->post_date)),
+                        'total'         => number_format($row->total,2,',','.'),
+                        'tax'           => number_format($row->tax,2,',','.'),
+                        'wtax'          => number_format(0,2,',','.'),
+                        'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                        'downpayment'   => number_format(0,2,',','.'),
+                        'rounding'      => number_format(0,2,',','.'),
+                        'balance'       => number_format($row->grandtotal,2,',','.'),
+                        'memo'          => number_format($memo,2,',','.'),
+                        'final'         => 'IDR '.number_format($final,2,',','.'),
+                        'note'          => $row->note,
+                    ];
+                }
+            }
         }
 
         $data['banks'] = $banks;
@@ -554,6 +581,34 @@ class PaymentRequestController extends Controller
                                 'memo'          => number_format($data->totalMemo(),2,',','.'),
                                 'currency_id'   => $data->currency()->id,
                                 'currency_rate' => number_format($data->currencyRate(),2,',','.'),
+                            ];
+                        }
+                    }
+                }elseif($row == 'marketing_order_memos'){
+                    $data = null;
+                    $data = MarketingOrderMemo::find(intval($request->arr_id[$key]));
+                    if($data){
+                        if(!$data->used()->exists() && $data->balance() > 0){
+                            CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Payment Request');
+                            $coa = Coa::where('code','100.01.03.01.01')->where('company_id',$data->company_id)->first();
+                            $details[] = [
+                                'id'            => $data->id,
+                                'type'          => 'marketing_order_memos',
+                                'code'          => CustomHelper::encrypt($data->code),
+                                'rawcode'       => $data->code,
+                                'rawdate'       => $data->post_date,
+                                'post_date'     => date('d/m/y',strtotime($data->post_date)),
+                                'due_date'      => date('d/m/y',strtotime($data->post_date)),
+                                'total'         => number_format($data->total,2,',','.'),
+                                'tax'           => number_format($data->tax,2,',','.'),
+                                'wtax'          => number_format(0,2,',','.'),
+                                'grandtotal'    => number_format($data->grandtotal,2,',','.'),
+                                'balance'       => number_format($data->balance(),2,',','.'),
+                                'coa_id'        => $coa ? $coa->id : '',
+                                'coa_name'      => $coa ? $coa->code.' - '.$coa->name : '',
+                                'memo'          => number_format($data->totalUsed(),2,',','.'),
+                                'currency_id'   => 1,
+                                'currency_rate' => number_format(1,2,',','.'),
                             ];
                         }
                     }
@@ -791,6 +846,8 @@ class PaymentRequestController extends Controller
                                 $idDetail = PurchaseDownPayment::where('code',$code)->first()->id;
                             }elseif($row == 'purchase_invoices'){
                                 $idDetail = PurchaseInvoice::where('code',$code)->first()->id;
+                            }elseif($row == 'marketing_order_memos'){
+                                $idDetail = MarketingOrderMemo::where('code',$code)->first()->id;
                             }
                             
                             $prd = PaymentRequestDetail::create([
@@ -867,7 +924,7 @@ class PaymentRequestController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="7">Daftar Item</th>
+                                <th class="center-align" colspan="7">Daftar Pembayaran</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>

@@ -20,6 +20,7 @@ use App\Models\MarketingOrderMemoDetail;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Models\Tax;
 use App\Models\TaxSeries;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -57,6 +58,7 @@ class MarketingOrderMemoController extends Controller
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
             'newcode'       => 'SMMO-'.date('y'),
+            'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -276,8 +278,8 @@ class MarketingOrderMemoController extends Controller
             'account_id'	                => 'required',
             'post_date'		                => 'required',
             'type'                          => 'required',
-            'arr_lookable_id'		        => 'required|array',
-            'arr_total'                     => 'required|array',
+            /* 'arr_lookable_id'		        => 'required|array',
+            'arr_total'                     => 'required|array', */
         ], [
             'code.required' 	                    => 'Kode tidak boleh kosong.',
             'code.string'                           => 'Kode harus dalam bentuk string.',
@@ -288,10 +290,10 @@ class MarketingOrderMemoController extends Controller
             'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
             'post_date.required' 			        => 'Tanggal post tidak boleh kosong.',
             'type.required'                         => 'Tipe memo tidak boleh kosong.',
-            'arr_lookable_id.required'              => 'Item tidak boleh kosong.',
+            /* 'arr_lookable_id.required'              => 'Item tidak boleh kosong.',
             'arr_lookable_id.array'                 => 'Item harus dalam bentuk array.',
             'arr_total.required'                    => 'Total tidak boleh kosong.',
-            'arr_total.array'                       => 'Total harus dalam bentuk array.',
+            'arr_total.array'                       => 'Total harus dalam bentuk array.', */
         ]);
 
         if($validation->fails()) {
@@ -307,18 +309,24 @@ class MarketingOrderMemoController extends Controller
             
             $arrNominal = [];
 
-            foreach($request->arr_grandtotal as $key => $row){
-                $rowtotal = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
-                $rowtax = str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
-                $rowgrandtotal = str_replace(',','.',str_replace('.','',$row));
-                $arrNominal[] = [
-                    'total'             => $rowtotal,
-                    'tax'               => $rowtax,
-                    'grandtotal'        => $rowgrandtotal,
-                ];
-                $total += $rowtotal;
-                $tax += $rowtax;
-                $grandtotal += $rowgrandtotal;
+            if($request->type !== '3'){
+                foreach($request->arr_grandtotal as $key => $row){
+                    $rowtotal = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
+                    $rowtax = str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
+                    $rowgrandtotal = str_replace(',','.',str_replace('.','',$row));
+                    $arrNominal[] = [
+                        'total'             => $rowtotal,
+                        'tax'               => $rowtax,
+                        'grandtotal'        => $rowgrandtotal,
+                    ];
+                    $total += $rowtotal;
+                    $tax += $rowtax;
+                    $grandtotal += $rowgrandtotal;
+                }
+            }else{
+                $total = str_replace(',','.',str_replace('.','',$request->total));
+                $tax = str_replace(',','.',str_replace('.','',$request->tax));
+                $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
             }
 
             $bp = User::find($request->account_id);
@@ -382,6 +390,9 @@ class MarketingOrderMemoController extends Controller
                         $query->type = $request->type;
                         $query->document = $document;
                         $query->tax_no = $request->tax_no;
+                        $query->is_include_tax = $request->type == '3' ? ($request->is_include_tax ? $request->is_include_tax : NULL) : NULL;
+                        $query->percent_tax = $request->type == '3' ? ($request->tax_id ? $request->tax_id : NULL) : NULL;
+                        $query->tax_id = $request->tax_id_real ? $request->tax_id_real : NULL;
                         $query->total = $total;
                         $query->tax = $tax;
                         $query->grandtotal = $grandtotal;
@@ -416,6 +427,9 @@ class MarketingOrderMemoController extends Controller
                         'status'                        => '1',
                         'document'                      => $request->file('document') ? $request->file('document')->store('public/marketing_order_memos') : NULL,
                         'tax_no'                        => $request->tax_no,
+                        'is_include_tax'                => $request->type == '3' ? ($request->is_include_tax ? $request->is_include_tax : NULL) : NULL,
+                        'percent_tax'                   => $request->type == '3' ? ($request->tax_id ? $request->tax_id : NULL) : NULL,
+                        'tax_id'                        => $request->real_tax ? $request->real_tax : NULL,
                         'total'                         => $total,
                         'tax'                           => $tax,
                         'grandtotal'                    => $grandtotal,
@@ -429,20 +443,22 @@ class MarketingOrderMemoController extends Controller
 			
 			if($query) {
 
-                foreach($request->arr_lookable_id as $key => $row){
-                    $momd = MarketingOrderMemoDetail::create([
-                        'marketing_order_memo_id'       => $query->id,
-                        'lookable_type'                 => $request->arr_lookable_type[$key],
-                        'lookable_id'                   => $row,
-                        'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                        'is_include_tax'                => $request->arr_is_include_tax[$key],
-                        'percent_tax'                   => $request->arr_percent_tax[$key],
-                        'tax_id'                        => $request->arr_tax_id[$key] > 0 ? $request->arr_tax_id[$key] : NULL,
-                        'total'                         => $arrNominal[$key]['total'],
-                        'tax'                           => $arrNominal[$key]['tax'],
-                        'grandtotal'                    => $arrNominal[$key]['grandtotal'],
-                        'note'                          => $request->arr_note[$key],
-                    ]);
+                if($request->arr_lookable_id){
+                    foreach($request->arr_lookable_id as $key => $row){
+                        $momd = MarketingOrderMemoDetail::create([
+                            'marketing_order_memo_id'       => $query->id,
+                            'lookable_type'                 => $request->arr_lookable_type[$key],
+                            'lookable_id'                   => $row,
+                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'is_include_tax'                => $request->arr_is_include_tax[$key],
+                            'percent_tax'                   => $request->arr_percent_tax[$key],
+                            'tax_id'                        => $request->arr_tax_id[$key] > 0 ? $request->arr_tax_id[$key] : NULL,
+                            'total'                         => $arrNominal[$key]['total'],
+                            'tax'                           => $arrNominal[$key]['tax'],
+                            'grandtotal'                    => $arrNominal[$key]['grandtotal'],
+                            'note'                          => $request->arr_note[$key],
+                        ]);
+                    }
                 }
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
@@ -866,6 +882,8 @@ class MarketingOrderMemoController extends Controller
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account->code.' - '.$po->account->name;
         $po['balance'] = number_format($po->grandtotal,2,',','.');
+        $po['tax'] = number_format($po->tax,2,',','.');
+        $po['total'] = number_format($po->total,2,',','.');
 
         $arr = [];
         $arrUsed = [];

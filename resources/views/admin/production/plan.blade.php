@@ -109,8 +109,6 @@
                                                         <th>Perusahaan</th>
                                                         <th>Plant</th>
                                                         <th>Tgl.Post</th>
-                                                        <th>Tgl.Periode Mulai</th>
-                                                        <th>Tgl.Periode Selesai</th>
                                                         <th>Tipe</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
@@ -133,7 +131,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow:auto !important;">
         <div class="row">
             <div class="col s12">
                 <h4>Tambah/Edit {{ $title }}</h4>
@@ -168,9 +166,9 @@
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
-                                        <select class="form-control" id="place_id" name="place_id">
+                                        <select class="form-control" id="place_id" name="place_id" onchange="getCapacity();">
                                             @foreach ($place as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                <option value="{{ $row->id }}" data-capacity="{{ number_format($row->capacity,3,',','.') }}">{{ $row->name }}</option>
                                             @endforeach
                                         </select>
                                         <label class="" for="place_id">Plant</label>
@@ -180,21 +178,14 @@
                                         <label class="active" for="post_date">Tgl. Posting</label>
                                     </div>
                                     <div class="input-field col m3 s12 step6">
-                                        <input id="date_start" name="date_start" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Periode Mulai">
-                                        <label class="active" for="date_start">Tgl. Periode Mulai</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step7">
-                                        <input id="date_end" name="date_end" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Periode Akhir">
-                                        <label class="active" for="date_end">Tgl. Periode Akhir</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step8">
                                         <select class="form-control" id="type" name="type" onchange="loadDataTable()">
                                             <option value="1">Normal</option>
-                                            <option value="2">Susulan</option>
+                                            <option value="2">Susulan dari Sales</option>
+                                            <option value="2">Susulan dari Produksi</option>
                                         </select>
                                         <label for="type">Tipe</label>
                                     </div>
-                                    <div class="file-field input-field col m3 s12 step9">
+                                    <div class="file-field input-field col m3 s12 step7">
                                         <div class="btn">
                                             <span>File</span>
                                             <input type="file" name="file" id="file">
@@ -203,6 +194,15 @@
                                             <input class="file-path validate" type="text">
                                         </div>
                                     </div>
+                                    <div class="input-field col m3 s12 right-align" style="font-size:15px !important;font-weight:800;">
+                                        Kapasitas Plant :
+                                    </div>
+                                    <div class="input-field col m2 s12 right-align" style="font-size:15px !important;font-weight:800;" id="capacity-nominal">
+                                        0,00
+                                    </div>
+                                    <div class="input-field col m1 s12" style="font-size:15px !important;font-weight:800;">
+                                        M<sup>2</sup>
+                                    </div>
                                 </fieldset>
                             </div>
                         </div>
@@ -210,7 +210,7 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. Detail Produk</legend>
-                                    <div class="col m12 s12 step10" style="overflow:auto;width:100% !important;">
+                                    <div class="col m12 s12 step8" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered">
                                                 <thead>
@@ -218,8 +218,9 @@
                                                         <th class="center">Item</th>
                                                         <th class="center">Qty (Satuan Jual)</th>
                                                         <th class="center">Satuan</th>
+                                                        <th class="center">Keterangan</th>
                                                         <th class="center">Tgl.Request</th>
-                                                        <th class="center">Remark</th>
+                                                        <th class="center">Urgent</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
@@ -229,16 +230,24 @@
                                                             <select class="browser-default item-array" id="arr_item0" name="arr_item[]" onchange="getRowUnit(0)" required></select>
                                                         </td>
                                                         <td>
-                                                            <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)" required>
+                                                            <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();" required>
                                                         </td>
                                                         <td class="center">
                                                             <span id="arr_satuan0">-</span>
                                                         </td>
                                                         <td>
+                                                            <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="-" required>
+                                                        </td>
+                                                        <td>
                                                             <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
                                                         </td>
                                                         <td>
-                                                            <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="-" required>
+                                                            <div class="switch mb-1">
+                                                                <label>
+                                                                    <input type="checkbox" id="arr_urgent0" name="arr_urgent[]" value="1">
+                                                                    <span class="lever"></span>
+                                                                </label>
+                                                            </div>
                                                         </td>
                                                         <td class="center">
                                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -246,8 +255,20 @@
                                                             </a>
                                                         </td>
                                                     </tr>
-                                                    <tr id="last-row-item">
-                                                        <td colspan="12">
+                                                    <tr id="last-row-item" style="font-size:17px !important;font-weight:800;">
+                                                        <td class="right-align">
+                                                            TOTAL MOP
+                                                        </td>
+                                                        <td class="right-align" id="total-mop">
+                                                            0,000
+                                                        </td>
+                                                        <td class="left-align" colspan="5">
+                                                            {{-- M<sup>2</sup> --}}
+                                                            Box
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="7">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah
                                                             </a>
@@ -262,7 +283,7 @@
                         </div>
                         <div class="row">
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step11" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step9" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -483,6 +504,10 @@
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
+                window.onbeforeunload = function() {
+                    return 'You will lose all changes made since your last save';
+                };
+                getCapacity();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -490,6 +515,10 @@
                 M.updateTextFields();
                 $('#project_id,#warehouse_id').empty();
                 $('.row_item').remove();
+                window.onbeforeunload = function() {
+                    return null;
+                };
+                $('#total-mop').text('0,000');
             }
         });
 
@@ -812,8 +841,6 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
-                { name: 'start_date', className: 'center-align' },
-                { name: 'end_date', className: 'center-align' },
                 { name: 'type', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -855,6 +882,14 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
+    function getCapacity(){
+        if($('#place_id').val()){
+            $('#capacity-nominal').text($('#place_id').find(':selected').data('capacity'));
+        }else{
+            $('#capacity-nominal').text('0,000');
+        }
+    }
+
     function rowDetail(data) {
         $.ajax({
             url: '{{ Request::url() }}/row_detail',
@@ -894,6 +929,12 @@
             if (willDelete) {
                 
                 var formData = new FormData($('#form_data')[0]);
+
+                formData.delete('arr_urgent[]');
+
+                $('input[name^="arr_urgent[]"]').each(function(index){
+                    formData.append('arr_urgent[]',($(this).is(':checked') ? $(this).val() : '' ));
+                });
 
                 $.ajax({
                     url: '{{ Request::url() }}/create',
@@ -988,8 +1029,6 @@
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#post_date').val(response.post_date);
-                $('#date_start').val(response.start_date);
-                $('#date_end').val(response.end_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
                 $('#type').val(response.type).formSelect();
@@ -1007,16 +1046,24 @@
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this)" required>
+                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
                                 </td>
                                 <td class="center">
                                     <span id="arr_satuan` + count + `">` + val.unit + `</span>
                                 </td>
                                 <td>
+                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `" required>
+                                </td>
+                                <td>
                                     <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `" required>
+                                    <div class="switch mb-1">
+                                        <label>
+                                            <input type="checkbox" id="arr_urgent` + count + `" name="arr_urgent[]" value="1">
+                                            <span class="lever"></span>
+                                        </label>
+                                    </div>
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1029,6 +1076,9 @@
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
                         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+                        if(val.is_urgent){
+                            $('#arr_urgent' + count).prop( "checked", true);
+                        }
                     });
                 }
                 
@@ -1045,6 +1095,16 @@
                 });
             }
         });
+    }
+
+    function count(){
+        let total = 0;
+        $('input[name^="arr_qty[]"]').each(function(){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#total-mop').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+        );
     }
 
     function duplicate(id){
@@ -1079,8 +1139,6 @@
                         $('#code_place_id').val(response.code_place_id).formSelect();
                         $('#code').val(response.code);
                         $('#post_date').val(response.post_date);
-                        $('#date_start').val(response.start_date);
-                        $('#date_end').val(response.end_date);
                         $('#company_id').val(response.company_id).formSelect();
                         $('#place_id').val(response.place_id).formSelect();
                         $('#type').val(response.type).formSelect();
@@ -1098,16 +1156,24 @@
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
                                         </td>
                                         <td>
-                                            <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this)" required>
+                                            <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);count();" required>
                                         </td>
                                         <td class="center">
                                             <span id="arr_satuan` + count + `">` + val.unit + `</span>
                                         </td>
                                         <td>
+                                            <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `" required>
+                                        </td>
+                                        <td>
                                             <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
                                         </td>
                                         <td>
-                                            <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `" required>
+                                            <div class="switch mb-1">
+                                                <label>
+                                                    <input type="checkbox" id="arr_urgent` + count + `" name="arr_urgent[]" value="1">
+                                                    <span class="lever"></span>
+                                                </label>
+                                            </div>
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1120,6 +1186,9 @@
                                     <option value="` + val.item_id + `">` + val.item_name + `</option>
                                 `);
                                 select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+                                if(val.is_urgent){
+                                    $('#arr_urgent' + count).prop( "checked", true);
+                                }
                             });
                         }
                         
@@ -1202,16 +1271,24 @@
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" required></select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this)" required>
+                    <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);count();" required>
                 </td>
                 <td class="center">
                     <span id="arr_satuan` + count + `">-</span>
                 </td>
                 <td>
+                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="-" required>
+                </td>
+                <td>
                     <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
                 </td>
                 <td>
-                    <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="-" required>
+                    <div class="switch mb-1">
+                        <label>
+                            <input type="checkbox" id="arr_urgent` + count + `" name="arr_urgent[]" value="1">
+                            <span class="lever"></span>
+                        </label>
+                    </div>
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1346,7 +1423,7 @@
             steps: [
                 {
                     title : 'Marketing Order Plan',
-                    intro : 'Form ini digunakan untuk mengelola data pengajuan produksi dari tim Marketing kepada tim PPIC / Produksi.'
+                    intro : 'Form ini digunakan untuk mengelola data pengajuan produksi dari tim Marketing (normal) / PPIC (susulan) kepada tim PPIC / Produksi.'
                 },
                 {
                     title : 'Nomor Dokumen',
@@ -1374,33 +1451,23 @@
                     intro : 'Tanggal posting yang akan muncul pada saat dokumen dicetak, difilter atau diproses pada form lainnya.' 
                 },
                 {
-                    title : 'Tgl. Mulai Periode',
-                    element : document.querySelector('.step6'),
-                    intro : 'Tanggal mulai periode perkiraan produksi.' 
-                },
-                {
-                    title : 'Tgl. Akhir Periode',
-                    element : document.querySelector('.step7'),
-                    intro : 'Tanggal akhir periode perkiraan produksi.' 
-                },
-                {
                     title : 'Tipe Produksi',
-                    element : document.querySelector('.step8'),
-                    intro : 'Tanggal akhir periode perkiraan produksi.' 
+                    element : document.querySelector('.step6'),
+                    intro : 'Tipe produksi yang akan dilaksanakan.' 
                 },
                 {
                     title : 'File Lampiran',
-                    element : document.querySelector('.step9'),
+                    element : document.querySelector('.step7'),
                     intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
                 },
                 {
                     title : 'Detail produk',
-                    element : document.querySelector('.step10'),
+                    element : document.querySelector('.step8'),
                     intro : 'Silahkan tambahkan produk anda disini, lengkap dengan keterangan detail tentang produk tersebut. Qty yang diisikan adalah qty dengan satuan jual.' 
                 },
                 {
                     title : 'Tombol Simpan',
-                    element : document.querySelector('.step11'),
+                    element : document.querySelector('.step9'),
                     intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
                 },
             ]

@@ -208,8 +208,8 @@
                                 <label class="active">&nbsp;</label>
                             </div>
                             <div class="input-field col m3 s12 step5">
-                                <select class="browser-default" id="vendor_id" name="vendor_id" onchange="getDeliveryCost();"></select>
-                                <label class="active" for="vendor_id">Broker</label>
+                                <select class="browser-default" id="delivery_cost_id" name="delivery_cost_id" onchange="getDeliveryCost();"></select>
+                                <label class="active" for="delivery_cost_id">Daftar Harga Pengiriman</label>
                             </div>
                             <div class="input-field col m3 s12 step6">
                                 <select class="form-control" id="company_id" name="company_id">
@@ -247,12 +247,6 @@
                             <div class="input-field col m3 s12 step11">
                                 <input id="reference" name="reference" type="text" placeholder="No. Referensi">
                                 <label class="active" for="reference">No. Referensi</label>
-                            </div>
-                            <div class="input-field col m3 s12 step12">
-                                <select class="browser-default" id="delivery_cost_id" name="delivery_cost_id" onchange="getDeliveryNominal(this);">
-                                    <option value="">--Silahkan pilih broker--</option>
-                                </select>
-                                <label class="active" for="delivery_cost_id">Tonase & Harga</label>
                             </div>
                             <div class="col m12 s12 step13">
                                 <div class="input-field col m3 s12">
@@ -299,6 +293,7 @@
                                                             {{ $row->name }}
                                                         </td>
                                                         <td class="center-align">
+                                                            <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
                                                             <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;" {{ $row->id == 1 ? 'readonly' : '' }}>
                                                         </td>
                                                         <td class="center-align">
@@ -349,6 +344,7 @@
                                                             {{ $row->name }}
                                                         </td>
                                                         <td class="center-align">
+                                                            <input id="arr_temp_nominal{{ $row->id }}" type="hidden" value="0,00">
                                                             <input id="arr_fee_nominal{{ $row->id }}" name="arr_fee_nominal[]" type="text" value="0,00" onkeyup="formatRupiah(this);countEach({{ $row->id }});" style="height:1.5rem !important;text-align:right;">
                                                         </td>
                                                         <td class="center-align">
@@ -803,14 +799,13 @@
                     $('.data-used').trigger('click');
                 }
                 M.updateTextFields();
-                $('#supplier_id,#vendor_id').empty();
+                $('#supplier_id,#delivery_cost_id').empty();
                 $('#total,#tax,#grandtotal').text('0,000');
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#delivery_cost_id').empty().append(`
-                    <option value="">--Silahkan pilih broker--</option>
-                `);
+                $('#to_address,#from_address').text('-');
+                $('#temp_from_address,#temp_to_address').val('');
             }
         });
 
@@ -1040,7 +1035,34 @@
             table_landed_cost.rows().deselect();
         });
 
-        select2ServerSide('#vendor_id,#filter_vendor', '{{ url("admin/select2/supplier_vendor") }}');
+        select2ServerSide('#filter_vendor', '{{ url("admin/select2/supplier_vendor") }}');
+
+        $('#delivery_cost_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/delivery_cost") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        /* subdistrict_from : $('#temp_from_address').val(),
+                        subdistrict_to : $('#temp_to_address').val(), */
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         select2ServerSide('#supplier_id', '{{ url("admin/select2/supplier") }}');
     });
 
@@ -1509,7 +1531,6 @@
                                 $('.modal-content').scrollTop(0);
                                 M.updateTextFields();
                                 $('#modal4').modal('close');
-                                getDeliveryCost();
                             }else{
                                 $.each(errormessage, function(i, val) {
                                     M.toast({
@@ -1540,71 +1561,16 @@
     }
 
     function getDeliveryCost(){
-        if($('#vendor_id').val() && $('#temp_from_address').val() && $('#temp_to_address').val()){
-            $.ajax({
-                url: '{{ Request::url() }}/get_delivery_cost',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    vendor: $('#vendor_id').val(),
-                    subdistrict_from: $('#temp_from_address').val(),
-                    subdistrict_to: $('#temp_to_address').val(),
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    if(response.length > 0){
-                        $('#delivery_cost_id').empty().append(`
-                            <option value="">--Silahkan pilih biaya pengiriman--</option>
-                        `);
-                        $.each(response, function(i, val) {
-                            $('#delivery_cost_id').append(`
-                                <option value="` + val.id + `" data-nominal="` + val.nominal + `">` + val.name + `</option>
-                            `);
-                        });
-                    }else{
-                        swal({
-                            title: 'Maaf! Biaya Pengiriman tidak ditemukan.',
-                            text: 'Broker, asal dan tujuan kecamatan belum memiliki data biaya pengiriman. Silahkan set di Master data - Administrasi - Biaya Kirim.',
-                            icon: 'error'
-                        }).then(function(){
-                            $('#vendor_id').empty();
-                            $('#delivery_cost_id').empty().append(`
-                                <option value="">--Silahkan pilih broker--</option>
-                            `);
-                        });
-                    }
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-        }else{
-            $('#delivery_cost_id').empty().append(`
-                <option value="">--Silahkan pilih broker--</option>
-            `);
-        }
-    }
-
-    function getDeliveryNominal(element){
-        if($(element).val()){
-            $('#arr_fee_nominal1').val($(element).find(':selected').data('nominal')).trigger('keyup');
+        if($('#delivery_cost_id').val()){
+            let datakuy = $('#delivery_cost_id').select2('data')[0];
+            $('#arr_temp_nominal1').val(datakuy.nominal);
+            $('#arr_fee_nominal1').val(datakuy.nominal).trigger('keyup');
         }else{
             $('#arr_fee_nominal1').val('0,00').trigger('keyup');
+            $('#arr_temp_nominal1').val('0,00');
         }
     }
-
+    
     function getAccountData(){
         let val = $('#supplier_id').val();
         $.ajax({
@@ -1741,7 +1707,7 @@
     }
     
     function countEach(val){
-        let rowtotal = parseFloat($('#arr_fee_nominal' + val).val().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowgrandtotal = 0, rowpercenttax = parseFloat($('#arr_fee_tax' + val).val()), rowpercentwtax = parseFloat($('#arr_fee_wtax' + val).val());
+        let rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowgrandtotal = 0, rowpercenttax = parseFloat($('#arr_fee_tax' + val).val()), rowpercentwtax = parseFloat($('#arr_fee_wtax' + val).val());
 
         if(rowpercenttax !== 0){
             if($('#arr_fee_include_tax' + val).is(':checked')){
@@ -1753,17 +1719,19 @@
                 }
             }else{
                 if(parseFloat($('#arr_fee_tax_rp' + val).val().replaceAll(".", "").replaceAll(",",".")) > 0){
-                    rowtotal = parseFloat($('#arr_fee_nominal' + val).val().replaceAll(".", "").replaceAll(",",".")) + parseFloat($('#arr_fee_tax_rp' + val).val().replaceAll(".", "").replaceAll(",","."));
+                    rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",","."));
                     $('#arr_fee_nominal' + val).val(
-                        (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
+                        $('#arr_temp_nominal' + val).val()
                     );
                 }
             }
-            rowtax = Math.floor(rowtotal * (rowpercenttax / 100));
+            /* rowtax = Math.floor(rowtotal * (rowpercenttax / 100)); */
+            rowtax = rowtotal * (rowpercenttax / 100);
         }
 
         if(rowpercentwtax !== 0){
-            rowwtax = Math.floor(rowtotal * (rowpercentwtax / 100));
+            /* rowwtax = Math.floor(rowtotal * (rowpercentwtax / 100)); */
+            rowwtax = rowtotal * (rowpercentwtax / 100);
         }
 
         rowgrandtotal = rowtotal + rowtax - rowwtax;
@@ -2159,9 +2127,9 @@
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
-                $('#vendor_id').empty();
-                $('#vendor_id').append(`
-                    <option value="` + response.account_id + `">` + response.vendor_name + `</option>
+                $('#delivery_cost_id').empty();
+                $('#delivery_cost_id').append(`
+                    <option value="` + response.delivery_cost_id + `">` + response.delivery_cost_name + `</option>
                 `);
                 $('#supplier_id').empty();
                 if(response.supplier_name){
@@ -2271,6 +2239,7 @@
 
                     $.each(response.fees, function(i, val) {
                         $('#arr_fee_nominal' + val.id).val(val.total);
+                        $('#arr_temp_nominal' + val.id).val(val.total);
                         if(val.is_include_tax == '1'){
                             $('#arr_fee_include_tax' + val.id).prop('checked',true);
                         }else{
@@ -2308,7 +2277,6 @@
                 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
-                getDeliveryCost();
                 M.updateTextFields();
             },
             error: function() {

@@ -308,7 +308,7 @@
                                 <div class="col m12 s12">
                                     <ul class="tabs">
                                         <li class="tab col m6" onclick="changeMode();">
-                                            <a class="active" href="#opdata" id="main-tab">Pembayaran BS / AP DP / AP Invoice</a>
+                                            <a class="active" href="#opdata" id="main-tab">Pembayaran BS / AP DP / AP Invoice / AR Credit Memo</a>
                                         </li>
                                         <li class="tab col m6" onclick="changeMode();">
                                             <a href="#costdata" id="cost-tab">Tutup BS dengan Coa Biaya (REKONSILIASI)</a>
@@ -603,7 +603,7 @@
                         <ul class="collapsible">
                             <li class="active">
                                 <div class="collapsible-header purple lightrn-1 white-text">
-                                    <i class="material-icons">layers</i> Fund Requests / AP Down Payment / AP Invoice
+                                    <i class="material-icons">layers</i> Fund Requests / AP Down Payment / AP Invoice / AR Credit Memo
                                 </div>
                                 <div class="collapsible-body">
                                     <div id="datatable_buttons_multi"></div>

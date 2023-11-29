@@ -290,6 +290,7 @@
                                 <th class="center">Sat.</th>
                                 <th class="center">Tgl.Request</th>
                                 <th class="center">Catatan</th>
+                                <th class="center">Urgent</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -300,6 +301,7 @@
                                 <td align="center">{{ $row->item->sellUnit->code }}</td>
                                 <td align="center">{{ date('d/m/y',strtotime($row->request_date)) }}</td>
                                 <td>{{ $row->note }}</td>
+                                <td align="center">{{ $row->isUrgent() }}</td>
                             </tr>
                             @endforeach
                         </tbody>

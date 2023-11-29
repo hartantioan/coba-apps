@@ -786,7 +786,7 @@
                     $(this).remove();
                 });
                 M.updateTextFields();
-                $('.row_detail').remove();
+                $('.row_detail,.row_detail_dp').remove();
                 $('#account_id').empty();
                 $('#total,#tax,#balance').text('0,00');
                 $('#subtotal,#discount,#downpayment').val('0,00');

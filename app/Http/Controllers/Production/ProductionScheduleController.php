@@ -8,7 +8,6 @@ use App\Models\MarketingOrderPlanDetail;
 use App\Models\ProductionSchedule;
 use App\Models\ProductionScheduleDetail;
 use App\Models\Place;
-use App\Models\Machine;
 use App\Models\ProductionScheduleTarget;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
@@ -35,26 +34,13 @@ class ProductionScheduleController extends Controller
     }
     public function index(Request $request)
     {
-        $machines = [];
         $places = Place::where('status','1')->whereIn('id',$this->dataplaces)->get();
-
-        foreach(Machine::where('status','1')->whereHas('line',function($query){
-            $query->where('status','1')->whereIn('place_id',$this->dataplaces);
-        })->get() as $row){
-            $machines[] = [
-                'id'        => $row->id,
-                'code'      => $row->code,
-                'name'      => $row->name.' - '.$row->line->code,
-                'place_id'  => $row->line->place_id,
-            ];
-        }
 
         $data = [
             'title'         => 'Jadwal Produksi',
             'content'       => 'admin.production.schedule',
             'company'       => Company::where('status','1')->get(),
             'place'         => $places,
-            'machine'       => $machines,
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -77,7 +63,6 @@ class ProductionScheduleController extends Controller
             'user_id',
             'company_id',
             'place_id',
-            'machine_id',
             'post_date',
         ];
 
@@ -178,7 +163,6 @@ class ProductionScheduleController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->place->name,
-                    $val->machine->name,
                     date('d/m/y',strtotime($val->post_date)),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -215,7 +199,6 @@ class ProductionScheduleController extends Controller
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
-            'machine_id'		        => 'required',
             'post_date'		            => 'required',
             'arr_id'                    => 'required|array',
             'arr_qty'                   => 'required|array',
@@ -231,7 +214,6 @@ class ProductionScheduleController extends Controller
             'code.unique'                       => 'Kode telah dipakai',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
-            'machine_id.required' 			    => 'Mesin tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'arr_id.required'                   => 'Marketing Order Plan tidak boleh kosong.',
             'arr_id.array'                      => 'Marketing Order Plan harus array.',
@@ -302,7 +284,6 @@ class ProductionScheduleController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
-                        $query->machine_id = $request->machine_id;
                         $query->post_date = $request->post_date;
                         $query->document = $document;
                         $query->status = '1';
@@ -335,7 +316,6 @@ class ProductionScheduleController extends Controller
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
-                        'machine_id'	            => $request->machine_id,
                         'post_date'                 => $request->post_date,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/production_schedules') : NULL,
                         'status'                    => '1',

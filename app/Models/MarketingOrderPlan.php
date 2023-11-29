@@ -21,8 +21,6 @@ class MarketingOrderPlan extends Model
         'company_id',
         'place_id',
         'post_date',
-        'start_date',
-        'end_date',
         'type',
         'document',
         'status',
@@ -44,7 +42,8 @@ class MarketingOrderPlan extends Model
     public function type(){
         $type = match ($this->type) {
             '1' => 'Normal',
-            '2' => 'Susulan',
+            '2' => 'Susulan dari Sales',
+            '3' => 'Susulan dari Produksi',
             default => 'Invalid',
         };
 

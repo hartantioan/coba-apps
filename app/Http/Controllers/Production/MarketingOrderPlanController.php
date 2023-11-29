@@ -37,7 +37,7 @@ class MarketingOrderPlanController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'Marketing Order Plan',
+            'title'         => 'Marketing Order Produksi',
             'content'       => 'admin.production.plan',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
@@ -167,8 +167,6 @@ class MarketingOrderPlanController extends Controller
                     $val->company->name,
                     $val->place->name,
                     date('d/m/y',strtotime($val->post_date)),
-                    date('d/m/y',strtotime($val->start_date)),
-                    date('d/m/y',strtotime($val->end_date)),
                     $val->type(),
                     '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>',
                     $val->status(),
@@ -207,8 +205,6 @@ class MarketingOrderPlanController extends Controller
             'company_id'			    => 'required',
             'place_id'		            => 'required',
             'post_date'		            => 'required',
-            'date_start'		        => 'required',
-            'date_end'                  => 'required',
             'type'                      => 'required',
             'arr_item'                  => 'required|array',
             'arr_qty'                   => 'required|array',
@@ -222,8 +218,6 @@ class MarketingOrderPlanController extends Controller
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'date_start.required' 			    => 'Tanggal periode mulai tidak boleh kosong.',
-            'date_end.required' 			    => 'Tanggal periode akhir tidak boleh kosong.',
             'type.required'		                => 'Tipe tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong.',
             'arr_item.array'                    => 'Item harus array.',
@@ -289,8 +283,6 @@ class MarketingOrderPlanController extends Controller
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
                         $query->post_date = $request->post_date;
-                        $query->start_date = $request->date_start;
-                        $query->end_date = $request->date_end;
                         $query->type = $request->type;
                         $query->document = $document;
                         $query->status = '1';
@@ -320,8 +312,6 @@ class MarketingOrderPlanController extends Controller
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
                         'post_date'                 => $request->post_date,
-                        'start_date'                => $request->date_start,
-                        'end_date'                  => $request->date_end,
                         'type'                      => $request->type,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/marketing_order_plans') : NULL,
                         'status'                    => '1',
@@ -345,6 +335,7 @@ class MarketingOrderPlanController extends Controller
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'request_date'                  => $request->arr_request_date[$key],
                             'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
+                            'is_urgent'                     => $request->arr_urgent[$key] ? $request->arr_urgent[$key] : NULL,
                         ]);
                     }
 
@@ -392,6 +383,7 @@ class MarketingOrderPlanController extends Controller
                 'unit'                  => $row->item->sellUnit->code,
                 'request_date'          => $row->request_date,
                 'note'                  => $row->note,
+                'is_urgent'             => $row->is_urgent ? $row->is_urgent : '',
             ];
         }
 
@@ -423,7 +415,7 @@ class MarketingOrderPlanController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="17">Daftar Item</th>
+                                <th class="center-align" colspan="7">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -432,6 +424,7 @@ class MarketingOrderPlanController extends Controller
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Tgl.Request</th>
                                 <th class="center-align">Keterangan</th>
+                                <th class="center-align">Urgent</th>
                             </tr>
                         </thead><tbody>';
         
@@ -443,6 +436,7 @@ class MarketingOrderPlanController extends Controller
                 <td class="center-align">'.$row->item->sellUnit->code.'</td>
                 <td class="center-align">'.date('d/m/y',strtotime($row->request_date)).'</td>
                 <td class="">'.$row->note.'</td>
+                <td class="center-align">'.$row->isUrgent().'</td>
             </tr>';
         }
         

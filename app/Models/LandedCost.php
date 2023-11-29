@@ -20,8 +20,8 @@ class LandedCost extends Model
         'user_id',
         'supplier_id',
         'account_id',
-        'good_receipt_id',
         'company_id',
+        'delivery_cost_id',
         'post_date',
         'reference',
         'currency_id',
@@ -55,6 +55,11 @@ class LandedCost extends Model
     public function vendor()
     {
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
+    }
+
+    public function deliveryCost()
+    {
+        return $this->belongsTo('App\Models\DeliveryCost', 'delivery_cost_id', 'id')->withTrashed();
     }
 
     public function currency()

@@ -177,12 +177,6 @@
                     {{ date('d/m/y',strtotime($data->post_date)) }}
                 </div>
                 <div class="col s4">
-                    Periode Pemakaian
-                </div>
-                <div class="col s8">
-                    {{ date('d/m/y',strtotime($data->start_date)).' - '.date('d/m/y',strtotime($data->end_date)) }}
-                </div>
-                <div class="col s4">
                     Tipe
                 </div>
                 <div class="col s8">
@@ -200,6 +194,7 @@
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                         <th class="center-align">Tgl.Request</th>
+                        <th class="center-align">Urgent</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -210,9 +205,10 @@
                         <td class="center-align">{{ number_format($row->qty,3,',','.') }}</td>
                         <td class="center-align">{{ $row->item->sellUnit->code }}</td>
                         <td class="center-align">{{ date('d/m/y',strtotime($row->request_date)) }}</td>
+                        <td class="center-align">{{ $row->isUrgent() }}</td>
                     </tr>
                     <tr>
-                        <td colspan="5">Keterangan: {{ $row->note }}</td>
+                        <td colspan="6">Keterangan: {{ $row->note }}</td>
                     </tr>
                     @endforeach
                 </tbody>

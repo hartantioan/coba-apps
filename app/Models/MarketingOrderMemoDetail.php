@@ -28,6 +28,21 @@ class MarketingOrderMemoDetail extends Model
         'note',
     ];
 
+    public function isIncludeTax(){
+        $type = match ($this->is_include_tax) {
+          '0' => 'Tidak',
+          '1' => 'Termasuk',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function taxMaster()
+    {
+        return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
+    }
+
     public function marketingOrderMemo()
     {
         return $this->belongsTo('App\Models\MarketingOrderMemo', 'marketing_order_memo_id', 'id')->withTrashed();

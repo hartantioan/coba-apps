@@ -1100,6 +1100,16 @@ class MarketingOrderDeliveryProcessController extends Controller
             ];
         } else {
             $data   = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->tempTracking))->first();
+
+            $cek = $data->marketingOrderDeliveryProcessTrack()->where('status','2')->count();
+
+            if($cek == 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf Surat Jalan nomor '.$data->code.' status tracking belum dirubah ke BARANG TELAH DIKIRIMKAN.',
+                ]);
+            }
+
             if($data){
                 if($request->has('document')) {
                     if($data->document){

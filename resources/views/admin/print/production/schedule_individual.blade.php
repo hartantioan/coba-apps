@@ -237,17 +237,6 @@
                                             {{ $data->place->name }}
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td style="vertical-align: top;">
-                                            Mesin
-                                        </td>
-                                        <td width="1%" style="vertical-align: top;">
-                                            :
-                                        </td>
-                                        <td style="vertical-align: top;">
-                                            {{ $data->machine->name }}
-                                        </td>
-                                    </tr>
                                 </table>
                             </td>
                             <td width="50%" class="left-align">

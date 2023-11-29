@@ -231,7 +231,72 @@ class OutgoingPaymentController extends Controller
     public function rowDetail(Request $request){
         $data   = OutgoingPayment::where('code',CustomHelper::decrypt($request->id))->first();
         
-        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+        $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="7">Daftar Pembayaran</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Referensi</th>
+                                <th class="center-align">Tipe</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Dist.Biaya</th>
+                                <th class="center-align">Coa</th>
+                                <th class="center-align">Bayar</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        foreach($data->paymentRequest->paymentRequestDetail as $key => $row){
+            
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->lookable->code.'</td>
+                <td class="center-align">'.$row->type().'</td>
+                <td class="center-align">'.$row->note.'</td>
+                <td class="center-align">'.($row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '-').'</td>
+                <td class="center-align">'.$row->coa->code.' - '.$row->coa->name.'</td>
+                <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+            </tr>';
+        }
+        
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="6">Pembayaran dengan Piutang Karyawan</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">Kode OP</th>
+                                <th class="center-align">Kode PR</th>
+                                <th class="center-align">Partner Bisnis</th>
+                                <th class="center-align">Tgl.Post</th>
+                                <th class="center-align">Coa Kas/Bank</th>
+                                <th class="center-align">Nominal</th>
+                            </tr>
+                        </thead><tbody>';
+        
+        if($data->paymentRequest->paymentRequestCross()->exists()){
+            foreach($data->paymentRequest->paymentRequestCross as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.$row->lookable->code.'</td>
+                    <td class="center-align">'.$row->lookable->paymentRequest->code.'</td>
+                    <td class="center-align">'.$row->lookable->account->name.'</td>
+                    <td class="center-align">'.date('d/m/y',strtotime($row->lookable->post_date)).'</td>
+                    <td class="center-align">'.$row->lookable->coaSource->name.'</td>
+                    <td class="right-align">'.number_format($row->nominal,3,',','.').'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="6">Data tidak ditemukan.</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="4">Approval</th>

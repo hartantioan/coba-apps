@@ -534,7 +534,7 @@ class LandedCostController extends Controller
         $validation = Validator::make($request->all(), [
             'code'			            => $request->temp ? ['required', Rule::unique('landed_costs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:landed_costs,code',
             'company_id' 			    => 'required',
-			'vendor_id'                 => 'required',
+			'delivery_cost_id'          => 'required',
             'post_date'                 => 'required',
             'currency_id'               => 'required',
             'currency_rate'             => 'required',
@@ -550,7 +550,7 @@ class LandedCostController extends Controller
             'code.min'                          => 'Kode harus minimal 18 karakter.',
             'code.unique'                       => 'Kode telah dipakai',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-			'vendor_id.required'                => 'Vendor/ekspedisi tidak boleh kosong',
+			'delivery_cost_id.required'         => 'Biaya Pengiriman tidak boleh kosong',
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'total.required'                    => 'Total tagihan tidak boleh kosong.',
@@ -571,6 +571,8 @@ class LandedCostController extends Controller
             ];
         } else {
             
+            $deliverycost = DeliveryCost::find($request->delivery_cost_id);
+
             $total = str_replace(',','.',str_replace('.','',$request->total));
             $tax = str_replace(',','.',str_replace('.','',$request->tax));
             $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
@@ -628,8 +630,9 @@ class LandedCostController extends Controller
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->supplier_id = $request->supplier_id ? $request->supplier_id : NULL;
-                        $query->account_id = $request->vendor_id;
+                        $query->account_id = $deliverycost->account_id;
                         $query->company_id = $request->company_id;
+                        $query->delivery_cost_id = $request->delivery_cost_id;
                         $query->post_date = $request->post_date;
                         $query->reference = $request->reference;
                         $query->currency_id = $request->currency_id;
@@ -666,8 +669,9 @@ class LandedCostController extends Controller
                         'code'			            => $request->code,
                         'user_id'		            => session('bo_id'),
                         'supplier_id'               => $request->supplier_id ? $request->supplier_id : NULL,
-                        'account_id'                => $request->vendor_id,
+                        'account_id'                => $deliverycost->account_id,
                         'company_id'                => $request->company_id,
+                        'delivery_cost_id'          => $request->delivery_cost_id,
                         'post_date'                 => $request->post_date,
                         'reference'                 => $request->reference,
                         'currency_id'               => $request->currency_id,
@@ -899,7 +903,7 @@ class LandedCostController extends Controller
     public function show(Request $request){
         $lc = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
         $lc['code_place_id'] = substr($lc->code,7,2);
-        $lc['vendor_name'] = $lc->vendor->name;
+        $lc['delivery_cost_name'] = $lc->deliveryCost->account->name.' Dari '.$lc->deliveryCost->fromCity->name.' - '.$lc->deliveryCost->fromSubdistrict->name.' -- Ke -- '.$lc->deliveryCost->toCity->name.' - '.$lc->deliveryCost->toSubdistrict->name.' Tonase : '.$lc->deliveryCost->tonnage.' Nominal : '.number_format($lc->deliveryCost->nominal,2,',','.');
         $lc['supplier_name'] = $lc->supplier()->exists() ? $lc->supplier->name : '';
         $lc['total'] = number_format($lc->total,2,',','.');
         $lc['tax'] = number_format($lc->tax,2,',','.');

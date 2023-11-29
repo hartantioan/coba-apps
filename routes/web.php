@@ -298,6 +298,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('material_request_pr', [Select2Controller::class, 'materialRequestPR']);
                 Route::get('material_request_gi', [Select2Controller::class, 'materialRequestGI']);
                 Route::get('marketing_order_delivery_process_po', [Select2Controller::class, 'marketingOrderDeliveryProcessPO']);
+                Route::get('delivery_cost', [Select2Controller::class, 'deliveryCost']);
             });
 
             Route::prefix('menu')->group(function () {
@@ -351,6 +352,13 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[UserController::class, 'index']);
                         Route::get('datatable',[UserController::class, 'datatable']);
                         Route::get('row_detail',[UserController::class, 'rowDetail']);
+                        Route::prefix('parent_company')->group(function () {
+                            Route::get('{id}',[UserController::class, 'companyIndex']);
+                            Route::get('{id}/datatable',[UserController::class, 'companyDatatable']);
+                            Route::post('{id}/show', [UserController::class, 'showCompany']);
+                            Route::post('{id}/create',[UserController::class, 'createCompany'])->middleware('operation.access:user,update');
+                            Route::post('{id}/destroy', [UserController::class, 'destroyCompany'])->middleware('operation.access:user,delete');
+                        });
                         Route::post('show', [UserController::class, 'show']);
                         Route::post('get_access', [UserController::class, 'getAccess']);
                         Route::post('get_files', [UserController::class, 'getFiles']);
@@ -1578,7 +1586,7 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('production')->middleware('direct.access')->group(function () {
-                Route::prefix('marketing_order_plan')->middleware('operation.access:marketing_order_plan,view')->middleware('lockacc')->group(function () {
+                Route::prefix('marketing_order_production')->middleware('operation.access:marketing_order_production,view')->middleware('lockacc')->group(function () {
                     Route::get('/',[MarketingOrderPlanController::class, 'index']);
                     Route::get('datatable',[MarketingOrderPlanController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderPlanController::class, 'rowDetail']);
@@ -1588,11 +1596,11 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[MarketingOrderPlanController::class, 'printByRange']);
                     Route::get('export',[MarketingOrderPlanController::class, 'export']);
                     Route::get('viewstructuretree',[MarketingOrderPlanController::class, 'viewStructureTree']);
-                    Route::post('create',[MarketingOrderPlanController::class, 'create'])->middleware('operation.access:marketing_order_plan,update');
+                    Route::post('create',[MarketingOrderPlanController::class, 'create'])->middleware('operation.access:marketing_order_production,update');
                     Route::get('approval/{id}',[MarketingOrderPlanController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[MarketingOrderPlanController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::post('void_status', [MarketingOrderPlanController::class, 'voidStatus'])->middleware('operation.access:marketing_order_plan,void');
-                    Route::post('destroy', [MarketingOrderPlanController::class, 'destroy'])->middleware('operation.access:marketing_order_plan,delete');
+                    Route::post('void_status', [MarketingOrderPlanController::class, 'voidStatus'])->middleware('operation.access:marketing_order_production,void');
+                    Route::post('destroy', [MarketingOrderPlanController::class, 'destroy'])->middleware('operation.access:marketing_order_production,delete');
                 });
 
                 Route::prefix('production_schedule')->middleware('operation.access:production_schedule,view')->middleware('lockacc')->group(function () {

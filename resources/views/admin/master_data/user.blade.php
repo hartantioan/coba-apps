@@ -53,9 +53,9 @@
                             <i class="material-icons right">view_list</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal4">
-                            <i class="material-icons hide-on-med-and-up">file_upload</i>
+                            <i class="material-icons hide-on-med-and-up">file_download</i>
                             <span class="hide-on-small-onl">Import</span>
-                            <i class="material-icons right">file_upload</i>
+                            <i class="material-icons right">file_download</i>
                         </a>
                     </div>
                 </div>

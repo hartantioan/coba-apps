@@ -20,9 +20,9 @@
                     </div>
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right modal-trigger" href="#modal2">
-                            <i class="material-icons hide-on-med-and-up">file_upload</i>
+                            <i class="material-icons hide-on-med-and-up">file_download</i>
                             <span class="hide-on-small-onl">Import</span>
-                            <i class="material-icons right">file_upload</i>
+                            <i class="material-icons right">file_download</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>

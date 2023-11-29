@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportPlace;
 use App\Models\Company;
+use App\Models\Region;
 
 class PlaceController extends Controller
 {
@@ -26,7 +27,8 @@ class PlaceController extends Controller
         $data = [
             'title'     => 'Plant',
             'content'   => 'admin.master_data.place',
-            'company'   => Company::all()
+            'company'   => Company::all(),
+            'province'  => Region::whereRaw("LENGTH(code) = 2")->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -40,6 +42,11 @@ class PlaceController extends Controller
             'address',
             'company_id',
             'type',
+            'province_id',
+            'city_id',
+            'district_id',
+            'subdistrict_id',
+            'capacity',
         ];
 
         $start  = $request->start;
@@ -114,7 +121,9 @@ class PlaceController extends Controller
                     $val->type(),
                     $val->province->name,
                     $val->city->name,
+                    $val->district->name,
                     $val->subdistrict->name,
+                    number_format($val->capacity,3,',','.'),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -148,7 +157,9 @@ class PlaceController extends Controller
             'type'              => 'required',
             'province_id'       => 'required',
             'city_id'           => 'required',
+            'district_id'       => 'required',
             'subdistrict_id'    => 'required',
+            'capacity'          => 'required',
         ], [
             'code.required'             => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah terpakai.',
@@ -160,7 +171,9 @@ class PlaceController extends Controller
             'type.required'             => 'Tipe tidak boleh kosong.',
             'province_id.required'      => 'Provinsi tidak boleh kosong.',
             'city_id.required'          => 'Kota tidak boleh kosong.',
-            'subdistrict_id.required'   => 'Kecamatan tidak boleh kosong.',
+            'district_id.required'      => 'Kecamatan tidak boleh kosong.',
+            'subdistrict_id.required'   => 'Kelurahan tidak boleh kosong.',
+            'capacity.required'         => 'Kapasitas satuan terkecil tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -180,7 +193,9 @@ class PlaceController extends Controller
                     $query->type	        = $request->type;
                     $query->province_id     = $request->province_id;
                     $query->city_id         = $request->city_id;
+                    $query->district_id     = $request->district_id;
                     $query->subdistrict_id  = $request->subdistrict_id;
+                    $query->capacity        = str_replace(',','.',str_replace('.','',$request->capacity));
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -198,7 +213,9 @@ class PlaceController extends Controller
                         'type'          => $request->type,
                         'province_id'   => $request->province_id,
                         'city_id'       => $request->city_id,
+                        'district_id'   => $request->district_id,
                         'subdistrict_id'=> $request->subdistrict_id,
+                        'capacity'      => str_replace(',','.',str_replace('.','',$request->capacity)),
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
@@ -232,9 +249,11 @@ class PlaceController extends Controller
 
     public function show(Request $request){
         $plant = Place::find($request->id);
-        $plant['province_name'] = $plant->province->name;
-        $plant['city_name'] = $plant->city->name;
-        $plant['subdistrict_list'] = $plant->city->getSubdistrict();
+        $plant['province_name'] = $plant->province->code.' - '.$plant->province->name;
+        $plant['city_name'] = $plant->city->code.' - '.$plant->city->name;
+        $plant['district_name'] = $plant->district->code.' - '.$plant->district->name;
+        $plant['subdistrict_name'] = $plant->subdistrict->code.' - '.$plant->subdistrict->name;
+        $plant['capacity'] = number_format($plant->capacity,3,',','.');
         				
 		return response()->json($plant);
     }

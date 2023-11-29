@@ -84,12 +84,22 @@ class PaymentRequestDetail extends Model
         }
     }
 
+    public function marketingOrderMemo()
+    {
+        if($this->lookable_type == 'marketing_order_memos'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function type(){
         $type = match ($this->lookable_type) {
             'fund_requests'             => 'Permohonan Dana',
             'purchase_invoices'         => 'A/P Invoice',
             'purchase_down_payments'    => 'AP Down Payment',
             'coas'                      => 'Coa Biaya',
+            'marketing_order_memos'     => 'AR Credit Memo',
             default                     => 'Belum ditentukan',
           };
   

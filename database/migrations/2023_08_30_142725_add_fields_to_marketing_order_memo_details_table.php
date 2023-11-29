@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('marketing_order_memo_details', function (Blueprint $table) {
             $table->string('lookable_type',155)->after('marketing_order_memo_id')->nullable();
             $table->bigInteger('lookable_id')->after('lookable_type')->nullable();
-            $table->char('is_include_tax')->after('lookable_id')->nullable();
+            $table->char('is_include_tax',1)->after('lookable_id')->nullable();
             $table->double('percent_tax')->after('is_include_tax')->nullable();
             $table->bigInteger('tax_id')->after('percent_tax')->nullable();
             $table->double('total')->after('tax_id')->nullable();

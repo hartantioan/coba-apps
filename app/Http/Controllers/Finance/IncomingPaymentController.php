@@ -155,7 +155,21 @@ class IncomingPaymentController extends Controller
                         'type'                  => $row->getTable(),
                         'code'                  => $row->code,
                         'post_date'             => date('d/m/y',strtotime($row->post_date)),
-                        'grandtotal'            => number_format($row->balance,2,',','.'),
+                        'grandtotal'            => number_format($row->grandtotal,2,',','.'),
+                        'memo'                  => number_format($row->totalUsed(),2,',','.'),
+                        'balance'               => number_format($row->balance(),2,',','.'),
+                    ];
+                }
+            }
+
+            foreach($data->marketingOrderMemo()->where('type','3')->get() as $row){
+                if(!$row->used()->exists() && $row->balance() > 0){
+                    $details[] = [
+                        'id'                    => $row->id,
+                        'type'                  => $row->getTable(),
+                        'code'                  => $row->code,
+                        'post_date'             => date('d/m/y',strtotime($row->post_date)),
+                        'grandtotal'            => number_format($row->grandtotal,2,',','.'),
                         'memo'                  => number_format($row->totalUsed(),2,',','.'),
                         'balance'               => number_format($row->balance(),2,',','.'),
                     ];
@@ -264,8 +278,8 @@ class IncomingPaymentController extends Controller
                                 'post_date'             => date('d/m/y',strtotime($moi->post_date)),
                                 'coa_name'              => '-',
                                 'admin'                 => number_format(0,2,',','.'),
-                                'total'                 => '-'.number_format($moi->balance,2,',','.'),
-                                'grandtotal'            => '-'.number_format($moi->balance,2,',','.'),
+                                'total'                 => '-'.number_format($moi->grandtotal,2,',','.'),
+                                'grandtotal'            => '-'.number_format($moi->grandtotal,2,',','.'),
                                 'used'                  => '-'.number_format($moi->totalUsed(),2,',','.'),
                                 'balance'               => '-'.number_format($balance,2,',','.'),
                                 'coa_id'                => 0,
@@ -687,7 +701,7 @@ class IncomingPaymentController extends Controller
                 <td class="right-align">'.number_format($row->total,3,',','.').'</td>
                 <td class="right-align">'.number_format($row->rounding,3,',','.').'</td>
                 <td class="right-align">'.number_format($row->subtotal,3,',','.').'</td>
-                <td class="">'.$row->note.' - '.($row->marketingOrderInvoice()->exists() ? 'Ya' : 'Tidak').'</td>
+                <td class="">'.$row->note.'</td>
             </tr>';
         }
         

@@ -14,16 +14,13 @@
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(3))) }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(4))) }}
+                            <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(4))) }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ Str::title(str_replace('_',' ',Request::segment(5))) }}
                             </li>
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
-                            <i class="material-icons hide-on-med-and-up">file_download</i>
-                            <span class="hide-on-small-onl">Import</span>
-                            <i class="material-icons right">file_download</i>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -34,21 +31,20 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <ul class="collapsible collapsible-accordion">
-                                <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
-                                    <div class="collapsible-body">
-                                        <div class="row">
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_place" style="font-size:1rem;">Plant :</label>
-                                                <div class="input-field">
-                                                    <select class="browser-default" id="filter_place" name="filter_place" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
-                                                </div>
-                                            </div>
+                            <div class="card-panel">
+                                <div class="row">
+                                    <div class="col s12 ">
+                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
+                                            <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                <option value="">Semua</option>
+                                                <option value="1">Aktif</option>
+                                                <option value="2">Non-Aktif</option>
+                                            </select>
                                         </div>
                                     </div>
-                                </li>
-                            </ul>
+                                </div>
+                            </div>
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">List Data</h4>
@@ -64,10 +60,12 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Pengguna</th>
-                                                        <th>Item</th>
-                                                        <th>Plant</th>
-                                                        <th>Nominal</th>
+                                                        <th>Code</th>
+                                                        <th>Nama Perusahaan</th>
+                                                        <th>Tanggal</th>
+                                                        <th>Nomor Dokumen</th>
+                                                        <th>Keterangan</th>
+                                                        <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -96,56 +94,37 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s6">
+                        <div class="input-field col s3">
                             <input type="hidden" id="temp" name="temp">
-                            <select class="browser-default" id="item_id" name="item_id"></select>
-                            <label class="active" for="item_id">Item</label>
+                            <select class="browser-default" id="vendor_id" name="vendor_id"></select>
+                            <label class="active" for="name">vendor_id</label>
                         </div>
-                        <div class="input-field col s6">
-                            <select class="browser-default" id="place_id" name="place_id"></select>
-                            <label class="active" for="place_id">Plant</label>
+                        <div class="input-field col s3">
+                            <input id="date" name="date" type="date" placeholder="Tanggal">
+                            <label class="active" for="date">Tanggal</label>
                         </div>
-                        <div class="input-field col s6">
-                            <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this)">
-                            <label class="active" for="nominal">Nominal</label>
+                        <div class="input-field col s3">
+                            <input id="document_no" name="document_no" type="text" placeholder="Nomor Dokumen">
+                            <label class="active" for="document_no">Nomor Dokumen</label>
+                        </div>
+                        <div class="input-field col s3">
+                            <input id="note" name="note" type="text" placeholder="Keterangan">
+                            <label class="active" for="note">Keterangan</label>
+                        </div>
+                        <div class="input-field col s3">
+                            <div class="switch mb-1">
+                                <label for="order">Status</label>
+                                <label>
+                                    Non-Active
+                                    <input checked type="checkbox" id="status" name="status" value="1">
+                                    <span class="lever"></span>
+                                    Active
+                                </label>
+                            </div>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
-    </div>
-</div>
-
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:70%;">
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12">
-                <h4>Import Excel</h4>
-                <div class="col s12">
-                    <div id="validation_alertImport" style="display:none;"></div>
-                </div>
-                <form class="row" action="{{ Request::url() }}/import" method="POST" enctype="multipart/form-data" id="form_dataimport">
-                    @csrf
-                    <div class="file-field input-field col m6 s12">
-                        <div class="btn">
-                            <span>Dokumen Excel</span>
-                            <input type="file" class="form-control-file" id="fileExcel" name="file">
-                        </div>
-                        <div class="file-path-wrapper">
-                            <input class="file-path validate" type="text">
-                        </div>
-                    </div>
-                    <div class="input-field col m6 s12">
-                        Download format disini : <a href="{{ asset(Storage::url('format_imports/format_bottom_price.xlsx')) }}" target="_blank">File</a>
-                    </div>
-                    <div class="input-field col m12 s12">
-                        <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
                     </div>
                 </form>
             </div>
@@ -181,137 +160,13 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#place_id,#item_id').empty();
                 M.updateTextFields();
+                $('#vendor_id').empty();
             }
         });
 
-        $('#modal2').modal({
-            dismissible: false,
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#form_dataimport')[0].reset();
-            }
-        });
-
-        $('#form_dataimport').submit(function(event) {
-            event.preventDefault();
-
-            var formData = new FormData(this);
-
-            $.ajax({
-                url: $(this).attr('action'),
-                type: $(this).attr('method'),
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    $('#validation_alertImport').hide();
-                    $('#validation_alertImport').html('');
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    if(response.status == 200) {
-                        successImport();
-                        M.toast({
-                            html: response.message
-                        });
-                    } else if(response.status == 422) {
-                        $('#validation_alertImport').show();
-                        $('.modal-content').scrollTop(0);
-
-                        $.each(response.error, function(i, val) {
-                            
-                            $('#validation_alertImport').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p> Line <b>` + val.row + `</b> in column <b>` + val.attribute + `</b> </p>
-                                            <p> `+val.errors[0]+`</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                        });
-                    }else if(response.status == 432) {
-                        $('#validation_alertImport').show();
-                        $('.modal-content').scrollTop(0);
-
-                        $.each(response.error, function(i, val) {
-                            $('#validation_alertImport').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p>` +val+`</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                        });
-                    } else {
-                        M.toast({
-                            html: response.message
-                        });
-                    }
-                    loadingClose('.modal-content');
-                },
-                error: function(response) {
-                    var errors = response.responseJSON.errors;
-                    var errorMessage = '';
-                    if(response.status == 422) {
-                        $('#validation_alertImport').show();
-                        $('.modal-content').scrollTop(0);
-                        
-                        swal({
-                            title: 'Ups! Validation',
-                            text: 'Check your form.',
-                            icon: 'warning'
-                        });
-
-                        $.each(errors, function(index, error) {
-                        var message = '';
-
-                        $.each(error.errors, function(index, value) {
-                            message += value + '\n';
-                        });
-
-                        errorMessage += errors.file;
-                    });
-
-                    $('#validation_alertImport').html(`
-                        <div class="card-alert card red">
-                            <div class="card-content white-text">
-                                <p>` + errorMessage + `</p>
-                            </div>
-                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                    `).show();
-
-                    }
-                    
-                   
-                }
-            });
-
-        });
-
-        select2ServerSide('#filter_place,#place_id', '{{ url("admin/select2/place") }}');
-        select2ServerSide('#item_id', '{{ url("admin/select2/sales_item") }}');
+        select2ServerSide('#vendor_id', '{{ url("admin/select2/supplier_vendor") }}');
     });
-
-    function successImport(){
-        loadDataTable();
-        $('#modal2').modal('close');
-    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -328,7 +183,8 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    'place_id[]' : $('#filter_place').val()
+                    status : $('#filter_status').val(),
+                    employee : '{{ $code }}',
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -346,11 +202,13 @@
                 }
             },
             columns: [
-                { name: 'id', searchable: false, className: 'center-align' },
-                { name: 'user_id', className: 'center-align' },
-                { name: 'item_id', className: 'center-align' },
-                { name: 'place_id', className: 'center-align' },
-                { name: 'nominal', className: 'right-align' },
+                { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'code', className: 'center-align' },
+                { name: 'vendor', className: 'center-align' },
+                { name: 'post_date', className: 'center-align' },
+                { name: 'document_no', className: '' },
+                { name: 'note', className: '' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -359,13 +217,14 @@
             ]
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-        
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
     function save(){
 			
         var formData = new FormData($('#form_data')[0]);
+
+        formData.append('user_code','{{ $code }}');
         
         $.ajax({
             url: '{{ Request::url() }}/create',
@@ -455,15 +314,18 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#nominal').val(response.nominal);
-                $('#item_id').empty().append(`
-                    <option value="` + response.item_id + `">` + response.item_name + `</option>
+                $('#vendor_id').empty().append(`
+                    <option value="` + response.vendor_id + `">` + response.vendor_name + `</option>
                 `);
-                $('#place_id').empty().append(`
-                    <option value="` + response.place_id + `">` + response.place_name + `</option>
-                `);
+                $('#date').val(response.post_date);
+                $('#document_no').val(response.document_no);
+                $('#note').val(response.note);
+                if(response.status == '1'){
+                    $('#status').prop( "checked", true);
+                }else{
+                    $('#status').prop( "checked", false);
+                }
                 $('.modal-content').scrollTop(0);
-                $('#nominal').focus();
                 M.updateTextFields();
             },
             error: function() {

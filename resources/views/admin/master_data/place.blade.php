@@ -81,6 +81,8 @@
                                                         <th>Provinsi</th>
                                                         <th>Kota</th>
                                                         <th>Kecamatan</th>
+                                                        <th>Kelurahan</th>
+                                                        <th>Kapasitas</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -139,18 +141,29 @@
                             <label class="active" for="type">Tipe</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="browser-default" id="province_id" name="province_id"></select>
+                            <select class="browser-default select2" id="province_id" name="province_id">
+                                <option value="">--Silahkan pilih--</option>
+                                @foreach($province as $row)
+                                    <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                                @endforeach
+                            </select>
                             <label class="active" for="province_id">Provinsi</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="browser-default" id="city_id" name="city_id" onchange="getSubdistrict()"></select>
+                            <select class="browser-default" id="city_id" name="city_id"></select>
                             <label class="active" for="city_id">Kota/Kabupaten</label>
                         </div>
                         <div class="input-field col s6">
-                            <select class="browser-default select2" id="subdistrict_id" name="subdistrict_id">
-                                <option value="">--Pilih ya--</option>
-                            </select>
-                            <label class="active" for="subdistrict_id">Kecamatan</label>
+                            <select class="browser-default" id="district_id" name="district_id"></select>
+                            <label class="active" for="district_id">Kecamatan</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <select class="browser-default" id="subdistrict_id" name="subdistrict_id"></select>
+                            <label class="active" for="subdistrict_id">Kelurahan</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="capacity" name="capacity" type="text" placeholder="Kapasitas" onkeyup="formatRupiah(this);" value="0,000">
+                            <label class="active" for="capacity">Kapasitas satuan terkecil (M<sup>2</sup>)</label>
                         </div>
                         <div class="input-field col s6">
                             <div class="switch mb-1">
@@ -203,13 +216,9 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#province_id').empty();
-                $('#city_id').empty();
+                $('#province_id').val('').trigger('change');
+                $('#city_id,#district_id,#subdistrict_id').empty();
                 M.updateTextFields();
-                $('#city_id').empty();
-                $('#subdistrict_id').empty().append(`
-                    <option value="">--Pilih ya--</option>
-                `);
             }
         });
 
@@ -218,8 +227,79 @@
             width: '100%',
         });
 
-        select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
-        select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
+        $('#city_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/city_by_province") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        province: $('#province_id').select2().find(":selected").data("code"),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+        $('#district_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/district_by_city") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        city: $('#city_id').select2('data')[0].code,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        $('#subdistrict_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/subdistrict_by_district") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        district: $('#district_id').select2('data')[0].code,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     });
 
     function loadDataTable() {
@@ -264,7 +344,9 @@
                 { name: 'type', className: 'center-align' },
                 { name: 'province', className: 'center-align' },
                 { name: 'city', className: 'center-align' },
+                { name: 'district', className: 'center-align' },
                 { name: 'subdistrict', className: 'center-align' },
+                { name: 'capacity', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -302,21 +384,6 @@
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
-    
-    function getSubdistrict(){
-        if($('#city_id').val()){
-            $('#subdistrict_id').empty();
-            $.each($('#city_id').select2('data')[0].subdistrict, function(i, value) {
-                $('#subdistrict_id').append(`
-                    <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
-                `);
-            });
-        }else{
-            $('#subdistrict_id').empty().append(`
-                <option value="">--Pilih ya--</option>
-            `);
-        }
-    }
 
     function save(){
 			
@@ -416,21 +483,17 @@
                 $("#address").val(response.address);
                 $("#company_id").val(response.company_id).formSelect();
                 $("#type").val(response.type).formSelect();
-                $('#province_id').append(`
-                    <option value="` + response.province_id + `">` + response.province_name + `</option>
-                `);
-                $('#city_id').append(`
+                $('#province_id').val(response.province_id).trigger('change');
+                $('#city_id').empty().append(`
                     <option value="` + response.city_id + `">` + response.city_name + `</option>
                 `);
-
-                $('#subdistrict_id').empty();
-                $.each(response.subdistrict_list, function(i, value) {
-                    $('#subdistrict_id').append(`
-                        <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
-                    `);
-                });
-
-                $('#subdistrict_id').val(response.subdistrict_id).trigger('change');
+                $('#district_id').empty().append(`
+                    <option value="` + response.district_id + `">` + response.district_name + `</option>
+                `);
+                $('#subdistrict_id').empty().append(`
+                    <option value="` + response.subdistrict_id + `">` + response.subdistrict_name + `</option>
+                `);
+                $('#capacity').val(response.capacity);
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

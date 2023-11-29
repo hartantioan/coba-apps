@@ -25,9 +25,12 @@ class ExportPlace implements FromCollection, WithTitle, WithHeadings, WithCustom
         'KODE', 
         'NAMA',
         'ALAMAT',
+        'TIPE',
         'PROVINSI',
         'KOTA',
         'KECAMATAN',
+        'KELURAHAN',
+        'KAPASITAS',
     ];
 
     public function collection()
@@ -41,6 +44,8 @@ class ExportPlace implements FromCollection, WithTitle, WithHeadings, WithCustom
                         ->orWhereHas('province', function ($query) {
                             $query->where('name', 'like', "%$this->search%");
                         })->orWhereHas('city', function ($query) {
+                            $query->where('name', 'like', "%$this->search%");
+                        })->orWhereHas('district', function ($query) {
                             $query->where('name', 'like', "%$this->search%");
                         })->orWhereHas('subdistrict', function ($query) {
                             $query->where('name', 'like', "%$this->search%");
@@ -60,11 +65,12 @@ class ExportPlace implements FromCollection, WithTitle, WithHeadings, WithCustom
                 'code' => $row->code,
                 'name' => $row->name,
                 'address' => $row->address,
-                'branch' => $row->branch->name,
                 'type' => $row->type(),
                 'province' => $row->province->name,
                 'city' => $row->city->name,
-                'subdistrict' => $row->subdistrict->name
+                'district' => $row->district->name,
+                'subdistrict' => $row->subdistrict->name,
+                'capacity' => $row->capacity
             ];
         }
 

@@ -20,7 +20,6 @@ class ProductionSchedule extends Model
         'user_id',
         'company_id',
         'place_id',
-        'machine_id',
         'post_date',
         'document',
         'status',
@@ -47,11 +46,6 @@ class ProductionSchedule extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function machine()
-    {
-        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
     }
 
     public function productionScheduleDetail()
